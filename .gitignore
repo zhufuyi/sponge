@@ -4,6 +4,7 @@
 *.dll
 *.so
 *.dylib
+cmd/sponge/sponge
 
 # Test binary, built with `go test -c`
 *.test
@@ -12,4 +13,10 @@
 *.out
 
 # Dependency directories (remove the comment below to include it)
-# vendor/
+vendor/
+
+# idea
+.idea
+*.iml
+*.ipr
+*.iws

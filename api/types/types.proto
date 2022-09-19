@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package types;
+
+option go_package = "github.com/zhufuyi/sponge/api/types;types";
+
+message Column {
+  string  name=1;  // 列名
+  string  exp=2;   // 表达式，值为空时默认为=，有=、!=、>、>=、<、<=、like七种类型
+  string value=3; // 列值
+  string  logic=4; // 逻辑类型，值为空时默认为and，有&(and)、||(or)两种类型
+}
+
+message Params {
+  int32 page = 1; // 页码，从0开始
+  int32 limit = 2; // 每页行数
+  string sort = 3; // 排序字段，多列排序用逗号分隔
+  repeated Column columns = 4; // 查询条件
+}

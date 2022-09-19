@@ -1,0 +1,254 @@
+definitions:
+  handler.Column:
+    properties:
+      exp:
+        description: 表达式，值为空时默认为=，有=、!=、>、>=、<、<=、like七种类型
+        type: string
+      logic:
+        description: 逻辑类型，值为空时默认为and，有&(and)、||(or)两种类型
+        type: string
+      name:
+        description: 列名
+        type: string
+      value:
+        description: 列值
+    type: object
+  handler.CreateUserExampleRequest:
+    properties:
+      age:
+        description: 年龄
+        type: integer
+      avatar:
+        description: 头像
+        minLength: 5
+        type: string
+      email:
+        description: 邮件
+        type: string
+      gender:
+        description: 性别，1:男，2:女
+        maximum: 2
+        minimum: 0
+        type: integer
+      name:
+        description: 名称
+        minLength: 2
+        type: string
+      password:
+        description: 密码
+        type: string
+      phone:
+        description: 手机号码，必须在前加'+86'
+        type: string
+    type: object
+  handler.Params:
+    properties:
+      columns:
+        description: 列查询条件
+        items:
+          $ref: '#/definitions/handler.Column'
+        type: array
+      page:
+        description: 页码
+        minimum: 0
+        type: integer
+      size:
+        description: 每页行数
+        type: integer
+      sort:
+        description: 排序字段，默认值为-id，字段前面有-号表示倒序，否则升序，多个字段用逗号分隔
+        type: string
+    type: object
+  handler.Result:
+    properties:
+      code:
+        description: 返回码
+        type: integer
+      data:
+        description: 返回数据
+      msg:
+        description: 返回信息说明
+        type: string
+    type: object
+  handler.UpdateUserExampleByIDRequest:
+    properties:
+      age:
+        description: 年龄
+        type: integer
+      avatar:
+        description: 头像
+        type: string
+      email:
+        description: 邮件
+        type: string
+      gender:
+        description: 性别，1:男，2:女
+        type: integer
+      id:
+        description: id
+        type: integer
+      name:
+        description: 名称
+        type: string
+      password:
+        description: 密码
+        type: string
+      phone:
+        description: 手机号码，必须在前加'+86'
+        type: string
+    type: object
+  handlerfunc.checkHealthResponse:
+    properties:
+      hostname:
+        type: string
+      status:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: http server api docs
+  title: sponge api docs
+  version: v0.0.0
+paths:
+  /api/v1/userExample:
+    post:
+      consumes:
+      - application/json
+      description: 提交信息创建userExample
+      parameters:
+      - description: userExample信息
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/handler.CreateUserExampleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.Result'
+      summary: 创建userExample
+      tags:
+      - userExample
+  /api/v1/userExample/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 根据id删除userExample
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.Result'
+      summary: 删除userExample
+      tags:
+      - userExample
+    get:
+      consumes:
+      - application/json
+      description: 根据id获取userExample详情
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.Result'
+      summary: 获取userExample详情
+      tags:
+      - userExample
+    put:
+      consumes:
+      - application/json
+      description: 根据id更新userExample信息
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: userExample信息
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/handler.UpdateUserExampleByIDRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.Result'
+      summary: 更新userExample信息
+      tags:
+      - userExample
+  /api/v1/userExamples:
+    post:
+      consumes:
+      - application/json
+      description: 使用post请求获取userExample列表
+      parameters:
+      - description: 查询条件
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/handler.Params'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.Result'
+      summary: 获取userExample列表
+      tags:
+      - userExample
+  /health:
+    get:
+      consumes:
+      - application/json
+      description: check health
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlerfunc.checkHealthResponse'
+      summary: check health
+      tags:
+      - system
+  /ping:
+    get:
+      consumes:
+      - application/json
+      description: ping
+      produces:
+      - application/json
+      responses: {}
+      summary: ping
+      tags:
+      - system
+schemes:
+- http
+- https
+swagger: "2.0"
