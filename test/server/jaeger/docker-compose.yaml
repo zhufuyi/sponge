@@ -1,0 +1,51 @@
+version: '3'
+services:
+  jaeger-collector:
+    image: jaegertracing/jaeger-collector:1.34
+    container_name: jaeger-collector
+    restart: always
+    environment:
+      - SPAN_STORAGE_TYPE=elasticsearch
+      - ES_SERVER_URLS=${ES_URLS}
+      - ES_USERNAME=${ES_USERNAME}
+      - ES_PASSWORD=${ES_PASSWORD}
+      - LOG_LEVEL=debug
+    networks:
+      - jaeger-net
+
+  jaeger-agent:
+    image: jaegertracing/jaeger-agent:1.34
+    container_name: jaeger-agent
+    restart: always
+    command: "--reporter.grpc.host-port=jaeger-collector:14250"
+    environment:
+      - LOG_LEVEL=debug
+    ports:
+      - "5775:5775/udp"
+      - "5778:5778"
+      - "6831:6831/udp"
+      - "6832:6832/udp"
+    networks:
+      - jaeger-net
+    depends_on:
+      - jaeger-collector
+
+  jaeger-query:
+    image: jaegertracing/jaeger-query:1.34
+    container_name: jaeger-query
+    restart: always
+    environment:
+      - SPAN_STORAGE_TYPE=elasticsearch
+      - ES_SERVER_URLS=${ES_URLS}
+      - ES_USERNAME=${ES_USERNAME}
+      - ES_PASSWORD=${ES_PASSWORD}
+      - LOG_LEVEL=debug
+    ports:
+      - 16686:16686
+    networks:
+      - jaeger-net
+
+networks: 
+  jaeger-net:
+    driver: bridge
+

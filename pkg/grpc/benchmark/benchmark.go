@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/zhufuyi/sponge/pkg/gofile"
+
 	"github.com/bojand/ghz/printer"
 	"github.com/bojand/ghz/runner"
 	"github.com/golang/protobuf/proto"
-	"github.com/zhufuyi/sponge/pkg/gofile"
 )
 
 type Runner interface {

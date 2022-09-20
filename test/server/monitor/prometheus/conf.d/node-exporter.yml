@@ -1,0 +1,3 @@
+- targets: ['node-exporter:9100']
+  labels:
+    env: 'dev'

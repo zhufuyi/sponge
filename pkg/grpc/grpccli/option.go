@@ -1,11 +1,13 @@
 package grpccli
 
 import (
+	"time"
+
 	"github.com/zhufuyi/sponge/pkg/registry"
+
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
-	"time"
 )
 
 // Option grpc dial options

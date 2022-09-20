@@ -1,0 +1,45 @@
+version: '3'
+services:
+  elasticsearch:
+    container_name: elasticsearch
+    image: elasticsearch:${ELASTIC_VERSION}
+    restart: always
+    environment:
+      - discovery.type=single-node
+      # 鉴权配置，如果想取消鉴权，注释下面4行配置
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - xpack.security.enabled=true 
+      - http.cors.enabled=true 
+      - http.cors.allow-origin="*"
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+    ports:
+      - "${ELASTIC_PORT}:9200"
+      - "${ELASTIC_CLUSTER_PORT}:9300"
+    networks:
+      - es-net
+
+  kibana:
+    container_name: kibana
+    image: kibana:${ELASTIC_VERSION}
+    restart: always
+    environment:
+      SERVER_NAME: kibana
+      ELASTICSEARCH_HOSTS: http://elasticsearch:${ELASTIC_PORT}
+      ELASTICSEARCH_USERNAME: ${ELASTIC_USER}
+      ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
+    ports:
+      - "${KIBANA_PORT}:5601"
+    depends_on:
+      - elasticsearch
+    networks:
+      - es-net
+
+volumes:
+  es-data:
+    driver: local
+
+networks: 
+  es-net:
+    driver: bridge
+

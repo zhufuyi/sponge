@@ -1,0 +1,83 @@
+groups:
+- name: linux_cpu_usage__global__1627292814309265500
+  rules:
+  - alert: linux_cpu_usage__P0
+    expr: 100 - avg(irate(node_cpu_seconds_total{mode="idle"}[5m]))by (instance,project,company,enterprise,environment,server_usage)
+      * 100 > 90
+    for: 0m
+    labels:
+      level_id: "1"
+      level_name: P0
+      metric_full_name: linux_cpu_usage
+      metric_id: "6"
+      scope: global
+      unit: '%'
+      version: "1627292814309265500"
+    annotations:
+      summary: '{{ $labels.instance }}'
+      value: '{{ $value }}'
+      description: CPU使用率
+  - alert: linux_cpu_usage__P1
+    expr: 100 - avg(irate(node_cpu_seconds_total{mode="idle"}[5m]))by (instance,project,company,enterprise,environment,server_usage)
+      * 100 > 85
+    for: 0m
+    labels:
+      level_id: "2"
+      level_name: P1
+      metric_full_name: linux_cpu_usage
+      metric_id: "6"
+      scope: global
+      unit: '%'
+      version: "1627292814309265500"
+    annotations:
+      summary: '{{ $labels.instance }}'
+      value: '{{ $value }}'
+      description: CPU使用率
+  - alert: linux_cpu_usage__P2
+    expr: 100 - avg(irate(node_cpu_seconds_total{mode="idle"}[5m]))by (instance,project,company,enterprise,environment,server_usage)
+      * 100 > 80
+    for: 0m
+    labels:
+      level_id: "3"
+      level_name: P2
+      metric_full_name: linux_cpu_usage
+      metric_id: "6"
+      scope: global
+      unit: '%'
+      version: "1627292814309265500"
+    annotations:
+      summary: '{{ $labels.instance }}'
+      value: '{{ $value }}'
+      description: CPU使用率
+  - alert: linux_cpu_usage__P3
+    expr: 100 - avg(irate(node_cpu_seconds_total{mode="idle"}[5m]))by (instance,project,company,enterprise,environment,server_usage)
+      * 100 > 75
+    for: 0m
+    labels:
+      level_id: "4"
+      level_name: P3
+      metric_full_name: linux_cpu_usage
+      metric_id: "6"
+      scope: global
+      unit: '%'
+      version: "1627292814309265500"
+    annotations:
+      summary: '{{ $labels.instance }}'
+      value: '{{ $value }}'
+      description: CPU使用率
+  - alert: linux_cpu_usage__P4
+    expr: 100 - avg(irate(node_cpu_seconds_total{mode="idle"}[5m]))by (instance,project,company,enterprise,environment,server_usage)
+      * 100 > 70
+    for: 0m
+    labels:
+      level_id: "5"
+      level_name: P4
+      metric_full_name: linux_cpu_usage
+      metric_id: "6"
+      scope: global
+      unit: '%'
+      version: "1627292814309265500"
+    annotations:
+      summary: '{{ $labels.instance }}'
+      value: '{{ $value }}'
+      description: CPU使用率

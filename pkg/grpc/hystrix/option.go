@@ -4,10 +4,9 @@ import (
 	"context"
 	"time"
 
+	"github.com/afex/hystrix-go/plugins"
 	"github.com/gunerhuseyin/goprometheus"
 	hystrixmiddleware "github.com/gunerhuseyin/goprometheus/middleware/hystrix"
-
-	"github.com/afex/hystrix-go/plugins"
 )
 
 const (

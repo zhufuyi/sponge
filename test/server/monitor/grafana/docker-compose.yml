@@ -1,0 +1,15 @@
+version: '3.1'
+
+services:
+    grafana:
+        image: grafana/grafana:7.4.3
+        container_name: grafana-simple
+        privileged: true
+        user: root
+        restart: always
+        ports:
+            - 33000:3000
+        volumes:
+            - $PWD/grafana-data/:/var/lib/grafana/
+            - $PWD/defaults.ini:/usr/share/grafana/conf/defaults.ini
+            - /etc/localtime:/etc/localtime

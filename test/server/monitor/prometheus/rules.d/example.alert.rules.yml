@@ -1,0 +1,42 @@
+groups:
+- name: example
+  rules:
+
+  # Alert for any instance that is unreachable for >2 minutes.
+  #- alert: service_down
+  #  expr: up == 0
+  #  for: 2m
+  #  labels:
+  #    severity: page
+  #  annotations:
+  #    summary: "Instance {{ $labels.instance }} down"
+  #    description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 2 minutes."
+
+
+  - alert: cpu_alert
+    expr: sum(avg without (cpu)(irate(node_cpu_seconds_total{mode!='idle'}[1m]))) by (instance) > 0.2
+    for: 1m
+    labels:
+      severity: page
+    annotations:
+      summary: "Instance {{ $labels.instance }} CPU usgae high"
+      description: "{{ $labels.instance }} CPU usage above 20% (current value: {{ $value }}), labels={{ $labels }}"
+
+  - alert: mem_alert
+    expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes > 0.7
+    for: 1m
+    labels:
+      severity: page
+    annotations:
+      summary: "Instance {{ $labels.instance }} MEM usgae high"
+      description: "{{ $labels.instance }} MEM usage above 70% (current value: {{ $value }}), labels={{ $labels }}"
+
+  - alert: my_high_load
+    expr: node_load1 > 0.8
+    for: 1m
+    labels:
+      severity: page
+    annotations:
+      summary: "Instance {{ $labels.instance }} under high load"
+      description: "{{ $labels.instance }} of job {{ $labels.job }} is under high load."
+
