@@ -3,7 +3,7 @@ package ecode
 import "github.com/zhufuyi/sponge/pkg/errcode"
 
 // nolint
-// http系统级别错误码，无Err前缀，错误码小于20000
+// http系统级别错误码，无Err前缀，错误码范围100000~200000
 var (
 	Success             = errcode.Success
 	InvalidParams       = errcode.InvalidParams

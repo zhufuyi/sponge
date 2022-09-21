@@ -13,7 +13,7 @@ const (
 // nolint
 // 服务级别错误码，有Err前缀
 var (
-	ErrCreateUserExample = errcode.NewError(errcode.HCode(userExampleNO)+1, "创建"+userExampleName+"失败") // todo 补充错误码注释，例如 20101
+	ErrCreateUserExample = errcode.NewError(errcode.HCode(userExampleNO)+1, "创建"+userExampleName+"失败") // todo 补充错误码注释，例如 200101
 	ErrDeleteUserExample = errcode.NewError(errcode.HCode(userExampleNO)+2, "删除"+userExampleName+"失败")
 	ErrUpdateUserExample = errcode.NewError(errcode.HCode(userExampleNO)+3, "更新"+userExampleName+"失败")
 	ErrGetUserExample    = errcode.NewError(errcode.HCode(userExampleNO)+4, "获取"+userExampleName+"失败")

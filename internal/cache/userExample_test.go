@@ -2,125 +2,126 @@ package cache
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
-
-	"github.com/zhufuyi/sponge/internal/model"
-	"github.com/zhufuyi/sponge/pkg/mysql"
 
 	"github.com/alicebob/miniredis/v2"
 	"github.com/go-redis/redis/v8"
 	"github.com/stretchr/testify/assert"
+	"github.com/zhufuyi/sponge/internal/model"
 )
 
-var (
+type _userExampleCache struct {
+	ctx         context.Context
+	testDatas   []*model.UserExample
 	redisServer *miniredis.Miniredis
-	redisClient *redis.Client
-	testData    = &model.UserExample{
-		Model: mysql.Model{ID: 1},
-		Name:  "foo",
-	}
-	uc UserExampleCache
-)
-
-func setup() {
-	redisServer = mockRedis()
-	redisClient = redis.NewClient(&redis.Options{Addr: redisServer.Addr()})
-	uc = NewUserExampleCache(redisClient)
+	iCache      UserExampleCache
 }
 
-func teardown() {
-	redisServer.Close()
-}
-
-func mockRedis() *miniredis.Miniredis {
-	s, err := miniredis.Run()
+func newUserExampleCache() *_userExampleCache {
+	redisServer, err := miniredis.Run()
 	if err != nil {
 		panic(err)
 	}
-	return s
+
+	cache := NewUserExampleCache(redis.NewClient(&redis.Options{Addr: redisServer.Addr()}))
+	record1 := &model.UserExample{}
+	record1.ID = 1
+	record2 := &model.UserExample{}
+	record2.ID = 2
+
+	return &_userExampleCache{
+		ctx:         context.Background(),
+		testDatas:   []*model.UserExample{record1, record2},
+		redisServer: redisServer,
+		iCache:      cache,
+	}
+}
+
+func (c *_userExampleCache) close() {
+	c.redisServer.Close()
+}
+
+func (c *_userExampleCache) getIDs() []uint64 {
+	var ids []uint64
+	for _, v := range c.testDatas {
+		ids = append(ids, v.ID)
+	}
+	return ids
+}
+
+func (c *_userExampleCache) getExpected() map[string]*model.UserExample {
+	expected := make(map[string]*model.UserExample)
+	for _, v := range c.testDatas {
+		record := &model.UserExample{}
+		record.ID = v.ID
+		expected[fmt.Sprintf("%d", v.ID)] = record
+	}
+	return expected
 }
 
 func Test_userExampleCache_Set(t *testing.T) {
-	setup()
-	defer teardown()
+	c := newUserExampleCache()
+	defer c.close()
 
-	var id uint64
-	ctx := context.Background()
-	id = 1
-	err := uc.Set(ctx, id, testData, time.Hour)
+	record := c.testDatas[0]
+	err := c.iCache.Set(c.ctx, record.ID, record, time.Hour)
 	if err != nil {
 		t.Fatal(err)
 	}
 }
 
 func Test_userExampleCache_Get(t *testing.T) {
-	setup()
-	defer teardown()
+	c := newUserExampleCache()
+	defer c.close()
 
-	var id uint64
-	ctx := context.Background()
-	id = 1
-	err := uc.Set(ctx, id, testData, time.Hour)
+	record := c.testDatas[0]
+	err := c.iCache.Set(c.ctx, record.ID, record, time.Hour)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	act, err := uc.Get(ctx, id)
+	got, err := c.iCache.Get(c.ctx, record.ID)
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(t, testData, act)
+	assert.Equal(t, record, got)
 }
 
 func Test_userExampleCache_MultiGet(t *testing.T) {
-	setup()
-	defer teardown()
+	c := newUserExampleCache()
+	defer c.close()
 
-	ctx := context.Background()
-	testData := []*model.UserExample{
-		{Model: mysql.Model{ID: 1}},
-		{Model: mysql.Model{ID: 2}},
-	}
-	err := uc.MultiSet(ctx, testData, time.Hour)
+	err := c.iCache.MultiSet(c.ctx, c.testDatas, time.Hour)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	expected := make(map[string]*model.UserExample)
-	expected["1"] = &model.UserExample{Model: mysql.Model{ID: 1}}
-	expected["2"] = &model.UserExample{Model: mysql.Model{ID: 2}}
-
-	act, err := uc.MultiGet(ctx, []uint64{1, 2})
+	got, err := c.iCache.MultiGet(c.ctx, c.getIDs())
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(t, expected, act)
+	expected := c.getExpected()
+	assert.Equal(t, expected, got)
 }
 
 func Test_userExampleCache_MultiSet(t *testing.T) {
-	setup()
-	defer teardown()
+	c := newUserExampleCache()
+	defer c.close()
 
-	ctx := context.Background()
-	testData := []*model.UserExample{
-		{Model: mysql.Model{ID: 1}},
-		{Model: mysql.Model{ID: 2}},
-	}
-	err := uc.MultiSet(ctx, testData, time.Hour)
+	err := c.iCache.MultiSet(c.ctx, c.testDatas, time.Hour)
 	if err != nil {
 		t.Fatal(err)
 	}
 }
 
 func Test_userExampleCache_Del(t *testing.T) {
-	setup()
-	defer teardown()
+	c := newUserExampleCache()
+	defer c.close()
 
-	var id uint64
-	ctx := context.Background()
-	id = 1
-	err := uc.Del(ctx, id)
+	record := c.testDatas[0]
+	err := c.iCache.Del(c.ctx, record.ID)
 	if err != nil {
 		t.Fatal(err)
 	}

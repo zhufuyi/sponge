@@ -11,9 +11,9 @@ const (
 )
 
 // nolint
-// 服务级别错误码，有Err前缀
+// 服务级别错误码
 var (
-	StatusCreateUserExample = errcode.NewGRPCStatus(errcode.GCode(_userExampleNO)+1, "创建"+_userExampleName+"失败") // todo 补充错误码注释，例如 20101
+	StatusCreateUserExample = errcode.NewGRPCStatus(errcode.GCode(_userExampleNO)+1, "创建"+_userExampleName+"失败") // todo 补充错误码注释，例如 400101
 	StatusDeleteUserExample = errcode.NewGRPCStatus(errcode.GCode(_userExampleNO)+2, "删除"+_userExampleName+"失败")
 	StatusUpdateUserExample = errcode.NewGRPCStatus(errcode.GCode(_userExampleNO)+3, "更新"+_userExampleName+"失败")
 	StatusGetUserExample    = errcode.NewGRPCStatus(errcode.GCode(_userExampleNO)+4, "获取"+_userExampleName+"失败")

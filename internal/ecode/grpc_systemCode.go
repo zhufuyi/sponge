@@ -5,7 +5,7 @@ import (
 )
 
 // nolint
-// rpc系统级别错误码，有status前缀
+// rpc系统级别错误码，有status前缀，错误码范围300000~400000
 var (
 	StatusSuccess = errcode.StatusSuccess
 

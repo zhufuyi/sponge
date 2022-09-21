@@ -177,9 +177,9 @@ func Test_userExampleService_benchmark(t *testing.T) {
 						Sort:  "",
 						Columns: []*types.Column{
 							{
-								Name:  "age",
-								Exp:   ">=",
-								Value: "15",
+								Name:  "id",
+								Exp:   "<",
+								Value: "100",
 								Logic: "",
 							},
 						},
