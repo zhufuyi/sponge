@@ -18,5 +18,6 @@ func userExampleRouter(group *gin.RouterGroup, h handler.UserExampleHandler) {
 	group.DELETE("/userExample/:id", h.DeleteByID)
 	group.PUT("/userExample/:id", h.UpdateByID)
 	group.GET("/userExample/:id", h.GetByID)
+	group.POST("/userExamples/ids", h.ListByIDs)
 	group.POST("/userExamples", h.List) // 通过post任意列组合查询
 }

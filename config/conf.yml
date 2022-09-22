@@ -6,12 +6,12 @@ app:
   name: "userExample"  # 服务名称
   env: "dev"                  # 运行环境，dev:开发环境，prod:生产环境，pre:预生产环境
   version: "v0.0.0"         # 版本
-  host: "127.0.0.1"       # 主机ip或域名
+  host: "127.0.0.1"       # 主机名称或ip
   enableProfile: false       # 是否开启性能分析功能，true:开启，false:关闭
   enableMetrics: true   # 是否开启指标采集，true:开启，false:关闭
   enableLimit: false     # 是否开启限流，true:开启，false:关闭
   enableTracing: false    # 是否开启链路跟踪，true:开启，false:关闭
-  enableRegistryDiscovery: true    # 是否开启注册与发现，true:开启，false:关闭
+  enableRegistryDiscovery: false    # 是否开启注册与发现，true:开启，false:关闭
 
 
 # http 设置
@@ -75,6 +75,11 @@ jaeger:
   samplingRate: 1.0     # 采样率，0~1之间，0表示禁止采样，大于等于1表示采样所有链路
 
 
+# etcd配置
+etcd:
+  addrs: ["192.168.3.37:2379"]
+
+
 # limit配置
 rateLimiter:
   dimension: "path"   # 限流维度，支持path和ip两种，默认是path
@@ -85,8 +90,3 @@ rateLimiter:
 # metrics配置
 metrics:
   port: 9082
-
-
-# etcd配置
-etcd:
-  addrs: ["192.168.3.37:2379"]

@@ -41,6 +41,14 @@ definitions:
         description: 手机号码，必须在前加'+86'
         type: string
     type: object
+  handler.GetUserExamples1Request:
+    properties:
+      ids:
+        items:
+          type: integer
+        minItems: 1
+        type: array
+    type: object
   handler.Params:
     properties:
       columns:
@@ -220,6 +228,28 @@ paths:
           schema:
             $ref: '#/definitions/handler.Result'
       summary: 获取userExample列表
+      tags:
+      - userExample
+  /api/v1/userExamples/ids:
+    post:
+      consumes:
+      - application/json
+      description: 使用post请求，根据id数组获取userExample列表
+      parameters:
+      - description: id 数组
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/handler.GetUserExamples1Request'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.Result'
+      summary: 根据id数组获取userExample列表
       tags:
       - userExample
   /health:

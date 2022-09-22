@@ -181,6 +181,40 @@
                 }
             }
         },
+        "/api/v1/userExamples/ids": {
+            "post": {
+                "description": "使用post请求，根据id数组获取userExample列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "userExample"
+                ],
+                "summary": "根据id数组获取userExample列表",
+                "parameters": [
+                    {
+                        "description": "id 数组",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.GetUserExamples1Request"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Result"
+                        }
+                    }
+                }
+            }
+        },
         "/health": {
             "get": {
                 "description": "check health",
@@ -276,6 +310,18 @@
                 "phone": {
                     "description": "手机号码，必须在前加'+86'",
                     "type": "string"
+                }
+            }
+        },
+        "handler.GetUserExamples1Request": {
+            "type": "object",
+            "properties": {
+                "ids": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "integer"
+                    }
                 }
             }
         },

@@ -24,6 +24,7 @@ type UserExampleHandler interface {
 	DeleteByID(c *gin.Context)
 	UpdateByID(c *gin.Context)
 	GetByID(c *gin.Context)
+	ListByIDs(c *gin.Context)
 	List(c *gin.Context)
 }
 
@@ -184,6 +185,43 @@ func (h *userExampleHandler) GetByID(c *gin.Context) {
 	response.Success(c, gin.H{"userExample": data})
 }
 
+// ListByIDs 根据id数组获取多条记录
+// @Summary 根据id数组获取userExample列表
+// @Description 使用post请求，根据id数组获取userExample列表
+// @Tags userExample
+// @Param data body GetUserExamplesByIDsRequest true "id 数组"
+// @Accept json
+// @Produce json
+// @Success 200 {object} Result{}
+// @Router /api/v1/userExamples/ids [post]
+func (h *userExampleHandler) ListByIDs(c *gin.Context) {
+	form := &GetUserExamplesByIDsRequest{}
+	err := c.ShouldBindJSON(form)
+	if err != nil {
+		logger.Warn("ShouldBindJSON error: ", logger.Err(err), utils.FieldRequestIDFromContext(c))
+		response.Error(c, ecode.InvalidParams)
+		return
+	}
+
+	userExamples, err := h.iDao.GetByIDs(c.Request.Context(), form.IDs)
+	if err != nil {
+		logger.Error("GetByIDs error", logger.Err(err), logger.Any("form", form), utils.FieldRequestIDFromContext(c))
+		response.Error(c, ecode.ErrListUserExample)
+		return
+	}
+
+	data, err := convertUserExamples(userExamples)
+	if err != nil {
+		logger.Error("Copy error", logger.Err(err), logger.Any("form", form), utils.FieldRequestIDFromContext(c))
+		response.Error(c, ecode.InternalServerError)
+		return
+	}
+
+	response.Success(c, gin.H{
+		"userExamples": data,
+	})
+}
+
 // List 通过post获取多条记录
 // @Summary 获取userExample列表
 // @Description 使用post请求获取userExample列表
@@ -267,7 +305,12 @@ type GetUserExampleByIDRespond struct {
 
 // delete the templates code end
 
-// GetUserExamplesRequest query params
+// GetUserExamplesByIDsRequest request form ids
+type GetUserExamplesByIDsRequest struct {
+	IDs []uint64 `json:"ids" binding:"min=1"`
+}
+
+// GetUserExamplesRequest request form params
 type GetUserExamplesRequest struct {
 	query.Params
 }

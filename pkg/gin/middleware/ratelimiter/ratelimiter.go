@@ -15,7 +15,7 @@ type Limiter struct {
 	qpsLimiter sync.Map
 }
 
-// NewLimiter instantiation
+// NewLimiter instantiated limiter
 func NewLimiter() *Limiter {
 	return &Limiter{}
 }

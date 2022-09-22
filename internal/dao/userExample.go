@@ -24,6 +24,7 @@ type UserExampleDao interface {
 	DeleteByID(ctx context.Context, id uint64) error
 	UpdateByID(ctx context.Context, table *model.UserExample) error
 	GetByID(ctx context.Context, id uint64) (*model.UserExample, error)
+	GetByIDs(ctx context.Context, ids []uint64) ([]*model.UserExample, error)
 	GetByColumns(ctx context.Context, params *query.Params) ([]*model.UserExample, int64, error)
 }
 
@@ -104,7 +105,7 @@ func (d *userExampleDao) UpdateByID(ctx context.Context, table *model.UserExampl
 		update["login_at"] = table.LoginAt
 	}
 	// delete the templates code end
-	err := d.db.WithContext(ctx).Model(table).Where("id = ?", table.ID).Updates(update).Error
+	err := d.db.WithContext(ctx).Model(table).Updates(update).Error
 	if err != nil {
 		return err
 	}
@@ -160,62 +161,6 @@ func (d *userExampleDao) GetByID(ctx context.Context, id uint64) (*model.UserExa
 	return record, nil
 }
 
-// GetByColumns 根据分页和列信息筛选多条记录
-// params 包括分页参数和查询参数
-// 分页参数(必须):
-
-//	page: 页码，从0开始
-//	size: 每页行数
-//	sort: 排序字段，默认是id倒叙，可以在字段前添加-号表示倒序，没有-号表示升序，多个字段用逗号分隔
-//
-// 查询参数(非必须):
-//
-//	name: 列名
-//	exp: 表达式，有=、!=、>、>=、<、<=、like七种类型，值为空时默认是=
-//	value: 列值
-//	logic: 表示逻辑类型，有&(and)、||(or)两种类型，值为空时默认是and
-//
-// 示例: 查询年龄大于20的男性
-//
-//	params = &query.Params{
-//	    Page: 0,
-//	    Size: 20,
-//	    Columns: []query.Column{
-//		{
-//			serviceName:    "age",
-//			Exp: ">",
-//			Value:   20,
-//		},
-//		{
-//			serviceName:  "gender",
-//			Value: "男",
-//		},
-//	}
-func (d *userExampleDao) GetByColumns(ctx context.Context, params *query.Params) ([]*model.UserExample, int64, error) {
-	query, args, err := params.ConvertToGormConditions()
-	if err != nil {
-		return nil, 0, err
-	}
-
-	var total int64
-	err = d.db.WithContext(ctx).Model(&model.UserExample{}).Where(query, args...).Count(&total).Error
-	if err != nil {
-		return nil, 0, err
-	}
-	if total == 0 {
-		return nil, total, nil
-	}
-
-	records := []*model.UserExample{}
-	order, limit, offset := params.ConvertToPage()
-	err = d.db.WithContext(ctx).Order(order).Limit(limit).Offset(offset).Where(query, args...).Find(&records).Error
-	if err != nil {
-		return nil, 0, err
-	}
-
-	return records, total, err
-}
-
 // GetByIDs 根据id批量获取
 func (d *userExampleDao) GetByIDs(ctx context.Context, ids []uint64) ([]*model.UserExample, error) {
 	records := []*model.UserExample{}
@@ -253,4 +198,62 @@ func (d *userExampleDao) GetByIDs(ctx context.Context, ids []uint64) ([]*model.U
 	}
 
 	return records, nil
+}
+
+// GetByColumns 根据分页和列信息筛选多条记录
+// params 包括分页参数和查询参数
+// 分页参数(必须):
+
+//	page: 页码，从0开始
+//	size: 每页行数
+//	sort: 排序字段，默认是id倒叙，可以在字段前添加-号表示倒序，没有-号表示升序，多个字段用逗号分隔
+//
+// 查询参数(非必须):
+//
+//	name: 列名
+//	exp: 表达式，有=、!=、>、>=、<、<=、like七种类型，值为空时默认是=
+//	value: 列值
+//	logic: 表示逻辑类型，有&(and)、||(or)两种类型，值为空时默认是and
+//
+// 示例: 查询年龄大于20的男性
+//
+//	params = &query.Params{
+//	    Page: 0,
+//	    Size: 20,
+//	    Columns: []query.Column{
+//		{
+//			serviceName:    "age",
+//			Exp: ">",
+//			Value:   20,
+//		},
+//		{
+//			serviceName:  "gender",
+//			Value: "男",
+//		},
+//	}
+func (d *userExampleDao) GetByColumns(ctx context.Context, params *query.Params) ([]*model.UserExample, int64, error) {
+	queryStr, args, err := params.ConvertToGormConditions()
+	if err != nil {
+		return nil, 0, err
+	}
+
+	var total int64
+	if params.Sort != "ignore count" { // 忽略测试标记
+		err = d.db.WithContext(ctx).Model(&model.UserExample{}).Select([]string{"id"}).Where(queryStr, args...).Count(&total).Error
+		if err != nil {
+			return nil, 0, err
+		}
+		if total == 0 {
+			return nil, total, nil
+		}
+	}
+
+	records := []*model.UserExample{}
+	order, limit, offset := params.ConvertToPage()
+	err = d.db.WithContext(ctx).Order(order).Limit(limit).Offset(offset).Where(queryStr, args...).Find(&records).Error
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return records, total, err
 }

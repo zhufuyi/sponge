@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
+
 	"strconv"
 	"time"
 
@@ -12,13 +12,18 @@ import (
 	"github.com/zhufuyi/sponge/internal/server"
 	"github.com/zhufuyi/sponge/pkg/app"
 	"github.com/zhufuyi/sponge/pkg/logger"
+	"github.com/zhufuyi/sponge/pkg/tracer"
+
+	// grpc import start
+	"fmt"
+
 	"github.com/zhufuyi/sponge/pkg/registry"
 	"github.com/zhufuyi/sponge/pkg/registry/etcd"
-	"github.com/zhufuyi/sponge/pkg/tracer"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	// grpc import end
 )
 
 var (
