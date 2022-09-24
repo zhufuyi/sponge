@@ -34,15 +34,13 @@ type RouterInfo struct {
 
 // NewHandler instantiated handler
 func NewHandler(dao *Dao, testData interface{}) *Handler {
-	port, _ := utils.GetAvailablePort()
-	requestAddr := fmt.Sprintf("http://localhost:%d", port)
-	httpAddr := fmt.Sprintf(":%d", port)
+	serverAddr, requestAddr := utils.GetLocalHTTPAddrPairs()
 
 	return &Handler{
 		TestData:    testData,
 		MockDao:     dao,
 		requestAddr: requestAddr,
-		httpAddr:    httpAddr,
+		httpAddr:    serverAddr,
 		routers:     make(map[string]RouterInfo),
 	}
 }
@@ -53,6 +51,7 @@ func (h *Handler) GoRunHttpServer(fns []RouterInfo) {
 		panic("HandlerFunc is empty")
 	}
 
+	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
 	for _, fn := range fns {
 		switch fn.Method {
