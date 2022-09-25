@@ -15,14 +15,12 @@ import (
 
 // Dial 安全连接
 func Dial(ctx context.Context, endpoint string, opts ...Option) (*grpc.ClientConn, error) {
-	isSecure := true
-	return dial(ctx, endpoint, isSecure, opts...)
+	return dial(ctx, endpoint, true, opts...)
 }
 
 // DialInsecure 不安全连接
 func DialInsecure(ctx context.Context, endpoint string, opts ...Option) (*grpc.ClientConn, error) {
-	isSecure := false
-	return dial(ctx, endpoint, isSecure, opts...)
+	return dial(ctx, endpoint, false, opts...)
 }
 
 func dial(ctx context.Context, endpoint string, isSecure bool, opts ...Option) (*grpc.ClientConn, error) {

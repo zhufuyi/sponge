@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var dsn = "root:123456@(192.168.30.37:3306)/test?charset=utf8mb4&parseTime=True&loc=Local"
+var dsn = "root:123456@(192.168.3.37:3306)/test?charset=utf8mb4&parseTime=True&loc=Local"
 
 func TestInit(t *testing.T) {
 	db, err := Init(dsn)

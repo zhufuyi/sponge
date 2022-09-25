@@ -29,7 +29,7 @@ type params struct {
 	importPaths []string // 依赖第三方protobuf文件位置
 }
 
-// New 创建一个压测示例
+// New 创建一个压测实例
 func New(host string, protoFile string, methodName string, req proto.Message, total uint, importPaths ...string) (Runner, error) {
 	data, err := os.ReadFile(protoFile)
 	if err != nil {

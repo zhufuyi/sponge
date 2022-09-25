@@ -66,9 +66,9 @@ func (h *Handler) GoRunHttpServer(fns []RouterInfo) {
 		case http.MethodGet:
 			r.GET(fn.Path, fn.HandlerFunc)
 		default:
-			panic("unsupported http method " + fn.Method)
+			fmt.Println("unsupported http method " + fn.Method)
 		}
-		h.routers[fn.FuncName] = fn
+		h.routers[strings.ToLower(fn.FuncName)] = fn
 	}
 
 	h.HTTPServer = &http.Server{
@@ -85,7 +85,7 @@ func (h *Handler) GoRunHttpServer(fns []RouterInfo) {
 
 // GetRequestURL get request url from name
 func (h *Handler) GetRequestURL(funcName string, pathVal ...interface{}) string {
-	fn, ok := h.routers[funcName]
+	fn, ok := h.routers[strings.ToLower(funcName)]
 	if !ok {
 		return ""
 	}

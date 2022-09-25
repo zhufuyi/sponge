@@ -109,7 +109,7 @@ func WithPrometheus() Option {
 }
 
 // WithStatsDCollector exports hystrix metrics to a statsD backend
-func WithStatsDCollector(addr, prefix string, sampleRate float32, flushBytes int) Option {
+func WithStatsDCollector(addr string, prefix string, sampleRate float32, flushBytes int) Option {
 	return func(c *options) {
 		c.statsD = &plugins.StatsdCollectorConfig{StatsdAddr: addr, Prefix: prefix, SampleRate: sampleRate, FlushBytes: flushBytes}
 	}

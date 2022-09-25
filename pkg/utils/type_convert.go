@@ -75,3 +75,8 @@ func IntToStr(v int) string {
 func Uint64ToStr(v uint64) string {
 	return strconv.FormatUint(v, 10)
 }
+
+// Int64ToStr int64 to string
+func Int64ToStr(v int64) string {
+	return strconv.FormatInt(v, 10)
+}

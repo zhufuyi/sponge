@@ -64,11 +64,13 @@ func watchConfig(obj interface{}, fs ...func()) {
 }
 
 // Show 打印配置信息(去掉敏感信息)
-func Show(obj interface{}, keywords ...string) {
+func Show(obj interface{}, keywords ...string) string {
+	var out string
+
 	data, err := json.MarshalIndent(obj, "", "    ")
 	if err != nil {
 		fmt.Println("json.MarshalIndent error: ", err)
-		return
+		return ""
 	}
 
 	buf := bufio.NewReader(bytes.NewReader(data))
@@ -79,8 +81,10 @@ func Show(obj interface{}, keywords ...string) {
 		}
 		keywords = append(keywords, `"dsn"`, `"password"`)
 
-		fmt.Printf(replacePWD(line, keywords...))
+		out += replacePWD(line, keywords...)
 	}
+
+	return out
 }
 
 // 替换密码

@@ -40,16 +40,12 @@ func TestVerifyToken(t *testing.T) {
 	// 无效token格式
 	token2 := "xxx.xxx.xxx"
 	v, err = VerifyToken(token2)
-	if !compareErr(err, errFormat) {
-		t.Fatal(err)
-	}
+	assert.Equal(t, err, errFormat)
 
 	// 签名失败
 	token3 := token + "xxx"
 	v, err = VerifyToken(token3)
-	if !compareErr(err, errSignature) {
-		t.Fatal(err)
-	}
+	assert.Equal(t, err, errSignature)
 
 	// token已过期
 	token, err = GenerateToken(uid, role)
@@ -58,9 +54,7 @@ func TestVerifyToken(t *testing.T) {
 	}
 	time.Sleep(time.Second * 2)
 	v, err = VerifyToken(token)
-	if !compareErr(err, errExpired) {
-		t.Fatal(err)
-	}
+	assert.Equal(t, err, errExpired)
 }
 
 func compareErr(err1, err2 error) bool {

@@ -33,6 +33,7 @@ func NewRedisCache(client *redis.Client, keyPrefix string, encoding encoding.Enc
 	}
 }
 
+// Set one value
 func (c *redisCache) Set(ctx context.Context, key string, val interface{}, expiration time.Duration) error {
 	buf, err := encoding.Marshal(c.encoding, val)
 	if err != nil {
@@ -53,6 +54,7 @@ func (c *redisCache) Set(ctx context.Context, key string, val interface{}, expir
 	return nil
 }
 
+// Get one value
 func (c *redisCache) Get(ctx context.Context, key string, val interface{}) error {
 	cacheKey, err := BuildCacheKey(c.KeyPrefix, key)
 	if err != nil {
@@ -61,7 +63,7 @@ func (c *redisCache) Get(ctx context.Context, key string, val interface{}) error
 
 	bytes, err := c.client.Get(ctx, cacheKey).Bytes()
 	// NOTE: don't handle the case where redis value is nil
-	// but leave it to the upstream for processing if need
+	// but leave it to the upstream for processing
 	if err != nil {
 		return err
 	}
@@ -81,6 +83,7 @@ func (c *redisCache) Get(ctx context.Context, key string, val interface{}) error
 	return nil
 }
 
+// MultiSet set multiple values
 func (c *redisCache) MultiSet(ctx context.Context, valueMap map[string]interface{}, expiration time.Duration) error {
 	if len(valueMap) == 0 {
 		return nil
@@ -124,6 +127,7 @@ func (c *redisCache) MultiSet(ctx context.Context, valueMap map[string]interface
 	return nil
 }
 
+// MultiGet get multiple values
 func (c *redisCache) MultiGet(ctx context.Context, keys []string, value interface{}) error {
 	if len(keys) == 0 {
 		return nil
@@ -159,6 +163,7 @@ func (c *redisCache) MultiGet(ctx context.Context, keys []string, value interfac
 	return nil
 }
 
+// Del delete multiple values
 func (c *redisCache) Del(ctx context.Context, keys ...string) error {
 	if len(keys) == 0 {
 		return nil
@@ -181,6 +186,7 @@ func (c *redisCache) Del(ctx context.Context, keys ...string) error {
 	return nil
 }
 
+// SetCacheWithNotFound set value for notfound
 func (c *redisCache) SetCacheWithNotFound(ctx context.Context, key string) error {
 	return c.client.Set(ctx, key, NotFoundPlaceholder, DefaultNotFoundExpireTime).Err()
 }

@@ -22,7 +22,7 @@ func GenerateToken(uid string, role ...string) (string, error) {
 	}
 
 	roleVal := ""
-	if len(role) > 1 {
+	if len(role) > 0 {
 		roleVal = role[0]
 	}
 	claims := CustomClaims{

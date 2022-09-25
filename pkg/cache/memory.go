@@ -2,6 +2,7 @@ package cache
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"reflect"
 	"time"
@@ -13,13 +14,15 @@ import (
 )
 
 type memoryCache struct {
-	client    *ristretto.Cache
-	KeyPrefix string
-	encoding  encoding.Encoding
+	client            *ristretto.Cache
+	KeyPrefix         string
+	encoding          encoding.Encoding
+	DefaultExpireTime time.Duration
+	newObject         func() interface{}
 }
 
 // NewMemoryCache create a memory cache
-func NewMemoryCache(keyPrefix string, encoding encoding.Encoding) Cache {
+func NewMemoryCache(keyPrefix string, encoding encoding.Encoding, newObject func() interface{}) Cache {
 	// see: https://dgraph.io/blog/post/introducing-ristretto-high-perf-go-cache/
 	//		https://www.start.io/blog/we-chose-ristretto-cache-for-go-heres-why/
 	config := &ristretto.Config{
@@ -32,6 +35,7 @@ func NewMemoryCache(keyPrefix string, encoding encoding.Encoding) Cache {
 		client:    store,
 		KeyPrefix: keyPrefix,
 		encoding:  encoding,
+		newObject: newObject,
 	}
 }
 
@@ -45,7 +49,11 @@ func (m *memoryCache) Set(ctx context.Context, key string, val interface{}, expi
 	if err != nil {
 		return fmt.Errorf("BuildCacheKey error: %v, key=%s", err, key)
 	}
-	m.client.SetWithTTL(cacheKey, buf, 0, expiration)
+	ok := m.client.SetWithTTL(cacheKey, buf, 0, expiration)
+	if !ok {
+		return errors.New("SetWithTTL failed")
+	}
+
 	return nil
 }
 
@@ -55,6 +63,7 @@ func (m *memoryCache) Get(ctx context.Context, key string, val interface{}) erro
 	if err != nil {
 		return fmt.Errorf("BuildCacheKey error: %v, key=%s", err, key)
 	}
+
 	data, ok := m.client.Get(cacheKey)
 	if !ok {
 		return nil
@@ -62,6 +71,7 @@ func (m *memoryCache) Get(ctx context.Context, key string, val interface{}) erro
 	if data == NotFoundPlaceholder {
 		return ErrPlaceholder
 	}
+
 	err = encoding.Unmarshal(m.encoding, data.([]byte), val)
 	if err != nil {
 		return fmt.Errorf("encoding.Unmarshal error: %v, key=%s, cacheKey=%s, type=%v, json=%+v ",
@@ -87,13 +97,31 @@ func (m *memoryCache) Del(ctx context.Context, keys ...string) error {
 }
 
 // MultiSet 批量set
-func (m *memoryCache) MultiSet(ctx context.Context, valMap map[string]interface{}, expiration time.Duration) error {
-	panic("implement me")
+func (m *memoryCache) MultiSet(ctx context.Context, valueMap map[string]interface{}, expiration time.Duration) error {
+	var err error
+	for key, value := range valueMap {
+		err = m.Set(ctx, key, value, expiration)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // MultiGet 批量获取
-func (m *memoryCache) MultiGet(ctx context.Context, keys []string, val interface{}) error {
-	panic("implement me")
+func (m *memoryCache) MultiGet(ctx context.Context, keys []string, value interface{}) error {
+	valueMap := reflect.ValueOf(value)
+	var err error
+	for _, key := range keys {
+		object := m.newObject()
+		err = m.Get(ctx, key, object)
+		if err != nil {
+			continue
+		}
+		valueMap.SetMapIndex(reflect.ValueOf(key), reflect.ValueOf(object))
+	}
+
+	return nil
 }
 
 func (m *memoryCache) SetCacheWithNotFound(ctx context.Context, key string) error {

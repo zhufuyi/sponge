@@ -31,6 +31,7 @@ func init() {
 // codec is a Codec implementation with json.
 type codec struct{}
 
+// Marshal object to data
 func (codec) Marshal(v interface{}) ([]byte, error) {
 	switch m := v.(type) {
 	case json.Marshaler:
@@ -42,6 +43,7 @@ func (codec) Marshal(v interface{}) ([]byte, error) {
 	}
 }
 
+// Unmarshal data to bytes
 func (codec) Unmarshal(data []byte, v interface{}) error {
 	switch m := v.(type) {
 	case json.Unmarshaler:
@@ -63,6 +65,7 @@ func (codec) Unmarshal(data []byte, v interface{}) error {
 	}
 }
 
+// Name get name
 func (codec) Name() string {
 	return Name
 }

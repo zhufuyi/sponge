@@ -15,6 +15,18 @@ func GetHostname() string {
 	return name
 }
 
+// GetLocalHTTPAddrPairs 获取可用的http服务端和请求地址
+func GetLocalHTTPAddrPairs() (string, string) {
+	port, err := GetAvailablePort()
+	if err != nil {
+		fmt.Printf("GetAvailablePort error: %v\n", err)
+		return "", ""
+	}
+	serverAddr := fmt.Sprintf(":%d", port)
+	requestAddr := fmt.Sprintf("http://localhost:%d", port)
+	return serverAddr, requestAddr
+}
+
 // GetAvailablePort 获取可用端口
 func GetAvailablePort() (int, error) {
 	address, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("%s:0", "0.0.0.0"))

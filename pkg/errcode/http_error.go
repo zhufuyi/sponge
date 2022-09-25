@@ -81,5 +81,5 @@ func (e *Error) StatusCode() int {
 		return http.StatusRequestTimeout
 	}
 
-	return http.StatusInternalServerError
+	return e.Code()
 }

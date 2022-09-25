@@ -17,8 +17,8 @@ func UnaryClientLog(logger *zap.Logger, opts ...grpc_zap.Option) grpc.UnaryClien
 	return grpc_zap.UnaryClientInterceptor(logger, opts...)
 }
 
-// UnaryStreamLog 客户端日志stream拦截器
-func UnaryStreamLog(logger *zap.Logger, opts ...grpc_zap.Option) grpc.StreamClientInterceptor {
+// StreamClientLog 客户端日志stream拦截器
+func StreamClientLog(logger *zap.Logger, opts ...grpc_zap.Option) grpc.StreamClientInterceptor {
 	return grpc_zap.StreamClientInterceptor(logger, opts...)
 }
 

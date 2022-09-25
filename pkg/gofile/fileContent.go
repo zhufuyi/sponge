@@ -1,6 +1,8 @@
 package gofile
 
-import "bytes"
+import (
+	"bytes"
+)
 
 // FindSubBytes 查找子字符串，包括开始和结束标记
 func FindSubBytes(data []byte, start []byte, end []byte) []byte {
@@ -9,7 +11,7 @@ func FindSubBytes(data []byte, start []byte, end []byte) []byte {
 	if startIndex >= endIndex {
 		return []byte{}
 	}
-	if len(data) > endIndex+len(end) {
+	if len(data) >= endIndex+len(end) {
 		endIndex += len(end)
 	}
 	return data[startIndex:endIndex]

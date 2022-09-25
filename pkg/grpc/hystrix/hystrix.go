@@ -98,25 +98,10 @@ func streamClientInterceptor(commandName string, o *options) grpc.StreamClientIn
 	}
 }
 
-func durationToInt(duration, unit time.Duration) int {
+func durationToInt(duration time.Duration, unit time.Duration) int {
 	durationAsNumber := duration / unit
 	if int64(durationAsNumber) > int64(maxInt) {
 		return maxInt
 	}
 	return int(durationAsNumber)
 }
-
-/*
-StreamClientInterceptor() func(ctx context.Context, desc *grpc.StreamDesc, cc *grpc.ClientConn, method string, streamer grpc.Streamer, opts ...grpc.CallOption) (grpc.ClientStream, error) {
-	return func(ctx context.Context, desc *grpc.StreamDesc, cc *grpc.ClientConn, method string, streamer grpc.Streamer, opts ...grpc.CallOption) (grpc.ClientStream, error) {
-		monitor := newClientReporter(m, clientStreamType(desc), method)
-		clientStream, err := streamer(ctx, desc, cc, method, opts...)
-		if err != nil {
-			st, _ := status.FromError(err)
-			monitor.Handled(st.Code())
-			return nil, err
-		}
-		return &monitoredClientStream{clientStream, monitor}, nil
-	}
-}
-*/

@@ -34,26 +34,16 @@ type Detail struct {
 }
 
 // String detail key-value
-func (d Detail) String() string {
+func (d *Detail) String() string {
 	return fmt.Sprintf("%s: {%v}", d.key, d.val)
 }
 
-// Any type
+// Any type key value
 func Any(key string, val interface{}) Detail {
 	return Detail{
 		key: key,
 		val: val,
 	}
-}
-
-// RPCErr rpc error
-func RPCErr(g *GRPCStatus, details ...Detail) error {
-	var dts []string
-	for _, detail := range details {
-		dts = append(dts, detail.String())
-	}
-
-	return status.Errorf(g.status.Code(), "%s details = %v", g.status.Message(), dts)
 }
 
 // Err return error
@@ -69,29 +59,25 @@ func (g *GRPCStatus) Err(details ...Detail) error {
 }
 
 // ToRPCCode 转换为RPC识别的错误码，避免返回Unknown状态码
-func ToRPCCode(code int) codes.Code {
-	var statusCode codes.Code
-
+func ToRPCCode(code codes.Code) codes.Code {
 	switch code {
-	case InternalServerError.code:
-		statusCode = codes.Internal
-	case InvalidParams.code:
-		statusCode = codes.InvalidArgument
-	case Unauthorized.code:
-		statusCode = codes.Unauthenticated
-	case NotFound.code:
-		statusCode = codes.NotFound
-	case DeadlineExceeded.code:
-		statusCode = codes.DeadlineExceeded
-	case AccessDenied.code:
-		statusCode = codes.PermissionDenied
-	case LimitExceed.code:
-		statusCode = codes.ResourceExhausted
-	case MethodNotAllowed.code:
-		statusCode = codes.Unimplemented
-	default:
-		statusCode = codes.Unknown
+	case StatusInternalServerError.status.Code():
+		code = codes.Internal
+	case StatusInvalidParams.status.Code():
+		code = codes.InvalidArgument
+	case StatusUnauthorized.status.Code():
+		code = codes.Unauthenticated
+	case StatusNotFound.status.Code():
+		code = codes.NotFound
+	case StatusDeadlineExceeded.status.Code():
+		code = codes.DeadlineExceeded
+	case StatusAccessDenied.status.Code():
+		code = codes.PermissionDenied
+	case StatusLimitExceed.status.Code():
+		code = codes.ResourceExhausted
+	case StatusMethodNotAllowed.status.Code():
+		code = codes.Unimplemented
 	}
 
-	return statusCode
+	return code
 }

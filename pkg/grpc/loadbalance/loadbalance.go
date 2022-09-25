@@ -55,7 +55,6 @@ type blResolver struct {
 }
 
 func (b *blResolver) start() {
-	//addrStrs := b.addrsStore[b.target.Endpoint]
 	addrStrs := b.addrsStore[b.target.URL.Path]
 	addrs := make([]resolver.Address, len(addrStrs))
 	for i, s := range addrStrs {
