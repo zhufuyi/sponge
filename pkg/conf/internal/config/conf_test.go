@@ -14,7 +14,8 @@ func TestParseYAML(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	conf.Show(config)
+	fmt.Println(conf.Show(config))
+	fmt.Println()
 }
 
 // 测试更新配置文件
@@ -34,7 +35,7 @@ func TestWatch(t *testing.T) {
 		return
 	}
 
-	for i := 0; i < 30; i++ {
+	for i := 0; i < 1; i++ { // 设置100秒等待时间，修改配置文件env字段
 		fmt.Println("port:", Get().App.Env)
 		time.Sleep(time.Second)
 	}

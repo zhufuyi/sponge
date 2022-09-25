@@ -1,16 +1,18 @@
 package etcd
 
+/*
+
+// 需要连接真实etcd服务测试
+
 import (
 	"context"
 	"fmt"
+	"github.com/zhufuyi/sponge/pkg/registry"
+	clientv3 "go.etcd.io/etcd/client/v3"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"testing"
 	"time"
-
-	"github.com/zhufuyi/sponge/pkg/registry"
-
-	clientv3 "go.etcd.io/etcd/client/v3"
-	"google.golang.org/grpc"
 )
 
 func TestGRPCSeverRegistry(t *testing.T) {
@@ -18,7 +20,7 @@ func TestGRPCSeverRegistry(t *testing.T) {
 
 	cli, err := clientv3.New(clientv3.Config{
 		Endpoints:   []string{"192.168.3.37:2379"},
-		DialTimeout: 10 * time.Second,
+		DialTimeout: 3 * time.Second,
 		DialOptions: []grpc.DialOption{
 			grpc.WithBlock(),
 			grpc.WithTransportCredentials(insecure.NewCredentials()),
@@ -42,7 +44,7 @@ func TestGRPCSeverRegistry(t *testing.T) {
 	}
 	t.Logf("register %+v", instances[0])
 
-	time.Sleep(time.Second * 15)
+	time.Sleep(3 * time.Second)
 
 	t.Log("deregister")
 	err = etcdRegistry.Deregister(ctx, instance)
@@ -50,12 +52,11 @@ func TestGRPCSeverRegistry(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	time.Sleep(time.Second * 15)
 }
 
 func TestRegistry(t *testing.T) {
 	client, err := clientv3.New(clientv3.Config{
-		Endpoints:   []string{"127.0.0.1:2379"},
+		Endpoints:   []string{"192.168.3.37:2379"},
 		DialTimeout: time.Second, DialOptions: []grpc.DialOption{grpc.WithBlock()},
 	})
 	if err != nil {
@@ -120,7 +121,7 @@ func TestRegistry(t *testing.T) {
 
 func TestHeartBeat(t *testing.T) {
 	client, err := clientv3.New(clientv3.Config{
-		Endpoints:   []string{"127.0.0.1:2379"},
+		Endpoints:   []string{"192.168.3.37:2379"},
 		DialTimeout: time.Second, DialOptions: []grpc.DialOption{grpc.WithBlock()},
 	})
 	if err != nil {
@@ -192,3 +193,4 @@ func TestHeartBeat(t *testing.T) {
 		t.Errorf("reconnect failed")
 	}
 }
+*/

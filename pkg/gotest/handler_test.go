@@ -1,9 +1,11 @@
 package gotest
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"testing"
+	"time"
 )
 
 func newHandler() *Handler {
@@ -43,15 +45,53 @@ func TestHandler_GoRunHttpServer(t *testing.T) {
 	h := newHandler()
 	defer h.Close()
 
+	handlerFunc := func(c *gin.Context) {
+		c.String(http.StatusOK, "hello world!")
+	}
+
 	h.GoRunHttpServer([]RouterInfo{
 		{
-			FuncName: "Hello",
-			Method:   http.MethodGet,
-			Path:     "/hello",
-			HandlerFunc: func(c *gin.Context) {
-				c.String(http.StatusOK, "hello world!")
-			},
+			FuncName:    "create",
+			Method:      http.MethodPost,
+			Path:        "/user",
+			HandlerFunc: handlerFunc,
+		},
+		{
+			FuncName:    "deleteByID",
+			Method:      http.MethodDelete,
+			Path:        "/user/:id",
+			HandlerFunc: handlerFunc,
+		},
+		{
+			FuncName:    "updateByID",
+			Method:      http.MethodPut,
+			Path:        "/user/:id",
+			HandlerFunc: handlerFunc,
+		},
+		{
+			FuncName:    "updateByID2",
+			Method:      http.MethodPatch,
+			Path:        "/user2/:id",
+			HandlerFunc: handlerFunc,
+		},
+		{
+			FuncName:    "getById",
+			Method:      http.MethodGet,
+			Path:        "/user/:id",
+			HandlerFunc: handlerFunc,
+		},
+		{
+			FuncName:    "options",
+			Method:      http.MethodOptions,
+			Path:        "/user",
+			HandlerFunc: handlerFunc,
 		},
 	})
 
+	url := h.GetRequestURL("updateByID", 1)
+	t.Log(url)
+
+	time.Sleep(time.Millisecond * 100)
+	ctx, _ := context.WithTimeout(context.Background(), time.Second)
+	_ = h.HTTPServer.Shutdown(ctx)
 }

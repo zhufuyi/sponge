@@ -1,8 +1,6 @@
 package middleware
 
 import (
-	"fmt"
-	"net"
 	"testing"
 
 	"github.com/zhufuyi/sponge/pkg/gin/response"
@@ -13,10 +11,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var requestAddr string
+func runLogHTTPServer() string {
+	serverAddr, requestAddr := utils.GetLocalHTTPAddrPairs()
 
-func initServer1() {
-	addr := getAddr()
+	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 	r.Use(RequestID())
 
@@ -25,10 +23,11 @@ func initServer1() {
 
 	// 自定义打印日志
 	r.Use(Logging(
+		WithLog(logger.Get()),
 		WithMaxLen(400),
-		//WithRequestIDFromHeader(),
+		WithRequestIDFromHeader(),
 		WithRequestIDFromContext(),
-		//WithIgnoreRoutes("/hello"), // 忽略/hello
+		WithIgnoreRoutes("/ping"), // 忽略/ping
 	))
 
 	// 自定义zap log
@@ -49,17 +48,17 @@ func initServer1() {
 	r.PATCH("/hello", helloFun)
 
 	go func() {
-		err := r.Run(addr)
+		err := r.Run(serverAddr)
 		if err != nil {
 			panic(err)
 		}
 	}()
+
+	return requestAddr
 }
 
-// ------------------------------------------------------------------------------------------
-
 func TestRequest(t *testing.T) {
-	initServer1()
+	requestAddr := runLogHTTPServer()
 
 	wantHello := "hello world"
 	result := &gohttp.StdResult{}
@@ -126,28 +125,4 @@ func TestRequest(t *testing.T) {
 			t.Errorf("got: %s, want: %s", got, wantHello)
 		}
 	})
-
-}
-
-func getAddr() string {
-	port, _ := getAvailablePort()
-	requestAddr = fmt.Sprintf("http://localhost:%d", port)
-	return fmt.Sprintf(":%d", port)
-}
-
-func getAvailablePort() (int, error) {
-	address, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("%s:0", "0.0.0.0"))
-	if err != nil {
-		return 0, err
-	}
-
-	listener, err := net.ListenTCP("tcp", address)
-	if err != nil {
-		return 0, err
-	}
-
-	port := listener.Addr().(*net.TCPAddr).Port
-	err = listener.Close()
-
-	return port, err
 }

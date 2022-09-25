@@ -105,3 +105,14 @@ func Test_userExampleCache_Del(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func Test_userExampleCache_SetCacheWithNotFound(t *testing.T) {
+	c := newUserExampleCache()
+	defer c.Close()
+
+	record := c.TestDataSlice[0].(*model.UserExample)
+	err := c.ICache.(UserExampleCache).SetCacheWithNotFound(c.Ctx, record.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+}

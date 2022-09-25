@@ -11,9 +11,14 @@ func printInfo() {
 	}()
 
 	Debug("this is debug")
+	Debugf("this is debug %d", 2)
 	Info("this is info")
+	Infof("this is info %d", 2)
 	Warn("this is warn")
+	Warnf("this is warn %d", 2)
 	Error("this is error")
+	Errorf("this is error %d", 2)
+	WithFields(Int("key", 2)).Info("this is info")
 
 	type people struct {
 		Name string `json:"name"`
@@ -48,13 +53,13 @@ func TestInit(t *testing.T) {
 			}},
 			wantErr: false,
 		},
-		{
-			name: "terminal json warn",
-			args: args{[]Option{
-				WithFormat("json"), WithLevel("warn"),
-			}},
-			wantErr: false,
-		},
+		//{
+		//	name: "terminal json warn",
+		//	args: args{[]Option{
+		//		WithFormat("json"), WithLevel("warn"),
+		//	}},
+		//	wantErr: false,
+		//},
 		{
 			name:    "file console debug",
 			args:    args{[]Option{WithSave(true)}},

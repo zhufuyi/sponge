@@ -4,9 +4,18 @@ import (
 	"fmt"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
-func TestVerifyTokenCustom(t *testing.T) {
+func TestGenerateToken(t *testing.T) {
+	Init()
+	token, err := GenerateToken("123")
+	assert.NoError(t, err)
+	t.Log(token)
+}
+
+func TestVerifyToken(t *testing.T) {
 	uid := "123"
 	role := "admin"
 

@@ -1,207 +1,176 @@
 package service
 
 import (
-	"context"
-	"fmt"
 	"testing"
+	"time"
 
 	"github.com/zhufuyi/sponge/api/types"
 	pb "github.com/zhufuyi/sponge/api/userExample/v1"
-	"github.com/zhufuyi/sponge/config"
-	"github.com/zhufuyi/sponge/pkg/grpc/benchmark"
+	"github.com/zhufuyi/sponge/internal/cache"
+	"github.com/zhufuyi/sponge/internal/dao"
+	"github.com/zhufuyi/sponge/internal/model"
+	"github.com/zhufuyi/sponge/pkg/gotest"
 
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/jinzhu/copier"
+	"github.com/stretchr/testify/assert"
 )
 
-func initUserExampleServiceClient() pb.UserExampleServiceClient {
-	err := config.Init(config.Path("conf.yml"))
-	if err != nil {
-		panic(err)
-	}
-	addr := fmt.Sprintf("127.0.0.1:%d", config.Get().Grpc.Port)
+func newUserExampleService() *gotest.Service {
+	// todo 补充测试字段信息
+	testData := &model.UserExample{}
+	testData.ID = 1
+	testData.CreatedAt = time.Now()
+	testData.UpdatedAt = testData.CreatedAt
 
-	conn, err := grpc.Dial(addr,
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
-	if err != nil {
-		panic(err)
-	}
-	//defer conn.Close()
+	// 初始化mock cache
+	c := gotest.NewCache(map[string]interface{}{"no cache": testData})
+	c.ICache = cache.NewUserExampleCache(c.RedisClient)
 
-	return pb.NewUserExampleServiceClient(conn)
+	// 初始化mock dao
+	d := gotest.NewDao(c, testData)
+	d.IDao = dao.NewUserExampleDao(d.DB, c.ICache.(cache.UserExampleCache))
+
+	// 初始化mock service
+	s := gotest.NewService(d, testData)
+	pb.RegisterUserExampleServiceServer(s.Server, &userExampleService{
+		UnimplementedUserExampleServiceServer: pb.UnimplementedUserExampleServiceServer{},
+		iDao:                                  d.IDao.(dao.UserExampleDao),
+	})
+
+	s.GoGrpcServer()
+
+	time.Sleep(time.Millisecond * 100)
+
+	s.IServiceClient = pb.NewUserExampleServiceClient(s.GetClientConn())
+
+	return s
 }
 
-// 通过客户端测试userExample的各个方法
-func Test_userExampleService_methods(t *testing.T) {
-	cli := initUserExampleServiceClient()
-	ctx := context.Background()
+func Test_userExampleService_Create(t *testing.T) {
+	s := newUserExampleService()
+	defer s.Close()
+	testData := &pb.CreateUserExampleRequest{}
+	_ = copier.Copy(testData, s.TestData.(*model.UserExample))
 
-	tests := []struct {
-		name    string
-		fn      func() (interface{}, error)
-		wantErr bool
-	}{
-		// todo generate the service struct code here
-		// delete the templates code start
-		{
-			name: "Create",
-			fn: func() (interface{}, error) {
-				// todo test after filling in parameters
-				return cli.Create(ctx, &pb.CreateUserExampleRequest{
-					Name:     "宋九",
-					Email:    "foo7@bar.com",
-					Password: "f447b20a7fcbf53a5d5be013ea0b15af",
-					Phone:    "+8618576552066",
-					Avatar:   "http://internal.com/7.jpg",
-					Age:      21,
-					Gender:   2,
-				})
-			},
-			wantErr: false,
-		},
+	s.MockDao.SqlMock.ExpectBegin()
+	args := s.MockDao.GetAnyArgs(s.TestData)
+	s.MockDao.SqlMock.ExpectExec("INSERT INTO .*").
+		WithArgs(args[:len(args)-1]...). // 根据实际参数数量修改
+		WillReturnResult(sqlmock.NewResult(1, 1))
+	s.MockDao.SqlMock.ExpectCommit()
 
-		{
-			name: "UpdateByID",
-			fn: func() (interface{}, error) {
-				// todo test after filling in parameters
-				return cli.UpdateByID(ctx, &pb.UpdateUserExampleByIDRequest{
-					Id:    7,
-					Phone: "18666666666",
-					Age:   21,
-				})
-			},
-			wantErr: false,
-		},
-		// delete the templates code end
-		{
-			name: "DeleteByID",
-			fn: func() (interface{}, error) {
-				// todo test after filling in parameters
-				return cli.DeleteByID(ctx, &pb.DeleteUserExampleByIDRequest{
-					Id: 3,
-				})
-			},
-			wantErr: false,
-		},
+	reply, err := s.IServiceClient.(pb.UserExampleServiceClient).Create(s.Ctx, testData)
+	//assert.NoError(t, err)
 
-		{
-			name: "GetByID",
-			fn: func() (interface{}, error) {
-				// todo test after filling in parameters
-				return cli.GetByID(ctx, &pb.GetUserExampleByIDRequest{
-					Id: 3,
-				})
-			},
-			wantErr: false,
-		},
-
-		{
-			name: "List",
-			fn: func() (interface{}, error) {
-				// todo test after filling in parameters
-				return cli.List(ctx, &pb.ListUserExampleRequest{
-					Params: &types.Params{
-						Page:  0,
-						Limit: 10,
-						Sort:  "",
-						Columns: []*types.Column{
-							{
-								Name:  "id",
-								Exp:   "<",
-								Value: "100",
-								Logic: "",
-							},
-						},
-					},
-				})
-			},
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.fn()
-			if (err != nil) != tt.wantErr {
-				t.Errorf("test '%s' error = %v, wantErr %v", tt.name, err, tt.wantErr)
-				return
-			}
-			t.Log("reply data: ", got)
-		})
-	}
+	t.Log(err, reply.String())
 }
 
-// 压测userExample的各个方法，完成后复制报告路径到浏览器查看
-func Test_userExampleService_benchmark(t *testing.T) {
-	err := config.Init(config.Path("conf.yml"))
-	if err != nil {
-		panic(err)
-	}
-	host := fmt.Sprintf("127.0.0.1:%d", config.Get().Grpc.Port)
-	protoFile := config.Path("../api/userExample/v1/userExample.proto")
-	// 如果压测过程中缺少第三方依赖，复制到项目的third_party目录下(不包括import路径)
-	importPaths := []string{
-		config.Path("../third_party"), // third_party目录
-		config.Path(".."),             // third_party的上一级目录
+func Test_userExampleService_DeleteByID(t *testing.T) {
+	s := newUserExampleService()
+	defer s.Close()
+	testData := &pb.DeleteUserExampleByIDRequest{
+		Id: s.TestData.(*model.UserExample).ID,
 	}
 
-	tests := []struct {
-		name    string
-		fn      func() error
-		wantErr bool
-	}{
-		{
-			name: "GetByID",
-			fn: func() error {
-				// todo test after filling in parameters
-				message := &pb.GetUserExampleByIDRequest{
-					Id: 3,
-				}
-				b, err := benchmark.New(host, protoFile, "GetByID", message, 100, importPaths...)
-				if err != nil {
-					return err
-				}
-				return b.Run()
-			},
-			wantErr: false,
+	reply, err := s.IServiceClient.(pb.UserExampleServiceClient).DeleteByID(s.Ctx, testData)
+	assert.NoError(t, err)
+
+	t.Log(reply.String())
+}
+
+func Test_userExampleService_UpdateByID(t *testing.T) {
+	s := newUserExampleService()
+	defer s.Close()
+	data := s.TestData.(*model.UserExample)
+	testData := &pb.UpdateUserExampleByIDRequest{}
+	_ = copier.Copy(testData, s.TestData.(*model.UserExample))
+	testData.Id = data.ID
+
+	s.MockDao.SqlMock.ExpectBegin()
+	s.MockDao.SqlMock.ExpectExec("UPDATE .*").
+		WithArgs(s.MockDao.AnyTime, testData.Id). // 根据测试数据数量调整
+		WillReturnResult(sqlmock.NewResult(int64(testData.Id), 1))
+	s.MockDao.SqlMock.ExpectCommit()
+
+	reply, err := s.IServiceClient.(pb.UserExampleServiceClient).UpdateByID(s.Ctx, testData)
+	assert.NoError(t, err)
+
+	t.Log(reply.String())
+}
+
+func Test_userExampleService_GetByID(t *testing.T) {
+	s := newUserExampleService()
+	defer s.Close()
+	data := s.TestData.(*model.UserExample)
+	testData := &pb.GetUserExampleByIDRequest{
+		Id: data.ID,
+	}
+
+	rows := sqlmock.NewRows([]string{"id", "created_at", "updated_at"}).
+		AddRow(data.ID, data.CreatedAt, data.UpdatedAt)
+
+	s.MockDao.SqlMock.ExpectQuery("SELECT .*").
+		WithArgs(testData.Id).
+		WillReturnRows(rows)
+
+	reply, err := s.IServiceClient.(pb.UserExampleServiceClient).GetByID(s.Ctx, testData)
+	assert.NoError(t, err)
+
+	t.Log(reply.String())
+}
+
+func Test_userExampleService_ListByIDs(t *testing.T) {
+	s := newUserExampleService()
+	defer s.Close()
+	data := s.TestData.(*model.UserExample)
+	testData := &pb.ListUserExampleByIDsRequest{
+		Ids: []uint64{data.ID},
+	}
+
+	rows := sqlmock.NewRows([]string{"id", "created_at", "updated_at"}).
+		AddRow(data.ID, data.CreatedAt, data.UpdatedAt)
+
+	s.MockDao.SqlMock.ExpectQuery("SELECT .*").
+		WithArgs(data.ID).
+		WillReturnRows(rows)
+
+	reply, err := s.IServiceClient.(pb.UserExampleServiceClient).ListByIDs(s.Ctx, testData)
+	assert.NoError(t, err)
+
+	t.Log(reply.String())
+}
+
+func Test_userExampleService_List(t *testing.T) {
+	s := newUserExampleService()
+	defer s.Close()
+	testData := s.TestData.(*model.UserExample)
+
+	rows := sqlmock.NewRows([]string{"id", "created_at", "updated_at"}).
+		AddRow(testData.ID, testData.CreatedAt, testData.UpdatedAt)
+
+	s.MockDao.SqlMock.ExpectQuery("SELECT .*").WillReturnRows(rows)
+
+	reply, err := s.IServiceClient.(pb.UserExampleServiceClient).List(s.Ctx, &pb.ListUserExampleRequest{
+		Params: &types.Params{
+			Page:  0,
+			Limit: 10,
+			Sort:  "ignore count", // 忽略测试 select count(*)
 		},
+	})
+	assert.NoError(t, err)
 
-		{
-			name: "List",
-			fn: func() error {
-				// todo test after filling in parameters
-				message := &pb.ListUserExampleRequest{
-					Params: &types.Params{
-						Page:  0,
-						Limit: 10,
-						Sort:  "",
-						Columns: []*types.Column{
-							{
-								Name:  "id",
-								Exp:   "<",
-								Value: "100",
-								Logic: "",
-							},
-						},
-					},
-				}
-				b, err := benchmark.New(host, protoFile, "List", message, 100, importPaths...)
-				if err != nil {
-					return err
-				}
-				return b.Run()
-			},
-			wantErr: false,
-		},
-	}
+	t.Log(reply.String())
+}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			err := tt.fn()
-			if (err != nil) != tt.wantErr {
-				t.Errorf("test '%s' error = %v, wantErr %v", tt.name, err, tt.wantErr)
-				return
-			}
-		})
-	}
+func Test_covertUserExample(t *testing.T) {
+	testData := &model.UserExample{}
+	testData.ID = 1
+	testData.CreatedAt = time.Now()
+	testData.UpdatedAt = testData.CreatedAt
+
+	data, err := covertUserExample(testData)
+	assert.NoError(t, err)
+
+	t.Logf("%+v", data)
 }

@@ -1,10 +1,10 @@
 package ratelimiter
 
 import (
-	"errors"
 	"fmt"
-	"net"
-	"net/http"
+	"github.com/zhufuyi/sponge/pkg/gin/response"
+	"github.com/zhufuyi/sponge/pkg/gohttp"
+	"github.com/zhufuyi/sponge/pkg/utils"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -15,10 +15,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var requestAddr string
+func runRateLimiterHTTPServer() string {
+	serverAddr, requestAddr := utils.GetLocalHTTPAddrPairs()
 
-func init() {
-	addr := getAddr()
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
 
@@ -40,26 +39,31 @@ func init() {
 	//	))
 
 	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, "pong "+c.ClientIP())
+		response.Success(c, "pong "+c.ClientIP())
 	})
 
 	r.GET("/hello", func(c *gin.Context) {
-		c.JSON(200, "hello "+c.ClientIP())
+		response.Success(c, "hello "+c.ClientIP())
 	})
 
 	go func() {
-		err := r.Run(addr)
+		err := r.Run(serverAddr)
 		if err != nil {
 			panic(err)
 		}
 	}()
+
+	return requestAddr
 }
 
 func TestLimiter_QPS(t *testing.T) {
+	requestAddr := runRateLimiterHTTPServer()
+
 	success, failure := 0, 0
 	start := time.Now()
-	for i := 0; i < 1000; i++ {
-		err := get(requestAddr + "/hello")
+	for i := 0; i < 150; i++ {
+		result := &gohttp.StdResult{}
+		err := gohttp.Get(result, requestAddr+"/hello")
 		if err != nil {
 			failure++
 			if failure%10 == 0 {
@@ -68,13 +72,15 @@ func TestLimiter_QPS(t *testing.T) {
 		} else {
 			success++
 		}
-		time.Sleep(time.Millisecond) // 间隔1毫秒
 	}
-	time := time.Now().Sub(start).Seconds()
-	t.Logf("time=%.3fs,  success=%d, failure=%d, qps=%.1f", time, success, failure, float64(success)/time)
+
+	end := time.Now().Sub(start).Seconds()
+	t.Logf("time=%.3fs,  success=%d, failure=%d, qps=%.1f", end, success, failure, float64(success)/end)
 }
 
 func TestRateLimiter(t *testing.T) {
+	requestAddr := runRateLimiterHTTPServer()
+
 	var pingSuccess, pingFailures int32
 	var helloSuccess, helloFailures int32
 
@@ -85,7 +91,8 @@ func TestRateLimiter(t *testing.T) {
 			wg.Add(1)
 			go func(i int) {
 				defer wg.Done()
-				if err := get(requestAddr + "/ping"); err != nil {
+				result := &gohttp.StdResult{}
+				if err := gohttp.Get(result, requestAddr+"/ping"); err != nil {
 					atomic.AddInt32(&pingFailures, 1)
 				} else {
 					atomic.AddInt32(&pingSuccess, 1)
@@ -95,7 +102,8 @@ func TestRateLimiter(t *testing.T) {
 			wg.Add(1)
 			go func(i int) {
 				defer wg.Done()
-				if err := get(requestAddr + "/hello"); err != nil {
+				result := &gohttp.StdResult{}
+				if err := gohttp.Get(result, requestAddr+"/hello"); err != nil {
 					atomic.AddInt32(&helloFailures, 1)
 				} else {
 					atomic.AddInt32(&helloSuccess, 1)
@@ -106,11 +114,13 @@ func TestRateLimiter(t *testing.T) {
 		wg.Wait()
 		fmt.Printf("%s   helloSuccess: %d, helloFailures: %d  pingSuccess: %d, pingFailures: %d\n", time.Now().Format(time.RFC3339Nano), helloSuccess, helloFailures, pingSuccess, pingFailures)
 
-		time.Sleep(time.Millisecond * 200)
+		//time.Sleep(time.Millisecond * 200)
 	}
 }
 
 func TestLimiter_GetQPSLimiterStatus(t *testing.T) {
+	requestAddr := runRateLimiterHTTPServer()
+
 	var pingSuccess, pingFailures int32
 
 	for j := 0; j < 10; j++ {
@@ -119,7 +129,8 @@ func TestLimiter_GetQPSLimiterStatus(t *testing.T) {
 			wg.Add(1)
 			go func(i int) {
 				defer wg.Done()
-				if err := get(requestAddr + "/ping"); err != nil {
+				result := &gohttp.StdResult{}
+				if err := gohttp.Get(result, requestAddr+"/ping"); err != nil {
 					atomic.AddInt32(&pingFailures, 1)
 				} else {
 					atomic.AddInt32(&pingSuccess, 1)
@@ -131,11 +142,13 @@ func TestLimiter_GetQPSLimiterStatus(t *testing.T) {
 
 		qps, _ := GetLimiter().GetQPSLimiterStatus("/ping")
 		fmt.Printf("%s    pingSuccess: %d, pingFailures: %d    limit:%.f\n", time.Now().Format(time.RFC3339Nano), pingSuccess, pingFailures, qps)
-		time.Sleep(time.Millisecond * 200)
+		//time.Sleep(time.Millisecond * 200)
 	}
 }
 
 func TestLimiter_UpdateQPSLimiter(t *testing.T) {
+	requestAddr := runRateLimiterHTTPServer()
+
 	var pingSuccess, pingFailures int32
 
 	for j := 0; j < 10; j++ {
@@ -144,7 +157,8 @@ func TestLimiter_UpdateQPSLimiter(t *testing.T) {
 			wg.Add(1)
 			go func(i int) {
 				defer wg.Done()
-				if err := get(requestAddr + "/ping"); err != nil {
+				result := &gohttp.StdResult{}
+				if err := gohttp.Get(result, requestAddr+"/ping"); err != nil {
 					atomic.AddInt32(&pingFailures, 1)
 				} else {
 					atomic.AddInt32(&pingSuccess, 1)
@@ -157,43 +171,6 @@ func TestLimiter_UpdateQPSLimiter(t *testing.T) {
 		limit, burst := GetLimiter().GetQPSLimiterStatus("/ping")
 		GetLimiter().UpdateQPSLimiter("/ping", limit+rate.Limit(j), burst)
 		fmt.Printf("%s    pingSuccess: %d, pingFailures: %d    limit:%.f\n", time.Now().Format(time.RFC3339Nano), pingSuccess, pingFailures, limit)
-		time.Sleep(time.Millisecond * 200)
+		//time.Sleep(time.Millisecond * 200)
 	}
-}
-
-func getAddr() string {
-	port, _ := getAvailablePort()
-	requestAddr = fmt.Sprintf("http://localhost:%d", port)
-	return fmt.Sprintf(":%d", port)
-}
-
-func getAvailablePort() (int, error) {
-	address, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("%s:0", "0.0.0.0"))
-	if err != nil {
-		return 0, err
-	}
-
-	listener, err := net.ListenTCP("tcp", address)
-	if err != nil {
-		return 0, err
-	}
-
-	port := listener.Addr().(*net.TCPAddr).Port
-	err = listener.Close()
-
-	return port, err
-}
-
-func get(url string) error {
-	resp, err := http.Get(url)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return errors.New(http.StatusText(resp.StatusCode))
-	}
-
-	return nil
 }

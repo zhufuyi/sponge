@@ -6,23 +6,23 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"net"
 	"net/http"
+	"reflect"
 	"strconv"
 	"strings"
 	"testing"
 
+	"github.com/zhufuyi/sponge/pkg/utils"
+
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
+	"github.com/stretchr/testify/assert"
 )
 
-var requestAddr string
+func runValidatorHTTPServer() string {
+	serverAddr, requestAddr := utils.GetLocalHTTPAddrPairs()
 
-func init() {
-	port, _ := getAvailablePort()
-	requestAddr = fmt.Sprintf("http://localhost:%d", port)
-	addr := fmt.Sprintf(":%d", port)
-
+	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 	binding.Validator = Init()
 
@@ -34,29 +34,13 @@ func init() {
 	r.GET("/hellos", getHellos)
 
 	go func() {
-		err := r.Run(addr)
+		err := r.Run(serverAddr)
 		if err != nil {
 			panic(err)
 		}
 	}()
-}
 
-// 获取可用端口
-func getAvailablePort() (int, error) {
-	address, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("%s:0", "0.0.0.0"))
-	if err != nil {
-		return 0, err
-	}
-
-	listener, err := net.ListenTCP("tcp", address)
-	if err != nil {
-		return 0, err
-	}
-
-	port := listener.Addr().(*net.TCPAddr).Port
-	err = listener.Close()
-
-	return port, err
+	return requestAddr
 }
 
 var (
@@ -159,6 +143,8 @@ func getHellos(c *gin.Context) {
 // ------------------------------------------------------------------------------------------
 
 func TestPostValidate(t *testing.T) {
+	requestAddr := runValidatorHTTPServer()
+
 	t.Run("success", func(t *testing.T) {
 		got, err := do(http.MethodPost, requestAddr+"/hello", &postForm{
 			Name:  "foo",
@@ -222,6 +208,8 @@ func TestPostValidate(t *testing.T) {
 // ------------------------------------------------------------------------------------------
 
 func TestDeleteValidate(t *testing.T) {
+	requestAddr := runValidatorHTTPServer()
+
 	t.Run("success", func(t *testing.T) {
 		got, err := do(http.MethodDelete, requestAddr+"/hello", &deleteForm{
 			IDS: []uint64{1, 2, 3},
@@ -261,6 +249,8 @@ func TestDeleteValidate(t *testing.T) {
 // -------------------------------------------------------------------------------------------
 
 func TestPutValidate(t *testing.T) {
+	requestAddr := runValidatorHTTPServer()
+
 	t.Run("success", func(t *testing.T) {
 		got, err := do(http.MethodPut, requestAddr+"/hello", &updateForm{
 			ID:    100,
@@ -309,6 +299,8 @@ func TestPutValidate(t *testing.T) {
 // -------------------------------------------------------------------------------------------
 
 func TestGetValidate(t *testing.T) {
+	requestAddr := runValidatorHTTPServer()
+
 	t.Run("success", func(t *testing.T) {
 		got, err := do(http.MethodGet, requestAddr+"/hello?id=100", nil)
 		if err != nil {
@@ -346,6 +338,8 @@ func TestGetValidate(t *testing.T) {
 // -------------------------------------------------------------------------------------------
 
 func TestGetsValidate(t *testing.T) {
+	requestAddr := runValidatorHTTPServer()
+
 	t.Run("success", func(t *testing.T) {
 		got, err := do(http.MethodGet, requestAddr+"/hellos?page=0&size=10&sort=-id", nil)
 		if err != nil {
@@ -420,4 +414,43 @@ func do(method string, url string, body interface{}) ([]byte, error) {
 	default:
 		return nil, errors.New("unknown method")
 	}
+}
+
+// ------------------------------------------------------------------------------------------
+
+type st struct {
+	Name string
+}
+
+func TestCustomValidator_Engine(t *testing.T) {
+	validator := NewCustomValidator()
+	v := validator.Engine()
+	assert.NotNil(t, v)
+}
+
+func TestCustomValidator_ValidateStruct(t *testing.T) {
+	validator := NewCustomValidator()
+	err := validator.ValidateStruct(new(st))
+	assert.NoError(t, err)
+}
+
+func TestCustomValidator_lazyinit(t *testing.T) {
+	validator := NewCustomValidator()
+	validator.lazyinit()
+}
+
+func TestInit(t *testing.T) {
+	validator := Init()
+	assert.NotNil(t, validator)
+}
+
+func TestNewCustomValidator(t *testing.T) {
+	validator := NewCustomValidator()
+	assert.NotNil(t, validator)
+}
+
+func Test_kindOfData(t *testing.T) {
+
+	kind := kindOfData(new(st))
+	assert.Equal(t, reflect.Struct, kind)
 }

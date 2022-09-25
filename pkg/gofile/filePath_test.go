@@ -1,6 +1,7 @@
 package gofile
 
 import (
+	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
 )
@@ -64,4 +65,14 @@ func TestListDirsAndFiles(t *testing.T) {
 	for dir, files := range df {
 		t.Log(dir, strings.Join(files, "\n"))
 	}
+}
+
+func TestGetFilename(t *testing.T) {
+	name := GetFilename("./README.md")
+	assert.Equal(t, "README.md", name)
+}
+
+func TestGetPathDelimiter(t *testing.T) {
+	d := GetPathDelimiter()
+	t.Log(d)
 }
