@@ -40,6 +40,7 @@ func NewUserExampleServiceServer() pb.UserExampleServiceServer {
 	}
 }
 
+// Create 创建一条记录
 func (s *userExampleService) Create(ctx context.Context, req *pb.CreateUserExampleRequest) (*pb.CreateUserExampleReply, error) {
 	err := req.Validate()
 	if err != nil {
@@ -63,6 +64,7 @@ func (s *userExampleService) Create(ctx context.Context, req *pb.CreateUserExamp
 	return &pb.CreateUserExampleReply{Id: userExample.ID}, nil
 }
 
+// DeleteByID 根据id删除一条记录
 func (s *userExampleService) DeleteByID(ctx context.Context, req *pb.DeleteUserExampleByIDRequest) (*pb.DeleteUserExampleByIDReply, error) {
 	err := req.Validate()
 	if err != nil {
@@ -79,6 +81,7 @@ func (s *userExampleService) DeleteByID(ctx context.Context, req *pb.DeleteUserE
 	return &pb.DeleteUserExampleByIDReply{}, nil
 }
 
+// UpdateByID 根据id更新一条记录
 func (s *userExampleService) UpdateByID(ctx context.Context, req *pb.UpdateUserExampleByIDRequest) (*pb.UpdateUserExampleByIDReply, error) {
 	err := req.Validate()
 	if err != nil {
@@ -103,6 +106,7 @@ func (s *userExampleService) UpdateByID(ctx context.Context, req *pb.UpdateUserE
 	return &pb.UpdateUserExampleByIDReply{}, nil
 }
 
+// GetByID 根据id查询一条记录
 func (s *userExampleService) GetByID(ctx context.Context, req *pb.GetUserExampleByIDRequest) (*pb.GetUserExampleByIDReply, error) {
 	err := req.Validate()
 	if err != nil {
@@ -120,15 +124,43 @@ func (s *userExampleService) GetByID(ctx context.Context, req *pb.GetUserExample
 		return nil, ecode.StatusGetUserExample.Err()
 	}
 
-	value, err := covertUserExample(record)
+	data, err := covertUserExample(record)
 	if err != nil {
 		logger.Warn("covertUserExample error", logger.Err(err), logger.Any("record", record))
 		return nil, ecode.StatusInternalServerError.Err()
 	}
 
-	return &pb.GetUserExampleByIDReply{UserExample: value}, nil
+	return &pb.GetUserExampleByIDReply{UserExample: data}, nil
 }
 
+// ListByIDs 根据id数组获取多条记录
+func (s *userExampleService) ListByIDs(ctx context.Context, req *pb.ListUserExampleByIDsRequest) (*pb.ListUserExampleByIDsReply, error) {
+	err := req.Validate()
+	if err != nil {
+		logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req))
+		return nil, ecode.StatusInvalidParams.Err()
+	}
+
+	records, err := s.iDao.GetByIDs(ctx, req.Ids)
+	if err != nil {
+		logger.Error("s.iDao.GetByID error", logger.Err(err), logger.Any("ids", req.Ids))
+		return nil, ecode.StatusGetUserExample.Err()
+	}
+
+	datas := []*pb.UserExample{}
+	for _, record := range records {
+		data, err := covertUserExample(record)
+		if err != nil {
+			logger.Warn("covertUserExample error", logger.Err(err), logger.Any("id", record.ID))
+			continue
+		}
+		datas = append(datas, data)
+	}
+
+	return &pb.ListUserExampleByIDsReply{UserExamples: datas}, nil
+}
+
+// List 获取多条记录
 func (s *userExampleService) List(ctx context.Context, req *pb.ListUserExampleRequest) (*pb.ListUserExampleReply, error) {
 	err := req.Validate()
 	if err != nil {
@@ -150,19 +182,19 @@ func (s *userExampleService) List(ctx context.Context, req *pb.ListUserExampleRe
 		return nil, ecode.StatusListUserExample.Err()
 	}
 
-	values := []*pb.UserExample{}
+	datas := []*pb.UserExample{}
 	for _, record := range records {
-		value, err := covertUserExample(record)
+		data, err := covertUserExample(record)
 		if err != nil {
 			logger.Warn("covertUserExample error", logger.Err(err), logger.Any("id", record.ID))
 			continue
 		}
-		values = append(values, value)
+		datas = append(datas, data)
 	}
 
 	return &pb.ListUserExampleReply{
 		Total:        total,
-		UserExamples: values,
+		UserExamples: datas,
 	}, nil
 }
 

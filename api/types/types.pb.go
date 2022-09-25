@@ -28,7 +28,7 @@ type Column struct {
 	Name  string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`   // 列名
 	Exp   string `protobuf:"bytes,2,opt,name=exp,proto3" json:"exp,omitempty"`     // 表达式，值为空时默认为=，有=、!=、>、>=、<、<=、like七种类型
 	Value string `protobuf:"bytes,3,opt,name=value,proto3" json:"value,omitempty"` // 列值
-	Logic string `protobuf:"bytes,4,opt,name=logic,proto3" json:"logic,omitempty"` // 逻辑类型，值为空时默认为and，有&(and)、||(or)两种类型
+	Logic string `protobuf:"bytes,4,opt,name=logic,proto3" json:"logic,omitempty"` // 逻辑类型，值为空时默认为and，只有&(and)、||(or)两种类型
 }
 
 func (x *Column) Reset() {

@@ -57,22 +57,20 @@ fmt:
 .PHONY: test
 # make test
 test:
-	go test -cover ./... | grep -v vendor;true
-	go vet ./... | grep -v vendor;true
 	go test -short ${PKG_LIST}
 
 
 .PHONY: cover
 # make cover
 cover:
-	go test -short -coverprofile coverage.txt -covermode=atomic ${PKG_LIST}
-	go tool cover -html=coverage.txt
+	go test -short -coverprofile coverage.out -covermode=atomic ${PKG_LIST}
+	go tool cover -html=coverage.out
 
 
 .PHONY: docker
 # generate docker image
 docker:
-	docker build -t sponge:latest -f Dockerfile .
+	docker build -t sponge:latest -f build/Dockerfile
 
 
 .PHONY: clean

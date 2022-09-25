@@ -23,3 +23,8 @@ var (
 	StatusAccessDenied     = errcode.StatusAccessDenied
 	StatusMethodNotAllowed = errcode.StatusMethodNotAllowed
 )
+
+// Any kev-value
+func Any(key string, val interface{}) errcode.Detail {
+	return errcode.Any(key, val)
+}

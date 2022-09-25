@@ -37,7 +37,7 @@ type grpcServer struct {
 // Start grpc service
 func (s *grpcServer) Start() error {
 	if s.iRegistry != nil {
-		ctx, _ := context.WithTimeout(context.Background(), 3*time.Second) //nolint
+		ctx, _ := context.WithTimeout(context.Background(), 5*time.Second) //nolint
 		if err := s.iRegistry.Register(ctx, s.serviceInstance); err != nil {
 			return err
 		}

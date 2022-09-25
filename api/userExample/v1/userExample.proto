@@ -15,6 +15,7 @@ service userExampleService {
   rpc DeleteByID(DeleteUserExampleByIDRequest) returns (DeleteUserExampleByIDReply) {}
   rpc UpdateByID(UpdateUserExampleByIDRequest) returns (UpdateUserExampleByIDReply) {}
   rpc GetByID(GetUserExampleByIDRequest) returns (GetUserExampleByIDReply) {}
+  rpc ListByIDs(ListUserExampleByIDsRequest) returns (ListUserExampleByIDsReply) {}
   rpc List(ListUserExampleRequest) returns (ListUserExampleReply) {}
 }
 
@@ -31,7 +32,7 @@ message CreateUserExampleRequest {
   string phone=4 [(validate.rules).string = {pattern: "^1[3456789]\\d{9}$"}];    // 手机号码
   string avatar=5 [(validate.rules).string.uri = true];       // 头像
   int32  age=6 [(validate.rules).int32  = {gte:0, lte: 120}];    // 年龄
-  GenderType  gender=7 [(validate.rules).enum.defined_only = true];  // 性别，1:男，2:女
+  GenderType  gender=7 [(validate.rules).enum.defined_only = true];  // 性别，0:未知，1:男，2:女
 }
 
 message CreateUserExampleReply {
@@ -83,6 +84,14 @@ message GetUserExampleByIDRequest {
 
 message GetUserExampleByIDReply {
   UserExample userExample = 1;
+}
+
+message ListUserExampleByIDsRequest {
+  repeated uint64 ids = 1;
+}
+
+message ListUserExampleByIDsReply {
+  repeated UserExample userExamples = 1;
 }
 
 message ListUserExampleRequest {

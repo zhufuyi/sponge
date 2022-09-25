@@ -201,7 +201,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handler.GetUserExamples1Request"
+                            "$ref": "#/definitions/handler.GetUserExamplesByIDsRequest"
                         }
                     }
                 ],
@@ -313,7 +313,7 @@
                 }
             }
         },
-        "handler.GetUserExamples1Request": {
+        "handler.GetUserExamplesByIDsRequest": {
             "type": "object",
             "properties": {
                 "ids": {

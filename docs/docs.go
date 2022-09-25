@@ -205,7 +205,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handler.GetUserExamples1Request"
+                            "$ref": "#/definitions/handler.GetUserExamplesByIDsRequest"
                         }
                     }
                 ],
@@ -317,7 +317,7 @@ const docTemplate = `{
                 }
             }
         },
-        "handler.GetUserExamples1Request": {
+        "handler.GetUserExamplesByIDsRequest": {
             "type": "object",
             "properties": {
                 "ids": {

@@ -26,6 +26,7 @@ type UserExampleServiceClient interface {
 	DeleteByID(ctx context.Context, in *DeleteUserExampleByIDRequest, opts ...grpc.CallOption) (*DeleteUserExampleByIDReply, error)
 	UpdateByID(ctx context.Context, in *UpdateUserExampleByIDRequest, opts ...grpc.CallOption) (*UpdateUserExampleByIDReply, error)
 	GetByID(ctx context.Context, in *GetUserExampleByIDRequest, opts ...grpc.CallOption) (*GetUserExampleByIDReply, error)
+	ListByIDs(ctx context.Context, in *ListUserExampleByIDsRequest, opts ...grpc.CallOption) (*ListUserExampleByIDsReply, error)
 	List(ctx context.Context, in *ListUserExampleRequest, opts ...grpc.CallOption) (*ListUserExampleReply, error)
 }
 
@@ -73,6 +74,15 @@ func (c *userExampleServiceClient) GetByID(ctx context.Context, in *GetUserExamp
 	return out, nil
 }
 
+func (c *userExampleServiceClient) ListByIDs(ctx context.Context, in *ListUserExampleByIDsRequest, opts ...grpc.CallOption) (*ListUserExampleByIDsReply, error) {
+	out := new(ListUserExampleByIDsReply)
+	err := c.cc.Invoke(ctx, "/api.userExample.v1.userExampleService/ListByIDs", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *userExampleServiceClient) List(ctx context.Context, in *ListUserExampleRequest, opts ...grpc.CallOption) (*ListUserExampleReply, error) {
 	out := new(ListUserExampleReply)
 	err := c.cc.Invoke(ctx, "/api.userExample.v1.userExampleService/List", in, out, opts...)
@@ -90,6 +100,7 @@ type UserExampleServiceServer interface {
 	DeleteByID(context.Context, *DeleteUserExampleByIDRequest) (*DeleteUserExampleByIDReply, error)
 	UpdateByID(context.Context, *UpdateUserExampleByIDRequest) (*UpdateUserExampleByIDReply, error)
 	GetByID(context.Context, *GetUserExampleByIDRequest) (*GetUserExampleByIDReply, error)
+	ListByIDs(context.Context, *ListUserExampleByIDsRequest) (*ListUserExampleByIDsReply, error)
 	List(context.Context, *ListUserExampleRequest) (*ListUserExampleReply, error)
 	mustEmbedUnimplementedUserExampleServiceServer()
 }
@@ -109,6 +120,9 @@ func (UnimplementedUserExampleServiceServer) UpdateByID(context.Context, *Update
 }
 func (UnimplementedUserExampleServiceServer) GetByID(context.Context, *GetUserExampleByIDRequest) (*GetUserExampleByIDReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetByID not implemented")
+}
+func (UnimplementedUserExampleServiceServer) ListByIDs(context.Context, *ListUserExampleByIDsRequest) (*ListUserExampleByIDsReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListByIDs not implemented")
 }
 func (UnimplementedUserExampleServiceServer) List(context.Context, *ListUserExampleRequest) (*ListUserExampleReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
@@ -198,6 +212,24 @@ func _UserExampleService_GetByID_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserExampleService_ListByIDs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListUserExampleByIDsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserExampleServiceServer).ListByIDs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.userExample.v1.userExampleService/ListByIDs",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserExampleServiceServer).ListByIDs(ctx, req.(*ListUserExampleByIDsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _UserExampleService_List_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListUserExampleRequest)
 	if err := dec(in); err != nil {
@@ -238,6 +270,10 @@ var UserExampleService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetByID",
 			Handler:    _UserExampleService_GetByID_Handler,
+		},
+		{
+			MethodName: "ListByIDs",
+			Handler:    _UserExampleService_ListByIDs_Handler,
 		},
 		{
 			MethodName: "List",

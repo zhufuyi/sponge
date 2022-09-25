@@ -56,21 +56,6 @@ func (d *userExampleDao) DeleteByID(ctx context.Context, id uint64) error {
 	return nil
 }
 
-// Deletes 根据id删除多条记录
-func (d *userExampleDao) Deletes(ctx context.Context, ids []uint64) error {
-	err := d.db.WithContext(ctx).Where("id IN (?)", ids).Delete(&model.UserExample{}).Error
-	if err != nil {
-		return err
-	}
-
-	// delete cache
-	for _, id := range ids {
-		_ = d.cache.Del(ctx, id)
-	}
-
-	return nil
-}
-
 // UpdateByID 根据id更新记录
 func (d *userExampleDao) UpdateByID(ctx context.Context, table *model.UserExample) error {
 	if table.ID < 1 {

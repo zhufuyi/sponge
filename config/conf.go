@@ -15,8 +15,8 @@ func Init(configFile string) error {
 	return conf.Parse(configFile, config)
 }
 
-func Show() {
-	conf.Show(config)
+func Show() string {
+	return conf.Show(config)
 }
 
 func Get() *Config {

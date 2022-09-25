@@ -2,12 +2,12 @@ package cache
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/zhufuyi/sponge/internal/model"
 	"github.com/zhufuyi/sponge/pkg/cache"
 	"github.com/zhufuyi/sponge/pkg/encoding"
+	"github.com/zhufuyi/sponge/pkg/utils"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/spf13/cast"
@@ -15,7 +15,7 @@ import (
 
 const (
 	// PrefixUserExampleCacheKey cache prefix
-	PrefixUserExampleCacheKey = "userExample:%d"
+	PrefixUserExampleCacheKey = "userExample:"
 )
 
 var _ UserExampleCache = (*userExampleCache)(nil)
@@ -48,7 +48,7 @@ func NewUserExampleCache(rdb *redis.Client) UserExampleCache {
 
 // GetUserExampleCacheKey 设置缓存
 func (c *userExampleCache) GetUserExampleCacheKey(id uint64) string {
-	return fmt.Sprintf(PrefixUserExampleCacheKey, id)
+	return PrefixUserExampleCacheKey + utils.Uint64ToStr(id)
 }
 
 // Set write to cache
@@ -99,7 +99,6 @@ func (c *userExampleCache) MultiGet(ctx context.Context, ids []uint64) (map[stri
 		keys = append(keys, cacheKey)
 	}
 
-	// NOTE: 需要在这里make实例化，如果在返回参数里直接定义会报 nil map
 	itemMap := make(map[string]*model.UserExample)
 	err := c.cache.MultiGet(ctx, keys, itemMap)
 	if err != nil {

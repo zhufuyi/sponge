@@ -4,6 +4,7 @@
 *.dll
 *.so
 *.dylib
+*.log
 cmd/sponge/sponge
 
 # Test binary, built with `go test -c`

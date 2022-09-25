@@ -41,7 +41,7 @@ definitions:
         description: 手机号码，必须在前加'+86'
         type: string
     type: object
-  handler.GetUserExamples1Request:
+  handler.GetUserExamplesByIDsRequest:
     properties:
       ids:
         items:
@@ -241,7 +241,7 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/handler.GetUserExamples1Request'
+          $ref: '#/definitions/handler.GetUserExamplesByIDsRequest'
       produces:
       - application/json
       responses:
