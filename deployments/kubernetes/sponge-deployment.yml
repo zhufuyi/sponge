@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sponge-dm
+  namespace: sponge
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sponge
+  template:
+    metadata:
+      name: sponge-pod
+      labels:
+        app: sponge
+    spec:
+      containers:
+        - name: sponge
+          image: sponge/sponge:latest
+          # If using a local image, use Never, the default is Always
+          imagePullPolicy: Never
+          command: ["./sponge", "-c", "/app/config/conf.yml"]
+          ports:
+            - name: http-port
+              containerPort: 8080
+            - name: grpc-port
+              containerPort: 9090
+            - name: metrics-port
+              containerPort: 9082
+          resources:
+            requests:
+              cpu: 10m
+              memory: 10Mi
+            limits:
+              cpu: 1000m
+              memory: 1000Mi
+          volumeMounts:
+            - name: sponge-vl
+              mountPath: /app/config/
+              readOnly: true
+          # 就绪探测
+          readinessProbe:
+            #httpGet:
+              #port: http-port
+              #path: /health
+            exec:
+              command: ["/bin/grpc_health_probe", "-addr=:9090"]
+            initialDelaySeconds: 10
+            timeoutSeconds: 2
+            periodSeconds: 30
+            successThreshold: 1
+            failureThreshold: 3
+
+          # 容器存活探测
+          livenessProbe:
+            #httpGet:
+              #port: http-port
+              #path: /health
+            exec:
+              command: ["/bin/grpc_health_probe", "-addr=:9090"]
+            initialDelaySeconds: 10
+            timeoutSeconds: 2
+            periodSeconds: 30
+            successThreshold: 1
+            failureThreshold: 3
+
+      volumes:
+        - name: sponge-vl
+          configMap:
+            name: sponge-config

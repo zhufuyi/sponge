@@ -37,7 +37,7 @@ sponge 是一个微服务框架，支持http和grpc及服务治理，结合[goct
 │   ├── handler         # http的业务功能实现
 │   ├── model           # 数据库 model
 │   ├── routers         # http 路由
-│   ├── server          # 服务入口，包括http和grpc服务入口
+│   ├── server          # 服务入口，包括http和grpc服务
 │   └── service         # grpc的业务功能实现
 ├── pkg                 # 外部应用程序可以使用的库代码
 ├── scripts             # 存放用于执行各种构建，安装，分析等操作的脚本

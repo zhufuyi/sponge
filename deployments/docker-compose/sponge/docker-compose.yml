@@ -14,9 +14,9 @@ services:
     volumes:
       - $PWD/config:/app/config
     healthcheck:
-      #test: ["CMD", "curl", "-f", "http://localhost:8080/health"]   # http健康检查，注：镜像里必须又curl命令
-      test: ["CMD", "grpc_health_probe", "-addr=localhost:9090"]    # grpc健康检查，注：镜像必须有grpc_health_probe命令
-      interval: 30s      # 间隔时间
-      timeout: 5s        # 超时时间
-      retries: 3         # 重试次数
+      #test: ["CMD", "curl", "-f", "http://localhost:8080/health"]   # http健康检查，注：镜像必须包含curl命令
+      test: ["CMD", "grpc_health_probe", "-addr=localhost:9090"]    # grpc健康检查，注：镜像必须包含grpc_health_probe命令
+      interval: 30s         # 间隔时间
+      timeout: 5s           # 超时时间
+      retries: 3              # 重试次数
       start_period: 10s  # 启动多久后开始检查

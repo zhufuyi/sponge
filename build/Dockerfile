@@ -14,7 +14,7 @@ RUN cd $GOPATH/pkg/mod/github.com/grpc-ecosystem/grpc-health-probe@v0.4.12 \
     && go mod download \
     && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /grpc_health_probe
 
-# 通过二进制文件构建镜像
+# 使用二进制文件构建镜像
 FROM alpine:latest
 MAINTAINER zhufuyi "g.zhufuyi@gmail.com"
 
@@ -24,7 +24,7 @@ RUN apk add tzdata  \
     && echo "Asia/Shanghai" > /etc/timezone \
     && apk del tzdata
 
-# 添加curl，用在http服务的检查
+# 添加curl，用在http服务的检查，如果用部署在k8s，可以不用安装
 RUN apk add curl
 
 # 添加grpc_health_probe，用在grpc服务的健康检查
@@ -35,3 +35,4 @@ COPY --from=build /go/src/sponge/config/conf.yml /app/config/conf.yml
 
 WORKDIR /app
 CMD ["./sponge", "-c", "config/conf.yml"]
+

@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: sponge-svc
+  namespace: sponge
+spec:
+  selector:
+    app: sponge
+  type: ClusterIP
+  ports:
+    - name: sponge-svc-http-port
+      port: 8080
+      targetPort: 8080
+    - name: sponge-svc-grpc-port
+      port: 9090
+      targetPort: 9090
+    - name: sponge-svc-grpc-metrics-port
+      port: 9082
+      targetPort: 9082

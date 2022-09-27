@@ -4,10 +4,11 @@ PROJECT_NAME := "github.com/zhufuyi/sponge"
 PKG := "$(PROJECT_NAME)"
 PKG_LIST := $(shell go list ${PKG}/... | grep -v /vendor/)
 GO_FILES := $(shell find . -name '*.go' | grep -v /vendor/ | grep -v _test.go)
+PROJECT_FILES := $(shell ls)
 
 
 .PHONY: init
-# init env
+# installation of dependent tools
 init:
 	go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28.0
 	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2.0
@@ -24,81 +25,93 @@ init:
 
 
 .PHONY: ci-lint
-# make ci-lint
+# check the code specification against the rules in the .golangci.yml file
 ci-lint:
 	golangci-lint run ./...
 
 
 .PHONY: build
-# make build, Build the binary file
+# go build the linux amd64 binary file
 build:
-	@cd cmd/sponge && go build
+	@cd cmd/sponge && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -gcflags "all=-N -l"
 	@echo "build finished, binary file in path 'cmd/sponge'"
 
 
 .PHONY: run
-# make run, run app
+# run server
 run:
 	@bash scripts/run.sh
 
 
 .PHONY: dep
-# make dep Get the dependencies
+# download dependencies to the directory vendor
 dep:
 	@go mod download
 
 
 .PHONY: fmt
-# make fmt
+# go format *.go files
 fmt:
 	@gofmt -s -w .
 
 
 .PHONY: test
-# make test
+# go test *_test.go files
 test:
 	go test -short ${PKG_LIST}
 
 
 .PHONY: cover
-# make cover
+# generate test coverage
 cover:
-	go test -short -coverprofile coverage.out -covermode=atomic ${PKG_LIST}
-	go tool cover -html=coverage.out
+	go test -short -coverprofile cover.out -covermode=atomic ${PKG_LIST}
+	go tool cover -html=cover.out
 
 
 .PHONY: docker
-# generate docker image
+# build docker image
 docker:
-	docker build -t sponge:latest -f build/Dockerfile
+	@tar zcf sponge.tar.gz ${PROJECT_FILES}
+	@mv -f sponge.tar.gz build/
+	docker build -t sponge/sponge:latest build/
+	@rm -rf build/sponge.tar.gz
+
+
+.PHONY: docker-image
+# copy the binary file to build the docker image, skip the compile to binary in docker
+docker-image: build
+	@bash scripts/grpc_health_probe.sh
+	@mv -f cmd/sponge/sponge build/ && cp -f /tmp/grpc_health_probe build/
+	@mkdir -p build/config && cp -f config/conf.yml build/config/
+	docker build -f build/Dockerfile_sponge -t sponge/sponge:latest build/
+	@rm -rf build/sponge build/config/ build/grpc_health_probe
 
 
 .PHONY: clean
-# make clean
+# clean binary file, cover.out, redundant dependency packages
 clean:
-	@-rm -vrf sponge
-	@-rm -vrf cover.out
-	@-rm -vrf coverage.txt
+	@rm -vrf cmd/sponge/sponge
+	@rm -vrf cover.out
 	@go mod tidy
 	@echo "clean finished"
 
 
 .PHONY: docs
-# gen swagger doc
+# generate swagger doc
 docs:
 	@swag init -g cmd/sponge/main.go
 	@echo "see docs by: http://localhost:8080/swagger/index.html"
 
 
 .PHONY: graph
-# make graph 生成交互式的可视化Go程序调用图，生成完毕后会在浏览器自动打开
+# generate interactive visual function dependency graphs
 graph:
 	@echo "generating graph ......"
 	@go-callvis github.com/zhufuyi/sponge
 
 
 .PHONY: mockgen
-# make mockgen gen mock file
+# mockgen gen mock file
 mockgen:
 	cd ./internal &&  for file in `egrep -rnl "type.*?interface" ./repository | grep -v "_test" `; do \
 		echo $$file ; \
@@ -107,13 +120,13 @@ mockgen:
 
 
 .PHONY: proto
-# generate proto struct only
+# generate *.pb.go codes from *.proto files
 proto:
 	@bash scripts/protoc.sh
 
 
 .PHONY: proto-doc
-# generate proto doc
+# generate doc from *.proto files
 proto-doc:
 	@bash scripts/proto-doc.sh
 

@@ -4,8 +4,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/zhufuyi/sponge/config"
+
+	"github.com/stretchr/testify/assert"
 )
 
 // 测试时需要连接真实数据

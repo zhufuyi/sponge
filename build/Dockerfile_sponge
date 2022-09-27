@@ -1,6 +1,5 @@
 # 需要先在本地编译好二进制文件和配置文件复制到和Dokerfile在同一个目录下
 FROM alpine:latest
-
 MAINTAINER zhufuyi "g.zhufuyi@gmail.com"
 
 # 设置时区为上海
@@ -19,5 +18,6 @@ RUN chmod +x /bin/grpc_health_probe
 COPY config/ /app/config/
 COPY sponge /app/sponge
 RUN chmod +x /app/sponge
+
 WORKDIR /app
 CMD ["./sponge", "-c", "config/conf.yml"]
