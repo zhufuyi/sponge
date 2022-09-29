@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/zhufuyi/sponge/configs"
-	"github.com/zhufuyi/sponge/internal/serverNameExample/config"
+	"github.com/zhufuyi/sponge/internal/config"
 	"github.com/zhufuyi/sponge/pkg/utils"
 
 	"github.com/gin-gonic/gin"

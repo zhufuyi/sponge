@@ -4,12 +4,6 @@ gin中间件插件。
 
 <br>
 
-## 安装
-
-> go get -u github.com/zhufuyi/pkg/gin/middleware
-
-<br>
-
 ## 使用示例
 
 ### 日志中间件

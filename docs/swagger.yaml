@@ -38,7 +38,7 @@ definitions:
         description: 密码
         type: string
       phone:
-        description: 手机号码，必须在前加'+86'
+        description: 手机号码
         type: string
     type: object
   handler.GetUserExamplesByIDsRequest:
@@ -102,7 +102,7 @@ definitions:
         description: 密码
         type: string
       phone:
-        description: 手机号码，必须在前加'+86'
+        description: 手机号码
         type: string
     type: object
   handlerfunc.checkHealthResponse:
@@ -116,7 +116,7 @@ host: localhost:8080
 info:
   contact: {}
   description: http server api docs
-  title: sponge api docs
+  title: serverNameExample api docs
   version: v0.0.0
 paths:
   /api/v1/userExample:

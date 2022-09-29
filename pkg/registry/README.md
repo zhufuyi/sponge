@@ -24,8 +24,8 @@ func setETCDRegistry(etcdEndpoints []string) registry.Registry {
 }
 
 func registryExample() {
-    // endpoint组成schema://ip，例如grpc://127.0.0.1:9090, http://127.0.0.1:8080
-    endpoints:=[]string{"grpc://127.0.0.1:9090"}
+    // endpoint组成schema://ip，例如grpc://127.0.0.1:8282, http://127.0.0.1:8080
+    endpoints:=[]string{"grpc://127.0.0.1:8282"}
 	serviceInstance := registry.NewServiceInstance("user", endpoints,
 		//registry.WithID("1"), // 服务id，唯一编号
 		//registry.WithVersion("v0.0.1"), // 服务版本

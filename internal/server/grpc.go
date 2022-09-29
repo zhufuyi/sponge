@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/zhufuyi/sponge/internal/serverNameExample/config"
-	"github.com/zhufuyi/sponge/internal/serverNameExample/service"
+	"github.com/zhufuyi/sponge/internal/config"
+	"github.com/zhufuyi/sponge/internal/service"
 	"github.com/zhufuyi/sponge/pkg/app"
 	"github.com/zhufuyi/sponge/pkg/grpc/interceptor"
 	"github.com/zhufuyi/sponge/pkg/grpc/metrics"
@@ -105,7 +105,7 @@ func (s *grpcServer) serverOptions() []grpc.ServerOption {
 			if s == nil || s.server == nil {
 				return errors.New("grpc server is nil")
 			}
-			promAddr := fmt.Sprintf(":%d", config.Get().Metrics.Port)
+			promAddr := fmt.Sprintf(":%d", config.Get().Grpc.MetricsPort)
 			s.metricsHTTPServer = metrics.GoHTTPService(promAddr, s.server)
 			logger.Infof("start up grpc metrics service, addr = %s", promAddr)
 			return nil

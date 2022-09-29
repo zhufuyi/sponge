@@ -4,12 +4,6 @@
 
 <br>
 
-### 安装
-
-> go get -u github.com/zhufuyi/pkg/app
-
-<br>
-
 ### 使用示例
 
 ```go

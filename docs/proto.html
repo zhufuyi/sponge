@@ -175,26 +175,7 @@
         
           
           <li>
-            <a href="#api%2ftypes%2ftypes.proto">api/types/types.proto</a>
-            <ul>
-              
-                <li>
-                  <a href="#types.Column"><span class="badge">M</span>Column</a>
-                </li>
-              
-                <li>
-                  <a href="#types.Params"><span class="badge">M</span>Params</a>
-                </li>
-              
-              
-              
-              
-            </ul>
-          </li>
-        
-          
-          <li>
-            <a href="#api%2fuserExample%2fv1%2fuserExample.proto">api/userExample/v1/userExample.proto</a>
+            <a href="#api%2fserverNameExample%2fv1%2fuserExample.proto">api/serverNameExample/v1/userExample.proto</a>
             <ul>
               
                 <li>
@@ -219,6 +200,14 @@
               
                 <li>
                   <a href="#api.userExample.v1.GetUserExampleByIDRequest"><span class="badge">M</span>GetUserExampleByIDRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#api.userExample.v1.ListUserExampleByIDsReply"><span class="badge">M</span>ListUserExampleByIDsReply</a>
+                </li>
+              
+                <li>
+                  <a href="#api.userExample.v1.ListUserExampleByIDsRequest"><span class="badge">M</span>ListUserExampleByIDsRequest</a>
                 </li>
               
                 <li>
@@ -255,6 +244,25 @@
             </ul>
           </li>
         
+          
+          <li>
+            <a href="#api%2ftypes%2ftypes.proto">api/types/types.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#types.Column"><span class="badge">M</span>Column</a>
+                </li>
+              
+                <li>
+                  <a href="#types.Params"><span class="badge">M</span>Params</a>
+                </li>
+              
+              
+              
+              
+            </ul>
+          </li>
+        
         <li><a href="#scalar-value-types">Scalar Value Types</a></li>
       </ul>
     </div>
@@ -262,111 +270,7 @@
     
       
       <div class="file-heading">
-        <h2 id="api/types/types.proto">api/types/types.proto</h2><a href="#title">Top</a>
-      </div>
-      <p></p>
-
-      
-        <h3 id="types.Column">Column</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>name</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>列名 </p></td>
-                </tr>
-              
-                <tr>
-                  <td>exp</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>表达式，值为空时默认为=，有=、!=、&gt;、&gt;=、&lt;、&lt;=、like七种类型 </p></td>
-                </tr>
-              
-                <tr>
-                  <td>value</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>列值 </p></td>
-                </tr>
-              
-                <tr>
-                  <td>logic</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>逻辑类型，值为空时默认为and，有&amp;(and)、||(or)两种类型 </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="types.Params">Params</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>page</td>
-                  <td><a href="#int32">int32</a></td>
-                  <td></td>
-                  <td><p>页码，从0开始 </p></td>
-                </tr>
-              
-                <tr>
-                  <td>limit</td>
-                  <td><a href="#int32">int32</a></td>
-                  <td></td>
-                  <td><p>每页行数 </p></td>
-                </tr>
-              
-                <tr>
-                  <td>sort</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>排序字段，多列排序用逗号分隔 </p></td>
-                </tr>
-              
-                <tr>
-                  <td>columns</td>
-                  <td><a href="#types.Column">Column</a></td>
-                  <td>repeated</td>
-                  <td><p>查询条件 </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-
-      
-
-      
-
-      
-    
-      
-      <div class="file-heading">
-        <h2 id="api/userExample/v1/userExample.proto">api/userExample/v1/userExample.proto</h2><a href="#title">Top</a>
+        <h2 id="api/serverNameExample/v1/userExample.proto">api/serverNameExample/v1/userExample.proto</h2><a href="#title">Top</a>
       </div>
       <p></p>
 
@@ -478,7 +382,7 @@
                   <td>gender</td>
                   <td><a href="#api.userExample.v1.GenderType">GenderType</a></td>
                   <td></td>
-                  <td><p>性别，1:男，2:女 </p></td>
+                  <td><p>性别，0:未知，1:男，2:女 </p></td>
                 </tr>
               
             </tbody>
@@ -712,6 +616,54 @@
               </tbody>
             </table>
             
+          
+
+        
+      
+        <h3 id="api.userExample.v1.ListUserExampleByIDsReply">ListUserExampleByIDsReply</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>userExamples</td>
+                  <td><a href="#api.userExample.v1.UserExample">UserExample</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="api.userExample.v1.ListUserExampleByIDsRequest">ListUserExampleByIDsRequest</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>ids</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
           
 
         
@@ -1085,6 +1037,13 @@
               </tr>
             
               <tr>
+                <td>ListByIDs</td>
+                <td><a href="#api.userExample.v1.ListUserExampleByIDsRequest">ListUserExampleByIDsRequest</a></td>
+                <td><a href="#api.userExample.v1.ListUserExampleByIDsReply">ListUserExampleByIDsReply</a></td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
                 <td>List</td>
                 <td><a href="#api.userExample.v1.ListUserExampleRequest">ListUserExampleRequest</a></td>
                 <td><a href="#api.userExample.v1.ListUserExampleReply">ListUserExampleReply</a></td>
@@ -1095,6 +1054,110 @@
         </table>
 
         
+    
+      
+      <div class="file-heading">
+        <h2 id="api/types/types.proto">api/types/types.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="types.Column">Column</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>列名 </p></td>
+                </tr>
+              
+                <tr>
+                  <td>exp</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>表达式，值为空时默认为=，有=、!=、&gt;、&gt;=、&lt;、&lt;=、like七种类型 </p></td>
+                </tr>
+              
+                <tr>
+                  <td>value</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>列值 </p></td>
+                </tr>
+              
+                <tr>
+                  <td>logic</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>逻辑类型，值为空时默认为and，只有&amp;(and)、||(or)两种类型 </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="types.Params">Params</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>page</td>
+                  <td><a href="#int32">int32</a></td>
+                  <td></td>
+                  <td><p>页码，从0开始 </p></td>
+                </tr>
+              
+                <tr>
+                  <td>limit</td>
+                  <td><a href="#int32">int32</a></td>
+                  <td></td>
+                  <td><p>每页行数 </p></td>
+                </tr>
+              
+                <tr>
+                  <td>sort</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>排序字段，多列排序用逗号分隔 </p></td>
+                </tr>
+              
+                <tr>
+                  <td>columns</td>
+                  <td><a href="#types.Column">Column</a></td>
+                  <td>repeated</td>
+                  <td><p>查询条件 </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
     
 
     <h2 id="scalar-value-types">Scalar Value Types</h2>

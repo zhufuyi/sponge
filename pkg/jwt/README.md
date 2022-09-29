@@ -4,12 +4,6 @@ token生成和验证。
 
 <br>
 
-## 安装
-
-> go get -u github.com/zhufuyi/pkg/jwt
-
-<br>
-
 ## 使用示例
 
 ```go

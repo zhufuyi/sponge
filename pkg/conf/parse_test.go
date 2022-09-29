@@ -3,6 +3,7 @@ package conf
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -50,4 +51,29 @@ func Test_watchConfig(t *testing.T) {
 	assert.NoError(t, err)
 
 	watchConfig(c)
+}
+
+// 测试监听配置文件更新
+func TestWatch(t *testing.T) {
+	conf := make(map[string]interface{})
+
+	fs := []func(){
+		func() {
+			fmt.Println("更新字段1")
+		},
+		func() {
+			fmt.Println("更新字段2")
+		},
+	}
+
+	err := Parse("test.yml", &conf, fs...)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	for i := 0; i < 1; i++ { // 设置在等待时间内，修改配置文件env字段，查看是否有变化
+		fmt.Println(conf["app"])
+		time.Sleep(time.Second)
+	}
 }

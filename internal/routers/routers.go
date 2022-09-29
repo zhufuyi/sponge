@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/zhufuyi/sponge/docs"
-	"github.com/zhufuyi/sponge/internal/serverNameExample/config"
+	"github.com/zhufuyi/sponge/internal/config"
 	"github.com/zhufuyi/sponge/pkg/gin/handlerfunc"
 	"github.com/zhufuyi/sponge/pkg/gin/middleware"
 	"github.com/zhufuyi/sponge/pkg/gin/middleware/metrics"

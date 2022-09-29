@@ -6,7 +6,7 @@ import (
 )
 
 func TestNewServiceInstance(t *testing.T) {
-	s := NewServiceInstance("demo", []string{"grpc://127.0.0.1:9090"},
+	s := NewServiceInstance("demo", []string{"grpc://127.0.0.1:8282"},
 		WithID("1"),
 		WithVersion("v1.0.0"),
 		WithMetadata(map[string]string{"foo": "bar"}),

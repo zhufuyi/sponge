@@ -4,12 +4,6 @@
 
 <br>
 
-## 安装
-
-> go get -u github.com/zhufuyi/pkg/tracer
-
-<br>
-
 ## 使用示例
 
 初始化trace，指定exporter和resource。

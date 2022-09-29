@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/zhufuyi/sponge/internal/serverNameExample/routers"
+	"github.com/zhufuyi/sponge/internal/routers"
 	"github.com/zhufuyi/sponge/pkg/app"
 
 	"github.com/gin-gonic/gin"

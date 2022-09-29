@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/zhufuyi/sponge/internal/serverNameExample/cache"
-	"github.com/zhufuyi/sponge/internal/serverNameExample/model"
+	"github.com/zhufuyi/sponge/internal/cache"
+	"github.com/zhufuyi/sponge/internal/model"
 	cacheBase "github.com/zhufuyi/sponge/pkg/cache"
 	"github.com/zhufuyi/sponge/pkg/goredis"
 	"github.com/zhufuyi/sponge/pkg/mysql/query"

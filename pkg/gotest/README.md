@@ -2,13 +2,6 @@
 
 gotest是一个模拟测试cache、dao、handler的库。
 
-
-<br>
-
-## 安装
-
-> go get -u github.com/zhufuyi/pkg/gotest
-
 <br>
 
 ## 使用示例

@@ -1,6 +1,8 @@
 package ecode
 
-import "github.com/zhufuyi/sponge/pkg/errcode"
+import (
+	"github.com/zhufuyi/sponge/pkg/errcode"
+)
 
 const (
 	// todo must be modified manually

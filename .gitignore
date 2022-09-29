@@ -5,7 +5,8 @@
 *.so
 *.dylib
 *.log
-cmd/sponge/sponge
+cmd/serverNameExample/serverNameExample
+*@@*@@*
 
 # Test binary, built with `go test -c`
 *.test

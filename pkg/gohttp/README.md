@@ -4,12 +4,6 @@ http请求客户端，只支持返回json格式。
 
 <br>
 
-## 安装
-
-> go get -u github.com/zhufuyi/pkg/gohttp
-
-<br>
-
 ## 使用示例
 
 ### 标准CURD

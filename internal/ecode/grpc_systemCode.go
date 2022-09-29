@@ -1,6 +1,8 @@
 package ecode
 
-import "github.com/zhufuyi/sponge/pkg/errcode"
+import (
+	"github.com/zhufuyi/sponge/pkg/errcode"
+)
 
 // nolint
 // rpc系统级别错误码，有status前缀，错误码范围300000~400000

@@ -8,7 +8,7 @@ package api.userExample.v1;
 import "validate/validate.proto";
 import "api/types/types.proto";
 
-option go_package = "github.com/zhufuyi/sponge/api/userExample/v1;v1";
+option go_package = "github.com/zhufuyi/sponge/api/serverNameExample/v1;v1";
 
 service userExampleService {
   rpc Create(CreateUserExampleRequest) returns (CreateUserExampleReply) {}
@@ -52,7 +52,7 @@ message UpdateUserExampleByIDRequest {
   string name = 2;         // 名称
   string email = 3;         // 邮件
   string password = 4;   // 密码
-  string phone=5;          // 手机号码，必须在前加'+86'
+  string phone=5;          // 手机号码
   string avatar=6;         // 头像
   int32  age=7;             // 年龄
   GenderType  gender=8;        // 性别，1:男，2:女
@@ -68,7 +68,7 @@ message UserExample {
   uint64   id = 1;
   string name = 2;          // 名称
   string email = 3;          // 邮件
-  string phone=4;           // 手机号码，必须在前加'+86'
+  string phone=4;           // 手机号码
   string avatar=5;           // 头像
   int32  age=6;               // 年龄
   GenderType  gender=7; // 性别，1:男，2:女

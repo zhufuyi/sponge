@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/zhufuyi/sponge/internal/serverNameExample/config"
+	"github.com/zhufuyi/sponge/internal/config"
 	"github.com/zhufuyi/sponge/pkg/goredis"
 	"github.com/zhufuyi/sponge/pkg/mysql"
 
@@ -76,7 +76,11 @@ func CloseMysql() error {
 
 // InitRedis 连接redis
 func InitRedis() {
-	opts := []goredis.Option{}
+	opts := []goredis.Option{
+		goredis.WithDialTimeout(time.Duration(config.Get().Redis.DialTimeout) * time.Second),
+		goredis.WithReadTimeout(time.Duration(config.Get().Redis.ReadTimeout) * time.Second),
+		goredis.WithWriteTimeout(time.Duration(config.Get().Redis.WriteTimeout) * time.Second),
+	}
 	if config.Get().App.EnableTracing {
 		opts = append(opts, goredis.WithEnableTrace())
 	}

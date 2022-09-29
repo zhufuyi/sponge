@@ -27,7 +27,7 @@ data:
     
     # grpc 服务设置
     grpc:
-      port: 9090          # 监听端口
+      port: 8282          # 监听端口
       readTimeout: 3  # 读超时，单位(秒)
       writeTimeout: 3 # 写超时，单位(秒)
     

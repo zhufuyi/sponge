@@ -1,5 +1,5 @@
 /*
-sponge 是一个微服务框架，支持http和grpc及服务治理.
+sponge is a microservices framework that supports http and grpc and service governance.
 */
 
 package sponge

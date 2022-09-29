@@ -13,12 +13,6 @@
 
 <br>
 
-### 安装
-
-> go get -u github.com/zhufuyi/pkg/errcode
-
-<br>
-
 ### 使用示例
 
 ### http错误码使用示例

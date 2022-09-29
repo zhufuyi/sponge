@@ -11,7 +11,7 @@ import (
 var r = &ResolverBuilder{
 	SchemeVal:   "grpc",
 	ServiceName: "demo",
-	Addrs:       []string{"localhost:9090"},
+	Addrs:       []string{"localhost:8282"},
 }
 
 func TestRegister(t *testing.T) {

@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/zhufuyi/sponge/configs"
-	"github.com/zhufuyi/sponge/internal/serverNameExample/config"
+	"github.com/zhufuyi/sponge/internal/config"
 	"github.com/zhufuyi/sponge/pkg/registry"
 	"github.com/zhufuyi/sponge/pkg/utils"
 
@@ -25,7 +25,7 @@ func TestGRPCServer(t *testing.T) {
 
 	port, _ := utils.GetAvailablePort()
 	addr := fmt.Sprintf(":%d", port)
-	instance := registry.NewServiceInstance("foo", []string{"grpc://127.0.0.1:9090"})
+	instance := registry.NewServiceInstance("foo", []string{"grpc://127.0.0.1:8282"})
 
 	server := NewGRPCServer(addr,
 		WithGRPCReadTimeout(time.Second),

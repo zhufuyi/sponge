@@ -1,7 +1,7 @@
 package routers
 
 import (
-	"github.com/zhufuyi/sponge/internal/serverNameExample/handler"
+	"github.com/zhufuyi/sponge/internal/handler"
 
 	"github.com/gin-gonic/gin"
 )

@@ -3,11 +3,11 @@ package routers
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/zhufuyi/sponge/configs"
-	"github.com/zhufuyi/sponge/internal/serverNameExample/config"
+	"github.com/zhufuyi/sponge/internal/config"
 
 	"github.com/gin-gonic/gin"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestNewRouter(t *testing.T) {

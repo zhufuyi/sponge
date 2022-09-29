@@ -1,12 +1,6 @@
 ## response
 
-封装gin返回json数据插件。
-
-<br>
-
-## 安装
-
-> go get -u github.com/zhufuyi/pkg/gin/response
+封装gin返回同一个格式的json数据。
 
 <br>
 

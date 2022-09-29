@@ -3,10 +3,10 @@ package handler
 import (
 	"time"
 
-	"github.com/zhufuyi/sponge/internal/serverNameExample/cache"
-	"github.com/zhufuyi/sponge/internal/serverNameExample/dao"
-	"github.com/zhufuyi/sponge/internal/serverNameExample/ecode"
-	"github.com/zhufuyi/sponge/internal/serverNameExample/model"
+	"github.com/zhufuyi/sponge/internal/cache"
+	"github.com/zhufuyi/sponge/internal/dao"
+	"github.com/zhufuyi/sponge/internal/ecode"
+	"github.com/zhufuyi/sponge/internal/model"
 	"github.com/zhufuyi/sponge/pkg/gin/response"
 	"github.com/zhufuyi/sponge/pkg/logger"
 	"github.com/zhufuyi/sponge/pkg/mysql/query"
@@ -270,7 +270,7 @@ type CreateUserExampleRequest struct {
 	Name     string `json:"name" binding:"min=2"`         // 名称
 	Email    string `json:"email" binding:"email"`        // 邮件
 	Password string `json:"password" binding:"md5"`       // 密码
-	Phone    string `form:"phone" binding:"e164"`         // 手机号码，必须在前加'+86'
+	Phone    string `form:"phone" binding:"e164"`         // 手机号码，e164表示<+国家编号><手机号码>
 	Avatar   string `form:"avatar" binding:"min=5"`       // 头像
 	Age      int    `form:"age" binding:"gt=0,lt=120"`    // 年龄
 	Gender   int    `form:"gender" binding:"gte=0,lte=2"` // 性别，1:男，2:女
@@ -282,7 +282,7 @@ type UpdateUserExampleByIDRequest struct {
 	Name     string `json:"name" binding:""`     // 名称
 	Email    string `json:"email" binding:""`    // 邮件
 	Password string `json:"password" binding:""` // 密码
-	Phone    string `form:"phone" binding:""`    // 手机号码，必须在前加'+86'
+	Phone    string `form:"phone" binding:""`    // 手机号码
 	Avatar   string `form:"avatar" binding:""`   // 头像
 	Age      int    `form:"age" binding:""`      // 年龄
 	Gender   int    `form:"gender" binding:""`   // 性别，1:男，2:女

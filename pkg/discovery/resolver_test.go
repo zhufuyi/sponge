@@ -51,7 +51,7 @@ func Test_discoveryResolver_Close(t *testing.T) {
 	r.ResolveNow(resolver.ResolveNowOptions{})
 	r.update([]*registry.ServiceInstance{registry.NewServiceInstance(
 		"demo",
-		[]string{"grpc://127.0.0.1:9090"},
+		[]string{"grpc://127.0.0.1:8282"},
 	)})
 	r.watch()
 }

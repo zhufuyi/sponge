@@ -33,8 +33,8 @@ ci-lint:
 .PHONY: build
 # go build the linux amd64 binary file
 build:
-	@cd cmd/sponge && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -gcflags "all=-N -l"
-	@echo "build finished, binary file in path 'cmd/sponge'"
+	@cd cmd/serverNameExample && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -gcflags "all=-N -l"
+	@echo "build finished, binary file in path 'cmd/serverNameExample'"
 
 
 .PHONY: run
@@ -71,26 +71,26 @@ cover:
 .PHONY: docker
 # build docker image
 docker:
-	@tar zcf sponge.tar.gz ${PROJECT_FILES}
-	@mv -f sponge.tar.gz build/
-	docker build -t sponge/sponge:latest build/
-	@rm -rf build/sponge.tar.gz
+	@tar zcf serverNameExample.tar.gz ${PROJECT_FILES}
+	@mv -f serverNameExample.tar.gz build/
+	docker build -t project-name-example/server-name-example:latest build/
+	@rm -rf build/serverNameExample.tar.gz
 
 
 .PHONY: docker-image
 # copy the binary file to build the docker image, skip the compile to binary in docker
 docker-image: build
 	@bash scripts/grpc_health_probe.sh
-	@mv -f cmd/sponge/sponge build/ && cp -f /tmp/grpc_health_probe build/
-	@mkdir -p build/config && cp -f config/conf.yml build/config/
-	docker build -f build/Dockerfile_sponge -t sponge/sponge:latest build/
-	@rm -rf build/sponge build/config/ build/grpc_health_probe
+	@mv -f cmd/serverNameExample/serverNameExample build/ && cp -f /tmp/grpc_health_probe build/
+	@mkdir -p build/configs && cp -f configs/serverNameExample.yml build/configs/
+	docker build -f build/Dockerfile_cp -t project-name-example/server-name-example:latest build/
+	@rm -rf build/serverNameExample build/configs/ build/grpc_health_probe
 
 
 .PHONY: clean
 # clean binary file, cover.out, redundant dependency packages
 clean:
-	@rm -vrf cmd/sponge/sponge
+	@rm -vrf cmd/serverNameExample/serverNameExample
 	@rm -vrf cover.out
 	@go mod tidy
 	@echo "clean finished"
@@ -99,7 +99,7 @@ clean:
 .PHONY: docs
 # generate swagger doc
 docs:
-	@swag init -g cmd/sponge/main.go
+	@swag init -g cmd/serverNameExample/main.go
 	@echo "see docs by: http://localhost:8080/swagger/index.html"
 
 
@@ -107,16 +107,8 @@ docs:
 # generate interactive visual function dependency graphs
 graph:
 	@echo "generating graph ......"
-	@go-callvis github.com/zhufuyi/sponge
-
-
-.PHONY: mockgen
-# mockgen gen mock file
-mockgen:
-	cd ./internal &&  for file in `egrep -rnl "type.*?interface" ./repository | grep -v "_test" `; do \
-		echo $$file ; \
-		cd .. && mockgen -destination="./internal/mock/$$file" -source="./internal/$$file" && cd ./internal ; \
-	done
+	@cd cmd/serverNameExample
+	@go-callvis -nostd github.com/zhufuyi/sponge
 
 
 .PHONY: proto

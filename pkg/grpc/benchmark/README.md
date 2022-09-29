@@ -6,8 +6,8 @@
 
 ```go
 func benchmarkExample() error {
-	host := "127.0.0.1:9090"
-	protoFile := "api/userExample/v1/userExample.proto"
+	host := "127.0.0.1:8282"
+	protoFile := "api/serverNameExample/v1/userExample.proto"
 	// 如果压测过程中缺少第三方依赖，复制到项目的third_party目录下(不包括import路径)
 	importPaths := []string{"third_party"}
 	message := &pb.GetUserExampleByIDRequest{

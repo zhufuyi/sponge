@@ -14,28 +14,15 @@ const (
 	DefaultRedisName = "default"
 )
 
-// RedisClient redis 客户端
-var RedisClient *redis.Client
-
 // Init 连接redis
-// redisURL 支持格式：
+// dsn 支持格式：
 // 没有密码，没有db：localhost:6379
 // 有密码，有db：<user>:<pass>@localhost:6379/2
-func Init(redisURL string, opts ...Option) (*redis.Client, error) {
+func Init(dsn string, opts ...Option) (*redis.Client, error) {
 	o := defaultOptions()
 	o.apply(opts...)
 
-	if len(redisURL) > 8 {
-		if !strings.Contains(redisURL[len(redisURL)-3:], "/") {
-			redisURL += "/0" // 默认使用db 0
-		}
-
-		if redisURL[:8] != "redis://" {
-			redisURL = "redis://" + redisURL
-		}
-	}
-
-	opt, err := redis.ParseURL(redisURL)
+	opt, err := getRedisOpt(dsn, o)
 	if err != nil {
 		return nil, err
 	}
@@ -47,4 +34,54 @@ func Init(redisURL string, opts ...Option) (*redis.Client, error) {
 	}
 
 	return rdb, nil
+}
+
+func getRedisOpt(dsn string, opts *options) (*redis.Options, error) {
+	if len(dsn) > 8 {
+		if !strings.Contains(dsn[len(dsn)-3:], "/") {
+			dsn += "/0" // 默认使用db 0
+		}
+
+		if dsn[:8] != "redis://" {
+			dsn = "redis://" + dsn
+		}
+	}
+
+	redisOpts, err := redis.ParseURL(dsn)
+	if err != nil {
+		return nil, err
+	}
+
+	if opts.dialTimeout > 0 {
+		redisOpts.DialTimeout = opts.dialTimeout
+	}
+	if opts.readTimeout > 0 {
+		redisOpts.ReadTimeout = opts.readTimeout
+	}
+	if opts.writeTimeout > 0 {
+		redisOpts.WriteTimeout = opts.writeTimeout
+	}
+
+	return redisOpts, nil
+}
+
+// Init2 连接redis
+func Init2(addr string, password string, db int, opts ...Option) *redis.Client {
+	o := defaultOptions()
+	o.apply(opts...)
+
+	rdb := redis.NewClient(&redis.Options{
+		Addr:         addr,
+		Password:     password,
+		DB:           db,
+		DialTimeout:  o.dialTimeout,
+		ReadTimeout:  o.readTimeout,
+		WriteTimeout: o.writeTimeout,
+	})
+
+	if o.enableTrace { // 根据设置是否开启链路跟踪
+		rdb.AddHook(redisotel.TracingHook{})
+	}
+
+	return rdb
 }

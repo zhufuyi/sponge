@@ -9,9 +9,9 @@ import (
 
 	"github.com/zhufuyi/sponge/pkg/registry"
 
-	"github.com/nacos-group/nacos-sdk-go/clients/naming_client"
-	"github.com/nacos-group/nacos-sdk-go/common/constant"
-	"github.com/nacos-group/nacos-sdk-go/vo"
+	"github.com/nacos-group/nacos-sdk-go/v2/clients/naming_client"
+	"github.com/nacos-group/nacos-sdk-go/v2/common/constant"
+	"github.com/nacos-group/nacos-sdk-go/v2/vo"
 )
 
 var (
@@ -82,7 +82,7 @@ func New(cli naming_client.INamingClient, opts ...Option) (r *Registry) {
 // Register the registration.
 func (r *Registry) Register(_ context.Context, si *registry.ServiceInstance) error {
 	if si.Name == "" {
-		return fmt.Errorf("eagle/nacos: serviceInstance.name can not be empty")
+		return fmt.Errorf("nacos: serviceInstance.name can not be empty")
 	}
 	for _, endpoint := range si.Endpoints {
 		u, err := url.Parse(endpoint)

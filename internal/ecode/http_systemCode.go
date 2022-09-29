@@ -1,6 +1,8 @@
 package ecode
 
-import "github.com/zhufuyi/sponge/pkg/errcode"
+import (
+	"github.com/zhufuyi/sponge/pkg/errcode"
+)
 
 // nolint
 // http系统级别错误码，无Err前缀，错误码范围100000~200000

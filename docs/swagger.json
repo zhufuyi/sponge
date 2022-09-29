@@ -6,7 +6,7 @@
     "swagger": "2.0",
     "info": {
         "description": "http server api docs",
-        "title": "sponge api docs",
+        "title": "serverNameExample api docs",
         "contact": {},
         "version": "v0.0.0"
     },
@@ -308,7 +308,7 @@
                     "type": "string"
                 },
                 "phone": {
-                    "description": "手机号码，必须在前加'+86'",
+                    "description": "手机号码",
                     "type": "string"
                 }
             }
@@ -398,7 +398,7 @@
                     "type": "string"
                 },
                 "phone": {
-                    "description": "手机号码，必须在前加'+86'",
+                    "description": "手机号码",
                     "type": "string"
                 }
             }

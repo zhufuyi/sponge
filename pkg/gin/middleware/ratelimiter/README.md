@@ -4,12 +4,6 @@ gin `path` or `ip` limit.
 
 <br>
 
-### Install
-
-> go get -u github.com/zhufuyi/pkg/gin/middleware/ratelimiter
-
-<br>
-
 ### Usage
 
 ```go

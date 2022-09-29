@@ -16,7 +16,7 @@ import (
 )
 
 func TestGRPCSeverRegistry(t *testing.T) {
-	instance := registry.NewServiceInstance("foo", []string{"grpc://127.0.0.1:9090"})
+	instance := registry.NewServiceInstance("foo", []string{"grpc://127.0.0.1:8282"})
 
 	cli, err := clientv3.New(clientv3.Config{
 		Endpoints:   []string{"192.168.3.37:2379"},

@@ -4,12 +4,6 @@
 
 <br>
 
-## 安装
-
-> go get -u github.com/zhufuyi/pkg/mysql
-
-<br>
-
 ## 使用示例
 
 ### 初始化连接示例

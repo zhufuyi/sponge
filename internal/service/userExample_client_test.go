@@ -6,12 +6,12 @@ package service
 import (
 	"context"
 	"fmt"
+	"github.com/zhufuyi/sponge/internal/config"
 	"testing"
 
 	pb "github.com/zhufuyi/sponge/api/serverNameExample/v1"
 	"github.com/zhufuyi/sponge/api/types"
 	"github.com/zhufuyi/sponge/configs"
-	"github.com/zhufuyi/sponge/internal/serverNameExample/config"
 	"github.com/zhufuyi/sponge/pkg/grpc/benchmark"
 
 	"google.golang.org/grpc"
@@ -53,10 +53,10 @@ func Test_userExampleService_methods(t *testing.T) {
 			fn: func() (interface{}, error) {
 				// todo test after filling in parameters
 				return cli.Create(ctx, &pb.CreateUserExampleRequest{
-					Name:     "宋九",
+					Name:     "foo7",
 					Email:    "foo7@bar.com",
 					Password: "f447b20a7fcbf53a5d5be013ea0b15af",
-					Phone:    "+8618576552066",
+					Phone:    "18666666666",
 					Avatar:   "http://internal.com/7.jpg",
 					Age:      21,
 					Gender:   2,

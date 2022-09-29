@@ -8,12 +8,6 @@
 
 <br>
 
-## 安装
-
-> go get -u github.com/zhufuyi/pkg/logger
-
-<br>
-
 ## 使用示例
 
 支持Debug、Info、Warn、Error、Panic、Fatal，也支持类似fmt.Printf打印日志，Debugf、Infof、Warnf、Errorf、Panicf、Fatalf

@@ -312,7 +312,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "phone": {
-                    "description": "手机号码，必须在前加'+86'",
+                    "description": "手机号码",
                     "type": "string"
                 }
             }
@@ -402,7 +402,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "phone": {
-                    "description": "手机号码，必须在前加'+86'",
+                    "description": "手机号码",
                     "type": "string"
                 }
             }
@@ -427,7 +427,7 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "localhost:8080",
 	BasePath:         "",
 	Schemes:          []string{"http", "https"},
-	Title:            "sponge api docs",
+	Title:            "serverNameExample api docs",
 	Description:      "http server api docs",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,

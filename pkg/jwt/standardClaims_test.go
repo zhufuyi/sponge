@@ -42,13 +42,13 @@ func TestVerifyTokenStandard(t *testing.T) {
 	// token已过期
 	Init(
 		WithSigningKey("123456"),
-		WithExpire(time.Millisecond*200),
+		WithExpire(time.Second),
 	)
 	token, err = GenerateTokenStandard()
 	if err != nil {
 		t.Fatal(err)
 	}
-	time.Sleep(time.Second)
+	time.Sleep(time.Second * 2)
 	err = VerifyTokenStandard(token)
 	assert.Equal(t, err, errExpired)
 }

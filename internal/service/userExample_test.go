@@ -1,14 +1,14 @@
 package service
 
 import (
+	"github.com/zhufuyi/sponge/internal/cache"
+	"github.com/zhufuyi/sponge/internal/dao"
+	"github.com/zhufuyi/sponge/internal/model"
 	"testing"
 	"time"
 
 	pb "github.com/zhufuyi/sponge/api/serverNameExample/v1"
 	"github.com/zhufuyi/sponge/api/types"
-	"github.com/zhufuyi/sponge/internal/serverNameExample/cache"
-	"github.com/zhufuyi/sponge/internal/serverNameExample/dao"
-	"github.com/zhufuyi/sponge/internal/serverNameExample/model"
 	"github.com/zhufuyi/sponge/pkg/gotest"
 
 	"github.com/DATA-DOG/go-sqlmock"

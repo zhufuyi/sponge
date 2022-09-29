@@ -20,11 +20,12 @@ spec:
           # If using a local image, use Never, default is Always
           #imagePullPolicy: Never
           command: ["./serverNameExample", "-c", "/app/configs/serverNameExample.yml"]
+          # todo 根据服务类型(http或grpc)选择端口
           ports:
             - name: http-port
               containerPort: 8080
             - name: grpc-port
-              containerPort: 9090
+              containerPort: 8282
             - name: metrics-port
               containerPort: 9082
           resources:
@@ -38,26 +39,26 @@ spec:
             - name: server-name-example-vl
               mountPath: /app/configs/
               readOnly: true
+          # todo 根据服务类型(http或grpc)选择健康检查
           # 就绪探测
           readinessProbe:
-            #httpGet:
-              #port: http-port
-              #path: /health
-            exec:
-              command: ["/bin/grpc_health_probe", "-addr=:9090"]
+            httpGet:
+              port: http-port
+              path: /health
+            #exec:
+            #  command: ["/bin/grpc_health_probe", "-addr=:8282"]
             initialDelaySeconds: 10
             timeoutSeconds: 2
             periodSeconds: 10
             successThreshold: 1
             failureThreshold: 3
-
           # 容器存活探测
           livenessProbe:
-            #httpGet:
-              #port: http-port
-              #path: /health
-            exec:
-              command: ["/bin/grpc_health_probe", "-addr=:9090"]
+            httpGet:
+              port: http-port
+              path: /health
+            #exec:
+            #  command: ["/bin/grpc_health_probe", "-addr=:8282"]
             initialDelaySeconds: 10
             timeoutSeconds: 2
             periodSeconds: 10

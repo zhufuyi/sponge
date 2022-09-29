@@ -55,7 +55,6 @@ func watchConfig(obj interface{}, fs ...func()) {
 		if err != nil {
 			fmt.Println("viper.Unmarshal error: ", err)
 		} else {
-			// 更新初始化
 			for _, f := range fs {
 				f()
 			}

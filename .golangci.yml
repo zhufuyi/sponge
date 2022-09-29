@@ -1,4 +1,4 @@
-# This file configures github.com/zhufuyi/pkg.
+# This file configures github.com/zhufuyi/sponge.
 
 run:
   # timeout for analysis, e.g. 30s, 5m, default is 1m
@@ -129,7 +129,7 @@ linters-settings:
   goimports:
     # put imports beginning with prefix after 3rd-party packages;
     # it's a comma-separated list of prefixes
-    local-prefixes: sponge
+    local-prefixes: github.com/zhufuyi/sponge
 
   golint:
     # minimal confidence for issues, default is 0.8

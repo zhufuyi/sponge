@@ -3,16 +3,19 @@ package main
 import (
 	"context"
 	"flag"
-
 	"strconv"
 	"time"
 
-	"github.com/zhufuyi/sponge/config"
+	"github.com/zhufuyi/sponge/configs"
+	"github.com/zhufuyi/sponge/internal/config"
 	"github.com/zhufuyi/sponge/internal/model"
 	"github.com/zhufuyi/sponge/internal/server"
 	"github.com/zhufuyi/sponge/pkg/app"
 	"github.com/zhufuyi/sponge/pkg/logger"
+	"github.com/zhufuyi/sponge/pkg/nacoscli"
 	"github.com/zhufuyi/sponge/pkg/tracer"
+
+	"github.com/jinzhu/copier"
 
 	// grpc import start
 	"fmt"
@@ -27,11 +30,12 @@ import (
 )
 
 var (
-	version    string
-	configFile string
+	version            string
+	configFile         string
+	enableConfigCenter bool
 )
 
-// @title sponge api docs
+// @title serverNameExample api docs
 // @description http server api docs
 // @schemes http https
 // @version v0.0.0
@@ -49,23 +53,49 @@ func main() {
 func registerInits() []app.Init {
 	// 初始化配置文件，必须优先执行，后面的初始化需要依赖配置
 	func() {
-		flag.StringVar(&configFile, "c", "", "配置文件")
-		flag.StringVar(&version, "version", "", "服务版本号")
+		flag.StringVar(&version, "version", "", "service Version Number")
+		flag.BoolVar(&enableConfigCenter, "enable-cc", false, "whether to get from the configuration center, "+
+			"if true, the '-c' parameter indicates the configuration center")
+		flag.StringVar(&configFile, "c", "", "configuration file")
 		flag.Parse()
-		if configFile == "" {
-			configFile = config.Path("conf.yml") // 默认配置文件config/conf.yml
-		}
-		err := config.Init(configFile)
-		if err != nil {
-			panic("init config error: " + err.Error())
+
+		if enableConfigCenter {
+			// 从配置中心获取配置(先获取nacos配置，再根据nacos配置中心读取服务配置)
+			if configFile == "" {
+				configFile = configs.Path("serverNameExample_cc.yml")
+			}
+			nacosConfig, err := config.NewCenter(configFile)
+			if err != nil {
+				panic(err)
+			}
+			appConfig := &config.Config{}
+			params := &nacoscli.Params{}
+			_ = copier.Copy(params, &nacosConfig.Nacos)
+			err = nacoscli.Init(appConfig, params)
+			if err != nil {
+				panic(err)
+			}
+			if appConfig.App.Name == "" {
+				panic("read the config from center error, config data is empty")
+			}
+			config.Set(appConfig)
+		} else {
+			// 从本地配置文件获取配置
+			if configFile == "" {
+				configFile = configs.Path("serverNameExample.yml")
+			}
+			err := config.Init(configFile)
+			if err != nil {
+				panic("init config error: " + err.Error())
+			}
 		}
 		if version != "" {
 			config.Get().App.Version = version
 		}
-		//config.Show()
+		//fmt.Println(config.Show())
 	}()
 
-	// 执行初始化日志
+	// 初始化日志
 	func() {
 		_, err := logger.Init(
 			logger.WithLevel(config.Get().Logger.Level),
