@@ -1,0 +1,21 @@
+version: "3.7"
+
+services:
+  server-name-example:
+    image: project-name-example/server-name-example:latest
+    container_name: server-name-example
+    restart: always
+    command: ["./serverNameExample", "-c", "/app/configs/serverNameExample.yml"]
+    ports:
+      - "28080:8080"   # http端口
+      - "29090:9090"   # grpc服务端口
+      - "29082:9082"   # grpc metrics端口
+    volumes:
+      - $PWD/configs:/app/configs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]   # http健康检查，注：镜像必须包含curl命令
+      #test: ["CMD", "grpc_health_probe", "-addr=localhost:9090"]    # grpc健康检查，注：镜像必须包含grpc_health_probe命令
+      interval: 10s         # 间隔时间
+      timeout: 5s           # 超时时间
+      retries: 3              # 重试次数
+      start_period: 10s  # 启动多久后开始检查

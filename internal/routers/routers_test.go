@@ -3,14 +3,15 @@ package routers
 import (
 	"testing"
 
-	"github.com/zhufuyi/sponge/config"
+	"github.com/zhufuyi/sponge/configs"
+	"github.com/zhufuyi/sponge/internal/serverNameExample/config"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestNewRouter(t *testing.T) {
-	err := config.Init(config.Path("conf.yml"))
+	err := config.Init(configs.Path("serverNameExample.yml"))
 	t.Log(err)
 
 	defer func() {

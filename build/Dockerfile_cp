@@ -15,9 +15,11 @@ RUN apk add curl
 COPY grpc_health_probe /bin/grpc_health_probe
 RUN chmod +x /bin/grpc_health_probe
 
-COPY config/ /app/config/
-COPY sponge /app/sponge
-RUN chmod +x /app/sponge
+COPY configs/ /app/configs/
+COPY serverNameExample /app/serverNameExample
+RUN chmod +x /app/serverNameExample
 
 WORKDIR /app
-CMD ["./sponge", "-c", "config/conf.yml"]
+CMD ["./serverNameExample", "-c", "configs/serverNameExample.yml"]
+# 使用配置中心，serverNameExample.yml是配置中心的配置。
+#CMD ["./serverNameExample", "-c", "configs/serverNameExample.yml", "-enable-cc"]

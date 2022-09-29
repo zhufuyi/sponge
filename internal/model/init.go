@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/zhufuyi/sponge/config"
+	"github.com/zhufuyi/sponge/internal/serverNameExample/config"
 	"github.com/zhufuyi/sponge/pkg/goredis"
 	"github.com/zhufuyi/sponge/pkg/mysql"
 

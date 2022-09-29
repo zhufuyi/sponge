@@ -2,16 +2,19 @@ package server
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/stretchr/testify/assert"
-	"github.com/zhufuyi/sponge/config"
-	"github.com/zhufuyi/sponge/pkg/utils"
 	"testing"
 	"time"
+
+	"github.com/zhufuyi/sponge/configs"
+	"github.com/zhufuyi/sponge/internal/serverNameExample/config"
+	"github.com/zhufuyi/sponge/pkg/utils"
+
+	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestHTTPServer(t *testing.T) {
-	err := config.Init(config.Path("conf.yml"))
+	err := config.Init(configs.Path("serverNameExample.yml"))
 	t.Log(err)
 
 	defer func() {

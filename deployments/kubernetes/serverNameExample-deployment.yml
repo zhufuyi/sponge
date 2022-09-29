@@ -1,25 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sponge-dm
-  namespace: sponge
+  name: server-name-example-dm
+  namespace: project-name-example
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: sponge
+      app: server-name-example
   template:
     metadata:
-      name: sponge-pod
+      name: server-name-example-pod
       labels:
-        app: sponge
+        app: server-name-example
     spec:
       containers:
-        - name: sponge
-          image: sponge/sponge:latest
-          # If using a local image, use Never, the default is Always
-          imagePullPolicy: Never
-          command: ["./sponge", "-c", "/app/config/conf.yml"]
+        - name: server-name-example
+          image: project-name-example/server-name-example:latest
+          # If using a local image, use Never, default is Always
+          #imagePullPolicy: Never
+          command: ["./serverNameExample", "-c", "/app/configs/serverNameExample.yml"]
           ports:
             - name: http-port
               containerPort: 8080
@@ -35,8 +35,8 @@ spec:
               cpu: 1000m
               memory: 1000Mi
           volumeMounts:
-            - name: sponge-vl
-              mountPath: /app/config/
+            - name: server-name-example-vl
+              mountPath: /app/configs/
               readOnly: true
           # 就绪探测
           readinessProbe:
@@ -47,7 +47,7 @@ spec:
               command: ["/bin/grpc_health_probe", "-addr=:9090"]
             initialDelaySeconds: 10
             timeoutSeconds: 2
-            periodSeconds: 30
+            periodSeconds: 10
             successThreshold: 1
             failureThreshold: 3
 
@@ -60,11 +60,11 @@ spec:
               command: ["/bin/grpc_health_probe", "-addr=:9090"]
             initialDelaySeconds: 10
             timeoutSeconds: 2
-            periodSeconds: 30
+            periodSeconds: 10
             successThreshold: 1
             failureThreshold: 3
 
       volumes:
-        - name: sponge-vl
+        - name: server-name-example-vl
           configMap:
-            name: sponge-config
+            name: server-name-example-config

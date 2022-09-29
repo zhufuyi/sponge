@@ -4,9 +4,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zhufuyi/sponge/config"
-
 	"github.com/stretchr/testify/assert"
+	"github.com/zhufuyi/sponge/configs"
+	"github.com/zhufuyi/sponge/internal/serverNameExample/config"
 )
 
 // 测试时需要连接真实数据
@@ -18,7 +18,7 @@ func TestInitMysql(t *testing.T) {
 		}
 	}()
 
-	err := config.Init(config.Path("conf.yml"))
+	err := config.Init(configs.Path("serverNameExample.yml"))
 	if err != nil {
 		panic(err)
 	}
@@ -38,7 +38,7 @@ func TestInitRedis(t *testing.T) {
 		}
 	}()
 
-	err := config.Init(config.Path("conf.yml"))
+	err := config.Init(configs.Path("serverNameExample.yml"))
 	if err != nil {
 		panic(err)
 	}

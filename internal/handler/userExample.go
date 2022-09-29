@@ -3,10 +3,10 @@ package handler
 import (
 	"time"
 
-	"github.com/zhufuyi/sponge/internal/cache"
-	"github.com/zhufuyi/sponge/internal/dao"
-	"github.com/zhufuyi/sponge/internal/ecode"
-	"github.com/zhufuyi/sponge/internal/model"
+	"github.com/zhufuyi/sponge/internal/serverNameExample/cache"
+	"github.com/zhufuyi/sponge/internal/serverNameExample/dao"
+	"github.com/zhufuyi/sponge/internal/serverNameExample/ecode"
+	"github.com/zhufuyi/sponge/internal/serverNameExample/model"
 	"github.com/zhufuyi/sponge/pkg/gin/response"
 	"github.com/zhufuyi/sponge/pkg/logger"
 	"github.com/zhufuyi/sponge/pkg/mysql/query"

@@ -1,0 +1,13 @@
+# 使用工具自动生成go struct
+# goctl sponge configCenter --file=serverNameExample_cc.yml
+
+# nacos 设置
+nacos:
+  ipAddr: "192.168.30.37"  # nacos 服务地址
+  port: 8848                      # 运行环境，dev:开发环境，prod:生产环境，pre:预生产环境
+  scheme: "http"               # http或https
+  contextPath: "/nacos"     # path
+  namespaceID: "de7b176e-91cd-49a3-ac83-beb725979775" # 名称空间id
+  group: "dev"                    # 分组，dev, prod, test
+  dataID: "serverNameExample.yml"  # 配置文件id
+  format: "yaml"                 # 配置文件类型: json,yaml,toml

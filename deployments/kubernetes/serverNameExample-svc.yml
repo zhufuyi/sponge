@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: server-name-example-svc
+  namespace: project-name-example
+spec:
+  selector:
+    app: server-name-example
+  type: ClusterIP
+  ports:
+    - name: server-name-example-svc-http-port
+      port: 8080
+      targetPort: 8080
+    - name: server-name-example-svc-grpc-port
+      port: 9090
+      targetPort: 9090
+    - name: server-name-example-svc-grpc-metrics-port
+      port: 9082
+      targetPort: 9082
