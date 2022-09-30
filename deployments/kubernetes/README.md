@@ -1,3 +1,12 @@
+部署服务到k8s前，在已经登录镜像仓库的docker主机中，创建一个为k8s拉取镜像权限的Secret，命令如下：
+
+```bash
+kubectl create secret generic docker-auth-secret \
+    --from-file=.dockerconfigjson=/root/.docker/config.json> \
+    --type=kubernetes.io/dockerconfigjson
+```
+
+<br>
 
 启动服务：
 

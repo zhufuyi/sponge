@@ -24,35 +24,22 @@ init:
 	go install github.com/ofabry/go-callvis@v0.6.1
 
 
+.PHONY: fmt
+# go format *.go files
+fmt:
+	@gofmt -s -w .
+
+
 .PHONY: ci-lint
 # check the code specification against the rules in the .golangci.yml file
 ci-lint:
 	golangci-lint run ./...
 
 
-.PHONY: build
-# go build the linux amd64 binary file
-build:
-	@cd cmd/serverNameExample && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -gcflags "all=-N -l"
-	@echo "build finished, binary file in path 'cmd/serverNameExample'"
-
-
-.PHONY: run
-# run server
-run:
-	@bash scripts/run.sh
-
-
 .PHONY: dep
 # download dependencies to the directory vendor
 dep:
 	@go mod download
-
-
-.PHONY: fmt
-# go format *.go files
-fmt:
-	@gofmt -s -w .
 
 
 .PHONY: test
@@ -68,23 +55,44 @@ cover:
 	go tool cover -html=cover.out
 
 
-.PHONY: docker
-# build docker image
-docker:
-	@tar zcf serverNameExample.tar.gz ${PROJECT_FILES}
-	@mv -f serverNameExample.tar.gz build/
-	docker build -t project-name-example/server-name-example:latest build/
-	@rm -rf build/serverNameExample.tar.gz
+.PHONY: build
+# go build the linux amd64 binary file
+build:
+	@cd cmd/serverNameExample && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GOPROXY=https://goproxy.cn,direct go build -gcflags "all=-N -l"
+	@echo "build finished, binary file in path 'cmd/serverNameExample'"
+
+
+.PHONY: run
+# run server
+run:
+	@bash scripts/run.sh
 
 
 .PHONY: docker-image
-# copy the binary file to build the docker image, skip the compile to binary in docker
-docker-image: build
-	@bash scripts/grpc_health_probe.sh
-	@mv -f cmd/serverNameExample/serverNameExample build/ && cp -f /tmp/grpc_health_probe build/
-	@mkdir -p build/configs && cp -f configs/serverNameExample.yml build/configs/
-	docker build -f build/Dockerfile_cp -t project-name-example/server-name-example:latest build/
-	@rm -rf build/serverNameExample build/configs/ build/grpc_health_probe
+# build docker image
+docker-image:
+	@tar zcf serverNameExample.tar.gz ${PROJECT_FILES}
+	@mv -f serverNameExample.tar.gz build/
+	docker build -f build/Dockerfile_build -t project-name-example/server-name-example:latest build/
+	@rm -rf build/serverNameExample.tar.gz
+
+
+.PHONY: image-build
+# build docker image with parameters
+image-build: build
+	@bash scripts/image-build.sh $(REPO_HOST) $(TAG)
+
+
+.PHONY: image-push
+# push docker image to remote repositories
+image-push:
+	@bash scripts/image-push.sh $(REPO_HOST) $(TAG)
+
+
+.PHONY: deploy-k8s
+# deploy service to k8s
+deploy-k8s:
+	@bash scripts/deploy-k8s.sh
 
 
 .PHONY: clean

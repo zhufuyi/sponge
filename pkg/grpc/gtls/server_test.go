@@ -9,7 +9,7 @@ import (
 )
 
 func TestGetServerTLSCredentials(t *testing.T) {
-	credentials, err := GetServerTLSCredentials(certfile.Path("/one-way/server.crt"), certfile.Path("/one-way/server.key"))
+	credentials, err := GetServerTLSCredentials(certfile.Path("one-way/server.crt"), certfile.Path("one-way/server.key"))
 	assert.NoError(t, err)
 	assert.NotNil(t, credentials)
 }
