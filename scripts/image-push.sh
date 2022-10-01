@@ -4,14 +4,13 @@
 IMAGE_REPO_HOST="https://index.docker.io/v1"
 
 # 镜像名称不能有大写字母
-PROJECT_NAME="project-name-example"
-SERVER_NAME="server-name-example"
+SERVER_NAME="project-name-example.server-name-example"
 
-# 私人仓库地址，通过第一个参数传进来
+# 镜像仓库地址，通过第一个参数传进来
 #REPO_HOST="ip或域名"
 REPO_HOST=$1
 if [ "X${REPO_HOST}" = "X" ];then
-    echo "param 'repo host' cannot be empty, example: ./image-push.sh github.com v1.0.0"
+    echo "param 'repo host' cannot be empty, example: ./image-push.sh hub.docker.com v1.0.0"
     exit 1
 fi
 
@@ -20,6 +19,8 @@ TAG=$2
 if [ "X${TAG}" = "X" ];then
     TAG="latest"
 fi
+# 镜像名称和tag
+IMAGE_NAME_TAG="${REPO_HOST}/${SERVER_NAME}:${TAG}"
 
 function checkResult() {
     result=$1
@@ -27,7 +28,6 @@ function checkResult() {
         exit ${result}
     fi
 }
-
 
 # 检查是否授权登录docker
 function checkLogin() {
@@ -41,13 +41,15 @@ function checkLogin() {
 checkLogin
 
 # 上传镜像
-docker push ${REPO_HOST}/$PROJECT_NAME/$SERVER_NAME:${TAG}
+echo "docker push ${IMAGE_NAME_TAG}"
+docker push ${IMAGE_NAME_TAG}
 checkResult $?
-echo "docker push ${REPO_HOST}/$PROJECT_NAME/$SERVER_NAME:${TAG} success."
+echo "docker push image success."
 
 sleep 1
 
 # 删除镜像
-docker rmi -f ${REPO_HOST}/$PROJECT_NAME/$SERVER_NAME:${TAG}
+echo "docker rmi -f ${IMAGE_NAME_TAG}"
+docker rmi -f ${IMAGE_NAME_TAG}
 checkResult $?
-echo "docker rmi -f ${REPO_HOST}/$PROJECT_NAME/$SERVER_NAME:${TAG} success."
+echo "docker remove image success."

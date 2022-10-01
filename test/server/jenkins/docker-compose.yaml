@@ -9,12 +9,11 @@ services:
     #- 50000:50000
     volumes:
       - $PWD/jenkins-volume:/var/jenkins_home
+      # docker配置目录映射
       - /var/run/docker.sock:/var/run/docker.sock
       - /usr/bin/docker:/usr/bin/docker
-      # docker本地登录后生成的授权配置
-      - /root/.docker/config.json:/root/.docker/config.json
-      - /usr/bin/docker:/usr/bin/docker
-      # k8s的api配置目录，包含config文件
+      - /root/.docker/:/root/.docker/
+      # k8s的api配置目录映射，包含config文件
       - /usr/local/bin/kubectl:/usr/local/bin/kubectl
       - /root/.kube/:/root/.kube/
       # 安装其他命令，例如 golangci-lint

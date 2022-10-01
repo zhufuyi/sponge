@@ -16,7 +16,8 @@ spec:
     spec:
       containers:
         - name: server-name-example
-          image: project-name-example/server-name-example:latest
+          # todo 修改私有仓库地址
+          image: zhufuyi/project-name-example.server-name-example:latest
           # If using a local image, use Never, default is Always
           #imagePullPolicy: Never
           command: ["./serverNameExample", "-c", "/app/configs/serverNameExample.yml"]

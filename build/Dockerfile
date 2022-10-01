@@ -21,6 +21,9 @@ RUN chmod +x /app/serverNameExample
 
 WORKDIR /app
 
+# http端口，grpc服务可以忽略
+EXPOSE 8080
+
 # todo 选择是否使用配置中心配置
 CMD ["./serverNameExample", "-c", "configs/serverNameExample.yml"]
 # 使用配置中心，serverNameExample.yml是配置中心的配置。

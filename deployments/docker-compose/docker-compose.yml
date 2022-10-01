@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   server-name-example:
-    image: project-name-example/server-name-example:latest
+    image: project-name-example.server-name-example:latest
     container_name: server-name-example
     restart: always
     command: ["./serverNameExample", "-c", "/app/configs/serverNameExample.yml"]

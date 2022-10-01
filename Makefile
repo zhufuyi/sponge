@@ -12,9 +12,9 @@ PROJECT_FILES := $(shell ls)
 init:
 	go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28.0
 	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2.0
+	go install github.com/envoyproxy/protoc-gen-validate@v0.6.7
 	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.10.0
 	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.10.0
-	go install github.com/envoyproxy/protoc-gen-validate@v0.6.7
 	go install github.com/mohuishou/protoc-gen-go-gin@v0.1.0
 	go install github.com/srikrsna/protoc-gen-gotag@v0.6.2
 	go install github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc@v1.5.1
@@ -69,18 +69,25 @@ run:
 
 
 .PHONY: docker-image
-# build docker image
-docker-image:
-	@tar zcf serverNameExample.tar.gz ${PROJECT_FILES}
-	@mv -f serverNameExample.tar.gz build/
-	docker build -f build/Dockerfile_build -t project-name-example/server-name-example:latest build/
-	@rm -rf build/serverNameExample.tar.gz
+# build docker image, use binary files to build
+docker-image: build
+	@bash scripts/grpc_health_probe.sh
+	@mv -f cmd/serverNameExample/serverNameExample build/
+	@mkdir -p build/configs && cp -f configs/serverNameExample.yml build/configs/
+	docker build -t project-name-example.server-name-example:latest build/
+	@rm -rf build/serverNameExample build/configs build/grpc_health_probe
 
 
 .PHONY: image-build
-# build docker image with parameters
-image-build: build
+# build docker image with parameters, use binary files to build
+image-build:
 	@bash scripts/image-build.sh $(REPO_HOST) $(TAG)
+
+
+.PHONY: image-build2
+# build docker image with parameters, phase II build
+image-build2:
+	@bash scripts/image-build2.sh $(REPO_HOST) $(TAG)
 
 
 .PHONY: image-push
