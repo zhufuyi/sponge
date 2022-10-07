@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# todo 填写自己的私有镜像仓库host，https://index.docker.io/v1是docker官方镜像仓库
-IMAGE_REPO_HOST="https://index.docker.io/v1"
-
 # 镜像名称不能有大写字母
 SERVER_NAME="project-name-example.server-name-example"
 
@@ -29,6 +26,8 @@ function checkResult() {
     fi
 }
 
+# 镜像仓库host，https://index.docker.io/v1是docker官方镜像仓库
+IMAGE_REPO_HOST="image-repo-host"
 # 检查是否授权登录docker
 function checkLogin() {
   loginStatus=$(cat /root/.docker/config.json | grep "${IMAGE_REPO_HOST}")

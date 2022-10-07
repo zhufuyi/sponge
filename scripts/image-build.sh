@@ -28,10 +28,9 @@ BIN_FILE="cmd/${serverName}/${serverName}"
 # 配置文件目录
 CONFIG_PATH="configs"
 
-# todo 根据服务类型(http或grpc)是否使用健康检查工具
-#bash scripts/grpc_health_probe.sh
-#cp -f /tmp/grpc_health_probe ${DOCKERFILE_PATH}
-
+# only grpc use start
+bash scripts/grpc_health_probe.sh
+# only grpc use end
 CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GOPROXY=https://goproxy.cn,direct go build -gcflags "all=-N -l" -o ${BIN_FILE} cmd/${serverName}/*.go
 mv -f ${BIN_FILE} ${DOCKERFILE_PATH}
 mkdir -p ${DOCKERFILE_PATH}/${CONFIG_PATH} && cp -f ${CONFIG_PATH}/${serverName}.yml ${DOCKERFILE_PATH}/${CONFIG_PATH}
