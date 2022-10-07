@@ -4,13 +4,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/zhufuyi/sponge/configs"
 	"github.com/zhufuyi/sponge/internal/config"
+
+	"github.com/stretchr/testify/assert"
 )
 
 // 测试时需要连接真实数据
-
 func TestInitMysql(t *testing.T) {
 	defer func() {
 		if e := recover(); e != nil {

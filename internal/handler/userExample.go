@@ -7,6 +7,7 @@ import (
 	"github.com/zhufuyi/sponge/internal/dao"
 	"github.com/zhufuyi/sponge/internal/ecode"
 	"github.com/zhufuyi/sponge/internal/model"
+
 	"github.com/zhufuyi/sponge/pkg/gin/response"
 	"github.com/zhufuyi/sponge/pkg/logger"
 	"github.com/zhufuyi/sponge/pkg/mysql/query"
@@ -17,6 +18,7 @@ import (
 )
 
 var _ UserExampleHandler = (*userExampleHandler)(nil)
+var _ time.Time
 
 // UserExampleHandler 定义handler接口
 type UserExampleHandler interface {

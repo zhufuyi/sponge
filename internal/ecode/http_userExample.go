@@ -1,3 +1,5 @@
+// nolint
+
 package ecode
 
 import (
@@ -12,7 +14,6 @@ const (
 	userExampleName = "userExample_cn_name"
 )
 
-// nolint
 // 服务级别错误码，有Err前缀
 var (
 	ErrCreateUserExample = errcode.NewError(errcode.HCode(userExampleNO)+1, "创建"+userExampleName+"失败") // todo 补充错误码注释，例如 200101

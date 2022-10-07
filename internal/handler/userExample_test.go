@@ -76,6 +76,7 @@ func newUserExampleHandler() *gotest.Handler {
 
 	h.GoRunHttpServer(testFns)
 
+	time.Sleep(time.Millisecond * 200)
 	return h
 }
 

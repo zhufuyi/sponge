@@ -1,3 +1,5 @@
+// nolint
+
 package ecode
 
 import (
@@ -12,7 +14,6 @@ const (
 	_userExampleName = "userExample_cn_name"
 )
 
-// nolint
 // 服务级别错误码
 var (
 	StatusCreateUserExample = errcode.NewGRPCStatus(errcode.GCode(_userExampleNO)+1, "创建"+_userExampleName+"失败") // todo 补充错误码注释，例如 400101

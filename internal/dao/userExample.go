@@ -8,6 +8,7 @@ import (
 
 	"github.com/zhufuyi/sponge/internal/cache"
 	"github.com/zhufuyi/sponge/internal/model"
+
 	cacheBase "github.com/zhufuyi/sponge/pkg/cache"
 	"github.com/zhufuyi/sponge/pkg/goredis"
 	"github.com/zhufuyi/sponge/pkg/mysql/query"
@@ -18,7 +19,7 @@ import (
 
 var _ UserExampleDao = (*userExampleDao)(nil)
 
-// UserExampleDao 定义dao接口
+// UserExampleDao defining the dao interface
 type UserExampleDao interface {
 	Create(ctx context.Context, table *model.UserExample) error
 	DeleteByID(ctx context.Context, id uint64) error
@@ -33,17 +34,17 @@ type userExampleDao struct {
 	cache cache.UserExampleCache
 }
 
-// NewUserExampleDao 创建dao接口
+// NewUserExampleDao creating the dao interface
 func NewUserExampleDao(db *gorm.DB, cache cache.UserExampleCache) UserExampleDao {
 	return &userExampleDao{db: db, cache: cache}
 }
 
-// Create 创建一条记录，插入记录后，id值被回写到table中
+// Create a record, insert the record and the id value is written back to the table
 func (d *userExampleDao) Create(ctx context.Context, table *model.UserExample) error {
 	return d.db.WithContext(ctx).Create(table).Error
 }
 
-// DeleteByID 根据id删除一条记录
+// DeleteByID delete a record based on id
 func (d *userExampleDao) DeleteByID(ctx context.Context, id uint64) error {
 	err := d.db.WithContext(ctx).Where("id = ?", id).Delete(&model.UserExample{}).Error
 	if err != nil {
@@ -56,7 +57,7 @@ func (d *userExampleDao) DeleteByID(ctx context.Context, id uint64) error {
 	return nil
 }
 
-// UpdateByID 根据id更新记录
+// UpdateByID update records by id
 func (d *userExampleDao) UpdateByID(ctx context.Context, table *model.UserExample) error {
 	if table.ID < 1 {
 		return errors.New("id cannot be 0")
@@ -90,6 +91,7 @@ func (d *userExampleDao) UpdateByID(ctx context.Context, table *model.UserExampl
 		update["login_at"] = table.LoginAt
 	}
 	// delete the templates code end
+
 	err := d.db.WithContext(ctx).Model(table).Updates(update).Error
 	if err != nil {
 		return err
@@ -101,7 +103,7 @@ func (d *userExampleDao) UpdateByID(ctx context.Context, table *model.UserExampl
 	return nil
 }
 
-// GetByID 根据id获取一条记录
+// GetByID get a record based on id
 func (d *userExampleDao) GetByID(ctx context.Context, id uint64) (*model.UserExample, error) {
 	record, err := d.cache.Get(ctx, id)
 
@@ -146,7 +148,7 @@ func (d *userExampleDao) GetByID(ctx context.Context, id uint64) (*model.UserExa
 	return record, nil
 }
 
-// GetByIDs 根据id批量获取
+// GetByIDs get multiple rows by ids
 func (d *userExampleDao) GetByIDs(ctx context.Context, ids []uint64) ([]*model.UserExample, error) {
 	records := []*model.UserExample{}
 
@@ -185,10 +187,11 @@ func (d *userExampleDao) GetByIDs(ctx context.Context, ids []uint64) ([]*model.U
 	return records, nil
 }
 
-// GetByColumns 根据分页和列信息筛选多条记录
+// GetByColumns filter multiple rows based on paging and column information
+//
 // params 包括分页参数和查询参数
 // 分页参数(必须):
-
+//
 //	page: 页码，从0开始
 //	size: 每页行数
 //	sort: 排序字段，默认是id倒叙，可以在字段前添加-号表示倒序，没有-号表示升序，多个字段用逗号分隔

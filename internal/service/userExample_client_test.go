@@ -6,13 +6,14 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/zhufuyi/sponge/internal/config"
 	"testing"
+
+	"github.com/zhufuyi/sponge/pkg/grpc/benchmark"
 
 	pb "github.com/zhufuyi/sponge/api/serverNameExample/v1"
 	"github.com/zhufuyi/sponge/api/types"
 	"github.com/zhufuyi/sponge/configs"
-	"github.com/zhufuyi/sponge/pkg/grpc/benchmark"
+	"github.com/zhufuyi/sponge/internal/config"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
