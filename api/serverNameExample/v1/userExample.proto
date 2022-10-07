@@ -3,7 +3,7 @@
 
 syntax = "proto3";
 
-package api.userExample.v1;
+package api.serverNameExample.v1;
 
 import "validate/validate.proto";
 import "api/types/types.proto";

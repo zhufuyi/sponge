@@ -1,5 +1,5 @@
 # 使用工具自动生成go struct
-# goctl sponge config --file=serverNameExample.yml --tags=json
+# sponge config --server-dir=./serverNameExample
 
 # app 设置
 app:
@@ -21,10 +21,10 @@ http:
   writeTimeout: 90  # 写超时，单位(秒)，如果enableProfile为true，需要大于60s，pprof做profiling的默认值是60s
 
 
-# grpc 服务设置
+# grpc 设置
 grpc:
   port: 8282          # 监听端口
-  metricsPort: 9082   # 获取指标端口
+  metricsPort: 9082   # 获取指标http端口
   readTimeout: 3   # 读超时，单位(秒)
   writeTimeout: 3  # 写超时，单位(秒)
 

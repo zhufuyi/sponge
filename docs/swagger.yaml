@@ -38,7 +38,7 @@ definitions:
         description: 密码
         type: string
       phone:
-        description: 手机号码
+        description: 手机号码，e164表示<+国家编号><手机号码>
         type: string
     type: object
   handler.GetUserExamplesByIDsRequest:

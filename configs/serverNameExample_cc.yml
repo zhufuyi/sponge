@@ -1,5 +1,5 @@
 # 使用工具自动生成go struct
-# goctl sponge configCenter --file=serverNameExample_cc.yml
+# sponge config --server-dir=./serverNameExample
 
 # nacos 设置
 nacos:

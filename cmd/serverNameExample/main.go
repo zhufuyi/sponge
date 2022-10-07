@@ -10,6 +10,7 @@ import (
 	"github.com/zhufuyi/sponge/internal/config"
 	"github.com/zhufuyi/sponge/internal/model"
 	"github.com/zhufuyi/sponge/internal/server"
+
 	"github.com/zhufuyi/sponge/pkg/app"
 	"github.com/zhufuyi/sponge/pkg/logger"
 	"github.com/zhufuyi/sponge/pkg/nacoscli"
@@ -17,7 +18,7 @@ import (
 
 	"github.com/jinzhu/copier"
 
-	// grpc import start
+	// only grpc use start
 	"fmt"
 
 	"github.com/zhufuyi/sponge/pkg/registry"
@@ -26,7 +27,7 @@ import (
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	// grpc import end
+	// only grpc use end
 )
 
 var (

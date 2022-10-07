@@ -312,7 +312,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "phone": {
-                    "description": "手机号码",
+                    "description": "手机号码，e164表示\u003c+国家编号\u003e\u003c手机号码\u003e",
                     "type": "string"
                 }
             }

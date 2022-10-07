@@ -1,6 +1,6 @@
 ## sponge
 
-sponge 是一个微服务框架，支持http和grpc及服务治理，结合[goctl](https://github.com/zhufuyi/goctl)工具自动生成框架代码。
+sponge 是一个微服务框架，支持http和grpc及服务治理，支持代码自动生成。
 
 功能:
 

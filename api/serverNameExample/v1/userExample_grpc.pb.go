@@ -40,7 +40,7 @@ func NewUserExampleServiceClient(cc grpc.ClientConnInterface) UserExampleService
 
 func (c *userExampleServiceClient) Create(ctx context.Context, in *CreateUserExampleRequest, opts ...grpc.CallOption) (*CreateUserExampleReply, error) {
 	out := new(CreateUserExampleReply)
-	err := c.cc.Invoke(ctx, "/api.userExample.v1.userExampleService/Create", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.serverNameExample.v1.userExampleService/Create", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func (c *userExampleServiceClient) Create(ctx context.Context, in *CreateUserExa
 
 func (c *userExampleServiceClient) DeleteByID(ctx context.Context, in *DeleteUserExampleByIDRequest, opts ...grpc.CallOption) (*DeleteUserExampleByIDReply, error) {
 	out := new(DeleteUserExampleByIDReply)
-	err := c.cc.Invoke(ctx, "/api.userExample.v1.userExampleService/DeleteByID", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.serverNameExample.v1.userExampleService/DeleteByID", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +58,7 @@ func (c *userExampleServiceClient) DeleteByID(ctx context.Context, in *DeleteUse
 
 func (c *userExampleServiceClient) UpdateByID(ctx context.Context, in *UpdateUserExampleByIDRequest, opts ...grpc.CallOption) (*UpdateUserExampleByIDReply, error) {
 	out := new(UpdateUserExampleByIDReply)
-	err := c.cc.Invoke(ctx, "/api.userExample.v1.userExampleService/UpdateByID", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.serverNameExample.v1.userExampleService/UpdateByID", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +67,7 @@ func (c *userExampleServiceClient) UpdateByID(ctx context.Context, in *UpdateUse
 
 func (c *userExampleServiceClient) GetByID(ctx context.Context, in *GetUserExampleByIDRequest, opts ...grpc.CallOption) (*GetUserExampleByIDReply, error) {
 	out := new(GetUserExampleByIDReply)
-	err := c.cc.Invoke(ctx, "/api.userExample.v1.userExampleService/GetByID", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.serverNameExample.v1.userExampleService/GetByID", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +76,7 @@ func (c *userExampleServiceClient) GetByID(ctx context.Context, in *GetUserExamp
 
 func (c *userExampleServiceClient) ListByIDs(ctx context.Context, in *ListUserExampleByIDsRequest, opts ...grpc.CallOption) (*ListUserExampleByIDsReply, error) {
 	out := new(ListUserExampleByIDsReply)
-	err := c.cc.Invoke(ctx, "/api.userExample.v1.userExampleService/ListByIDs", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.serverNameExample.v1.userExampleService/ListByIDs", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +85,7 @@ func (c *userExampleServiceClient) ListByIDs(ctx context.Context, in *ListUserEx
 
 func (c *userExampleServiceClient) List(ctx context.Context, in *ListUserExampleRequest, opts ...grpc.CallOption) (*ListUserExampleReply, error) {
 	out := new(ListUserExampleReply)
-	err := c.cc.Invoke(ctx, "/api.userExample.v1.userExampleService/List", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.serverNameExample.v1.userExampleService/List", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -150,7 +150,7 @@ func _UserExampleService_Create_Handler(srv interface{}, ctx context.Context, de
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.userExample.v1.userExampleService/Create",
+		FullMethod: "/api.serverNameExample.v1.userExampleService/Create",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserExampleServiceServer).Create(ctx, req.(*CreateUserExampleRequest))
@@ -168,7 +168,7 @@ func _UserExampleService_DeleteByID_Handler(srv interface{}, ctx context.Context
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.userExample.v1.userExampleService/DeleteByID",
+		FullMethod: "/api.serverNameExample.v1.userExampleService/DeleteByID",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserExampleServiceServer).DeleteByID(ctx, req.(*DeleteUserExampleByIDRequest))
@@ -186,7 +186,7 @@ func _UserExampleService_UpdateByID_Handler(srv interface{}, ctx context.Context
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.userExample.v1.userExampleService/UpdateByID",
+		FullMethod: "/api.serverNameExample.v1.userExampleService/UpdateByID",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserExampleServiceServer).UpdateByID(ctx, req.(*UpdateUserExampleByIDRequest))
@@ -204,7 +204,7 @@ func _UserExampleService_GetByID_Handler(srv interface{}, ctx context.Context, d
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.userExample.v1.userExampleService/GetByID",
+		FullMethod: "/api.serverNameExample.v1.userExampleService/GetByID",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserExampleServiceServer).GetByID(ctx, req.(*GetUserExampleByIDRequest))
@@ -222,7 +222,7 @@ func _UserExampleService_ListByIDs_Handler(srv interface{}, ctx context.Context,
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.userExample.v1.userExampleService/ListByIDs",
+		FullMethod: "/api.serverNameExample.v1.userExampleService/ListByIDs",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserExampleServiceServer).ListByIDs(ctx, req.(*ListUserExampleByIDsRequest))
@@ -240,7 +240,7 @@ func _UserExampleService_List_Handler(srv interface{}, ctx context.Context, dec 
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.userExample.v1.userExampleService/List",
+		FullMethod: "/api.serverNameExample.v1.userExampleService/List",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserExampleServiceServer).List(ctx, req.(*ListUserExampleRequest))
@@ -252,7 +252,7 @@ func _UserExampleService_List_Handler(srv interface{}, ctx context.Context, dec 
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var UserExampleService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "api.userExample.v1.userExampleService",
+	ServiceName: "api.serverNameExample.v1.userExampleService",
 	HandlerType: (*UserExampleServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
