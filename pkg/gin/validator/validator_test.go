@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/zhufuyi/sponge/pkg/utils"
 
@@ -40,6 +41,7 @@ func runValidatorHTTPServer() string {
 		}
 	}()
 
+	time.Sleep(time.Millisecond * 200)
 	return requestAddr
 }
 

@@ -88,6 +88,7 @@ func TestHandler_GoRunHttpServer(t *testing.T) {
 		},
 	})
 
+	time.Sleep(time.Millisecond * 200)
 	url := h.GetRequestURL("updateByID", 1)
 	t.Log(url)
 

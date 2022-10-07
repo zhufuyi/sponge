@@ -2,16 +2,17 @@ package middleware
 
 import (
 	"fmt"
-	"github.com/zhufuyi/sponge/pkg/utils"
 	"io"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/zhufuyi/sponge/pkg/gin/response"
 	"github.com/zhufuyi/sponge/pkg/gohttp"
+	"github.com/zhufuyi/sponge/pkg/jwt"
+	"github.com/zhufuyi/sponge/pkg/utils"
 
 	"github.com/gin-gonic/gin"
-	"github.com/zhufuyi/sponge/pkg/jwt"
 )
 
 var (
@@ -49,6 +50,7 @@ func runAuthHTTPServer() string {
 		}
 	}()
 
+	time.Sleep(time.Millisecond * 200)
 	return requestAddr
 }
 

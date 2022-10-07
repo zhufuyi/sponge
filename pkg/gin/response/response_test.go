@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/zhufuyi/sponge/pkg/errcode"
 	"github.com/zhufuyi/sponge/pkg/gohttp"
@@ -37,6 +38,7 @@ func runResponseHTTPServer() string {
 		}
 	}()
 
+	time.Sleep(time.Millisecond * 200)
 	return requestAddr
 }
 

@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"testing"
+	"time"
 
 	"github.com/zhufuyi/sponge/pkg/gin/response"
 	"github.com/zhufuyi/sponge/pkg/gohttp"
@@ -53,6 +54,8 @@ func runLogHTTPServer() string {
 			panic(err)
 		}
 	}()
+
+	time.Sleep(time.Millisecond * 200)
 
 	return requestAddr
 }

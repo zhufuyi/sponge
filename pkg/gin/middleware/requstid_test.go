@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"testing"
+	"time"
 
 	"github.com/zhufuyi/sponge/pkg/gin/response"
 	"github.com/zhufuyi/sponge/pkg/gohttp"
@@ -33,6 +34,7 @@ func TestRequestID(t *testing.T) {
 		}
 	}()
 
+	time.Sleep(time.Millisecond * 200)
 	result := &gohttp.StdResult{}
 	err := gohttp.Get(result, requestAddr+"/hello")
 	assert.NoError(t, err)

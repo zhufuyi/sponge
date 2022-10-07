@@ -2,17 +2,17 @@ package ratelimiter
 
 import (
 	"fmt"
-	"github.com/zhufuyi/sponge/pkg/gin/response"
-	"github.com/zhufuyi/sponge/pkg/gohttp"
-	"github.com/zhufuyi/sponge/pkg/utils"
 	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
 
-	"golang.org/x/time/rate"
+	"github.com/zhufuyi/sponge/pkg/gin/response"
+	"github.com/zhufuyi/sponge/pkg/gohttp"
+	"github.com/zhufuyi/sponge/pkg/utils"
 
 	"github.com/gin-gonic/gin"
+	"golang.org/x/time/rate"
 )
 
 func runRateLimiterHTTPServer() string {
@@ -53,6 +53,7 @@ func runRateLimiterHTTPServer() string {
 		}
 	}()
 
+	time.Sleep(time.Millisecond * 200)
 	return requestAddr
 }
 

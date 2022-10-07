@@ -3,11 +3,14 @@ package gohttp
 import (
 	"errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/stretchr/testify/assert"
-	"github.com/zhufuyi/sponge/pkg/utils"
 	"net/http"
 	"testing"
+	"time"
+
+	"github.com/zhufuyi/sponge/pkg/utils"
+
+	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/assert"
 )
 
 type myBody struct {
@@ -78,6 +81,7 @@ func runGoHTTPServer() string {
 		}
 	}()
 
+	time.Sleep(time.Millisecond * 200)
 	return requestAddr
 }
 

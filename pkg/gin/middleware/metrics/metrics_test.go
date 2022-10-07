@@ -3,6 +3,7 @@ package metrics
 import (
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/zhufuyi/sponge/pkg/gin/handlerfunc"
 	"github.com/zhufuyi/sponge/pkg/utils"
@@ -34,6 +35,7 @@ func TestMetrics(t *testing.T) {
 		}
 	}()
 
+	time.Sleep(time.Millisecond * 200)
 	resp, err := http.Get(requestAddr + "/ping")
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)

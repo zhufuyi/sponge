@@ -21,7 +21,7 @@ func TestCheckHealth(t *testing.T) {
 		_ = r.Run(serverAddr)
 	}()
 
-	time.Sleep(time.Millisecond * 100)
+	time.Sleep(time.Millisecond * 200)
 	resp, err := http.Get(requestAddr + "/health")
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
@@ -38,7 +38,7 @@ func TestPing(t *testing.T) {
 		_ = r.Run(serverAddr)
 	}()
 
-	time.Sleep(time.Millisecond * 100)
+	time.Sleep(time.Millisecond * 200)
 	resp, err := http.Get(requestAddr + "/ping")
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)

@@ -23,7 +23,7 @@ func GetLocalHTTPAddrPairs() (string, string) {
 		return "", ""
 	}
 	serverAddr := fmt.Sprintf(":%d", port)
-	requestAddr := fmt.Sprintf("http://localhost:%d", port)
+	requestAddr := fmt.Sprintf("http://127.0.0.1:%d", port)
 	return serverAddr, requestAddr
 }
 
