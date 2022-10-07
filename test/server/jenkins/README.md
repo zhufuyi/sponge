@@ -64,14 +64,21 @@ dashboard --> 系统管理 --> 系统配置 --> 勾选环境变量
 设置容器镜像的仓库地址
 
 ```bash
+# 添加环境变量
+PATH
+/opt/java/openjdk/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/go/bin
+
 # 开发环境镜像仓库
-DEV_REPO_HOST http://localhost:18080
+DEV_REPO_HOST
+示例dev.host.docker.com
 
 # 生产环境镜像仓库
-TEST_REPO_HOST http://localhost:18081
+TEST_REPO_HOST
+示例test.host.docker.com
 
 # 生产环境镜像仓库
-PROD_REPO_HOST http://localhost:18082
+PROD_REPO_HOST
+示例prod.host.docker.com
 ```
 
 <br><br>

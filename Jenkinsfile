@@ -5,6 +5,7 @@ pipeline {
         stage("检查构建分支") {
             steps {
                 echo "检查构建分支中......"
+                // 判断分支是否允许构建，根据实际情况修改
                 script {
                     if (env.GIT_BRANCH ==~ /^v([0-9])+\.([0-9])+\.([0-9])+.*/)  {
                         echo "构建生产环境，tag=${env.GIT_BRANCH}"
@@ -13,7 +14,7 @@ pipeline {
                     } else if (env.GIT_BRANCH ==~ /(origin\/develop)/) {
                         echo "构建开发环境，/origin/develop"
                     } else {
-                        echo "构建分支${env.GIT_BRANCH}不合法，允许构建生产环境分支(例如：v1.0.0)，开发产环境分支(例如：test-1.0.0)，开发环境分支(/origin/develop)"
+                        echo "构建分支${env.GIT_BRANCH}不合法，允许构建开发环境分支(/origin/develop)，测试环境分支(例如：test-1.0.0)，生产环境分支(例如：v1.0.0)"
                         sh 'exit 1'
                     }
                 }
@@ -124,7 +125,7 @@ pipeline {
         }
 
         stage("部署到k8s") {
-            // 生产环境和测试环境跳过部署，手动部署
+            // 判断分支是否允许部署到k8s，根据实际情况更改
             when { expression { return env.GIT_BRANCH ==~ /(origin\/staging|origin\/develop)/ } }
             steps {
                 echo "部署到k8s..."
@@ -153,12 +154,11 @@ pipeline {
    }
 }
 
-
+// todo 如果使用钉钉通知，填写手机号码和钉钉机器人token
 void SendDingding(res)
 {
-	// 输入相应的手机号码，在钉钉群指定通知某个人
+	// 填写相应的手机号码，在钉钉群指定通知某个人
 	tel_num="xxxxxxxxxxx"
-
 	// 钉钉机器人的地址
 	dingding_url="https://oapi.dingtalk.com/robot/send\\?access_token\\=你的钉钉机器人token"
 
@@ -187,6 +187,7 @@ void SendDingding(res)
 	sh sh_cmd
 }
 
+// todo 如果使用邮件通知，填写邮箱地址
 void SendEmail(res)
 {
 	//在这里定义邮箱地址

@@ -7,7 +7,8 @@ spec:
   selector:
     app: server-name-example
   type: ClusterIP
-  # todo 根据服务类型(http或grpc)选择服务端口
+# todo generate k8s-svc.yml code for http or grpc here
+# delete the templates code start
   ports:
     - name: server-name-example-svc-http-port
       port: 8080
@@ -18,3 +19,4 @@ spec:
     - name: server-name-example-svc-grpc-metrics-port
       port: 9082
       targetPort: 9082
+# delete the templates code end
