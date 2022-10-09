@@ -2,7 +2,7 @@ SHELL := /bin/bash
 
 PROJECT_NAME := "github.com/zhufuyi/sponge"
 PKG := "$(PROJECT_NAME)"
-PKG_LIST := $(shell go list ${PKG}/... | grep -v /vendor/)
+PKG_LIST := $(shell go list ${PKG}/... | grep -v /vendor/ | grep -v /api/)
 GO_FILES := $(shell find . -name '*.go' | grep -v /vendor/ | grep -v _test.go)
 
 
@@ -57,7 +57,7 @@ test:
 .PHONY: cover
 # generate test coverage
 cover:
-	go test -short -coverprofile cover.out -covermode=atomic ${PKG_LIST}
+	go test -race -short -coverprofile=cover.out -covermode=atomic ${PKG_LIST}
 	go tool cover -html=cover.out
 
 

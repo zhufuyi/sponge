@@ -89,25 +89,25 @@ PROD_REPO_HOST
 
 **(1) 创建新的jenkins任务**
 
-![创建job](../../../assets/jenkins/createJob.jpg)
+![创建job](pictures/createJob.jpg)
 
 <br>
 
 **(2) 设置参数化构建**，参数名字为`GIT_PARAMETER`，如下图所示：
 
-![参数化构建](../../../assets/jenkins/paramSetting.jpg)
+![参数化构建](pictures/paramSetting.jpg)
 
 <br>
 
 **(3) 设置流水线信息**，如下图所示：
 
-![流水线](../../../assets/jenkins/pipelineSetting.jpg)
+![流水线](pictures/pipelineSetting.jpg)
 
 <br>
 
 **(4) 构建项目**，点击左边菜单栏Build with Parameters，选择对应的参数构建，如下图所示：
 
-![runJob-dev](../../../assets/jenkins/building.jpg)
+![runJob-dev](pictures/building.jpg)
 
 注：在构建之前，修改钉钉或邮件通知目标，方便查看构建部署结果，打开代码仓库下的Jenkinsfile文件，找到字段tel_num，填写手机号码。
 
