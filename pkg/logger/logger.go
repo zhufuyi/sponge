@@ -53,13 +53,21 @@ func Init(opts ...Option) (*zap.Logger, error) {
 	encoding := o.encoding
 
 	var err error
+	var zapLog *zap.Logger
+	var str string
 	if !isSave { // 在终端打印
-		defaultLogger, err = log2Terminal(levelName, encoding)
-		Infof("initialize logger finish, config is output to 'terminal', format=%s, level=%s", encoding, levelName)
+		zapLog, err = log2Terminal(levelName, encoding)
+		if err != nil {
+			panic(err)
+		}
+		str = fmt.Sprintf("initialize logger finish, config is output to 'terminal', format=%s, level=%s", encoding, levelName)
 	} else {
-		defaultLogger = log2File(encoding, levelName, o.fileConfig)
-		Info("initialize logger finish, config is output to 'file'", String("format", encoding), String("level", levelName), Any("file", o.fileConfig))
+		zapLog = log2File(encoding, levelName, o.fileConfig)
+		str = fmt.Sprintf("initialize logger finish, config is output to 'file', format=%s, level=%s, file=%s", encoding, levelName, o.fileConfig.filename)
 	}
+
+	defaultLogger = zapLog
+	Info(str)
 
 	return defaultLogger, err
 }
@@ -133,14 +141,12 @@ func timeFormatter(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
 // GetWithSkip 获取defaultLogger，设置跳过的caller值，自定义显示代码行数
 func GetWithSkip(skip int) *zap.Logger {
 	checkNil()
-
 	return defaultLogger.WithOptions(zap.AddCallerSkip(skip))
 }
 
 // Get 获取logger对象
 func Get() *zap.Logger {
 	checkNil()
-
 	return defaultLogger
 }
 
@@ -150,6 +156,5 @@ func checkNil() {
 		if err != nil {
 			panic(err)
 		}
-		//Warn("not yet initialized the log, use default log")
 	}
 }

@@ -4,11 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/url"
 	"strconv"
 	"time"
 
-	"github.com/zhufuyi/sponge/pkg/logger"
 	"github.com/zhufuyi/sponge/pkg/registry"
 
 	"google.golang.org/grpc/attributes"
@@ -38,7 +38,7 @@ func (r *discoveryResolver) watch() {
 			if errors.Is(err, context.Canceled) {
 				return
 			}
-			logger.Errorf("[resolver] Failed to watch discovery endpoint: %v", err)
+			fmt.Printf("[resolver] Failed to watch discovery endpoint: %v\n", err)
 			time.Sleep(time.Second)
 			continue
 		}
@@ -52,7 +52,7 @@ func (r *discoveryResolver) update(ins []*registry.ServiceInstance) {
 	for _, in := range ins {
 		endpoint, err := parseEndpoint(in.Endpoints, "grpc", !r.insecure)
 		if err != nil {
-			logger.Errorf("[resolver] Failed to parse discovery endpoint: %v", err)
+			fmt.Printf("[resolver] Failed to parse discovery endpoint: %v\n", err)
 			continue
 		}
 		if endpoint == "" {
@@ -72,17 +72,17 @@ func (r *discoveryResolver) update(ins []*registry.ServiceInstance) {
 		addrs = append(addrs, addr)
 	}
 	if len(addrs) == 0 {
-		logger.Warnf("[resolver] Zero endpoint found,refused to write, instances: %v", ins)
+		fmt.Printf("[resolver] Zero endpoint found,refused to write, instances: %v\n", ins)
 		return
 	}
 	err := r.cc.UpdateState(resolver.State{Addresses: addrs})
 	if err != nil {
-		logger.Errorf("[resolver] failed to update state: %s", err)
+		fmt.Printf("[resolver] failed to update state: %v\n", err)
 	}
 
 	if !r.debugLogDisabled {
 		b, _ := json.Marshal(ins)
-		logger.Infof("[resolver] update instances: %s", b)
+		fmt.Printf("[resolver] update instances: %s\n", b)
 	}
 }
 
@@ -90,7 +90,7 @@ func (r *discoveryResolver) Close() {
 	r.cancel()
 	err := r.w.Stop()
 	if err != nil {
-		logger.Errorf("[resolver] failed to watch top: %s", err)
+		fmt.Printf("[resolver] failed to watch top: %v\n", err)
 	}
 }
 

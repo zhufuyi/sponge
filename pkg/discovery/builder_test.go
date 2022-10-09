@@ -2,11 +2,13 @@ package discovery
 
 import (
 	"context"
-	"github.com/stretchr/testify/assert"
-	"github.com/zhufuyi/sponge/pkg/registry"
-	"google.golang.org/grpc/resolver"
 	"testing"
 	"time"
+
+	"github.com/zhufuyi/sponge/pkg/registry"
+
+	"github.com/stretchr/testify/assert"
+	"google.golang.org/grpc/resolver"
 )
 
 type discovery struct{}
