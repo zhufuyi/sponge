@@ -65,7 +65,7 @@ func (h *userExampleHandler) Create(c *gin.Context) {
 	userExample := &model.UserExample{}
 	err = copier.Copy(userExample, form)
 	if err != nil {
-		logger.Error("Copy error", logger.Err(err), logger.Any("form", form), utils.FieldRequestIDFromContext(c))
+		logger.Warn("Copy error", logger.Err(err), logger.Any("form", form), utils.FieldRequestIDFromContext(c))
 		response.Error(c, ecode.InternalServerError)
 		return
 	}
@@ -90,8 +90,8 @@ func (h *userExampleHandler) Create(c *gin.Context) {
 // @Success 200 {object} Result{}
 // @Router /api/v1/userExample/{id} [delete]
 func (h *userExampleHandler) DeleteByID(c *gin.Context) {
-	_, id, isAbout := getUserExampleIDFromPath(c)
-	if isAbout {
+	_, id, isAbort := getUserExampleIDFromPath(c)
+	if isAbort {
 		return
 	}
 
@@ -116,8 +116,8 @@ func (h *userExampleHandler) DeleteByID(c *gin.Context) {
 // @Success 200 {object} Result{}
 // @Router /api/v1/userExample/{id} [put]
 func (h *userExampleHandler) UpdateByID(c *gin.Context) {
-	_, id, isAbout := getUserExampleIDFromPath(c)
-	if isAbout {
+	_, id, isAbort := getUserExampleIDFromPath(c)
+	if isAbort {
 		return
 	}
 
@@ -133,7 +133,7 @@ func (h *userExampleHandler) UpdateByID(c *gin.Context) {
 	userExample := &model.UserExample{}
 	err = copier.Copy(userExample, form)
 	if err != nil {
-		logger.Error("Copy error", logger.Err(err), logger.Any("form", form), utils.FieldRequestIDFromContext(c))
+		logger.Warn("Copy error", logger.Err(err), logger.Any("form", form), utils.FieldRequestIDFromContext(c))
 		response.Error(c, ecode.InternalServerError)
 		return
 	}
@@ -158,8 +158,8 @@ func (h *userExampleHandler) UpdateByID(c *gin.Context) {
 // @Success 200 {object} Result{}
 // @Router /api/v1/userExample/{id} [get]
 func (h *userExampleHandler) GetByID(c *gin.Context) {
-	idstr, id, isAbout := getUserExampleIDFromPath(c)
-	if isAbout {
+	idStr, id, isAbort := getUserExampleIDFromPath(c)
+	if isAbort {
 		return
 	}
 
@@ -178,11 +178,11 @@ func (h *userExampleHandler) GetByID(c *gin.Context) {
 	data := &GetUserExampleByIDRespond{}
 	err = copier.Copy(data, userExample)
 	if err != nil {
-		logger.Error("Copy error", logger.Err(err), logger.Any("id", id), utils.FieldRequestIDFromContext(c))
+		logger.Warn("Copy error", logger.Err(err), logger.Any("id", id), utils.FieldRequestIDFromContext(c))
 		response.Error(c, ecode.InternalServerError)
 		return
 	}
-	data.ID = idstr
+	data.ID = idStr
 
 	response.Success(c, gin.H{"userExample": data})
 }
@@ -214,7 +214,7 @@ func (h *userExampleHandler) ListByIDs(c *gin.Context) {
 
 	data, err := convertUserExamples(userExamples)
 	if err != nil {
-		logger.Error("Copy error", logger.Err(err), logger.Any("form", form), utils.FieldRequestIDFromContext(c))
+		logger.Warn("Copy error", logger.Err(err), logger.Any("form", form), utils.FieldRequestIDFromContext(c))
 		response.Error(c, ecode.InternalServerError)
 		return
 	}
@@ -251,7 +251,7 @@ func (h *userExampleHandler) List(c *gin.Context) {
 
 	data, err := convertUserExamples(userExamples)
 	if err != nil {
-		logger.Error("Copy error", logger.Err(err), logger.Any("form", form), utils.FieldRequestIDFromContext(c))
+		logger.Warn("Copy error", logger.Err(err), logger.Any("form", form), utils.FieldRequestIDFromContext(c))
 		response.Error(c, ecode.InternalServerError)
 		return
 	}

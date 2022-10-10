@@ -36,6 +36,10 @@ func Test_userExampleCache_Set(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	// nil data
+	err = c.ICache.(UserExampleCache).Set(c.Ctx, 0, nil, time.Hour)
+	assert.NoError(t, err)
 }
 
 func Test_userExampleCache_Get(t *testing.T) {
@@ -52,8 +56,11 @@ func Test_userExampleCache_Get(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
 	assert.Equal(t, record, got)
+
+	// zero key error
+	_, err = c.ICache.(UserExampleCache).Get(c.Ctx, 0)
+	assert.Error(t, err)
 }
 
 func Test_userExampleCache_MultiGet(t *testing.T) {

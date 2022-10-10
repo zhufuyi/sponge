@@ -23,6 +23,11 @@ func TestHTTPServer(t *testing.T) {
 		}
 	}()
 
+	config.Get().App.EnableMetrics = true
+	config.Get().App.EnableTracing = true
+	config.Get().App.EnableProfile = true
+	config.Get().App.EnableLimit = true
+
 	port, _ := utils.GetAvailablePort()
 	addr := fmt.Sprintf(":%d", port)
 	gin.SetMode(gin.ReleaseMode)

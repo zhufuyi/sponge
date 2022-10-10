@@ -1,9 +1,9 @@
 package routers
 
 import (
+	"github.com/zhufuyi/sponge/internal/handler"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/zhufuyi/sponge/configs"
 	"github.com/zhufuyi/sponge/internal/config"
 
@@ -12,7 +12,9 @@ import (
 
 func TestNewRouter(t *testing.T) {
 	err := config.Init(configs.Path("serverNameExample.yml"))
-	t.Log(err)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	defer func() {
 		if e := recover(); e != nil {
@@ -20,7 +22,13 @@ func TestNewRouter(t *testing.T) {
 		}
 	}()
 
+	config.Get().App.EnableMetrics = true
+	config.Get().App.EnableTracing = true
+	config.Get().App.EnableProfile = true
+	config.Get().App.EnableLimit = true
+
 	gin.SetMode(gin.ReleaseMode)
 	r := NewRouter()
-	assert.NotNil(t, r)
+
+	userExampleRouter(r.Group("/"), handler.NewUserExampleHandler())
 }

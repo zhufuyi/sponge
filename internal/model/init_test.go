@@ -29,6 +29,13 @@ func TestInitMysql(t *testing.T) {
 	time.Sleep(time.Millisecond * 10)
 	err = CloseMysql()
 	assert.NoError(t, err)
+
+	// change config error test
+	config.Get().App.EnableTracing = true
+	config.Get().Mysql.Dsn = "root:123456@(127.0.0.1:3306)/test"
+	db = nil
+	_ = CloseMysql()
+	_ = GetDB()
 }
 
 func TestInitRedis(t *testing.T) {
@@ -49,6 +56,12 @@ func TestInitRedis(t *testing.T) {
 	time.Sleep(time.Millisecond * 10)
 	err = CloseRedis()
 	assert.NoError(t, err)
+
+	// change config error test
+	config.Get().App.EnableTracing = true
+	config.Get().Redis.Dsn = "default:123456@127.0.0.1:6379/0"
+	redisCli = nil
+	_ = GetRedisCli()
 }
 
 func TestTableName(t *testing.T) {

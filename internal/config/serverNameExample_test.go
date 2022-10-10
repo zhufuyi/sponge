@@ -22,7 +22,13 @@ func TestInit(t *testing.T) {
 
 	str := Show()
 	assert.NotEmpty(t, str)
-	t.Log(str)
+
+	// set nil
+	Set(nil)
+	defer func() {
+		recover()
+	}()
+	Get()
 }
 
 func TestInitNacos(t *testing.T) {

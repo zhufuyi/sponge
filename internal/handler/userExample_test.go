@@ -8,12 +8,15 @@ import (
 	"github.com/zhufuyi/sponge/internal/cache"
 	"github.com/zhufuyi/sponge/internal/dao"
 	"github.com/zhufuyi/sponge/internal/model"
+
 	"github.com/zhufuyi/sponge/pkg/gohttp"
 	"github.com/zhufuyi/sponge/pkg/gotest"
 	"github.com/zhufuyi/sponge/pkg/mysql/query"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jinzhu/copier"
+	"github.com/stretchr/testify/assert"
+	"github.com/zhufuyi/sponge/pkg/utils"
 )
 
 func newUserExampleHandler() *gotest.Handler {
@@ -24,7 +27,7 @@ func newUserExampleHandler() *gotest.Handler {
 	testData.UpdatedAt = testData.CreatedAt
 
 	// 初始化mock cache
-	c := gotest.NewCache(map[string]interface{}{"no cache": testData})
+	c := gotest.NewCache(map[string]interface{}{utils.Uint64ToStr(testData.ID): testData})
 	c.ICache = cache.NewUserExampleCache(c.RedisClient)
 
 	// 初始化mock dao
@@ -100,12 +103,41 @@ func Test_userExampleHandler_Create(t *testing.T) {
 	}
 
 	t.Logf("%+v", result)
+	// delete the templates code start
+	result = &gohttp.StdResult{}
+	testData = &CreateUserExampleRequest{
+		Name:     "foo",
+		Password: "f447b20a7fcbf53a5d5be013ea0b15af",
+		Email:    "foo@bar.com",
+		Phone:    "+8616000000001",
+		Avatar:   "http://foo/1.jpg",
+		Age:      10,
+		Gender:   1,
+	}
+	err = gohttp.Post(result, h.GetRequestURL("Create"), testData)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Logf("%+v", result)
+
+	h.MockDao.SqlMock.ExpectBegin()
+	h.MockDao.SqlMock.ExpectCommit()
+	result = &gohttp.StdResult{}
+	err = gohttp.Post(result, h.GetRequestURL("Create"), testData)
+	assert.NoError(t, err)
+	// delete the templates code end
 }
 
 func Test_userExampleHandler_DeleteByID(t *testing.T) {
 	h := newUserExampleHandler()
 	defer h.Close()
 	testData := h.TestData.(*model.UserExample)
+
+	h.MockDao.SqlMock.ExpectBegin()
+	h.MockDao.SqlMock.ExpectExec("UPDATE .*").
+		WithArgs(h.MockDao.AnyTime, testData.ID). // 根据测试数据数量调整
+		WillReturnResult(sqlmock.NewResult(int64(testData.ID), 1))
+	h.MockDao.SqlMock.ExpectCommit()
 
 	result := &gohttp.StdResult{}
 	err := gohttp.Delete(result, h.GetRequestURL("DeleteByID", testData.ID))
@@ -115,6 +147,14 @@ func Test_userExampleHandler_DeleteByID(t *testing.T) {
 	if result.Code != 0 {
 		t.Fatalf("%+v", result)
 	}
+
+	// zero id error test
+	err = gohttp.Delete(result, h.GetRequestURL("DeleteByID", 0))
+	assert.NoError(t, err)
+
+	// delete error test
+	err = gohttp.Delete(result, h.GetRequestURL("DeleteByID", 111))
+	assert.NoError(t, err)
 }
 
 func Test_userExampleHandler_UpdateByID(t *testing.T) {
@@ -137,6 +177,14 @@ func Test_userExampleHandler_UpdateByID(t *testing.T) {
 	if result.Code != 0 {
 		t.Fatalf("%+v", result)
 	}
+
+	// zero id error test
+	err = gohttp.Put(result, h.GetRequestURL("UpdateByID", 0), testData)
+	assert.NoError(t, err)
+
+	// update error test
+	err = gohttp.Put(result, h.GetRequestURL("UpdateByID", 111), testData)
+	assert.NoError(t, err)
 }
 
 func Test_userExampleHandler_GetByID(t *testing.T) {
@@ -159,6 +207,14 @@ func Test_userExampleHandler_GetByID(t *testing.T) {
 	if result.Code != 0 {
 		t.Fatalf("%+v", result)
 	}
+
+	// zero id error test
+	err = gohttp.Get(result, h.GetRequestURL("GetByID", 0))
+	assert.NoError(t, err)
+
+	// get error test
+	err = gohttp.Get(result, h.GetRequestURL("GetByID", 111))
+	assert.NoError(t, err)
 }
 
 func Test_userExampleHandler_ListByIDs(t *testing.T) {
@@ -179,6 +235,14 @@ func Test_userExampleHandler_ListByIDs(t *testing.T) {
 	if result.Code != 0 {
 		t.Fatalf("%+v", result)
 	}
+
+	// zero id error test
+	err = gohttp.Post(result, h.GetRequestURL("ListByIDs"), nil)
+	assert.NoError(t, err)
+
+	// get error test
+	err = gohttp.Post(result, h.GetRequestURL("ListByIDs"), &GetUserExamplesByIDsRequest{IDs: []uint64{111}})
+	assert.NoError(t, err)
 }
 
 func Test_userExampleHandler_List(t *testing.T) {
@@ -203,4 +267,20 @@ func Test_userExampleHandler_List(t *testing.T) {
 	if result.Code != 0 {
 		t.Fatalf("%+v", result)
 	}
+
+	// nil params error test
+	err = gohttp.Post(result, h.GetRequestURL("List"), nil)
+
+	// get error test
+	err = gohttp.Post(result, h.GetRequestURL("List"), &GetUserExamplesRequest{query.Params{
+		Page: 0,
+		Size: 10,
+	}})
+}
+
+func TestNewUserExampleHandler(t *testing.T) {
+	defer func() {
+		recover()
+	}()
+	_ = NewUserExampleHandler()
 }

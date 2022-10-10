@@ -1,224 +1,223 @@
 ## sponge
 
-<p align="center">
-<img align="center" width="300px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/logo.jpg">
-</p>
-
-[![Go Report](https://goreportcard.com/badge/github.com/zhufuyi/sponge)](https://goreportcard.com/report/github.com/zhufuyi/sponge)
-[![codecov](https://codecov.io/gh/zhufuyi/sponge/branch/main/graph/badge.svg)](https://codecov.io/gh/zhufuyi/sponge)
-[![Go Reference](https://pkg.go.dev/badge/github.com/zhufuyi/sponge.svg)](https://pkg.go.dev/github.com/zhufuyi/sponge)
+[![Go Report](https://goreportcard.com/badge/github.com/zhufuyi/sponge)](https://goreportcard.com/report/github.com/zhufuyi/sponge)  
+[![codecov](https://codecov.io/gh/zhufuyi/sponge/branch/main/graph/badge.svg)](https://codecov.io/gh/zhufuyi/sponge)  
+[![Go Reference](https://pkg.go.dev/badge/github.com/zhufuyi/sponge.svg)](https://pkg.go.dev/github.com/zhufuyi/sponge)  
+[![Go](https://github.com/zhufuyi/sponge/workflows/Go/badge.svg?branch=main)](https://github.com/zhufuyi/sponge/actions)  
 [![License: MIT](https://img.shields.io/github/license/zhufuyi/sponge)](https://img.shields.io/github/license/zhufuyi/sponge)
 
-sponge 是一个微服务框架，支持自动生成http服务代码、grpc服务代码和CICD完整流程脚本，生成独立子模块config、ecode、model、dao、handler、router、http、proto、service、grpc，低耦合的模块代码经过组合成完整服务(类似打散的海绵细胞会自动重组新的海绵)，只需填充业务代码。
+**sponge** is a microservices framework that supports automatic generation of http service code, grpc service code and CICD execution scripts. Generate config, ecode, model, dao, handler, router, http, proto, service, grpc independent sub-modules. The low-coupling module code is combined into a complete service (similar to how a broken sponge cell automatically reorganises itself into a new sponge) and only needs to be populated with business code.
 
-功能:
+Features :
 
-- web框架 [gin](https://github.com/gin-gonic/gin)
-- rpc框架 [grpc](https://github.com/grpc/grpc-go)
-- 配置文件解析 [viper](https://github.com/spf13/viper)
-- 日志 [zap](go.uber.org/zap)
-- 数据库组件 [gorm](gorm.io/gorm)
-- 缓存组件 [go-redis](github.com/go-redis/redis)
-- 文档 [swagger](github.com/swaggo/swag)
-- 校验器 [validator](github.com/go-playground/validator)
-- 链路跟踪 [opentelemetry](go.opentelemetry.io/otel)
-- 指标采集 [prometheus](github.com/prometheus/client_golang/prometheus)
-- 限流 [ratelimiter](golang.org/x/time/rate)
-- 熔断 [hystrix](github.com/afex/hystrix-go)
-- 配置中心 [nacos](https://github.com/alibaba/nacos)
-- 服务注册与发现 [etcd](https://github.com/etcd-io/etcd), [consul](https://github.com/hashicorp/consul), [nacos](https://github.com/alibaba/nacos)
-- 包管理工具 [go modules](https://github.com/golang/go/wiki/Modules)
-- 性能分析 [go profile](https://go.dev/blog/pprof)
-- 代码检测 [golangci-lint](https://github.com/golangci/golangci-lint)
-- 持续集成CI [jenkins](https://github.com/jenkinsci/jenkins)
-- 持续部署CD [docker](https://www.docker.com/), [kubernetes](https://github.com/kubernetes/kubernetes)
+- web framework [gin](https://github.com/gin-gonic/gin)
+- rpc framework [grpc](https://github.com/grpc/grpc-go)
+- Configuration file parsing [viper](https://github.com/spf13/viper)
+- logging [zap](go.uber.org/zap)
+- Database component [gorm](gorm.io/gorm)
+- Caching component [go-redis](github.com/go-redis/redis)
+- Documentation [swagger](github.com/swaggo/swag)
+- Validator [validator](github.com/go-playground/validator)
+- Link tracking [opentelemetry](go.opentelemetry.io/otel)
+- Metrics collection [prometheus](github.com/prometheus/client_golang/prometheus)
+- ratelimiter](golang.org/x/time/rate)
+- fuse [hystrix](github.com/afex/hystrix-go)
+- Configuration Center [nacos](https://github.com/alibaba/nacos)
+- Service registration and discovery [etcd](https://github.com/etcd-io/etcd), [consul](https://github.com/hashicorp/consul), [nacos](https://github.com/alibaba/) nacos)
+- Package management tools [go modules](https://github.com/golang/go/wiki/Modules)
+- Performance analysis [go profile](https://go.dev/blog/pprof)
+- Code inspection [golangci-lint](https://github.com/golangci/golangci-lint)
+- Continuous Integration CI [jenkins](https://github.com/jenkinsci/jenkins)
+- Continuous Deployment CD [docker](https://www.docker.com/), [kubernetes](https://github.com/kubernetes/kubernetes)
 
-<br>
+<br>  
 
-目录结构遵循[golang-standards/project-layout](https://github.com/golang-standards/project-layout)。
+The directory structure follows [golang-standards/project-layout](https://github.com/golang-standards/project-layout)。
 
-```
-.
-├── api                 # grpc的proto文件和对应代码
-├── assets              # 与存储库一起使用的其他资产(图像、徽标等)
-├── build               # 打包和持续集成
-├── cmd                 # 应用程序的目录
-├── configs             # 配置文件目录
-├── deployments         # IaaS、PaaS、系统和容器编排部署配置和模板
-├── docs                # 设计文档和接口文档
-├── internal            # 私有应用程序和库代码
-│   ├── cache           # 基于业务封装的cache
-│   ├── config          # 配置文件映射的go struct
-│   ├── dao             # 数据访问
-│   ├── ecode           # 自定义业务错误码
-│   ├── handler         # http的业务功能实现
-│   ├── model           # 数据库 model
-│   ├── routers         # http 路由
-│   ├── server          # 服务入口，包括http和grpc服务
-│   └── service         # grpc的业务功能实现
-├── pkg                 # 外部应用程序可以使用的库代码
-├── scripts             # 存放用于执行各种构建，安装，分析等操作的脚本
-├── test                # 额外的外部测试应用程序和测试数据
-└── third_party         # 外部辅助工具，分叉代码和其他第三方工具
-```
+```bash
+.  
+├── api               # grpc's proto file and corresponding code  
+├── assets          # other assets used with the repository (images, logos, etc.)  
+├── build            # Packaging and continuous integration  
+├── cmd             # The application's directory  
+├── configs         # Directory of configuration files  
+├── deployments # IaaS, PaaS, system and container orchestration deployment configurations and templates  
+├─ docs              # Design documentation and interface documentation  
+├── internal        # Private application and library code  
+│ ├── cache       # Business wrapper-based cache  
+│ ├── config       # Go struct for config file mapping  
+│ ├── dao          # Data access  
+│ ├── ecode       # custom business error codes  
+│ ├── handler    # Business function implementation for http  
+│ ├── model      # Database model  
+│ ├── routers    # http routing  
+│ ├── server     # service entry, including http and grpc services  
+│ ├── service    # Business function implementation for grpc  
+├── pkg            # library code that external applications can use  
+├── scripts       # Scripts for performing various build, install, analysis, etc. operations  
+├── test            # Additional external test applications and test data  
+└── third_party # External helpers, forked code and other third party tools  
+``` 
 
-<br>
+<br>  
 
-开发规范遵循 [Uber Go 语言编码规范](https://github.com/uber-go/guide/blob/master/style.md) 。
+The development specification follows the [Uber Go Language Coding Specification](https://github.com/uber-go/guide/blob/master/style.md).
 
-<br>
+<br>  
 
-## 快速开始
+## Quick start
 
-### 快速创建http项目
+### Quickly create an http project
 
-#### 创建新http服务
+#### Creating a new http service
 
-根据module名称、服务名称、项目名称、仓库地址和mysql表生成一个完整的http服务代码，自动实现增删改查数据功能，支持缓存、链路跟踪、指标采集、限流、性能分析等服务治理，支持构建、部署、CICD等，执行代码步骤：
-
-**(1) 生成http服务代码**
+**(1) Generate http service code**
 
 > sponge http --module-name=account --server-name=account --project-name=account --repo-addr=zhufuyi --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=use
 
-命令参数说明：
+Command parameter description.
 
-- --module-name: go.mod文件的module名
-- --server-name: http服务名称
-- --project-name: http服务所属项目名称
-- --db-dsn: 连接msyql地址
-- --db-table: 表名
-- --embed: 是否嵌入gorm.Model(id和时间作为内嵌字段)，可选参数，默认为true
-- --out: 生成代码到指定目录，例如`$PATH/src/<http服务名称>`，可选参数，默认生成代码在当前目录，注：如果文件存在会直接替换
+- --**module-name**: module name of the go.mod file
+- --**server-name**: the name of the http service
+- --**project-name**: the name of the project to which the http service belongs
+- --**repo-addr**: image repository address
+- --**db-dsn**: address of the msyql connection
+- --**db-table**: the name of the table
+- --**embed**: whether to embed gorm.Model (id and time as embedded fields), optional parameter, default is true
+- --**out**: generate code to the specified directory, e.g. `$PATH/src/<http service name>`, optional, default code generated in the current directory, note: if the file exists it will be cancel generate codes.
 
-**(2) 修改配置文件configs/<服务名称>.yml**
 
-- 修改redis配置
-- 如果字段`enableTracing`为true，必须设置jaeger地址
-- 如果字段`enableRegistryDiscovery`为true，必须设置etcd地址
+**(2) Modify the configuration file configs/<service name>.yml**
 
-**(3) 生成swagger文档**
+- Modify the redis configuration
+- If the field `enableTracing` is true, the jaeger address must be set
+- If the field `enableRegistryDiscovery` is true, the etcd address must be set
+
+**(3) Generate swagger documentation**
 
 ```bash
-# 第一次运行，更新项目依赖库
+# First run, update project dependencies
 make mod && make fmt
 
-# 生成swagger文档
+# Generate swagger documentation
 make docs
 ```
 
-**(4) 启动服务**
+**(4) Start the service**
 
-方式一：在本地二进制运行
+Way 1: Run locally in the binary
 
 > make run
 
-复制 `http://localhost:8080/swagger/index.html` 到浏览器，测试增删改查接口。
+Copy `http://localhost:8080/swagger/index.html` to your browser and test the add/remove interface.
 
-方式二：在docker运行
+Way 2: Run in docker
 
 ```bash
-# 构建docker镜像
+# Build the docker image
 make docker-image
 
-# 启动服务
+# Start the service
 make deploy-docker
 
-# 查看服务运行状态，如果为healthy说明启动成功
+# Check the status of the service, if it is healthy, it started successfully
 cd deployments/docker-compose
 docker-compose ps
 ```
 
-方式三：在k8s运行
+Way 3: Run in k8s
 
 ```bash
-# 构建镜像
+# Build the image
 make image-build REPO_HOST=zhufuyi TAG=latest
 
-# 推送镜像到远程镜像仓库，上传成功后删除本地镜像
+# Push the image to the remote image repository and delete the local image after a successful upload
 make image-push REPO_HOST=zhufuyi TAG=latest
 
-# 部署k8s
+# Deploy k8s
 kubectl apply -f deployments/kubernetes/
 make deploy-k8s
 
-# 查看服务状态
-kubectl get -f account-deployment.yml  
-```
+# Check the status of the service
+kubectl get -f account-deployment.yml
+```  
 
-也可以使用Jenkins自动构建部署到k8s。
+You can also use Jenkins to automatically build deployments to k8s.
 
-<br>
+<br>  
 
-### 快速创建grpc项目
+### Quick creation of grpc projects
 
-#### 创建新grpc服务
+#### Creating a new grpc service
 
-根据module名称、服务名称、项目名称、仓库地址和mysql表生成一个完整的grpc服务代码，自动实现增删改查数据功能，支持缓存、链路跟踪、指标采集、限流、熔断、性能分析等服务治理，支持构建、部署、CICD。生成一个完整的grpc服务代码步骤：
-
-**(1) 生成grpc服务代码**
+**(1) Generate grpc service code**
 
 > sponge grpc --module-name=account --server-name=account --project-name=account --repo-addr=zhufuyi --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
-命令参数说明：
+Command parameter description.
 
-- --project-name 项目名称
-- --db-dsn 连接msyql
-- --db-table 表名
-- --embedded 可选参数，使用gorm.Model，id和时间作为内嵌字段
-- --server-name 可选参数，服务名称，用在生成proto文件路径上，例如`serverName`，如果为空，默认等于project-name参数值
-- --out: 生成代码到指定目录，例如`$PATH/src/<http服务名称>`，可选参数，默认生成代码在当前目录，注：如果文件存在会直接替换
+- --**module-name**: module name of the go.mod file
+- --**server-name**: the name of the http service
+- --**project-name**: the name of the project to which the http service belongs
+- --**repo-addr**: image repository address
+- --**db-dsn**: address of the msyql connection
+- --**db-table**: the name of the table
+- --**embed**: whether to embed gorm.Model (id and time as embedded fields), optional parameter, default is true
+- --**out**: generate code to the specified directory, e.g. `$PATH/src/<http service name>`, optional, default code generated in the current directory, note: if the file exists it will be cancel generate codes.
 
-**(2) 修改配置文件configs/<服务名称>.yml**
+**(2) Modify the configuration file configs/<service name>.yml**
 
-- 修改redis配置
-- 如果字段`enableTracing`为true，必须设置jaeger地址
-- 如果字段`enableRegistryDiscovery`为true，必须设置etcd地址
+- Modify the redis configuration
+- If the field `enableTracing` is true, the jaeger address must be set
+- If the field `enableRegistryDiscovery` is true, the etcd address must be set
 
-**(4) 生成grpc代码**
+**(3) Generating grpc code**
 
 ```bash
-# 第一次运行，更新项目依赖库
+# First run, update project dependencies
 make mod && make fmt
 
-# 生成*.pb.go
+# Generate *.pb.go
 make proto
-```
+```  
 
-**(5) 启动服务**
+**(4) Start the service**
 
-方式一：本地二进制运行
+Way 1: Run locally in the binary
 
 > make run
 
-使用IDE打开`internal/service/表名_client_test.go`，测试增删改查接口和和生成压测报告。
+Copy `http://localhost:8080/swagger/index.html` to your browser and test the add/remove interface.
 
-方式二：在docker运行
+Way 2: Run in docker
 
 ```bash
-# 构建docker镜像
+# Build the docker image
 make docker-image
 
-# 启动服务
+# Start the service
 make deploy-docker
 
-# 查看服务运行状态，如果为healthy说明启动成功
+# Check the status of the service, if it is healthy, it started successfully
 cd deployments/docker-compose
 docker-compose ps
 ```
 
-方式三：在k8s运行
+Way 3: Run in k8s
 
 ```bash
-# 构建镜像
+# Build the image
 make image-build REPO_HOST=zhufuyi TAG=latest
 
-# 推送镜像到远程镜像仓库，上传成功后删除本地镜像
+# Push the image to the remote image repository and delete the local image after a successful upload
 make image-push REPO_HOST=zhufuyi TAG=latest
 
-# 部署k8s
+# Deploy k8s
 kubectl apply -f deployments/kubernetes/
 make deploy-k8s
 
-# 查看服务状态
-kubectl get -f account-deployment.yml  
-```
+# Check the status of the service
+kubectl get -f account-deployment.yml
+```  
+
+You can also use Jenkins to automatically build deployments to k8s.  

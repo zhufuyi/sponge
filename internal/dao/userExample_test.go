@@ -11,6 +11,7 @@ import (
 	"github.com/zhufuyi/sponge/pkg/mysql/query"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )
 
@@ -68,6 +69,10 @@ func Test_userExampleDao_DeleteByID(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	// zero id error
+	err = d.IDao.(UserExampleDao).DeleteByID(d.Ctx, 0)
+	assert.Error(t, err)
 }
 
 func Test_userExampleDao_UpdateByID(t *testing.T) {
@@ -85,6 +90,27 @@ func Test_userExampleDao_UpdateByID(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	// zero id error
+	err = d.IDao.(UserExampleDao).UpdateByID(d.Ctx, &model.UserExample{})
+	assert.Error(t, err)
+	// delete the templates code start
+	// update error
+	testData = &model.UserExample{
+		Name:     "foo",
+		Password: "f447b20a7fcbf53a5d5be013ea0b15af",
+		Email:    "foo@bar.com",
+		Phone:    "16000000001",
+		Avatar:   "http://foo/1.jpg",
+		Age:      10,
+		Gender:   1,
+		Status:   1,
+		LoginAt:  time.Now().Unix(),
+	}
+	testData.ID = 1
+	err = d.IDao.(UserExampleDao).UpdateByID(d.Ctx, testData)
+	assert.Error(t, err)
+	// delete the templates code end
 }
 
 func Test_userExampleDao_GetByID(t *testing.T) {
@@ -108,6 +134,13 @@ func Test_userExampleDao_GetByID(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	// notfound error
+	d.SqlMock.ExpectQuery("SELECT .*").
+		WithArgs(2).
+		WillReturnRows(rows)
+	_, err = d.IDao.(UserExampleDao).GetByID(d.Ctx, 2)
+	assert.Error(t, err)
 }
 
 func Test_userExampleDao_GetByIDs(t *testing.T) {
@@ -156,4 +189,18 @@ func Test_userExampleDao_GetByColumns(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	// err test
+	_, _, err = d.IDao.(UserExampleDao).GetByColumns(d.Ctx, &query.Params{
+		Page: 0,
+		Size: 10,
+		Columns: []query.Column{
+			{
+				Name:  "id",
+				Exp:   "<",
+				Value: 0,
+			},
+		},
+	})
+	assert.Error(t, err)
 }

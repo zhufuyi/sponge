@@ -48,7 +48,7 @@ func (d *userExampleDao) Create(ctx context.Context, table *model.UserExample) e
 func (d *userExampleDao) DeleteByID(ctx context.Context, id uint64) error {
 	err := d.db.WithContext(ctx).Where("id = ?", id).Delete(&model.UserExample{}).Error
 	if err != nil {
-		return nil
+		return err
 	}
 
 	// delete cache
@@ -109,10 +109,8 @@ func (d *userExampleDao) GetByID(ctx context.Context, id uint64) (*model.UserExa
 
 	if errors.Is(err, cacheBase.ErrPlaceholder) {
 		return nil, model.ErrRecordNotFound
-	}
-
-	// 从mysql获取
-	if errors.Is(err, goredis.ErrRedisNotFound) {
+	} else if errors.Is(err, goredis.ErrRedisNotFound) {
+		// 从mysql获取
 		table := &model.UserExample{}
 		err = d.db.WithContext(ctx).Where("id = ?", id).First(table).Error
 		if err != nil {
@@ -138,9 +136,7 @@ func (d *userExampleDao) GetByID(ctx context.Context, id uint64) (*model.UserExa
 		}
 
 		return table, nil
-	}
-
-	if err != nil {
+	} else if err != nil {
 		// fail fast, if cache error return, don't request to db
 		return nil, err
 	}
