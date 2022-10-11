@@ -54,7 +54,7 @@ func unaryClientInterceptor(commandName string, o *options) grpc.UnaryClientInte
 	}
 }
 
-// StreamClientInterceptor set the hystrix of stream client interceptor
+// StreamClientInterceptor set the hystrix of clientStream client interceptor
 func StreamClientInterceptor(commandName string, opts ...Option) grpc.StreamClientInterceptor {
 	o := defaultOptions()
 	o.apply(opts...)

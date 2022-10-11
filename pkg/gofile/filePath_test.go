@@ -1,9 +1,10 @@
 package gofile
 
 import (
-	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestIsExists(t *testing.T) {
@@ -75,4 +76,12 @@ func TestGetFilename(t *testing.T) {
 func TestGetPathDelimiter(t *testing.T) {
 	d := GetPathDelimiter()
 	t.Log(d)
+}
+
+func TestError(t *testing.T) {
+	fn := matchPrefix("")
+	assert.Equal(t, false, fn("."))
+
+	fn = matchContain("")
+	assert.Equal(t, false, fn("."))
 }

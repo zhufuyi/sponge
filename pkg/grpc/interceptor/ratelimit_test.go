@@ -24,6 +24,15 @@ func TestWithRateLimitQPS(t *testing.T) {
 	o := new(rateLimitOptions)
 	o.apply(opt)
 	assert.Less(t, time.Duration(testData), o.refillInterval)
+
+	_ = WithRateLimitQPS(5)
+	_ = WithRateLimitQPS(55)
+	_ = WithRateLimitQPS(255)
+	_ = WithRateLimitQPS(555)
+	_ = WithRateLimitQPS(1555)
+	_ = WithRateLimitQPS(2555)
+	_ = WithRateLimitQPS(5555)
+	_ = WithRateLimitQPS(55555)
 }
 
 func Test_defaultRateLimitOptions(t *testing.T) {

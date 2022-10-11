@@ -9,13 +9,21 @@ import (
 )
 
 func TestGenerateTokenStandard(t *testing.T) {
-	Init()
+	opt = nil
 	token, err := GenerateTokenStandard()
+	assert.Error(t, err)
+
+	Init()
+	token, err = GenerateTokenStandard()
 	assert.NoError(t, err)
 	t.Log(token)
 }
 
 func TestVerifyTokenStandard(t *testing.T) {
+	opt = nil
+	err := VerifyTokenStandard("token")
+	assert.Error(t, err)
+
 	Init(WithSigningKey("123456"))
 
 	// 正常验证

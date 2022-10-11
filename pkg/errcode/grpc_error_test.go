@@ -46,4 +46,9 @@ func TestToRPCCode(t *testing.T) {
 func TestGCode(t *testing.T) {
 	code := GCode(1)
 	t.Log("error code is", int(code))
+
+	defer func() {
+		recover()
+	}()
+	code = GCode(10001)
 }

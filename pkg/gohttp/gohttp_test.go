@@ -1,6 +1,7 @@
 package gohttp
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"net/http"
@@ -656,5 +657,42 @@ func TestResponse_BodyString(t *testing.T) {
 	assert.Error(t, err)
 
 	err = resp.Error()
+	assert.Error(t, err)
+}
+
+func TestError(t *testing.T) {
+	req := &Request{}
+	req.SetParam("foo", "bar")
+	req.SetParam("foo3", make(chan string))
+	req.SetParams(map[string]interface{}{"foo2": "bar2"})
+	req.SetBody("foo")
+	req.SetTimeout(time.Second * 10)
+	req.CustomRequest(func(req *http.Request, data *bytes.Buffer) {
+		fmt.Println("customRequest")
+	})
+	req.SetURL("http://127.0.0.1:0")
+
+	resp, err := req.pull()
+	assert.Error(t, err)
+
+	req.method = http.MethodPost
+	resp, err = req.push()
+	assert.Error(t, err)
+
+	_, err = resp.ReadBody()
+	assert.Error(t, err)
+
+	err = resp.BindJSON(nil)
+	assert.Error(t, err)
+
+	err = notOKErr(resp)
+	assert.Error(t, err)
+
+	err = do(http.MethodPost, nil, "", nil)
+	assert.Error(t, err)
+	err = do(http.MethodPost, &StdResult{}, "http://127.0.0.1:0", nil, KV{"foo": "bar"})
+	assert.Error(t, err)
+
+	err = gDo(http.MethodGet, nil, "http://127.0.0.1:0", nil)
 	assert.Error(t, err)
 }

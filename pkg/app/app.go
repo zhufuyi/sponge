@@ -2,11 +2,10 @@ package app
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
-
-	"github.com/zhufuyi/sponge/pkg/logger"
 
 	"golang.org/x/sync/errgroup"
 )
@@ -53,7 +52,7 @@ func (a *App) Run() {
 	for _, server := range a.servers {
 		s := server
 		eg.Go(func() error {
-			logger.Infof("start up %s", s.String())
+			fmt.Printf("start up %s\n", s.String())
 			if err := s.Start(); err != nil {
 				return err
 			}
@@ -82,11 +81,11 @@ func (a *App) watch(ctx context.Context) error {
 			_ = a.stop()
 			return ctx.Err()
 		case s := <-quit: // system notification signal
-			logger.Infof("receive a quit signal: %s", s.String())
+			fmt.Printf("receive a quit signal: %s\n", s.String())
 			if err := a.stop(); err != nil {
 				return err
 			}
-			logger.Infof("stop app successfully")
+			fmt.Println("stop app successfully")
 			return nil
 		}
 	}

@@ -49,6 +49,42 @@ func TestEncoding(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func TestEncodingError(t *testing.T) {
+	gobE := GobEncoding{}
+	// gob error test
+	err := gobE.Unmarshal([]byte("foo"), nil)
+	assert.Error(t, err)
+
+	jsonE := JSONEncoding{}
+	// json error test
+	err = jsonE.Unmarshal([]byte("foo"), nil)
+	assert.Error(t, err)
+
+	jsonDE := JSONGzipEncoding{}
+	// gzip error test
+	_, err = jsonDE.Marshal(make(chan string))
+	assert.Error(t, err)
+	err = jsonDE.Unmarshal([]byte("foo"), nil)
+	assert.Error(t, err)
+	data, _ := GzipEncode([]byte("foo"))
+	err = jsonDE.Unmarshal(data, make(chan string))
+	assert.Error(t, err)
+	_, err = GzipDecode(nil)
+	assert.Error(t, err)
+
+	jsonSE := JSONSnappyEncoding{}
+	// snappy error test
+	_, err = jsonSE.Marshal(make(chan string))
+	assert.Error(t, err)
+	err = jsonSE.Unmarshal([]byte("foo"), nil)
+	assert.Error(t, err)
+
+	msgE := MsgPackEncoding{}
+	// pack error test
+	err = msgE.Unmarshal([]byte("foo"), nil)
+	assert.Error(t, err)
+}
+
 type codec struct{}
 
 func (c codec) Marshal(v interface{}) ([]byte, error) {
@@ -64,13 +100,63 @@ func (c codec) Name() string {
 }
 
 func TestRegisterCodec(t *testing.T) {
-	defer func() { recover() }()
-
 	RegisterCodec(&codec{})
 	c := GetCodec("json")
 	assert.NotNil(t, c)
 
+	defer func() { recover() }()
 	RegisterCodec(nil)
+}
+
+type codec2 struct{ codec }
+
+func (c codec2) Name() string {
+	return ""
+}
+
+func TestRegisterCodec2(t *testing.T) {
+	defer func() { recover() }()
+	RegisterCodec(&codec2{})
+}
+
+type encoder struct{}
+
+func (e encoder) Marshal(v interface{}) ([]byte, error) {
+	return nil, errors.New("mock Marshal error")
+}
+
+func (e encoder) Unmarshal(data []byte, v interface{}) error {
+	return errors.New("mock Unmarshal error")
+}
+
+func (e encoder) MarshalBinary() (data []byte, err error) {
+	return nil, nil
+}
+
+func (e encoder) UnmarshalBinary(data []byte) error {
+	return nil
+}
+
+func TestMarshal(t *testing.T) {
+	_, err := Marshal(encoder{}, nil)
+	assert.Error(t, err)
+
+	_, err = Marshal(nil, &encoder{})
+	assert.NoError(t, err)
+
+	_, err = Marshal(encoder{}, &encoder{})
+	assert.NoError(t, err)
+}
+
+func TestUnmarshall(t *testing.T) {
+	err := Unmarshal(encoder{}, nil, nil)
+	assert.Error(t, err)
+
+	err = Unmarshal(nil, []byte("foo"), &encoder{})
+	assert.NoError(t, err)
+
+	err = Unmarshal(encoder{}, []byte("foo"), &encoder{})
+	assert.NoError(t, err)
 }
 
 func BenchmarkJsonMarshal(b *testing.B) {

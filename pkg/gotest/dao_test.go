@@ -40,6 +40,12 @@ func TestDao_GetAnyArgs(t *testing.T) {
 	defer d.Close()
 
 	t.Log(d.GetAnyArgs(testData))
+
+	// test error
+	defer func() {
+		recover()
+	}()
+	d.GetAnyArgs(make(chan string))
 }
 
 func TestAnyTime_Match(t *testing.T) {

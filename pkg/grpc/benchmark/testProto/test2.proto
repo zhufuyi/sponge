@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+// no package error
+
+option go_package = "./v1;v1";
+
+service userService {
+  rpc Create(CreateUserRequest) returns (CreateUserReply) {}
+  rpc DeleteByID(DeleteUserByIDRequest) returns (DeleteUserByIDReply) {}
+}
+
+message CreateUserRequest {
+  string name = 1;
+}
+
+message CreateUserReply {
+  uint64   id = 1;
+}
+
+message DeleteUserByIDRequest {
+  uint64   id = 1;
+}
+
+message DeleteUserByIDReply {
+
+}

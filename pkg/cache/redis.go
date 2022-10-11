@@ -8,10 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/zhufuyi/sponge/pkg/encoding"
-	"github.com/zhufuyi/sponge/pkg/logger"
-
 	"github.com/go-redis/redis/v8"
+	"github.com/zhufuyi/sponge/pkg/encoding"
 )
 
 // redisCache redis cache结构体
@@ -96,12 +94,12 @@ func (c *redisCache) MultiSet(ctx context.Context, valueMap map[string]interface
 	for key, value := range valueMap {
 		buf, err := encoding.Marshal(c.encoding, value)
 		if err != nil {
-			logger.Warn("marshal data error", logger.Err(err), logger.Any("value", value))
+			//logger.Warn("marshal data error", logger.Err(err), logger.Any("value", value))
 			continue
 		}
 		cacheKey, err := BuildCacheKey(c.KeyPrefix, key)
 		if err != nil {
-			logger.Warn("build cache key error", logger.Err(err), logger.String("key", key))
+			//logger.Warn("build cache key error", logger.Err(err), logger.String("key", key))
 			continue
 		}
 		paris = append(paris, []byte(cacheKey))
@@ -117,7 +115,7 @@ func (c *redisCache) MultiSet(ctx context.Context, valueMap map[string]interface
 		case []byte:
 			pipeline.Expire(ctx, string(paris[i].([]byte)), expiration)
 		default:
-			logger.Warnf("redis expire is unsupported key type: %+v", reflect.TypeOf(paris[i]))
+			fmt.Printf("redis expire is unsupported key type: %+v\n", reflect.TypeOf(paris[i]))
 		}
 	}
 	_, err = pipeline.Exec(ctx)
@@ -154,8 +152,7 @@ func (c *redisCache) MultiGet(ctx context.Context, keys []string, value interfac
 		object := c.newObject()
 		err = encoding.Unmarshal(c.encoding, []byte(value.(string)), object)
 		if err != nil {
-			logger.Warnf("unmarshal data error: %+v, key=%s, cacheKey=%s type=%v", err,
-				keys[i], cacheKeys[i], reflect.TypeOf(value))
+			//logger.Warnf("unmarshal data error: %+v, key=%s, cacheKey=%s type=%v", err, keys[i], cacheKeys[i], reflect.TypeOf(value))
 			continue
 		}
 		valueMap.SetMapIndex(reflect.ValueOf(cacheKeys[i]), reflect.ValueOf(object))
@@ -174,7 +171,7 @@ func (c *redisCache) Del(ctx context.Context, keys ...string) error {
 	for index, key := range keys {
 		cacheKey, err := BuildCacheKey(c.KeyPrefix, key)
 		if err != nil {
-			logger.Warnf("build cache key err: %+v, key is %+v", err, key)
+			//logger.Warnf("build cache key err: %+v, key is %+v", err, key)
 			continue
 		}
 		cacheKeys[index] = cacheKey
@@ -192,15 +189,15 @@ func (c *redisCache) SetCacheWithNotFound(ctx context.Context, key string) error
 }
 
 // BuildCacheKey 构建一个带有前缀的缓存key
-func BuildCacheKey(keyPrefix string, key string) (cacheKey string, err error) {
+func BuildCacheKey(keyPrefix string, key string) (string, error) {
 	if key == "" {
 		return "", errors.New("[cache] key should not be empty")
 	}
 
-	cacheKey = key
+	cacheKey := key
 	if keyPrefix != "" {
-		cacheKey, err = strings.Join([]string{keyPrefix, key}, ":"), nil
+		cacheKey = strings.Join([]string{keyPrefix, key}, ":")
 	}
 
-	return
+	return cacheKey, nil
 }

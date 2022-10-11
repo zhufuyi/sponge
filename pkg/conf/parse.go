@@ -21,9 +21,6 @@ func Parse(configFile string, obj interface{}, fs ...func()) error {
 	}
 
 	filePathStr, filename := filepath.Split(confFileAbs)
-	if filePathStr == "" {
-		filePathStr = "."
-	}
 	ext := strings.TrimLeft(path.Ext(filename), ".")
 	filename = strings.ReplaceAll(filename, "."+ext, "") // 不包括后缀名
 

@@ -2,27 +2,12 @@ package app
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
-)
 
-var (
-	inits = []Init{
-		func() {
-			fmt.Println("init config")
-		},
-	}
-
-	s       = &httpServer{}
-	servers = []IServer{s}
-
-	closes = []Close{
-		func() error {
-			return s.Stop()
-		},
-	}
+	"github.com/stretchr/testify/assert"
 )
 
 type httpServer struct{}
@@ -33,31 +18,97 @@ func (h *httpServer) Start() error {
 }
 
 func (h *httpServer) Stop() error {
+	return errors.New("mock stop http server")
+}
+
+func (h *httpServer) String() string {
+	return ":8081"
+}
+
+type httpServer2 struct{}
+
+func (h *httpServer2) Start() error {
+	fmt.Println("running http server2")
+	return nil
+}
+
+func (h *httpServer2) Stop() error {
 	fmt.Println("stop http server")
 	return nil
 }
 
-func (h *httpServer) String() string {
-	return ":8080"
+func (h *httpServer2) String() string {
+	return ":8082"
 }
 
-func TestNew(t *testing.T) {
-	New(inits, servers, closes)
+type httpServer3 struct{}
+
+func (h *httpServer3) Start() error {
+	return errors.New("mock running http server3 error")
 }
 
-func TestApp_Run(t *testing.T) {
+func (h *httpServer3) Stop() error {
+	fmt.Println("stop http server3")
+	return nil
+}
+
+func (h *httpServer3) String() string {
+	return ":8083"
+}
+
+func TestApp(t *testing.T) {
+	var (
+		inits = []Init{
+			func() {
+				fmt.Println("init config")
+			},
+		}
+
+		s       = &httpServer{}
+		s2      = &httpServer2{}
+		servers = []IServer{s, s2}
+
+		closes = []Close{
+			func() error {
+				return s.Stop()
+			},
+			func() error {
+				return s2.Stop()
+			},
+		}
+	)
+
 	a := New(inits, servers, closes)
 	go a.Run()
-	time.Sleep(time.Millisecond * 100)
-}
+	time.Sleep(time.Second)
 
-func TestApp_stop(t *testing.T) {
-	a := New(inits, servers, closes)
+	// test watch
+	ctx, _ := context.WithTimeout(context.Background(), time.Millisecond*100)
+	assert.Error(t, a.watch(ctx))
+
+	time.Sleep(time.Second)
 	t.Log(a.stop())
 }
 
-func TestApp_watch(t *testing.T) {
+func TestAppError(t *testing.T) {
+	inits := []Init{}
+	s3 := &httpServer3{}
+	servers := []IServer{s3}
+	closes := []Close{
+		func() error {
+			return s3.Stop()
+		},
+	}
+
 	a := New(inits, servers, closes)
-	ctx, _ := context.WithTimeout(context.Background(), time.Millisecond*100)
-	assert.Error(t, a.watch(ctx))
+	go func() {
+		defer func() {
+			if e := recover(); e != nil {
+				t.Log(e)
+			}
+		}()
+		a.Run()
+	}()
+	time.Sleep(time.Second)
+	t.Log(a.stop())
 }

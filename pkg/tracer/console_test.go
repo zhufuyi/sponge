@@ -1,9 +1,10 @@
 package tracer
 
 import (
-	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNewConsoleExporter(t *testing.T) {
@@ -20,6 +21,22 @@ func TestNewFileExporter(t *testing.T) {
 	assert.NotNil(t, exporter)
 	_ = file.Close()
 	_ = os.RemoveAll("demo")
+
+	exporter, file, err = NewFileExporter("")
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.NotNil(t, exporter)
+	_ = file.Close()
+	_ = os.RemoveAll("traces.json")
+
+	defer func() {
+		recover()
+	}()
+	_, _, err = NewFileExporter("\\\\")
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 func Test_newExporter(t *testing.T) {

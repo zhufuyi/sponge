@@ -11,6 +11,8 @@ syntax = "proto3";
 
 package api.use.v1;
 
+option go_package = "./v1;v1";
+
 service useService {
   rpc Create(CreateUseRequest) returns (CreateUseReply) {}
   rpc DeleteByID(DeleteUseByIDRequest) returns (DeleteUseByIDReply) {}
@@ -20,6 +22,9 @@ service useService {
 func Test_getName(t *testing.T) {
 	actual := getName(testData, packagePattern)
 	assert.Equal(t, "api.use.v1", actual)
+
+	actual = getName(testData, servicePattern)
+	assert.Equal(t, "useService", actual)
 }
 
 func Test_getMethodNames(t *testing.T) {

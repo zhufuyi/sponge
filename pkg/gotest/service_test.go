@@ -1,8 +1,11 @@
 package gotest
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+	"time"
+
+	"github.com/stretchr/testify/assert"
+	"google.golang.org/grpc"
 )
 
 func newService() *Service {
@@ -47,4 +50,20 @@ func TestService_GoGrpcServer(t *testing.T) {
 	defer s.Close()
 
 	s.GoGrpcServer()
+}
+
+func TestServiceError(t *testing.T) {
+	var testData = map[string]interface{}{
+		"1": "foo",
+		"2": "bar",
+	}
+
+	s := NewService(nil, testData)
+	s.clientAddr = ":0"
+	s.GetClientConn()
+	time.Sleep(time.Millisecond * 10)
+
+	defer func() { recover() }()
+	s.clientConn = &grpc.ClientConn{}
+	s.Close()
 }

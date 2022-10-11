@@ -4,7 +4,11 @@ import (
 	"testing"
 
 	"github.com/nacos-group/nacos-sdk-go/v2/common/constant"
+	"github.com/stretchr/testify/assert"
 )
+
+var addr = "127.0.0.1"
+var port uint64 = 8848
 
 type config struct {
 	Env     string `yaml:"env" json:"env"`
@@ -17,8 +21,8 @@ func TestParse(t *testing.T) {
 	// 方式一：
 	conf := &config{}
 	params := &Params{
-		IPAddr:      "192.168.3.37",
-		Port:        8848,
+		IPAddr:      addr,
+		Port:        port,
 		NamespaceID: "de7b176e-91cd-49a3-ac83-beb725979775",
 		Group:       "dev",
 		DataID:      "user-srv.yml",
@@ -37,15 +41,15 @@ func TestParse(t *testing.T) {
 	}
 	clientConfig := &constant.ClientConfig{
 		NamespaceId:         "3c715c7a-9e49-4359-8fe6-ff2c67a3a871",
-		TimeoutMs:           5000,
+		TimeoutMs:           1000,
 		NotLoadCacheAtStart: true,
 		LogDir:              "tmp/nacos/log",
 		CacheDir:            "tmp/nacos/cache",
 	}
 	serverConfigs := []constant.ServerConfig{
 		{
-			IpAddr: "192.168.3.37",
-			Port:   8848,
+			IpAddr: addr,
+			Port:   port,
 		},
 	}
 	err = Init(conf, params,
@@ -58,8 +62,8 @@ func TestParse(t *testing.T) {
 
 func TestNewNamingClient(t *testing.T) {
 	params := &Params{
-		IPAddr:      "192.168.3.37",
-		Port:        8848,
+		IPAddr:      addr,
+		Port:        port,
 		NamespaceID: "de7b176e-91cd-49a3-ac83-beb725979775",
 		Group:       "dev",
 		DataID:      "user-srv.yml",
@@ -70,4 +74,43 @@ func TestNewNamingClient(t *testing.T) {
 	//assert.NoError(t, err)
 	//assert.NotNil(t, namingClient)
 	t.Log(err, namingClient)
+}
+
+func TestError(t *testing.T) {
+	p := &Params{}
+	p.Group = ""
+	err := p.valid()
+	assert.Error(t, err)
+
+	p.Group = "group"
+	p.DataID = ""
+	err = p.valid()
+	assert.Error(t, err)
+
+	p.Group = "group"
+	p.DataID = "id"
+	p.Format = ""
+	err = p.valid()
+	assert.Error(t, err)
+
+	p.Group = "group"
+	p.DataID = "id"
+	p.Format = "yml"
+	err = p.valid()
+	assert.NoError(t, err)
+
+	p.Group = "group"
+	p.DataID = "id"
+	p.Format = "unknown"
+	err = p.valid()
+	assert.Error(t, err)
+
+	err = setParams(p)
+	assert.Error(t, err)
+
+	err = Init(nil, p)
+	assert.Error(t, err)
+
+	_, err = NewNamingClient(p)
+	assert.Error(t, err)
 }

@@ -1,5 +1,14 @@
 package etcd
 
+import (
+	"context"
+	"github.com/stretchr/testify/assert"
+	"github.com/zhufuyi/sponge/pkg/registry"
+	clientv3 "go.etcd.io/etcd/client/v3"
+	"testing"
+	"time"
+)
+
 /*
 
 // 需要连接真实etcd服务测试
@@ -194,3 +203,33 @@ func TestHeartBeat(t *testing.T) {
 	}
 }
 */
+
+func TestNew(t *testing.T) {
+	r := New(&clientv3.Client{},
+		WithRegisterTTL(time.Second),
+		WithContext(context.Background()),
+		WithMaxRetry(3),
+		WithNamespace("foo"),
+	)
+	assert.NotNil(t, r)
+}
+
+func TestRegistry_Register(t *testing.T) {
+	defer func() {
+		recover()
+	}()
+	r := New(&clientv3.Client{})
+	instance := registry.NewServiceInstance("foo", []string{"grpc://127.0.0.1:8282"})
+	err := r.Register(context.Background(), instance)
+	assert.NoError(t, err)
+}
+
+func TestRegistry_Deregister(t *testing.T) {
+	defer func() {
+		recover()
+	}()
+	r := New(&clientv3.Client{})
+	instance := registry.NewServiceInstance("foo", []string{"grpc://127.0.0.1:8282"})
+	err := r.Deregister(context.Background(), instance)
+	assert.NoError(t, err)
+}

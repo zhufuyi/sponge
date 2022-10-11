@@ -1,11 +1,11 @@
 package grpccli
 
 import (
+	"go.uber.org/zap"
 	"testing"
 	"time"
 
 	"github.com/zhufuyi/sponge/pkg/grpc/interceptor"
-	"github.com/zhufuyi/sponge/pkg/logger"
 	"github.com/zhufuyi/sponge/pkg/registry"
 
 	"github.com/stretchr/testify/assert"
@@ -53,7 +53,7 @@ func TestWithEnableLoadBalance(t *testing.T) {
 }
 
 func TestWithEnableLog(t *testing.T) {
-	testData := logger.Get()
+	testData := zap.NewNop()
 	opt := WithEnableLog(testData)
 	o := new(options)
 	o.apply(opt)

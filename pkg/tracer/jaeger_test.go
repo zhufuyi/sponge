@@ -13,7 +13,10 @@ func TestNewJaegerAgentExporter(t *testing.T) {
 }
 
 func TestNewJaegerExporter(t *testing.T) {
-	exporter, err := NewJaegerExporter("http://localhost:14268/api/traces")
+	exporter, err := NewJaegerExporter("http://localhost:14268/api/traces",
+		WithUsername("foo"),
+		WithPassword("bar"),
+	)
 	assert.NoError(t, err)
 	assert.NotNil(t, exporter)
 }

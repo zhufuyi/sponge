@@ -12,6 +12,9 @@ func TestGetClientTLSCredentials(t *testing.T) {
 	credentials, err := GetClientTLSCredentials("localhost", certfile.Path("one-way/server.crt"))
 	assert.NoError(t, err)
 	assert.NotNil(t, credentials)
+
+	_, err = GetClientTLSCredentials("localhost", certfile.Path("one-way/notfound.crt"))
+	assert.Error(t, err)
 }
 
 func TestGetClientTLSCredentialsByCA(t *testing.T) {
@@ -23,4 +26,20 @@ func TestGetClientTLSCredentialsByCA(t *testing.T) {
 	)
 	assert.NoError(t, err)
 	assert.NotNil(t, credentials)
+
+	_, err = GetClientTLSCredentialsByCA(
+		"localhost",
+		certfile.Path("two-way/ca.pem"),
+		certfile.Path("two-way/client/notfound.pem"),
+		certfile.Path("two-way/client/notfound.key"),
+	)
+	assert.Error(t, err)
+
+	_, err = GetClientTLSCredentialsByCA(
+		"localhost",
+		certfile.Path("two-way/notfound.pem"),
+		certfile.Path("two-way/client/client.pem"),
+		certfile.Path("two-way/client/client.key"),
+	)
+	assert.Error(t, err)
 }

@@ -1,12 +1,12 @@
 package json
 
 import (
-	"google.golang.org/protobuf/compiler/protogen"
-	"google.golang.org/protobuf/reflect/protoreflect"
-	"google.golang.org/protobuf/types/pluginpb"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/compiler/protogen"
+	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/types/pluginpb"
 )
 
 type obj struct {
@@ -50,7 +50,10 @@ func TestJSON2(t *testing.T) {
 	assert.NotNil(t, b)
 
 	err = c.Unmarshal(b, &obj2{})
-	assert.NotNil(t, err)
+	assert.Error(t, err)
+
+	err = c.Unmarshal(b, obj2{})
+	assert.Error(t, err)
 }
 
 type obj3 struct {
@@ -75,5 +78,20 @@ func TestJSON3(t *testing.T) {
 	assert.NotNil(t, b)
 
 	err = c.Unmarshal(b, &obj3{})
+	assert.NoError(t, err)
+}
+
+type obj4 struct {
+	ID   uint64 `json:"id"`
+	Name string `json:"name"`
+}
+
+func (o obj4) UnmarshalJSON(bytes []byte) error {
+	return nil
+}
+
+func TestJSON4(t *testing.T) {
+	c := codec{}
+	err := c.Unmarshal(nil, &obj4{})
 	assert.NoError(t, err)
 }

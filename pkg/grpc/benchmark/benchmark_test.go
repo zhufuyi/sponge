@@ -2,19 +2,37 @@ package benchmark
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/compiler/protogen"
+	"google.golang.org/protobuf/types/pluginpb"
 )
 
 func TestNew(t *testing.T) {
-	_, err := New("localhost", "test.proto", "Create", nil, 100)
+	_, err := New("localhost", "testProto/test.proto", "Create", nil, 100)
 	assert.NoError(t, err)
+
+	_, err = New("localhost", "testProto/test2.proto", "Create", nil, 100)
+	assert.Error(t, err)
+
+	_, err = New("localhost", "testProto/test3.proto", "Create", nil, 100)
+	assert.Error(t, err)
+
+	_, err = New("localhost", "testProto/test4.proto", "Create", nil, 100)
+	assert.Error(t, err)
 }
 
 func Test_params_Run(t *testing.T) {
-	b, err := New("localhost", "test.proto", "Create", nil, 100)
+	req := &pluginpb.CodeGeneratorRequest{}
+	opts := protogen.Options{}
+	gen, err := opts.New(req)
+	o1 := gen.Response()
+
+	b, err := New("localhost", "testProto/test.proto", "Create", o1, 10)
 	assert.NoError(t, err)
 
 	err = b.Run()
-	assert.NotNil(t, err)
+	assert.NoError(t, err)
+	time.Sleep(time.Second)
 }

@@ -9,7 +9,6 @@ import (
 	"github.com/zhufuyi/sponge/pkg/registry"
 
 	"github.com/stretchr/testify/assert"
-
 	"google.golang.org/grpc/resolver"
 	"google.golang.org/grpc/serviceconfig"
 )
@@ -31,16 +30,8 @@ func (c cliConn) ParseServiceConfig(serviceConfigJSON string) *serviceconfig.Par
 	return &serviceconfig.ParseResult{}
 }
 
-func TestIsSecure(t *testing.T) {
-	u, err := url.Parse("http://localhost:8080")
-	assert.NoError(t, err)
-
-	ok := IsSecure(u)
-	assert.Equal(t, false, ok)
-}
-
 func Test_discoveryResolver_Close(t *testing.T) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 	r := &discoveryResolver{
 		w:                &watcher{},
 		cc:               &cliConn{},
@@ -56,10 +47,48 @@ func Test_discoveryResolver_Close(t *testing.T) {
 		"demo",
 		[]string{"grpc://127.0.0.1:8282"},
 	)})
-	r.watch()
+	//r.watch()
+	//time.Sleep(time.Millisecond * 100)
 }
 
 func Test_parseAttributes(t *testing.T) {
-	a := parseAttributes(map[string]string{"foo": "bar"})
+	a := parseAttributes(map[string]string{"foo": "bar", "foo2": "bar2"})
 	assert.NotNil(t, a)
+}
+
+func Test_discoveryResolver_watch(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+	r := &discoveryResolver{
+		w:                &watcher{},
+		cc:               &cliConn{},
+		ctx:              ctx,
+		cancel:           cancel,
+		insecure:         true,
+		debugLogDisabled: false,
+	}
+	defer r.Close()
+
+	r.watch()
+	time.Sleep(time.Millisecond * 200)
+}
+
+func Test_parseEndpoint(t *testing.T) {
+	_, err := parseEndpoint([]string{"grpc://127.0.0.1:8282"}, "grpc", false)
+	assert.NoError(t, err)
+	_, err = parseEndpoint([]string{"grpc://127.0.0.1:8282"}, "grpc", true)
+	assert.NoError(t, err)
+	_, err = parseEndpoint(nil, "", true)
+	assert.NoError(t, err)
+}
+
+func TestIsSecure(t *testing.T) {
+	u, err := url.Parse("http://localhost:8080")
+	assert.NoError(t, err)
+
+	ok := IsSecure(u)
+	assert.Equal(t, false, ok)
+
+	u, _ = url.Parse("http://localhost:8080?isSecure=true")
+	ok = IsSecure(u)
+	assert.Equal(t, true, ok)
 }

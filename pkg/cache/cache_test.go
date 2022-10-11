@@ -1,12 +1,14 @@
 package cache
 
 import (
-	"github.com/stretchr/testify/assert"
+	"testing"
+	"time"
+
 	"github.com/zhufuyi/sponge/pkg/encoding"
 	"github.com/zhufuyi/sponge/pkg/gotest"
 	"github.com/zhufuyi/sponge/pkg/utils"
-	"testing"
-	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 type cacheUser struct {

@@ -38,9 +38,19 @@ func TestNewError(t *testing.T) {
 		httpCodes = append(httpCodes, e.StatusCode())
 	}
 	t.Log(httpCodes)
+
+	defer func() {
+		recover()
+	}()
+	_ = NewError(code, msg)
 }
 
 func TestHCode(t *testing.T) {
 	code := HCode(1)
 	t.Log("error code is", code)
+
+	defer func() {
+		recover()
+	}()
+	code = HCode(10001)
 }

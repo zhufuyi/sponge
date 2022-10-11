@@ -7,10 +7,8 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/zhufuyi/sponge/pkg/encoding"
-	"github.com/zhufuyi/sponge/pkg/logger"
-
 	"github.com/dgraph-io/ristretto"
+	"github.com/zhufuyi/sponge/pkg/encoding"
 )
 
 type memoryCache struct {
@@ -89,8 +87,7 @@ func (m *memoryCache) Del(ctx context.Context, keys ...string) error {
 	key := keys[0]
 	cacheKey, err := BuildCacheKey(m.KeyPrefix, key)
 	if err != nil {
-		logger.Warn("build cache key error", logger.Err(err), logger.String("key", key))
-		return err
+		return fmt.Errorf("build cache key error, err=%v, key=%s\n", err, key)
 	}
 	m.client.Del(cacheKey)
 	return nil

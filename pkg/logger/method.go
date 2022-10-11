@@ -32,9 +32,9 @@ func Panic(msg string, fields ...Field) {
 }
 
 // Fatal fatal级别信息
-func Fatal(msg string, fields ...Field) {
-	getLogger().Fatal(msg, fields...)
-}
+//func Fatal(msg string, fields ...Field) {
+//	getLogger().Fatal(msg, fields...)
+//}
 
 // Debugf 带格式化debug级别信息
 func Debugf(format string, a ...interface{}) {
@@ -57,9 +57,9 @@ func Errorf(format string, a ...interface{}) {
 }
 
 // Fatalf 带格式化fatal级别信息
-func Fatalf(format string, a ...interface{}) {
-	getLogger().Fatal(fmt.Sprintf(format, a...))
-}
+//func Fatalf(format string, a ...interface{}) {
+//	getLogger().Fatal(fmt.Sprintf(format, a...))
+//}
 
 // WithFields 携带字段信息
 func WithFields(fields ...Field) *zap.Logger {

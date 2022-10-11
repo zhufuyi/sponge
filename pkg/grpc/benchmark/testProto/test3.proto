@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package v1;
+
+option go_package = "./v1;v1";
+
+// no service error

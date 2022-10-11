@@ -2,6 +2,7 @@ package goredis
 
 import (
 	"testing"
+	"time"
 )
 
 func TestInit(t *testing.T) {
@@ -41,11 +42,24 @@ func TestInit(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := Init(tt.args.redisURL)
+			_, err := Init(tt.args.redisURL,
+				WithEnableTrace(),
+				WithDialTimeout(time.Second),
+				WithReadTimeout(time.Second),
+				WithWriteTimeout(time.Second),
+			)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Init() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 		})
 	}
+}
+
+func TestInit2(t *testing.T) {
+	Init2("127.0.0.1:6379", "123456", 0,
+		WithEnableTrace(),
+		WithDialTimeout(time.Second),
+		WithReadTimeout(time.Second),
+		WithWriteTimeout(time.Second))
 }

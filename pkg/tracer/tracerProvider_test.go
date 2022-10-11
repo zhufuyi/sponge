@@ -13,6 +13,9 @@ func TestInit(t *testing.T) {
 	assert.NoError(t, err)
 	resource := NewResource()
 	Init(exporter, resource)
+
+	Init(exporter, resource, 0.5)
+	Init(exporter, resource, -1.0)
 }
 
 func TestClose(t *testing.T) {
@@ -20,5 +23,8 @@ func TestClose(t *testing.T) {
 	assert.NoError(t, err)
 	resource := NewResource()
 	Init(exporter, resource)
+	_ = Close(context.Background())
+
+	tp = nil
 	_ = Close(context.Background())
 }

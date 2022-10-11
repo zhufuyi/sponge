@@ -1,14 +1,18 @@
 package utils
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
+
+	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestFieldRequestIDFromContext(t *testing.T) {
 	field := FieldRequestIDFromContext(&gin.Context{})
+	assert.NotNil(t, field)
+
+	field = FieldRequestIDFromContext(&gin.Context{}, "foo")
 	assert.NotNil(t, field)
 }
 
@@ -19,6 +23,13 @@ func TestFieldRequestIDFromHeader(t *testing.T) {
 		},
 	})
 
+	assert.NotNil(t, field)
+
+	field = FieldRequestIDFromHeader(&gin.Context{
+		Request: &http.Request{
+			Header: map[string][]string{},
+		},
+	}, "foo")
 	assert.NotNil(t, field)
 }
 

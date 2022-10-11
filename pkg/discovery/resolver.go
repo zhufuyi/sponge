@@ -52,7 +52,7 @@ func (r *discoveryResolver) update(ins []*registry.ServiceInstance) {
 	for _, in := range ins {
 		endpoint, err := parseEndpoint(in.Endpoints, "grpc", !r.insecure)
 		if err != nil {
-			fmt.Printf("[resolver] Failed to parse discovery endpoint: %v\n", err)
+			//fmt.Printf("[resolver] Failed to parse discovery endpoint: %v\n", err)
 			continue
 		}
 		if endpoint == "" {
@@ -72,7 +72,7 @@ func (r *discoveryResolver) update(ins []*registry.ServiceInstance) {
 		addrs = append(addrs, addr)
 	}
 	if len(addrs) == 0 {
-		fmt.Printf("[resolver] Zero endpoint found,refused to write, instances: %v\n", ins)
+		//fmt.Printf("[resolver] Zero endpoint found,refused to write, instances: %v\n", ins)
 		return
 	}
 	err := r.cc.UpdateState(resolver.State{Addresses: addrs})
@@ -125,6 +125,7 @@ func parseEndpoint(endpoints []string, scheme string, isSecure bool) (string, er
 // IsSecure parses isSecure for Endpoint URL.
 func IsSecure(u *url.URL) bool {
 	ok, err := strconv.ParseBool(u.Query().Get("isSecure"))
+	fmt.Println(ok)
 	if err != nil {
 		return false
 	}

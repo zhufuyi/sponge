@@ -9,19 +9,27 @@ import (
 )
 
 func TestGenerateToken(t *testing.T) {
-	Init()
+	opt = nil
 	token, err := GenerateToken("123")
+	assert.Error(t, err)
+
+	Init()
+	token, err = GenerateToken("123")
 	assert.NoError(t, err)
 	t.Log(token)
 }
 
 func TestVerifyToken(t *testing.T) {
+	opt = nil
+	v, err := VerifyToken("token")
+	assert.Error(t, err)
+
 	uid := "123"
 	role := "admin"
 
 	Init(
 		WithSigningKey("123456"),
-		WithExpire(time.Second),
+		WithExpire(time.Millisecond*500),
 		WithSigningMethod(HS512),
 	)
 
@@ -31,7 +39,7 @@ func TestVerifyToken(t *testing.T) {
 		t.Fatal(err)
 	}
 	fmt.Println(token)
-	v, err := VerifyToken(token)
+	v, err = VerifyToken(token)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -55,8 +63,4 @@ func TestVerifyToken(t *testing.T) {
 	time.Sleep(time.Second * 2)
 	v, err = VerifyToken(token)
 	assert.Equal(t, err, errExpired)
-}
-
-func compareErr(err1, err2 error) bool {
-	return err1.Error() == err2.Error()
 }

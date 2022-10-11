@@ -358,7 +358,7 @@ var jsonParseErr = func(err error) error { return fmt.Errorf("json parsing error
 var notOKErr = func(resp *Response) error {
 	body, err := resp.ReadBody()
 	if err != nil {
-		return fmt.Errorf("statusCode=%d, err=%v", resp.StatusCode, err)
+		return err
 	}
 	if len(body) > 500 {
 		body = append(body[:500], []byte(" ......")...)

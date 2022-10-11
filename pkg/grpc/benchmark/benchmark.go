@@ -15,8 +15,8 @@ type Runner interface {
 	Run() error
 }
 
-// params 压测参数
-type params struct {
+// bench 压测参数
+type bench struct {
 	rpcServerHost string // rpc server端地址
 
 	protoFile     string        // proto file
@@ -52,7 +52,7 @@ func New(host string, protoFile string, methodName string, req proto.Message, to
 		return nil, fmt.Errorf("not found name %s in protobuf file %s", methodName, protoFile)
 	}
 
-	return &params{
+	return &bench{
 		protoFile:     protoFile,
 		packageName:   packageName,
 		serviceName:   serviceName,
@@ -64,7 +64,7 @@ func New(host string, protoFile string, methodName string, req proto.Message, to
 	}, nil
 }
 
-func (b *params) Run() error {
+func (b *bench) Run() error {
 	callMethod := fmt.Sprintf("%s.%s/%s", b.packageName, b.serviceName, b.methodName)
 	fmt.Printf("benchmark '%s', total %d requests\n", callMethod, b.total)
 

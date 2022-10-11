@@ -2,7 +2,6 @@ package interceptor
 
 import (
 	"context"
-
 	"github.com/zhufuyi/sponge/pkg/jwt"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"

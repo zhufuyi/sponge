@@ -12,6 +12,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func init() {
+	_, _ = logger.Init()
+}
+
 func runLogHTTPServer() string {
 	serverAddr, requestAddr := utils.GetLocalHTTPAddrPairs()
 
@@ -25,7 +29,7 @@ func runLogHTTPServer() string {
 	// 自定义打印日志
 	r.Use(Logging(
 		WithLog(logger.Get()),
-		WithMaxLen(400),
+		WithMaxLen(40),
 		WithRequestIDFromHeader(),
 		WithRequestIDFromContext(),
 		WithIgnoreRoutes("/ping"), // 忽略/ping
@@ -42,7 +46,12 @@ func runLogHTTPServer() string {
 		response.Success(c, "hello world")
 	}
 
+	pingFun := func(c *gin.Context) {
+		response.Success(c, "ping")
+	}
+
 	r.GET("/hello", helloFun)
+	r.GET("/ping", pingFun)
 	r.DELETE("/hello", helloFun)
 	r.POST("/hello", helloFun)
 	r.PUT("/hello", helloFun)
@@ -68,6 +77,18 @@ func TestRequest(t *testing.T) {
 	type User struct {
 		Name string `json:"name"`
 	}
+
+	t.Run("get ping", func(t *testing.T) {
+		err := gohttp.Get(result, requestAddr+"/ping")
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		got := result.Data.(string)
+		if got != "ping" {
+			t.Errorf("got: %s, want: ping", got)
+		}
+	})
 
 	t.Run("get hello", func(t *testing.T) {
 		err := gohttp.Get(result, requestAddr+"/hello", gohttp.KV{"id": "100"})
@@ -126,6 +147,53 @@ func TestRequest(t *testing.T) {
 		got := result.Data.(string)
 		if got != wantHello {
 			t.Errorf("got: %s, want: %s", got, wantHello)
+		}
+	})
+}
+
+func runLogHTTPServer2() string {
+	serverAddr, requestAddr := utils.GetLocalHTTPAddrPairs()
+
+	gin.SetMode(gin.ReleaseMode)
+	r := gin.Default()
+	r.Use(RequestID())
+	r.Use(Logging(
+		WithLog(logger.Get()),
+		WithMaxLen(200),
+		WithRequestIDFromContext("request-id"),
+		WithRequestIDFromHeader("request-id"),
+	))
+
+	pingFun := func(c *gin.Context) {
+		response.Success(c, "ping")
+	}
+
+	r.GET("/ping", pingFun)
+
+	go func() {
+		err := r.Run(serverAddr)
+		if err != nil {
+			panic(err)
+		}
+	}()
+
+	time.Sleep(time.Millisecond * 200)
+
+	return requestAddr
+}
+
+func TestRequest2(t *testing.T) {
+	requestAddr := runLogHTTPServer2()
+	result := &gohttp.StdResult{}
+	t.Run("get ping", func(t *testing.T) {
+		err := gohttp.Get(result, requestAddr+"/ping")
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		got := result.Data.(string)
+		if got != "ping" {
+			t.Errorf("got: %s, want: ping", got)
 		}
 	})
 }

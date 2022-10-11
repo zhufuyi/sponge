@@ -29,3 +29,12 @@ func TestProto(t *testing.T) {
 	err = c.Unmarshal(b, o2)
 	assert.NoError(t, err)
 }
+
+func TestProtoError(t *testing.T) {
+	c := codec{}
+
+	_, err := c.Marshal(nil)
+	assert.Error(t, err)
+	err = c.Unmarshal(nil, nil)
+	assert.Error(t, err)
+}

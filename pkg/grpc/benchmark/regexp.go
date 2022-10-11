@@ -6,8 +6,8 @@ import (
 )
 
 const (
-	packagePattern = `package(.*);`
-	servicePattern = `service (\w+)`
+	packagePattern = `\npackage (.*);`
+	servicePattern = `\nservice (\w+)`
 	methodPattern  = `rpc (\w+)`
 )
 

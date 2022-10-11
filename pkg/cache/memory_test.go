@@ -75,5 +75,44 @@ func TestMemoryCache(t *testing.T) {
 
 	err = iCache.SetCacheWithNotFound(c.Ctx, "not_found")
 	assert.NoError(t, err)
+}
 
+func TestMemoryCacheError(t *testing.T) {
+	c := newMemoryCache()
+	defer c.Close()
+	testData := c.TestDataSlice[0].(*memoryUser)
+	iCache := c.ICache.(Cache)
+
+	// Set empty key error test
+	key := utils.Uint64ToStr(testData.ID)
+	err := iCache.Set(c.Ctx, "", c.TestDataMap[key], time.Minute)
+	assert.Error(t, err)
+
+	// Set empty value error test
+	key = utils.Uint64ToStr(testData.ID)
+	err = iCache.Set(c.Ctx, key, nil, time.Minute)
+	assert.Error(t, err)
+
+	// Get empty key error test
+	val := &memoryUser{}
+	err = iCache.Get(c.Ctx, "", val)
+	assert.Error(t, err)
+
+	// Get empty result  test
+	key = utils.Uint64ToStr(testData.ID)
+	err = iCache.Get(c.Ctx, key, val)
+	assert.NoError(t, err)
+
+	// Get result error test
+	key = utils.Uint64ToStr(testData.ID)
+	_ = iCache.Set(c.Ctx, key, c.TestDataMap[key], time.Minute)
+	time.Sleep(time.Millisecond)
+	err = iCache.Get(c.Ctx, key, nil)
+	assert.Error(t, err)
+
+	// Del empty key error test
+	err = iCache.Del(c.Ctx)
+	assert.NoError(t, err)
+	err = iCache.Del(c.Ctx, "")
+	assert.Error(t, err)
 }

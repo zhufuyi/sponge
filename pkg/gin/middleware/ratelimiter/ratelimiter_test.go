@@ -85,9 +85,9 @@ func TestRateLimiter(t *testing.T) {
 	var pingSuccess, pingFailures int32
 	var helloSuccess, helloFailures int32
 
-	for j := 0; j < 10; j++ {
+	for j := 0; j < 5; j++ {
 		wg := &sync.WaitGroup{}
-		for i := 0; i < 20; i++ {
+		for i := 0; i < 40; i++ {
 
 			wg.Add(1)
 			go func(i int) {
@@ -124,9 +124,9 @@ func TestLimiter_GetQPSLimiterStatus(t *testing.T) {
 
 	var pingSuccess, pingFailures int32
 
-	for j := 0; j < 10; j++ {
+	for j := 0; j < 5; j++ {
 		wg := &sync.WaitGroup{}
-		for i := 0; i < 20; i++ {
+		for i := 0; i < 40; i++ {
 			wg.Add(1)
 			go func(i int) {
 				defer wg.Done()
@@ -152,9 +152,9 @@ func TestLimiter_UpdateQPSLimiter(t *testing.T) {
 
 	var pingSuccess, pingFailures int32
 
-	for j := 0; j < 10; j++ {
+	for j := 0; j < 5; j++ {
 		wg := &sync.WaitGroup{}
-		for i := 0; i < 20; i++ {
+		for i := 0; i < 40; i++ {
 			wg.Add(1)
 			go func(i int) {
 				defer wg.Done()
@@ -172,6 +172,63 @@ func TestLimiter_UpdateQPSLimiter(t *testing.T) {
 		limit, burst := GetLimiter().GetQPSLimiterStatus("/ping")
 		GetLimiter().UpdateQPSLimiter("/ping", limit+rate.Limit(j), burst)
 		fmt.Printf("%s    pingSuccess: %d, pingFailures: %d    limit:%.f\n", time.Now().Format(time.RFC3339Nano), pingSuccess, pingFailures, limit)
+		//time.Sleep(time.Millisecond * 200)
+	}
+}
+
+func runRateLimiterHTTPServer2() string {
+	serverAddr, requestAddr := utils.GetLocalHTTPAddrPairs()
+	l := NewLimiter()
+	gin.SetMode(gin.ReleaseMode)
+	r := gin.New()
+
+	r.Use(l.SetLimiter(10, 20))
+
+	r.Use(QPS(
+		WithIP(),
+		WithQPS(10),
+		WithBurst(20),
+	))
+
+	r.GET("/hello", func(c *gin.Context) {
+		response.Success(c, "hello "+c.ClientIP())
+	})
+
+	go func() {
+		err := r.Run(serverAddr)
+		if err != nil {
+			panic(err)
+		}
+	}()
+
+	time.Sleep(time.Millisecond * 200)
+	return requestAddr
+}
+
+func TestRateLimiter2(t *testing.T) {
+	requestAddr := runRateLimiterHTTPServer2()
+
+	var pingSuccess, pingFailures int32
+	var helloSuccess, helloFailures int32
+
+	for j := 0; j < 3; j++ {
+		wg := &sync.WaitGroup{}
+		for i := 0; i < 10; i++ {
+			wg.Add(1)
+			go func(i int) {
+				defer wg.Done()
+				result := &gohttp.StdResult{}
+				if err := gohttp.Get(result, requestAddr+"/hello"); err != nil {
+					atomic.AddInt32(&helloFailures, 1)
+				} else {
+					atomic.AddInt32(&helloSuccess, 1)
+				}
+			}(i)
+		}
+
+		wg.Wait()
+		fmt.Printf("%s   helloSuccess: %d, helloFailures: %d  pingSuccess: %d, pingFailures: %d\n", time.Now().Format(time.RFC3339Nano), helloSuccess, helloFailures, pingSuccess, pingFailures)
+
 		//time.Sleep(time.Millisecond * 200)
 	}
 }
