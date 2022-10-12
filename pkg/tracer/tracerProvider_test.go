@@ -28,3 +28,8 @@ func TestClose(t *testing.T) {
 	tp = nil
 	_ = Close(context.Background())
 }
+
+func TestInitWithConfig(t *testing.T) {
+	InitWithConfig("foo", "dev", "v1.0.0",
+		"127.0.0.1", "6831", 1.0)
+}

@@ -52,67 +52,21 @@ func main() {
 
 // -------------------------------- 注册app初始化 ---------------------------------
 func registerInits() []app.Init {
-	// 初始化配置文件，必须优先执行，后面的初始化需要依赖配置
-	func() {
-		flag.StringVar(&version, "version", "", "service Version Number")
-		flag.BoolVar(&enableConfigCenter, "enable-cc", false, "whether to get from the configuration center, "+
-			"if true, the '-c' parameter indicates the configuration center")
-		flag.StringVar(&configFile, "c", "", "configuration file")
-		flag.Parse()
-
-		if enableConfigCenter {
-			// 从配置中心获取配置(先获取nacos配置，再根据nacos配置中心读取服务配置)
-			if configFile == "" {
-				configFile = configs.Path("serverNameExample_cc.yml")
-			}
-			nacosConfig, err := config.NewCenter(configFile)
-			if err != nil {
-				panic(err)
-			}
-			appConfig := &config.Config{}
-			params := &nacoscli.Params{}
-			_ = copier.Copy(params, &nacosConfig.Nacos)
-			err = nacoscli.Init(appConfig, params)
-			if err != nil {
-				panic(err)
-			}
-			if appConfig.App.Name == "" {
-				panic("read the config from center error, config data is empty")
-			}
-			config.Set(appConfig)
-		} else {
-			// 从本地配置文件获取配置
-			if configFile == "" {
-				configFile = configs.Path("serverNameExample.yml")
-			}
-			err := config.Init(configFile)
-			if err != nil {
-				panic("init config error: " + err.Error())
-			}
-		}
-		if version != "" {
-			config.Get().App.Version = version
-		}
-		//fmt.Println(config.Show())
-	}()
+	// 初始化配置
+	initConfig()
 
 	// 初始化日志
-	func() {
-		_, err := logger.Init(
-			logger.WithLevel(config.Get().Logger.Level),
-			logger.WithFormat(config.Get().Logger.Format),
-			logger.WithSave(config.Get().Logger.IsSave,
-				logger.WithFileName(config.Get().Logger.LogFileConfig.Filename),
-				logger.WithFileMaxSize(config.Get().Logger.LogFileConfig.MaxSize),
-				logger.WithFileMaxBackups(config.Get().Logger.LogFileConfig.MaxBackups),
-				logger.WithFileMaxAge(config.Get().Logger.LogFileConfig.MaxAge),
-				logger.WithFileIsCompression(config.Get().Logger.LogFileConfig.IsCompression),
-			),
-		)
-		if err != nil {
-			panic("init logger error: " + err.Error())
-		}
-	}()
+	_, _ = logger.Init(
+		logger.WithLevel(config.Get().Logger.Level),
+		logger.WithFormat(config.Get().Logger.Format),
+		logger.WithSave(config.Get().Logger.IsSave,
+			logger.WithFileName(config.Get().Logger.LogFileConfig.Filename),
+			logger.WithFileMaxSize(config.Get().Logger.LogFileConfig.MaxSize),
+			logger.WithFileMaxBackups(config.Get().Logger.LogFileConfig.MaxBackups),
+			logger.WithFileMaxAge(config.Get().Logger.LogFileConfig.MaxAge),
+			logger.WithFileIsCompression(config.Get().Logger.LogFileConfig.IsCompression),
+		),
+	)
 
 	var inits []app.Init
 
@@ -122,24 +76,60 @@ func registerInits() []app.Init {
 		model.InitRedis()
 	})
 
-	if config.Get().App.EnableTracing { // 根据配置是否开启链路跟踪
+	// 初始化链路跟踪
+	if config.Get().App.EnableTracing {
 		inits = append(inits, func() {
-			// 初始化链路跟踪
-			exporter, err := tracer.NewJaegerAgentExporter(config.Get().Jaeger.AgentHost, config.Get().Jaeger.AgentPort)
-			if err != nil {
-				panic("init trace error:" + err.Error())
-			}
-			resource := tracer.NewResource(
-				tracer.WithServiceName(config.Get().App.Name),
-				tracer.WithEnvironment(config.Get().App.Env),
-				tracer.WithServiceVersion(config.Get().App.Version),
-			)
-
-			tracer.Init(exporter, resource, config.Get().Jaeger.SamplingRate) // 如果SamplingRate=0.5表示只采样50%
+			tracer.InitWithConfig(config.Get().App.Name, config.Get().App.Env, config.Get().App.Version,
+				config.Get().Jaeger.AgentHost, config.Get().Jaeger.AgentPort, config.Get().Jaeger.SamplingRate)
 		})
 	}
 
 	return inits
+}
+
+// 初始化配置
+func initConfig() {
+	flag.StringVar(&version, "version", "", "service Version Number")
+	flag.BoolVar(&enableConfigCenter, "enable-cc", false, "whether to get from the configuration center, "+
+		"if true, the '-c' parameter indicates the configuration center")
+	flag.StringVar(&configFile, "c", "", "configuration file")
+	flag.Parse()
+
+	if enableConfigCenter {
+		// 从配置中心获取配置(先获取nacos配置，再根据nacos配置中心读取服务配置)
+		if configFile == "" {
+			configFile = configs.Path("serverNameExample_cc.yml")
+		}
+		nacosConfig, err := config.NewCenter(configFile)
+		if err != nil {
+			panic(err)
+		}
+		appConfig := &config.Config{}
+		params := &nacoscli.Params{}
+		_ = copier.Copy(params, &nacosConfig.Nacos)
+		err = nacoscli.Init(appConfig, params)
+		if err != nil {
+			panic(err)
+		}
+		if appConfig.App.Name == "" {
+			panic("read the config from center error, config data is empty")
+		}
+		config.Set(appConfig)
+	} else {
+		// 从本地配置文件获取配置
+		if configFile == "" {
+			configFile = configs.Path("serverNameExample.yml")
+		}
+		err := config.Init(configFile)
+		if err != nil {
+			panic("init config error: " + err.Error())
+		}
+	}
+
+	if version != "" {
+		config.Get().App.Version = version
+	}
+	//fmt.Println(config.Show())
 }
 
 // -------------------------------- 注册app服务 ---------------------------------
@@ -203,6 +193,7 @@ func getETCDRegistry(etcdEndpoints []string, instanceName string, instanceEndpoi
 // delete the templates code end
 
 // -------------------------- 注册app需要释放的资源  -------------------------------------------
+
 func registerCloses(servers []app.IServer) []app.Close {
 	var closes []app.Close
 

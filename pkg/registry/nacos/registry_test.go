@@ -1,28 +1,34 @@
 package nacos
 
 import (
+	"context"
+	"github.com/zhufuyi/sponge/pkg/registry"
 	"testing"
-
-	"github.com/nacos-group/nacos-sdk-go/v2/clients"
-	"github.com/nacos-group/nacos-sdk-go/v2/vo"
-	"github.com/stretchr/testify/assert"
 )
 
-func TestNew(t *testing.T) {
-	namingClient, err := clients.NewNamingClient(
-		vo.NacosClientParam{
-			ClientConfig:  nil,
-			ServerConfigs: nil,
-		},
-	)
-	assert.Error(t, err)
-
-	r := New(namingClient,
+func newNacosRegistry() *Registry {
+	return New(getCli(),
 		WithPrefix("/micro"),
 		WithWeight(1),
 		WithCluster("cluster"),
 		WithGroup("dev"),
 		WithDefaultKind("grpc"),
 	)
-	assert.NotNil(t, r)
+}
+
+func TestRegistry(t *testing.T) {
+	r := newNacosRegistry()
+	instance := registry.NewServiceInstance("foo", []string{"grpc://127.0.0.1:8282"})
+
+	err := r.Register(context.Background(), instance)
+	t.Log(err)
+
+	err = r.Deregister(context.Background(), instance)
+	t.Log(err)
+
+	_, err = r.GetService(context.Background(), "foo")
+	t.Log(err)
+
+	_, err = r.Watch(context.Background(), "foo")
+	t.Log(err)
 }

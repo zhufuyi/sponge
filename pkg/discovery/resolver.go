@@ -125,7 +125,6 @@ func parseEndpoint(endpoints []string, scheme string, isSecure bool) (string, er
 // IsSecure parses isSecure for Endpoint URL.
 func IsSecure(u *url.URL) bool {
 	ok, err := strconv.ParseBool(u.Query().Get("isSecure"))
-	fmt.Println(ok)
 	if err != nil {
 		return false
 	}

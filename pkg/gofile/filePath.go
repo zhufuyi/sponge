@@ -1,7 +1,6 @@
 package gofile
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -18,7 +17,6 @@ func IsExists(path string) bool {
 func GetRunPath() string {
 	dir, err := os.Executable()
 	if err != nil {
-		fmt.Println("os.Executable error.", err.Error())
 		return ""
 	}
 

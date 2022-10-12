@@ -47,7 +47,7 @@ func writeJSON(c *gin.Context, code int, res interface{}) {
 	writeContentType(c.Writer, jsonContentType)
 	err := json.NewEncoder(c.Writer).Encode(res)
 	if err != nil {
-		fmt.Printf("json encode error, err = %s", err.Error())
+		fmt.Printf("json encode error, err = %s\n", err.Error())
 	}
 }
 
