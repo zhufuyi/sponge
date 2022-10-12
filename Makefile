@@ -125,7 +125,7 @@ clean:
 
 .PHONY: docs
 # generate swagger docs, the host address can be changed via parameters, e.g. make docs HOST=192.168.3.37
-docs:
+docs: mod fmt
 	@bash scripts/swag-docs.sh $(HOST)
 
 
@@ -140,7 +140,7 @@ graph:
 
 .PHONY: proto
 # generate *.pb.go codes from *.proto files
-proto:
+proto: mod fmt
 	@bash scripts/protoc.sh
 
 

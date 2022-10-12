@@ -1,5 +1,8 @@
-// Package sponge is a microservices framework that supports http and grpc and service,
-// combined with the [sponge](https://github.com/zhufuyi/sponge@sponge) tool to automatically generate framework code。
+// Package sponge is a go microservices framework, a tool for quickly creating complete microservices code for http or grpc.
+// Generate `config`, `ecode`, `model`, `dao`, `handler`, `router`, `http`, `proto`, `service`, `grpc` code from the SQL DDL,
+// which can be combined into full services(similar to how a broken sponge cell automatically reorganises itself into a new sponge).
+//
+// combined with the [sponge](https://github.com/zhufuyi/sponge@sponge) tool to generate framework code。
 //
 //	sponge -h
 //	sponge management tools

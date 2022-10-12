@@ -1,12 +1,20 @@
 ## sponge
 
-[![Go Report](https://goreportcard.com/badge/github.com/zhufuyi/sponge)](https://goreportcard.com/report/github.com/zhufuyi/sponge)  
-[![codecov](https://codecov.io/gh/zhufuyi/sponge/branch/main/graph/badge.svg)](https://codecov.io/gh/zhufuyi/sponge)  
-[![Go Reference](https://pkg.go.dev/badge/github.com/zhufuyi/sponge.svg)](https://pkg.go.dev/github.com/zhufuyi/sponge)  
-[![Go](https://github.com/zhufuyi/sponge/workflows/Go/badge.svg?branch=main)](https://github.com/zhufuyi/sponge/actions)  
+<p align="center">
+<img align="center" width="500px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/logo.png">
+</p>
+
+<div align=center>
+
+[![Go Report](https://goreportcard.com/badge/github.com/zhufuyi/sponge)](https://goreportcard.com/report/github.com/zhufuyi/sponge)
+[![codecov](https://codecov.io/gh/zhufuyi/sponge/branch/main/graph/badge.svg)](https://codecov.io/gh/zhufuyi/sponge)
+[![Go Reference](https://pkg.go.dev/badge/github.com/zhufuyi/sponge.svg)](https://pkg.go.dev/github.com/zhufuyi/sponge)
+[![Go](https://github.com/zhufuyi/sponge/workflows/Go/badge.svg?branch=main)](https://github.com/zhufuyi/sponge/actions)
 [![License: MIT](https://img.shields.io/github/license/zhufuyi/sponge)](https://img.shields.io/github/license/zhufuyi/sponge)
 
-**sponge** is a microservices framework that supports automatic generation of http service code, grpc service code and CICD execution scripts. Generate config, ecode, model, dao, handler, router, http, proto, service, grpc independent sub-modules. The low-coupling module code is combined into a complete service (similar to how a broken sponge cell automatically reorganises itself into a new sponge) and only needs to be populated with business code.
+</div>
+
+**sponge** is a go microservices framework, a tool for quickly creating complete microservices code for http or grpc. Generate `config`, `ecode`, `model`, `dao`, `handler`, `router`, `http`, `proto`, `service`, `grpc` code from the SQL DDL, which can be combined into full services(similar to how a broken sponge cell automatically reorganises itself into a new sponge).
 
 Features :
 
@@ -30,64 +38,56 @@ Features :
 - Continuous Integration CI [jenkins](https://github.com/jenkinsci/jenkins)
 - Continuous Deployment CD [docker](https://www.docker.com/), [kubernetes](https://github.com/kubernetes/kubernetes)
 
-<br>  
+<br>
 
-The directory structure follows [golang-standards/project-layout](https://github.com/golang-standards/project-layout)。
+The directory structure follows [golang-standards/project-layout](https://github.com/golang-standards/project-layout).
 
 ```bash
-.  
-├── api               # grpc's proto file and corresponding code  
-├── assets          # other assets used with the repository (images, logos, etc.)  
-├── build            # Packaging and continuous integration  
-├── cmd             # The application's directory  
-├── configs         # Directory of configuration files  
-├── deployments # IaaS, PaaS, system and container orchestration deployment configurations and templates  
-├─ docs              # Design documentation and interface documentation  
-├── internal        # Private application and library code  
-│ ├── cache       # Business wrapper-based cache  
-│ ├── config       # Go struct for config file mapping  
-│ ├── dao          # Data access  
-│ ├── ecode       # custom business error codes  
-│ ├── handler    # Business function implementation for http  
-│ ├── model      # Database model  
-│ ├── routers    # http routing  
-│ ├── server     # service entry, including http and grpc services  
-│ ├── service    # Business function implementation for grpc  
-├── pkg            # library code that external applications can use  
-├── scripts       # Scripts for performing various build, install, analysis, etc. operations  
-├── test            # Additional external test applications and test data  
-└── third_party # External helpers, forked code and other third party tools  
-``` 
+.
+├── api            # grpc's proto file and corresponding code
+├── assets         # other assets used with the repository (images, logos, etc.)
+├── build          # Packaging and continuous integration
+├── cmd            # The application's directory
+├── configs        # Directory of configuration files
+├── deployments    # IaaS, PaaS, system and container orchestration deployment configurations and templates
+├─ docs            # Design documentation and interface documentation
+├── internal       # Private application and library code
+│ ├── cache        # Business wrapper-based cache
+│ ├── config       # Go struct for config file mapping
+│ ├── dao          # Data access
+│ ├── ecode        # custom business error codes
+│ ├── handler      # Business function implementation for http
+│ ├── model        # Database model
+│ ├── routers      # http routing
+│ ├── server       # service entry, including http and grpc servers
+│ ├── service      # Business function implementation for grpc
+├── pkg            # library code that external applications can use
+├── scripts        # Scripts for performing various build, install, analysis, etc. operations
+├── test           # Additional external test applications and test data
+└── third_party    # External helpers, forked code and other third party tools
+```
 
-<br>  
+<br>
 
 The development specification follows the [Uber Go Language Coding Specification](https://github.com/uber-go/guide/blob/master/style.md).
 
-<br>  
+<br>
 
 ## Quick start
 
-### Quickly create an http project
+### Install
 
-#### Creating a new http service
+> go install github.com/zhufuyi/sponge@sponge
 
-**(1) Generate http service code**
+### Quickly create a http project
 
-> sponge http --module-name=account --server-name=account --project-name=account --repo-addr=zhufuyi --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=use
+#### Creating a new http server
 
-Command parameter description.
+**(1) Generate http server code**
 
-- --**module-name**: module name of the go.mod file
-- --**server-name**: the name of the http service
-- --**project-name**: the name of the project to which the http service belongs
-- --**repo-addr**: image repository address
-- --**db-dsn**: address of the msyql connection
-- --**db-table**: the name of the table
-- --**embed**: whether to embed gorm.Model (id and time as embedded fields), optional parameter, default is true
-- --**out**: generate code to the specified directory, e.g. `$PATH/src/<http service name>`, optional, default code generated in the current directory, note: if the file exists it will be cancel generate codes.
+> sponge http --module-name=account --server-name=account --project-name=account --repo-addr=zhufuyi --db-dsn=root:123456@(127.0.0.1:3306)/test --db-table=student
 
-
-**(2) Modify the configuration file configs/<service name>.yml**
+**(2) Modify the configuration file `configs/<service name>.yml`**
 
 - Modify the redis configuration
 - If the field `enableTracing` is true, the jaeger address must be set
@@ -95,21 +95,15 @@ Command parameter description.
 
 **(3) Generate swagger documentation**
 
-```bash
-# First run, update project dependencies
-make mod && make fmt
+> make docs
 
-# Generate swagger documentation
-make docs
-```
-
-**(4) Start the service**
+**(4) Start up the server**
 
 Way 1: Run locally in the binary
 
 > make run
 
-Copy `http://localhost:8080/swagger/index.html` to your browser and test the add/remove interface.
+Copy `http://localhost:8080/swagger/index.html` to your browser and test the api interface.
 
 Way 2: Run in docker
 
@@ -144,28 +138,29 @@ kubectl get -f account-deployment.yml
 
 You can also use Jenkins to automatically build deployments to k8s.
 
-<br>  
+<br>
 
-### Quick creation of grpc projects
+#### Creating a new handler
 
-#### Creating a new grpc service
+> sponge handler --module-name=account --db-dsn=root:123456@(127.0.0.1:3306)/test --db-table=teacher --out=./account
 
-**(1) Generate grpc service code**
+Start up the server
 
-> sponge grpc --module-name=account --server-name=account --project-name=account --repo-addr=zhufuyi --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
+> make docs && make run
 
-Command parameter description.
+Copy `http://localhost:8080/swagger/index.html` to your browser and test the api interface.
 
-- --**module-name**: module name of the go.mod file
-- --**server-name**: the name of the http service
-- --**project-name**: the name of the project to which the http service belongs
-- --**repo-addr**: image repository address
-- --**db-dsn**: address of the msyql connection
-- --**db-table**: the name of the table
-- --**embed**: whether to embed gorm.Model (id and time as embedded fields), optional parameter, default is true
-- --**out**: generate code to the specified directory, e.g. `$PATH/src/<http service name>`, optional, default code generated in the current directory, note: if the file exists it will be cancel generate codes.
+<br>
 
-**(2) Modify the configuration file configs/<service name>.yml**
+### Quick create a grpc project
+
+#### Creating a new grpc server
+
+**(1) Generate grpc server code**
+
+> sponge grpc --module-name=account --server-name=account --project-name=account --repo-addr=zhufuyi --db-dsn=root:123456@(127.0.0.1:3306)/test --db-table=student
+
+**(2) Modify the configuration file configs/<server name>.yml**
 
 - Modify the redis configuration
 - If the field `enableTracing` is true, the jaeger address must be set
@@ -173,21 +168,15 @@ Command parameter description.
 
 **(3) Generating grpc code**
 
-```bash
-# First run, update project dependencies
-make mod && make fmt
+> make proto
 
-# Generate *.pb.go
-make proto
-```  
-
-**(4) Start the service**
+**(4) Start up the server**
 
 Way 1: Run locally in the binary
 
 > make run
 
-Copy `http://localhost:8080/swagger/index.html` to your browser and test the add/remove interface.
+Use IDE to open the file `internal/service/<table name>_client_test.go` to test the api interface of grpc, you can copy the pressure test report to your browser to view it.
 
 Way 2: Run in docker
 
@@ -221,3 +210,15 @@ kubectl get -f account-deployment.yml
 ```  
 
 You can also use Jenkins to automatically build deployments to k8s.  
+
+<br>
+
+#### Creating a new service
+
+> sponge service --module-name=account --server-name=account --db-dsn=root:123456@(127.0.0.1:3306)/test --db-table=teacher --out=./account
+
+Start up the server
+
+> make proto && make run
+
+Use IDE to open the file `internal/service/<table name>_client_test.go` to test the api interface of grpc.

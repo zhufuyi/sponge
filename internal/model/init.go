@@ -62,16 +62,17 @@ func GetDB() *gorm.DB {
 
 // CloseMysql 关闭mysql
 func CloseMysql() error {
-	if db != nil {
-		sqlDB, err := db.DB()
-		if err != nil {
-			return err
-		}
-		if sqlDB != nil {
-			return sqlDB.Close()
-		}
+	if db == nil {
+		return nil
 	}
 
+	sqlDB, err := db.DB()
+	if err != nil {
+		return err
+	}
+	if sqlDB != nil {
+		return sqlDB.Close()
+	}
 	return nil
 }
 
@@ -106,6 +107,10 @@ func GetRedisCli() *redis.Client {
 
 // CloseRedis 关闭redis
 func CloseRedis() error {
+	if redisCli == nil {
+		return nil
+	}
+
 	err := redisCli.Close()
 	if err != nil && err.Error() != redis.ErrClosed.Error() {
 		return err
