@@ -8,8 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-redis/redis/v8"
 	"github.com/zhufuyi/sponge/pkg/encoding"
+
+	"github.com/go-redis/redis/v8"
 )
 
 // redisCache redis cache结构体

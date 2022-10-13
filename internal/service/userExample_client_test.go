@@ -8,26 +8,31 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/zhufuyi/sponge/pkg/grpc/benchmark"
-
 	pb "github.com/zhufuyi/sponge/api/serverNameExample/v1"
 	"github.com/zhufuyi/sponge/api/types"
 	"github.com/zhufuyi/sponge/configs"
 	"github.com/zhufuyi/sponge/internal/config"
 
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+	"github.com/zhufuyi/sponge/pkg/grpc/benchmark"
+	"github.com/zhufuyi/sponge/pkg/grpc/grpccli"
 )
 
 func initUserExampleServiceClient() pb.UserExampleServiceClient {
 	err := config.Init(configs.Path("serverNameExample.yml"))
 	if err != nil {
-		fmt.Printf("config.Init error: %s, test ignore the error info\n", err)
+		panic(err)
 	}
 	addr := fmt.Sprintf("127.0.0.1:%d", config.Get().Grpc.Port)
 
-	conn, err := grpc.Dial(addr,
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	conn, err := grpccli.DialInsecure(context.Background(),
+		addr,
+		//grpccli.WithEnableLog(logger.Get()),
+		//grpccli.WithDiscovery(discovery),
+		//grpccli.WithEnableTrace(),
+		//grpccli.WithEnableHystrix("user"),
+		//grpccli.WithEnableLoadBalance(),
+		//grpccli.WithEnableRetry(),
+		//grpccli.WithEnableMetrics(),
 	)
 	if err != nil {
 		panic(err)
@@ -190,7 +195,7 @@ func Test_userExampleService_benchmark(t *testing.T) {
 				message := &pb.ListUserExampleByIDsRequest{
 					Ids: []uint64{1, 2, 3},
 				}
-				b, err := benchmark.New(host, protoFile, "ListByIDs", message, 1000, importPaths...)
+				b, err := benchmark.New(host, protoFile, "ListByIDs", message, 100, importPaths...)
 				if err != nil {
 					return err
 				}

@@ -106,10 +106,11 @@ func (d *userExampleDao) UpdateByID(ctx context.Context, table *model.UserExampl
 // GetByID get a record based on id
 func (d *userExampleDao) GetByID(ctx context.Context, id uint64) (*model.UserExample, error) {
 	record, err := d.cache.Get(ctx, id)
+	if err == nil {
+		return record, nil
+	}
 
-	if errors.Is(err, cacheBase.ErrPlaceholder) {
-		return nil, model.ErrRecordNotFound
-	} else if errors.Is(err, goredis.ErrRedisNotFound) {
+	if errors.Is(err, goredis.ErrRedisNotFound) {
 		// 从mysql获取
 		table := &model.UserExample{}
 		err = d.db.WithContext(ctx).Where("id = ?", id).First(table).Error
@@ -125,23 +126,18 @@ func (d *userExampleDao) GetByID(ctx context.Context, id uint64) (*model.UserExa
 			return nil, err
 		}
 
-		if table.ID == 0 {
-			return nil, model.ErrRecordNotFound
-		}
-
 		// set cache
 		err = d.cache.Set(ctx, id, table, cacheBase.DefaultExpireTime)
 		if err != nil {
 			return nil, fmt.Errorf("cache.Set error: %v, id=%d", err, id)
 		}
-
 		return table, nil
-	} else if err != nil {
-		// fail fast, if cache error return, don't request to db
-		return nil, err
+	} else if errors.Is(err, cacheBase.ErrPlaceholder) {
+		return nil, model.ErrRecordNotFound
 	}
 
-	return record, nil
+	// fail fast, if cache error return, don't request to db
+	return nil, err
 }
 
 // GetByIDs get multiple rows by ids

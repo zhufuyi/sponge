@@ -36,7 +36,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handler.CreateUserExampleRequest"
+                            "$ref": "#/definitions/types.CreateUserExampleRequest"
                         }
                     }
                 ],
@@ -44,7 +44,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.Result"
+                            "$ref": "#/definitions/types.Result"
                         }
                     }
                 }
@@ -76,7 +76,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.Result"
+                            "$ref": "#/definitions/types.Result"
                         }
                     }
                 }
@@ -107,7 +107,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handler.UpdateUserExampleByIDRequest"
+                            "$ref": "#/definitions/types.UpdateUserExampleByIDRequest"
                         }
                     }
                 ],
@@ -115,7 +115,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.Result"
+                            "$ref": "#/definitions/types.Result"
                         }
                     }
                 }
@@ -145,7 +145,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.Result"
+                            "$ref": "#/definitions/types.Result"
                         }
                     }
                 }
@@ -171,7 +171,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handler.Params"
+                            "$ref": "#/definitions/types.Params"
                         }
                     }
                 ],
@@ -179,7 +179,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.Result"
+                            "$ref": "#/definitions/types.Result"
                         }
                     }
                 }
@@ -205,7 +205,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handler.GetUserExamplesByIDsRequest"
+                            "$ref": "#/definitions/types.GetUserExamplesByIDsRequest"
                         }
                     }
                 ],
@@ -213,7 +213,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.Result"
+                            "$ref": "#/definitions/types.Result"
                         }
                     }
                 }
@@ -260,7 +260,18 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "handler.Column": {
+        "handlerfunc.checkHealthResponse": {
+            "type": "object",
+            "properties": {
+                "hostname": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.Column": {
             "type": "object",
             "properties": {
                 "exp": {
@@ -280,7 +291,7 @@ const docTemplate = `{
                 }
             }
         },
-        "handler.CreateUserExampleRequest": {
+        "types.CreateUserExampleRequest": {
             "type": "object",
             "properties": {
                 "age": {
@@ -317,7 +328,7 @@ const docTemplate = `{
                 }
             }
         },
-        "handler.GetUserExamplesByIDsRequest": {
+        "types.GetUserExamplesByIDsRequest": {
             "type": "object",
             "properties": {
                 "ids": {
@@ -329,14 +340,14 @@ const docTemplate = `{
                 }
             }
         },
-        "handler.Params": {
+        "types.Params": {
             "type": "object",
             "properties": {
                 "columns": {
                     "description": "列查询条件",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/handler.Column"
+                        "$ref": "#/definitions/types.Column"
                     }
                 },
                 "page": {
@@ -354,7 +365,7 @@ const docTemplate = `{
                 }
             }
         },
-        "handler.Result": {
+        "types.Result": {
             "type": "object",
             "properties": {
                 "code": {
@@ -370,7 +381,7 @@ const docTemplate = `{
                 }
             }
         },
-        "handler.UpdateUserExampleByIDRequest": {
+        "types.UpdateUserExampleByIDRequest": {
             "type": "object",
             "properties": {
                 "age": {
@@ -403,17 +414,6 @@ const docTemplate = `{
                 },
                 "phone": {
                     "description": "手机号码",
-                    "type": "string"
-                }
-            }
-        },
-        "handlerfunc.checkHealthResponse": {
-            "type": "object",
-            "properties": {
-                "hostname": {
-                    "type": "string"
-                },
-                "status": {
                     "type": "string"
                 }
             }

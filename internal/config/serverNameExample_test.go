@@ -3,9 +3,11 @@ package config
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/zhufuyi/sponge/configs"
+
 	"github.com/zhufuyi/sponge/pkg/gofile"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestInit(t *testing.T) {

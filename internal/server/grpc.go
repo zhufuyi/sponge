@@ -8,14 +8,14 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/zhufuyi/sponge/internal/config"
+	"github.com/zhufuyi/sponge/internal/service"
+
 	"github.com/zhufuyi/sponge/pkg/app"
 	"github.com/zhufuyi/sponge/pkg/grpc/interceptor"
 	"github.com/zhufuyi/sponge/pkg/grpc/metrics"
 	"github.com/zhufuyi/sponge/pkg/logger"
 	"github.com/zhufuyi/sponge/pkg/registry"
-
-	"github.com/zhufuyi/sponge/internal/config"
-	"github.com/zhufuyi/sponge/internal/service"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
@@ -108,7 +108,7 @@ func (s *grpcServer) serverOptions() []grpc.ServerOption {
 			}
 			promAddr := fmt.Sprintf(":%d", config.Get().Grpc.MetricsPort)
 			s.metricsHTTPServer = metrics.GoHTTPService(promAddr, s.server)
-			logger.Infof("start up grpc metrics service, addr = %s", promAddr)
+			fmt.Printf("start up grpc metrics service, addr = %s\n", promAddr)
 			return nil
 		}
 	}

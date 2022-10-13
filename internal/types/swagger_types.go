@@ -1,7 +1,7 @@
-package handler
+package types
 
-// swagger公共结构体，每个字段建议都写注释，生成的swagger.json也带有注释，
-// 把swagger.json导入yapi后自动填写备注，避免重复填写
+// swagger公共结构体，建议都写注释，生成的swagger.json也会带有注释，
+// 如果使用yapi，把swagger.json导入yapi后自动填写备注，避免重复填写注释。
 
 // Result 输出数据格式
 type Result struct {

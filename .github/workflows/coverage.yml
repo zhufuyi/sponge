@@ -22,6 +22,6 @@ jobs:
         with:
           fetch-depth: 2
       - name: Run coverage
-        run: go test -race -coverprofile=coverage.txt -covermode=atomic $(go list ./... | grep -v /vendor/)
+        run: go test -race -coverprofile=coverage.txt -covermode=atomic $(go list ./... | grep -v /vendor/ | grep -v /api/)
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3

@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -9,6 +10,7 @@ import (
 
 	"github.com/zhufuyi/sponge/pkg/gotest"
 	"github.com/zhufuyi/sponge/pkg/mysql/query"
+	"github.com/zhufuyi/sponge/pkg/utils"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
@@ -22,7 +24,8 @@ func newUserExampleDao() *gotest.Dao {
 	testData.UpdatedAt = testData.CreatedAt
 
 	// 初始化mock cache
-	c := gotest.NewCache(map[string]interface{}{"no cache": testData}) // 为了测试mysql，禁止缓存
+	//c := gotest.NewCache(map[string]interface{}{"no cache": testData}) // 为了测试mysql，禁止缓存
+	c := gotest.NewCache(map[string]interface{}{utils.Uint64ToStr(testData.ID): testData})
 	c.ICache = cache.NewUserExampleCache(c.RedisClient)
 
 	// 初始化mock dao
@@ -125,7 +128,7 @@ func Test_userExampleDao_GetByID(t *testing.T) {
 		WithArgs(testData.ID).
 		WillReturnRows(rows)
 
-	_, err := d.IDao.(UserExampleDao).GetByID(d.Ctx, testData.ID)
+	_, err := d.IDao.(UserExampleDao).GetByID(d.Ctx, testData.ID) // notfound
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -140,6 +143,12 @@ func Test_userExampleDao_GetByID(t *testing.T) {
 		WithArgs(2).
 		WillReturnRows(rows)
 	_, err = d.IDao.(UserExampleDao).GetByID(d.Ctx, 2)
+	assert.Error(t, err)
+
+	d.SqlMock.ExpectQuery("SELECT .*").
+		WithArgs(3, 4).
+		WillReturnRows(rows)
+	_, err = d.IDao.(UserExampleDao).GetByID(d.Ctx, 4)
 	assert.Error(t, err)
 }
 
@@ -159,6 +168,9 @@ func Test_userExampleDao_GetByIDs(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	_, err = d.IDao.(UserExampleDao).GetByIDs(d.Ctx, []uint64{111})
+	assert.Error(t, err)
 
 	err = d.SqlMock.ExpectationsWereMet()
 	if err != nil {
@@ -203,4 +215,10 @@ func Test_userExampleDao_GetByColumns(t *testing.T) {
 		},
 	})
 	assert.Error(t, err)
+}
+
+func TestGetByColumnsError(t *testing.T) {
+	d := &userExampleDao{}
+	_, _, err := d.GetByColumns(context.Background(), &query.Params{Columns: []query.Column{{}}})
+	t.Log(err)
 }

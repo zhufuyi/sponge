@@ -8,6 +8,7 @@ import (
 	"github.com/zhufuyi/sponge/internal/config"
 
 	"github.com/stretchr/testify/assert"
+	"gorm.io/gorm"
 )
 
 // 测试时需要连接真实数据
@@ -23,19 +24,38 @@ func TestInitMysql(t *testing.T) {
 		panic(err)
 	}
 
-	InitMysql()
+	config.Get().App.EnableTracing = true
+	config.Get().Mysql.EnableLog = true
 	gdb := GetDB()
 	assert.NotNil(t, gdb)
 	time.Sleep(time.Millisecond * 10)
 	err = CloseMysql()
 	assert.NoError(t, err)
+}
+
+func TestInitMysqlError(t *testing.T) {
+	defer func() {
+		if e := recover(); e != nil {
+			t.Log("ignore connect mysql error info")
+		}
+	}()
+
+	err := config.Init(configs.Path("serverNameExample.yml"))
+	if err != nil {
+		panic(err)
+	}
 
 	// change config error test
-	config.Get().App.EnableTracing = true
 	config.Get().Mysql.Dsn = "root:123456@(127.0.0.1:3306)/test"
-	db = nil
 	_ = CloseMysql()
-	_ = GetDB()
+	InitMysql()
+}
+
+func TestCloseMysql(t *testing.T) {
+	defer func() { recover() }()
+	db = &gorm.DB{}
+	err := CloseMysql()
+	assert.NoError(t, err)
 }
 
 func TestInitRedis(t *testing.T) {
@@ -61,6 +81,7 @@ func TestInitRedis(t *testing.T) {
 	config.Get().App.EnableTracing = true
 	config.Get().Redis.Dsn = "default:123456@127.0.0.1:6379/0"
 	redisCli = nil
+	_ = CloseRedis()
 	_ = GetRedisCli()
 }
 

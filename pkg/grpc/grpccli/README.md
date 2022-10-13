@@ -21,8 +21,6 @@ func grpcClientExample() pb.UserExampleServiceClient {
 	conn, err := grpccli.DialInsecure(ctx, endpoint,
 		grpccli.WithEnableLog(logger.Get()),
 		grpccli.WithDiscovery(discovery),
-		//grpccli.WithEnableLog(logger.Get()),
-		//grpccli.WithDiscovery(discovery),
 		//grpccli.WithEnableTrace(),
 		//grpccli.WithEnableHystrix("user"),
 		//grpccli.WithEnableLoadBalance(),

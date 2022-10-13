@@ -1,12 +1,11 @@
 package handler
 
 import (
-	"time"
-
 	"github.com/zhufuyi/sponge/internal/cache"
 	"github.com/zhufuyi/sponge/internal/dao"
 	"github.com/zhufuyi/sponge/internal/ecode"
 	"github.com/zhufuyi/sponge/internal/model"
+	"github.com/zhufuyi/sponge/internal/types"
 
 	"github.com/zhufuyi/sponge/pkg/gin/response"
 	"github.com/zhufuyi/sponge/pkg/logger"
@@ -18,7 +17,6 @@ import (
 )
 
 var _ UserExampleHandler = (*userExampleHandler)(nil)
-var _ time.Time
 
 // UserExampleHandler 定义handler接口
 type UserExampleHandler interface {
@@ -50,11 +48,11 @@ func NewUserExampleHandler() UserExampleHandler {
 // @Tags userExample
 // @accept json
 // @Produce json
-// @Param data body CreateUserExampleRequest true "userExample信息"
-// @Success 200 {object} Result{}
+// @Param data body types.CreateUserExampleRequest true "userExample信息"
+// @Success 200 {object} types.Result{}
 // @Router /api/v1/userExample [post]
 func (h *userExampleHandler) Create(c *gin.Context) {
-	form := &CreateUserExampleRequest{}
+	form := &types.CreateUserExampleRequest{}
 	err := c.ShouldBindJSON(form)
 	if err != nil {
 		logger.Warn("ShouldBindJSON error: ", logger.Err(err), utils.FieldRequestIDFromContext(c))
@@ -87,7 +85,7 @@ func (h *userExampleHandler) Create(c *gin.Context) {
 // @accept json
 // @Produce json
 // @Param id path string true "id"
-// @Success 200 {object} Result{}
+// @Success 200 {object} types.Result{}
 // @Router /api/v1/userExample/{id} [delete]
 func (h *userExampleHandler) DeleteByID(c *gin.Context) {
 	_, id, isAbort := getUserExampleIDFromPath(c)
@@ -112,8 +110,8 @@ func (h *userExampleHandler) DeleteByID(c *gin.Context) {
 // @accept json
 // @Produce json
 // @Param id path string true "id"
-// @Param data body UpdateUserExampleByIDRequest true "userExample信息"
-// @Success 200 {object} Result{}
+// @Param data body types.UpdateUserExampleByIDRequest true "userExample信息"
+// @Success 200 {object} types.Result{}
 // @Router /api/v1/userExample/{id} [put]
 func (h *userExampleHandler) UpdateByID(c *gin.Context) {
 	_, id, isAbort := getUserExampleIDFromPath(c)
@@ -121,7 +119,7 @@ func (h *userExampleHandler) UpdateByID(c *gin.Context) {
 		return
 	}
 
-	form := &UpdateUserExampleByIDRequest{}
+	form := &types.UpdateUserExampleByIDRequest{}
 	err := c.ShouldBindJSON(form)
 	if err != nil {
 		logger.Warn("ShouldBindJSON error: ", logger.Err(err), utils.FieldRequestIDFromContext(c))
@@ -155,7 +153,7 @@ func (h *userExampleHandler) UpdateByID(c *gin.Context) {
 // @Param id path string true "id"
 // @Accept json
 // @Produce json
-// @Success 200 {object} Result{}
+// @Success 200 {object} types.Result{}
 // @Router /api/v1/userExample/{id} [get]
 func (h *userExampleHandler) GetByID(c *gin.Context) {
 	idStr, id, isAbort := getUserExampleIDFromPath(c)
@@ -175,7 +173,7 @@ func (h *userExampleHandler) GetByID(c *gin.Context) {
 		return
 	}
 
-	data := &GetUserExampleByIDRespond{}
+	data := &types.GetUserExampleByIDRespond{}
 	err = copier.Copy(data, userExample)
 	if err != nil {
 		logger.Warn("Copy error", logger.Err(err), logger.Any("id", id), utils.FieldRequestIDFromContext(c))
@@ -187,17 +185,17 @@ func (h *userExampleHandler) GetByID(c *gin.Context) {
 	response.Success(c, gin.H{"userExample": data})
 }
 
-// ListByIDs 根据id数组获取多条记录
-// @Summary 根据id数组获取userExample列表
-// @Description 使用post请求，根据id数组获取userExample列表
+// ListByIDs 根据多个id获取多条记录
+// @Summary 根据多个id获取userExample列表
+// @Description 使用post请求，根据多个id获取userExample列表
 // @Tags userExample
-// @Param data body GetUserExamplesByIDsRequest true "id 数组"
+// @Param data body types.GetUserExamplesByIDsRequest true "id 数组"
 // @Accept json
 // @Produce json
-// @Success 200 {object} Result{}
+// @Success 200 {object} types.Result{}
 // @Router /api/v1/userExamples/ids [post]
 func (h *userExampleHandler) ListByIDs(c *gin.Context) {
-	form := &GetUserExamplesByIDsRequest{}
+	form := &types.GetUserExamplesByIDsRequest{}
 	err := c.ShouldBindJSON(form)
 	if err != nil {
 		logger.Warn("ShouldBindJSON error: ", logger.Err(err), utils.FieldRequestIDFromContext(c))
@@ -230,11 +228,11 @@ func (h *userExampleHandler) ListByIDs(c *gin.Context) {
 // @Tags userExample
 // @accept json
 // @Produce json
-// @Param data body Params true "查询条件"
-// @Success 200 {object} Result{}
+// @Param data body types.Params true "查询条件"
+// @Success 200 {object} types.Result{}
 // @Router /api/v1/userExamples [post]
 func (h *userExampleHandler) List(c *gin.Context) {
-	form := &GetUserExamplesRequest{}
+	form := &types.GetUserExamplesRequest{}
 	err := c.ShouldBindJSON(form)
 	if err != nil {
 		logger.Warn("ShouldBindJSON error: ", logger.Err(err), utils.FieldRequestIDFromContext(c))
@@ -262,68 +260,6 @@ func (h *userExampleHandler) List(c *gin.Context) {
 	})
 }
 
-// ----------------------------------- 定义请求参数和返回结果 -----------------------------
-// todo generate the request and response struct to here
-// delete the templates code start
-
-// CreateUserExampleRequest 创建请求参数，所有字段是必须的，并且满足binding规则
-// binding使用说明 https://github.com/go-playground/validator
-type CreateUserExampleRequest struct {
-	Name     string `json:"name" binding:"min=2"`         // 名称
-	Email    string `json:"email" binding:"email"`        // 邮件
-	Password string `json:"password" binding:"md5"`       // 密码
-	Phone    string `form:"phone" binding:"e164"`         // 手机号码，e164表示<+国家编号><手机号码>
-	Avatar   string `form:"avatar" binding:"min=5"`       // 头像
-	Age      int    `form:"age" binding:"gt=0,lt=120"`    // 年龄
-	Gender   int    `form:"gender" binding:"gte=0,lte=2"` // 性别，1:男，2:女
-}
-
-// UpdateUserExampleByIDRequest 更新请求参数，所有字段不是必须的，字段为非零值更新
-type UpdateUserExampleByIDRequest struct {
-	ID       uint64 `json:"id" binding:"-"`      // id
-	Name     string `json:"name" binding:""`     // 名称
-	Email    string `json:"email" binding:""`    // 邮件
-	Password string `json:"password" binding:""` // 密码
-	Phone    string `form:"phone" binding:""`    // 手机号码
-	Avatar   string `form:"avatar" binding:""`   // 头像
-	Age      int    `form:"age" binding:""`      // 年龄
-	Gender   int    `form:"gender" binding:""`   // 性别，1:男，2:女
-}
-
-// GetUserExampleByIDRespond 返回数据
-type GetUserExampleByIDRespond struct {
-	ID        string    `json:"id"`         // id
-	Name      string    `json:"name"`       // 名称
-	Email     string    `json:"email"`      // 邮件
-	Phone     string    `json:"phone"`      // 手机号码
-	Avatar    string    `json:"avatar"`     // 头像
-	Age       int       `json:"age"`        // 年龄
-	Gender    int       `json:"gender"`     // 性别，1:男，2:女
-	Status    int       `json:"status"`     // 账号状态
-	LoginAt   int64     `json:"login_at"`   // 登录时间戳
-	CreatedAt time.Time `json:"created_at"` // 创建时间
-	UpdatedAt time.Time `json:"updated_at"` // 更新时间
-}
-
-// delete the templates code end
-
-// GetUserExamplesByIDsRequest request form ids
-type GetUserExamplesByIDsRequest struct {
-	IDs []uint64 `json:"ids" binding:"min=1"`
-}
-
-// GetUserExamplesRequest request form params
-type GetUserExamplesRequest struct {
-	query.Params
-}
-
-// ListUserExamplesRespond list data
-type ListUserExamplesRespond []struct {
-	GetUserExampleByIDRespond
-}
-
-// ------------------------------- 除了handler的辅助函数 -----------------------------
-
 func getUserExampleIDFromPath(c *gin.Context) (string, uint64, bool) {
 	idStr := c.Param("id")
 	id, err := utils.StrToUint64E(idStr)
@@ -336,10 +272,10 @@ func getUserExampleIDFromPath(c *gin.Context) (string, uint64, bool) {
 	return idStr, id, false
 }
 
-func convertUserExamples(fromValues []*model.UserExample) ([]*GetUserExampleByIDRespond, error) {
-	toValues := []*GetUserExampleByIDRespond{}
+func convertUserExamples(fromValues []*model.UserExample) ([]*types.GetUserExampleByIDRespond, error) {
+	toValues := []*types.GetUserExampleByIDRespond{}
 	for _, v := range fromValues {
-		data := &GetUserExampleByIDRespond{}
+		data := &types.GetUserExampleByIDRespond{}
 		err := copier.Copy(data, v)
 		if err != nil {
 			return nil, err

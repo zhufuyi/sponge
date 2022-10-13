@@ -1,5 +1,12 @@
 definitions:
-  handler.Column:
+  handlerfunc.checkHealthResponse:
+    properties:
+      hostname:
+        type: string
+      status:
+        type: string
+    type: object
+  types.Column:
     properties:
       exp:
         description: 表达式，值为空时默认为=，有=、!=、>、>=、<、<=、like七种类型
@@ -13,7 +20,7 @@ definitions:
       value:
         description: 列值
     type: object
-  handler.CreateUserExampleRequest:
+  types.CreateUserExampleRequest:
     properties:
       age:
         description: 年龄
@@ -41,7 +48,7 @@ definitions:
         description: 手机号码，e164表示<+国家编号><手机号码>
         type: string
     type: object
-  handler.GetUserExamplesByIDsRequest:
+  types.GetUserExamplesByIDsRequest:
     properties:
       ids:
         items:
@@ -49,12 +56,12 @@ definitions:
         minItems: 1
         type: array
     type: object
-  handler.Params:
+  types.Params:
     properties:
       columns:
         description: 列查询条件
         items:
-          $ref: '#/definitions/handler.Column'
+          $ref: '#/definitions/types.Column'
         type: array
       page:
         description: 页码
@@ -67,7 +74,7 @@ definitions:
         description: 排序字段，默认值为-id，字段前面有-号表示倒序，否则升序，多个字段用逗号分隔
         type: string
     type: object
-  handler.Result:
+  types.Result:
     properties:
       code:
         description: 返回码
@@ -78,7 +85,7 @@ definitions:
         description: 返回信息说明
         type: string
     type: object
-  handler.UpdateUserExampleByIDRequest:
+  types.UpdateUserExampleByIDRequest:
     properties:
       age:
         description: 年龄
@@ -105,13 +112,6 @@ definitions:
         description: 手机号码
         type: string
     type: object
-  handlerfunc.checkHealthResponse:
-    properties:
-      hostname:
-        type: string
-      status:
-        type: string
-    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -130,14 +130,14 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/handler.CreateUserExampleRequest'
+          $ref: '#/definitions/types.CreateUserExampleRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.Result'
+            $ref: '#/definitions/types.Result'
       summary: 创建userExample
       tags:
       - userExample
@@ -158,7 +158,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.Result'
+            $ref: '#/definitions/types.Result'
       summary: 删除userExample
       tags:
       - userExample
@@ -178,7 +178,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.Result'
+            $ref: '#/definitions/types.Result'
       summary: 获取userExample详情
       tags:
       - userExample
@@ -197,14 +197,14 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/handler.UpdateUserExampleByIDRequest'
+          $ref: '#/definitions/types.UpdateUserExampleByIDRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.Result'
+            $ref: '#/definitions/types.Result'
       summary: 更新userExample信息
       tags:
       - userExample
@@ -219,14 +219,14 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/handler.Params'
+          $ref: '#/definitions/types.Params'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.Result'
+            $ref: '#/definitions/types.Result'
       summary: 获取userExample列表
       tags:
       - userExample
@@ -241,14 +241,14 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/handler.GetUserExamplesByIDsRequest'
+          $ref: '#/definitions/types.GetUserExamplesByIDsRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.Result'
+            $ref: '#/definitions/types.Result'
       summary: 根据id数组获取userExample列表
       tags:
       - userExample

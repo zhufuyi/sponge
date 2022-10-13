@@ -8,6 +8,7 @@ import (
 	"github.com/zhufuyi/sponge/internal/cache"
 	"github.com/zhufuyi/sponge/internal/dao"
 	"github.com/zhufuyi/sponge/internal/model"
+	"github.com/zhufuyi/sponge/internal/types"
 
 	"github.com/zhufuyi/sponge/pkg/gohttp"
 	"github.com/zhufuyi/sponge/pkg/gotest"
@@ -86,7 +87,7 @@ func newUserExampleHandler() *gotest.Handler {
 func Test_userExampleHandler_Create(t *testing.T) {
 	h := newUserExampleHandler()
 	defer h.Close()
-	testData := &CreateUserExampleRequest{}
+	testData := &types.CreateUserExampleRequest{}
 	_ = copier.Copy(testData, h.TestData.(*model.UserExample))
 
 	h.MockDao.SqlMock.ExpectBegin()
@@ -105,7 +106,7 @@ func Test_userExampleHandler_Create(t *testing.T) {
 	t.Logf("%+v", result)
 	// delete the templates code start
 	result = &gohttp.StdResult{}
-	testData = &CreateUserExampleRequest{
+	testData = &types.CreateUserExampleRequest{
 		Name:     "foo",
 		Password: "f447b20a7fcbf53a5d5be013ea0b15af",
 		Email:    "foo@bar.com",
@@ -160,7 +161,7 @@ func Test_userExampleHandler_DeleteByID(t *testing.T) {
 func Test_userExampleHandler_UpdateByID(t *testing.T) {
 	h := newUserExampleHandler()
 	defer h.Close()
-	testData := &UpdateUserExampleByIDRequest{}
+	testData := &types.UpdateUserExampleByIDRequest{}
 	_ = copier.Copy(testData, h.TestData.(*model.UserExample))
 
 	h.MockDao.SqlMock.ExpectBegin()
@@ -228,7 +229,7 @@ func Test_userExampleHandler_ListByIDs(t *testing.T) {
 	h.MockDao.SqlMock.ExpectQuery("SELECT .*").WillReturnRows(rows)
 
 	result := &gohttp.StdResult{}
-	err := gohttp.Post(result, h.GetRequestURL("ListByIDs"), &GetUserExamplesByIDsRequest{IDs: []uint64{testData.ID}})
+	err := gohttp.Post(result, h.GetRequestURL("ListByIDs"), &types.GetUserExamplesByIDsRequest{IDs: []uint64{testData.ID}})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -241,7 +242,7 @@ func Test_userExampleHandler_ListByIDs(t *testing.T) {
 	assert.NoError(t, err)
 
 	// get error test
-	err = gohttp.Post(result, h.GetRequestURL("ListByIDs"), &GetUserExamplesByIDsRequest{IDs: []uint64{111}})
+	err = gohttp.Post(result, h.GetRequestURL("ListByIDs"), &types.GetUserExamplesByIDsRequest{IDs: []uint64{111}})
 	assert.NoError(t, err)
 }
 
@@ -256,7 +257,7 @@ func Test_userExampleHandler_List(t *testing.T) {
 	h.MockDao.SqlMock.ExpectQuery("SELECT .*").WillReturnRows(rows)
 
 	result := &gohttp.StdResult{}
-	err := gohttp.Post(result, h.GetRequestURL("List"), &GetUserExamplesRequest{query.Params{
+	err := gohttp.Post(result, h.GetRequestURL("List"), &types.GetUserExamplesRequest{query.Params{
 		Page: 0,
 		Size: 10,
 		Sort: "ignore count", // 忽略测试 select count(*)
@@ -272,7 +273,7 @@ func Test_userExampleHandler_List(t *testing.T) {
 	err = gohttp.Post(result, h.GetRequestURL("List"), nil)
 
 	// get error test
-	err = gohttp.Post(result, h.GetRequestURL("List"), &GetUserExamplesRequest{query.Params{
+	err = gohttp.Post(result, h.GetRequestURL("List"), &types.GetUserExamplesRequest{query.Params{
 		Page: 0,
 		Size: 10,
 	}})

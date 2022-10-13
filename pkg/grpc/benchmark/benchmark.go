@@ -92,7 +92,7 @@ func (b *bench) Run() error {
 	}
 
 	// 指定输出路径
-	outputFile := fmt.Sprintf("%sreport_%s.html", gofile.GetRunPath()+gofile.GetPathDelimiter(), b.methodName)
+	outputFile := fmt.Sprintf("%sreport_%s.html", os.TempDir()+gofile.GetPathDelimiter(), b.methodName)
 	file, err := os.Create(outputFile)
 	if err != nil {
 		return err

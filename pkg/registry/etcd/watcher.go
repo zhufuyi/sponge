@@ -2,7 +2,9 @@ package etcd
 
 import (
 	"context"
+
 	"github.com/zhufuyi/sponge/pkg/registry"
+
 	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
