@@ -8,10 +8,10 @@ import (
 )
 
 func TestIsExists(t *testing.T) {
-	ok := IsExists("/tmp/test")
-	if !ok {
-		t.Log("not exists")
-	}
+	ok := IsExists("/tmp/tmp/tmp")
+	assert.Equal(t, false, ok)
+	ok = IsExists("README.md")
+	assert.Equal(t, true, ok)
 }
 
 func TestGetRunPath(t *testing.T) {
@@ -78,10 +78,36 @@ func TestGetPathDelimiter(t *testing.T) {
 	t.Log(d)
 }
 
-func TestError(t *testing.T) {
+func TestNotMatch(t *testing.T) {
 	fn := matchPrefix("")
 	assert.Equal(t, false, fn("."))
 
 	fn = matchContain("")
 	assert.Equal(t, false, fn("."))
+
+	fn = matchSuffix("")
+	assert.NotNil(t, fn)
+}
+
+func TestIsWindows(t *testing.T) {
+	t.Log(IsWindows())
+}
+
+func TestErrorPath(t *testing.T) {
+	dir := "/notfound"
+
+	_, err := ListFiles(dir)
+	assert.Error(t, err)
+
+	_, err = ListDirsAndFiles(dir)
+	assert.Error(t, err)
+
+	err = walkDirWithFilter(dir, nil, nil)
+	assert.Error(t, err)
+
+	err = walkDir(dir, nil)
+	assert.Error(t, err)
+
+	err = walkDir2(dir, nil, nil)
+	assert.Error(t, err)
 }

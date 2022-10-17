@@ -1,8 +1,6 @@
-// Package sponge is a go microservices framework, a tool for quickly creating complete microservices code for http or grpc.
-// Generate `config`, `ecode`, `model`, `dao`, `handler`, `router`, `http`, `proto`, `service`, `grpc` code from the SQL DDL,
-// which can be combined into full services(similar to how a broken sponge cell automatically reorganises itself into a new sponge).
-//
-// combined with the [sponge](https://github.com/zhufuyi/sponge@sponge) tool to generate framework code。
+// Package sponge is a microservices framework for quickly creating http or grpc code.
+// Generate codes `config`, `ecode`, `model`, `dao`, `handler`, `router`, `http`, `proto`, `service`, `grpc` from the SQL DDL,
+// these codes can be combined into complete services (similar to how a broken sponge cell can automatically reorganize into a new sponge).
 //
 //	sponge -h
 //	sponge management tools
@@ -12,7 +10,7 @@
 //
 //	Available Commands:
 //	completion  Generate the autocompletion script for the specified shell
-//	config      Generate go config code
+//	config      Generate go config code from yaml file
 //	dao         Generate dao code
 //	grpc        Generate grpc server code
 //	handler     Generate handler code
@@ -21,4 +19,5 @@
 //	model       Generate model code
 //	proto       Generate protobuf code
 //	service     Generate grpc service code
+//	update		Update sponge to the latest version
 package sponge

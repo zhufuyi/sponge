@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"errors"
+	"strings"
 
 	pb "github.com/zhufuyi/sponge/api/serverNameExample/v1"
 	"github.com/zhufuyi/sponge/internal/cache"
@@ -53,13 +55,13 @@ func (s *userExampleService) Create(ctx context.Context, req *pb.CreateUserExamp
 	err = copier.Copy(userExample, req)
 	if err != nil {
 		logger.Warn("copier.Copy error", logger.Err(err), logger.Any("req", req))
-		return nil, ecode.StatusInternalServerError.Err()
+		return nil, ecode.StatusCreateUserExample.Err()
 	}
 
 	err = s.iDao.Create(ctx, userExample)
 	if err != nil {
 		logger.Error("s.iDao.Create error", logger.Err(err), logger.Any("userExample", userExample))
-		return nil, ecode.StatusCreateUserExample.Err()
+		return nil, ecode.StatusInternalServerError.ToRPCErr()
 	}
 
 	return &pb.CreateUserExampleReply{Id: userExample.ID}, nil
@@ -76,7 +78,7 @@ func (s *userExampleService) DeleteByID(ctx context.Context, req *pb.DeleteUserE
 	err = s.iDao.DeleteByID(ctx, req.Id)
 	if err != nil {
 		logger.Error("s.iDao.DeleteByID error", logger.Err(err), logger.Any("id", req.Id))
-		return nil, ecode.StatusDeleteUserExample.Err()
+		return nil, ecode.StatusInternalServerError.ToRPCErr()
 	}
 
 	return &pb.DeleteUserExampleByIDReply{}, nil
@@ -94,14 +96,14 @@ func (s *userExampleService) UpdateByID(ctx context.Context, req *pb.UpdateUserE
 	err = copier.Copy(userExample, req)
 	if err != nil {
 		logger.Warn("copier.Copy error", logger.Err(err), logger.Any("req", req))
-		return nil, ecode.StatusInternalServerError.Err()
+		return nil, ecode.StatusUpdateUserExample.Err()
 	}
 	userExample.ID = req.Id
 
 	err = s.iDao.UpdateByID(ctx, userExample)
 	if err != nil {
 		logger.Error("s.iDao.UpdateByID error", logger.Err(err), logger.Any("userExample", userExample))
-		return nil, ecode.StatusUpdateUserExample.Err()
+		return nil, ecode.StatusInternalServerError.ToRPCErr()
 	}
 
 	return &pb.UpdateUserExampleByIDReply{}, nil
@@ -117,18 +119,18 @@ func (s *userExampleService) GetByID(ctx context.Context, req *pb.GetUserExample
 
 	record, err := s.iDao.GetByID(ctx, req.Id)
 	if err != nil {
-		if err.Error() == query.ErrNotFound.Error() {
+		if errors.Is(err, query.ErrNotFound) {
 			logger.Warn("s.iDao.GetByID error", logger.Err(err), logger.Any("id", req.Id))
 			return nil, ecode.StatusNotFound.Err()
 		}
 		logger.Error("s.iDao.GetByID error", logger.Err(err), logger.Any("id", req.Id))
-		return nil, ecode.StatusGetUserExample.Err()
+		return nil, ecode.StatusInternalServerError.ToRPCErr()
 	}
 
 	data, err := covertUserExample(record)
 	if err != nil {
 		logger.Warn("covertUserExample error", logger.Err(err), logger.Any("record", record))
-		return nil, ecode.StatusInternalServerError.Err()
+		return nil, ecode.StatusGetUserExample.Err()
 	}
 
 	return &pb.GetUserExampleByIDReply{UserExample: data}, nil
@@ -145,7 +147,7 @@ func (s *userExampleService) ListByIDs(ctx context.Context, req *pb.ListUserExam
 	records, err := s.iDao.GetByIDs(ctx, req.Ids)
 	if err != nil {
 		logger.Error("s.iDao.GetByID error", logger.Err(err), logger.Any("ids", req.Ids))
-		return nil, ecode.StatusGetUserExample.Err()
+		return nil, ecode.StatusInternalServerError.ToRPCErr()
 	}
 
 	datas := []*pb.UserExample{}
@@ -173,14 +175,18 @@ func (s *userExampleService) List(ctx context.Context, req *pb.ListUserExampleRe
 	err = copier.Copy(params, req.Params)
 	if err != nil {
 		logger.Warn("copier.Copy error", logger.Err(err), logger.Any("params", req.Params))
-		return nil, ecode.StatusInternalServerError.Err()
+		return nil, ecode.StatusListUserExample.Err()
 	}
 	params.Size = int(req.Params.Limit)
 
 	records, total, err := s.iDao.GetByColumns(ctx, params)
 	if err != nil {
+		if strings.Contains(err.Error(), "query params error:") {
+			logger.Warn("s.iDao.GetByColumns error", logger.Err(err), logger.Any("params", params))
+			return nil, ecode.StatusInvalidParams.Err()
+		}
 		logger.Error("s.iDao.GetByColumns error", logger.Err(err), logger.Any("params", params))
-		return nil, ecode.StatusListUserExample.Err()
+		return nil, ecode.StatusInternalServerError.ToRPCErr()
 	}
 
 	datas := []*pb.UserExample{}

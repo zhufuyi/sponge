@@ -121,6 +121,53 @@ func getDialOptions() []grpc.DialOption {
 
 <br>
 
+#### 限流
+
+```go
+func getDialOptions() []grpc.DialOption {
+	var options []grpc.DialOption
+
+	// 禁用tls
+	options = append(options, grpc.WithTransportCredentials(insecure.NewCredentials()))
+
+	// circuit breaker
+	option := grpc.WithUnaryInterceptor(
+		grpc_middleware.ChainUnaryClient(
+			interceptor.UnaryRateLimit(),
+		),
+	)
+	options = append(options, option)
+
+	return options
+}
+```
+
+<br>
+
+
+#### 熔断器
+
+```go
+func getDialOptions() []grpc.DialOption {
+	var options []grpc.DialOption
+
+	// 禁用tls
+	options = append(options, grpc.WithTransportCredentials(insecure.NewCredentials()))
+
+	// circuit breaker
+	option := grpc.WithUnaryInterceptor(
+		grpc_middleware.ChainUnaryClient(
+			interceptor.UnaryClientCircuitBreaker(),
+		),
+	)
+	options = append(options, option)
+
+	return options
+}
+```
+
+<br>
+
 #### timeout
 
 ```go
@@ -209,8 +256,3 @@ func SpanDemo(serviceName string, spanName string, ctx context.Context) {
 使用示例 [metrics](../metrics/README.md)。
 
 <br>
-
-#### hystrix
-
-使用示例 [hystrix](../hystrix/README.md)。
-

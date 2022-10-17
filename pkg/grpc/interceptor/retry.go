@@ -12,7 +12,7 @@ import (
 
 var (
 	// 默认触发重试的错误码
-	defaultErrCodes = []codes.Code{codes.Unavailable}
+	defaultErrCodes = []codes.Code{codes.Internal}
 )
 
 // RetryOption set the retry retryOptions.

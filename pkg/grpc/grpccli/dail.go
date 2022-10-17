@@ -66,9 +66,9 @@ func dial(ctx context.Context, endpoint string, isSecure bool, opts ...Option) (
 		clientOptions = append(clientOptions, grpc.WithDefaultServiceConfig(`{"loadBalancingConfig": [{"round_robin":{}}]}`))
 	}
 
-	// 熔断器 hystrix
-	if o.enableHystrix {
-		unaryClientInterceptors = append(unaryClientInterceptors, interceptor.UnaryClientHystrix(o.hystrixName))
+	// 熔断器
+	if o.enableCircuitBreaker {
+		unaryClientInterceptors = append(unaryClientInterceptors, interceptor.UnaryClientCircuitBreaker())
 	}
 
 	// 重试 retry

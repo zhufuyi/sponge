@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"errors"
+
 	"github.com/zhufuyi/sponge/internal/cache"
 	"github.com/zhufuyi/sponge/internal/dao"
 	"github.com/zhufuyi/sponge/internal/ecode"
@@ -64,14 +66,14 @@ func (h *userExampleHandler) Create(c *gin.Context) {
 	err = copier.Copy(userExample, form)
 	if err != nil {
 		logger.Warn("Copy error", logger.Err(err), logger.Any("form", form), utils.FieldRequestIDFromContext(c))
-		response.Error(c, ecode.InternalServerError)
+		response.Error(c, ecode.ErrCreateUserExample)
 		return
 	}
 
 	err = h.iDao.Create(c.Request.Context(), userExample)
 	if err != nil {
 		logger.Error("Create error", logger.Err(err), logger.Any("form", form), utils.FieldRequestIDFromContext(c))
-		response.Error(c, ecode.ErrCreateUserExample)
+		response.Output(c, ecode.InternalServerError.ToHTTPCode())
 		return
 	}
 
@@ -96,7 +98,7 @@ func (h *userExampleHandler) DeleteByID(c *gin.Context) {
 	err := h.iDao.DeleteByID(c.Request.Context(), id)
 	if err != nil {
 		logger.Error("DeleteByID error", logger.Err(err), logger.Any("id", id), utils.FieldRequestIDFromContext(c))
-		response.Error(c, ecode.ErrDeleteUserExample)
+		response.Output(c, ecode.InternalServerError.ToHTTPCode())
 		return
 	}
 
@@ -132,14 +134,14 @@ func (h *userExampleHandler) UpdateByID(c *gin.Context) {
 	err = copier.Copy(userExample, form)
 	if err != nil {
 		logger.Warn("Copy error", logger.Err(err), logger.Any("form", form), utils.FieldRequestIDFromContext(c))
-		response.Error(c, ecode.InternalServerError)
+		response.Error(c, ecode.ErrUpdateUserExample)
 		return
 	}
 
 	err = h.iDao.UpdateByID(c.Request.Context(), userExample)
 	if err != nil {
 		logger.Error("UpdateByID error", logger.Err(err), logger.Any("form", form), utils.FieldRequestIDFromContext(c))
-		response.Error(c, ecode.ErrUpdateUserExample)
+		response.Output(c, ecode.InternalServerError.ToHTTPCode())
 		return
 	}
 
@@ -163,12 +165,12 @@ func (h *userExampleHandler) GetByID(c *gin.Context) {
 
 	userExample, err := h.iDao.GetByID(c.Request.Context(), id)
 	if err != nil {
-		if err.Error() == query.ErrNotFound.Error() {
+		if errors.Is(err, query.ErrNotFound) {
 			logger.Warn("GetByID not found", logger.Err(err), logger.Any("id", id), utils.FieldRequestIDFromContext(c))
 			response.Error(c, ecode.NotFound)
 		} else {
 			logger.Error("GetByID error", logger.Err(err), logger.Any("id", id), utils.FieldRequestIDFromContext(c))
-			response.Error(c, ecode.ErrGetUserExample)
+			response.Output(c, ecode.InternalServerError.ToHTTPCode())
 		}
 		return
 	}
@@ -177,7 +179,7 @@ func (h *userExampleHandler) GetByID(c *gin.Context) {
 	err = copier.Copy(data, userExample)
 	if err != nil {
 		logger.Warn("Copy error", logger.Err(err), logger.Any("id", id), utils.FieldRequestIDFromContext(c))
-		response.Error(c, ecode.InternalServerError)
+		response.Error(c, ecode.ErrGetUserExample)
 		return
 	}
 	data.ID = idStr
@@ -206,14 +208,15 @@ func (h *userExampleHandler) ListByIDs(c *gin.Context) {
 	userExamples, err := h.iDao.GetByIDs(c.Request.Context(), form.IDs)
 	if err != nil {
 		logger.Error("GetByIDs error", logger.Err(err), logger.Any("form", form), utils.FieldRequestIDFromContext(c))
-		response.Error(c, ecode.ErrListUserExample)
+		response.Output(c, ecode.InternalServerError.ToHTTPCode())
+
 		return
 	}
 
 	data, err := convertUserExamples(userExamples)
 	if err != nil {
 		logger.Warn("Copy error", logger.Err(err), logger.Any("form", form), utils.FieldRequestIDFromContext(c))
-		response.Error(c, ecode.InternalServerError)
+		response.Error(c, ecode.ErrListUserExample)
 		return
 	}
 
@@ -243,14 +246,14 @@ func (h *userExampleHandler) List(c *gin.Context) {
 	userExamples, total, err := h.iDao.GetByColumns(c.Request.Context(), &form.Params)
 	if err != nil {
 		logger.Error("GetByColumns error", logger.Err(err), logger.Any("form", form), utils.FieldRequestIDFromContext(c))
-		response.Error(c, ecode.ErrListUserExample)
+		response.Output(c, ecode.InternalServerError.ToHTTPCode())
 		return
 	}
 
 	data, err := convertUserExamples(userExamples)
 	if err != nil {
 		logger.Warn("Copy error", logger.Err(err), logger.Any("form", form), utils.FieldRequestIDFromContext(c))
-		response.Error(c, ecode.InternalServerError)
+		response.Error(c, ecode.ErrListUserExample)
 		return
 	}
 

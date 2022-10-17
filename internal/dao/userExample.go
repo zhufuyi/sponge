@@ -116,7 +116,7 @@ func (d *userExampleDao) GetByID(ctx context.Context, id uint64) (*model.UserExa
 		err = d.db.WithContext(ctx).Where("id = ?", id).First(table).Error
 		if err != nil {
 			// if data is empty, set not found cache to prevent cache penetration(防止缓存穿透)
-			if err.Error() == model.ErrRecordNotFound.Error() {
+			if errors.Is(err, model.ErrRecordNotFound) {
 				err = d.cache.SetCacheWithNotFound(ctx, id)
 				if err != nil {
 					return nil, err
@@ -214,7 +214,7 @@ func (d *userExampleDao) GetByIDs(ctx context.Context, ids []uint64) ([]*model.U
 func (d *userExampleDao) GetByColumns(ctx context.Context, params *query.Params) ([]*model.UserExample, int64, error) {
 	queryStr, args, err := params.ConvertToGormConditions()
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, errors.New("query params error: " + err.Error())
 	}
 
 	var total int64

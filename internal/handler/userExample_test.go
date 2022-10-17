@@ -125,7 +125,7 @@ func Test_userExampleHandler_Create(t *testing.T) {
 	h.MockDao.SqlMock.ExpectCommit()
 	result = &gohttp.StdResult{}
 	err = gohttp.Post(result, h.GetRequestURL("Create"), testData)
-	assert.NoError(t, err)
+	assert.Error(t, err)
 	// delete the templates code end
 }
 
@@ -155,7 +155,7 @@ func Test_userExampleHandler_DeleteByID(t *testing.T) {
 
 	// delete error test
 	err = gohttp.Delete(result, h.GetRequestURL("DeleteByID", 111))
-	assert.NoError(t, err)
+	assert.Error(t, err)
 }
 
 func Test_userExampleHandler_UpdateByID(t *testing.T) {
@@ -185,7 +185,7 @@ func Test_userExampleHandler_UpdateByID(t *testing.T) {
 
 	// update error test
 	err = gohttp.Put(result, h.GetRequestURL("UpdateByID", 111), testData)
-	assert.NoError(t, err)
+	assert.Error(t, err)
 }
 
 func Test_userExampleHandler_GetByID(t *testing.T) {
@@ -215,7 +215,7 @@ func Test_userExampleHandler_GetByID(t *testing.T) {
 
 	// get error test
 	err = gohttp.Get(result, h.GetRequestURL("GetByID", 111))
-	assert.NoError(t, err)
+	assert.Error(t, err)
 }
 
 func Test_userExampleHandler_ListByIDs(t *testing.T) {
@@ -243,7 +243,7 @@ func Test_userExampleHandler_ListByIDs(t *testing.T) {
 
 	// get error test
 	err = gohttp.Post(result, h.GetRequestURL("ListByIDs"), &types.GetUserExamplesByIDsRequest{IDs: []uint64{111}})
-	assert.NoError(t, err)
+	assert.Error(t, err)
 }
 
 func Test_userExampleHandler_List(t *testing.T) {

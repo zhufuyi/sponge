@@ -29,7 +29,7 @@ func Test_dial(t *testing.T) {
 		WithEnableLog(zap.NewNop()),
 		WithEnableMetrics(),
 		WithEnableLoadBalance(),
-		WithEnableHystrix("foo"),
+		WithEnableCircuitBreaker(),
 		WithEnableRetry(),
 		WithDiscovery(etcd.New(&clientv3.Client{})),
 	)

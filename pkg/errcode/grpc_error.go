@@ -2,6 +2,7 @@ package errcode
 
 import (
 	"fmt"
+	"strings"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -58,26 +59,64 @@ func (g *GRPCStatus) Err(details ...Detail) error {
 	return status.Errorf(g.status.Code(), "%s details = %v", g.status.Message(), dts)
 }
 
-// ToRPCCode 转换为RPC识别的错误码，避免返回Unknown状态码
-func ToRPCCode(code codes.Code) codes.Code {
-	switch code {
+// ToRPCErr converted to standard RPC error
+func (g *GRPCStatus) ToRPCErr(desc ...string) error {
+	switch g.status.Code() {
 	case StatusInternalServerError.status.Code():
-		code = codes.Internal
+		return toRPCErr(codes.Internal, desc...)
 	case StatusInvalidParams.status.Code():
-		code = codes.InvalidArgument
+		return toRPCErr(codes.InvalidArgument, desc...)
 	case StatusUnauthorized.status.Code():
-		code = codes.Unauthenticated
+		return toRPCErr(codes.Unauthenticated, desc...)
 	case StatusNotFound.status.Code():
-		code = codes.NotFound
+		return toRPCErr(codes.NotFound, desc...)
 	case StatusDeadlineExceeded.status.Code():
-		code = codes.DeadlineExceeded
+		return toRPCErr(codes.DeadlineExceeded, desc...)
 	case StatusAccessDenied.status.Code():
-		code = codes.PermissionDenied
+		return toRPCErr(codes.PermissionDenied, desc...)
 	case StatusLimitExceed.status.Code():
-		code = codes.ResourceExhausted
+		return toRPCErr(codes.ResourceExhausted, desc...)
 	case StatusMethodNotAllowed.status.Code():
-		code = codes.Unimplemented
+		return toRPCErr(codes.Unimplemented, desc...)
+	case StatusServiceUnavailable.status.Code():
+		return toRPCErr(codes.Unavailable, desc...)
 	}
 
-	return code
+	return g.status.Err()
+}
+
+func toRPCErr(code codes.Code, descs ...string) error {
+	var desc string
+	if len(descs) > 0 {
+		desc = strings.Join(descs, ", ")
+	} else {
+		desc = code.String()
+	}
+	return status.New(code, desc).Err()
+}
+
+// ToRPCCode converted to standard RPC error code
+func (g *GRPCStatus) ToRPCCode() codes.Code {
+	switch g.status.Code() {
+	case StatusInternalServerError.status.Code():
+		return codes.Internal
+	case StatusInvalidParams.status.Code():
+		return codes.InvalidArgument
+	case StatusUnauthorized.status.Code():
+		return codes.Unauthenticated
+	case StatusNotFound.status.Code():
+		return codes.NotFound
+	case StatusDeadlineExceeded.status.Code():
+		return codes.DeadlineExceeded
+	case StatusAccessDenied.status.Code():
+		return codes.PermissionDenied
+	case StatusLimitExceed.status.Code():
+		return codes.ResourceExhausted
+	case StatusMethodNotAllowed.status.Code():
+		return codes.Unimplemented
+	case StatusServiceUnavailable.status.Code():
+		return codes.Unavailable
+	}
+
+	return g.status.Code()
 }

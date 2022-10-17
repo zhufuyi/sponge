@@ -10,7 +10,10 @@ import (
 // IsExists 判断文件或文件夹是否存在
 func IsExists(path string) bool {
 	_, err := os.Stat(path)
-	return err == nil
+	if err != nil {
+		return !os.IsNotExist(err)
+	}
+	return true
 }
 
 // GetRunPath 获取程序执行的绝对路径
@@ -29,10 +32,15 @@ func GetFilename(filePath string) string {
 	return name
 }
 
+// IsWindows 判断是否window环境
+func IsWindows() bool {
+	return runtime.GOOS == "windows"
+}
+
 // GetPathDelimiter 根据系统类型获取分隔符
 func GetPathDelimiter() string {
 	delimiter := "/"
-	if runtime.GOOS == "windows" {
+	if IsWindows() {
 		delimiter = "\\"
 	}
 

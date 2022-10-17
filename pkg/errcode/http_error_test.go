@@ -35,7 +35,7 @@ func TestNewError(t *testing.T) {
 	}
 	var httpCodes []int
 	for _, e := range errorsCodes {
-		httpCodes = append(httpCodes, e.StatusCode())
+		httpCodes = append(httpCodes, e.ToHTTPCode())
 	}
 	t.Log(httpCodes)
 

@@ -42,34 +42,33 @@ gin中间件插件。
 
 <br>
 
-### qps限流
+### 限流
 
-#### path维度的qps限流
+#### 方式一：根据硬件资源自适应限流
+
+```go
+	r := gin.Default()
+
+    // e.g. (1) use default
+    // r.Use(RateLimit())
+    
+    // e.g. (2) custom parameters
+    r.Use(RateLimit(
+    WithWindow(time.Second*10),
+    WithBucket(100),
+    WithCPUThreshold(100),
+    WithCPUQuota(0.5),
+    ))
+```
+
+<br>
+
+### 熔断器
 
 ```go
     r := gin.Default()
-
-    // path, 默认qps=500, burst=1000
-    r.Use(ratelimiter.QPS())
-
-    // path, 自定义qps=50, burst=100
-    r.Use(ratelimiter.QPS(
-        ratelimiter.WithQPS(50),
-        ratelimiter.WithBurst(100),
-    ))
+    r.Use(CircuitBreaker())
 ```
-
-#### ip维度的qps限流
-
-```go
-    // ip, 自定义qps=40, burst=80
-    r.Use(ratelimiter.QPS(
-        ratelimiter.WithIP(),
-        ratelimiter.WithQPS(40),
-        ratelimiter.WithBurst(80),
-    ))
-```
-
 <br>
 
 ### jwt鉴权

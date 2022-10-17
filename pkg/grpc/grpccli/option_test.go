@@ -37,12 +37,11 @@ func TestWithDiscovery(t *testing.T) {
 	assert.NotEqual(t, testData, o.discovery)
 }
 
-func TestWithEnableHystrix(t *testing.T) {
-	testData := "hystrix"
-	opt := WithEnableHystrix(testData)
+func TestWithEnableCircuitBreaker(t *testing.T) {
+	opt := WithEnableCircuitBreaker()
 	o := new(options)
 	o.apply(opt)
-	assert.Equal(t, testData, o.hystrixName)
+	assert.Equal(t, true, o.enableCircuitBreaker)
 }
 
 func TestWithEnableLoadBalance(t *testing.T) {

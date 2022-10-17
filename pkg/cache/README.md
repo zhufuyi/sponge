@@ -41,7 +41,7 @@ func (d *userExampleDao) GetByID(ctx context.Context, id uint64) (*model.UserExa
 		err := d.db.WithContext(ctx).Where("id = ?", id).First(table).Error
 		if err != nil {
 			// if data is empty, set not found cache to prevent cache penetration(防止缓存穿透)
-			if err.Error() == model.ErrRecordNotFound.Error() {
+			if errors.Is(err, model.ErrRecordNotFound) {
 				err = d.cache.SetCacheWithNotFound(ctx, id)
 				if err != nil {
 					return nil, err

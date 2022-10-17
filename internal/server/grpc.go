@@ -115,9 +115,12 @@ func (s *grpcServer) serverOptions() []grpc.ServerOption {
 
 	// limit 拦截器
 	if config.Get().App.EnableLimit {
-		unaryServerInterceptors = append(unaryServerInterceptors, interceptor.UnaryServerRateLimit(
-			interceptor.WithRateLimitQPS(config.Get().RateLimiter.QPSLimit),
-		))
+		unaryServerInterceptors = append(unaryServerInterceptors, interceptor.UnaryServerRateLimit())
+	}
+
+	// circuit breaker 拦截器
+	if config.Get().App.EnableCircuitBreaker {
+		unaryServerInterceptors = append(unaryServerInterceptors, interceptor.UnaryServerCircuitBreaker())
 	}
 
 	// trace 拦截器

@@ -6,6 +6,7 @@
 *.dylib
 *.log
 cmd/serverNameExample/serverNameExample
+cmd/sponge/sponge
 *@@*@@*
 coverage.txt
 

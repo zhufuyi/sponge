@@ -187,7 +187,7 @@ const docTemplate = `{
         },
         "/api/v1/userExamples/ids": {
             "post": {
-                "description": "使用post请求，根据id数组获取userExample列表",
+                "description": "使用post请求，根据多个id获取userExample列表",
                 "consumes": [
                     "application/json"
                 ],
@@ -197,7 +197,7 @@ const docTemplate = `{
                 "tags": [
                     "userExample"
                 ],
-                "summary": "根据id数组获取userExample列表",
+                "summary": "根据多个id获取userExample列表",
                 "parameters": [
                     {
                         "description": "id 数组",
@@ -332,6 +332,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "ids": {
+                    "description": "id列表",
                     "type": "array",
                     "minItems": 1,
                     "items": {

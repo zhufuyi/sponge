@@ -80,6 +80,10 @@ func Output(c *gin.Context, code int, msg ...interface{}) {
 		respJSONWithStatusCode(c, http.StatusConflict, errcode.AlreadyExists.Msg(), msg...)
 	case http.StatusInternalServerError:
 		respJSONWithStatusCode(c, http.StatusInternalServerError, errcode.InternalServerError.Msg(), msg...)
+	case http.StatusTooManyRequests:
+		respJSONWithStatusCode(c, http.StatusTooManyRequests, errcode.LimitExceed.Msg(), msg...)
+	case http.StatusServiceUnavailable:
+		respJSONWithStatusCode(c, http.StatusServiceUnavailable, errcode.MethodServiceUnavailable.Msg(), msg...)
 
 	default:
 		respJSONWithStatusCode(c, code, http.StatusText(code), msg...)

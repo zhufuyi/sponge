@@ -60,8 +60,8 @@ func (e *Error) WithDetails(details ...string) *Error {
 	return &newError
 }
 
-// StatusCode 对应http错误码
-func (e *Error) StatusCode() int {
+// ToHTTPCode 转换为http错误码
+func (e *Error) ToHTTPCode() int {
 	switch e.Code() {
 	case Success.Code():
 		return http.StatusOK

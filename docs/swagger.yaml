@@ -51,6 +51,7 @@ definitions:
   types.GetUserExamplesByIDsRequest:
     properties:
       ids:
+        description: id列表
         items:
           type: integer
         minItems: 1
@@ -234,7 +235,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: 使用post请求，根据id数组获取userExample列表
+      description: 使用post请求，根据多个id获取userExample列表
       parameters:
       - description: id 数组
         in: body
@@ -249,7 +250,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/types.Result'
-      summary: 根据id数组获取userExample列表
+      summary: 根据多个id获取userExample列表
       tags:
       - userExample
   /health:

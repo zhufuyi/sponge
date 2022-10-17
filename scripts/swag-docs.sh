@@ -13,3 +13,4 @@ swag init -g cmd/serverNameExample/main.go
 
 echo ""
 echo "run server and see docs by http://${HOST_ADDR}:8080/swagger/index.html"
+echo ""

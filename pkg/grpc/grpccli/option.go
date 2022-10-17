@@ -25,12 +25,11 @@ type options struct {
 	enableLog bool // 是否开启日志
 	log       *zap.Logger
 
-	enableTrace       bool   // 是否开启链路跟踪
-	enableMetrics     bool   // 是否开启指标
-	enableRetry       bool   // 是否开启重试
-	enableLoadBalance bool   // 是否开启负载均衡器
-	enableHystrix     bool   // 是否开启熔断
-	hystrixName       string // hystrix命令名称
+	enableTrace          bool // 是否开启链路跟踪
+	enableMetrics        bool // 是否开启指标
+	enableRetry          bool // 是否开启重试
+	enableLoadBalance    bool // 是否开启负载均衡器
+	enableCircuitBreaker bool // 是否开启熔断器
 
 	discovery registry.Discovery // 服务发现接口
 }
@@ -97,11 +96,10 @@ func WithEnableRetry() Option {
 	}
 }
 
-// WithEnableHystrix enable hystrix
-func WithEnableHystrix(name string) Option {
+// WithEnableCircuitBreaker enable circuit breaker
+func WithEnableCircuitBreaker() Option {
 	return func(o *options) {
-		o.enableHystrix = true
-		o.hystrixName = name
+		o.enableCircuitBreaker = true
 	}
 }
 

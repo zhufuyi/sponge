@@ -2,17 +2,15 @@ package routers
 
 import (
 	"net/http"
-	"strings"
-
-	"github.com/zhufuyi/sponge/docs"
-	"github.com/zhufuyi/sponge/internal/config"
 
 	"github.com/zhufuyi/sponge/pkg/gin/handlerfunc"
 	"github.com/zhufuyi/sponge/pkg/gin/middleware"
 	"github.com/zhufuyi/sponge/pkg/gin/middleware/metrics"
-	"github.com/zhufuyi/sponge/pkg/gin/middleware/ratelimiter"
 	"github.com/zhufuyi/sponge/pkg/gin/validator"
 	"github.com/zhufuyi/sponge/pkg/logger"
+
+	"github.com/zhufuyi/sponge/docs"
+	"github.com/zhufuyi/sponge/internal/config"
 
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
@@ -53,14 +51,12 @@ func NewRouter() *gin.Engine {
 
 	// limit 中间件
 	if config.Get().App.EnableLimit {
-		opts := []ratelimiter.Option{
-			ratelimiter.WithQPS(config.Get().RateLimiter.QPSLimit),
-			ratelimiter.WithBurst(config.Get().RateLimiter.MaxLimit),
-		}
-		if strings.ToUpper(config.Get().RateLimiter.Dimension) == "IP" {
-			opts = append(opts, ratelimiter.WithIP())
-		}
-		r.Use(ratelimiter.QPS(opts...))
+		r.Use(middleware.RateLimit())
+	}
+
+	// circuit breaker 中间件
+	if config.Get().App.EnableCircuitBreaker {
+		r.Use(middleware.CircuitBreaker())
 	}
 
 	// trace 中间件

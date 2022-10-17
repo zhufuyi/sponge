@@ -34,13 +34,23 @@ func TestToRPCCode(t *testing.T) {
 		StatusDeadlineExceeded,
 		StatusAccessDenied,
 		StatusMethodNotAllowed,
+		StatusServiceUnavailable,
 	}
 
 	var codes []string
 	for _, s := range status {
-		codes = append(codes, ToRPCCode(s.status.Code()).String())
+		codes = append(codes, s.ToRPCCode().String())
 	}
 	t.Log(codes)
+	var errors []error
+	for i, s := range status {
+		if i%2 == 0 {
+			errors = append(errors, s.ToRPCErr())
+			continue
+		}
+		errors = append(errors, s.ToRPCErr(s.status.Message()))
+	}
+	t.Log(errors)
 }
 
 func TestGCode(t *testing.T) {

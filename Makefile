@@ -61,11 +61,45 @@ cover:
 	go tool cover -html=cover.out
 
 
+.PHONY: docs
+# generate swagger docs, the host address can be changed via parameters, e.g. make docs HOST=192.168.3.37
+docs: mod fmt
+	@bash scripts/swag-docs.sh $(HOST)
+
+
+.PHONY: graph
+# generate interactive visual function dependency graphs
+graph:
+	@echo "generating graph ......"
+	@cp -f cmd/serverNameExample/main.go .
+	go-callvis -skipbrowser -format=svg -nostd -file=serverNameExample github.com/zhufuyi/sponge
+	@rm -f main.go serverNameExample.gv
+
+
+.PHONY: proto
+# generate *.pb.go codes from *.proto files
+proto: mod fmt
+	@bash scripts/protoc.sh
+
+
+.PHONY: proto-doc
+# generate doc from *.proto files
+proto-doc:
+	@bash scripts/proto-doc.sh
+
+
 .PHONY: build
-# go build the linux amd64 binary file
+# build serverNameExample for linux amd64 binary
 build:
+	@echo "building 'serverNameExample', binary file will output to 'cmd/serverNameExample'"
 	@cd cmd/serverNameExample && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GOPROXY=https://goproxy.cn,direct go build -gcflags "all=-N -l"
-	@echo "build finished, binary file in path 'cmd/serverNameExample'"
+
+
+.PHONY: build-sponge
+# build sponge for linux amd64 binary
+build-sponge:
+	@echo "building 'sponge', binary file will output to 'cmd/sponge'"
+	@cd cmd/sponge && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GOPROXY=https://goproxy.cn,direct go build
 
 
 .PHONY: run
@@ -118,36 +152,10 @@ deploy-docker:
 # clean binary file, cover.out, redundant dependency packages
 clean:
 	@rm -vrf cmd/serverNameExample/serverNameExample
+	@rm -vrf cmd/sponge/sponge
 	@rm -vrf cover.out
 	go mod tidy
 	@echo "clean finished"
-
-
-.PHONY: docs
-# generate swagger docs, the host address can be changed via parameters, e.g. make docs HOST=192.168.3.37
-docs: mod fmt
-	@bash scripts/swag-docs.sh $(HOST)
-
-
-.PHONY: graph
-# generate interactive visual function dependency graphs
-graph:
-	@echo "generating graph ......"
-	@cp -f cmd/serverNameExample/main.go .
-	go-callvis -skipbrowser -format=svg -nostd -file=serverNameExample github.com/zhufuyi/sponge
-	@rm -f main.go serverNameExample.gv
-
-
-.PHONY: proto
-# generate *.pb.go codes from *.proto files
-proto: mod fmt
-	@bash scripts/protoc.sh
-
-
-.PHONY: proto-doc
-# generate doc from *.proto files
-proto-doc:
-	@bash scripts/proto-doc.sh
 
 
 # show help

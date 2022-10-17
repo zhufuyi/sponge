@@ -20,9 +20,10 @@ var (
 	StatusForbidden           = errcode.StatusForbidden
 	StatusLimitExceed         = errcode.StatusLimitExceed
 
-	StatusDeadlineExceeded = errcode.StatusDeadlineExceeded
-	StatusAccessDenied     = errcode.StatusAccessDenied
-	StatusMethodNotAllowed = errcode.StatusMethodNotAllowed
+	StatusDeadlineExceeded   = errcode.StatusDeadlineExceeded
+	StatusAccessDenied       = errcode.StatusAccessDenied
+	StatusMethodNotAllowed   = errcode.StatusMethodNotAllowed
+	StatusServiceUnavailable = errcode.StatusServiceUnavailable
 )
 
 // Any kev-value

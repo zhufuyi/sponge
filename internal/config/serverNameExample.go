@@ -9,9 +9,9 @@ import (
 
 var config *Config
 
-func Init(configFile string) error {
+func Init(configFile string, fs ...func()) error {
 	config = &Config{}
-	return conf.Parse(configFile, config)
+	return conf.Parse(configFile, config, fs...)
 }
 
 func Show() string {
@@ -30,15 +30,14 @@ func Set(conf *Config) {
 }
 
 type Config struct {
-	App         App         `yaml:"app" json:"app"`
-	Etcd        Etcd        `yaml:"etcd" json:"etcd"`
-	Grpc        Grpc        `yaml:"grpc" json:"grpc"`
-	HTTP        HTTP        `yaml:"http" json:"http"`
-	Jaeger      Jaeger      `yaml:"jaeger" json:"jaeger"`
-	Logger      Logger      `yaml:"logger" json:"logger"`
-	Mysql       Mysql       `yaml:"mysql" json:"mysql"`
-	RateLimiter RateLimiter `yaml:"rateLimiter" json:"rateLimiter"`
-	Redis       Redis       `yaml:"redis" json:"redis"`
+	App    App    `yaml:"app" json:"app"`
+	Etcd   Etcd   `yaml:"etcd" json:"etcd"`
+	Grpc   Grpc   `yaml:"grpc" json:"grpc"`
+	HTTP   HTTP   `yaml:"http" json:"http"`
+	Jaeger Jaeger `yaml:"jaeger" json:"jaeger"`
+	Logger Logger `yaml:"logger" json:"logger"`
+	Mysql  Mysql  `yaml:"mysql" json:"mysql"`
+	Redis  Redis  `yaml:"redis" json:"redis"`
 }
 
 type Etcd struct {
@@ -67,13 +66,8 @@ type Redis struct {
 	WriteTimeout int    `yaml:"writeTimeout" json:"writeTimeout"`
 }
 
-type RateLimiter struct {
-	Dimension string `yaml:"dimension" json:"dimension"`
-	MaxLimit  int    `yaml:"maxLimit" json:"maxLimit"`
-	QPSLimit  int    `yaml:"qpsLimit" json:"qpsLimit"`
-}
-
 type App struct {
+	EnableCircuitBreaker    bool   `yaml:"enableCircuitBreaker" json:"enableCircuitBreaker"`
 	EnableLimit             bool   `yaml:"enableLimit" json:"enableLimit"`
 	EnableMetrics           bool   `yaml:"enableMetrics" json:"enableMetrics"`
 	EnableProfile           bool   `yaml:"enableProfile" json:"enableProfile"`
@@ -85,19 +79,10 @@ type App struct {
 	Version                 string `yaml:"version" json:"version"`
 }
 
-type LogFileConfig struct {
-	Filename      string `yaml:"filename" json:"filename"`
-	IsCompression bool   `yaml:"isCompression" json:"isCompression"`
-	MaxAge        int    `yaml:"maxAge" json:"maxAge"`
-	MaxBackups    int    `yaml:"maxBackups" json:"maxBackups"`
-	MaxSize       int    `yaml:"maxSize" json:"maxSize"`
-}
-
 type Logger struct {
-	Format        string        `yaml:"format" json:"format"`
-	IsSave        bool          `yaml:"isSave" json:"isSave"`
-	Level         string        `yaml:"level" json:"level"`
-	LogFileConfig LogFileConfig `yaml:"logFileConfig" json:"logFileConfig"`
+	Format string `yaml:"format" json:"format"`
+	IsSave bool   `yaml:"isSave" json:"isSave"`
+	Level  string `yaml:"level" json:"level"`
 }
 
 type Grpc struct {

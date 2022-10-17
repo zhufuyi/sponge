@@ -14,7 +14,7 @@
 
 </div>
 
-**sponge** is a go microservices framework, a tool for quickly creating complete microservices codes for http or grpc. Generate `config`, `ecode`, `model`, `dao`, `handler`, `router`, `http`, `proto`, `service`, `grpc` codes from the SQL DDL, which can be combined into full services(similar to how a broken sponge cell automatically reorganises itself into a new sponge).
+**sponge** is a microservices framework for quickly creating http or grpc code. Generate codes `config`, `ecode`, `model`, `dao`, `handler`, `router`, `http`, `proto`, `service`, `grpc` from SQL DDL, these codes can be combined into complete services (similar to how a broken sponge cell can automatically reorganize into a new sponge).
 
 Features :
 
@@ -22,17 +22,17 @@ Features :
 - RPC framework [grpc](https://github.com/grpc/grpc-go)
 - Configuration file parsing [viper](https://github.com/spf13/viper)
 - Configuration Center [nacos](https://github.com/alibaba/nacos)
-- Logging [zap](go.uber.org/zap)
-- Database component [gorm](gorm.io/gorm)
-- Caching component [go-redis](github.com/go-redis/redis)
-- Documentation [swagger](github.com/swaggo/swag)
-- Authorization [authorization](github.com/golang-jwt/jwt)
-- Validator [validator](github.com/go-playground/validator)
-- Rate limiter [ratelimiter](golang.org/x/time/rate)
-- Circuit Breaker [hystrix](github.com/afex/hystrix-go)
-- Tracking [opentelemetry](go.opentelemetry.io/otel)
-- Monitoring [prometheus](github.com/prometheus/client_golang/prometheus) [grafana](https://github.com/grafana/grafana)
-- Service registration and discovery [etcd](https://github.com/etcd-io/etcd), [consul](https://github.com/hashicorp/consul), [nacos](https://github.com/alibaba/) nacos)
+- Logging [zap](https://go.uber.org/zap)
+- Database component [gorm](https://gorm.io/gorm)
+- Caching component [go-redis](https://github.com/go-redis/redis)
+- Documentation [swagger](https://github.com/swaggo/swag)
+- Authorization [authorization](https://github.com/golang-jwt/jwt)
+- Validator [validator](https://github.com/go-playground/validator)
+- Rate limiter [aegis](https://github.com/go-kratos/aegis), [rate](https://golang.org/x/time/rate)
+- Circuit Breaker [aegis](https://github.com/go-kratos/aegis)
+- Tracking [opentelemetry](https://go.opentelemetry.io/otel)
+- Monitoring [prometheus](https://github.com/prometheus/client_golang/prometheus), [grafana](https://github.com/grafana/grafana)
+- Service registration and discovery [etcd](https://github.com/etcd-io/etcd), [consul](https://github.com/hashicorp/consul), [nacos](https://github.com/alibaba/)
 - Performance analysis [go profile](https://go.dev/blog/pprof)
 - Code inspection [golangci-lint](https://github.com/golangci/golangci-lint)
 - Continuous Integration CI [jenkins](https://github.com/jenkinsci/jenkins)
@@ -78,7 +78,15 @@ The development specification follows the [Uber Go Language Coding Specification
 
 ### Install
 
-> go install github.com/zhufuyi/sponge@sponge
+
+
+```bash
+go install github.com/zhufuyi/sponge/cmd/sponge@latest
+
+sponge update
+```
+
+<br>
 
 ### Quickly create a http project
 
@@ -106,7 +114,7 @@ Way 1: Run locally in the binary
 
 Copy `http://localhost:8080/swagger/index.html` to your browser and test the api interface.
 
-Way 2: Run in docker
+Way 2: Run in docker. Prerequisite: `docker` and `docker-compose` are already installed.
 
 ```bash
 # Build the docker image
@@ -120,7 +128,7 @@ cd deployments/docker-compose
 docker-compose ps
 ```
 
-Way 3: Run in k8s
+Way 3: Run in k8s. Prerequisite: `docker` and `kubectl` are already installed.
 
 ```bash
 # Build the image
@@ -135,7 +143,7 @@ make deploy-k8s
 
 # Check the status of the service
 kubectl get -f account-deployment.yml
-```  
+```
 
 You can also use Jenkins to automatically build deployments to k8s.
 
@@ -208,9 +216,9 @@ make deploy-k8s
 
 # Check the status of the service
 kubectl get -f account-deployment.yml
-```  
+```
 
-You can also use Jenkins to automatically build deployments to k8s.  
+You can also use Jenkins to automatically build deployments to k8s.
 
 <br>
 

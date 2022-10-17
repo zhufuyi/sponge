@@ -19,7 +19,8 @@ var (
 	Forbidden           = errcode.Forbidden
 	LimitExceed         = errcode.LimitExceed
 
-	DeadlineExceeded = errcode.DeadlineExceeded
-	AccessDenied     = errcode.AccessDenied
-	MethodNotAllowed = errcode.MethodNotAllowed
+	DeadlineExceeded         = errcode.DeadlineExceeded
+	AccessDenied             = errcode.AccessDenied
+	MethodNotAllowed         = errcode.MethodNotAllowed
+	MethodServiceUnavailable = errcode.MethodServiceUnavailable
 )

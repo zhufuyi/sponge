@@ -14,7 +14,8 @@ var (
 	Forbidden           = NewError(100008, "拒绝访问")
 	LimitExceed         = NewError(100009, "访问限制")
 
-	DeadlineExceeded = NewError(100010, "已超过最后期限")
-	AccessDenied     = NewError(100011, "拒绝访问")
-	MethodNotAllowed = NewError(100012, "不允许使用的方法")
+	DeadlineExceeded         = NewError(100010, "已超过最后期限")
+	AccessDenied             = NewError(100011, "拒绝访问")
+	MethodNotAllowed         = NewError(100012, "不允许使用的方法")
+	MethodServiceUnavailable = NewError(100013, "服务不可用")
 )

@@ -1,0 +1,19 @@
+[
+  {
+    "name": "foo",
+    "age": 10,
+    "email": "foo@bar.com",
+    "companies": [
+      {
+        "name":"foo",
+        "address":"foo",
+        "position": "foo"
+      },
+      {
+        "name":"foo2",
+        "address":"foo2",
+        "position": "foo2"
+      }
+      ]
+ }
+]

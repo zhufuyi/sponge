@@ -29,7 +29,7 @@ func initUserExampleServiceClient() pb.UserExampleServiceClient {
 		//grpccli.WithEnableLog(logger.Get()),
 		//grpccli.WithDiscovery(discovery),
 		//grpccli.WithEnableTrace(),
-		//grpccli.WithEnableHystrix("user"),
+		//grpccli.WithEnableCircuitBreaker(),
 		//grpccli.WithEnableLoadBalance(),
 		//grpccli.WithEnableRetry(),
 		//grpccli.WithEnableMetrics(),
@@ -177,7 +177,7 @@ func Test_userExampleService_benchmark(t *testing.T) {
 			fn: func() error {
 				// todo test after filling in parameters
 				message := &pb.GetUserExampleByIDRequest{
-					Id: 3,
+					Id: 1,
 				}
 				b, err := benchmark.New(host, protoFile, "GetByID", message, 1000, importPaths...)
 				if err != nil {

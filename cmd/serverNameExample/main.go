@@ -59,13 +59,7 @@ func registerInits() []app.Init {
 	_, _ = logger.Init(
 		logger.WithLevel(config.Get().Logger.Level),
 		logger.WithFormat(config.Get().Logger.Format),
-		logger.WithSave(config.Get().Logger.IsSave,
-			logger.WithFileName(config.Get().Logger.LogFileConfig.Filename),
-			logger.WithFileMaxSize(config.Get().Logger.LogFileConfig.MaxSize),
-			logger.WithFileMaxBackups(config.Get().Logger.LogFileConfig.MaxBackups),
-			logger.WithFileMaxAge(config.Get().Logger.LogFileConfig.MaxAge),
-			logger.WithFileIsCompression(config.Get().Logger.LogFileConfig.IsCompression),
-		),
+		logger.WithSave(config.Get().Logger.IsSave),
 	)
 
 	var inits []app.Init
@@ -171,6 +165,7 @@ func grpcOptions() []server.GRPCOption {
 	return opts
 }
 
+// 使用etcd实例化服务注册，consul和nacos也类似
 func getETCDRegistry(etcdEndpoints []string, instanceName string, instanceEndpoints []string) (registry.Registry, *registry.ServiceInstance) {
 	serviceInstance := registry.NewServiceInstance(instanceName, instanceEndpoints)
 
