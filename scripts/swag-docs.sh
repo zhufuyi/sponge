@@ -2,6 +2,7 @@
 
 HOST_ADDR=$1
 
+# change host addr
 if [ "X${HOST_ADDR}" = "X" ];then
   HOST_ADDR=$(cat cmd/serverNameExample/main.go | grep "@host" | awk '{print $3}')
   HOST_ADDR=$(echo  ${HOST_ADDR} | cut -d ':' -f 1)

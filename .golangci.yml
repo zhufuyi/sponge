@@ -4,7 +4,7 @@ run:
   # timeout for analysis, e.g. 30s, 5m, default is 1m
   timeout: 10m
   # default concurrency is available CPU number
-  concurrency: 4
+  #concurrency: 4
   # include test files or not, default is true
   tests: false
   # which dirs to skip: issues from them won't be reported;

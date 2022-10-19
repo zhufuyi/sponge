@@ -1,0 +1,19 @@
+before:
+  hooks:
+    - go mod tidy
+builds:
+  - id: sponge
+    env:
+      - CGO_ENABLED=0
+    ldflags:
+      - -s -w
+    main: cmd/sponge/main.go
+    binary: sponge
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+archives:
+  - format: zip

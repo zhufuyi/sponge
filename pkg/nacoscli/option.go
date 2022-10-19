@@ -16,7 +16,7 @@ func defaultOptions() *options {
 	}
 }
 
-// Option set the jwt options.
+// Option set the nacos client options.
 type Option func(*options)
 
 func (o *options) apply(opts ...Option) {

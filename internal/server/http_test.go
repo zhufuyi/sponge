@@ -16,7 +16,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// 需要连接连接真实数据库测试
+// need real database to test
 func TestHTTPServer(t *testing.T) {
 	err := config.Init(configs.Path("serverNameExample.yml"))
 	if err != nil {
@@ -24,7 +24,7 @@ func TestHTTPServer(t *testing.T) {
 	}
 	config.Get().App.EnableMetrics = true
 	config.Get().App.EnableTracing = true
-	config.Get().App.EnableProfile = true
+	config.Get().App.EnablePprof = true
 	config.Get().App.EnableLimit = true
 
 	port, _ := utils.GetAvailablePort()
@@ -44,14 +44,14 @@ func TestHTTPServer(t *testing.T) {
 	assert.NotNil(t, server)
 }
 
-func TestHTTPServer2(t *testing.T) {
+func TestHTTPServerMock(t *testing.T) {
 	err := config.Init(configs.Path("serverNameExample.yml"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	config.Get().App.EnableMetrics = true
 	config.Get().App.EnableTracing = true
-	config.Get().App.EnableProfile = true
+	config.Get().App.EnablePprof = true
 	config.Get().App.EnableLimit = true
 	config.Get().App.EnableRegistryDiscovery = true
 

@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/zhufuyi/sponge/pkg/grpc/interceptor"
-	"github.com/zhufuyi/sponge/pkg/registry"
+	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
 
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc"

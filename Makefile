@@ -12,12 +12,8 @@ install:
 	go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28.0
 	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2.0
 	go install github.com/envoyproxy/protoc-gen-validate@v0.6.7
-	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.10.0
-	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.10.0
-	go install github.com/mohuishou/protoc-gen-go-gin@v0.1.0
 	go install github.com/srikrsna/protoc-gen-gotag@v0.6.2
 	go install github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc@v1.5.1
-	go install github.com/golang/mock/mockgen@v1.6.0
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.49.0
 	go install github.com/swaggo/swag/cmd/swag@v1.8.6
 	go install github.com/ofabry/go-callvis@v0.6.1

@@ -13,7 +13,7 @@ services:
     ports:
       - "8080:8080"   # http端口
       - "8282:8282"   # grpc服务端口
-      - "9082:9082"   # grpc metrics端口
+      - "8283:8283"   # grpc metrics端口
     # todo 根据服务类型(http或grpc)选择健康检查
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]   # http健康检查，注：镜像必须包含curl命令

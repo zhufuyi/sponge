@@ -17,6 +17,6 @@ spec:
       port: 8282
       targetPort: 8282
     - name: server-name-example-svc-grpc-metrics-port
-      port: 9082
-      targetPort: 9082
+      port: 8283
+      targetPort: 8283
 # delete the templates code end

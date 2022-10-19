@@ -3,10 +3,10 @@ package server
 import (
 	"time"
 
-	"github.com/zhufuyi/sponge/pkg/registry"
+	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
 )
 
-// GRPCOption 设置grpc
+// GRPCOption grpc settings
 type GRPCOption func(*grpcOptions)
 
 type grpcOptions struct {
@@ -16,7 +16,6 @@ type grpcOptions struct {
 	iRegistry    registry.Registry
 }
 
-// 默认设置
 func defaultGRPCOptions() *grpcOptions {
 	return &grpcOptions{
 		readTimeout:  time.Second * 3,
@@ -32,21 +31,21 @@ func (o *grpcOptions) apply(opts ...GRPCOption) {
 	}
 }
 
-// WithGRPCReadTimeout 设置read timeout
+// WithGRPCReadTimeout setting up read timeout
 func WithGRPCReadTimeout(timeout time.Duration) GRPCOption {
 	return func(o *grpcOptions) {
 		o.readTimeout = timeout
 	}
 }
 
-// WithGRPCWriteTimeout 设置writer timeout
+// WithGRPCWriteTimeout setting up writer timeout
 func WithGRPCWriteTimeout(timeout time.Duration) GRPCOption {
 	return func(o *grpcOptions) {
 		o.writeTimeout = timeout
 	}
 }
 
-// WithRegistry 设置registry
+// WithRegistry setting up registry
 func WithRegistry(iRegistry registry.Registry, instance *registry.ServiceInstance) GRPCOption {
 	return func(o *grpcOptions) {
 		o.iRegistry = iRegistry

@@ -11,13 +11,13 @@ import (
 	"github.com/zhufuyi/sponge/internal/config"
 	"github.com/zhufuyi/sponge/internal/service"
 
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/zhufuyi/sponge/pkg/app"
 	"github.com/zhufuyi/sponge/pkg/grpc/interceptor"
 	"github.com/zhufuyi/sponge/pkg/grpc/metrics"
 	"github.com/zhufuyi/sponge/pkg/logger"
-	"github.com/zhufuyi/sponge/pkg/registry"
+	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
 
-	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
 )
 
@@ -28,8 +28,9 @@ type grpcServer struct {
 	server *grpc.Server
 	listen net.Listener
 
-	metricsHTTPServer   *http.Server
-	goRunPromHTTPServer func() error
+	metricsHTTPServer     *http.Server
+	metricsHTTPServerFunc func() error
+	pprofHTTPServerFunc   func() error
 
 	iRegistry       registry.Registry
 	serviceInstance *registry.ServiceInstance
@@ -44,8 +45,14 @@ func (s *grpcServer) Start() error {
 		}
 	}
 
-	if s.goRunPromHTTPServer != nil {
-		if err := s.goRunPromHTTPServer(); err != nil {
+	if s.pprofHTTPServerFunc != nil {
+		if err := s.pprofHTTPServerFunc(); err != nil {
+			return err
+		}
+	}
+
+	if s.metricsHTTPServerFunc != nil {
+		if err := s.metricsHTTPServerFunc(); err != nil {
 			return err
 		}
 	}
@@ -83,7 +90,7 @@ func (s *grpcServer) String() string {
 	return "grpc service, addr = " + s.addr
 }
 
-// InitServerOptions 初始化rpc设置
+// InitServerOptions setting up interceptors
 func (s *grpcServer) serverOptions() []grpc.ServerOption {
 	var options []grpc.ServerOption
 
@@ -94,36 +101,28 @@ func (s *grpcServer) serverOptions() []grpc.ServerOption {
 
 	streamServerInterceptors := []grpc.StreamServerInterceptor{}
 
-	// logger 拦截器
+	// logger interceptor
 	unaryServerInterceptors = append(unaryServerInterceptors, interceptor.UnaryServerLog(
 		logger.Get(),
 	))
 
-	// metrics 拦截器
+	// metrics interceptor
 	if config.Get().App.EnableMetrics {
 		unaryServerInterceptors = append(unaryServerInterceptors, interceptor.UnaryServerMetrics())
-		s.goRunPromHTTPServer = func() error {
-			if s == nil || s.server == nil {
-				return errors.New("grpc server is nil")
-			}
-			promAddr := fmt.Sprintf(":%d", config.Get().Grpc.MetricsPort)
-			s.metricsHTTPServer = metrics.GoHTTPService(promAddr, s.server)
-			fmt.Printf("start up grpc metrics service, addr = %s\n", promAddr)
-			return nil
-		}
+		s.metricsHTTPServerFunc = s.metricsServer()
 	}
 
-	// limit 拦截器
+	// limit interceptor
 	if config.Get().App.EnableLimit {
 		unaryServerInterceptors = append(unaryServerInterceptors, interceptor.UnaryServerRateLimit())
 	}
 
-	// circuit breaker 拦截器
+	// circuit breaker interceptor
 	if config.Get().App.EnableCircuitBreaker {
 		unaryServerInterceptors = append(unaryServerInterceptors, interceptor.UnaryServerCircuitBreaker())
 	}
 
-	// trace 拦截器
+	// trace interceptor
 	if config.Get().App.EnableTracing {
 		unaryServerInterceptors = append(unaryServerInterceptors, interceptor.UnaryServerTracing())
 	}
@@ -136,7 +135,32 @@ func (s *grpcServer) serverOptions() []grpc.ServerOption {
 	return options
 }
 
-// NewGRPCServer 创建一个grpc服务
+func (s *grpcServer) metricsServer() func() error {
+	return func() error {
+		if s == nil || s.server == nil {
+			return errors.New("grpc server is nil")
+		}
+		promAddr := fmt.Sprintf(":%d", config.Get().Grpc.MetricsPort)
+		fmt.Printf("start up grpc metrics service, addr = %s\n", promAddr)
+		s.metricsHTTPServer = metrics.GoHTTPService(promAddr, s.server)
+		return nil
+	}
+}
+
+func (s *grpcServer) pprofServer() func() error {
+	return func() error {
+		pprofAddr := fmt.Sprintf(":%d", config.Get().Grpc.PprofPort)
+		fmt.Printf("start up grpc pprof service, addr = %s\n", pprofAddr)
+		go func() {
+			if err := http.ListenAndServe(pprofAddr, nil); err != nil { // default route is /debug/pprof
+				panic("listen and serve error: " + err.Error())
+			}
+		}()
+		return nil
+	}
+}
+
+// NewGRPCServer creates a new grpc server
 func NewGRPCServer(addr string, opts ...GRPCOption) app.IServer {
 	var err error
 	o := defaultGRPCOptions()
@@ -146,18 +170,15 @@ func NewGRPCServer(addr string, opts ...GRPCOption) app.IServer {
 		iRegistry:       o.iRegistry,
 		serviceInstance: o.instance,
 	}
+	if config.Get().App.EnablePprof {
+		s.pprofHTTPServerFunc = s.pprofServer()
+	}
 
-	// 监听TCP端口
 	s.listen, err = net.Listen("tcp", addr)
 	if err != nil {
 		panic(err)
 	}
-
-	// 创建grpc server对象，拦截器可以在这里注入
 	s.server = grpc.NewServer(s.serverOptions()...)
-
-	// 注册所有服务
-	service.RegisterAllService(s.server)
-
+	service.RegisterAllService(s.server) // register for all services
 	return s
 }

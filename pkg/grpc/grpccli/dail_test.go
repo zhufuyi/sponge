@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zhufuyi/sponge/pkg/registry/etcd"
+	"github.com/zhufuyi/sponge/pkg/servicerd/registry/etcd"
 
 	"github.com/stretchr/testify/assert"
 	clientv3 "go.etcd.io/etcd/client/v3"

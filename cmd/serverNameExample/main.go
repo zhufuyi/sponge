@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -14,20 +15,10 @@ import (
 	"github.com/zhufuyi/sponge/pkg/app"
 	"github.com/zhufuyi/sponge/pkg/logger"
 	"github.com/zhufuyi/sponge/pkg/nacoscli"
+	"github.com/zhufuyi/sponge/pkg/servicerd/registry/etcd"
 	"github.com/zhufuyi/sponge/pkg/tracer"
 
 	"github.com/jinzhu/copier"
-
-	// only grpc use start
-	"fmt"
-
-	"github.com/zhufuyi/sponge/pkg/registry"
-	"github.com/zhufuyi/sponge/pkg/registry/etcd"
-
-	clientv3 "go.etcd.io/etcd/client/v3"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
-	// only grpc use end
 )
 
 var (
@@ -103,7 +94,7 @@ func initConfig() {
 		_ = copier.Copy(params, &nacosConfig.Nacos)
 		err = nacoscli.Init(appConfig, params)
 		if err != nil {
-			panic(err)
+			panic(fmt.Sprintf("connect to configuration center err, %v", err))
 		}
 		if appConfig.App.Name == "" {
 			panic("read the config from center error, config data is empty")
@@ -151,38 +142,24 @@ func registerServers() []app.IServer {
 }
 
 func grpcOptions() []server.GRPCOption {
-	var opts []server.GRPCOption
+	var opts = []server.GRPCOption{
+		server.WithGRPCReadTimeout(time.Duration(config.Get().Grpc.ReadTimeout) * time.Second),
+		server.WithGRPCWriteTimeout(time.Duration(config.Get().Grpc.WriteTimeout) * time.Second),
+	}
 
 	if config.Get().App.EnableRegistryDiscovery {
-		iRegistry, instance := getETCDRegistry(
+		iRegistry, instance, err := etcd.NewRegistry(
 			config.Get().Etcd.Addrs,
 			config.Get().App.Name,
 			[]string{fmt.Sprintf("grpc://%s:%d", config.Get().App.Host, config.Get().Grpc.Port)},
 		)
+		if err != nil {
+			panic(err)
+		}
 		opts = append(opts, server.WithRegistry(iRegistry, instance))
 	}
 
 	return opts
-}
-
-// 使用etcd实例化服务注册，consul和nacos也类似
-func getETCDRegistry(etcdEndpoints []string, instanceName string, instanceEndpoints []string) (registry.Registry, *registry.ServiceInstance) {
-	serviceInstance := registry.NewServiceInstance(instanceName, instanceEndpoints)
-
-	cli, err := clientv3.New(clientv3.Config{
-		Endpoints:   etcdEndpoints,
-		DialTimeout: 5 * time.Second,
-		DialOptions: []grpc.DialOption{
-			grpc.WithBlock(),
-			grpc.WithTransportCredentials(insecure.NewCredentials()),
-		},
-	})
-	if err != nil {
-		panic(err)
-	}
-	iRegistry := etcd.New(cli)
-
-	return iRegistry, serviceInstance
 }
 
 // delete the templates code end

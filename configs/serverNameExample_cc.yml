@@ -1,5 +1,4 @@
-# 使用工具自动生成go struct
-# sponge config --server-dir=./serverNameExample
+# 生成go struct命令：sponge config --server-dir=./serverDir
 
 # nacos 设置
 nacos:

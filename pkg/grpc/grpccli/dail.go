@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 
-	"github.com/zhufuyi/sponge/pkg/discovery"
 	"github.com/zhufuyi/sponge/pkg/grpc/interceptor"
 	"github.com/zhufuyi/sponge/pkg/logger"
+	"github.com/zhufuyi/sponge/pkg/servicerd/discovery"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"

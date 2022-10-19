@@ -65,7 +65,7 @@ func NewRouter() *gin.Engine {
 	}
 
 	// profile 性能分析
-	if config.Get().App.EnableProfile {
+	if config.Get().App.EnablePprof {
 		pprof.Register(r)
 	}
 

@@ -1,0 +1,32 @@
+name: Release
+
+on:
+  create:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+
+jobs:
+  release:
+    name: Release on GitHub
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+          cache: true
+
+      - name: Create release on GitHub
+        uses: goreleaser/goreleaser-action@v3
+        with:
+          distribution: goreleaser
+          version: latest
+          args: release --rm-dist --config=.github/.goreleaser.yaml
+        env:
+          # Actions are injected automatically, no need to add secrets.GITHUB_TOKEN separately and manually.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

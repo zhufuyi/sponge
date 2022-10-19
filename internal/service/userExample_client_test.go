@@ -7,14 +7,19 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	pb "github.com/zhufuyi/sponge/api/serverNameExample/v1"
 	"github.com/zhufuyi/sponge/api/types"
 	"github.com/zhufuyi/sponge/configs"
 	"github.com/zhufuyi/sponge/internal/config"
 
+	"github.com/zhufuyi/sponge/pkg/etcdcli"
 	"github.com/zhufuyi/sponge/pkg/grpc/benchmark"
 	"github.com/zhufuyi/sponge/pkg/grpc/grpccli"
+	"github.com/zhufuyi/sponge/pkg/servicerd/registry/etcd"
+
+	"go.uber.org/zap"
 )
 
 func initUserExampleServiceClient() pb.UserExampleServiceClient {
@@ -22,18 +27,35 @@ func initUserExampleServiceClient() pb.UserExampleServiceClient {
 	if err != nil {
 		panic(err)
 	}
-	addr := fmt.Sprintf("127.0.0.1:%d", config.Get().Grpc.Port)
+	endpoint := fmt.Sprintf("127.0.0.1:%d", config.Get().Grpc.Port)
 
-	conn, err := grpccli.DialInsecure(context.Background(),
-		addr,
-		//grpccli.WithEnableLog(logger.Get()),
-		//grpccli.WithDiscovery(discovery),
-		//grpccli.WithEnableTrace(),
-		//grpccli.WithEnableCircuitBreaker(),
+	var cliOptions = []grpccli.Option{
+		grpccli.WithEnableLog(zap.NewNop()),
 		//grpccli.WithEnableLoadBalance(),
 		//grpccli.WithEnableRetry(),
-		//grpccli.WithEnableMetrics(),
-	)
+	}
+	if config.Get().App.EnableRegistryDiscovery {
+		// 用etcd来测试，测试前通过命令etcdctl get / --prefix查看是否有服务注册，注：IDE使用代理可能会造成连接etcd服务失败
+		cli, err := etcdcli.Init(config.Get().Etcd.Addrs, etcdcli.WithDialTimeout(time.Second*2))
+		if err != nil {
+			panic(err)
+		}
+		iDiscovery := etcd.New(cli)
+
+		endpoint = "discovery:///" + config.Get().App.Name // 通过服务名称连接grpc服务
+		cliOptions = append(cliOptions, grpccli.WithDiscovery(iDiscovery))
+	}
+	if config.Get().App.EnableTracing {
+		cliOptions = append(cliOptions, grpccli.WithEnableTrace())
+	}
+	if config.Get().App.EnableCircuitBreaker {
+		cliOptions = append(cliOptions, grpccli.WithEnableCircuitBreaker())
+	}
+	if config.Get().App.EnableMetrics {
+		cliOptions = append(cliOptions, grpccli.WithEnableMetrics())
+	}
+
+	conn, err := grpccli.DialInsecure(context.Background(), endpoint, cliOptions...)
 	if err != nil {
 		panic(err)
 	}
@@ -45,7 +67,7 @@ func initUserExampleServiceClient() pb.UserExampleServiceClient {
 // 通过客户端测试userExample的各个方法
 func Test_userExampleService_methods(t *testing.T) {
 	cli := initUserExampleServiceClient()
-	ctx := context.Background()
+	ctx, _ := context.WithTimeout(context.Background(), time.Second*3)
 
 	tests := []struct {
 		name    string
@@ -62,9 +84,9 @@ func Test_userExampleService_methods(t *testing.T) {
 					Name:     "foo7",
 					Email:    "foo7@bar.com",
 					Password: "f447b20a7fcbf53a5d5be013ea0b15af",
-					Phone:    "18666666666",
+					Phone:    "16000000000",
 					Avatar:   "http://internal.com/7.jpg",
-					Age:      21,
+					Age:      11,
 					Gender:   2,
 				})
 			},
@@ -77,8 +99,8 @@ func Test_userExampleService_methods(t *testing.T) {
 				// todo test after filling in parameters
 				return cli.UpdateByID(ctx, &pb.UpdateUserExampleByIDRequest{
 					Id:    7,
-					Phone: "18666666666",
-					Age:   21,
+					Phone: "16000000001",
+					Age:   11,
 				})
 			},
 			wantErr: false,

@@ -7,17 +7,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zhufuyi/sponge/pkg/registry"
-	"github.com/zhufuyi/sponge/pkg/utils"
-
 	"github.com/zhufuyi/sponge/configs"
 	"github.com/zhufuyi/sponge/internal/config"
+
+	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
+	"github.com/zhufuyi/sponge/pkg/utils"
 
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc"
 )
 
-// 需要连接连接真实数据库测试
+// need real database to test
 func TestGRPCServer(t *testing.T) {
 	err := config.Init(configs.Path("serverNameExample.yml"))
 	if err != nil {
@@ -26,7 +26,7 @@ func TestGRPCServer(t *testing.T) {
 
 	config.Get().App.EnableMetrics = true
 	config.Get().App.EnableTracing = true
-	config.Get().App.EnableProfile = true
+	config.Get().App.EnablePprof = true
 	config.Get().App.EnableLimit = true
 	config.Get().App.EnableRegistryDiscovery = true
 
@@ -47,14 +47,14 @@ func TestGRPCServer(t *testing.T) {
 	assert.NotNil(t, server)
 }
 
-func TestGRPCServer2(t *testing.T) {
+func TestGRPCServerMock(t *testing.T) {
 	err := config.Init(configs.Path("serverNameExample.yml"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	config.Get().App.EnableMetrics = true
 	config.Get().App.EnableTracing = true
-	config.Get().App.EnableProfile = true
+	config.Get().App.EnablePprof = true
 	config.Get().App.EnableLimit = true
 	config.Get().App.EnableRegistryDiscovery = true
 
@@ -70,6 +70,7 @@ func TestGRPCServer2(t *testing.T) {
 		iRegistry:       o.iRegistry,
 		serviceInstance: o.instance,
 	}
+	s.pprofHTTPServerFunc = s.pprofServer()
 	s.listen, err = net.Listen("tcp", addr)
 	if err != nil {
 		t.Fatal(err)

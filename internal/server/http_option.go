@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-// HTTPOption 设置http
+// HTTPOption setting up http
 type HTTPOption func(*httpOptions)
 
 type httpOptions struct {
@@ -13,7 +13,6 @@ type httpOptions struct {
 	isProd       bool
 }
 
-// 默认设置
 func defaultHTTPOptions() *httpOptions {
 	return &httpOptions{
 		readTimeout:  time.Second * 60,
@@ -28,21 +27,21 @@ func (o *httpOptions) apply(opts ...HTTPOption) {
 	}
 }
 
-// WithHTTPReadTimeout 设置read timeout
+// WithHTTPReadTimeout setting up read timeout
 func WithHTTPReadTimeout(timeout time.Duration) HTTPOption {
 	return func(o *httpOptions) {
 		o.readTimeout = timeout
 	}
 }
 
-// WithHTTPWriteTimeout 设置writer timeout
+// WithHTTPWriteTimeout setting up writer timeout
 func WithHTTPWriteTimeout(timeout time.Duration) HTTPOption {
 	return func(o *httpOptions) {
 		o.writeTimeout = timeout
 	}
 }
 
-// WithHTTPIsProd 设置是否为生产环境
+// WithHTTPIsProd setting up production environment markers
 func WithHTTPIsProd(IsProd bool) HTTPOption {
 	return func(o *httpOptions) {
 		o.isProd = IsProd

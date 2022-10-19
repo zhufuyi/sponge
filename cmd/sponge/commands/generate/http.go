@@ -86,10 +86,10 @@ func runGenHTTPCommand(moduleName string, serverName string, projectName string,
 
 	// 设置模板信息
 	subDirs := []string{} // 只处理的子目录，如果为空或者没有指定的子目录，表示所有文件
-	ignoreDirs := []string{"cmd/sponge", "sponge/.github", "sponge/.git", "sponge/api", "sponge/pkg", "sponge/assets",
-		"sponge/test", "sponge/third_party", "internal/service"} // 指定子目录下忽略处理的目录
+	ignoreDirs := []string{"cmd/sponge", "sponge/.github", "sponge/.git", "sponge/api", "sponge/pkg",
+		"sponge/assets", "sponge/test", "sponge/third_party", "internal/service"} // 指定子目录下忽略处理的目录
 	ignoreFiles := []string{"swagger.json", "swagger.yaml", "proto.html", "protoc.sh",
-		"proto-doc.sh", "grpc.go", "grpc_option.go", "grpc_test.go", "LICENSE", "doc.go",
+		"proto-doc.sh", "grpc_health_probe.sh", "grpc.go", "grpc_option.go", "grpc_test.go", "LICENSE", "doc.go",
 		"grpc_userExample.go", "grpc_systemCode.go", "grpc_systemCode_test.go"} // 指定子目录下忽略处理的文件
 
 	r.SetSubDirs(subDirs...)
@@ -102,7 +102,7 @@ func runGenHTTPCommand(moduleName string, serverName string, projectName string,
 		return err
 	}
 
-	fmt.Printf("generate '%s' project code successfully, out = %s\n\n", subTplName, r.GetOutputDir())
+	fmt.Printf("generate %s's http code successfully, out = %s\n\n", serverName, r.GetOutputDir())
 	return nil
 }
 
@@ -118,7 +118,6 @@ func addHTTPFields(moduleName string, serverName string, projectName string, rep
 	fields = append(fields, deleteFieldsMark(r, handlerFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, handlerTestFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, mainFile, startMark, endMark)...)
-	fields = append(fields, deleteFieldsMark(r, mainFile, onlyGrpcStartMark, onlyGrpcEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, dockerFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, dockerFileBuild, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, dockerComposeFile, wellStartMark, wellEndMark)...)

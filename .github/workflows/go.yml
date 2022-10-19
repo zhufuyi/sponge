@@ -1,0 +1,82 @@
+name: Go
+
+on:
+  # triggers the execution of jobs when committed to the main branch
+  push:
+    branches:
+      - main
+  # trigger execution of jobs when merging to main branch
+  pull_request:
+    branches:
+      - main
+
+jobs:
+
+  lint:
+    name: Golangci-lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+          cache: true
+
+      - name: Lint Go Code
+        run: |
+          export PATH=$PATH:$(go env GOPATH)/bin
+          go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.49.0
+          make ci-lint
+
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+          cache: true
+
+      - name: Run Unit tests
+        run: make test
+
+      - name: Run coverage
+        run: go test -race -coverprofile=coverage.txt -covermode=atomic $(go list ./... | grep -v /vendor/ | grep -v /api/)
+
+      - name: Upload Coverage report to CodeCov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.txt
+          token: ${{secrets.CODECOV_TOKEN}}
+
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+          cache: true
+
+      - name: Build
+        run: make build && make build-sponge

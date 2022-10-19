@@ -91,7 +91,7 @@ func runGenGRPCCommand(moduleName string, serverName string, projectName string,
 	ignoreDirs := []string{"cmd/sponge", "sponge/.github", "sponge/.git", "sponge/docs", "sponge/pkg", "sponge/assets",
 		"sponge/test", "internal/handler", "internal/routers", "internal/types"} // 指定子目录下忽略处理的目录
 	ignoreFiles := []string{"http_systemCode.go", "http_userExample.go", "http.go", "http_test.go", "http_option.go",
-		"userExample.pb.go", "userExample.pb.validate.go", "userExample_grpc.pb.go",
+		"userExample.pb.go", "userExample.pb.validate.go", "userExample_grpc.pb.go", "swag-docs.sh",
 		"types.pb.go", "types.pb.validate.go", "LICENSE", "doc.go"} // 指定子目录下忽略处理的文件
 
 	r.SetSubDirs(subDirs...)
@@ -104,7 +104,7 @@ func runGenGRPCCommand(moduleName string, serverName string, projectName string,
 		return err
 	}
 
-	fmt.Printf("generate '%s' project code successfully, out = %s\n\n", subTplName, r.GetOutputDir())
+	fmt.Printf("generate %s's grpc code successfully, out = %s\n\n", subTplName, r.GetOutputDir())
 	return nil
 }
 
@@ -227,14 +227,6 @@ func addGRPCFields(moduleName string, serverName string, projectName string, rep
 		{
 			Old: "image-repo-host",
 			New: repoHost,
-		},
-		{
-			Old: string(onlyGrpcStartMark),
-			New: "",
-		},
-		{
-			Old: string(onlyGrpcEndMark),
-			New: "",
 		},
 		{
 			Old: string(wellOnlyGrpcStartMark),

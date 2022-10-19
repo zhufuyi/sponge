@@ -1,5 +1,4 @@
-# 使用工具自动生成go struct
-# sponge config --server-dir=./serverNameExample
+# 生成go struct命令：sponge config --server-dir=./serverDir
 
 # app 设置
 app:
@@ -7,7 +6,7 @@ app:
   env: "dev"                   # 运行环境，dev:开发环境，prod:生产环境，test:测试环境
   version: "v0.0.0"         # 版本
   host: "127.0.0.1"         # 主机名称或ip
-  enableProfile: false      # 是否开启性能分析功能，true:开启，false:关闭
+  enablePprof: false       # 是否开启性能分析功能，true:开启，false:关闭
   enableMetrics: true     # 是否开启指标采集，true:开启，false:关闭
   enableLimit: false       # 是否开启限流，true:开启，false:关闭
   enableCircuitBreaker: false       # 是否开启熔断，true:开启，false:关闭
@@ -19,15 +18,16 @@ app:
 http:
   port: 8080            # 监听端口
   readTimeout: 3     # 读超时，单位(秒)
-  writeTimeout: 90  # 写超时，单位(秒)，如果enableProfile为true，需要大于60s，pprof做profiling的默认值是60s
+  writeTimeout: 60  # 写超时，单位(秒)，如果enablePprof为true，需要大于60s，pprof做profiling的默认值是60s
 
 
 # grpc 设置
 grpc:
-  port: 8282          # 监听端口
-  metricsPort: 9082   # 获取指标http端口
-  readTimeout: 3   # 读超时，单位(秒)
-  writeTimeout: 3  # 写超时，单位(秒)
+  port: 8282              # rpc监听端口
+  metricsPort: 8283   # 获取指标http端口
+  pprofPort: 8284      # pprof的http端口
+  readTimeout: 3      # 读超时，单位(秒)
+  writeTimeout: 3     # 写超时，单位(秒)
 
 
 # logger 设置

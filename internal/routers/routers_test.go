@@ -24,7 +24,7 @@ func TestNewRouter(t *testing.T) {
 
 	config.Get().App.EnableMetrics = true
 	config.Get().App.EnableTracing = true
-	config.Get().App.EnableProfile = true
+	config.Get().App.EnablePprof = true
 	config.Get().App.EnableLimit = true
 
 	gin.SetMode(gin.ReleaseMode)

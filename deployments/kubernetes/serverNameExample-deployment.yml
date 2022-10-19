@@ -39,7 +39,7 @@ spec:
             - name: grpc-port
               containerPort: 8282
             - name: metrics-port
-              containerPort: 9082
+              containerPort: 8283
           # 根据服务类型(http或grpc)选择健康检查
           # 就绪探测
           readinessProbe:

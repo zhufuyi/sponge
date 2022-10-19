@@ -78,8 +78,6 @@ The development specification follows the [Uber Go Language Coding Specification
 
 ### Install
 
-
-
 ```bash
 go install github.com/zhufuyi/sponge/cmd/sponge@latest
 

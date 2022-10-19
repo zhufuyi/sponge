@@ -143,7 +143,7 @@ func (r *replacerInfo) SetIgnoreSubDirs(dirs ...string) {
 
 // SetOutputDir 设置输出目录，优先使用absPath，如果absPath为空，自动在当前目录根据参数name名称生成输出目录
 func (r *replacerInfo) SetOutputDir(absPath string, name ...string) error {
-	// 使用指定输出目录
+	// 输出到指定目录
 	if absPath != "" {
 		abs, err := filepath.Abs(absPath)
 		if err != nil {
@@ -154,12 +154,13 @@ func (r *replacerInfo) SetOutputDir(absPath string, name ...string) error {
 		return nil
 	}
 
-	// 使用当前目录
-	subPath := ""
-	if len(name) > 0 && name[0] != "" {
-		subPath = name[0]
+	// 输出到当前目录
+	subPath := strings.Join(name, "_")
+	pwd, err := os.Getwd()
+	if err != nil {
+		return err
 	}
-	r.outPath = gofile.GetRunPath() + gofile.GetPathDelimiter() + subPath + "_" + time.Now().Format("150405")
+	r.outPath = pwd + gofile.GetPathDelimiter() + subPath + "_" + time.Now().Format("150405")
 	return nil
 }
 

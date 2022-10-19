@@ -70,7 +70,7 @@ type App struct {
 	EnableCircuitBreaker    bool   `yaml:"enableCircuitBreaker" json:"enableCircuitBreaker"`
 	EnableLimit             bool   `yaml:"enableLimit" json:"enableLimit"`
 	EnableMetrics           bool   `yaml:"enableMetrics" json:"enableMetrics"`
-	EnableProfile           bool   `yaml:"enableProfile" json:"enableProfile"`
+	EnablePprof             bool   `yaml:"enablePprof" json:"enablePprof"`
 	EnableRegistryDiscovery bool   `yaml:"enableRegistryDiscovery" json:"enableRegistryDiscovery"`
 	EnableTracing           bool   `yaml:"enableTracing" json:"enableTracing"`
 	Env                     string `yaml:"env" json:"env"`
@@ -88,6 +88,7 @@ type Logger struct {
 type Grpc struct {
 	MetricsPort  int `yaml:"metricsPort" json:"metricsPort"`
 	Port         int `yaml:"port" json:"port"`
+	PprofPort    int `yaml:"pprofPort" json:"pprofPort"`
 	ReadTimeout  int `yaml:"readTimeout" json:"readTimeout"`
 	WriteTimeout int `yaml:"writeTimeout" json:"writeTimeout"`
 }
