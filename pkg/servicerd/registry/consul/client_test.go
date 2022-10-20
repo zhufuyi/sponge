@@ -21,7 +21,7 @@ func getConsulClient() *Client {
 func TestConsulClient(t *testing.T) {
 	cli := getConsulClient()
 
-	instance := registry.NewServiceInstance("foo", []string{"grpc://127.0.0.1:8282"})
+	instance := registry.NewServiceInstance("foo", "bar", []string{"grpc://127.0.0.1:8282"})
 	err := cli.Register(context.Background(), instance, false)
 	t.Log(err)
 

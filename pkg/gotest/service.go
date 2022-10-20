@@ -30,15 +30,10 @@ func NewService(dao *Dao, testData interface{}) *Service {
 	port, _ := utils.GetAvailablePort()
 	clientAddr := fmt.Sprintf("127.0.0.1:%d", port)
 
-	list, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
 		panic(err)
 	}
-
-	//server := grpc.NewServer(grpc_middleware.WithUnaryServerChain(
-	//	interceptor.UnaryServerCtxTags(),
-	//	interceptor.UnaryServerLog(logger.Get()),
-	//))
 	server := grpc.NewServer()
 
 	return &Service{
@@ -48,7 +43,7 @@ func NewService(dao *Dao, testData interface{}) *Service {
 
 		clientAddr: clientAddr,
 		Server:     server,
-		listen:     list,
+		listen:     lis,
 	}
 }
 

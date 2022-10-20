@@ -1,13 +1,13 @@
 package registry
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNewServiceInstance(t *testing.T) {
-	s := NewServiceInstance("demo", []string{"grpc://127.0.0.1:8282"},
-		WithID("1"),
+	s := NewServiceInstance("foo", "bar", []string{"grpc://127.0.0.1:8282"},
 		WithVersion("v1.0.0"),
 		WithMetadata(map[string]string{"foo": "bar"}),
 	)

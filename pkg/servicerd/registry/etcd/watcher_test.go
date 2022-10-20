@@ -72,7 +72,7 @@ func Test_watcher_getInstance(t *testing.T) {
 }
 
 func TestService_marshal(t *testing.T) {
-	instance := registry.NewServiceInstance("foo", []string{"grpc://127.0.0.1:8282"})
+	instance := registry.NewServiceInstance("foo", "bar", []string{"grpc://127.0.0.1:8282"})
 	v, err := marshal(instance)
 	assert.NoError(t, err)
 

@@ -89,27 +89,21 @@ func (d *Client) Register(ctx context.Context, svc *registry.ServiceInstance, en
 		TaggedAddresses: addresses,
 		Address:         addr,
 		Port:            int(port),
-		Checks: []*api.AgentServiceCheck{
-			{
-				CheckID:                        "service:" + svc.ID,
-				TTL:                            "30s",
-				Status:                         "passing",
-				DeregisterCriticalServiceAfter: "90s",
-			},
-		},
 	}
 	if enableHealthCheck {
 		asr.Checks = append(asr.Checks, &api.AgentServiceCheck{
 			TCP:                            fmt.Sprintf("%s:%d", addr, port),
 			Interval:                       "20s",
+			Timeout:                        "5s",
 			Status:                         "passing",
-			DeregisterCriticalServiceAfter: "90s",
+			DeregisterCriticalServiceAfter: "60s",
 		})
 	}
 	err := d.client.Agent().ServiceRegister(asr)
 	if err != nil {
 		return err
 	}
+
 	go func() {
 		ticker := time.NewTicker(time.Second * 20)
 		defer ticker.Stop()

@@ -45,11 +45,14 @@ func TestService_GetClientConn(t *testing.T) {
 }
 
 func TestService_GoGrpcServer(t *testing.T) {
+	defer func() { recover() }()
+
 	s := newService()
 	assert.NotNil(t, s)
 	defer s.Close()
 
 	s.GoGrpcServer()
+	time.Sleep(time.Millisecond * 100)
 }
 
 func TestServiceError(t *testing.T) {

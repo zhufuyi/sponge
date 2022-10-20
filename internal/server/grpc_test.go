@@ -32,7 +32,7 @@ func TestGRPCServer(t *testing.T) {
 
 	port, _ := utils.GetAvailablePort()
 	addr := fmt.Sprintf(":%d", port)
-	instance := registry.NewServiceInstance("foo", []string{"grpc://127.0.0.1:8282"})
+	instance := registry.NewServiceInstance("foo", "bar", []string{"grpc://127.0.0.1:8282"})
 
 	defer func() {
 		if e := recover(); e != nil {
@@ -40,9 +40,9 @@ func TestGRPCServer(t *testing.T) {
 		}
 	}()
 	server := NewGRPCServer(addr,
-		WithGRPCReadTimeout(time.Second),
-		WithGRPCWriteTimeout(time.Second),
-		WithRegistry(nil, instance),
+		WithGrpcReadTimeout(time.Second),
+		WithGrpcWriteTimeout(time.Second),
+		WithGrpcRegistry(nil, instance),
 	)
 	assert.NotNil(t, server)
 }
@@ -60,15 +60,15 @@ func TestGRPCServerMock(t *testing.T) {
 
 	port, _ := utils.GetAvailablePort()
 	addr := fmt.Sprintf(":%d", port)
-	instance := registry.NewServiceInstance("foo", []string{"grpc://127.0.0.1:8282"})
+	instance := registry.NewServiceInstance("foo", "bar", []string{"grpc://127.0.0.1:8282"})
 
-	o := defaultGRPCOptions()
-	o.apply(WithRegistry(&gRegistry{}, instance))
+	o := defaultGrpcOptions()
+	o.apply(WithGrpcRegistry(&gRegistry{}, instance))
 
 	s := &grpcServer{
-		addr:            addr,
-		iRegistry:       o.iRegistry,
-		serviceInstance: o.instance,
+		addr:      addr,
+		iRegistry: o.iRegistry,
+		instance:  o.instance,
 	}
 	s.pprofHTTPServerFunc = s.pprofServer()
 	s.listen, err = net.Listen("tcp", addr)

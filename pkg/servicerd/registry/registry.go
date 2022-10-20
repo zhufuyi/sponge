@@ -47,15 +47,15 @@ type ServiceInstance struct {
 }
 
 // NewServiceInstance creates a new instance
-func NewServiceInstance(name string, endpoints []string, opts ...Option) *ServiceInstance {
+func NewServiceInstance(id string, name string, endpoints []string, opts ...Option) *ServiceInstance {
 	o := defaultOptions()
 	o.apply(opts...)
 
 	return &ServiceInstance{
-		ID:        o.id,
+		ID:        id,
 		Name:      name,
+		Endpoints: endpoints,
 		Version:   o.version,
 		Metadata:  o.metadata,
-		Endpoints: endpoints,
 	}
 }

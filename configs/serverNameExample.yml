@@ -5,13 +5,14 @@ app:
   name: "serverNameExample"  # 服务名称
   env: "dev"                   # 运行环境，dev:开发环境，prod:生产环境，test:测试环境
   version: "v0.0.0"         # 版本
-  host: "127.0.0.1"         # 主机名称或ip
+  host: "192.168.3.27"   # 主机名称或ip
   enablePprof: false       # 是否开启性能分析功能，true:开启，false:关闭
   enableMetrics: true     # 是否开启指标采集，true:开启，false:关闭
   enableLimit: false       # 是否开启限流，true:开启，false:关闭
   enableCircuitBreaker: false       # 是否开启熔断，true:开启，false:关闭
   enableTracing: false    # 是否开启链路跟踪，true:开启，false:关闭
   enableRegistryDiscovery: false    # 是否开启注册与发现，true:开启，false:关闭
+  registryDiscoveryType: consul     # 注册与发现类型，consul、etcd
 
 
 # http 设置
@@ -62,6 +63,11 @@ jaeger:
   agentHost: "192.168.3.37"
   agentPort: "6831"
   samplingRate: 1.0     # 采样率，0~1之间，0表示禁止采样，大于等于1表示采样所有链路
+
+
+# consul 配置
+consul:
+  addr: "192.168.3.37:8500"
 
 
 # etcd 配置

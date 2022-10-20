@@ -6,8 +6,8 @@ import (
 	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
 )
 
-// GRPCOption grpc settings
-type GRPCOption func(*grpcOptions)
+// GrpcOption grpc settings
+type GrpcOption func(*grpcOptions)
 
 type grpcOptions struct {
 	readTimeout  time.Duration
@@ -16,7 +16,7 @@ type grpcOptions struct {
 	iRegistry    registry.Registry
 }
 
-func defaultGRPCOptions() *grpcOptions {
+func defaultGrpcOptions() *grpcOptions {
 	return &grpcOptions{
 		readTimeout:  time.Second * 3,
 		writeTimeout: time.Second * 3,
@@ -25,28 +25,28 @@ func defaultGRPCOptions() *grpcOptions {
 	}
 }
 
-func (o *grpcOptions) apply(opts ...GRPCOption) {
+func (o *grpcOptions) apply(opts ...GrpcOption) {
 	for _, opt := range opts {
 		opt(o)
 	}
 }
 
-// WithGRPCReadTimeout setting up read timeout
-func WithGRPCReadTimeout(timeout time.Duration) GRPCOption {
+// WithGrpcReadTimeout setting up read timeout
+func WithGrpcReadTimeout(timeout time.Duration) GrpcOption {
 	return func(o *grpcOptions) {
 		o.readTimeout = timeout
 	}
 }
 
-// WithGRPCWriteTimeout setting up writer timeout
-func WithGRPCWriteTimeout(timeout time.Duration) GRPCOption {
+// WithGrpcWriteTimeout setting up writer timeout
+func WithGrpcWriteTimeout(timeout time.Duration) GrpcOption {
 	return func(o *grpcOptions) {
 		o.writeTimeout = timeout
 	}
 }
 
-// WithRegistry setting up registry
-func WithRegistry(iRegistry registry.Registry, instance *registry.ServiceInstance) GRPCOption {
+// WithGrpcRegistry registration services
+func WithGrpcRegistry(iRegistry registry.Registry, instance *registry.ServiceInstance) GrpcOption {
 	return func(o *grpcOptions) {
 		o.iRegistry = iRegistry
 		o.instance = instance

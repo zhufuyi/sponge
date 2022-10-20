@@ -55,6 +55,8 @@ var (
 	imageBuildFile = "scripts/image-build.sh"
 	readmeFile     = "sponge/README.md"
 
+	makeFile = "sponge/Makefile"
+
 	// 清除标记的模板代码片段标记
 	startMark             = []byte("// delete the templates code start")
 	endMark               = []byte("// delete the templates code end")
@@ -65,6 +67,7 @@ var (
 	wellOnlyGrpcStartMark = bytes.ReplaceAll(onlyGrpcStartMark, []byte("//"), []byte("#"))
 	wellOnlyGrpcEndMark   = bytes.ReplaceAll(onlyGrpcEndMark, []byte("//"), []byte("#"))
 
+	// embed FS模板文件时使用
 	selfPackageName = "github.com/zhufuyi/sponge"
 )
 

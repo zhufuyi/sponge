@@ -14,15 +14,15 @@ import (
 )
 
 // NewRegistry register service address to consul
-func NewRegistry(addr string, instanceName string, instanceEndpoints []string) (registry.Registry, *registry.ServiceInstance, error) {
-	serviceInstance := registry.NewServiceInstance(instanceName, instanceEndpoints)
+func NewRegistry(consulAddr string, id string, instanceName string, instanceEndpoints []string) (registry.Registry, *registry.ServiceInstance, error) {
+	serviceInstance := registry.NewServiceInstance(id, instanceName, instanceEndpoints)
 
-	cli, err := consulcli.Init(addr, consulcli.WithWaitTime(time.Second*5))
+	cli, err := consulcli.Init(consulAddr, consulcli.WithWaitTime(time.Second*5))
 	if err != nil {
 		return nil, nil, err
 	}
 
-	return New(cli), serviceInstance, nil
+	return New(cli, WithHealthCheck(true)), serviceInstance, nil
 }
 
 var (
@@ -73,6 +73,7 @@ func (r *Registry) Register(ctx context.Context, svc *registry.ServiceInstance) 
 
 // Deregister deregister service
 func (r *Registry) Deregister(ctx context.Context, svc *registry.ServiceInstance) error {
+	// NOTE: invoke the func Deregister will block when err is not nil
 	return r.cli.Deregister(ctx, svc.ID)
 }
 

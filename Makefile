@@ -90,13 +90,13 @@ build:
 	@echo "building 'serverNameExample', binary file will output to 'cmd/serverNameExample'"
 	@cd cmd/serverNameExample && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GOPROXY=https://goproxy.cn,direct go build -gcflags "all=-N -l"
 
-
+# delete the templates code start
 .PHONY: build-sponge
 # build sponge for linux amd64 binary
 build-sponge:
 	@echo "building 'sponge', binary file will output to 'cmd/sponge'"
 	@cd cmd/sponge && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GOPROXY=https://goproxy.cn,direct go build
-
+# delete the templates code end
 
 .PHONY: run
 # run server
@@ -148,7 +148,6 @@ deploy-docker:
 # clean binary file, cover.out, redundant dependency packages
 clean:
 	@rm -vrf cmd/serverNameExample/serverNameExample
-	@rm -vrf cmd/sponge/sponge
 	@rm -vrf cover.out
 	go mod tidy
 	@echo "clean finished"

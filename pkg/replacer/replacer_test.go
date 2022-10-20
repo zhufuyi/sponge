@@ -2,8 +2,11 @@ package replacer
 
 import (
 	"embed"
+	"fmt"
 	"github.com/stretchr/testify/assert"
+	"os"
 	"testing"
+	"time"
 )
 
 //go:embed testDir
@@ -65,11 +68,12 @@ func TestNewWithFS(t *testing.T) {
 					IsCaseSensitive: true,
 				},
 			}
-			r.SetSubDirs(subDirs...)                // 只处理指定子目录，为空时表示指定全部文件
-			r.SetIgnoreFiles(ignoreDirs...)         // 忽略替换目录
-			r.SetIgnoreFiles(ignoreFiles...)        // 忽略替换文件
-			r.SetReplacementFields(fields)          // 设置替换文本
-			_ = r.SetOutputDir("", tt.name+"_test") // 设置输出目录和名称
+			r.SetSubDirs(subDirs...)         // 只处理指定子目录，为空时表示指定全部文件
+			r.SetIgnoreFiles(ignoreDirs...)  // 忽略替换目录
+			r.SetIgnoreFiles(ignoreFiles...) // 忽略替换文件
+			r.SetReplacementFields(fields)   // 设置替换文本
+			_ = r.SetOutputDir(fmt.Sprintf("%s/replacer_test/%s_%s",
+				os.TempDir(), tt.name, time.Now().Format("150405"))) // 设置输出目录和名称
 			_, err := r.ReadFile("replace.txt")
 			assert.NoError(t, err)
 			err = r.SaveFiles() // 保存替换后文件

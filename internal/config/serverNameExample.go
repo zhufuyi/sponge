@@ -31,6 +31,7 @@ func Set(conf *Config) {
 
 type Config struct {
 	App    App    `yaml:"app" json:"app"`
+	Consul Consul `yaml:"consul" json:"consul"`
 	Etcd   Etcd   `yaml:"etcd" json:"etcd"`
 	Grpc   Grpc   `yaml:"grpc" json:"grpc"`
 	HTTP   HTTP   `yaml:"http" json:"http"`
@@ -38,6 +39,10 @@ type Config struct {
 	Logger Logger `yaml:"logger" json:"logger"`
 	Mysql  Mysql  `yaml:"mysql" json:"mysql"`
 	Redis  Redis  `yaml:"redis" json:"redis"`
+}
+
+type Consul struct {
+	Addr string `yaml:"addr" json:"addr"`
 }
 
 type Etcd struct {
@@ -76,6 +81,7 @@ type App struct {
 	Env                     string `yaml:"env" json:"env"`
 	Host                    string `yaml:"host" json:"host"`
 	Name                    string `yaml:"name" json:"name"`
+	RegistryDiscoveryType   string `yaml:"registryDiscoveryType" json:"registryDiscoveryType"`
 	Version                 string `yaml:"version" json:"version"`
 }
 

@@ -1,52 +1,30 @@
 package generate
 
 const (
-	mainFileHTTPCode = `func registerServers() []app.IServer {
-	var servers []app.IServer
-
+	mainFileHTTPCode = `
 	// 创建http服务
 	httpAddr := ":" + strconv.Itoa(config.Get().HTTP.Port)
+	httpRegistry, httpInstance := registryService("http", config.Get().App.Host, config.Get().HTTP.Port)
 	httpServer := server.NewHTTPServer(httpAddr,
 		server.WithHTTPReadTimeout(time.Second*time.Duration(config.Get().HTTP.ReadTimeout)),
 		server.WithHTTPWriteTimeout(time.Second*time.Duration(config.Get().HTTP.WriteTimeout)),
+		server.WithHTTPRegistry(httpRegistry, httpInstance),
 		server.WithHTTPIsProd(config.Get().App.Env == "prod"),
 	)
 	servers = append(servers, httpServer)
+`
 
-	return servers
-}`
-
-	mainFileGrpcCode = `func registerServers() []app.IServer {
-	var servers []app.IServer
-
+	mainFileGrpcCode = `
 	// 创建grpc服务
 	grpcAddr := ":" + strconv.Itoa(config.Get().Grpc.Port)
-	grpcServer := server.NewGRPCServer(grpcAddr, grpcOptions()...)
+	grpcRegistry, grpcInstance := registryService("grpc", config.Get().App.Host, config.Get().Grpc.Port)
+	grpcServer := server.NewGRPCServer(grpcAddr,
+		server.WithGrpcReadTimeout(time.Duration(config.Get().Grpc.ReadTimeout)*time.Second),
+		server.WithGrpcWriteTimeout(time.Duration(config.Get().Grpc.WriteTimeout)*time.Second),
+		server.WithGrpcRegistry(grpcRegistry, grpcInstance),
+	)
 	servers = append(servers, grpcServer)
-
-	return servers
-}
-
-func grpcOptions() []server.GRPCOption {
-	var opts = []server.GRPCOption{
-		server.WithGRPCReadTimeout(time.Duration(config.Get().Grpc.ReadTimeout) * time.Second),
-		server.WithGRPCWriteTimeout(time.Duration(config.Get().Grpc.WriteTimeout) * time.Second),
-	}
-
-	if config.Get().App.EnableRegistryDiscovery {
-		iRegistry, instance, err := etcd.NewRegistry(
-			config.Get().Etcd.Addrs,
-			config.Get().App.Name,
-			[]string{fmt.Sprintf("grpc://%s:%d", config.Get().App.Host, config.Get().Grpc.Port)},
-		)
-		if err != nil {
-			panic(err)
-		}
-		opts = append(opts, server.WithRegistry(iRegistry, instance))
-	}
-
-	return opts
-}`
+`
 
 	dockerFileHTTPCode = `# 添加curl，用在http服务的检查，如果用部署在k8s，可以不用安装
 RUN apk add curl

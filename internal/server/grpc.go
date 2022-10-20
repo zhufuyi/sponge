@@ -6,22 +6,24 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"net/http/pprof"
 	"time"
 
 	"github.com/zhufuyi/sponge/internal/config"
 	"github.com/zhufuyi/sponge/internal/service"
 
-	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/zhufuyi/sponge/pkg/app"
 	"github.com/zhufuyi/sponge/pkg/grpc/interceptor"
 	"github.com/zhufuyi/sponge/pkg/grpc/metrics"
 	"github.com/zhufuyi/sponge/pkg/logger"
 	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
 
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
 )
 
 var _ app.IServer = (*grpcServer)(nil)
+var _ = pprof.Cmdline
 
 type grpcServer struct {
 	addr   string
@@ -32,27 +34,27 @@ type grpcServer struct {
 	metricsHTTPServerFunc func() error
 	pprofHTTPServerFunc   func() error
 
-	iRegistry       registry.Registry
-	serviceInstance *registry.ServiceInstance
+	iRegistry registry.Registry
+	instance  *registry.ServiceInstance
 }
 
 // Start grpc service
 func (s *grpcServer) Start() error {
 	if s.iRegistry != nil {
 		ctx, _ := context.WithTimeout(context.Background(), 5*time.Second) //nolint
-		if err := s.iRegistry.Register(ctx, s.serviceInstance); err != nil {
-			return err
-		}
-	}
-
-	if s.pprofHTTPServerFunc != nil {
-		if err := s.pprofHTTPServerFunc(); err != nil {
+		if err := s.iRegistry.Register(ctx, s.instance); err != nil {
 			return err
 		}
 	}
 
 	if s.metricsHTTPServerFunc != nil {
 		if err := s.metricsHTTPServerFunc(); err != nil {
+			return err
+		}
+	}
+
+	if s.pprofHTTPServerFunc != nil {
+		if err := s.pprofHTTPServerFunc(); err != nil {
 			return err
 		}
 	}
@@ -67,10 +69,12 @@ func (s *grpcServer) Start() error {
 // Stop grpc service
 func (s *grpcServer) Stop() error {
 	if s.iRegistry != nil {
-		ctx, _ := context.WithTimeout(context.Background(), 3*time.Second) //nolint
-		if err := s.iRegistry.Deregister(ctx, s.serviceInstance); err != nil {
-			return err
-		}
+		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+		go func() {
+			_ = s.iRegistry.Deregister(ctx, s.instance)
+			cancel()
+		}()
+		<-ctx.Done()
 	}
 
 	s.server.GracefulStop()
@@ -87,7 +91,7 @@ func (s *grpcServer) Stop() error {
 
 // String comment
 func (s *grpcServer) String() string {
-	return "grpc service, addr = " + s.addr
+	return "grpc service address " + s.addr
 }
 
 // InitServerOptions setting up interceptors
@@ -141,7 +145,7 @@ func (s *grpcServer) metricsServer() func() error {
 			return errors.New("grpc server is nil")
 		}
 		promAddr := fmt.Sprintf(":%d", config.Get().Grpc.MetricsPort)
-		fmt.Printf("start up grpc metrics service, addr = %s\n", promAddr)
+		fmt.Printf("grpc metrics address %s\n", promAddr)
 		s.metricsHTTPServer = metrics.GoHTTPService(promAddr, s.server)
 		return nil
 	}
@@ -150,7 +154,7 @@ func (s *grpcServer) metricsServer() func() error {
 func (s *grpcServer) pprofServer() func() error {
 	return func() error {
 		pprofAddr := fmt.Sprintf(":%d", config.Get().Grpc.PprofPort)
-		fmt.Printf("start up grpc pprof service, addr = %s\n", pprofAddr)
+		fmt.Printf("grpc pprof address %s\n", pprofAddr)
 		go func() {
 			if err := http.ListenAndServe(pprofAddr, nil); err != nil { // default route is /debug/pprof
 				panic("listen and serve error: " + err.Error())
@@ -161,14 +165,14 @@ func (s *grpcServer) pprofServer() func() error {
 }
 
 // NewGRPCServer creates a new grpc server
-func NewGRPCServer(addr string, opts ...GRPCOption) app.IServer {
+func NewGRPCServer(addr string, opts ...GrpcOption) app.IServer {
 	var err error
-	o := defaultGRPCOptions()
+	o := defaultGrpcOptions()
 	o.apply(opts...)
 	s := &grpcServer{
-		addr:            addr,
-		iRegistry:       o.iRegistry,
-		serviceInstance: o.instance,
+		addr:      addr,
+		iRegistry: o.iRegistry,
+		instance:  o.instance,
 	}
 	if config.Get().App.EnablePprof {
 		s.pprofHTTPServerFunc = s.pprofServer()

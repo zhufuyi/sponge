@@ -11,10 +11,11 @@ import (
 )
 
 func TestNewRegistry(t *testing.T) {
-	addr := "192.168.3.37:8500"
+	consulAddr := "192.168.3.37:8500"
+	id := "serverName_192.168.3.37"
 	instanceName := "serverName"
-	instanceEndpoints := []string{"grpc://127.0.0.1:8282"}
-	iRegistry, serviceInstance, err := NewRegistry(addr, instanceName, instanceEndpoints)
+	instanceEndpoints := []string{"grpc://192.168.3.37:8282"}
+	iRegistry, serviceInstance, err := NewRegistry(consulAddr, id, instanceName, instanceEndpoints)
 	t.Log(err, iRegistry, serviceInstance)
 }
 
@@ -31,7 +32,7 @@ func newConsulRegistry() *Registry {
 
 func TestRegistry_Register(t *testing.T) {
 	r := newConsulRegistry()
-	instance := registry.NewServiceInstance("foo", []string{"grpc://127.0.0.1:8282"})
+	instance := registry.NewServiceInstance("foo", "bar", []string{"grpc://127.0.0.1:8282"})
 
 	err := r.Register(context.Background(), instance)
 	t.Log(err)

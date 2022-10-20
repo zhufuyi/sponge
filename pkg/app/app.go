@@ -52,7 +52,7 @@ func (a *App) Run() {
 	for _, server := range a.servers {
 		s := server
 		eg.Go(func() error {
-			fmt.Printf("start up %s\n", s.String())
+			fmt.Println(s.String())
 			if err := s.Start(); err != nil {
 				return err
 			}

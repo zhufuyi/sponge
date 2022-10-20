@@ -14,7 +14,7 @@ import (
 /*
 // need real etcd service test
 func TestGRPCSeverRegistry(t *testing.T) {
-	instance := registry.NewServiceInstance("foo", []string{"grpc://127.0.0.1:8282"})
+	instance := registry.NewServiceInstance("foo", "bar", []string{"grpc://127.0.0.1:8282"})
 
 	cli, err := clientv3.New(clientv3.Config{
 		Endpoints:   []string{"192.168.3.37:2379"},
@@ -195,9 +195,10 @@ func TestHeartBeat(t *testing.T) {
 
 func TestNewRegistry(t *testing.T) {
 	etcdEndpoints := []string{"127.0.0.1:2379"}
+	id := "1"
 	instanceName := "serverName"
 	instanceEndpoints := []string{"grpc://127.0.0.1:8282"}
-	iRegistry, serviceInstance, err := NewRegistry(etcdEndpoints, instanceName, instanceEndpoints)
+	iRegistry, serviceInstance, err := NewRegistry(etcdEndpoints, id, instanceName, instanceEndpoints)
 	t.Log(err, iRegistry, serviceInstance)
 }
 
@@ -274,14 +275,14 @@ func TestRegistry_Register(t *testing.T) {
 	defer func() { recover() }()
 
 	r := newEtcdRegistry()
-	instance := registry.NewServiceInstance("foo", []string{"grpc://127.0.0.1:8282"})
+	instance := registry.NewServiceInstance("foo", "bar", []string{"grpc://127.0.0.1:8282"})
 	err := r.Register(context.Background(), instance)
 	assert.NoError(t, err)
 }
 
 func TestRegistry_Deregister(t *testing.T) {
 	r := newEtcdRegistry()
-	instance := registry.NewServiceInstance("foo", []string{"grpc://127.0.0.1:8282"})
+	instance := registry.NewServiceInstance("foo", "bar", []string{"grpc://127.0.0.1:8282"})
 	err := r.Deregister(context.Background(), instance)
 	assert.NoError(t, err)
 }

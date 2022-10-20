@@ -1,6 +1,7 @@
 package nacoscli
 
 import (
+	"os"
 	"testing"
 
 	"github.com/nacos-group/nacos-sdk-go/v2/common/constant"
@@ -43,8 +44,8 @@ func TestParse(t *testing.T) {
 		NamespaceId:         "3c715c7a-9e49-4359-8fe6-ff2c67a3a871",
 		TimeoutMs:           1000,
 		NotLoadCacheAtStart: true,
-		LogDir:              "tmp/nacos/log",
-		CacheDir:            "tmp/nacos/cache",
+		LogDir:              os.TempDir() + "/nacos/log",
+		CacheDir:            os.TempDir() + "/nacos/cache",
 	}
 	serverConfigs := []constant.ServerConfig{
 		{

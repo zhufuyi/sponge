@@ -1,10 +1,9 @@
 package registry
 
-// Option represents the etcd options
+// Option service instance  options
 type Option func(*options)
 
 type options struct {
-	id       string
 	version  string
 	metadata map[string]string
 }
@@ -16,13 +15,6 @@ func defaultOptions() *options {
 func (o *options) apply(opts ...Option) {
 	for _, opt := range opts {
 		opt(o)
-	}
-}
-
-// WithID set server id
-func WithID(id string) Option {
-	return func(o *options) {
-		o.id = id
 	}
 }
 

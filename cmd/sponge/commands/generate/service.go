@@ -157,6 +157,10 @@ func addServiceFields(moduleName string, serverName string, r replacer.Replacer,
 			New: "github.com/zhufuyi/sponge/pkg",
 		},
 		{
+			Old: "serverNameExample",
+			New: serverName,
+		},
+		{
 			Old:             "UserExample",
 			New:             codes[parser.TableName],
 			IsCaseSensitive: true,

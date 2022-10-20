@@ -2,6 +2,8 @@ package server
 
 import (
 	"time"
+
+	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
 )
 
 // HTTPOption setting up http
@@ -11,6 +13,9 @@ type httpOptions struct {
 	readTimeout  time.Duration
 	writeTimeout time.Duration
 	isProd       bool
+
+	instance  *registry.ServiceInstance
+	iRegistry registry.Registry
 }
 
 func defaultHTTPOptions() *httpOptions {
@@ -18,6 +23,8 @@ func defaultHTTPOptions() *httpOptions {
 		readTimeout:  time.Second * 60,
 		writeTimeout: time.Second * 60,
 		isProd:       false,
+		instance:     nil,
+		iRegistry:    nil,
 	}
 }
 
@@ -45,5 +52,13 @@ func WithHTTPWriteTimeout(timeout time.Duration) HTTPOption {
 func WithHTTPIsProd(IsProd bool) HTTPOption {
 	return func(o *httpOptions) {
 		o.isProd = IsProd
+	}
+}
+
+// WithHTTPRegistry registration services
+func WithHTTPRegistry(iRegistry registry.Registry, instance *registry.ServiceInstance) HTTPOption {
+	return func(o *httpOptions) {
+		o.iRegistry = iRegistry
+		o.instance = instance
 	}
 }

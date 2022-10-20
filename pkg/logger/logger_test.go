@@ -62,18 +62,13 @@ func TestInit(t *testing.T) {
 			}},
 			wantErr: false,
 		},
-		//{
-		//	name:    "file console warn",
-		//	args:    args{[]Option{WithSave(true)}},
-		//	wantErr: false,
-		//},
 		{
 			name: "file json debug",
 			args: args{[]Option{
 				WithFormat("json"), WithLevel("unknown"),
 				WithSave(
 					true,
-					WithFileName("my.log"),
+					WithFileName(os.TempDir()+"/testLog/my.log"),
 					WithFileMaxSize(5),
 					WithFileMaxBackups(5),
 					WithFileMaxAge(10),

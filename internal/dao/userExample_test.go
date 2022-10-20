@@ -215,10 +215,9 @@ func Test_userExampleDao_GetByColumns(t *testing.T) {
 		},
 	})
 	assert.Error(t, err)
-}
 
-func TestGetByColumnsError(t *testing.T) {
-	d := &userExampleDao{}
-	_, _, err := d.GetByColumns(context.Background(), &query.Params{Columns: []query.Column{{}}})
+	// error test
+	dao := &userExampleDao{}
+	_, _, err = dao.GetByColumns(context.Background(), &query.Params{Columns: []query.Column{{}}})
 	t.Log(err)
 }

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/nacos-group/nacos-sdk-go/v2/clients"
@@ -69,8 +70,8 @@ func setParams(params *Params, opts ...Option) error {
 			NamespaceId:         params.NamespaceID,
 			TimeoutMs:           5000,
 			NotLoadCacheAtStart: true,
-			LogDir:              "tmp/nacos/log",
-			CacheDir:            "tmp/nacos/cache",
+			LogDir:              os.TempDir() + "/nacos/log",
+			CacheDir:            os.TempDir() + "/nacos/cache",
 		}
 	}
 

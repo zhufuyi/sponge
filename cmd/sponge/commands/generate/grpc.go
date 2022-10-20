@@ -104,7 +104,7 @@ func runGenGRPCCommand(moduleName string, serverName string, projectName string,
 		return err
 	}
 
-	fmt.Printf("generate %s's grpc code successfully, out = %s\n\n", subTplName, r.GetOutputDir())
+	fmt.Printf("generate %s's grpc code successfully, out = %s\n\n", serverName, r.GetOutputDir())
 	return nil
 }
 
@@ -126,6 +126,7 @@ func addGRPCFields(moduleName string, serverName string, projectName string, rep
 	fields = append(fields, deleteFieldsMark(r, dockerComposeFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, k8sDeploymentFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, k8sServiceFile, wellStartMark, wellEndMark)...)
+	fields = append(fields, deleteFieldsMark(r, makeFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, replaceFileContentMark(r, readmeFile, "## "+serverName)...)
 	fields = append(fields, []replacer.Field{
 		{ // 替换model/userExample.go文件内容

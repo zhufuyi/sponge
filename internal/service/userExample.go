@@ -212,7 +212,7 @@ func covertUserExample(record *model.UserExample) (*pb.UserExample, error) {
 		return nil, err
 	}
 	value.Id = record.ID
-	value.CreatedAt = record.CreatedAt.UnixNano()
-	value.UpdatedAt = record.UpdatedAt.UnixNano()
+	value.CreatedAt = record.CreatedAt.Unix()
+	value.UpdatedAt = record.UpdatedAt.Unix()
 	return value, nil
 }

@@ -13,8 +13,8 @@ import (
 )
 
 // NewRegistry register service address to etcd
-func NewRegistry(etcdEndpoints []string, instanceName string, instanceEndpoints []string) (registry.Registry, *registry.ServiceInstance, error) {
-	serviceInstance := registry.NewServiceInstance(instanceName, instanceEndpoints)
+func NewRegistry(etcdEndpoints []string, id string, instanceName string, instanceEndpoints []string) (registry.Registry, *registry.ServiceInstance, error) {
+	serviceInstance := registry.NewServiceInstance(id, instanceName, instanceEndpoints)
 
 	cli, err := etcdcli.Init(etcdEndpoints, etcdcli.WithDialTimeout(time.Second*5))
 	if err != nil {

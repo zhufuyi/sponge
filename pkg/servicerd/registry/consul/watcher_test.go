@@ -21,7 +21,7 @@ func newServiceSet() *serviceSet {
 
 func TestServiceSet_broadcast(t *testing.T) {
 	ss := newServiceSet()
-	instance := registry.NewServiceInstance("foo", []string{"grpc://127.0.0.1:8282"})
+	instance := registry.NewServiceInstance("foo", "bar", []string{"grpc://127.0.0.1:8282"})
 	ss.broadcast([]*registry.ServiceInstance{instance})
 }
 

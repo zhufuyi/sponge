@@ -6,6 +6,9 @@ package service
 import (
 	"context"
 	"fmt"
+	"github.com/zhufuyi/sponge/pkg/etcdcli"
+	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
+	"github.com/zhufuyi/sponge/pkg/servicerd/registry/etcd"
 	"testing"
 	"time"
 
@@ -14,11 +17,10 @@ import (
 	"github.com/zhufuyi/sponge/configs"
 	"github.com/zhufuyi/sponge/internal/config"
 
-	"github.com/zhufuyi/sponge/pkg/etcdcli"
+	"github.com/zhufuyi/sponge/pkg/consulcli"
 	"github.com/zhufuyi/sponge/pkg/grpc/benchmark"
 	"github.com/zhufuyi/sponge/pkg/grpc/grpccli"
-	"github.com/zhufuyi/sponge/pkg/servicerd/registry/etcd"
-
+	"github.com/zhufuyi/sponge/pkg/servicerd/registry/consul"
 	"go.uber.org/zap"
 )
 
@@ -35,12 +37,25 @@ func initUserExampleServiceClient() pb.UserExampleServiceClient {
 		//grpccli.WithEnableRetry(),
 	}
 	if config.Get().App.EnableRegistryDiscovery {
-		// 用etcd来测试，测试前通过命令etcdctl get / --prefix查看是否有服务注册，注：IDE使用代理可能会造成连接etcd服务失败
-		cli, err := etcdcli.Init(config.Get().Etcd.Addrs, etcdcli.WithDialTimeout(time.Second*2))
-		if err != nil {
-			panic(err)
+		var iDiscovery registry.Discovery
+
+		// 使用consul做发现，注意配置文件serverNameExample.yml的字段host需要填本机ip，不是127.0.0.1，用来做健康检查
+		if config.Get().App.RegistryDiscoveryType == "consul" {
+			cli, err := consulcli.Init(config.Get().Consul.Addr, consulcli.WithWaitTime(time.Second*2))
+			if err != nil {
+				panic(err)
+			}
+			iDiscovery = consul.New(cli)
 		}
-		iDiscovery := etcd.New(cli)
+
+		// 使用etcd做服务发现，测试前使用命令etcdctl get / --prefix查看是否有服务注册，注：IDE使用代理可能会造成连接etcd服务失败
+		if config.Get().App.RegistryDiscoveryType == "etcd" {
+			cli, err := etcdcli.Init(config.Get().Etcd.Addrs, etcdcli.WithDialTimeout(time.Second*2))
+			if err != nil {
+				panic(err)
+			}
+			iDiscovery = etcd.New(cli)
+		}
 
 		endpoint = "discovery:///" + config.Get().App.Name // 通过服务名称连接grpc服务
 		cliOptions = append(cliOptions, grpccli.WithDiscovery(iDiscovery))
@@ -151,8 +166,8 @@ func Test_userExampleService_methods(t *testing.T) {
 						Columns: []*types.Column{
 							{
 								Name:  "id",
-								Exp:   "<",
-								Value: "100",
+								Exp:   ">=",
+								Value: "1",
 								Logic: "",
 							},
 						},
@@ -238,8 +253,8 @@ func Test_userExampleService_benchmark(t *testing.T) {
 						Columns: []*types.Column{
 							{
 								Name:  "id",
-								Exp:   "<",
-								Value: "100",
+								Exp:   ">=",
+								Value: "1",
 								Logic: "",
 							},
 						},

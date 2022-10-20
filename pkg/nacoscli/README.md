@@ -28,8 +28,8 @@
 		NamespaceId:         "de7b176e-91cd-49a3-ac83-beb725979775",
 		TimeoutMs:           5000,
 		NotLoadCacheAtStart: true,
-		LogDir:              "tmp/nacos/log",
-		CacheDir:            "tmp/nacos/cache",
+		LogDir:              os.TempDir() + "/nacos/log",
+		CacheDir:            os.TempDir() + "/nacos/cache",
 	}
 	serverConfigs := []constant.ServerConfig{
 		{

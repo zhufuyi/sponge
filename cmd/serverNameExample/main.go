@@ -15,6 +15,8 @@ import (
 	"github.com/zhufuyi/sponge/pkg/app"
 	"github.com/zhufuyi/sponge/pkg/logger"
 	"github.com/zhufuyi/sponge/pkg/nacoscli"
+	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
+	"github.com/zhufuyi/sponge/pkg/servicerd/registry/consul"
 	"github.com/zhufuyi/sponge/pkg/servicerd/registry/etcd"
 	"github.com/zhufuyi/sponge/pkg/tracer"
 
@@ -118,51 +120,72 @@ func initConfig() {
 }
 
 // -------------------------------- 注册app服务 ---------------------------------
-// todo generate the code to register http and grpc services here
-// delete the templates code start
-
 func registerServers() []app.IServer {
 	var servers []app.IServer
 
+	// todo generate the code to register http and grpc services here
+	// delete the templates code start
 	// 创建http服务
 	httpAddr := ":" + strconv.Itoa(config.Get().HTTP.Port)
+	httpRegistry, httpInstance := registryService("http", config.Get().App.Host, config.Get().HTTP.Port)
 	httpServer := server.NewHTTPServer(httpAddr,
 		server.WithHTTPReadTimeout(time.Second*time.Duration(config.Get().HTTP.ReadTimeout)),
 		server.WithHTTPWriteTimeout(time.Second*time.Duration(config.Get().HTTP.WriteTimeout)),
+		server.WithHTTPRegistry(httpRegistry, httpInstance),
 		server.WithHTTPIsProd(config.Get().App.Env == "prod"),
 	)
 	servers = append(servers, httpServer)
 
 	// 创建grpc服务
 	grpcAddr := ":" + strconv.Itoa(config.Get().Grpc.Port)
-	grpcServer := server.NewGRPCServer(grpcAddr, grpcOptions()...)
+	grpcRegistry, grpcInstance := registryService("grpc", config.Get().App.Host, config.Get().Grpc.Port)
+	grpcServer := server.NewGRPCServer(grpcAddr,
+		server.WithGrpcReadTimeout(time.Duration(config.Get().Grpc.ReadTimeout)*time.Second),
+		server.WithGrpcWriteTimeout(time.Duration(config.Get().Grpc.WriteTimeout)*time.Second),
+		server.WithGrpcRegistry(grpcRegistry, grpcInstance),
+	)
 	servers = append(servers, grpcServer)
+	// delete the templates code end
 
 	return servers
 }
 
-func grpcOptions() []server.GRPCOption {
-	var opts = []server.GRPCOption{
-		server.WithGRPCReadTimeout(time.Duration(config.Get().Grpc.ReadTimeout) * time.Second),
-		server.WithGRPCWriteTimeout(time.Duration(config.Get().Grpc.WriteTimeout) * time.Second),
-	}
+func registryService(scheme string, host string, port int) (registry.Registry, *registry.ServiceInstance) {
+	instanceEndpoint := fmt.Sprintf("%s://%s:%d", scheme, host, port)
 
 	if config.Get().App.EnableRegistryDiscovery {
-		iRegistry, instance, err := etcd.NewRegistry(
-			config.Get().Etcd.Addrs,
-			config.Get().App.Name,
-			[]string{fmt.Sprintf("grpc://%s:%d", config.Get().App.Host, config.Get().Grpc.Port)},
-		)
-		if err != nil {
-			panic(err)
+		// 使用consul注册服务
+		if config.Get().App.RegistryDiscoveryType == "consul" {
+			iRegistry, instance, err := consul.NewRegistry(
+				config.Get().Consul.Addr,
+				config.Get().App.Name+"_"+scheme+"_"+host,
+				config.Get().App.Name,
+				[]string{instanceEndpoint},
+			)
+			if err != nil {
+				panic(err)
+			}
+			return iRegistry, instance
 		}
-		opts = append(opts, server.WithRegistry(iRegistry, instance))
+
+		// 使用etcd注册服务
+		if config.Get().App.RegistryDiscoveryType == "etcd" {
+			iRegistry, instance, err := etcd.NewRegistry(
+				config.Get().Etcd.Addrs,
+				config.Get().App.Name+"_"+scheme+"_"+host,
+				config.Get().App.Name,
+				[]string{instanceEndpoint},
+			)
+
+			if err != nil {
+				panic(err)
+			}
+			return iRegistry, instance
+		}
 	}
 
-	return opts
+	return nil, nil
 }
-
-// delete the templates code end
 
 // -------------------------- 注册app需要释放的资源  -------------------------------------------
 
