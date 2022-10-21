@@ -18,5 +18,3 @@ redis:
   dialTimeout: 10        # 链接超时，单位(秒)
   readTimeout: 2        # 读超时，单位(秒)
   writeTimeout: 2       # 写超时，单位(秒)
-
-#########################
