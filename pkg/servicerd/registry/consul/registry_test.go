@@ -14,7 +14,7 @@ func TestNewRegistry(t *testing.T) {
 	consulAddr := "192.168.3.37:8500"
 	id := "serverName_192.168.3.37"
 	instanceName := "serverName"
-	instanceEndpoints := []string{"grpc://192.168.3.37:8282"}
+	instanceEndpoints := []string{"grpc://192.168.3.27:8282"}
 	iRegistry, serviceInstance, err := NewRegistry(consulAddr, id, instanceName, instanceEndpoints)
 	t.Log(err, iRegistry, serviceInstance)
 }

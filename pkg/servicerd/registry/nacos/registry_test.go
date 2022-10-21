@@ -9,6 +9,23 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestNewRegistry(t *testing.T) {
+	nacosIPAddr := "192.168.3.37"
+	nacosPort := 8848
+	nacosNamespaceID := "3454d2b5-2455-4d0e-bf6d-e033b086bb4c"
+
+	id := "serverName_192.168.3.37"
+	instanceName := "serverName"
+	instanceEndpoints := []string{"grpc://192.168.3.27:8282"}
+
+	iRegistry, instance, err := NewRegistry(nacosIPAddr, nacosPort, nacosNamespaceID, id, instanceName, instanceEndpoints)
+	if err != nil {
+		t.Log(err)
+		return
+	}
+	t.Log(iRegistry, instance)
+}
+
 func newNacosRegistry() *Registry {
 	return New(getCli(),
 		WithPrefix("/micro"),
@@ -47,7 +64,7 @@ func TestRegistry_Register(t *testing.T) {
 			"foo2": "bar2",
 		}))
 	err = r.Register(context.Background(), instance)
-	assert.Error(t, err)
+	assert.NoError(t, err)
 
 	instance = registry.NewServiceInstance("foo", "bar", []string{"127.0.0.1:port"})
 	err = r.Register(context.Background(), instance)

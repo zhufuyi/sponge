@@ -7,8 +7,10 @@ import (
 	"context"
 	"fmt"
 	"github.com/zhufuyi/sponge/pkg/etcdcli"
+	"github.com/zhufuyi/sponge/pkg/nacoscli"
 	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
 	"github.com/zhufuyi/sponge/pkg/servicerd/registry/etcd"
+	"github.com/zhufuyi/sponge/pkg/servicerd/registry/nacos"
 	"testing"
 	"time"
 
@@ -38,6 +40,7 @@ func initUserExampleServiceClient() pb.UserExampleServiceClient {
 	}
 	if config.Get().App.EnableRegistryDiscovery {
 		var iDiscovery registry.Discovery
+		endpoint = "discovery:///" + config.Get().App.Name // 通过服务名称连接grpc服务
 
 		// 使用consul做发现，注意配置文件serverNameExample.yml的字段host需要填本机ip，不是127.0.0.1，用来做健康检查
 		if config.Get().App.RegistryDiscoveryType == "consul" {
@@ -57,7 +60,20 @@ func initUserExampleServiceClient() pb.UserExampleServiceClient {
 			iDiscovery = etcd.New(cli)
 		}
 
-		endpoint = "discovery:///" + config.Get().App.Name // 通过服务名称连接grpc服务
+		// 使用nacos做服务发现
+		if config.Get().App.RegistryDiscoveryType == "nacos" {
+			// example: endpoint = "discovery:///serverName.scheme"
+			endpoint += ".grpc" // 在endpoint+.grpc
+			cli, err := nacoscli.NewNamingClient(
+				config.Get().NacosRd.IPAddr,
+				config.Get().NacosRd.Port,
+				config.Get().NacosRd.NamespaceID)
+			if err != nil {
+				panic(err)
+			}
+			iDiscovery = nacos.New(cli)
+		}
+
 		cliOptions = append(cliOptions, grpccli.WithDiscovery(iDiscovery))
 	}
 	if config.Get().App.EnableTracing {
@@ -185,7 +201,7 @@ func Test_userExampleService_methods(t *testing.T) {
 				t.Logf("test '%s' error = %v, wantErr %v", tt.name, err, tt.wantErr)
 				return
 			}
-			t.Log("reply data: ", got)
+			t.Logf("reply data: %+v", got)
 		})
 	}
 }

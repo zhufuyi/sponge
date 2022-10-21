@@ -2,23 +2,22 @@ package nacos
 
 import (
 	"context"
-	"github.com/nacos-group/nacos-sdk-go/v2/clients/naming_client"
-	"github.com/stretchr/testify/assert"
-	"github.com/zhufuyi/sponge/pkg/nacoscli"
 	"testing"
 	"time"
+
+	"github.com/zhufuyi/sponge/pkg/nacoscli"
+
+	"github.com/nacos-group/nacos-sdk-go/v2/clients/naming_client"
+	"github.com/stretchr/testify/assert"
 )
 
 func getCli() naming_client.INamingClient {
-	params := &nacoscli.Params{
-		IPAddr:      "127.0.0.1",
-		Port:        8448,
-		NamespaceID: "de7b176e-91cd-49a3-ac83-beb725979775",
-		Group:       "dev",
-		DataID:      "user-srv.yml",
-		Format:      "yaml",
-	}
-	namingClient, err := nacoscli.NewNamingClient(params)
+	var (
+		ipAddr      = "192.168.3.37"
+		port        = 8848
+		namespaceID = "3454d2b5-2455-4d0e-bf6d-e033b086bb4c"
+	)
+	namingClient, err := nacoscli.NewNamingClient(ipAddr, port, namespaceID)
 	if err != nil {
 		panic(err)
 	}

@@ -53,12 +53,7 @@ func (p *Params) valid() error {
 	return nil
 }
 
-func setParams(params *Params, opts ...Option) error {
-	err := params.valid()
-	if err != nil {
-		return err
-	}
-
+func setParams(params *Params, opts ...Option) {
 	o := defaultOptions()
 	o.apply(opts...)
 	params.clientConfig = o.clientConfig
@@ -86,16 +81,16 @@ func setParams(params *Params, opts ...Option) error {
 			},
 		}
 	}
-
-	return nil
 }
 
 // Init 从nacos获取配置并解析到struct
 func Init(obj interface{}, params *Params, opts ...Option) error {
-	err := setParams(params, opts...)
+	err := params.valid()
 	if err != nil {
 		return err
 	}
+
+	setParams(params, opts...)
 
 	// 创建动态配置客户端
 	configClient, err := clients.NewConfigClient(
@@ -131,12 +126,14 @@ func Init(obj interface{}, params *Params, opts ...Option) error {
 	return nil
 }
 
-// NewNamingClient 创建服务发现客户端
-func NewNamingClient(params *Params, opts ...Option) (naming_client.INamingClient, error) {
-	err := setParams(params, opts...)
-	if err != nil {
-		return nil, err
+// NewNamingClient 实例化服务注册和发现nacos客户端
+func NewNamingClient(nacosIPAddr string, nacosPort int, nacosNamespaceID string, opts ...Option) (naming_client.INamingClient, error) {
+	params := &Params{
+		IPAddr:      nacosIPAddr,
+		Port:        uint64(nacosPort),
+		NamespaceID: nacosNamespaceID,
 	}
+	setParams(params, opts...)
 
 	return clients.NewNamingClient(
 		vo.NacosClientParam{
@@ -145,3 +142,14 @@ func NewNamingClient(params *Params, opts ...Option) (naming_client.INamingClien
 		},
 	)
 }
+
+//func NewNamingClient(params *Params, opts ...Option) (naming_client.INamingClient, error) {
+//	setParams(params, opts...)
+//
+//	return clients.NewNamingClient(
+//		vo.NacosClientParam{
+//			ClientConfig:  params.clientConfig,
+//			ServerConfigs: params.serverConfigs,
+//		},
+//	)
+//}

@@ -1,0 +1,18 @@
+comment: false
+
+github_checks:
+  annotations: false
+
+coverage:
+  status:
+    project:
+      default:
+        target: '80'
+    patch:
+      default:
+        target: '60'
+        informational: true
+
+ignore:
+  - "vendor/**/*"
+  - "**.pb.go"

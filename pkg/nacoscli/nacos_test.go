@@ -8,25 +8,21 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var addr = "127.0.0.1"
-var port uint64 = 8848
-
-type config struct {
-	Env     string `yaml:"env" json:"env"`
-	Host    string `yaml:"hostIP" json:"hostIP"`
-	Name    string `yaml:"name" json:"name"`
-	Version string `yaml:"version" json:"version"`
-}
+var (
+	ipAddr      = "192.168.3.37"
+	port        = 8848
+	namespaceID = "3454d2b5-2455-4d0e-bf6d-e033b086bb4c"
+)
 
 func TestParse(t *testing.T) {
 	// 方式一：
-	conf := &config{}
+	conf := new(map[string]interface{})
 	params := &Params{
-		IPAddr:      addr,
-		Port:        port,
-		NamespaceID: "de7b176e-91cd-49a3-ac83-beb725979775",
+		IPAddr:      ipAddr,
+		Port:        uint64(port),
+		NamespaceID: namespaceID,
 		Group:       "dev",
-		DataID:      "user-srv.yml",
+		DataID:      "serverNameExample.yml",
 		Format:      "yaml",
 	}
 	err := Init(conf, params)
@@ -34,14 +30,14 @@ func TestParse(t *testing.T) {
 	t.Log(err, conf)
 
 	// 方式二：直接设置ClientConfig和ServerConfig
-	conf = &config{}
+	conf = new(map[string]interface{})
 	params = &Params{
 		Group:  "dev",
-		DataID: "user-srv.yml",
+		DataID: "serverNameExample.yml",
 		Format: "yaml",
 	}
 	clientConfig := &constant.ClientConfig{
-		NamespaceId:         "3c715c7a-9e49-4359-8fe6-ff2c67a3a871",
+		NamespaceId:         namespaceID,
 		TimeoutMs:           1000,
 		NotLoadCacheAtStart: true,
 		LogDir:              os.TempDir() + "/nacos/log",
@@ -49,8 +45,8 @@ func TestParse(t *testing.T) {
 	}
 	serverConfigs := []constant.ServerConfig{
 		{
-			IpAddr: addr,
-			Port:   port,
+			IpAddr: ipAddr,
+			Port:   uint64(port),
 		},
 	}
 	err = Init(conf, params,
@@ -62,16 +58,7 @@ func TestParse(t *testing.T) {
 }
 
 func TestNewNamingClient(t *testing.T) {
-	params := &Params{
-		IPAddr:      addr,
-		Port:        port,
-		NamespaceID: "de7b176e-91cd-49a3-ac83-beb725979775",
-		Group:       "dev",
-		DataID:      "user-srv.yml",
-		Format:      "yaml",
-	}
-
-	namingClient, err := NewNamingClient(params)
+	namingClient, err := NewNamingClient(ipAddr, port, namespaceID)
 	//assert.NoError(t, err)
 	//assert.NotNil(t, namingClient)
 	t.Log(err, namingClient)
@@ -106,12 +93,6 @@ func TestError(t *testing.T) {
 	err = p.valid()
 	assert.Error(t, err)
 
-	err = setParams(p)
-	assert.Error(t, err)
-
 	err = Init(nil, p)
-	assert.Error(t, err)
-
-	_, err = NewNamingClient(p)
 	assert.Error(t, err)
 }

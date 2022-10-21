@@ -3,11 +3,11 @@ package nacos
 import (
 	"context"
 	"fmt"
+	"github.com/zhufuyi/sponge/pkg/nacoscli"
+	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
 	"net"
 	"net/url"
 	"strconv"
-
-	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
 
 	"github.com/nacos-group/nacos-sdk-go/v2/clients/naming_client"
 	"github.com/nacos-group/nacos-sdk-go/v2/common/constant"
@@ -59,6 +59,19 @@ func WithDefaultKind(kind string) Option {
 type Registry struct {
 	opts options
 	cli  naming_client.INamingClient
+}
+
+// NewRegistry instantiating the nacos registry
+func NewRegistry(nacosIPAddr string, nacosPort int, nacosNamespaceID string,
+	id string, instanceName string, instanceEndpoints []string) (registry.Registry, *registry.ServiceInstance, error) {
+	serviceInstance := registry.NewServiceInstance(id, instanceName, instanceEndpoints)
+
+	cli, err := nacoscli.NewNamingClient(nacosIPAddr, nacosPort, nacosNamespaceID)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return New(cli), serviceInstance, nil
 }
 
 // New new a nacos registry.

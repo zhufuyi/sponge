@@ -12,18 +12,6 @@ import (
 	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
-// NewRegistry register service address to etcd
-func NewRegistry(etcdEndpoints []string, id string, instanceName string, instanceEndpoints []string) (registry.Registry, *registry.ServiceInstance, error) {
-	serviceInstance := registry.NewServiceInstance(id, instanceName, instanceEndpoints)
-
-	cli, err := etcdcli.Init(etcdEndpoints, etcdcli.WithDialTimeout(time.Second*5))
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return New(cli), serviceInstance, nil
-}
-
 var (
 	_ registry.Registry  = &Registry{}
 	_ registry.Discovery = &Registry{}
@@ -66,6 +54,18 @@ func WithRegisterTTL(ttl time.Duration) Option {
 // WithMaxRetry set max retry times.
 func WithMaxRetry(num int) Option {
 	return func(o *options) { o.maxRetry = num }
+}
+
+// NewRegistry instantiating the etcd registry
+func NewRegistry(etcdEndpoints []string, id string, instanceName string, instanceEndpoints []string) (registry.Registry, *registry.ServiceInstance, error) {
+	serviceInstance := registry.NewServiceInstance(id, instanceName, instanceEndpoints)
+
+	cli, err := etcdcli.Init(etcdEndpoints, etcdcli.WithDialTimeout(time.Second*5))
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return New(cli), serviceInstance, nil
 }
 
 // Registry is etcd registry.

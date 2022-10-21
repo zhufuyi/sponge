@@ -13,18 +13,6 @@ import (
 	"github.com/hashicorp/consul/api"
 )
 
-// NewRegistry register service address to consul
-func NewRegistry(consulAddr string, id string, instanceName string, instanceEndpoints []string) (registry.Registry, *registry.ServiceInstance, error) {
-	serviceInstance := registry.NewServiceInstance(id, instanceName, instanceEndpoints)
-
-	cli, err := consulcli.Init(consulAddr, consulcli.WithWaitTime(time.Second*5))
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return New(cli, WithHealthCheck(true)), serviceInstance, nil
-}
-
 var (
 	_ registry.Registry  = &Registry{}
 	_ registry.Discovery = &Registry{}
@@ -51,6 +39,18 @@ type Registry struct {
 	enableHealthCheck bool
 	registry          map[string]*serviceSet
 	lock              sync.RWMutex
+}
+
+// NewRegistry instantiating the consul registry
+func NewRegistry(consulAddr string, id string, instanceName string, instanceEndpoints []string) (registry.Registry, *registry.ServiceInstance, error) {
+	serviceInstance := registry.NewServiceInstance(id, instanceName, instanceEndpoints)
+
+	cli, err := consulcli.Init(consulAddr, consulcli.WithWaitTime(time.Second*5))
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return New(cli, WithHealthCheck(true)), serviceInstance, nil
 }
 
 // New create a consul registry

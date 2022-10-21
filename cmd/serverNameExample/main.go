@@ -18,6 +18,7 @@ import (
 	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
 	"github.com/zhufuyi/sponge/pkg/servicerd/registry/consul"
 	"github.com/zhufuyi/sponge/pkg/servicerd/registry/etcd"
+	"github.com/zhufuyi/sponge/pkg/servicerd/registry/nacos"
 	"github.com/zhufuyi/sponge/pkg/tracer"
 
 	"github.com/jinzhu/copier"
@@ -66,8 +67,14 @@ func registerInits() []app.Init {
 	// 初始化链路跟踪
 	if config.Get().App.EnableTracing {
 		inits = append(inits, func() {
-			tracer.InitWithConfig(config.Get().App.Name, config.Get().App.Env, config.Get().App.Version,
-				config.Get().Jaeger.AgentHost, config.Get().Jaeger.AgentPort, config.Get().Jaeger.SamplingRate)
+			tracer.InitWithConfig(
+				config.Get().App.Name,
+				config.Get().App.Env,
+				config.Get().App.Version,
+				config.Get().Jaeger.AgentHost,
+				strconv.Itoa(config.Get().Jaeger.AgentPort),
+				config.Get().App.TracingSamplingRate,
+			)
 		})
 	}
 
@@ -176,7 +183,22 @@ func registryService(scheme string, host string, port int) (registry.Registry, *
 				config.Get().App.Name,
 				[]string{instanceEndpoint},
 			)
+			if err != nil {
+				panic(err)
+			}
+			return iRegistry, instance
+		}
 
+		// 使用nacos注册服务
+		if config.Get().App.RegistryDiscoveryType == "nacos" {
+			iRegistry, instance, err := nacos.NewRegistry(
+				config.Get().NacosRd.IPAddr,
+				config.Get().NacosRd.Port,
+				config.Get().NacosRd.NamespaceID,
+				config.Get().App.Name+"_"+scheme+"_"+host,
+				config.Get().App.Name,
+				[]string{instanceEndpoint},
+			)
 			if err != nil {
 				panic(err)
 			}

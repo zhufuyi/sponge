@@ -92,7 +92,7 @@ func runGenGRPCCommand(moduleName string, serverName string, projectName string,
 		"sponge/test", "internal/handler", "internal/routers", "internal/types"} // 指定子目录下忽略处理的目录
 	ignoreFiles := []string{"http_systemCode.go", "http_userExample.go", "http.go", "http_test.go", "http_option.go",
 		"userExample.pb.go", "userExample.pb.validate.go", "userExample_grpc.pb.go", "swag-docs.sh",
-		"types.pb.go", "types.pb.validate.go", "LICENSE", "doc.go"} // 指定子目录下忽略处理的文件
+		"types.pb.go", "types.pb.validate.go", "LICENSE", "doc.go", "codecov.yml"} // 指定子目录下忽略处理的文件
 
 	r.SetSubDirs(subDirs...)
 	r.SetIgnoreSubDirs(ignoreDirs...)

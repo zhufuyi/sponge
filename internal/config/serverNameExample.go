@@ -30,15 +30,16 @@ func Set(conf *Config) {
 }
 
 type Config struct {
-	App    App    `yaml:"app" json:"app"`
-	Consul Consul `yaml:"consul" json:"consul"`
-	Etcd   Etcd   `yaml:"etcd" json:"etcd"`
-	Grpc   Grpc   `yaml:"grpc" json:"grpc"`
-	HTTP   HTTP   `yaml:"http" json:"http"`
-	Jaeger Jaeger `yaml:"jaeger" json:"jaeger"`
-	Logger Logger `yaml:"logger" json:"logger"`
-	Mysql  Mysql  `yaml:"mysql" json:"mysql"`
-	Redis  Redis  `yaml:"redis" json:"redis"`
+	App     App     `yaml:"app" json:"app"`
+	Consul  Consul  `yaml:"consul" json:"consul"`
+	Etcd    Etcd    `yaml:"etcd" json:"etcd"`
+	Grpc    Grpc    `yaml:"grpc" json:"grpc"`
+	HTTP    HTTP    `yaml:"http" json:"http"`
+	Jaeger  Jaeger  `yaml:"jaeger" json:"jaeger"`
+	Logger  Logger  `yaml:"logger" json:"logger"`
+	Mysql   Mysql   `yaml:"mysql" json:"mysql"`
+	NacosRd NacosRd `yaml:"nacosRd" json:"nacosRd"`
+	Redis   Redis   `yaml:"redis" json:"redis"`
 }
 
 type Consul struct {
@@ -50,9 +51,8 @@ type Etcd struct {
 }
 
 type Jaeger struct {
-	AgentHost    string  `yaml:"agentHost" json:"agentHost"`
-	AgentPort    string  `yaml:"agentPort" json:"agentPort"`
-	SamplingRate float64 `yaml:"samplingRate" json:"samplingRate"`
+	AgentHost string `yaml:"agentHost" json:"agentHost"`
+	AgentPort int    `yaml:"agentPort" json:"agentPort"`
 }
 
 type Mysql struct {
@@ -72,23 +72,30 @@ type Redis struct {
 }
 
 type App struct {
-	EnableCircuitBreaker    bool   `yaml:"enableCircuitBreaker" json:"enableCircuitBreaker"`
-	EnableLimit             bool   `yaml:"enableLimit" json:"enableLimit"`
-	EnableMetrics           bool   `yaml:"enableMetrics" json:"enableMetrics"`
-	EnablePprof             bool   `yaml:"enablePprof" json:"enablePprof"`
-	EnableRegistryDiscovery bool   `yaml:"enableRegistryDiscovery" json:"enableRegistryDiscovery"`
-	EnableTracing           bool   `yaml:"enableTracing" json:"enableTracing"`
-	Env                     string `yaml:"env" json:"env"`
-	Host                    string `yaml:"host" json:"host"`
-	Name                    string `yaml:"name" json:"name"`
-	RegistryDiscoveryType   string `yaml:"registryDiscoveryType" json:"registryDiscoveryType"`
-	Version                 string `yaml:"version" json:"version"`
+	EnableCircuitBreaker    bool    `yaml:"enableCircuitBreaker" json:"enableCircuitBreaker"`
+	EnableLimit             bool    `yaml:"enableLimit" json:"enableLimit"`
+	EnableMetrics           bool    `yaml:"enableMetrics" json:"enableMetrics"`
+	EnablePprof             bool    `yaml:"enablePprof" json:"enablePprof"`
+	EnableRegistryDiscovery bool    `yaml:"enableRegistryDiscovery" json:"enableRegistryDiscovery"`
+	EnableTracing           bool    `yaml:"enableTracing" json:"enableTracing"`
+	Env                     string  `yaml:"env" json:"env"`
+	Host                    string  `yaml:"host" json:"host"`
+	Name                    string  `yaml:"name" json:"name"`
+	RegistryDiscoveryType   string  `yaml:"registryDiscoveryType" json:"registryDiscoveryType"`
+	TracingSamplingRate     float64 `yaml:"tracingSamplingRate" json:"tracingSamplingRate"`
+	Version                 string  `yaml:"version" json:"version"`
 }
 
 type Logger struct {
 	Format string `yaml:"format" json:"format"`
 	IsSave bool   `yaml:"isSave" json:"isSave"`
 	Level  string `yaml:"level" json:"level"`
+}
+
+type NacosRd struct {
+	IPAddr      string `yaml:"ipAddr" json:"ipAddr"`
+	NamespaceID string `yaml:"namespaceID" json:"namespaceID"`
+	Port        int    `yaml:"port" json:"port"`
 }
 
 type Grpc struct {

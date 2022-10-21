@@ -8,11 +8,12 @@ app:
   host: "192.168.3.27"   # 主机名称或ip
   enablePprof: false       # 是否开启性能分析功能，true:开启，false:关闭
   enableMetrics: true     # 是否开启指标采集，true:开启，false:关闭
-  enableLimit: false       # 是否开启限流，true:开启，false:关闭
-  enableCircuitBreaker: false       # 是否开启熔断，true:开启，false:关闭
-  enableTracing: false    # 是否开启链路跟踪，true:开启，false:关闭
-  enableRegistryDiscovery: false    # 是否开启注册与发现，true:开启，false:关闭
-  registryDiscoveryType: consul     # 注册与发现类型，consul、etcd
+  enableLimit: false       # 是否开启限流(自适应)，true:开启，false:关闭
+  enableCircuitBreaker: false          # 是否开启熔断(自适应)，true:开启，false:关闭
+  enableTracing: false                    # 是否开启链路跟踪，true:开启，false:关闭，如果为true必须设置jaeger配置
+  tracingSamplingRate: 1.0            # 链路采样率，0~1之间，0表示禁止采样，1表示采样所有链路
+  enableRegistryDiscovery: false    # 是否开启注册与发现，true:开启，false:关闭，如果为true，必须设置registryDiscoveryType对应类型的配置，例如consul配置
+  registryDiscoveryType: "consul"   # 注册与发现类型，consul、etcd、nacos
 
 
 # http 设置
@@ -45,7 +46,7 @@ mysql:
   enableLog: true                    # 是否开启打印所有日志
   slowThreshold: 0                  # 如果大于0，只打印时间大于阈值的日志，优先级比enableLog高，单位(毫秒)
   maxIdleConns: 3                  # 设置空闲连接池中连接的最大数量
-  maxOpenConns: 50              # 设置打开数据库连接的最大数量
+  maxOpenConns: 100            # 设置打开数据库连接的最大数量
   connMaxLifetime: 30            # 设置了连接可复用的最大时间，单位(分钟)
 
 
@@ -61,8 +62,7 @@ redis:
 # jaeger 配置
 jaeger:
   agentHost: "192.168.3.37"
-  agentPort: "6831"
-  samplingRate: 1.0     # 采样率，0~1之间，0表示禁止采样，大于等于1表示采样所有链路
+  agentPort: 6831
 
 
 # consul 配置
@@ -73,3 +73,10 @@ consul:
 # etcd 配置
 etcd:
   addrs: ["192.168.3.37:2379"]
+
+
+# nacos 设置，用在服务注册发现
+nacosRd:
+  ipAddr: "192.168.3.37"
+  port: 8848
+  namespaceID: "3454d2b5-2455-4d0e-bf6d-e033b086bb4c" # 名称空间id
