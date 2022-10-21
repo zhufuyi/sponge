@@ -92,13 +92,21 @@ sponge update
 
 **(1) Generate http server code**
 
-> sponge http --module-name=account --server-name=account --project-name=account --repo-addr=zhufuyi --db-dsn=root:123456@(127.0.0.1:3306)/test --db-table=student
+```bash
+sponge http \
+  --module-name=account \
+  --server-name=account \
+  --project-name=account \
+  --repo-addr=zhufuyi \
+  --db-dsn=root:123456@(127.0.0.1:3306)/test \
+  --db-table=student
+```
 
 **(2) Modify the configuration file `configs/<service name>.yml`**
 
 - Modify the redis configuration
 - If the field `enableTracing` is true, the jaeger address must be set
-- If the field `enableRegistryDiscovery` is true, the etcd address must be set
+- If the field `enableRegistryDiscovery` is true, the configuration of the corresponding type of **registryDiscoveryType** must be set
 
 **(3) Generate swagger documentation**
 
@@ -135,7 +143,8 @@ make image-build REPO_HOST=zhufuyi TAG=latest
 # Push the image to the remote image repository and delete the local image after a successful upload
 make image-push REPO_HOST=zhufuyi TAG=latest
 
-# Deploy k8s
+# Deploy to k8s
+kubectl apply -f deployments/kubernetes/*namespace.yml
 kubectl apply -f deployments/kubernetes/
 make deploy-k8s
 
@@ -149,7 +158,15 @@ You can also use Jenkins to automatically build deployments to k8s.
 
 #### Creating a new handler
 
-> sponge handler --module-name=account --db-dsn=root:123456@(127.0.0.1:3306)/test --db-table=teacher --out=./account
+add a new **handler** to an existing http server.
+
+```bash
+sponge handler \
+  --module-name=account \
+  --db-dsn=root:123456@(127.0.0.1:3306)/test \
+  --db-table=teacher \
+  --out=./account
+```
 
 Start up the server
 
@@ -165,13 +182,21 @@ Copy `http://localhost:8080/swagger/index.html` to your browser and test the api
 
 **(1) Generate grpc server code**
 
-> sponge grpc --module-name=account --server-name=account --project-name=account --repo-addr=zhufuyi --db-dsn=root:123456@(127.0.0.1:3306)/test --db-table=student
+```bash
+sponge grpc \
+  --module-name=account \
+  --server-name=account \
+  --project-name=account \
+  --repo-addr=zhufuyi \
+  --db-dsn=root:123456@(127.0.0.1:3306)/test \
+  --db-table=student
+```
 
 **(2) Modify the configuration file configs/<server name>.yml**
 
 - Modify the redis configuration
 - If the field `enableTracing` is true, the jaeger address must be set
-- If the field `enableRegistryDiscovery` is true, the etcd address must be set
+- If the field `enableRegistryDiscovery` is true, the configuration of the corresponding type of **registryDiscoveryType** must be set
 
 **(3) Generating grpc code**
 
@@ -208,7 +233,8 @@ make image-build REPO_HOST=zhufuyi TAG=latest
 # Push the image to the remote image repository and delete the local image after a successful upload
 make image-push REPO_HOST=zhufuyi TAG=latest
 
-# Deploy k8s
+# Deploy to k8s
+kubectl apply -f deployments/kubernetes/*namespace.yml
 kubectl apply -f deployments/kubernetes/
 make deploy-k8s
 
@@ -222,10 +248,25 @@ You can also use Jenkins to automatically build deployments to k8s.
 
 #### Creating a new service
 
-> sponge service --module-name=account --server-name=account --db-dsn=root:123456@(127.0.0.1:3306)/test --db-table=teacher --out=./account
+add a new **service** to an existing grpc server.
+
+```bash
+sponge service \
+  --module-name=account \
+  --server-name=account \
+  --db-dsn=root:123456@(127.0.0.1:3306)/test \
+  --db-table=teacher \
+  --out=./account
+```
 
 Start up the server
 
 > make proto && make run
 
 Use IDE to open the file `internal/service/<table name>_client_test.go` to test the api interface of grpc.
+
+<br>
+
+## License
+
+See the [LICENSE](LICENSE) file for licensing information.

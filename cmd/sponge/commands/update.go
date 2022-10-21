@@ -41,11 +41,11 @@ Examples:
 			if err != nil {
 				return err
 			}
-			err = CopyToTempDir()
+			version, err := CopyToTempDir()
 			if err != nil {
 				return err
 			}
-			fmt.Println("update sponge successfully.")
+			fmt.Printf("update sponge version to %s successfully.\n", version)
 			return nil
 		},
 	}
@@ -64,8 +64,8 @@ func runUpdateCommand(enableCNGoProxy bool) error {
 		command = "GOPROXY=https://goproxy.cn,direct && " + command
 	}
 	result := gobash.Run(ctx, command)
-	for v := range result.StdOut {
-		fmt.Printf("%s", v)
+	for range result.StdOut {
+		//fmt.Printf("%s", v)
 	}
 	if result.Err != nil {
 		return fmt.Errorf("exec command failed, %v", result.Err)
@@ -75,25 +75,25 @@ func runUpdateCommand(enableCNGoProxy bool) error {
 }
 
 // CopyToTempDir 复制模板文件到临时目录下
-func CopyToTempDir() error {
+func CopyToTempDir() (string, error) {
 	result, err := gobash.Exec("go env GOPATH")
 	if err != nil {
-		return fmt.Errorf("Exec() error %v", err)
+		return "", fmt.Errorf("Exec() error %v", err)
 	}
 	gopath := strings.ReplaceAll(string(result), "\n", "")
 	if gopath == "" {
-		return fmt.Errorf("$GOPATH is empty, you need set $GOPATH in your $PATH")
+		return "", fmt.Errorf("$GOPATH is empty, you need set $GOPATH in your $PATH")
 	}
 
 	// 找出新版本sponge代码文件夹
 	command := "ls $(go env GOPATH)/pkg/mod/github.com/zhufuyi | grep sponge@ | sort -r | head -1"
 	result, err = gobash.Exec(command)
 	if err != nil {
-		return fmt.Errorf("Exec() error %v", err)
+		return "", fmt.Errorf("Exec() error %v", err)
 	}
 	latestSpongeDirName := strings.ReplaceAll(string(result), "\n", "")
 	if latestSpongeDirName == "" {
-		return fmt.Errorf("not found 'sponge' directory in '$GOPATH/pkg/mod/github.com/zhufuyi'")
+		return "", fmt.Errorf("not found 'sponge' directory in '$GOPATH/pkg/mod/github.com/zhufuyi'")
 	}
 	srcDir := fmt.Sprintf("%s/pkg/mod/github.com/zhufuyi/%s", gopath, latestSpongeDirName)
 	destDir := os.TempDir() + "/sponge"
@@ -102,7 +102,13 @@ func CopyToTempDir() error {
 	_ = os.RemoveAll(adaptPathDelimiter(destDir))
 	command = fmt.Sprintf(`cp -rf %s %s`, adaptPathDelimiter(srcDir), adaptPathDelimiter(destDir))
 	_, err = gobash.Exec(command)
-	return err
+	if err != nil {
+		return "", fmt.Errorf("exec '%s' error, %v", command, err)
+	}
+
+	version := strings.Replace(latestSpongeDirName, "sponge@", "", 1)
+	_ = os.WriteFile(versionFile, []byte(version), 0666)
+	return version, err
 }
 
 func adaptPathDelimiter(filePath string) string {

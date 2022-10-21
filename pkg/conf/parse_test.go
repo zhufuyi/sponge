@@ -64,8 +64,10 @@ func TestWatch(t *testing.T) {
 
 	time.Sleep(time.Second)
 	content, _ := os.ReadFile("test.yml")
-	content = append(content, byte('#'))
+	contentChange := append(content, byte('#'))
 	time.Sleep(time.Millisecond * 100)
-	_ = os.WriteFile("test.yml", content, 0666)
+	_ = os.WriteFile("test.yml", contentChange, 0666) // 修改文件
+	time.Sleep(time.Millisecond * 100)
+	_ = os.WriteFile("test.yml", content, 0666) // 还原文件
 	time.Sleep(time.Millisecond * 100)
 }

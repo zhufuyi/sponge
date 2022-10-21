@@ -7,8 +7,6 @@
 *.log
 cmd/serverNameExample/serverNameExample
 cmd/sponge/sponge
-*@@*@@*
-coverage.txt
 
 # Test binary, built with `go test -c`
 *.test
