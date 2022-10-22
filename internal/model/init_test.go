@@ -94,15 +94,8 @@ func TestGetCacheType(t *testing.T) {
 	ct := GetCacheType()
 	assert.NotNil(t, ct)
 
-	go func() {
-		defer func() { recover() }()
-		InitCache("redis")
-		ct = GetCacheType()
-		assert.NotNil(t, ct)
-	}()
-
-	time.Sleep(time.Millisecond * 200)
 	defer func() { recover() }()
-	cacheType = nil
-	GetCacheType()
+	InitCache("redis")
+	ct = GetCacheType()
+	assert.NotNil(t, ct)
 }
