@@ -27,7 +27,10 @@ func newUserExampleService() *gotest.Service {
 
 	// 初始化mock cache
 	c := gotest.NewCache(map[string]interface{}{utils.Uint64ToStr(testData.ID): testData})
-	c.ICache = cache.NewUserExampleCache(c.RedisClient)
+	c.ICache = cache.NewUserExampleCache(&model.CacheType{
+		CType: "redis",
+		Rdb:   c.RedisClient,
+	})
 
 	// 初始化mock dao
 	d := gotest.NewDao(c, testData)

@@ -14,6 +14,7 @@ app:
   tracingSamplingRate: 1.0            # 链路采样率，0~1之间，0表示禁止采样，1表示采样所有链路
   enableRegistryDiscovery: false    # 是否开启注册与发现，true:开启，false:关闭，如果为true，必须设置registryDiscoveryType对应类型的配置，例如consul配置
   registryDiscoveryType: "consul"   # 注册与发现类型，consul、etcd、nacos
+  cacheType: "memory"                 # 缓存类型，memory、redis，如果设置为redis，必须设置redis配置
 
 
 # http 设置

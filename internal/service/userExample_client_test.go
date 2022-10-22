@@ -248,7 +248,7 @@ func Test_userExampleService_benchmark(t *testing.T) {
 				message := &pb.ListUserExampleByIDsRequest{
 					Ids: []uint64{1, 2, 3},
 				}
-				b, err := benchmark.New(host, protoFile, "ListByIDs", message, 100, importPaths...)
+				b, err := benchmark.New(host, protoFile, "ListByIDs", message, 1000, importPaths...)
 				if err != nil {
 					return err
 				}

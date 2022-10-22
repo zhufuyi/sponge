@@ -13,7 +13,10 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
-// redisCache redis cache结构体
+// CacheNotFound no hit cache
+var CacheNotFound = redis.Nil
+
+// redisCache redis cache object
 type redisCache struct {
 	client            *redis.Client
 	KeyPrefix         string
@@ -146,12 +149,12 @@ func (c *redisCache) MultiGet(ctx context.Context, keys []string, value interfac
 
 	// 通过反射注入到map
 	valueMap := reflect.ValueOf(value)
-	for i, value := range values {
-		if value == nil {
+	for i, v := range values {
+		if v == nil {
 			continue
 		}
 		object := c.newObject()
-		err = encoding.Unmarshal(c.encoding, []byte(value.(string)), object)
+		err = encoding.Unmarshal(c.encoding, []byte(v.(string)), object)
 		if err != nil {
 			//logger.Warnf("unmarshal data error: %+v, key=%s, cacheKey=%s type=%v", err, keys[i], cacheKeys[i], reflect.TypeOf(value))
 			continue
@@ -186,7 +189,12 @@ func (c *redisCache) Del(ctx context.Context, keys ...string) error {
 
 // SetCacheWithNotFound set value for notfound
 func (c *redisCache) SetCacheWithNotFound(ctx context.Context, key string) error {
-	return c.client.Set(ctx, key, NotFoundPlaceholder, DefaultNotFoundExpireTime).Err()
+	cacheKey, err := BuildCacheKey(c.KeyPrefix, key)
+	if err != nil {
+		return fmt.Errorf("BuildCacheKey error: %v, key=%s", err, key)
+	}
+
+	return c.client.Set(ctx, cacheKey, NotFoundPlaceholder, DefaultNotFoundExpireTime).Err()
 }
 
 // BuildCacheKey 构建一个带有前缀的缓存key

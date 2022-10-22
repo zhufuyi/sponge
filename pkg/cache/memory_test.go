@@ -101,7 +101,7 @@ func TestMemoryCacheError(t *testing.T) {
 	// Get empty result  test
 	key = utils.Uint64ToStr(testData.ID)
 	err = iCache.Get(c.Ctx, key, val)
-	assert.NoError(t, err)
+	assert.Error(t, err)
 
 	// Get result error test
 	key = utils.Uint64ToStr(testData.ID)
@@ -114,5 +114,9 @@ func TestMemoryCacheError(t *testing.T) {
 	err = iCache.Del(c.Ctx)
 	assert.NoError(t, err)
 	err = iCache.Del(c.Ctx, "")
+	assert.Error(t, err)
+
+	// empty key test
+	err = iCache.SetCacheWithNotFound(c.Ctx, "")
 	assert.Error(t, err)
 }

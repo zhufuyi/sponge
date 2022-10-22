@@ -2,6 +2,7 @@ package cache
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/zhufuyi/sponge/internal/model"
@@ -10,7 +11,6 @@ import (
 	"github.com/zhufuyi/sponge/pkg/encoding"
 	"github.com/zhufuyi/sponge/pkg/utils"
 
-	"github.com/go-redis/redis/v8"
 	"github.com/spf13/cast"
 )
 
@@ -37,13 +37,22 @@ type userExampleCache struct {
 }
 
 // NewUserExampleCache new a cache
-func NewUserExampleCache(rdb *redis.Client) UserExampleCache {
+func NewUserExampleCache(cacheType *model.CacheType) UserExampleCache {
 	jsonEncoding := encoding.JSONEncoding{}
 	cachePrefix := ""
-	return &userExampleCache{
-		cache: cache.NewRedisCache(rdb, cachePrefix, jsonEncoding, func() interface{} {
+	var c cache.Cache
+	if strings.ToLower(cacheType.CType) == "redis" {
+		c = cache.NewRedisCache(cacheType.Rdb, cachePrefix, jsonEncoding, func() interface{} {
 			return &model.UserExample{}
-		}),
+		})
+	} else {
+		c = cache.NewMemoryCache(cachePrefix, jsonEncoding, func() interface{} {
+			return &model.UserExample{}
+		})
+	}
+
+	return &userExampleCache{
+		cache: c,
 	}
 }
 

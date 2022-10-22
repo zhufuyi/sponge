@@ -65,9 +65,10 @@ func (m *memoryCache) Get(ctx context.Context, key string, val interface{}) erro
 
 	data, ok := m.client.Get(cacheKey)
 	if !ok {
-		return nil
+		return CacheNotFound
 	}
-	if data == NotFoundPlaceholder {
+
+	if string(data.([]byte)) == NotFoundPlaceholder {
 		return ErrPlaceholder
 	}
 
@@ -123,8 +124,15 @@ func (m *memoryCache) MultiGet(ctx context.Context, keys []string, value interfa
 }
 
 func (m *memoryCache) SetCacheWithNotFound(ctx context.Context, key string) error {
-	if m.client.Set(key, NotFoundPlaceholder, int64(DefaultNotFoundExpireTime)) {
-		return nil
+	cacheKey, err := BuildCacheKey(m.KeyPrefix, key)
+	if err != nil {
+		return fmt.Errorf("BuildCacheKey error: %v, key=%s", err, key)
 	}
-	return ErrSetMemoryWithNotFound
+
+	ok := m.client.SetWithTTL(cacheKey, []byte(NotFoundPlaceholder), 0, DefaultNotFoundExpireTime)
+	if !ok {
+		return errors.New("SetWithTTL failed")
+	}
+
+	return nil
 }

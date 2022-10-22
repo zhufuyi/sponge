@@ -10,6 +10,7 @@ import (
 	"github.com/zhufuyi/sponge/configs"
 	"github.com/zhufuyi/sponge/internal/config"
 
+	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
 	"github.com/zhufuyi/sponge/pkg/utils"
 
 	"github.com/gin-gonic/gin"
@@ -40,6 +41,7 @@ func TestHTTPServer(t *testing.T) {
 		WithHTTPReadTimeout(time.Second),
 		WithHTTPWriteTimeout(time.Second),
 		WithHTTPIsProd(true),
+		WithHTTPRegistry(&iRegistry{}, &registry.ServiceInstance{}),
 	)
 	assert.NotNil(t, server)
 }
@@ -60,7 +62,9 @@ func TestHTTPServerMock(t *testing.T) {
 
 	o := defaultHTTPOptions()
 	s := &httpServer{
-		addr: addr,
+		addr:      addr,
+		instance:  &registry.ServiceInstance{},
+		iRegistry: &iRegistry{},
 	}
 	s.server = &http.Server{
 		Addr:           addr,
@@ -81,4 +85,14 @@ func TestHTTPServerMock(t *testing.T) {
 	assert.NoError(t, err)
 	err = s.Stop()
 	assert.NoError(t, err)
+}
+
+type iRegistry struct{}
+
+func (i *iRegistry) Register(ctx context.Context, service *registry.ServiceInstance) error {
+	return nil
+}
+
+func (i *iRegistry) Deregister(ctx context.Context, service *registry.ServiceInstance) error {
+	return nil
 }

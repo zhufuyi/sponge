@@ -24,7 +24,7 @@ Features :
 - Configuration Center [nacos](https://github.com/alibaba/nacos)
 - Logging [zap](https://go.uber.org/zap)
 - Database component [gorm](https://gorm.io/gorm)
-- Caching component [go-redis](https://github.com/go-redis/redis)
+- Caching component [go-redis](https://github.com/go-redis/redis) [ristretto](github.com/dgraph-io/ristretto)
 - Documentation [swagger](https://github.com/swaggo/swag)
 - Authorization [jwt](https://github.com/golang-jwt/jwt)
 - Validator [validator](https://github.com/go-playground/validator)
@@ -102,11 +102,11 @@ sponge http \
   --db-table=student
 ```
 
-**(2) Modify the configuration file `configs/<service name>.yml`**
+**(2) If using the default configuration, skip this step. Modify the configuration file configs/<server name>.yml**
 
-- Modify the redis configuration
-- If the field `enableTracing` is true, the jaeger address must be set
-- If the field `enableRegistryDiscovery` is true, the configuration of the corresponding type of **registryDiscoveryType** must be set
+- If the field `cacheType` is `redis`, the `redis` address must be set.
+- If the field `enableTracing` is true, the `jaeger` address must be set.
+- If the field `enableRegistryDiscovery` is true, the configuration of the corresponding type of `registryDiscoveryType` must be set.
 
 **(3) Generate swagger documentation**
 
@@ -192,11 +192,11 @@ sponge grpc \
   --db-table=student
 ```
 
-**(2) Modify the configuration file configs/<server name>.yml**
+**(2) If using the default configuration, skip this step. Modify the configuration file configs/<server name>.yml**
 
-- Modify the redis configuration
-- If the field `enableTracing` is true, the jaeger address must be set
-- If the field `enableRegistryDiscovery` is true, the configuration of the corresponding type of **registryDiscoveryType** must be set
+- If the field `cacheType` is `redis`, the `redis` address must be set.
+- If the field `enableTracing` is true, the `jaeger` address must be set.
+- If the field `enableRegistryDiscovery` is true, the configuration of the corresponding type of `registryDiscoveryType` must be set.
 
 **(3) Generating grpc code**
 
@@ -264,6 +264,12 @@ Start up the server
 > make proto && make run
 
 Use IDE to open the file `internal/service/<table name>_client_test.go` to test the api interface of grpc.
+
+<br>
+
+## Give a Star! ⭐
+
+If you like it, and it's of use for you, please give a star, thanks!
 
 <br>
 

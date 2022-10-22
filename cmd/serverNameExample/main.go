@@ -61,7 +61,7 @@ func registerInits() []app.Init {
 	// 初始化数据库
 	inits = append(inits, func() {
 		model.InitMysql()
-		model.InitRedis()
+		model.InitCache(config.Get().App.CacheType)
 	})
 
 	// 初始化链路跟踪

@@ -39,7 +39,7 @@ func NewUserExampleHandler() UserExampleHandler {
 	return &userExampleHandler{
 		iDao: dao.NewUserExampleDao(
 			model.GetDB(),
-			cache.NewUserExampleCache(model.GetRedisCli()),
+			cache.NewUserExampleCache(model.GetCacheType()),
 		),
 	}
 }

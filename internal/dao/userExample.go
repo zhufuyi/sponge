@@ -10,7 +10,6 @@ import (
 	"github.com/zhufuyi/sponge/internal/model"
 
 	cacheBase "github.com/zhufuyi/sponge/pkg/cache"
-	"github.com/zhufuyi/sponge/pkg/goredis"
 	"github.com/zhufuyi/sponge/pkg/mysql/query"
 
 	"github.com/spf13/cast"
@@ -41,7 +40,9 @@ func NewUserExampleDao(db *gorm.DB, cache cache.UserExampleCache) UserExampleDao
 
 // Create a record, insert the record and the id value is written back to the table
 func (d *userExampleDao) Create(ctx context.Context, table *model.UserExample) error {
-	return d.db.WithContext(ctx).Create(table).Error
+	err := d.db.WithContext(ctx).Create(table).Error
+	_ = d.cache.Del(ctx, table.ID)
+	return err
 }
 
 // DeleteByID delete a record based on id
@@ -110,7 +111,7 @@ func (d *userExampleDao) GetByID(ctx context.Context, id uint64) (*model.UserExa
 		return record, nil
 	}
 
-	if errors.Is(err, goredis.ErrRedisNotFound) {
+	if errors.Is(err, model.ErrCacheNotFound) {
 		// 从mysql获取
 		table := &model.UserExample{}
 		err = d.db.WithContext(ctx).Where("id = ?", id).First(table).Error
@@ -149,33 +150,49 @@ func (d *userExampleDao) GetByIDs(ctx context.Context, ids []uint64) ([]*model.U
 		return nil, err
 	}
 
-	var missedID []uint64
+	var missedIDs []uint64
 	for _, id := range ids {
 		item, ok := itemMap[cast.ToString(id)]
 		if !ok {
-			missedID = append(missedID, id)
+			missedIDs = append(missedIDs, id)
 			continue
 		}
 		records = append(records, item)
 	}
 
 	// get missed data
-	if len(missedID) > 0 {
-		var missedData []*model.UserExample
-		err = d.db.WithContext(ctx).Where("id IN (?)", missedID).Find(&missedData).Error
-		if err != nil {
-			return nil, err
+	if len(missedIDs) > 0 {
+		// 找出主动占位符的id，也就是在mysql不存在的id
+		var realMissedIDs []uint64
+		for _, id := range missedIDs {
+			_, err = d.cache.Get(ctx, id)
+			if errors.Is(err, cacheBase.ErrPlaceholder) {
+				continue
+			} else {
+				realMissedIDs = append(realMissedIDs, id)
+			}
 		}
 
-		if len(missedData) > 0 {
-			records = append(records, missedData...)
-			err = d.cache.MultiSet(ctx, missedData, 10*time.Minute)
+		if len(realMissedIDs) > 0 {
+			var missedData []*model.UserExample
+			err = d.db.WithContext(ctx).Where("id IN (?)", realMissedIDs).Find(&missedData).Error
 			if err != nil {
 				return nil, err
 			}
+
+			if len(missedData) > 0 {
+				records = append(records, missedData...)
+				err = d.cache.MultiSet(ctx, missedData, 10*time.Minute)
+				if err != nil {
+					return nil, err
+				}
+			} else {
+				for _, id := range realMissedIDs {
+					_ = d.cache.SetCacheWithNotFound(ctx, id)
+				}
+			}
 		}
 	}
-
 	return records, nil
 }
 

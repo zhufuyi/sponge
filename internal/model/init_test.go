@@ -88,3 +88,21 @@ func TestInitRedis(t *testing.T) {
 func TestTableName(t *testing.T) {
 	t.Log(new(UserExample).TableName())
 }
+
+func TestGetCacheType(t *testing.T) {
+	InitCache("memory")
+	ct := GetCacheType()
+	assert.NotNil(t, ct)
+
+	go func() {
+		defer func() { recover() }()
+		InitCache("redis")
+		ct = GetCacheType()
+		assert.NotNil(t, ct)
+	}()
+
+	time.Sleep(time.Millisecond * 200)
+	defer func() { recover() }()
+	cacheType = nil
+	GetCacheType()
+}

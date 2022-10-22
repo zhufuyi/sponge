@@ -14,7 +14,10 @@ import (
 )
 
 var (
-	// ErrRecordNotFound 没有找到记录
+	// ErrCacheNotFound No hit cache
+	ErrCacheNotFound = redis.Nil
+
+	// ErrRecordNotFound no records found
 	ErrRecordNotFound = gorm.ErrRecordNotFound
 )
 
@@ -24,9 +27,12 @@ var (
 
 	redisCli *redis.Client
 	once2    sync.Once
+
+	cacheType *CacheType
+	once3     sync.Once
 )
 
-// InitMysql 连接mysql
+// InitMysql connect mysql
 func InitMysql() {
 	opts := []mysql.Option{
 		mysql.WithSlowThreshold(time.Duration(config.Get().Mysql.SlowThreshold) * time.Millisecond),
@@ -49,7 +55,7 @@ func InitMysql() {
 	}
 }
 
-// GetDB 返回db对象
+// GetDB get db
 func GetDB() *gorm.DB {
 	if db == nil {
 		once1.Do(func() {
@@ -60,7 +66,7 @@ func GetDB() *gorm.DB {
 	return db
 }
 
-// CloseMysql 关闭mysql
+// CloseMysql close mysql
 func CloseMysql() error {
 	if db == nil {
 		return nil
@@ -76,7 +82,37 @@ func CloseMysql() error {
 	return nil
 }
 
-// InitRedis 连接redis
+// ------------------------------------------------------------------------------------------
+
+// CacheType cache type
+type CacheType struct {
+	CType string        // cache type  memory or redis
+	Rdb   *redis.Client // if CType=redis, Rdb cannot be empty
+}
+
+// InitCache initial cache
+func InitCache(cType string) {
+	cacheType = &CacheType{
+		CType: cType,
+	}
+
+	if cType == "redis" {
+		cacheType.Rdb = GetRedisCli()
+	}
+}
+
+// GetCacheType get cacheType
+func GetCacheType() *CacheType {
+	if cacheType == nil {
+		once3.Do(func() {
+			InitCache(config.Get().App.CacheType)
+		})
+	}
+
+	return cacheType
+}
+
+// InitRedis connect redis
 func InitRedis() {
 	opts := []goredis.Option{
 		goredis.WithDialTimeout(time.Duration(config.Get().Redis.DialTimeout) * time.Second),
@@ -94,7 +130,7 @@ func InitRedis() {
 	}
 }
 
-// GetRedisCli 返回redis client
+// GetRedisCli get redis client
 func GetRedisCli() *redis.Client {
 	if redisCli == nil {
 		once2.Do(func() {
@@ -105,7 +141,7 @@ func GetRedisCli() *redis.Client {
 	return redisCli
 }
 
-// CloseRedis 关闭redis
+// CloseRedis close redis
 func CloseRedis() error {
 	if redisCli == nil {
 		return nil

@@ -72,6 +72,7 @@ type Redis struct {
 }
 
 type App struct {
+	CacheType               string  `yaml:"cacheType" json:"cacheType"`
 	EnableCircuitBreaker    bool    `yaml:"enableCircuitBreaker" json:"enableCircuitBreaker"`
 	EnableLimit             bool    `yaml:"enableLimit" json:"enableLimit"`
 	EnableMetrics           bool    `yaml:"enableMetrics" json:"enableMetrics"`

@@ -23,7 +23,10 @@ func newUserExampleCache() *gotest.Cache {
 	}
 
 	c := gotest.NewCache(testData)
-	c.ICache = NewUserExampleCache(c.RedisClient)
+	c.ICache = NewUserExampleCache(&model.CacheType{
+		CType: "redis",
+		Rdb:   c.RedisClient,
+	})
 	return c
 }
 
