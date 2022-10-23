@@ -10,6 +10,7 @@ kubectl create secret generic docker-auth-secret \
 
 启动服务：
 
+> kubectl apply -f ./*namespace.yml
 > kubectl apply -f ./
 
 查看启动状态：
@@ -22,5 +23,5 @@ kubectl create secret generic docker-auth-secret \
 
 ```bash
 # 在本机端口映射到服务的http端口
-kubectl port-forward --address=0.0.0.0 service/server-name-example-svc 8080:8080 -n project-name-example
+kubectl port-forward --address=0.0.0.0 service/<server-name-example-svc> 8080:8080 -n <project-name-example>
 ```

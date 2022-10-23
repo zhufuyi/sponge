@@ -89,7 +89,7 @@ func runGenHTTPCommand(moduleName string, serverName string, projectName string,
 	ignoreDirs := []string{"cmd/sponge", "sponge/.github", "sponge/.git", "sponge/api", "sponge/pkg",
 		"sponge/assets", "sponge/test", "sponge/third_party", "internal/service"} // 指定子目录下忽略处理的目录
 	ignoreFiles := []string{"swagger.json", "swagger.yaml", "proto.html", "protoc.sh",
-		"proto-doc.sh", "grpc_health_probe.sh", "grpc.go", "grpc_option.go", "grpc_test.go", "LICENSE", "doc.go",
+		"proto-doc.sh", "grpc.go", "grpc_option.go", "grpc_test.go", "LICENSE", "doc.go",
 		"grpc_userExample.go", "grpc_systemCode.go", "grpc_systemCode_test.go", "codecov.yml"} // 指定子目录下忽略处理的文件
 
 	r.SetSubDirs(subDirs...)

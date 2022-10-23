@@ -16,6 +16,20 @@
 
 **sponge** is a microservices framework for quickly creating http or grpc code. Generate codes `config`, `ecode`, `model`, `dao`, `handler`, `router`, `http`, `proto`, `service`, `grpc` from SQL DDL, these codes can be combined into complete services (similar to how a broken sponge cell can automatically reorganize into a new sponge).
 
+sponge framework diagram:
+
+<p align="center">
+<img align="center" width="1200px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/sponge-framework.png">
+</p>
+
+<br>
+
+microservices framework diagram:
+
+<p align="center">
+<img align="center" width="1200px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/microservices-framework.png">
+</p>
+
 Features :
 
 - Web framework [gin](https://github.com/gin-gonic/gin)
@@ -30,9 +44,9 @@ Features :
 - Validator [validator](https://github.com/go-playground/validator)
 - Rate limiter [aegis](https://github.com/go-kratos/aegis)
 - Circuit Breaker [aegis](https://github.com/go-kratos/aegis)
-- Tracking [opentelemetry](https://go.opentelemetry.io/otel)
+- Tracing [opentelemetry](https://go.opentelemetry.io/otel)
 - Monitoring [prometheus](https://github.com/prometheus/client_golang/prometheus), [grafana](https://github.com/grafana/grafana)
-- Service registration and discovery [etcd](https://github.com/etcd-io/etcd), [consul](https://github.com/hashicorp/consul), [nacos](https://github.com/alibaba/)
+- Service registry and discovery [etcd](https://github.com/etcd-io/etcd), [consul](https://github.com/hashicorp/consul), [nacos](https://github.com/alibaba/)
 - Performance analysis [go profile](https://go.dev/blog/pprof)
 - Code inspection [golangci-lint](https://github.com/golangci/golangci-lint)
 - Continuous Integration CI [jenkins](https://github.com/jenkinsci/jenkins)
@@ -77,6 +91,8 @@ The development specification follows the [Uber Go Language Coding Specification
 ## Quick start
 
 ### Install
+
+Add `$GOROOT/bin` to the system path.
 
 ```bash
 go install github.com/zhufuyi/sponge/cmd/sponge@latest
@@ -239,7 +255,7 @@ kubectl apply -f deployments/kubernetes/
 make deploy-k8s
 
 # Check the status of the service
-kubectl get -f account-deployment.yml
+kubectl get -f deployments/kubernetes/account-deployment.yml
 ```
 
 You can also use Jenkins to automatically build deployments to k8s.
@@ -264,12 +280,6 @@ Start up the server
 > make proto && make run
 
 Use IDE to open the file `internal/service/<table name>_client_test.go` to test the api interface of grpc.
-
-<br>
-
-## Give a Star! ⭐
-
-If you like it, and it's of use for you, please give a star, thanks!
 
 <br>
 
