@@ -18,17 +18,23 @@
 
 sponge framework diagram:
 
+<br>
+
 <p align="center">
-<img align="center" width="1200px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/sponge-framework.png">
+<img align="center" width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/sponge-framework.png">
 </p>
 
 <br>
 
 microservices framework diagram:
 
+<br>
+
 <p align="center">
-<img align="center" width="1200px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/microservices-framework.png">
+<img align="center" width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/microservices-framework.png">
 </p>
+
+<br>
 
 Features :
 
