@@ -1,0 +1,100 @@
+syntax = "proto3";
+
+package v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "./v1;v1";
+
+service GreeterService {
+  rpc Create(CreateDemoRequest) returns (CreateDemoReply) {
+    option (google.api.http) = {
+      post: "/api/v1/demo"
+      body: "*"
+    };
+  }
+
+  rpc DeleteByID(DeleteDemoByIDRequest) returns (DeleteDemoByIDReply) {
+    option (google.api.http) = {
+      delete: "/api/v1/demo/{id}"
+    };
+  }
+
+  rpc UpdateByID(UpdateDemoByIDRequest) returns (UpdateDemoByIDReply) {
+    option (google.api.http) = {
+      put: "/api/v1/demo/{id}"
+      body: "*"
+    };
+  }
+
+  rpc GetByID(GetDemoByIDRequest) returns (GetDemoByIDReply) {
+    option (google.api.http) = {
+      get: "/api/v1/demo/{id}"
+    };
+  }
+
+  rpc List(ListDemoRequest) returns (ListDemoReply) {
+    option (google.api.http) = {
+      post: "/api/v1/userExamples"
+      body: "*"
+    };
+  }
+}
+
+message CreateDemoRequest {
+  string name = 1;
+  string email = 2;
+  string password = 3;
+}
+
+message CreateDemoReply {
+  uint64   id = 1;
+}
+
+message DeleteDemoByIDRequest {
+  uint64   id = 1;
+}
+
+message DeleteDemoByIDReply {
+
+}
+
+message UpdateDemoByIDRequest {
+  uint64   id = 1;
+  string name = 2;
+  string email = 3;
+}
+
+message UpdateDemoByIDReply {
+
+}
+
+message Demo {
+  uint64   id = 1;
+  string name = 2;
+  string email = 3;
+
+}
+
+message GetDemoByIDRequest {
+  uint64   id = 1;
+}
+
+message GetDemoByIDReply {
+  Demo userExample = 1;
+}
+
+message ListDemoRequest {
+  Params params = 1;
+}
+
+message ListDemoReply {
+  int64 total =1;
+  repeated Demo userExamples = 2;
+}
+
+message Params {
+  int32 page = 1;
+  int32 limit = 2;
+  string sort = 3;
+}
