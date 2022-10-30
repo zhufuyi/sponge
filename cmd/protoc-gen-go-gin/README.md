@@ -1,6 +1,6 @@
 ## protoc-gen-go-gin
 
-根据protobuf生成gin调用rpc的handler方法。
+根据protobuf生成gin注册路由代码，可以使用自己log和response替换默认值，除了生成注册路由代码，还支持生成http的handler模板代码和调用rpc服务端模板代码。
 
 <br>
 
@@ -23,9 +23,7 @@ go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2.0
 
 ### 安装 protoc-gen-go-gin
 
-> go install github.com/zhufuyi/gotool/tools/protoc-gen-go-gin@latest
-
-注：go版本必须大于1.16
+> go install github.com/zhufuyi/sponge/cmd/protoc-gen-go-gin@latest
 
 <br>
 
@@ -60,7 +58,9 @@ service GreeterService {
 }
 ```
 
-### 生成*_gin.pb.go代码
+### 生成代码
+
+只生成*_router.pb.go
 
 ```bash
 protoc --proto_path=. --proto_path=./third_party \
@@ -70,3 +70,22 @@ protoc --proto_path=. --proto_path=./third_party \
   api/v1/*.proto
 ```
 
+生成*_router.pb.go和handler模板文件*_handler.go，用在由proto生成http的handler使用
+
+```bash
+protoc --proto_path=. --proto_path=./third_party \
+  --go_out=. --go_opt=paths=source_relative \
+  --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugins=handler \
+  --plugin=./protoc-gen-go-gin* \
+  api/v1/*.proto
+```
+
+生成*_router.pb.go和调用rpc模板文件*_service.go，用在rpc的gateway上
+```bash
+protoc --proto_path=. --proto_path=./third_party \
+  --go_out=. --go_opt=paths=source_relative \
+  --go-grpc_out=. --go-grpc_opt=paths=source_relative \
+  --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugins=service \
+  --plugin=./protoc-gen-go-gin* \
+  api/v1/*.proto
+```
