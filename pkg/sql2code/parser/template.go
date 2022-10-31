@@ -195,14 +195,14 @@ message List{{.TableName}}Reply {
 `
 
 	serviceCreateStructTmpl    *template.Template
-	serviceCreateStructTmplRaw = `				return cli.Create(ctx, &pb.Create{{.TableName}}Request{
+	serviceCreateStructTmplRaw = `				return cli.Create(ctx, &serverNameExampleV1.Create{{.TableName}}Request{
 					{{- range .Fields}}
 						{{.Name}}:  {{.GoTypeZero}}, {{if .Comment}} // {{.Comment}}{{end}}
 					{{- end}}
 				})`
 
 	serviceUpdateStructTmpl    *template.Template
-	serviceUpdateStructTmplRaw = `				return cli.UpdateByID(ctx, &pb.Update{{.TableName}}ByIDRequest{
+	serviceUpdateStructTmplRaw = `				return cli.UpdateByID(ctx, &serverNameExampleV1.Update{{.TableName}}ByIDRequest{
 					{{- range .Fields}}
 						{{.Name}}:  {{.GoTypeZero}}, {{if .Comment}} // {{.Comment}}{{end}}
 					{{- end}}

@@ -90,9 +90,8 @@ func replacePWD(line string, keywords ...string) string {
 			index := strings.Index(line, keyword)
 			if strings.Contains(line, "@") && strings.Contains(line, ":") {
 				return replaceDSN(line)
-			} else {
-				return fmt.Sprintf("%s: \"******\",\n", line[:index+len(keyword)])
 			}
+			return fmt.Sprintf("%s: \"******\",\n", line[:index+len(keyword)])
 		}
 	}
 

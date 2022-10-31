@@ -3,7 +3,11 @@ package errcode
 import (
 	"fmt"
 	"net/http"
+	"strconv"
+	"strings"
 )
+
+var errCodes = map[int]*Error{}
 
 // Error 错误
 type Error struct {
@@ -15,20 +19,22 @@ type Error struct {
 	details []string
 }
 
-var errCodes = map[int]string{}
-
 // NewError 创建新错误信息
 func NewError(code int, msg string) *Error {
 	if v, ok := errCodes[code]; ok {
-		panic(fmt.Sprintf("http error code = %d already exists, please replace with a new error code, old msg = %s", code, v))
+		panic(fmt.Sprintf("http error code = %d already exists, please replace with a new error code, old msg = %s", code, v.Msg()))
 	}
-	errCodes[code] = msg
-	return &Error{code: code, msg: msg}
+	e := &Error{code: code, msg: msg}
+	errCodes[code] = e
+	return e
 }
 
-// String 打印错误
-func (e *Error) Error() string {
-	return fmt.Sprintf("错误码：%d, 错误信息:：%s", e.Code(), e.Msg())
+// Err 转为标准error
+func (e *Error) Err() error {
+	if len(e.details) == 0 {
+		return fmt.Errorf("code = %d, msg = %s", e.code, e.msg)
+	}
+	return fmt.Errorf("code = %d, msg = %s, details = %v", e.code, e.msg, e.details)
 }
 
 // Code 错误码
@@ -82,4 +88,29 @@ func (e *Error) ToHTTPCode() int {
 	}
 
 	return e.Code()
+}
+
+// ParseError 根据标准错误信息解析出错误码和错误信息
+func ParseError(err error) *Error {
+	if err == nil {
+		return Success
+	}
+
+	unknownError := &Error{
+		code: -1,
+		msg:  "unknown error",
+	}
+
+	splits := strings.Split(err.Error(), ", msg = ")
+	codeStr := strings.ReplaceAll(splits[0], "code = ", "")
+	code, er := strconv.Atoi(codeStr)
+	if er != nil {
+		return unknownError
+	}
+
+	if e, ok := errCodes[code]; ok {
+		return e
+	}
+
+	return unknownError
 }

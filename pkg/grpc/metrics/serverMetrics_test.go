@@ -13,7 +13,7 @@ import (
 )
 
 func Test_srvRegisterMetrics(t *testing.T) {
-	opts := []MetricsOption{
+	opts := []Option{
 		WithCounterMetrics(prometheus.NewCounterVec(prometheus.CounterOpts{Name: "demo1"}, []string{})),
 		WithGaugeMetrics(prometheus.NewGaugeVec(prometheus.GaugeOpts{Name: "demo2"}, []string{})),
 		WithHistogramMetrics(prometheus.NewHistogramVec(prometheus.HistogramOpts{Name: "demo3"}, []string{})),
@@ -27,7 +27,7 @@ func Test_srvRegisterMetrics(t *testing.T) {
 func TestWithCounterMetrics(t *testing.T) {
 	testData := &prometheus.CounterVec{}
 	opt := WithCounterMetrics(testData)
-	o := new(metricsOptions)
+	o := new(options)
 	o.apply(opt)
 	assert.Contains(t, customizedCounterMetrics, testData)
 }
@@ -35,7 +35,7 @@ func TestWithCounterMetrics(t *testing.T) {
 func TestWithGaugeMetrics(t *testing.T) {
 	testData := &prometheus.GaugeVec{}
 	opt := WithGaugeMetrics(testData)
-	o := new(metricsOptions)
+	o := new(options)
 	o.apply(opt)
 	assert.Contains(t, customizedGaugeMetrics, testData)
 }
@@ -43,7 +43,7 @@ func TestWithGaugeMetrics(t *testing.T) {
 func TestWithHistogramMetrics(t *testing.T) {
 	testData := &prometheus.HistogramVec{}
 	opt := WithHistogramMetrics(testData)
-	o := new(metricsOptions)
+	o := new(options)
 	o.apply(opt)
 	assert.Contains(t, customizedHistogramMetrics, testData)
 }
@@ -51,7 +51,7 @@ func TestWithHistogramMetrics(t *testing.T) {
 func TestWithSummaryMetrics(t *testing.T) {
 	testData := &prometheus.SummaryVec{}
 	opt := WithSummaryMetrics(testData)
-	o := new(metricsOptions)
+	o := new(options)
 	o.apply(opt)
 	assert.Contains(t, customizedSummaryMetrics, testData)
 }

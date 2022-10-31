@@ -49,7 +49,7 @@ func TestHandler_GoRunHttpServer(t *testing.T) {
 		c.String(http.StatusOK, "hello world!")
 	}
 
-	h.GoRunHttpServer([]RouterInfo{
+	h.GoRunHTTPServer([]RouterInfo{
 		{
 			FuncName:    "create",
 			Method:      http.MethodPost,

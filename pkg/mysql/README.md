@@ -1,4 +1,4 @@
-## mysql客户端
+## mysql
 
 在[gorm](gorm.io/gorm)基础上封装的库，添加了链路跟踪，分页查询等功能。
 

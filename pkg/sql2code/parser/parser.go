@@ -4,16 +4,17 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"go/format"
+	"sort"
+	"strings"
+	"text/template"
+
 	"github.com/blastrain/vitess-sqlparser/tidbparser/ast"
 	"github.com/blastrain/vitess-sqlparser/tidbparser/dependency/mysql"
 	"github.com/blastrain/vitess-sqlparser/tidbparser/dependency/types"
 	"github.com/blastrain/vitess-sqlparser/tidbparser/parser"
 	"github.com/huandu/xstrings"
 	"github.com/jinzhu/inflection"
-	"go/format"
-	"sort"
-	"strings"
-	"text/template"
 )
 
 const (

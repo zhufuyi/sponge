@@ -1,12 +1,6 @@
 ## jy2struct
 
-json和yaml转go struct代码。
-
-<br>
-
-### 安装
-
-> go get -u github.com/zhufuyi/pkg/jy2struct
+一个生成go struct代码库，支持json和yaml。
 
 <br>
 

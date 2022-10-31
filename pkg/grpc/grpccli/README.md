@@ -5,7 +5,7 @@ grpc 客户端，支持服务发现、日志、负载均衡、链路跟踪、指
 ### 使用示例
 
 ```go
-func grpcClientExample() pb.UserExampleServiceClient {
+func grpcClientExample() serverNameV1.UserExampleServiceClient {
 	err := config.Init(third_party.Path("../config/conf.yml"))
 	if err != nil {
 		panic(err)
@@ -31,7 +31,7 @@ func grpcClientExample() pb.UserExampleServiceClient {
 		panic(err)
 	}
 
-	return pb.NewUserExampleServiceClient(conn)
+	return serverNameV1.NewUserExampleServiceClient(conn)
 }
 
 func discoveryETCD(endpoints []string) registry.Discovery {

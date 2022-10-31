@@ -165,11 +165,11 @@ func TestUserDao_Create(t *testing.T) {
 	defer d.Close()
 	testData := d.TestData.(*User)
 
-	d.SqlMock.ExpectBegin()
-	d.SqlMock.ExpectExec("INSERT INTO .*").
+	d.SQLMock.ExpectBegin()
+	d.SQLMock.ExpectExec("INSERT INTO .*").
 		WithArgs(testData.Name, testData.CreatedAt, testData.UpdatedAt, testData.ID).
 		WillReturnResult(sqlmock.NewResult(int64(testData.ID), 1))
-	d.SqlMock.ExpectCommit()
+	d.SQLMock.ExpectCommit()
 
 	err := d.IDao.(*userDao).Create(d.Ctx, testData)
 	if err != nil {
@@ -182,11 +182,11 @@ func TestUserDao_Update(t *testing.T) {
 	defer d.Close()
 	testData := d.TestData.(*User)
 
-	d.SqlMock.ExpectBegin()
-	d.SqlMock.ExpectExec("UPDATE .*").
+	d.SQLMock.ExpectBegin()
+	d.SQLMock.ExpectExec("UPDATE .*").
 		WithArgs(testData.Name, d.AnyTime, testData.ID).
 		WillReturnResult(sqlmock.NewResult(1, 1))
-	d.SqlMock.ExpectCommit()
+	d.SQLMock.ExpectCommit()
 
 	err := d.IDao.(*userDao).UpdateByID(d.Ctx, testData)
 	if err != nil {
@@ -199,11 +199,11 @@ func TestUserDao_Delete(t *testing.T) {
 	defer d.Close()
 	testData := d.TestData.(*User)
 
-	d.SqlMock.ExpectBegin()
-	d.SqlMock.ExpectExec("DELETE  FROM .*").
+	d.SQLMock.ExpectBegin()
+	d.SQLMock.ExpectExec("DELETE  FROM .*").
 		WithArgs(testData.ID).
 		WillReturnResult(sqlmock.NewResult(1, 1))
-	d.SqlMock.ExpectCommit()
+	d.SQLMock.ExpectCommit()
 
 	err := d.IDao.(*userDao).DeleteByID(d.Ctx, testData.ID)
 	if err != nil {
@@ -218,7 +218,7 @@ func TestUserDao_GetByID(t *testing.T) {
 
 	rows := sqlmock.NewRows([]string{"id", "name"}).AddRow(testData.ID, testData.Name)
 
-	d.SqlMock.ExpectQuery("SELECT .*").
+	d.SQLMock.ExpectQuery("SELECT .*").
 		WithArgs(testData.ID).
 		WillReturnRows(rows)
 
@@ -227,7 +227,7 @@ func TestUserDao_GetByID(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = d.SqlMock.ExpectationsWereMet()
+	err = d.SQLMock.ExpectationsWereMet()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -239,7 +239,7 @@ func TestUserDao_GetByColumns(t *testing.T) {
 	testData := d.TestData.(*User)
 
 	rows := sqlmock.NewRows([]string{"id", "name"}).AddRow(testData.ID, testData.Name)
-	d.SqlMock.ExpectQuery("SELECT .*").WillReturnRows(rows)
+	d.SQLMock.ExpectQuery("SELECT .*").WillReturnRows(rows)
 
 	_, _, err := d.IDao.(*userDao).GetByColumns(d.Ctx, &query.Params{
 		Page: 0,
@@ -250,7 +250,7 @@ func TestUserDao_GetByColumns(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = d.SqlMock.ExpectationsWereMet()
+	err = d.SQLMock.ExpectationsWereMet()
 	if err != nil {
 		t.Fatal(err)
 	}

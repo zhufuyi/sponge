@@ -42,7 +42,7 @@ func runLogHTTPServer() string {
 	//))
 
 	helloFun := func(c *gin.Context) {
-		logger.Info("test request id", utils.FieldRequestIDFromContext(c))
+		logger.Info("test request id", GCtxRequestIDField(c))
 		response.Success(c, "hello world")
 	}
 

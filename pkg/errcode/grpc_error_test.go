@@ -42,6 +42,7 @@ func TestToRPCCode(t *testing.T) {
 		codes = append(codes, s.ToRPCCode().String())
 	}
 	t.Log(codes)
+
 	var errors []error
 	for i, s := range status {
 		if i%2 == 0 {
@@ -51,6 +52,12 @@ func TestToRPCCode(t *testing.T) {
 		errors = append(errors, s.ToRPCErr(s.status.Message()))
 	}
 	t.Log(errors)
+
+	codeInt := []int{}
+	for _, s := range status {
+		codeInt = append(codeInt, ToHTTPErr(s.status).code)
+	}
+	t.Log(codeInt)
 }
 
 func TestGCode(t *testing.T) {

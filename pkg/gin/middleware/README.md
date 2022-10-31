@@ -1,4 +1,4 @@
-## render
+## middleware
 
 gin中间件插件。
 

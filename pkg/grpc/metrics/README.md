@@ -49,7 +49,7 @@ func main() {
 	}
 
 	server := grpc.NewServer(getServerOptions()...)
-	pb.RegisterGreeterServer(server, &GreeterServer{})
+    serverNameV1.RegisterGreeterServer(server, &GreeterServer{})
 
 	// 启动metrics服务器，默认采集grpc指标，开启、go指标
 	metrics.ServerHTTPService(":9092", server)
@@ -85,7 +85,7 @@ func main() {
 	metrics.ClientHTTPService(":9094")
 	fmt.Println("start metrics server", ":9094")
 
-	client := pb.NewGreeterClient(conn)
+	client := serverNameV1.NewGreeterClient(conn)
 	i := 0
 	for {
 		i++

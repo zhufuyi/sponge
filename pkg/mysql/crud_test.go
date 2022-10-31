@@ -44,11 +44,11 @@ func TestCreate(t *testing.T) {
 	defer d.Close()
 	testData := d.TestData.(*userExample)
 
-	d.SqlMock.ExpectBegin()
-	d.SqlMock.ExpectExec("INSERT INTO .*").
+	d.SQLMock.ExpectBegin()
+	d.SQLMock.ExpectExec("INSERT INTO .*").
 		WithArgs(d.GetAnyArgs(testData)...).
 		WillReturnResult(sqlmock.NewResult(1, 1))
-	d.SqlMock.ExpectCommit()
+	d.SQLMock.ExpectCommit()
 
 	err := Create(d.Ctx, d.DB, testData)
 	assert.NoError(t, err)
@@ -59,11 +59,11 @@ func TestDelete(t *testing.T) {
 	defer d.Close()
 	testData := d.TestData.(*userExample)
 
-	d.SqlMock.ExpectBegin()
-	d.SqlMock.ExpectExec("UPDATE .*").
+	d.SQLMock.ExpectBegin()
+	d.SQLMock.ExpectExec("UPDATE .*").
 		WithArgs(d.AnyTime, testData.Name).
 		WillReturnResult(sqlmock.NewResult(int64(testData.ID), 1))
-	d.SqlMock.ExpectCommit()
+	d.SQLMock.ExpectCommit()
 
 	err := Delete(d.Ctx, d.DB, table, "name = ?", testData.Name)
 	assert.NoError(t, err)
@@ -74,11 +74,11 @@ func TestDeleteByID(t *testing.T) {
 	defer d.Close()
 	testData := d.TestData.(*userExample)
 
-	d.SqlMock.ExpectBegin()
-	d.SqlMock.ExpectExec("UPDATE .*").
+	d.SQLMock.ExpectBegin()
+	d.SQLMock.ExpectExec("UPDATE .*").
 		WithArgs(d.AnyTime, testData.ID).
 		WillReturnResult(sqlmock.NewResult(int64(testData.ID), 1))
-	d.SqlMock.ExpectCommit()
+	d.SQLMock.ExpectCommit()
 
 	err := Delete(d.Ctx, d.DB, table, "id = ?", testData.ID)
 	assert.NoError(t, err)
@@ -89,11 +89,11 @@ func TestUpdate(t *testing.T) {
 	defer d.Close()
 	testData := d.TestData.(*userExample)
 
-	d.SqlMock.ExpectBegin()
-	d.SqlMock.ExpectExec("UPDATE .*").
+	d.SQLMock.ExpectBegin()
+	d.SQLMock.ExpectExec("UPDATE .*").
 		WithArgs(sqlmock.AnyArg(), d.AnyTime, testData.Name).
 		WillReturnResult(sqlmock.NewResult(int64(testData.ID), 1))
-	d.SqlMock.ExpectCommit()
+	d.SQLMock.ExpectCommit()
 
 	err := Update(d.Ctx, d.DB, table, "age", gorm.Expr("age  + ?", 1), "name = ?", testData.Name)
 	assert.NoError(t, err)
@@ -104,11 +104,11 @@ func TestUpdates(t *testing.T) {
 	defer d.Close()
 	testData := d.TestData.(*userExample)
 
-	d.SqlMock.ExpectBegin()
-	d.SqlMock.ExpectExec("UPDATE .*").
+	d.SQLMock.ExpectBegin()
+	d.SQLMock.ExpectExec("UPDATE .*").
 		WithArgs(sqlmock.AnyArg(), d.AnyTime, testData.Gender).
 		WillReturnResult(sqlmock.NewResult(int64(testData.ID), 1))
-	d.SqlMock.ExpectCommit()
+	d.SQLMock.ExpectCommit()
 
 	update := KV{"age": gorm.Expr("age  + ?", 1)}
 	err := Updates(d.Ctx, d.DB, table, update, "gender = ?", testData.Gender)
@@ -123,7 +123,7 @@ func TestGetByID(t *testing.T) {
 	rows := sqlmock.NewRows([]string{"id", "created_at", "updated_at", "name", "age", "gender"}).
 		AddRow(testData.ID, testData.CreatedAt, testData.UpdatedAt, testData.Name, testData.Age, testData.Gender)
 
-	d.SqlMock.ExpectQuery("SELECT .*").WithArgs(testData.ID).WillReturnRows(rows)
+	d.SQLMock.ExpectQuery("SELECT .*").WithArgs(testData.ID).WillReturnRows(rows)
 
 	err := GetByID(d.Ctx, d.DB, table, testData.ID)
 	assert.NoError(t, err)
@@ -139,7 +139,7 @@ func TestGet(t *testing.T) {
 	rows := sqlmock.NewRows([]string{"id", "created_at", "updated_at", "name", "age", "gender"}).
 		AddRow(testData.ID, testData.CreatedAt, testData.UpdatedAt, testData.Name, testData.Age, testData.Gender)
 
-	d.SqlMock.ExpectQuery("SELECT .*").WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnRows(rows) // 单独时参数为1个，整个文件测试参数为2个
+	d.SQLMock.ExpectQuery("SELECT .*").WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnRows(rows) // 单独时参数为1个，整个文件测试参数为2个
 
 	err := Get(d.Ctx, d.DB, table, "name = ?", testData.Name)
 	assert.NoError(t, err)
@@ -155,7 +155,7 @@ func TestList(t *testing.T) {
 	rows := sqlmock.NewRows([]string{"id", "created_at", "updated_at", "name", "age", "gender"}).
 		AddRow(testData.ID, testData.CreatedAt, testData.UpdatedAt, testData.Name, testData.Age, testData.Gender)
 
-	d.SqlMock.ExpectQuery("SELECT .*").WillReturnRows(rows)
+	d.SQLMock.ExpectQuery("SELECT .*").WillReturnRows(rows)
 
 	page := query.NewPage(0, 10, "")
 	tables := []userExample{}
@@ -175,7 +175,7 @@ func TestCount(t *testing.T) {
 	rows := sqlmock.NewRows([]string{"id", "created_at", "updated_at", "name", "age", "gender"}).
 		AddRow(testData.ID, testData.CreatedAt, testData.UpdatedAt, testData.Name, testData.Age, testData.Gender)
 
-	d.SqlMock.ExpectQuery("SELECT .*").
+	d.SQLMock.ExpectQuery("SELECT .*").
 		WithArgs(sqlmock.AnyArg()).
 		WillReturnRows(rows)
 
@@ -199,9 +199,9 @@ func createUser() error {
 	testData := d.TestData.(*userExample)
 	rows := sqlmock.NewRows([]string{"id", "created_at", "updated_at", "name", "age", "gender"}).
 		AddRow(testData.ID, testData.CreatedAt, testData.UpdatedAt, testData.Name, testData.Age, testData.Gender)
-	d.SqlMock.ExpectBegin()
-	d.SqlMock.ExpectQuery("SELECT .*").WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnRows(rows) // 单独时参数为1个，整个文件测试参数为2个
-	d.SqlMock.ExpectCommit()
+	d.SQLMock.ExpectBegin()
+	d.SQLMock.ExpectQuery("SELECT .*").WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnRows(rows) // 单独时参数为1个，整个文件测试参数为2个
+	d.SQLMock.ExpectCommit()
 
 	// 注意，当你在一个事务中应使用 tx 作为数据库句柄
 	tx := d.DB.Begin()

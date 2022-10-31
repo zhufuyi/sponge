@@ -304,12 +304,3 @@ func TestRegistry_heartBeat(t *testing.T) {
 	go r.heartBeat(context.Background(), 1, "foo", "bar")
 	time.Sleep(time.Second)
 }
-
-func TestRegistry_retry(t *testing.T) {
-	r := newEtcdRegistry()
-	ctx := context.Background()
-	leaseID := clientv3.LeaseID(0)
-	kac, _ := r.client.KeepAlive(ctx, leaseID)
-	go r.retry(ctx, leaseID, "foo", "bar", kac)
-	time.Sleep(time.Second)
-}

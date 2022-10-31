@@ -89,7 +89,7 @@ func (m *memoryCache) Del(ctx context.Context, keys ...string) error {
 	key := keys[0]
 	cacheKey, err := BuildCacheKey(m.KeyPrefix, key)
 	if err != nil {
-		return fmt.Errorf("build cache key error, err=%v, key=%s\n", err, key)
+		return fmt.Errorf("build cache key error, err=%v, key=%s", err, key)
 	}
 	m.client.Del(cacheKey)
 	return nil

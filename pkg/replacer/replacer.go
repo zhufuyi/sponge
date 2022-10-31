@@ -249,7 +249,9 @@ func (r *replacerInfo) SaveFiles() error {
 	}
 
 	if len(existFiles) > 0 {
-		return fmt.Errorf("existing files detected\n    %s\nCode generation has been cancelled\n", strings.Join(existFiles, "\n    "))
+		//nolint
+		return fmt.Errorf("existing files detected\n    %s\nCode generation has been cancelled\n",
+			strings.Join(existFiles, "\n    "))
 	}
 
 	for file, data := range writeData {

@@ -1,6 +1,6 @@
-## validator
+## swagger
 
-gin请求参数校验。
+gin swagger。
 
 <br>
 

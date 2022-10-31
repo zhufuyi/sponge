@@ -27,7 +27,7 @@ func main() {
 	}
 	defer roundRobinConn.Close()
 
-	client := pb.NewGreeterClient(roundRobinConn)
+	client := serverNameV1.NewGreeterClient(roundRobinConn)
 	for {
 		err = sayHello(client)
 		if err != nil {

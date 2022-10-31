@@ -56,7 +56,7 @@ func (g *GRPCStatus) Err(details ...Detail) error {
 	if len(dts) == 0 {
 		return status.Errorf(g.status.Code(), "%s", g.status.Message())
 	}
-	return status.Errorf(g.status.Code(), "%s details = %v", g.status.Message(), dts)
+	return status.Errorf(g.status.Code(), "%s details = %s", g.status.Message(), dts)
 }
 
 // ToRPCErr converted to standard RPC error

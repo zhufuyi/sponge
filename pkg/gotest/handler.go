@@ -46,8 +46,8 @@ func NewHandler(dao *Dao, testData interface{}) *Handler {
 	}
 }
 
-// GoRunHttpServer run http server
-func (h *Handler) GoRunHttpServer(fns []RouterInfo) {
+// GoRunHTTPServer run http server
+func (h *Handler) GoRunHTTPServer(fns []RouterInfo) {
 	if len(fns) == 0 {
 		panic("HandlerFunc is empty")
 	}

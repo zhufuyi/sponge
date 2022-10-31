@@ -16,7 +16,7 @@ import (
 type Dao struct {
 	Ctx      context.Context
 	TestData interface{}
-	SqlMock  sqlmock.Sqlmock
+	SQLMock  sqlmock.Sqlmock
 	Cache    *Cache
 	DB       *gorm.DB
 	IDao     interface{}
@@ -57,7 +57,7 @@ func NewDao(c *Cache, testData interface{}) *Dao {
 
 	return &Dao{
 		Ctx:      context.Background(),
-		SqlMock:  mock,
+		SQLMock:  mock,
 		TestData: testData,
 		Cache:    c,
 		DB:       mockDB,

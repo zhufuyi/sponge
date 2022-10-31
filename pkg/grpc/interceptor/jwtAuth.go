@@ -2,6 +2,7 @@ package interceptor
 
 import (
 	"context"
+
 	"github.com/zhufuyi/sponge/pkg/jwt"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
@@ -24,9 +25,10 @@ var (
 	authIgnoreMethods = map[string]struct{}{}
 )
 
-// AuthOption 鉴权设置
+// AuthOption 设置鉴权字段
 type AuthOption func(*AuthOptions)
 
+// AuthOptions 鉴权设置
 type AuthOptions struct {
 	authScheme    string
 	ctxClaimsName string

@@ -17,11 +17,11 @@ func StreamClientMetrics() grpc.StreamClientInterceptor {
 }
 
 // UnaryServerMetrics 服务端指标unary拦截器
-func UnaryServerMetrics(opts ...metrics.MetricsOption) grpc.UnaryServerInterceptor {
+func UnaryServerMetrics(opts ...metrics.Option) grpc.UnaryServerInterceptor {
 	return metrics.UnaryServerMetrics(opts...)
 }
 
 // StreamServerMetrics 服务端指标stream拦截器
-func StreamServerMetrics(opts ...metrics.MetricsOption) grpc.StreamServerInterceptor {
+func StreamServerMetrics(opts ...metrics.Option) grpc.StreamServerInterceptor {
 	return metrics.StreamServerMetrics(opts...)
 }

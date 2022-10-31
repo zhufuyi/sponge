@@ -3,10 +3,11 @@ package replacer
 import (
 	"embed"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 //go:embed testDir

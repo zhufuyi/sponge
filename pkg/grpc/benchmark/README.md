@@ -10,7 +10,7 @@ func benchmarkExample() error {
 	protoFile := "api/serverNameExample/v1/userExample.proto"
 	// 如果压测过程中缺少第三方依赖，复制到项目的third_party目录下(不包括import路径)
 	importPaths := []string{"third_party"}
-	message := &pb.GetUserExampleByIDRequest{
+	message := &serverNameV1.GetUserExampleByIDRequest{
 		ID: 2,
 	}
 

@@ -4,12 +4,6 @@
 
 <br>
 
-### 安装
-
-> go get -u github.com/zhufuyi/pkg/sql2code
-
-<br>
-
 ### 使用示例
 
 主要设置参数

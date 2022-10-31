@@ -58,12 +58,6 @@ func (h *httpServer3) String() string {
 
 func TestApp(t *testing.T) {
 	var (
-		inits = []Init{
-			func() {
-				fmt.Println("init config")
-			},
-		}
-
 		s       = &httpServer{}
 		s2      = &httpServer2{}
 		servers = []IServer{s, s2}
@@ -78,7 +72,7 @@ func TestApp(t *testing.T) {
 		}
 	)
 
-	a := New(inits, servers, closes)
+	a := New(servers, closes)
 	go a.Run()
 	time.Sleep(time.Second)
 
@@ -91,7 +85,6 @@ func TestApp(t *testing.T) {
 }
 
 func TestAppError(t *testing.T) {
-	inits := []Init{}
 	s3 := &httpServer3{}
 	servers := []IServer{s3}
 	closes := []Close{
@@ -100,7 +93,7 @@ func TestAppError(t *testing.T) {
 		},
 	}
 
-	a := New(inits, servers, closes)
+	a := New(servers, closes)
 	go func() {
 		defer func() {
 			if e := recover(); e != nil {

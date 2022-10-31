@@ -16,7 +16,7 @@ var (
 	defaultMaxLength = 300
 
 	// default zap log
-	defaultLogger, _ = zap.NewDevelopment()
+	defaultLogger, _ = zap.NewProduction()
 
 	// Default request id name
 	defaultRequestIDNameInHeader  = "X-Request-Id"

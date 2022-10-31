@@ -1,16 +1,19 @@
 package middleware
 
 import (
+	"context"
+
 	"github.com/zhufuyi/sponge/pkg/krand"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 const (
 	// ContextRequestIDKey context request id for context
 	ContextRequestIDKey = "request_id"
 
-	// HeaderXRequestIDKey http header request ID key
+	// HeaderXRequestIDKey http header request id key
 	HeaderXRequestIDKey = "X-Request-ID"
 )
 
@@ -35,18 +38,41 @@ func RequestID() gin.HandlerFunc {
 	}
 }
 
-// GetRequestIDFromContext returns 'RequestID' from the given context if present.
-func GetRequestIDFromContext(c *gin.Context) string {
-	if v, ok := c.Get(ContextRequestIDKey); ok {
+// GCtxRequestID get request id from gin.Context
+func GCtxRequestID(c *gin.Context) string {
+	if v, isExist := c.Get(defaultRequestIDNameInContext); isExist {
 		if requestID, ok := v.(string); ok {
 			return requestID
 		}
 	}
-
 	return ""
 }
 
-// GetRequestIDFromHeaders returns 'RequestID' from the headers if present.
-func GetRequestIDFromHeaders(c *gin.Context) string {
-	return c.Request.Header.Get(HeaderXRequestIDKey)
+// GCtxRequestIDField get request id field from gin.Context
+func GCtxRequestIDField(c *gin.Context) zap.Field {
+	return zap.String(defaultRequestIDNameInContext, GCtxRequestID(c))
+}
+
+// CtxRequestID get request id from context.Context
+func CtxRequestID(ctx context.Context) string {
+	v := ctx.Value(defaultRequestIDNameInContext)
+	if str, ok := v.(string); ok {
+		return str
+	}
+	return ""
+}
+
+// CtxRequestIDField get request id field from context.Context
+func CtxRequestIDField(ctx context.Context) zap.Field {
+	return zap.String(defaultRequestIDNameInContext, CtxRequestID(ctx))
+}
+
+// HeaderRequestID get request id from the header
+func HeaderRequestID(c *gin.Context) string {
+	return c.Request.Header.Get(defaultRequestIDNameInHeader)
+}
+
+// HeaderRequestIDField get request id field from header
+func HeaderRequestIDField(c *gin.Context) zap.Field {
+	return zap.String(defaultRequestIDNameInHeader, HeaderRequestID(c))
 }
