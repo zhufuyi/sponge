@@ -23,7 +23,7 @@ type {{$.Name}}Logicer interface {
 type {{$.Name}}Option func(*{{$.LowerName}}Options)
 
 type {{$.LowerName}}Options struct {
-	isFromRpc bool
+	isFromRPC bool
 	responser errcode.Responser
 	zapLog    *zap.Logger
 }
@@ -36,13 +36,13 @@ func (o *{{$.LowerName}}Options) apply(opts ...{{$.Name}}Option) {
 
 func With{{$.Name}}HTTPResponse() {{$.Name}}Option {
 	return func(o *{{$.LowerName}}Options) {
-		o.isFromRpc = false
+		o.isFromRPC = false
 	}
 }
 
-func With{{$.Name}}RpcResponse() {{$.Name}}Option {
+func With{{$.Name}}RPCResponse() {{$.Name}}Option {
 	return func(o *{{$.LowerName}}Options) {
-		o.isFromRpc = true
+		o.isFromRPC = true
 	}
 }
 
@@ -63,7 +63,7 @@ func Register{{$.Name}}Router(iRouter gin.IRouter, iLogic {{$.Name}}Logicer, opt
 	o.apply(opts...)
 
 	if o.responser == nil {
-		o.responser = errcode.NewResponse(o.isFromRpc)
+		o.responser = errcode.NewResponse(o.isFromRPC)
 	}
 	if o.zapLog == nil {
 		o.zapLog,_ = zap.NewProduction()
@@ -95,26 +95,26 @@ func (r *{{$.LowerName}}Router) {{ .HandlerName }} (c *gin.Context) {
 	req := &{{.Request}}{}
 {{if .HasPathParams }}
 	if err := c.ShouldBindUri(req); err != nil {
-		r.zapLog.Warn("ShouldBindUri error", zap.Error(err))
+		r.zapLog.Warn("ShouldBindUri error", zap.Error(err), middleware.GCtxRequestIDField(c))
 		r.iResponse.ParamError(c, err)
 		return
 	}
 {{end}}
 {{if eq .Method "GET" "DELETE" }}
 	if err := c.ShouldBindQuery(req); err != nil {
-		r.zapLog.Warn("ShouldBindQuery error", zap.Error(err))
+		r.zapLog.Warn("ShouldBindQuery error", zap.Error(err), middleware.GCtxRequestIDField(c))
 		r.iResponse.ParamError(c, err)
 		return
 	}
 {{else if eq .Method "POST" "PUT" }}
 	if err := c.ShouldBindJSON(req); err != nil {
-		r.zapLog.Warn("ShouldBindJSON error", zap.Error(err))
+		r.zapLog.Warn("ShouldBindJSON error", zap.Error(err), middleware.GCtxRequestIDField(c))
 		r.iResponse.ParamError(c, err)
 		return
 	}
 {{else}}
 	if err := c.ShouldBind(req); err != nil {
-		r.zapLog.Warn("ShouldBind error", zap.Error(err))
+		r.zapLog.Warn("ShouldBind error", zap.Error(err), middleware.GCtxRequestIDField(c))
 		r.iResponse.ParamError(c, err)
 		return
 	}
@@ -128,7 +128,7 @@ func (r *{{$.LowerName}}Router) {{ .HandlerName }} (c *gin.Context) {
 	if err != nil {
 		isIgnore := r.iResponse.Error(c, err)
 		if !isIgnore {
-			r.zapLog.Error("{{.Name}} error", zap.Error(err))
+			r.zapLog.Error("{{.Name}} error", zap.Error(err), middleware.GCtxRequestIDField(c))
 		}
 		return
 	}

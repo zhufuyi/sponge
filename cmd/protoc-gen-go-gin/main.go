@@ -40,7 +40,8 @@ protoc --proto_path=. --proto_path=./third_party --go-gin_out=. --go-gin_opt=pat
 
 	options.Run(func(gen *protogen.Plugin) error {
 		handlerFlag, serviceFlag := false, false
-		for _, plugin := range strings.Split(*plugins, ",") {
+		pluginNames := strings.Split(*plugins, ",")
+		for _, plugin := range pluginNames {
 			switch strings.ReplaceAll(plugin, " ", "") {
 			case "handler":
 				handlerFlag = true

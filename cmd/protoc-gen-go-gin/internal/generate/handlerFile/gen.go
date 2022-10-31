@@ -35,14 +35,16 @@ func genService(g *protogen.GeneratedFile, s *protogen.Service) {
 			// example:
 			// 	reply, err := h.%sDao.%s(ctx, req)
 			// 	if err != nil {
-			//			logger.Warn("invoke error", logger.Err(err), utils.FieldRequestIDFromCtx(ctx))
+			//			logger.Warn("invoke error", logger.Err(err), middleware.CtxRequestIDField(ctx))
 			//			return nil, ecode.InternalServerError.Err()
 			//		}
 			// 	return reply, nil
+			//
 			// If required, fill in the code for getting data from other dao here
 
 			panic("implement me")
-		}`, field.LowerName, m.GoName, m.Input.GoIdent.GoName, m.Output.GoIdent.GoName, field.LowerName, m.GoName)
+		}
+`, field.LowerName, m.GoName, m.Input.GoIdent.GoName, m.Output.GoIdent.GoName, field.LowerName, m.GoName)
 		g.P(m.Comments.Leading, funcCode)
 	}
 }

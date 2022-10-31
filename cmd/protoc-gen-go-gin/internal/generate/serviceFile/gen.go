@@ -35,7 +35,8 @@ func genService(g *protogen.GeneratedFile, s *protogen.Service) {
 			// implement me
 			// If required, fill in the code to fetch data from other microservices here.
 			return c.%sCli.%s(ctx, req)
-		}`, field.LowerName, m.GoName, m.Input.GoIdent.GoName, m.Output.GoIdent.GoName, field.LowerName, m.GoName)
+		}
+`, field.LowerName, m.GoName, m.Input.GoIdent.GoName, m.Output.GoIdent.GoName, field.LowerName, m.GoName)
 		g.P(m.Comments.Leading, funCode)
 	}
 }

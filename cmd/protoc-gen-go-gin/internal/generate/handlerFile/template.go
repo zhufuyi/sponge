@@ -20,6 +20,7 @@ import (
 	"context"
 
 	serverNameExampleV1 "github.com/zhufuyi/sponge/api/serverNameExample/v1"
+	//"github.com/zhufuyi/sponge/pkg/gin/middleware"
 )
 
 var _ serverNameExampleV1.{{$.Name}}Logicer = (*{{$.LowerName}}Handler)(nil)
@@ -35,10 +36,10 @@ type {{$.LowerName}}Handler struct {
 func New{{$.Name}}Handler() serverNameExampleV1.{{$.Name}}Logicer {
 	return &{{$.LowerName}}Handler{
 		// example:
-		// {{$.LowerName}}Dao: dao.New{{$.Name}}Dao(
-		// 	model.GetDB(),
-		// 	cache.New{{$.Name}}Cache(model.GetCacheType()),
-		// ),
+		// 	{{$.LowerName}}Dao: dao.New{{$.Name}}Dao(
+		// 		model.GetDB(),
+		// 		cache.New{{$.Name}}Cache(model.GetCacheType()),
+		// 	),
 
 		// If required, fill in the code to implement other dao here.
 	}

@@ -48,12 +48,13 @@ func main() {
 func registerInits() []app.Init {
 	// 初始化配置
 	initConfig()
+	cfg := config.Get()
 
 	// 初始化日志
 	_, _ = logger.Init(
-		logger.WithLevel(config.Get().Logger.Level),
-		logger.WithFormat(config.Get().Logger.Format),
-		logger.WithSave(config.Get().Logger.IsSave),
+		logger.WithLevel(cfg.Logger.Level),
+		logger.WithFormat(cfg.Logger.Format),
+		logger.WithSave(cfg.Logger.IsSave),
 	)
 
 	var inits []app.Init
@@ -61,19 +62,19 @@ func registerInits() []app.Init {
 	// 初始化数据库
 	inits = append(inits, func() {
 		model.InitMysql()
-		model.InitCache(config.Get().App.CacheType)
+		model.InitCache(cfg.App.CacheType)
 	})
 
 	// 初始化链路跟踪
-	if config.Get().App.EnableTracing {
+	if cfg.App.EnableTracing {
 		inits = append(inits, func() {
 			tracer.InitWithConfig(
-				config.Get().App.Name,
-				config.Get().App.Env,
-				config.Get().App.Version,
-				config.Get().Jaeger.AgentHost,
-				strconv.Itoa(config.Get().Jaeger.AgentPort),
-				config.Get().App.TracingSamplingRate,
+				cfg.App.Name,
+				cfg.App.Env,
+				cfg.App.Version,
+				cfg.Jaeger.AgentHost,
+				strconv.Itoa(cfg.Jaeger.AgentPort),
+				cfg.App.TracingSamplingRate,
 			)
 		})
 	}
@@ -128,27 +129,28 @@ func initConfig() {
 
 // -------------------------------- 注册app服务 ---------------------------------
 func registerServers() []app.IServer {
+	var cfg = config.Get()
 	var servers []app.IServer
 
 	// todo generate the code to register http and grpc services here
 	// delete the templates code start
 	// 创建http服务
-	httpAddr := ":" + strconv.Itoa(config.Get().HTTP.Port)
-	httpRegistry, httpInstance := registryService("http", config.Get().App.Host, config.Get().HTTP.Port)
-	httpServer := server.NewHTTPServer(httpAddr,
-		server.WithHTTPReadTimeout(time.Second*time.Duration(config.Get().HTTP.ReadTimeout)),
-		server.WithHTTPWriteTimeout(time.Second*time.Duration(config.Get().HTTP.WriteTimeout)),
-		server.WithHTTPRegistry(httpRegistry, httpInstance),
-		server.WithHTTPIsProd(config.Get().App.Env == "prod"),
-	)
-	servers = append(servers, httpServer)
+	//httpAddr := ":" + strconv.Itoa(cfg.HTTP.Port)
+	//httpRegistry, httpInstance := registryService("http", cfg.App.Host, cfg.HTTP.Port)
+	//httpServer := server.NewHTTPServer(httpAddr,
+	//	server.WithHTTPReadTimeout(time.Second*time.Duration(cfg.HTTP.ReadTimeout)),
+	//	server.WithHTTPWriteTimeout(time.Second*time.Duration(cfg.HTTP.WriteTimeout)),
+	//	server.WithHTTPRegistry(httpRegistry, httpInstance),
+	//	server.WithHTTPIsProd(cfg.App.Env == "prod"),
+	//)
+	//servers = append(servers, httpServer)
 
 	// 创建grpc服务
-	grpcAddr := ":" + strconv.Itoa(config.Get().Grpc.Port)
-	grpcRegistry, grpcInstance := registryService("grpc", config.Get().App.Host, config.Get().Grpc.Port)
+	grpcAddr := ":" + strconv.Itoa(cfg.Grpc.Port)
+	grpcRegistry, grpcInstance := registryService("grpc", cfg.App.Host, cfg.Grpc.Port)
 	grpcServer := server.NewGRPCServer(grpcAddr,
-		server.WithGrpcReadTimeout(time.Duration(config.Get().Grpc.ReadTimeout)*time.Second),
-		server.WithGrpcWriteTimeout(time.Duration(config.Get().Grpc.WriteTimeout)*time.Second),
+		server.WithGrpcReadTimeout(time.Duration(cfg.Grpc.ReadTimeout)*time.Second),
+		server.WithGrpcWriteTimeout(time.Duration(cfg.Grpc.WriteTimeout)*time.Second),
 		server.WithGrpcRegistry(grpcRegistry, grpcInstance),
 	)
 	servers = append(servers, grpcServer)
@@ -159,51 +161,47 @@ func registerServers() []app.IServer {
 
 func registryService(scheme string, host string, port int) (registry.Registry, *registry.ServiceInstance) {
 	instanceEndpoint := fmt.Sprintf("%s://%s:%d", scheme, host, port)
+	cfg := config.Get()
 
-	if config.Get().App.EnableRegistryDiscovery {
-		// 使用consul注册服务
-		if config.Get().App.RegistryDiscoveryType == "consul" {
-			iRegistry, instance, err := consul.NewRegistry(
-				config.Get().Consul.Addr,
-				config.Get().App.Name+"_"+scheme+"_"+host,
-				config.Get().App.Name,
-				[]string{instanceEndpoint},
-			)
-			if err != nil {
-				panic(err)
-			}
-			return iRegistry, instance
+	switch cfg.App.RegistryDiscoveryType {
+	// 使用consul注册服务
+	case "consul":
+		iRegistry, instance, err := consul.NewRegistry(
+			cfg.Consul.Addr,
+			cfg.App.Name+"_"+scheme+"_"+host,
+			cfg.App.Name,
+			[]string{instanceEndpoint},
+		)
+		if err != nil {
+			panic(err)
 		}
-
-		// 使用etcd注册服务
-		if config.Get().App.RegistryDiscoveryType == "etcd" {
-			iRegistry, instance, err := etcd.NewRegistry(
-				config.Get().Etcd.Addrs,
-				config.Get().App.Name+"_"+scheme+"_"+host,
-				config.Get().App.Name,
-				[]string{instanceEndpoint},
-			)
-			if err != nil {
-				panic(err)
-			}
-			return iRegistry, instance
+		return iRegistry, instance
+	// 使用etcd注册服务
+	case "etcd":
+		iRegistry, instance, err := etcd.NewRegistry(
+			cfg.Etcd.Addrs,
+			cfg.App.Name+"_"+scheme+"_"+host,
+			cfg.App.Name,
+			[]string{instanceEndpoint},
+		)
+		if err != nil {
+			panic(err)
 		}
-
-		// 使用nacos注册服务
-		if config.Get().App.RegistryDiscoveryType == "nacos" {
-			iRegistry, instance, err := nacos.NewRegistry(
-				config.Get().NacosRd.IPAddr,
-				config.Get().NacosRd.Port,
-				config.Get().NacosRd.NamespaceID,
-				config.Get().App.Name+"_"+scheme+"_"+host,
-				config.Get().App.Name,
-				[]string{instanceEndpoint},
-			)
-			if err != nil {
-				panic(err)
-			}
-			return iRegistry, instance
+		return iRegistry, instance
+	// 使用nacos注册服务
+	case "nacos":
+		iRegistry, instance, err := nacos.NewRegistry(
+			cfg.NacosRd.IPAddr,
+			cfg.NacosRd.Port,
+			cfg.NacosRd.NamespaceID,
+			cfg.App.Name+"_"+scheme+"_"+host,
+			cfg.App.Name,
+			[]string{instanceEndpoint},
+		)
+		if err != nil {
+			panic(err)
 		}
+		return iRegistry, instance
 	}
 
 	return nil, nil
