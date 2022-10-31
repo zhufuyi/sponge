@@ -37,12 +37,39 @@ function listFiles(){
 # 获取所有proto文件路径
 listFiles $protoBasePath
 
-# 生成文件 *_pb.go, *_grpc_pb.go, *_pb.validate.go文件在同一目录
+# 生成文件 *_pb.go, *_grpc_pb.go，
 protoc --proto_path=. --proto_path=./third_party \
- --go_out=. --go_opt=paths=source_relative \
- --go-grpc_out=. --go-grpc_opt=paths=source_relative \
- --validate_out=lang=go:. --validate_opt=paths=source_relative \
- $allProtoFiles
+  --go_out=. --go_opt=paths=source_relative \
+  --go-grpc_out=. --go-grpc_opt=paths=source_relative \
+  $allProtoFiles
+
+checkResult $?
+
+# 生成文件*_pb.validate.go
+protoc --proto_path=. --proto_path=./third_party \
+  --validate_out=lang=go:. --validate_opt=paths=source_relative \
+  $allProtoFiles
+
+checkResult $?
+
+# 生成swagger文档，所有文件合并到docs/apis.swagger.json
+protoc --proto_path=. --proto_path=./third_party \
+  --openapiv2_out=. --openapiv2_opt=logtostderr=true --openapiv2_opt=allow_merge=true --openapiv2_opt=merge_file_name=docs/apis.json \
+  $allProtoFiles
+
+checkResult $?
+
+# 对*_pb.go字段嵌入tag
+protoc --proto_path=. --proto_path=./third_party \
+  --gotag_out=:. --gotag_opt=paths=source_relative \
+  $allProtoFiles
+
+checkResult $?
+
+# 生成_*router.pb.go
+protoc --proto_path=. --proto_path=./third_party \
+  --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugins=service \
+  $allProtoFiles
 
 checkResult $?
 

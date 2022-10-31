@@ -9,22 +9,21 @@ import (
 	"github.com/zhufuyi/sponge/pkg/gin/handlerfunc"
 	"github.com/zhufuyi/sponge/pkg/gin/middleware"
 	"github.com/zhufuyi/sponge/pkg/gin/middleware/metrics"
+	"github.com/zhufuyi/sponge/pkg/gin/swagger"
 	"github.com/zhufuyi/sponge/pkg/gin/validator"
 	"github.com/zhufuyi/sponge/pkg/logger"
 
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 var (
-	routerFns []func(*gin.RouterGroup) // 路由集合
+	rootRouterFns []func(engine *gin.Engine) // 根路由组
 )
 
-// NewRouter 实例化路由
-func NewRouter() *gin.Engine {
+// NewRouter_gwExample 创建一个路由
+func NewRouter_gwExample() *gin.Engine { //nolint
 	r := gin.New()
 
 	r.Use(gin.Recovery())
@@ -74,14 +73,11 @@ func NewRouter() *gin.Engine {
 	r.GET("/health", handlerfunc.CheckHealth)
 	r.GET("/ping", handlerfunc.Ping)
 
-	// 注册swagger路由，通过swag init生成代码
-	docs.SwaggerInfo.BasePath = ""
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	swagger.CustomRouter(r, "apis", docs.ApiDocs)
 
-	apiV1 := r.Group("/api/v1")
-	// 注册/api/v1前缀路由组
-	for _, fn := range routerFns {
-		fn(apiV1)
+	// 注册/前缀路由组
+	for _, fn := range rootRouterFns {
+		fn(r)
 	}
 
 	return r

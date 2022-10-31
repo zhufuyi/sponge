@@ -28,7 +28,7 @@ func TestGRPCServer(t *testing.T) {
 	config.Get().App.EnableTracing = true
 	config.Get().App.EnablePprof = true
 	config.Get().App.EnableLimit = true
-	config.Get().App.EnableRegistryDiscovery = true
+	config.Get().App.EnableCircuitBreaker = true
 
 	port, _ := utils.GetAvailablePort()
 	addr := fmt.Sprintf(":%d", port)
@@ -56,7 +56,7 @@ func TestGRPCServerMock(t *testing.T) {
 	config.Get().App.EnableTracing = true
 	config.Get().App.EnablePprof = true
 	config.Get().App.EnableLimit = true
-	config.Get().App.EnableRegistryDiscovery = true
+	config.Get().App.EnableCircuitBreaker = true
 
 	port, _ := utils.GetAvailablePort()
 	addr := fmt.Sprintf(":%d", port)

@@ -6,27 +6,28 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/zhufuyi/sponge/pkg/etcdcli"
-	"github.com/zhufuyi/sponge/pkg/nacoscli"
-	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
-	"github.com/zhufuyi/sponge/pkg/servicerd/registry/etcd"
-	"github.com/zhufuyi/sponge/pkg/servicerd/registry/nacos"
 	"testing"
 	"time"
 
-	pb "github.com/zhufuyi/sponge/api/serverNameExample/v1"
+	serverNameExampleV1 "github.com/zhufuyi/sponge/api/serverNameExample/v1"
 	"github.com/zhufuyi/sponge/api/types"
 	"github.com/zhufuyi/sponge/configs"
 	"github.com/zhufuyi/sponge/internal/config"
 
 	"github.com/zhufuyi/sponge/pkg/consulcli"
+	"github.com/zhufuyi/sponge/pkg/etcdcli"
 	"github.com/zhufuyi/sponge/pkg/grpc/benchmark"
 	"github.com/zhufuyi/sponge/pkg/grpc/grpccli"
+	"github.com/zhufuyi/sponge/pkg/nacoscli"
+	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
 	"github.com/zhufuyi/sponge/pkg/servicerd/registry/consul"
+	"github.com/zhufuyi/sponge/pkg/servicerd/registry/etcd"
+	"github.com/zhufuyi/sponge/pkg/servicerd/registry/nacos"
+
 	"go.uber.org/zap"
 )
 
-func initUserExampleServiceClient() pb.UserExampleServiceClient {
+func initUserExampleServiceClient() serverNameExampleV1.UserExampleServiceClient {
 	err := config.Init(configs.Path("serverNameExample.yml"))
 	if err != nil {
 		panic(err)
@@ -38,7 +39,7 @@ func initUserExampleServiceClient() pb.UserExampleServiceClient {
 		//grpccli.WithEnableLoadBalance(),
 		//grpccli.WithEnableRetry(),
 	}
-	if config.Get().App.EnableRegistryDiscovery {
+	if config.Get().App.RegistryDiscoveryType != "" {
 		var iDiscovery registry.Discovery
 		endpoint = "discovery:///" + config.Get().App.Name // 通过服务名称连接grpc服务
 
@@ -63,7 +64,7 @@ func initUserExampleServiceClient() pb.UserExampleServiceClient {
 		// 使用nacos做服务发现
 		if config.Get().App.RegistryDiscoveryType == "nacos" {
 			// example: endpoint = "discovery:///serverName.scheme"
-			endpoint += ".grpc" // 在endpoint+.grpc
+			endpoint = "discovery:///" + config.Get().App.Name + ".grpc"
 			cli, err := nacoscli.NewNamingClient(
 				config.Get().NacosRd.IPAddr,
 				config.Get().NacosRd.Port,
@@ -76,6 +77,7 @@ func initUserExampleServiceClient() pb.UserExampleServiceClient {
 
 		cliOptions = append(cliOptions, grpccli.WithDiscovery(iDiscovery))
 	}
+
 	if config.Get().App.EnableTracing {
 		cliOptions = append(cliOptions, grpccli.WithEnableTrace())
 	}
@@ -90,9 +92,8 @@ func initUserExampleServiceClient() pb.UserExampleServiceClient {
 	if err != nil {
 		panic(err)
 	}
-	//defer conn.Close()
 
-	return pb.NewUserExampleServiceClient(conn)
+	return serverNameExampleV1.NewUserExampleServiceClient(conn)
 }
 
 // 通过客户端测试userExample的各个方法
@@ -111,7 +112,7 @@ func Test_userExampleService_methods(t *testing.T) {
 			name: "Create",
 			fn: func() (interface{}, error) {
 				// todo test after filling in parameters
-				return cli.Create(ctx, &pb.CreateUserExampleRequest{
+				return cli.Create(ctx, &serverNameExampleV1.CreateUserExampleRequest{
 					Name:     "foo7",
 					Email:    "foo7@bar.com",
 					Password: "f447b20a7fcbf53a5d5be013ea0b15af",
@@ -128,7 +129,7 @@ func Test_userExampleService_methods(t *testing.T) {
 			name: "UpdateByID",
 			fn: func() (interface{}, error) {
 				// todo test after filling in parameters
-				return cli.UpdateByID(ctx, &pb.UpdateUserExampleByIDRequest{
+				return cli.UpdateByID(ctx, &serverNameExampleV1.UpdateUserExampleByIDRequest{
 					Id:    7,
 					Phone: "16000000001",
 					Age:   11,
@@ -141,7 +142,7 @@ func Test_userExampleService_methods(t *testing.T) {
 			name: "DeleteByID",
 			fn: func() (interface{}, error) {
 				// todo test after filling in parameters
-				return cli.DeleteByID(ctx, &pb.DeleteUserExampleByIDRequest{
+				return cli.DeleteByID(ctx, &serverNameExampleV1.DeleteUserExampleByIDRequest{
 					Id: 100,
 				})
 			},
@@ -152,7 +153,7 @@ func Test_userExampleService_methods(t *testing.T) {
 			name: "GetByID",
 			fn: func() (interface{}, error) {
 				// todo test after filling in parameters
-				return cli.GetByID(ctx, &pb.GetUserExampleByIDRequest{
+				return cli.GetByID(ctx, &serverNameExampleV1.GetUserExampleByIDRequest{
 					Id: 1,
 				})
 			},
@@ -163,7 +164,7 @@ func Test_userExampleService_methods(t *testing.T) {
 			name: "ListByIDs",
 			fn: func() (interface{}, error) {
 				// todo test after filling in parameters
-				return cli.ListByIDs(ctx, &pb.ListUserExampleByIDsRequest{
+				return cli.ListByIDs(ctx, &serverNameExampleV1.ListUserExampleByIDsRequest{
 					Ids: []uint64{1, 2, 3},
 				})
 			},
@@ -174,7 +175,7 @@ func Test_userExampleService_methods(t *testing.T) {
 			name: "List",
 			fn: func() (interface{}, error) {
 				// todo test after filling in parameters
-				return cli.List(ctx, &pb.ListUserExampleRequest{
+				return cli.List(ctx, &serverNameExampleV1.ListUserExampleRequest{
 					Params: &types.Params{
 						Page:  0,
 						Limit: 10,
@@ -229,7 +230,7 @@ func Test_userExampleService_benchmark(t *testing.T) {
 			name: "GetByID",
 			fn: func() error {
 				// todo test after filling in parameters
-				message := &pb.GetUserExampleByIDRequest{
+				message := &serverNameExampleV1.GetUserExampleByIDRequest{
 					Id: 1,
 				}
 				b, err := benchmark.New(host, protoFile, "GetByID", message, 1000, importPaths...)
@@ -245,7 +246,7 @@ func Test_userExampleService_benchmark(t *testing.T) {
 			name: "ListByIDs",
 			fn: func() error {
 				// todo test after filling in parameters
-				message := &pb.ListUserExampleByIDsRequest{
+				message := &serverNameExampleV1.ListUserExampleByIDsRequest{
 					Ids: []uint64{1, 2, 3},
 				}
 				b, err := benchmark.New(host, protoFile, "ListByIDs", message, 1000, importPaths...)
@@ -261,7 +262,7 @@ func Test_userExampleService_benchmark(t *testing.T) {
 			name: "List",
 			fn: func() error {
 				// todo test after filling in parameters
-				message := &pb.ListUserExampleRequest{
+				message := &serverNameExampleV1.ListUserExampleRequest{
 					Params: &types.Params{
 						Page:  0,
 						Limit: 10,

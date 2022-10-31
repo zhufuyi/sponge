@@ -81,7 +81,7 @@ func newUserExampleHandler() *gotest.Handler {
 		},
 	}
 
-	h.GoRunHttpServer(testFns)
+	h.GoRunHTTPServer(testFns)
 
 	time.Sleep(time.Millisecond * 200)
 	return h
@@ -93,12 +93,12 @@ func Test_userExampleHandler_Create(t *testing.T) {
 	testData := &types.CreateUserExampleRequest{}
 	_ = copier.Copy(testData, h.TestData.(*model.UserExample))
 
-	h.MockDao.SqlMock.ExpectBegin()
+	h.MockDao.SQLMock.ExpectBegin()
 	args := h.MockDao.GetAnyArgs(h.TestData)
-	h.MockDao.SqlMock.ExpectExec("INSERT INTO .*").
+	h.MockDao.SQLMock.ExpectExec("INSERT INTO .*").
 		WithArgs(args[:len(args)-1]...). // 根据实际参数数量修改
 		WillReturnResult(sqlmock.NewResult(1, 1))
-	h.MockDao.SqlMock.ExpectCommit()
+	h.MockDao.SQLMock.ExpectCommit()
 
 	result := &gohttp.StdResult{}
 	err := gohttp.Post(result, h.GetRequestURL("Create"), testData)
@@ -124,8 +124,8 @@ func Test_userExampleHandler_Create(t *testing.T) {
 	}
 	t.Logf("%+v", result)
 
-	h.MockDao.SqlMock.ExpectBegin()
-	h.MockDao.SqlMock.ExpectCommit()
+	h.MockDao.SQLMock.ExpectBegin()
+	h.MockDao.SQLMock.ExpectCommit()
 	result = &gohttp.StdResult{}
 	err = gohttp.Post(result, h.GetRequestURL("Create"), testData)
 	assert.Error(t, err)
@@ -137,11 +137,11 @@ func Test_userExampleHandler_DeleteByID(t *testing.T) {
 	defer h.Close()
 	testData := h.TestData.(*model.UserExample)
 
-	h.MockDao.SqlMock.ExpectBegin()
-	h.MockDao.SqlMock.ExpectExec("UPDATE .*").
+	h.MockDao.SQLMock.ExpectBegin()
+	h.MockDao.SQLMock.ExpectExec("UPDATE .*").
 		WithArgs(h.MockDao.AnyTime, testData.ID). // 根据测试数据数量调整
 		WillReturnResult(sqlmock.NewResult(int64(testData.ID), 1))
-	h.MockDao.SqlMock.ExpectCommit()
+	h.MockDao.SQLMock.ExpectCommit()
 
 	result := &gohttp.StdResult{}
 	err := gohttp.Delete(result, h.GetRequestURL("DeleteByID", testData.ID))
@@ -167,11 +167,11 @@ func Test_userExampleHandler_UpdateByID(t *testing.T) {
 	testData := &types.UpdateUserExampleByIDRequest{}
 	_ = copier.Copy(testData, h.TestData.(*model.UserExample))
 
-	h.MockDao.SqlMock.ExpectBegin()
-	h.MockDao.SqlMock.ExpectExec("UPDATE .*").
+	h.MockDao.SQLMock.ExpectBegin()
+	h.MockDao.SQLMock.ExpectExec("UPDATE .*").
 		WithArgs(h.MockDao.AnyTime, testData.ID). // 根据测试数据数量调整
 		WillReturnResult(sqlmock.NewResult(int64(testData.ID), 1))
-	h.MockDao.SqlMock.ExpectCommit()
+	h.MockDao.SQLMock.ExpectCommit()
 
 	result := &gohttp.StdResult{}
 	err := gohttp.Put(result, h.GetRequestURL("UpdateByID", testData.ID), testData)
@@ -199,7 +199,7 @@ func Test_userExampleHandler_GetByID(t *testing.T) {
 	rows := sqlmock.NewRows([]string{"id", "created_at", "updated_at"}).
 		AddRow(testData.ID, testData.CreatedAt, testData.UpdatedAt)
 
-	h.MockDao.SqlMock.ExpectQuery("SELECT .*").
+	h.MockDao.SQLMock.ExpectQuery("SELECT .*").
 		WithArgs(testData.ID).
 		WillReturnRows(rows)
 
@@ -229,7 +229,7 @@ func Test_userExampleHandler_ListByIDs(t *testing.T) {
 	rows := sqlmock.NewRows([]string{"id", "created_at", "updated_at"}).
 		AddRow(testData.ID, testData.CreatedAt, testData.UpdatedAt)
 
-	h.MockDao.SqlMock.ExpectQuery("SELECT .*").WillReturnRows(rows)
+	h.MockDao.SQLMock.ExpectQuery("SELECT .*").WillReturnRows(rows)
 
 	result := &gohttp.StdResult{}
 	err := gohttp.Post(result, h.GetRequestURL("ListByIDs"), &types.GetUserExamplesByIDsRequest{IDs: []uint64{testData.ID}})
@@ -257,7 +257,7 @@ func Test_userExampleHandler_List(t *testing.T) {
 	rows := sqlmock.NewRows([]string{"id", "created_at", "updated_at"}).
 		AddRow(testData.ID, testData.CreatedAt, testData.UpdatedAt)
 
-	h.MockDao.SqlMock.ExpectQuery("SELECT .*").WillReturnRows(rows)
+	h.MockDao.SQLMock.ExpectQuery("SELECT .*").WillReturnRows(rows)
 
 	result := &gohttp.StdResult{}
 	err := gohttp.Post(result, h.GetRequestURL("List"), &types.GetUserExamplesRequest{query.Params{

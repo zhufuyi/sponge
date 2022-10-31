@@ -8,8 +8,8 @@ import (
 
 // nolint
 func init() {
-	routerFns = append(routerFns, func() {
-		userExampleRouter(apiV1, handler.NewUserExampleHandler()) // 加入到路由组
+	routerFns = append(routerFns, func(group *gin.RouterGroup) {
+		userExampleRouter(group, handler.NewUserExampleHandler())
 	})
 }
 

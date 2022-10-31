@@ -70,7 +70,8 @@ func NewHTTPServer(addr string, opts ...HTTPOption) app.IServer {
 		gin.SetMode(gin.DebugMode)
 	}
 
-	router := routers.NewRouter()
+	//router := routers.NewRouter()
+	router := routers.NewRouter_gwExample()
 	server := &http.Server{
 		Addr:           addr,
 		Handler:        router,

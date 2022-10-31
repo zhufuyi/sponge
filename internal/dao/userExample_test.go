@@ -43,11 +43,11 @@ func Test_userExampleDao_Create(t *testing.T) {
 	defer d.Close()
 	testData := d.TestData.(*model.UserExample)
 
-	d.SqlMock.ExpectBegin()
-	d.SqlMock.ExpectExec("INSERT INTO .*").
+	d.SQLMock.ExpectBegin()
+	d.SQLMock.ExpectExec("INSERT INTO .*").
 		WithArgs(d.GetAnyArgs(testData)...).
 		WillReturnResult(sqlmock.NewResult(1, 1))
-	d.SqlMock.ExpectCommit()
+	d.SQLMock.ExpectCommit()
 
 	err := d.IDao.(UserExampleDao).Create(d.Ctx, testData)
 	if err != nil {
@@ -65,11 +65,11 @@ func Test_userExampleDao_DeleteByID(t *testing.T) {
 		Valid: false,
 	}
 
-	d.SqlMock.ExpectBegin()
-	d.SqlMock.ExpectExec("UPDATE .*").
+	d.SQLMock.ExpectBegin()
+	d.SQLMock.ExpectExec("UPDATE .*").
 		WithArgs(d.AnyTime, testData.ID).
 		WillReturnResult(sqlmock.NewResult(int64(testData.ID), 1))
-	d.SqlMock.ExpectCommit()
+	d.SQLMock.ExpectCommit()
 
 	err := d.IDao.(UserExampleDao).DeleteByID(d.Ctx, testData.ID)
 	if err != nil {
@@ -86,11 +86,11 @@ func Test_userExampleDao_UpdateByID(t *testing.T) {
 	defer d.Close()
 	testData := d.TestData.(*model.UserExample)
 
-	d.SqlMock.ExpectBegin()
-	d.SqlMock.ExpectExec("UPDATE .*").
+	d.SQLMock.ExpectBegin()
+	d.SQLMock.ExpectExec("UPDATE .*").
 		WithArgs(d.AnyTime, testData.ID).
 		WillReturnResult(sqlmock.NewResult(1, 1))
-	d.SqlMock.ExpectCommit()
+	d.SQLMock.ExpectCommit()
 
 	err := d.IDao.(UserExampleDao).UpdateByID(d.Ctx, testData)
 	if err != nil {
@@ -127,7 +127,7 @@ func Test_userExampleDao_GetByID(t *testing.T) {
 	rows := sqlmock.NewRows([]string{"id", "created_at", "updated_at"}).
 		AddRow(testData.ID, testData.CreatedAt, testData.UpdatedAt)
 
-	d.SqlMock.ExpectQuery("SELECT .*").
+	d.SQLMock.ExpectQuery("SELECT .*").
 		WithArgs(testData.ID).
 		WillReturnRows(rows)
 
@@ -136,19 +136,19 @@ func Test_userExampleDao_GetByID(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = d.SqlMock.ExpectationsWereMet()
+	err = d.SQLMock.ExpectationsWereMet()
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// notfound error
-	d.SqlMock.ExpectQuery("SELECT .*").
+	d.SQLMock.ExpectQuery("SELECT .*").
 		WithArgs(2).
 		WillReturnRows(rows)
 	_, err = d.IDao.(UserExampleDao).GetByID(d.Ctx, 2)
 	assert.Error(t, err)
 
-	d.SqlMock.ExpectQuery("SELECT .*").
+	d.SQLMock.ExpectQuery("SELECT .*").
 		WithArgs(3, 4).
 		WillReturnRows(rows)
 	_, err = d.IDao.(UserExampleDao).GetByID(d.Ctx, 4)
@@ -163,7 +163,7 @@ func Test_userExampleDao_GetByIDs(t *testing.T) {
 	rows := sqlmock.NewRows([]string{"id", "created_at", "updated_at"}).
 		AddRow(testData.ID, testData.CreatedAt, testData.UpdatedAt)
 
-	d.SqlMock.ExpectQuery("SELECT .*").
+	d.SQLMock.ExpectQuery("SELECT .*").
 		WithArgs(testData.ID).
 		WillReturnRows(rows)
 
@@ -175,7 +175,7 @@ func Test_userExampleDao_GetByIDs(t *testing.T) {
 	_, err = d.IDao.(UserExampleDao).GetByIDs(d.Ctx, []uint64{111})
 	assert.Error(t, err)
 
-	err = d.SqlMock.ExpectationsWereMet()
+	err = d.SQLMock.ExpectationsWereMet()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -189,7 +189,7 @@ func Test_userExampleDao_GetByColumns(t *testing.T) {
 	rows := sqlmock.NewRows([]string{"id", "created_at", "updated_at"}).
 		AddRow(testData.ID, testData.CreatedAt, testData.UpdatedAt)
 
-	d.SqlMock.ExpectQuery("SELECT .*").WillReturnRows(rows)
+	d.SQLMock.ExpectQuery("SELECT .*").WillReturnRows(rows)
 
 	_, _, err := d.IDao.(UserExampleDao).GetByColumns(d.Ctx, &query.Params{
 		Page: 0,
@@ -200,7 +200,7 @@ func Test_userExampleDao_GetByColumns(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = d.SqlMock.ExpectationsWereMet()
+	err = d.SQLMock.ExpectationsWereMet()
 	if err != nil {
 		t.Fatal(err)
 	}

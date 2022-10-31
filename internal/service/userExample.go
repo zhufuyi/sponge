@@ -5,7 +5,7 @@ import (
 	"errors"
 	"strings"
 
-	pb "github.com/zhufuyi/sponge/api/serverNameExample/v1"
+	serverNameExampleV1 "github.com/zhufuyi/sponge/api/serverNameExample/v1"
 	"github.com/zhufuyi/sponge/internal/cache"
 	"github.com/zhufuyi/sponge/internal/dao"
 	"github.com/zhufuyi/sponge/internal/ecode"
@@ -21,20 +21,20 @@ import (
 // nolint
 func init() {
 	registerFns = append(registerFns, func(server *grpc.Server) {
-		pb.RegisterUserExampleServiceServer(server, NewUserExampleServiceServer()) // 把service注册到rpc服务中
+		serverNameExampleV1.RegisterUserExampleServiceServer(server, NewUserExampleServiceServer()) // 把service注册到rpc服务中
 	})
 }
 
-var _ pb.UserExampleServiceServer = (*userExampleService)(nil)
+var _ serverNameExampleV1.UserExampleServiceServer = (*userExampleService)(nil)
 
 type userExampleService struct {
-	pb.UnimplementedUserExampleServiceServer
+	serverNameExampleV1.UnimplementedUserExampleServiceServer
 
 	iDao dao.UserExampleDao
 }
 
 // NewUserExampleServiceServer 创建一个实例
-func NewUserExampleServiceServer() pb.UserExampleServiceServer {
+func NewUserExampleServiceServer() serverNameExampleV1.UserExampleServiceServer {
 	return &userExampleService{
 		iDao: dao.NewUserExampleDao(
 			model.GetDB(),
@@ -44,7 +44,7 @@ func NewUserExampleServiceServer() pb.UserExampleServiceServer {
 }
 
 // Create 创建一条记录
-func (s *userExampleService) Create(ctx context.Context, req *pb.CreateUserExampleRequest) (*pb.CreateUserExampleReply, error) {
+func (s *userExampleService) Create(ctx context.Context, req *serverNameExampleV1.CreateUserExampleRequest) (*serverNameExampleV1.CreateUserExampleReply, error) {
 	err := req.Validate()
 	if err != nil {
 		logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req))
@@ -64,11 +64,11 @@ func (s *userExampleService) Create(ctx context.Context, req *pb.CreateUserExamp
 		return nil, ecode.StatusInternalServerError.ToRPCErr()
 	}
 
-	return &pb.CreateUserExampleReply{Id: userExample.ID}, nil
+	return &serverNameExampleV1.CreateUserExampleReply{Id: userExample.ID}, nil
 }
 
 // DeleteByID 根据id删除一条记录
-func (s *userExampleService) DeleteByID(ctx context.Context, req *pb.DeleteUserExampleByIDRequest) (*pb.DeleteUserExampleByIDReply, error) {
+func (s *userExampleService) DeleteByID(ctx context.Context, req *serverNameExampleV1.DeleteUserExampleByIDRequest) (*serverNameExampleV1.DeleteUserExampleByIDReply, error) {
 	err := req.Validate()
 	if err != nil {
 		logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req))
@@ -81,11 +81,11 @@ func (s *userExampleService) DeleteByID(ctx context.Context, req *pb.DeleteUserE
 		return nil, ecode.StatusInternalServerError.ToRPCErr()
 	}
 
-	return &pb.DeleteUserExampleByIDReply{}, nil
+	return &serverNameExampleV1.DeleteUserExampleByIDReply{}, nil
 }
 
 // UpdateByID 根据id更新一条记录
-func (s *userExampleService) UpdateByID(ctx context.Context, req *pb.UpdateUserExampleByIDRequest) (*pb.UpdateUserExampleByIDReply, error) {
+func (s *userExampleService) UpdateByID(ctx context.Context, req *serverNameExampleV1.UpdateUserExampleByIDRequest) (*serverNameExampleV1.UpdateUserExampleByIDReply, error) {
 	err := req.Validate()
 	if err != nil {
 		logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req))
@@ -106,11 +106,11 @@ func (s *userExampleService) UpdateByID(ctx context.Context, req *pb.UpdateUserE
 		return nil, ecode.StatusInternalServerError.ToRPCErr()
 	}
 
-	return &pb.UpdateUserExampleByIDReply{}, nil
+	return &serverNameExampleV1.UpdateUserExampleByIDReply{}, nil
 }
 
 // GetByID 根据id查询一条记录
-func (s *userExampleService) GetByID(ctx context.Context, req *pb.GetUserExampleByIDRequest) (*pb.GetUserExampleByIDReply, error) {
+func (s *userExampleService) GetByID(ctx context.Context, req *serverNameExampleV1.GetUserExampleByIDRequest) (*serverNameExampleV1.GetUserExampleByIDReply, error) {
 	err := req.Validate()
 	if err != nil {
 		logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req))
@@ -133,11 +133,11 @@ func (s *userExampleService) GetByID(ctx context.Context, req *pb.GetUserExample
 		return nil, ecode.StatusGetUserExample.Err()
 	}
 
-	return &pb.GetUserExampleByIDReply{UserExample: data}, nil
+	return &serverNameExampleV1.GetUserExampleByIDReply{UserExample: data}, nil
 }
 
 // ListByIDs 根据id数组获取多条记录
-func (s *userExampleService) ListByIDs(ctx context.Context, req *pb.ListUserExampleByIDsRequest) (*pb.ListUserExampleByIDsReply, error) {
+func (s *userExampleService) ListByIDs(ctx context.Context, req *serverNameExampleV1.ListUserExampleByIDsRequest) (*serverNameExampleV1.ListUserExampleByIDsReply, error) {
 	err := req.Validate()
 	if err != nil {
 		logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req))
@@ -150,7 +150,7 @@ func (s *userExampleService) ListByIDs(ctx context.Context, req *pb.ListUserExam
 		return nil, ecode.StatusInternalServerError.ToRPCErr()
 	}
 
-	datas := []*pb.UserExample{}
+	datas := []*serverNameExampleV1.UserExample{}
 	for _, record := range records {
 		data, err := covertUserExample(record)
 		if err != nil {
@@ -160,11 +160,11 @@ func (s *userExampleService) ListByIDs(ctx context.Context, req *pb.ListUserExam
 		datas = append(datas, data)
 	}
 
-	return &pb.ListUserExampleByIDsReply{UserExamples: datas}, nil
+	return &serverNameExampleV1.ListUserExampleByIDsReply{UserExamples: datas}, nil
 }
 
 // List 获取多条记录
-func (s *userExampleService) List(ctx context.Context, req *pb.ListUserExampleRequest) (*pb.ListUserExampleReply, error) {
+func (s *userExampleService) List(ctx context.Context, req *serverNameExampleV1.ListUserExampleRequest) (*serverNameExampleV1.ListUserExampleReply, error) {
 	err := req.Validate()
 	if err != nil {
 		logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req))
@@ -189,7 +189,7 @@ func (s *userExampleService) List(ctx context.Context, req *pb.ListUserExampleRe
 		return nil, ecode.StatusInternalServerError.ToRPCErr()
 	}
 
-	datas := []*pb.UserExample{}
+	datas := []*serverNameExampleV1.UserExample{}
 	for _, record := range records {
 		data, err := covertUserExample(record)
 		if err != nil {
@@ -199,14 +199,14 @@ func (s *userExampleService) List(ctx context.Context, req *pb.ListUserExampleRe
 		datas = append(datas, data)
 	}
 
-	return &pb.ListUserExampleReply{
+	return &serverNameExampleV1.ListUserExampleReply{
 		Total:        total,
 		UserExamples: datas,
 	}, nil
 }
 
-func covertUserExample(record *model.UserExample) (*pb.UserExample, error) {
-	value := &pb.UserExample{}
+func covertUserExample(record *model.UserExample) (*serverNameExampleV1.UserExample, error) {
+	value := &serverNameExampleV1.UserExample{}
 	err := copier.Copy(value, record)
 	if err != nil {
 		return nil, err

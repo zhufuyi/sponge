@@ -9,6 +9,7 @@ import (
 	"github.com/zhufuyi/sponge/internal/model"
 	"github.com/zhufuyi/sponge/internal/types"
 
+	"github.com/zhufuyi/sponge/pkg/gin/middleware"
 	"github.com/zhufuyi/sponge/pkg/gin/response"
 	"github.com/zhufuyi/sponge/pkg/logger"
 	"github.com/zhufuyi/sponge/pkg/mysql/query"
@@ -44,7 +45,7 @@ func NewUserExampleHandler() UserExampleHandler {
 	}
 }
 
-// Create 创建
+// Create 创建一条记录
 // @Summary 创建userExample
 // @Description 提交信息创建userExample
 // @Tags userExample
@@ -57,7 +58,7 @@ func (h *userExampleHandler) Create(c *gin.Context) {
 	form := &types.CreateUserExampleRequest{}
 	err := c.ShouldBindJSON(form)
 	if err != nil {
-		logger.Warn("ShouldBindJSON error: ", logger.Err(err), utils.FieldRequestIDFromContext(c))
+		logger.Warn("ShouldBindJSON error: ", logger.Err(err), middleware.GCtxRequestIDField(c))
 		response.Error(c, ecode.InvalidParams)
 		return
 	}
@@ -65,14 +66,14 @@ func (h *userExampleHandler) Create(c *gin.Context) {
 	userExample := &model.UserExample{}
 	err = copier.Copy(userExample, form)
 	if err != nil {
-		logger.Warn("Copy error", logger.Err(err), logger.Any("form", form), utils.FieldRequestIDFromContext(c))
+		logger.Warn("Copy error", logger.Err(err), logger.Any("form", form), middleware.GCtxRequestIDField(c))
 		response.Error(c, ecode.ErrCreateUserExample)
 		return
 	}
 
 	err = h.iDao.Create(c.Request.Context(), userExample)
 	if err != nil {
-		logger.Error("Create error", logger.Err(err), logger.Any("form", form), utils.FieldRequestIDFromContext(c))
+		logger.Error("Create error", logger.Err(err), logger.Any("form", form), middleware.GCtxRequestIDField(c))
 		response.Output(c, ecode.InternalServerError.ToHTTPCode())
 		return
 	}
@@ -97,7 +98,7 @@ func (h *userExampleHandler) DeleteByID(c *gin.Context) {
 
 	err := h.iDao.DeleteByID(c.Request.Context(), id)
 	if err != nil {
-		logger.Error("DeleteByID error", logger.Err(err), logger.Any("id", id), utils.FieldRequestIDFromContext(c))
+		logger.Error("DeleteByID error", logger.Err(err), logger.Any("id", id), middleware.GCtxRequestIDField(c))
 		response.Output(c, ecode.InternalServerError.ToHTTPCode())
 		return
 	}
@@ -124,7 +125,7 @@ func (h *userExampleHandler) UpdateByID(c *gin.Context) {
 	form := &types.UpdateUserExampleByIDRequest{}
 	err := c.ShouldBindJSON(form)
 	if err != nil {
-		logger.Warn("ShouldBindJSON error: ", logger.Err(err), utils.FieldRequestIDFromContext(c))
+		logger.Warn("ShouldBindJSON error: ", logger.Err(err), middleware.GCtxRequestIDField(c))
 		response.Error(c, ecode.InvalidParams)
 		return
 	}
@@ -133,14 +134,14 @@ func (h *userExampleHandler) UpdateByID(c *gin.Context) {
 	userExample := &model.UserExample{}
 	err = copier.Copy(userExample, form)
 	if err != nil {
-		logger.Warn("Copy error", logger.Err(err), logger.Any("form", form), utils.FieldRequestIDFromContext(c))
+		logger.Warn("Copy error", logger.Err(err), logger.Any("form", form), middleware.GCtxRequestIDField(c))
 		response.Error(c, ecode.ErrUpdateUserExample)
 		return
 	}
 
 	err = h.iDao.UpdateByID(c.Request.Context(), userExample)
 	if err != nil {
-		logger.Error("UpdateByID error", logger.Err(err), logger.Any("form", form), utils.FieldRequestIDFromContext(c))
+		logger.Error("UpdateByID error", logger.Err(err), logger.Any("form", form), middleware.GCtxRequestIDField(c))
 		response.Output(c, ecode.InternalServerError.ToHTTPCode())
 		return
 	}
@@ -166,10 +167,10 @@ func (h *userExampleHandler) GetByID(c *gin.Context) {
 	userExample, err := h.iDao.GetByID(c.Request.Context(), id)
 	if err != nil {
 		if errors.Is(err, query.ErrNotFound) {
-			logger.Warn("GetByID not found", logger.Err(err), logger.Any("id", id), utils.FieldRequestIDFromContext(c))
+			logger.Warn("GetByID not found", logger.Err(err), logger.Any("id", id), middleware.GCtxRequestIDField(c))
 			response.Error(c, ecode.NotFound)
 		} else {
-			logger.Error("GetByID error", logger.Err(err), logger.Any("id", id), utils.FieldRequestIDFromContext(c))
+			logger.Error("GetByID error", logger.Err(err), logger.Any("id", id), middleware.GCtxRequestIDField(c))
 			response.Output(c, ecode.InternalServerError.ToHTTPCode())
 		}
 		return
@@ -178,7 +179,7 @@ func (h *userExampleHandler) GetByID(c *gin.Context) {
 	data := &types.GetUserExampleByIDRespond{}
 	err = copier.Copy(data, userExample)
 	if err != nil {
-		logger.Warn("Copy error", logger.Err(err), logger.Any("id", id), utils.FieldRequestIDFromContext(c))
+		logger.Warn("Copy error", logger.Err(err), logger.Any("id", id), middleware.GCtxRequestIDField(c))
 		response.Error(c, ecode.ErrGetUserExample)
 		return
 	}
@@ -200,14 +201,14 @@ func (h *userExampleHandler) ListByIDs(c *gin.Context) {
 	form := &types.GetUserExamplesByIDsRequest{}
 	err := c.ShouldBindJSON(form)
 	if err != nil {
-		logger.Warn("ShouldBindJSON error: ", logger.Err(err), utils.FieldRequestIDFromContext(c))
+		logger.Warn("ShouldBindJSON error: ", logger.Err(err), middleware.GCtxRequestIDField(c))
 		response.Error(c, ecode.InvalidParams)
 		return
 	}
 
 	userExamples, err := h.iDao.GetByIDs(c.Request.Context(), form.IDs)
 	if err != nil {
-		logger.Error("GetByIDs error", logger.Err(err), logger.Any("form", form), utils.FieldRequestIDFromContext(c))
+		logger.Error("GetByIDs error", logger.Err(err), logger.Any("form", form), middleware.GCtxRequestIDField(c))
 		response.Output(c, ecode.InternalServerError.ToHTTPCode())
 
 		return
@@ -215,7 +216,7 @@ func (h *userExampleHandler) ListByIDs(c *gin.Context) {
 
 	data, err := convertUserExamples(userExamples)
 	if err != nil {
-		logger.Warn("Copy error", logger.Err(err), logger.Any("form", form), utils.FieldRequestIDFromContext(c))
+		logger.Warn("Copy error", logger.Err(err), logger.Any("form", form), middleware.GCtxRequestIDField(c))
 		response.Error(c, ecode.ErrListUserExample)
 		return
 	}
@@ -238,21 +239,21 @@ func (h *userExampleHandler) List(c *gin.Context) {
 	form := &types.GetUserExamplesRequest{}
 	err := c.ShouldBindJSON(form)
 	if err != nil {
-		logger.Warn("ShouldBindJSON error: ", logger.Err(err), utils.FieldRequestIDFromContext(c))
+		logger.Warn("ShouldBindJSON error: ", logger.Err(err), middleware.GCtxRequestIDField(c))
 		response.Error(c, ecode.InvalidParams)
 		return
 	}
 
 	userExamples, total, err := h.iDao.GetByColumns(c.Request.Context(), &form.Params)
 	if err != nil {
-		logger.Error("GetByColumns error", logger.Err(err), logger.Any("form", form), utils.FieldRequestIDFromContext(c))
+		logger.Error("GetByColumns error", logger.Err(err), logger.Any("form", form), middleware.GCtxRequestIDField(c))
 		response.Output(c, ecode.InternalServerError.ToHTTPCode())
 		return
 	}
 
 	data, err := convertUserExamples(userExamples)
 	if err != nil {
-		logger.Warn("Copy error", logger.Err(err), logger.Any("form", form), utils.FieldRequestIDFromContext(c))
+		logger.Warn("Copy error", logger.Err(err), logger.Any("form", form), middleware.GCtxRequestIDField(c))
 		response.Error(c, ecode.ErrListUserExample)
 		return
 	}
@@ -267,7 +268,7 @@ func getUserExampleIDFromPath(c *gin.Context) (string, uint64, bool) {
 	idStr := c.Param("id")
 	id, err := utils.StrToUint64E(idStr)
 	if err != nil || id == 0 {
-		logger.Warn("StrToUint64E error: ", logger.String("idStr", idStr), utils.FieldRequestIDFromContext(c))
+		logger.Warn("StrToUint64E error: ", logger.String("idStr", idStr), middleware.GCtxRequestIDField(c))
 		response.Error(c, ecode.InvalidParams)
 		return "", 0, true
 	}

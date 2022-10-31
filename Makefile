@@ -1,4 +1,4 @@
-SHELL := /bin/bash
+#SHELL := /bin/bash
 
 PROJECT_NAME := "github.com/zhufuyi/sponge"
 PKG := "$(PROJECT_NAME)"
@@ -13,6 +13,8 @@ install:
 	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2.0
 	go install github.com/envoyproxy/protoc-gen-validate@v0.6.7
 	go install github.com/srikrsna/protoc-gen-gotag@v0.6.2
+	go install github.com/mohuishou/protoc-gen-go-gin@v0.1.0
+	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.10.0
 	go install github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc@v1.5.1
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.49.0
 	go install github.com/swaggo/swag/cmd/swag@v1.8.6
@@ -53,7 +55,7 @@ test:
 .PHONY: cover
 # generate test coverage
 cover:
-	go test -race -short -coverprofile=cover.out -covermode=atomic ${PKG_LIST}
+	go test -short -coverprofile=cover.out -covermode=atomic ${PKG_LIST}
 	go tool cover -html=cover.out
 
 
