@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/zhufuyi/sponge/cmd/serverNameExample/initial"
-	"runtime"
 
 	"github.com/zhufuyi/sponge/pkg/app"
 )
@@ -13,13 +12,11 @@ import (
 // @version v0.0.0
 // @host localhost:8080
 func main() {
-	n := runtime.NumCPU()
-	runtime.GOMAXPROCS(n / 2) //设置cpu运行的数目
 
 	initial.Config()
 	servers := initial.RegisterServers()
 	closes := initial.RegisterClose(servers)
-
+	initial.Init()
 	a := app.New(servers, closes)
 	a.Run()
 }
