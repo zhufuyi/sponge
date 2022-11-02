@@ -62,6 +62,7 @@ type App struct {
 	EnableLimit           bool    `yaml:"enableLimit" json:"enableLimit"`
 	EnableMetrics         bool    `yaml:"enableMetrics" json:"enableMetrics"`
 	EnablePprof           bool    `yaml:"enablePprof" json:"enablePprof"`
+	EnableStat            bool    `yaml:"enableStat" json:"enableStat"`
 	EnableTracing         bool    `yaml:"enableTracing" json:"enableTracing"`
 	Env                   string  `yaml:"env" json:"env"`
 	Host                  string  `yaml:"host" json:"host"`
@@ -93,6 +94,13 @@ type Logger struct {
 	Level  string `yaml:"level" json:"level"`
 }
 
+type Grpc struct {
+	HTTPPort     int `yaml:"httpPort" json:"httpPort"`
+	Port         int `yaml:"port" json:"port"`
+	ReadTimeout  int `yaml:"readTimeout" json:"readTimeout"`
+	WriteTimeout int `yaml:"writeTimeout" json:"writeTimeout"`
+}
+
 type GrpcClient struct {
 	Host                  string `yaml:"host" json:"host"`
 	Name                  string `yaml:"name" json:"name"`
@@ -104,14 +112,6 @@ type NacosRd struct {
 	IPAddr      string `yaml:"ipAddr" json:"ipAddr"`
 	NamespaceID string `yaml:"namespaceID" json:"namespaceID"`
 	Port        int    `yaml:"port" json:"port"`
-}
-
-type Grpc struct {
-	MetricsPort  int `yaml:"metricsPort" json:"metricsPort"`
-	Port         int `yaml:"port" json:"port"`
-	PprofPort    int `yaml:"pprofPort" json:"pprofPort"`
-	ReadTimeout  int `yaml:"readTimeout" json:"readTimeout"`
-	WriteTimeout int `yaml:"writeTimeout" json:"writeTimeout"`
 }
 
 type HTTP struct {

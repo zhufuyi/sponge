@@ -70,7 +70,8 @@ func TestGRPCServerMock(t *testing.T) {
 		iRegistry: o.iRegistry,
 		instance:  o.instance,
 	}
-	s.pprofHTTPServerFunc = s.pprofServer()
+	//s.registerHTTPPprof()
+	//s.metricsHTTPServerFunc = s.registerHTTPMetrics()
 	s.listen, err = net.Listen("tcp", addr)
 	if err != nil {
 		t.Fatal(err)

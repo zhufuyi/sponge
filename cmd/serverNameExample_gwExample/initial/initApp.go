@@ -11,6 +11,7 @@ import (
 
 	"github.com/zhufuyi/sponge/pkg/logger"
 	"github.com/zhufuyi/sponge/pkg/nacoscli"
+	"github.com/zhufuyi/sponge/pkg/stat"
 	"github.com/zhufuyi/sponge/pkg/tracer"
 
 	"github.com/jinzhu/copier"
@@ -48,6 +49,11 @@ func Config() {
 
 	// 初始化rpc服务连接
 	rpcclient.NewServerNameExampleRPCConn()
+
+	// 初始化打印系统和进程资源
+	if cfg.App.EnableStat {
+		stat.Init(stat.WithLog(logger.Get()))
+	}
 }
 
 // 初始化配置

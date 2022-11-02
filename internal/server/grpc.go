@@ -2,11 +2,9 @@ package server
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net"
 	"net/http"
-	"net/http/pprof"
 	"time"
 
 	"github.com/zhufuyi/sponge/internal/config"
@@ -16,6 +14,7 @@ import (
 	"github.com/zhufuyi/sponge/pkg/grpc/interceptor"
 	"github.com/zhufuyi/sponge/pkg/grpc/metrics"
 	"github.com/zhufuyi/sponge/pkg/logger"
+	"github.com/zhufuyi/sponge/pkg/prof"
 	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
@@ -23,16 +22,15 @@ import (
 )
 
 var _ app.IServer = (*grpcServer)(nil)
-var _ = pprof.Cmdline
 
 type grpcServer struct {
 	addr   string
 	server *grpc.Server
 	listen net.Listener
 
-	metricsHTTPServer     *http.Server
+	mux                   *http.ServeMux
+	httpServer            *http.Server
 	metricsHTTPServerFunc func() error
-	pprofHTTPServerFunc   func() error
 
 	iRegistry registry.Registry
 	instance  *registry.ServiceInstance
@@ -53,10 +51,18 @@ func (s *grpcServer) Start() error {
 		}
 	}
 
-	if s.pprofHTTPServerFunc != nil {
-		if err := s.pprofHTTPServerFunc(); err != nil {
-			return err
+	if s.mux != nil { // 如果启用pprof或metrics任何一个，都会启动http服务
+		addr := fmt.Sprintf(":%d", config.Get().Grpc.HTTPPort)
+		httpSrv := &http.Server{
+			Addr:    addr,
+			Handler: s.mux,
 		}
+		go func() {
+			fmt.Printf("http address of pprof and metrics  %s\n", addr)
+			if err := httpSrv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+				panic("listen and serve error: " + err.Error())
+			}
+		}()
 	}
 
 	if err := s.server.Serve(s.listen); err != nil { // block
@@ -79,9 +85,9 @@ func (s *grpcServer) Stop() error {
 
 	s.server.GracefulStop()
 
-	if s.metricsHTTPServer != nil {
+	if s.httpServer != nil {
 		ctx, _ := context.WithTimeout(context.Background(), 3*time.Second) //nolint
-		if err := s.metricsHTTPServer.Shutdown(ctx); err != nil {
+		if err := s.httpServer.Shutdown(ctx); err != nil {
 			return err
 		}
 	}
@@ -113,7 +119,7 @@ func (s *grpcServer) serverOptions() []grpc.ServerOption {
 	// metrics interceptor
 	if config.Get().App.EnableMetrics {
 		unaryServerInterceptors = append(unaryServerInterceptors, interceptor.UnaryServerMetrics())
-		s.metricsHTTPServerFunc = s.metricsServer()
+		s.metricsHTTPServerFunc = s.registerHTTPMetrics()
 	}
 
 	// limit interceptor
@@ -139,29 +145,21 @@ func (s *grpcServer) serverOptions() []grpc.ServerOption {
 	return options
 }
 
-func (s *grpcServer) metricsServer() func() error {
+func (s *grpcServer) registerHTTPMetrics() func() error {
 	return func() error {
-		if s == nil || s.server == nil {
-			return errors.New("grpc server is nil")
+		if s.mux == nil {
+			s.mux = http.NewServeMux()
 		}
-		promAddr := fmt.Sprintf(":%d", config.Get().Grpc.MetricsPort)
-		fmt.Printf("grpc metrics address %s\n", promAddr)
-		s.metricsHTTPServer = metrics.GoHTTPService(promAddr, s.server)
+		metrics.Register(s.mux, s.server)
 		return nil
 	}
 }
 
-func (s *grpcServer) pprofServer() func() error {
-	return func() error {
-		pprofAddr := fmt.Sprintf(":%d", config.Get().Grpc.PprofPort)
-		fmt.Printf("grpc pprof address %s\n", pprofAddr)
-		go func() {
-			if err := http.ListenAndServe(pprofAddr, nil); err != nil { // default route is /debug/pprof
-				panic("listen and serve error: " + err.Error())
-			}
-		}()
-		return nil
+func (s *grpcServer) registerHTTPPprof() {
+	if s.mux == nil {
+		s.mux = http.NewServeMux()
 	}
+	prof.Register(s.mux)
 }
 
 // NewGRPCServer creates a new grpc server
@@ -175,7 +173,7 @@ func NewGRPCServer(addr string, opts ...GrpcOption) app.IServer {
 		instance:  o.instance,
 	}
 	if config.Get().App.EnablePprof {
-		s.pprofHTTPServerFunc = s.pprofServer()
+		s.registerHTTPPprof()
 	}
 
 	s.listen, err = net.Listen("tcp", addr)

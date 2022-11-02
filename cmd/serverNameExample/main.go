@@ -12,11 +12,10 @@ import (
 // @version v0.0.0
 // @host localhost:8080
 func main() {
-
 	initial.Config()
 	servers := initial.RegisterServers()
 	closes := initial.RegisterClose(servers)
-	initial.Init()
+
 	a := app.New(servers, closes)
 	a.Run()
 }

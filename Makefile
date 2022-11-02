@@ -1,4 +1,4 @@
-#SHELL := /bin/bash
+SHELL := /bin/bash
 
 PROJECT_NAME := "github.com/zhufuyi/sponge"
 PKG := "$(PROJECT_NAME)"

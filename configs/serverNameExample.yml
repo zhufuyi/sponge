@@ -6,7 +6,8 @@ app:
   env: "dev"                   # 运行环境，dev:开发环境，prod:生产环境，test:测试环境
   version: "v0.0.0"         # 版本
   host: "192.168.3.27"   # 主机名称或ip
-  enablePprof: false       # 是否开启性能分析功能，true:开启，false:关闭
+  enablePprof: true        # 是否开启性能分析功能，true:开启，false:关闭
+  enableStat: true         # 是否开启打印统计信息，true:开启，false:关闭
   enableMetrics: true     # 是否开启指标采集，true:开启，false:关闭
   enableLimit: false       # 是否开启限流(自适应)，true:开启，false:关闭
   enableCircuitBreaker: false          # 是否开启熔断(自适应)，true:开启，false:关闭
@@ -26,8 +27,7 @@ http:
 # grpc server 设置
 grpc:
   port: 8282              # rpc监听端口
-  metricsPort: 8283   # 获取指标http端口
-  pprofPort: 8284      # pprof的http端口
+  httpPort: 8283   # 获取pprof和监控指标http端口
   readTimeout: 3      # 读超时，单位(秒)
   writeTimeout: 3     # 写超时，单位(秒)
 
