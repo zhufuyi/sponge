@@ -5,10 +5,9 @@ import (
 
 	"github.com/zhufuyi/sponge/pkg/container/group"
 	"github.com/zhufuyi/sponge/pkg/gin/response"
+	"github.com/zhufuyi/sponge/pkg/shield/circuitbreaker"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-kratos/aegis/circuitbreaker"
-	"github.com/go-kratos/aegis/circuitbreaker/sre"
 )
 
 // ErrNotAllowed error not allowed.
@@ -24,7 +23,7 @@ type circuitBreakerOptions struct {
 func defaultCircuitBreakerOptions() *circuitBreakerOptions {
 	return &circuitBreakerOptions{
 		group: group.NewGroup(func() interface{} {
-			return sre.NewBreaker()
+			return circuitbreaker.NewBreaker()
 		}),
 	}
 }

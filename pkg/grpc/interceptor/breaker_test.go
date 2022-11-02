@@ -6,8 +6,8 @@ import (
 
 	"github.com/zhufuyi/sponge/pkg/container/group"
 	"github.com/zhufuyi/sponge/pkg/errcode"
+	"github.com/zhufuyi/sponge/pkg/shield/circuitbreaker"
 
-	"github.com/go-kratos/aegis/circuitbreaker/sre"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc"
 )
@@ -15,7 +15,7 @@ import (
 func TestUnaryClientCircuitBreaker(t *testing.T) {
 	interceptor := UnaryClientCircuitBreaker(WithGroup(
 		group.NewGroup(func() interface{} {
-			return sre.NewBreaker()
+			return circuitbreaker.NewBreaker()
 		}),
 	))
 	assert.NotNil(t, interceptor)

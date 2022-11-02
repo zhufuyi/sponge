@@ -18,10 +18,13 @@ const (
 )
 
 var (
-	r         = rand.New(rand.NewSource(time.Now().UnixNano()))
 	refSlices = []byte("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789")
 	kinds     = [][]byte{refSlices[0:10], refSlices[10:36], refSlices[0:36], refSlices[36:62], refSlices[36:], refSlices[10:62], refSlices[0:62]}
 )
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
 
 // String 生成多种类型的任意长度的随机字符串，如果参数size为空，默认长度为6
 // example：String(R_ALL), String(R_ALL, 16), String(R_NUM|R_LOWER, 16)
@@ -46,7 +49,7 @@ func Bytes(kind int, bytesLen ...int) []byte {
 
 	result := make([]byte, length)
 	for i := 0; i < length; i++ {
-		result[i] = kinds[kind-1][r.Intn(len(kinds[kind-1]))]
+		result[i] = kinds[kind-1][rand.Intn(len(kinds[kind-1]))]
 	}
 
 	return result
@@ -56,14 +59,14 @@ func Bytes(kind int, bytesLen ...int) []byte {
 func Int(rangeSize ...int) int {
 	switch len(rangeSize) {
 	case 0:
-		return r.Intn(101) // 默认0~100
+		return rand.Intn(101) // 默认0~100
 	case 1:
-		return r.Intn(rangeSize[0] + 1)
+		return rand.Intn(rangeSize[0] + 1)
 	default:
 		if rangeSize[0] > rangeSize[1] {
 			rangeSize[0], rangeSize[1] = rangeSize[1], rangeSize[0]
 		}
-		return r.Intn(rangeSize[1]-rangeSize[0]+1) + rangeSize[0]
+		return rand.Intn(rangeSize[1]-rangeSize[0]+1) + rangeSize[0]
 	}
 }
 
@@ -76,18 +79,18 @@ func Float64(dpLength int, rangeSize ...int) float64 {
 		for i := 0; i < dpLength; i++ {
 			dpmax *= 10
 		}
-		dp = float64(r.Intn(dpmax)) / float64(dpmax)
+		dp = float64(rand.Intn(dpmax)) / float64(dpmax)
 	}
 
 	switch len(rangeSize) {
 	case 0:
-		return float64(r.Intn(101)) + dp // 默认0~100
+		return float64(rand.Intn(101)) + dp // 默认0~100
 	case 1:
-		return float64(r.Intn(rangeSize[0]+1)) + dp
+		return float64(rand.Intn(rangeSize[0]+1)) + dp
 	default:
 		if rangeSize[0] > rangeSize[1] {
 			rangeSize[0], rangeSize[1] = rangeSize[1], rangeSize[0]
 		}
-		return float64(r.Intn(rangeSize[1]-rangeSize[0]+1)+rangeSize[0]) + dp
+		return float64(rand.Intn(rangeSize[1]-rangeSize[0]+1)+rangeSize[0]) + dp
 	}
 }

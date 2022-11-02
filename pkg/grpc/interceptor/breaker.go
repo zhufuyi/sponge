@@ -5,9 +5,8 @@ import (
 
 	"github.com/zhufuyi/sponge/pkg/container/group"
 	"github.com/zhufuyi/sponge/pkg/errcode"
+	"github.com/zhufuyi/sponge/pkg/shield/circuitbreaker"
 
-	"github.com/go-kratos/aegis/circuitbreaker"
-	"github.com/go-kratos/aegis/circuitbreaker/sre"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -26,7 +25,7 @@ type circuitBreakerOptions struct {
 func defaultCircuitBreakerOptions() *circuitBreakerOptions {
 	return &circuitBreakerOptions{
 		group: group.NewGroup(func() interface{} {
-			return sre.NewBreaker()
+			return circuitbreaker.NewBreaker()
 		}),
 	}
 }

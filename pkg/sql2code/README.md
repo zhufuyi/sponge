@@ -1,6 +1,6 @@
 ## sql2code
 
-根据sql生成不同用途代码，支持生成json、gorm model、dao、handler代码，sql可以从参数、文件、db三种方式获取，优先从高到低。
+根据sql生成不同用途代码，支持生成json、gorm model、update参数、request 参数代码，sql可以从参数、文件、db三种方式获取，优先从高到低。
 
 <br>
 

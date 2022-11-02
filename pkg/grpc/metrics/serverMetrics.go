@@ -103,6 +103,15 @@ func srvRegisterMetrics() {
 	})
 }
 
+// Register 注册http路由和grpc方法
+func Register(mux *http.ServeMux, grpcServer *grpc.Server) {
+	// 注册http路由
+	mux.Handle("/metrics", promhttp.HandlerFor(srvReg, promhttp.HandlerOpts{}))
+
+	// 注册所有gRPC方法到metrics
+	grpcServerMetrics.InitializeMetrics(grpcServer)
+}
+
 // GoHTTPService 初始化服务端的prometheus的exporter服务，使用 http://ip:port/metrics 获取数据
 func GoHTTPService(addr string, grpcServer *grpc.Server) *http.Server {
 	httpServer := &http.Server{
