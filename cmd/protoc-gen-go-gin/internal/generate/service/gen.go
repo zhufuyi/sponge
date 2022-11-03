@@ -1,4 +1,4 @@
-package serviceFile
+package service
 
 import (
 	"bytes"

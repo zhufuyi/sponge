@@ -1,4 +1,4 @@
-package handlerFile
+package handler
 
 import (
 	"text/template"

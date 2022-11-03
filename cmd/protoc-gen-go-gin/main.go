@@ -5,20 +5,15 @@ import (
 	"fmt"
 	"strings"
 
-	"protoc-gen-go-gin/internal/generate/handlerFile"
-	"protoc-gen-go-gin/internal/generate/routerFile"
-	"protoc-gen-go-gin/internal/generate/serviceFile"
+	"github.com/zhufuyi/sponge/cmd/protoc-gen-go-gin/internal/generate/handler"
+	"github.com/zhufuyi/sponge/cmd/protoc-gen-go-gin/internal/generate/router"
+	"github.com/zhufuyi/sponge/cmd/protoc-gen-go-gin/internal/generate/service"
 
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/types/pluginpb"
 )
 
-func main() {
-	var example bool
-	flag.BoolVar(&example, "example", false, "usage example")
-	flag.Parse()
-	if example {
-		fmt.Println(`
+const exampleTip = `
 # generate *_router.pb.go file
 protoc --proto_path=. --proto_path=./third_party --go-gin_out=. --go-gin_opt=paths=source_relative *.proto
 
@@ -27,7 +22,14 @@ protoc --proto_path=. --proto_path=./third_party --go-gin_out=. --go-gin_opt=pat
 
 # generate *_router.pb.go and *_service.go files, Note: You need to move *_service.go to the internal/service directory
 protoc --proto_path=. --proto_path=./third_party --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugins=service *.proto
-`)
+`
+
+func main() {
+	var example bool
+	flag.BoolVar(&example, "example", false, "usage example")
+	flag.Parse()
+	if example {
+		fmt.Printf("%s", exampleTip)
 		return
 	}
 
@@ -58,13 +60,13 @@ protoc --proto_path=. --proto_path=./third_party --go-gin_out=. --go-gin_opt=pat
 			if !f.Generate {
 				continue
 			}
-			routerFile.GenerateFile(gen, f)
+			router.GenerateFile(gen, f)
 
 			if handlerFlag {
-				handlerFile.GenerateFile(gen, f)
+				handler.GenerateFile(gen, f)
 			}
 			if serviceFlag {
-				serviceFile.GenerateFile(gen, f)
+				service.GenerateFile(gen, f)
 			}
 		}
 		return nil

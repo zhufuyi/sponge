@@ -1,4 +1,4 @@
-package routerFile
+package router
 
 import (
 	"text/template"
