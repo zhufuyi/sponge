@@ -13,7 +13,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// ProtoCommand generate protobuf code
+// ProtoCommand generate protobuf codes
 func ProtoCommand() *cobra.Command {
 	var (
 		moduleName string // go.mod文件的module名称
@@ -24,14 +24,14 @@ func ProtoCommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "proto",
-		Short: "Generate protobuf code",
-		Long: `generate protobuf code.
+		Short: "Generate protobuf codes",
+		Long: `generate protobuf codes.
 
 Examples:
-  # generate protobuf code.
+  # generate protobuf codes.
   sponge proto --module-name=yourModuleName --server-name=yourServerName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
-  # generate protobuf code and specify the output directory, Note: if the file already exists, code generation will be canceled.
+  # generate protobuf codes and specify the output directory, Note: if the file already exists, code generation will be canceled.
   sponge proto --module-name=yourModuleName --server-name=yourServerName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
 `,
 		SilenceErrors: true,
@@ -86,7 +86,7 @@ func runGenProtoCommand(moduleName string, serverName string, codes map[string]s
 		return err
 	}
 
-	fmt.Printf("generate '%s' code successfully, out = %s\n\n", subTplName, r.GetOutputDir())
+	fmt.Printf("generate '%s' codes successfully, out = %s\n\n", subTplName, r.GetOutputDir())
 	return nil
 }
 

@@ -18,13 +18,16 @@ var (
 func NewRootCMD() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:           "sponge",
-		Long:          "sponge management tools",
+		Long:          "sponge is a microservices framework for quickly creating http or grpc code.",
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		Version:       getVersion(),
 	}
 
 	cmd.AddCommand(
+		InitCommand(),
+		UpdateCommand(),
+		ToolsCommand(),
 		generate.ModelCommand(),
 		generate.DaoCommand(),
 		generate.HandlerCommand(),
@@ -33,7 +36,6 @@ func NewRootCMD() *cobra.Command {
 		generate.ServiceCommand(),
 		generate.GRPCCommand(),
 		generate.ConfigCommand(),
-		UpdateCommand(),
 	)
 	return cmd
 }

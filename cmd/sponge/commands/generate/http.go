@@ -13,7 +13,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// HTTPCommand generate http code
+// HTTPCommand generate http server codes
 func HTTPCommand() *cobra.Command {
 	var (
 		moduleName  string // go.mod文件的module名称
@@ -31,20 +31,20 @@ func HTTPCommand() *cobra.Command {
 	//nolint
 	cmd := &cobra.Command{
 		Use:   "http",
-		Short: "Generate http server code",
-		Long: `generate http server code.
+		Short: "Generate http server codes",
+		Long: `generate http server codes.
 
 Examples:
-  # generate http code and embed 'gorm.model' struct.
+  # generate http server codes and embed 'gorm.model' struct.
   sponge http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
-  # generate http code, structure fields correspond to the column names of the table.
+  # generate http server codes, structure fields correspond to the column names of the table.
   sponge http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --embed=false
 
-  # generate http code and specify the output directory, Note: if the file already exists, code generation will be canceled.
+  # generate http server codes and specify the output directory, Note: if the file already exists, code generation will be canceled.
   sponge http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
 
-  # generate http code and specify the docker image repository address.
+  # generate http server codes and specify the docker image repository address.
   sponge http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 `,
 		SilenceErrors: true,
@@ -102,7 +102,7 @@ func runGenHTTPCommand(moduleName string, serverName string, projectName string,
 		return err
 	}
 
-	fmt.Printf("generate %s's http code successfully, out = %s\n\n", serverName, r.GetOutputDir())
+	fmt.Printf("generate %s's http server codes successfully, out = %s\n\n", serverName, r.GetOutputDir())
 	return nil
 }
 

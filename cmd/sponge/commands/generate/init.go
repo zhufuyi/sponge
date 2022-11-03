@@ -3,12 +3,18 @@ package generate
 import (
 	"embed"
 	"fmt"
+	"math/rand"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/zhufuyi/sponge/pkg/gofile"
 	"github.com/zhufuyi/sponge/pkg/replacer"
 )
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
 
 // Replacers 模板名称对应的接口
 var Replacers = map[string]replacer.Replacer{}
@@ -27,7 +33,7 @@ func Init(name string, filepath string) error {
 		if isShowCommand() {
 			return nil
 		}
-		return fmt.Errorf(`Hint: for the first time, run the command "sponge update"`)
+		return fmt.Errorf("⚠ Not yet initialized, run the command 'sponge init'")
 	}
 
 	var err error
@@ -64,13 +70,13 @@ func isShowCommand() bool {
 
 	// sponge update or sponge -h
 	if l == 2 {
-		if os.Args[1] == "update" || os.Args[1] == "-h" {
+		if os.Args[1] == "init" || os.Args[1] == "-h" {
 			return true
 		}
 		return false
 	}
 	if l > 2 {
-		return strings.Contains(strings.Join(os.Args[:3], ""), "update")
+		return strings.Contains(strings.Join(os.Args[:3], ""), "init")
 	}
 
 	return false

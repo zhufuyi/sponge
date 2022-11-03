@@ -28,7 +28,7 @@ Examples:
   sponge update
   # for windows, need to specify the bash file
   sponge update --executor="D:\Program Files\cmder\vendor\git-for-windows\bin\bash.exe"
-  # use https://goproxy.cn goproxy
+  # use goproxy https://goproxy.cn
   sponge update -g
 `,
 		SilenceErrors: true,
@@ -37,15 +37,16 @@ Examples:
 			if executor != "" {
 				gobash.SetExecutorPath(executor)
 			}
+			fmt.Println("update sponge ......")
 			err := runUpdateCommand(enableCNGoProxy)
 			if err != nil {
 				return err
 			}
-			version, err := CopyToTempDir()
+			ver, err := CopyToTempDir()
 			if err != nil {
 				return err
 			}
-			fmt.Printf("update sponge version to %s successfully.\n", version)
+			fmt.Printf("update sponge version to %s successfully.\n", ver)
 			return nil
 		},
 	}
@@ -57,17 +58,16 @@ Examples:
 }
 
 func runUpdateCommand(enableCNGoProxy bool) error {
-	fmt.Println("update sponge ......")
-	ctx, _ := context.WithTimeout(context.Background(), time.Minute*5) //nolint
+	ctx, _ := context.WithTimeout(context.Background(), time.Minute*3) //nolint
 	command := "go install github.com/zhufuyi/sponge/cmd/sponge@latest"
 	if enableCNGoProxy {
 		command = "GOPROXY=https://goproxy.cn,direct && " + command
 	}
 	result := gobash.Run(ctx, command)
 	for range result.StdOut {
-		//fmt.Printf("%s", v)
 	}
 	if result.Err != nil {
+		checkExit("update", result.Err)
 		return fmt.Errorf("exec command failed, %v", result.Err)
 	}
 
@@ -106,9 +106,9 @@ func CopyToTempDir() (string, error) {
 		return "", fmt.Errorf("exec '%s' error, %v", command, err)
 	}
 
-	version := strings.Replace(latestSpongeDirName, "sponge@", "", 1)
-	_ = os.WriteFile(versionFile, []byte(version), 0666)
-	return version, err
+	ver := strings.Replace(latestSpongeDirName, "sponge@", "", 1)
+	_ = os.WriteFile(versionFile, []byte(ver), 0666)
+	return ver, err
 }
 
 func adaptPathDelimiter(filePath string) string {

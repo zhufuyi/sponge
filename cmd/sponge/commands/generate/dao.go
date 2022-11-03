@@ -11,7 +11,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// DaoCommand generate dao code
+// DaoCommand generate dao codes
 func DaoCommand() *cobra.Command {
 	var (
 		moduleName string // 服务名称，也就是包名称
@@ -25,17 +25,17 @@ func DaoCommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "dao",
-		Short: "Generate dao code",
-		Long: `generate dao code.
+		Short: "Generate dao codes",
+		Long: `generate dao codes.
 
 Examples:
-  # generate dao code and embed 'gorm.model' struct.
+  # generate dao codes and embed 'gorm.model' struct.
   sponge dao --module-name=yourModuleName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
-  # generate dao code, structure fields correspond to the column names of the table.
+  # generate dao codes, structure fields correspond to the column names of the table.
   sponge dao --module-name=yourModuleName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --embed=false
 
-  # generate dao code and specify the output directory, Note: if the file already exists, code generation will be canceled.
+  # generate dao codes and specify the output directory, Note: if the file already exists, code generation will be canceled.
   sponge dao --module-name=yourModuleName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
 `,
 		SilenceErrors: true,
@@ -84,7 +84,7 @@ func runGenDaoCommand(moduleName string, codes map[string]string, outPath string
 		return err
 	}
 
-	fmt.Printf("generate '%s' code successfully, out = %s\n\n", subTplName, r.GetOutputDir())
+	fmt.Printf("generate '%s' codes successfully, out = %s\n\n", subTplName, r.GetOutputDir())
 	return nil
 }
 

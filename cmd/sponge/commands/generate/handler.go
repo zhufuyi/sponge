@@ -12,7 +12,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// HandlerCommand generate handler code
+// HandlerCommand generate handler codes
 func HandlerCommand() *cobra.Command {
 	var (
 		moduleName string // go.mod文件的module名称
@@ -26,17 +26,17 @@ func HandlerCommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "handler",
-		Short: "Generate handler code",
-		Long: `generate handler code.
+		Short: "Generate handler codes",
+		Long: `generate handler codes.
 
 Examples:
-  # generate handler code and embed 'gorm.model' struct.
+  # generate handler codes and embed 'gorm.model' struct.
   sponge handler --module-name=yourModuleName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
-  # generate handler code, structure fields correspond to the column names of the table.
+  # generate handler codes, structure fields correspond to the column names of the table.
   sponge handler --module-name=yourModuleName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --embed=false
 
-  # generate handler code and specify the output directory, Note: if the file already exists, code generation will be canceled.
+  # generate handler codes and specify the output directory, Note: if the file already exists, code generation will be canceled.
   sponge handler --module-name=yourModuleName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
 `,
 		SilenceErrors: true,
@@ -88,7 +88,7 @@ func runGenHandlerCommand(moduleName string, codes map[string]string, outPath st
 		return err
 	}
 
-	fmt.Printf("generate '%s' code successfully, out = %s\n\n", subTplName, r.GetOutputDir())
+	fmt.Printf("generate '%s' codes successfully, out = %s\n\n", subTplName, r.GetOutputDir())
 	return nil
 }
 

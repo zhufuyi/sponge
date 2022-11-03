@@ -11,7 +11,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// ModelCommand generate model code
+// ModelCommand generate model codes
 func ModelCommand() *cobra.Command {
 	var (
 		outPath string // 输出目录
@@ -24,17 +24,17 @@ func ModelCommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "model",
-		Short: "Generate model code",
-		Long: `generate model code.
+		Short: "Generate model codes",
+		Long: `generate model codes.
 
 Examples:
-  # generate model code and embed 'gorm.Model' struct.
+  # generate model codes and embed 'gorm.Model' struct.
   sponge model --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
-  # generate model code, structure fields correspond to the column names of the table.
+  # generate model codes, structure fields correspond to the column names of the table.
   sponge model --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --embed=false
 
-  # generate model code and specify the output directory, Note: if the file already exists, code generation will be canceled.
+  # generate model codes and specify the output directory, Note: if the file already exists, code generation will be canceled.
   sponge model --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
 `,
 		SilenceErrors: true,
@@ -81,7 +81,7 @@ func runGenModelCommand(codes map[string]string, outPath string) error {
 		return err
 	}
 
-	fmt.Printf("generate '%s' code successfully, out = %s\n\n", subTplName, r.GetOutputDir())
+	fmt.Printf("generate '%s' codes successfully, out = %s\n\n", subTplName, r.GetOutputDir())
 	return nil
 }
 

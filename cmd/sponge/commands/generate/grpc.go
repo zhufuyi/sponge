@@ -15,7 +15,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// GRPCCommand generate grpc code
+// GRPCCommand generate grpc server codes
 func GRPCCommand() *cobra.Command {
 	var (
 		moduleName  string // go.mod文件的module名称
@@ -33,20 +33,20 @@ func GRPCCommand() *cobra.Command {
 	//nolint
 	cmd := &cobra.Command{
 		Use:   "grpc",
-		Short: "Generate grpc server code",
-		Long: `generate grpc server code.
+		Short: "Generate grpc server codes",
+		Long: `generate grpc server codes.
 
 Examples:
-  # generate grpc server code and embed 'gorm.model' struct.
+  # generate grpc server codes and embed 'gorm.model' struct.
   sponge grpc --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
-  # generate grpc server code, structure fields correspond to the column names of the table.
+  # generate grpc server codes, structure fields correspond to the column names of the table.
   sponge grpc --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --embed=false
 
-  # generate grpc server code and specify the output directory, Note: if the file already exists, code generation will be canceled.
+  # generate grpc server codes and specify the output directory, Note: if the file already exists, code generation will be canceled.
   sponge grpc --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
 
-  # generate grpc server code and specify the docker image repository address.
+  # generate grpc server codes and specify the docker image repository address.
   sponge grpc --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 `,
 		SilenceErrors: true,
@@ -104,7 +104,7 @@ func runGenGRPCCommand(moduleName string, serverName string, projectName string,
 		return err
 	}
 
-	fmt.Printf("generate %s's grpc code successfully, out = %s\n\n", serverName, r.GetOutputDir())
+	fmt.Printf("generate %s's grpc server codes successfully, out = %s\n\n", serverName, r.GetOutputDir())
 	return nil
 }
 

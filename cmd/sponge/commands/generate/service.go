@@ -14,7 +14,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// ServiceCommand generate service code
+// ServiceCommand generate service codes
 func ServiceCommand() *cobra.Command {
 	var (
 		moduleName string // go.mod文件的module名称
@@ -29,17 +29,17 @@ func ServiceCommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "service",
-		Short: "Generate grpc service code",
-		Long: `generate grpc service code.
+		Short: "Generate grpc service codes",
+		Long: `generate grpc service codes.
 
 Examples:
-  # generate service code and embed 'gorm.model' struct.
+  # generate service codes and embed 'gorm.model' struct.
   sponge service --module-name=yourModuleName --server-name=yourServerName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
-  # generate service code, structure fields correspond to the column names of the table.
+  # generate service codes, structure fields correspond to the column names of the table.
   sponge service --module-name=yourModuleName --server-name=yourServerName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --embed=false
 
-  # generate service code and specify the output directory, Note: if the file already exists, code generation will be canceled.
+  # generate service codes and specify the output directory, Note: if the file already exists, code generation will be canceled.
   sponge service --module-name=yourModuleName --server-name=yourServerName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
 `,
 		SilenceErrors: true,
@@ -97,7 +97,7 @@ func runGenServiceCommand(moduleName string, serverName string, codes map[string
 		return err
 	}
 
-	fmt.Printf("generate '%s' code successfully, out = %s\n\n", subTplName, r.GetOutputDir())
+	fmt.Printf("generate '%s' codes successfully, out = %s\n\n", subTplName, r.GetOutputDir())
 	return nil
 }
 

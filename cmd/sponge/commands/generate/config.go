@@ -23,11 +23,11 @@ func ConfigCommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "config",
-		Short: "Generate go config code from yaml file",
-		Long: `generate go config code from yaml file.
+		Short: "Generate go config codes from yaml file",
+		Long: `generate go config codes from yaml file.
 
 Examples:
-  # generate config code in server directory, the yaml configuration file must be in <yourServerDir>/configs directory.
+  # generate config codes in server directory, the yaml configuration file must be in <yourServerDir>/configs directory.
   sponge config --server-dir=/yourServerDir
 `,
 		SilenceErrors: true,
