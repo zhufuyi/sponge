@@ -24,9 +24,6 @@ func TestParseSql(t *testing.T) {
 	codes, err := ParseSQL(sql, WithTablePrefix("t_"), WithJSONTag(0))
 	assert.Nil(t, err)
 	for k, v := range codes {
-		//if k == CodeTypeModel {
-		//	t.Log(v)
-		//}
 		assert.NotEmpty(t, k)
 		assert.NotEmpty(t, v)
 	}
@@ -90,6 +87,9 @@ func TestParseSQLs(t *testing.T) {
 			continue
 		}
 		for k, v := range codes {
+			if len(v) > 100 {
+				v = v[:100]
+			}
 			t.Log(i+1, k, v)
 		}
 	}

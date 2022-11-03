@@ -1,11 +1,17 @@
 package routers
 
 import (
+	"context"
 	"testing"
+	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/zhufuyi/sponge/configs"
 	"github.com/zhufuyi/sponge/internal/config"
+
+	"github.com/zhufuyi/sponge/pkg/utils"
+
+	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNewRouter(t *testing.T) {
@@ -20,10 +26,12 @@ func TestNewRouter(t *testing.T) {
 	config.Get().App.EnableLimit = true
 	config.Get().App.EnableCircuitBreaker = true
 
-	gin.SetMode(gin.ReleaseMode)
-	r := NewRouter()
-
-	userExampleRouter(r.Group("/"), &mock{})
+	utils.SafeRunWithTimeout(time.Second*2, func(cancel context.CancelFunc) {
+		gin.SetMode(gin.ReleaseMode)
+		r := NewRouter()
+		assert.NotNil(t, r)
+		cancel()
+	})
 }
 
 type mock struct{}
@@ -34,3 +42,9 @@ func (u mock) UpdateByID(c *gin.Context) { return }
 func (u mock) GetByID(c *gin.Context)    { return }
 func (u mock) ListByIDs(c *gin.Context)  { return }
 func (u mock) List(c *gin.Context)       { return }
+
+func Test_userExampleRouter(t *testing.T) {
+	gin.SetMode(gin.ReleaseMode)
+	r := gin.Default()
+	userExampleRouter(r.Group("/"), &mock{})
+}

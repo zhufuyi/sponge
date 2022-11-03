@@ -17,26 +17,29 @@ func TestNewServerNameExampleRPCConn(t *testing.T) {
 	}
 
 	go func() {
+		defer func() { recover() }()
 		time.Sleep(time.Millisecond * 100)
 		config.Get().GrpcClient[0].RegistryDiscoveryType = "consul"
 		NewServerNameExampleRPCConn()
 	}()
 
 	go func() {
+		defer func() { recover() }()
 		time.Sleep(time.Millisecond * 200)
 		config.Get().GrpcClient[0].RegistryDiscoveryType = "etcd"
 		NewServerNameExampleRPCConn()
 	}()
 
 	go func() {
+		defer func() { recover() }()
 		time.Sleep(time.Millisecond * 300)
 		config.Get().GrpcClient[0].RegistryDiscoveryType = "nacos"
 		NewServerNameExampleRPCConn()
 	}()
 
 	go func() {
-		time.Sleep(time.Millisecond * 400)
 		defer func() { recover() }()
+		time.Sleep(time.Millisecond * 400)
 		config.Get().GrpcClient[0].Name = "unknown name"
 		NewServerNameExampleRPCConn()
 	}()

@@ -5,9 +5,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/zhufuyi/sponge/pkg/utils"
+
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
-	"github.com/zhufuyi/sponge/pkg/utils"
 )
 
 func TestCheckHealth(t *testing.T) {

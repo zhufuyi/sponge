@@ -13,11 +13,11 @@ import (
 	"github.com/zhufuyi/sponge/pkg/gohttp"
 	"github.com/zhufuyi/sponge/pkg/gotest"
 	"github.com/zhufuyi/sponge/pkg/mysql/query"
+	"github.com/zhufuyi/sponge/pkg/utils"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jinzhu/copier"
 	"github.com/stretchr/testify/assert"
-	"github.com/zhufuyi/sponge/pkg/utils"
 )
 
 func newUserExampleHandler() *gotest.Handler {

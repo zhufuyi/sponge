@@ -9,16 +9,16 @@ GO_FILES := $(shell find . -name '*.go' | grep -v /vendor/ | grep -v _test.go)
 .PHONY: install
 # installation of dependent tools
 install:
-	go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28.0
-	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2.0
-	go install github.com/envoyproxy/protoc-gen-validate@v0.6.7
-	go install github.com/srikrsna/protoc-gen-gotag@v0.6.2
-	go install github.com/mohuishou/protoc-gen-go-gin@v0.1.0
-	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.10.0
-	go install github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc@v1.5.1
-	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.49.0
-	go install github.com/swaggo/swag/cmd/swag@v1.8.6
-	go install github.com/ofabry/go-callvis@v0.6.1
+	go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+	go install github.com/envoyproxy/protoc-gen-validate@latest
+	go install github.com/srikrsna/protoc-gen-gotag@latest
+	go install github.com/zhufuyi/sponge/cmd/protoc-gen-go-gin@latest
+	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@latest
+	go install github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc@latest
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+	go install github.com/swaggo/swag/cmd/swag@latest
+	go install github.com/ofabry/go-callvis@latest
 	go install golang.org/x/pkgsite/cmd/pkgsite@latest
 
 

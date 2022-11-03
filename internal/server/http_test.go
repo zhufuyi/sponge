@@ -33,18 +33,16 @@ func TestHTTPServer(t *testing.T) {
 	addr := fmt.Sprintf(":%d", port)
 	gin.SetMode(gin.ReleaseMode)
 
-	defer func() {
-		if e := recover(); e != nil {
-			t.Log("ignore connect mysql error info")
-		}
-	}()
-	server := NewHTTPServer(addr,
-		WithHTTPReadTimeout(time.Second),
-		WithHTTPWriteTimeout(time.Second),
-		WithHTTPIsProd(true),
-		WithHTTPRegistry(&iRegistry{}, &registry.ServiceInstance{}),
-	)
-	assert.NotNil(t, server)
+	utils.SafeRunWithTimeout(time.Second*2, func(cancel context.CancelFunc) {
+		server := NewHTTPServer(addr,
+			WithHTTPReadTimeout(time.Second),
+			WithHTTPWriteTimeout(time.Second),
+			WithHTTPIsProd(true),
+			WithHTTPRegistry(&iRegistry{}, &registry.ServiceInstance{}),
+		)
+		assert.NotNil(t, server)
+		cancel()
+	})
 }
 
 func TestHTTPServerMock(t *testing.T) {

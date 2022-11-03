@@ -27,7 +27,7 @@ http:
 # grpc server 设置
 grpc:
   port: 8282              # rpc监听端口
-  httpPort: 8283   # 获取pprof和监控指标http端口
+  httpPort: 8283        # 获取pprof和监控指标http端口
   readTimeout: 3      # 读超时，单位(秒)
   writeTimeout: 3     # 写超时，单位(秒)
 

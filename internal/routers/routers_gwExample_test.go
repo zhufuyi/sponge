@@ -3,12 +3,16 @@ package routers
 import (
 	"context"
 	"testing"
+	"time"
 
 	serverNameExampleV1 "github.com/zhufuyi/sponge/api/serverNameExample/v1"
 	"github.com/zhufuyi/sponge/configs"
 	"github.com/zhufuyi/sponge/internal/config"
 
+	"github.com/zhufuyi/sponge/pkg/utils"
+
 	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNewRouter_gwExample(t *testing.T) {
@@ -23,11 +27,12 @@ func TestNewRouter_gwExample(t *testing.T) {
 	config.Get().App.EnableLimit = true
 	config.Get().App.EnableCircuitBreaker = true
 
-	gin.SetMode(gin.ReleaseMode)
-	r := NewRouter_gwExample()
-
-	defer func() { recover() }()
-	userExampleRouter_gwExample(r, &mockGw{})
+	utils.SafeRunWithTimeout(time.Second*2, func(cancel context.CancelFunc) {
+		gin.SetMode(gin.ReleaseMode)
+		r := NewRouter_gwExample()
+		assert.NotNil(t, r)
+		cancel()
+	})
 }
 
 type mockGw struct{}
@@ -54,4 +59,10 @@ func (m mockGw) ListByIDs(ctx context.Context, req *serverNameExampleV1.ListUser
 
 func (m mockGw) UpdateByID(ctx context.Context, req *serverNameExampleV1.UpdateUserExampleByIDRequest) (*serverNameExampleV1.UpdateUserExampleByIDReply, error) {
 	return nil, nil
+}
+
+func Test_userExampleRouter_gwExample(t *testing.T) {
+	gin.SetMode(gin.ReleaseMode)
+	r := gin.Default()
+	userExampleRouter_gwExample(r, &mockGw{})
 }

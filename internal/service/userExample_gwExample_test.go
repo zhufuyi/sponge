@@ -8,6 +8,8 @@ import (
 	"github.com/zhufuyi/sponge/configs"
 	"github.com/zhufuyi/sponge/internal/config"
 	"github.com/zhufuyi/sponge/internal/rpcclient"
+
+	"github.com/zhufuyi/sponge/pkg/utils"
 )
 
 func TestNewUserExampleServiceClient(t *testing.T) {
@@ -25,30 +27,35 @@ func TestNewUserExampleServiceClient(t *testing.T) {
 	cli := NewUserExampleServiceClient()
 	ctx := context.Background()
 
-	go func() {
+	utils.SafeRunWithTimeout(time.Second, func(cancel context.CancelFunc) {
 		reply, err := cli.Create(ctx, nil)
 		t.Log(reply, err)
-	}()
-	go func() {
+		cancel()
+	})
+	utils.SafeRunWithTimeout(time.Second, func(cancel context.CancelFunc) {
 		reply, err := cli.DeleteByID(ctx, nil)
 		t.Log(reply, err)
-	}()
-	go func() {
+		cancel()
+	})
+	utils.SafeRunWithTimeout(time.Second, func(cancel context.CancelFunc) {
 		reply, err := cli.UpdateByID(ctx, nil)
 		t.Log(reply, err)
-	}()
-	go func() {
+		cancel()
+	})
+	utils.SafeRunWithTimeout(time.Second, func(cancel context.CancelFunc) {
 		reply, err := cli.GetByID(ctx, nil)
 		t.Log(reply, err)
-	}()
-	go func() {
+		cancel()
+	})
+	utils.SafeRunWithTimeout(time.Second, func(cancel context.CancelFunc) {
 		reply, err := cli.ListByIDs(ctx, nil)
 		t.Log(reply, err)
-	}()
-	go func() {
+		cancel()
+	})
+	utils.SafeRunWithTimeout(time.Second, func(cancel context.CancelFunc) {
 		reply, err := cli.List(ctx, nil)
 		t.Log(reply, err)
-	}()
+		cancel()
+	})
 
-	time.Sleep(time.Second * 15)
 }
