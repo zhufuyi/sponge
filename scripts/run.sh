@@ -1,6 +1,6 @@
 #!/bin/bash
 
-serverName="serverNameExample"
+serverName="serverNameExample_mixExample"
 
 binaryFile="cmd/${serverName}/${serverName}"
 

@@ -88,10 +88,13 @@ func runGenGRPCCommand(moduleName string, serverName string, projectName string,
 
 	// 设置模板信息
 	subDirs := []string{} // 只处理的指定子目录，如果为空或者没有指定的子目录，表示所有文件
-	ignoreDirs := []string{"cmd/sponge", "sponge/.github", "sponge/.git", "sponge/docs", "sponge/pkg", "sponge/assets",
-		"sponge/test", "internal/handler", "internal/routers", "internal/types"} // 指定子目录下忽略处理的目录
+	ignoreDirs := []string{"cmd/sponge", "cmd/protoc-gen-go-gin", "cmd/serverNameExample_mixExample",
+		"cmd/serverNameExample_httpExample", "cmd/serverNameExample_gwExample",
+		"sponge/.github", "sponge/.git", "sponge/docs", "sponge/pkg", "sponge/assets", "sponge/test",
+		"internal/handler", "internal/routers", "internal/types", "internal/rpcclient"} // 指定子目录下忽略处理的目录
 	ignoreFiles := []string{"http_systemCode.go", "http_userExample.go", "http.go", "http_test.go", "http_option.go",
 		"userExample.pb.go", "userExample.pb.validate.go", "userExample_grpc.pb.go", "swag-docs.sh",
+		"userExample_gwExample.go", "userExample_gwExample_test.go", "userExample_router.pb.go",
 		"types.pb.go", "types.pb.validate.go", "LICENSE", "doc.go", "codecov.yml"} // 指定子目录下忽略处理的文件
 
 	r.SetSubDirs(subDirs...)
@@ -120,13 +123,13 @@ func addGRPCFields(moduleName string, serverName string, projectName string, rep
 	fields = append(fields, deleteFieldsMark(r, protoFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, serviceClientFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, serviceTestFile, startMark, endMark)...)
-	fields = append(fields, deleteFieldsMark(r, mainFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, dockerFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, dockerFileBuild, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, dockerComposeFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, k8sDeploymentFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, k8sServiceFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, makeFile, wellStartMark, wellEndMark)...)
+	fields = append(fields, deleteFieldsMark(r, gitignoreFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, replaceFileContentMark(r, readmeFile, "## "+serverName)...)
 	fields = append(fields, []replacer.Field{
 		{ // 替换model/userExample.go文件内容
@@ -144,10 +147,6 @@ func addGRPCFields(moduleName string, serverName string, projectName string, rep
 		{ // 替换service/userExample_client_test.go文件内容
 			Old: serviceFileMark,
 			New: adjustmentOfIDType(codes[parser.CodeTypeService]),
-		},
-		{ // 替换main.go文件内容
-			Old: mainFileMark,
-			New: mainFileGrpcCode,
 		},
 		{ // 替换Dockerfile文件内容
 			Old: dockerFileMark,
@@ -228,6 +227,14 @@ func addGRPCFields(moduleName string, serverName string, projectName string, rep
 		{
 			Old: "image-repo-host",
 			New: repoHost,
+		},
+		{
+			Old: "_grpcExample",
+			New: "",
+		},
+		{
+			Old: "_mixExample",
+			New: "",
 		},
 		{
 			Old: string(wellOnlyGrpcStartMark),

@@ -70,8 +70,11 @@ func NewHTTPServer(addr string, opts ...HTTPOption) app.IServer {
 		gin.SetMode(gin.DebugMode)
 	}
 
-	// router := routers.NewRouter()
-	router := routers.NewRouter_gwExample()
+	router := routers.NewRouter()
+	// delete the templates code start
+	// only used for cmd/serverNameExample_gwExample
+	//router := routers.NewRouter_gwExample()
+	// delete the templates code end
 	server := &http.Server{
 		Addr:           addr,
 		Handler:        router,

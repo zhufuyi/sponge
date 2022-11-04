@@ -11,8 +11,10 @@ var defaultPrefix = "/debug/pprof"
 
 // Option set defaultPrefix func
 type Option func(o *options)
+
 type options struct {
-	prefix string
+	prefix           string
+	enableIOWaitTime bool
 }
 
 func (o *options) apply(opts ...Option) {
@@ -28,6 +30,13 @@ func WithPrefix(prefix string) Option {
 			return
 		}
 		o.prefix = prefix
+	}
+}
+
+// WithIOWaitTime enable IO wait time
+func WithIOWaitTime() Option {
+	return func(o *options) {
+		o.enableIOWaitTime = true
 	}
 }
 
@@ -47,6 +56,8 @@ func Register(mux *http.ServeMux, opts ...Option) {
 	mux.Handle(o.prefix+"/block", pprof.Handler("block"))
 	mux.Handle(o.prefix+"/mutex", pprof.Handler("mutex"))
 
-	// Similar to /profile, add IO wait time
-	mux.Handle(o.prefix+"/fgprof", fgprof.Handler())
+	if o.enableIOWaitTime {
+		// Similar to /profile, add IO wait time,  https://github.com/felixge/fgprof
+		mux.Handle(o.prefix+"/profile-io", fgprof.Handler())
+	}
 }

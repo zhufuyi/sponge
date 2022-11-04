@@ -53,7 +53,7 @@ jobs:
         run: make test
 
       - name: Run coverage
-        run: go test -race -coverprofile=coverage.txt -covermode=atomic $(go list ./... | grep -v /vendor/ | grep -v /api/)
+        run: go test -coverprofile=coverage.txt -covermode=atomic $(go list ./... | grep -v /vendor/ | grep -v /api/)
 
       - name: Upload Coverage report to CodeCov
         uses: codecov/codecov-action@v3

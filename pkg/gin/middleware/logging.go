@@ -18,10 +18,6 @@ var (
 	// default zap log
 	defaultLogger, _ = zap.NewProduction()
 
-	// Default request id name
-	defaultRequestIDNameInHeader  = "X-Request-Id"
-	defaultRequestIDNameInContext = "request_id"
-
 	// Ignore route list
 	defaultIgnoreRoutes = map[string]struct{}{
 		"/ping":   {},
@@ -88,7 +84,7 @@ func WithRequestIDFromHeader(name ...string) Option {
 	if len(name) > 0 && name[0] != "" {
 		requestIDName = name[0]
 	} else {
-		requestIDName = defaultRequestIDNameInHeader
+		requestIDName = HeaderXRequestIDKey
 	}
 	return func(o *options) {
 		o.requestIDFrom = 1
@@ -102,7 +98,7 @@ func WithRequestIDFromContext(name ...string) Option {
 	if len(name) > 0 && name[0] != "" {
 		requestIDName = name[0]
 	} else {
-		requestIDName = defaultRequestIDNameInContext
+		requestIDName = ContextRequestIDKey
 	}
 	return func(o *options) {
 		o.requestIDFrom = 2

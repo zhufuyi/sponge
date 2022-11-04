@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/zhufuyi/sponge/cmd/serverNameExample/initial"
+	"github.com/zhufuyi/sponge/cmd/serverNameExample_mixExample/initial"
 
 	"github.com/zhufuyi/sponge/pkg/app"
 )

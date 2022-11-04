@@ -7,12 +7,12 @@
 ### 使用示例
 
 ```go
-	mux := http.NewServeMux()
-    prof.Register(r, WithPrefix("/myServer"), WithIOWaitTime())
+	r := gin.Default()
+	prof.Register(r, WithPrefix("/myServer"), WithIOWaitTime())
 
 	httpServer := &http.Server{
 		Addr:    ":8080",
-		Handler: mux,
+		Handler: r,
 	}
 	
     if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {

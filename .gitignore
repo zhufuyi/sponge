@@ -22,9 +22,11 @@ dist/
 *.ipr
 *.iws
 
+cmd/serverNameExample_mixExample/serverNameExample_mixExample*
+# delete the templates code start
 cmd/sponge/sponge
 cmd/protoc-gen-go-gin/protoc-gen-go-gin
-cmd/serverNameExample/serverNameExample
 cmd/serverNameExample_grpcExample/serverNameExample_grpcExample
 cmd/serverNameExample_gwExample/serverNameExample_gwExample
 cmd/serverNameExample_httpExample/serverNameExample_httpExample
+# delete the templates code end

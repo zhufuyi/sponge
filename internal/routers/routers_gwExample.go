@@ -9,12 +9,11 @@ import (
 	"github.com/zhufuyi/sponge/pkg/gin/handlerfunc"
 	"github.com/zhufuyi/sponge/pkg/gin/middleware"
 	"github.com/zhufuyi/sponge/pkg/gin/middleware/metrics"
+	"github.com/zhufuyi/sponge/pkg/gin/prof"
 	"github.com/zhufuyi/sponge/pkg/gin/swagger"
 	"github.com/zhufuyi/sponge/pkg/gin/validator"
 	"github.com/zhufuyi/sponge/pkg/logger"
 
-	"github.com/felixge/fgprof"
-	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 )
@@ -63,11 +62,9 @@ func NewRouter_gwExample() *gin.Engine { //nolint
 		r.Use(middleware.Tracing(config.Get().App.Name))
 	}
 
-	// profile 性能分析
+	// pprof 性能分析
 	if config.Get().App.EnablePprof {
-		// https://github.com/felixge/fgprof
-		r.GET("/debug/fgprof", gin.WrapH(fgprof.Handler()))
-		pprof.Register(r)
+		prof.Register(r, prof.WithIOWaitTime())
 	}
 
 	// 校验器

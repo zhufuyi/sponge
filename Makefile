@@ -69,9 +69,9 @@ docs: mod fmt
 # generate interactive visual function dependency graphs
 graph:
 	@echo "generating graph ......"
-	@cp -f cmd/serverNameExample/main.go .
-	go-callvis -skipbrowser -format=svg -nostd -file=serverNameExample github.com/zhufuyi/sponge
-	@rm -f main.go serverNameExample.gv
+	@cp -f cmd/serverNameExample_mixExample/main.go .
+	go-callvis -skipbrowser -format=svg -nostd -file=serverNameExample_mixExample github.com/zhufuyi/sponge
+	@rm -f main.go serverNameExample_mixExample.gv
 
 
 .PHONY: proto
@@ -87,10 +87,10 @@ proto-doc:
 
 
 .PHONY: build
-# build serverNameExample for linux amd64 binary
+# build serverNameExample_mixExample for linux amd64 binary
 build:
-	@echo "building 'serverNameExample', binary file will output to 'cmd/serverNameExample'"
-	@cd cmd/serverNameExample && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GOPROXY=https://goproxy.cn,direct go build -gcflags "all=-N -l"
+	@echo "building 'serverNameExample_mixExample', binary file will output to 'cmd/serverNameExample_mixExample'"
+	@cd cmd/serverNameExample_mixExample && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GOPROXY=https://goproxy.cn,direct go build -gcflags "all=-N -l"
 
 # delete the templates code start
 .PHONY: build-sponge
@@ -110,7 +110,7 @@ run:
 # build docker image, use binary files to build
 docker-image: build
 	@bash scripts/grpc_health_probe.sh
-	@mv -f cmd/serverNameExample/serverNameExample build/
+	@mv -f cmd/serverNameExample_mixExample/serverNameExample_mixExample build/serverNameExample
 	@mkdir -p build/configs && cp -f configs/serverNameExample.yml build/configs/
 	docker build -t project-name-example.server-name-example:latest build/
 	@rm -rf build/serverNameExample build/configs build/grpc_health_probe
@@ -149,8 +149,9 @@ deploy-docker:
 .PHONY: clean
 # clean binary file, cover.out, redundant dependency packages
 clean:
-	@rm -vrf cmd/serverNameExample/serverNameExample
+	@rm -vrf cmd/serverNameExample_mixExample/serverNameExample_mixExample
 	@rm -vrf cover.out
+	@rm -rf main.go serverNameExample_mixExample.gv
 	go mod tidy
 	@echo "clean finished"
 

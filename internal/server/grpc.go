@@ -159,7 +159,7 @@ func (s *grpcServer) registerHTTPPprof() {
 	if s.mux == nil {
 		s.mux = http.NewServeMux()
 	}
-	prof.Register(s.mux)
+	prof.Register(s.mux, prof.WithIOWaitTime())
 }
 
 // NewGRPCServer creates a new grpc server

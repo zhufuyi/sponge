@@ -1,6 +1,7 @@
 package prof
 
 import (
+	"github.com/gin-gonic/gin"
 	"net/http"
 	"testing"
 	"time"
@@ -10,13 +11,13 @@ import (
 )
 
 func TestRegister(t *testing.T) {
-	mux := http.NewServeMux()
-	Register(mux, WithPrefix(""), WithPrefix("/myServer"), WithIOWaitTime())
+	r := gin.Default()
+	Register(r, WithPrefix(""), WithPrefix("/myServer"), WithIOWaitTime())
 
 	serverAddr, requestAddr := utils.GetLocalHTTPAddrPairs()
 	httpServer := &http.Server{
 		Addr:    serverAddr,
-		Handler: mux,
+		Handler: r,
 	}
 
 	go func() {

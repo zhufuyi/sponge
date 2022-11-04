@@ -40,7 +40,7 @@ func RequestID() gin.HandlerFunc {
 
 // GCtxRequestID get request id from gin.Context
 func GCtxRequestID(c *gin.Context) string {
-	if v, isExist := c.Get(defaultRequestIDNameInContext); isExist {
+	if v, isExist := c.Get(ContextRequestIDKey); isExist {
 		if requestID, ok := v.(string); ok {
 			return requestID
 		}
@@ -50,12 +50,12 @@ func GCtxRequestID(c *gin.Context) string {
 
 // GCtxRequestIDField get request id field from gin.Context
 func GCtxRequestIDField(c *gin.Context) zap.Field {
-	return zap.String(defaultRequestIDNameInContext, GCtxRequestID(c))
+	return zap.String(ContextRequestIDKey, GCtxRequestID(c))
 }
 
 // CtxRequestID get request id from context.Context
 func CtxRequestID(ctx context.Context) string {
-	v := ctx.Value(defaultRequestIDNameInContext)
+	v := ctx.Value(ContextRequestIDKey)
 	if str, ok := v.(string); ok {
 		return str
 	}
@@ -64,15 +64,15 @@ func CtxRequestID(ctx context.Context) string {
 
 // CtxRequestIDField get request id field from context.Context
 func CtxRequestIDField(ctx context.Context) zap.Field {
-	return zap.String(defaultRequestIDNameInContext, CtxRequestID(ctx))
+	return zap.String(ContextRequestIDKey, CtxRequestID(ctx))
 }
 
 // HeaderRequestID get request id from the header
 func HeaderRequestID(c *gin.Context) string {
-	return c.Request.Header.Get(defaultRequestIDNameInHeader)
+	return c.Request.Header.Get(HeaderXRequestIDKey)
 }
 
 // HeaderRequestIDField get request id field from header
 func HeaderRequestIDField(c *gin.Context) zap.Field {
-	return zap.String(defaultRequestIDNameInHeader, HeaderRequestID(c))
+	return zap.String(HeaderXRequestIDKey, HeaderRequestID(c))
 }

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 两阶段构建镜像，优点：镜像体积最小，缺点：构建速度较慢，每次构建都产生比较大的中间镜像
-serverName="serverNameExample"
+serverName="serverNameExample_mixExample"
 # 服务的镜像名称，不能有大写字母
 SERVER_NAME="project-name-example.server-name-example"
 # Dockerfile文件目录
