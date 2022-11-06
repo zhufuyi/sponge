@@ -8,19 +8,19 @@ import (
 	"google.golang.org/protobuf/compiler/protogen"
 )
 
-// GenerateFile generates a _handler.pb.go file.
-func GenerateFile(gen *protogen.Plugin, file *protogen.File) *protogen.GeneratedFile {
+// GenerateFile generates a handler.go file.
+func GenerateFile(gen *protogen.Plugin, file *protogen.File) (string, *protogen.GeneratedFile) {
 	if len(file.Services) == 0 {
-		return nil
+		return "", nil
 	}
 
-	filename := file.GeneratedFilenamePrefix + "_handler.go"
+	filename := file.GeneratedFilenamePrefix + "_logic.go"
 	g := gen.NewGeneratedFile(filename, file.GoImportPath)
 
 	for _, s := range file.Services {
 		genService(g, s)
 	}
-	return g
+	return filename, g
 }
 
 func genService(g *protogen.GeneratedFile, s *protogen.Service) {

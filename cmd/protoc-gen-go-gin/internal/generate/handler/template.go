@@ -19,7 +19,8 @@ var (
 import (
 	"context"
 
-	serverNameExampleV1 "github.com/zhufuyi/sponge/api/serverNameExample/v1"
+	serverNameExampleV1 "module_name_example/api/server_name_example/v1"
+
 	//"github.com/zhufuyi/sponge/pkg/gin/middleware"
 )
 

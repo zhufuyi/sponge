@@ -1,9 +1,13 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/zhufuyi/sponge/cmd/protoc-gen-go-gin/internal/generate/handler"
 	"github.com/zhufuyi/sponge/cmd/protoc-gen-go-gin/internal/generate/router"
@@ -17,11 +21,13 @@ const exampleTip = `
 # generate *_router.pb.go file
 protoc --proto_path=. --proto_path=./third_party --go-gin_out=. --go-gin_opt=paths=source_relative *.proto
 
-# generate *_router.pb.go and *_handler.go files, Note: You need to move *_handler.go to the internal/handler directory
-protoc --proto_path=. --proto_path=./third_party --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugins=handler *.proto
+# generate *_router.pb.go and handler *_logic.go file
+protoc --proto_path=. --proto_path=./third_party --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=handler \
+  --go-gin_opt=moduleName=yourModuleName --go-gin_opt=serverName=yourServerName --go-gin_opt=out=internal/handler *.proto
 
-# generate *_router.pb.go and *_service.go files, Note: You need to move *_service.go to the internal/service directory
-protoc --proto_path=. --proto_path=./third_party --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugins=service *.proto
+# generate *_router.pb.go and service *_logic.go
+protoc --proto_path=. --proto_path=./third_party --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=service \
+  --go-gin_opt=moduleName=yourModuleName --go-gin_opt=serverName=yourServerName --go-gin_opt=out=internal/service *.proto
 `
 
 func main() {
@@ -34,7 +40,12 @@ func main() {
 	}
 
 	var flags flag.FlagSet
-	var plugins = flags.String("plugins", "", "list of plugins to enable (supported values: handler,service)")
+
+	var plugin, moduleName, serverName, out string
+	flags.StringVar(&plugin, "plugin", "", "list of plugin to enable (supported values: handler or service)")
+	flags.StringVar(&moduleName, "moduleName", "", "import module name")
+	flags.StringVar(&serverName, "serverName", "", "import server name")
+	flags.StringVar(&out, "out", "", "plugin generation code output folder")
 
 	options := protogen.Options{
 		ParamFunc: flags.Set,
@@ -42,17 +53,15 @@ func main() {
 
 	options.Run(func(gen *protogen.Plugin) error {
 		handlerFlag, serviceFlag := false, false
-		pluginNames := strings.Split(*plugins, ",")
-		for _, plugin := range pluginNames {
-			switch strings.ReplaceAll(plugin, " ", "") {
-			case "handler":
-				handlerFlag = true
-			case "service":
-				serviceFlag = true
-			case "":
-			default:
-				return fmt.Errorf("protoc-gen-go-gin: unknown plugin %q", plugin)
-			}
+		pluginName := strings.ReplaceAll(plugin, " ", "")
+		switch pluginName {
+		case "handler":
+			handlerFlag = true
+		case "service":
+			serviceFlag = true
+		case "":
+		default:
+			return fmt.Errorf("protoc-gen-go-gin: unknown plugin %q", plugin)
 		}
 
 		gen.SupportedFeatures = uint64(pluginpb.CodeGeneratorResponse_FEATURE_PROTO3_OPTIONAL)
@@ -63,12 +72,66 @@ func main() {
 			router.GenerateFile(gen, f)
 
 			if handlerFlag {
-				handler.GenerateFile(gen, f)
-			}
-			if serviceFlag {
-				service.GenerateFile(gen, f)
+				filename, gf := handler.GenerateFile(gen, f)
+				content, err := gf.Content()
+				if err != nil {
+					return err
+				}
+				err = saveFile(moduleName, serverName, out, filename, content)
+				if err != nil {
+					return err
+				}
+				gf.Skip()
+			} else if serviceFlag {
+				filename, gf := service.GenerateFile(gen, f)
+				content, err := gf.Content()
+				if err != nil {
+					return err
+				}
+				err = saveFile(moduleName, serverName, out, filename, content)
+				if err != nil {
+					return err
+				}
+				gf.Skip()
 			}
 		}
 		return nil
 	})
+}
+
+func saveFile(moduleName string, serverName string, out string, filename string, content []byte) error {
+	if moduleName == "" {
+		panic("--go-gin_opt option error, 'moduleName' cannot be empty\n" +
+			"    usage example: --go-gin_opt=moduleName=yourModuleName --go-gin_opt=serverName=yourServerName --go-gin_opt=out=internal/service")
+	}
+	if serverName == "" {
+		panic("--go-gin_opt option error, 'serverName' cannot be empty\n" +
+			"    usage example: --go-gin_opt=moduleName=yourModuleName --go-gin_opt=serverName=yourServerName --go-gin_opt=out=internal/service")
+	}
+	if out == "" {
+		panic("--go-gin_opt option error, 'out' cannot be empty\n" +
+			"    usage example: --go-gin_opt=moduleName=yourModuleName --go-gin_opt=serverName=yourServerName --go-gin_opt=out=internal/service")
+	}
+
+	_ = os.MkdirAll(out, 0666)
+	_, name := filepath.Split(filename)
+	file := out + "/" + name
+	if isExists(file) {
+		err := os.Rename(file, file+".bak."+time.Now().Format("150405"))
+		if err != nil {
+			return err
+		}
+	}
+
+	content = bytes.ReplaceAll(content, []byte("module_name_example"), []byte(moduleName))
+	content = bytes.ReplaceAll(content, []byte("server_name_example"), []byte(serverName))
+	return os.WriteFile(file, content, 0666)
+}
+
+func isExists(path string) bool {
+	_, err := os.Stat(path)
+	if err != nil {
+		return !os.IsNotExist(err)
+	}
+	return true
 }

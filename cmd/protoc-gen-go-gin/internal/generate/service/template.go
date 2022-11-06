@@ -19,8 +19,8 @@ var (
 import (
 	"context"
 
-	serverNameExampleV1 "github.com/zhufuyi/sponge/api/serverNameExample/v1"
-	"github.com/zhufuyi/sponge/internal/rpcclient"
+	serverNameExampleV1 "module_name_example/api/server_name_example/v1"
+	"module_name_example/internal/rpcclient"
 )
 
 var _ serverNameExampleV1.{{$.Name}}Logicer = (*{{$.LowerName}}Client)(nil)

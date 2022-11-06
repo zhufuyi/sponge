@@ -8,19 +8,19 @@ import (
 	"google.golang.org/protobuf/compiler/protogen"
 )
 
-// GenerateFile generates a _service.pb.go file.
-func GenerateFile(gen *protogen.Plugin, file *protogen.File) *protogen.GeneratedFile {
+// GenerateFile generates a service.go file.
+func GenerateFile(gen *protogen.Plugin, file *protogen.File) (string, *protogen.GeneratedFile) {
 	if len(file.Services) == 0 {
-		return nil
+		return "", nil
 	}
 
-	filename := file.GeneratedFilenamePrefix + "_service.go"
+	filename := file.GeneratedFilenamePrefix + "_logic.go"
 	g := gen.NewGeneratedFile(filename, file.GoImportPath)
 
 	for _, s := range file.Services {
 		genService(g, s)
 	}
-	return g
+	return filename, g
 }
 
 func genService(g *protogen.GeneratedFile, s *protogen.Service) {
@@ -33,7 +33,7 @@ func genService(g *protogen.GeneratedFile, s *protogen.Service) {
 	for _, m := range s.Methods {
 		funCode := fmt.Sprintf(`func (c *%sClient) %s(ctx context.Context, req *serverNameExampleV1.%s) (*serverNameExampleV1.%s, error) {
 			// implement me
-			// If required, fill in the code to fetch data from other microservices here.
+			// If required, fill in the code to fetch data from other rpc servers here.
 			return c.%sCli.%s(ctx, req)
 		}
 `, field.LowerName, m.GoName, m.Input.GoIdent.GoName, m.Output.GoIdent.GoName, field.LowerName, m.GoName)

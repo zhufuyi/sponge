@@ -70,22 +70,22 @@ protoc --proto_path=. --proto_path=./third_party \
   api/v1/*.proto
 ```
 
-生成*_router.pb.go和handler模板文件*_handler.go，用在由proto生成http的handler使用
+生成*_router.pb.go和handler模板文件*_logic.go，用在由proto生成http的handler使用
 
 ```bash
 protoc --proto_path=. --proto_path=./third_party \
   --go_out=. --go_opt=paths=source_relative \
-  --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugins=handler \
-  --plugin=./protoc-gen-go-gin* \
+  --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=handler \
+  --go-gin_opt=moduleName=yourModuleName --go-gin_opt=serverName=yourServerName --go-gin_opt=out=internal/handler \
   api/v1/*.proto
 ```
 
-生成*_router.pb.go和调用rpc模板文件*_service.go，用在rpc的gateway上
+生成*_router.pb.go和调用rpc模板文件*_logic.go，用在rpc的gateway上
 ```bash
 protoc --proto_path=. --proto_path=./third_party \
   --go_out=. --go_opt=paths=source_relative \
   --go-grpc_out=. --go-grpc_opt=paths=source_relative \
-  --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugins=service \
-  --plugin=./protoc-gen-go-gin* \
+  --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=service \
+  --go-gin_opt=moduleName=yourModuleName --go-gin_opt=serverName=yourServerName --go-gin_opt=out=internal/service \
   api/v1/*.proto
 ```
