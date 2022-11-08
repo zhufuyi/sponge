@@ -9,7 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// nolint
 func init() {
 	rootRouterFns = append(rootRouterFns, func(r *gin.Engine) {
 		userExampleRouter_gwExample(r, service.NewUserExampleServiceClient())

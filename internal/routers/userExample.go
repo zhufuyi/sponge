@@ -6,7 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// nolint
 func init() {
 	routerFns = append(routerFns, func(group *gin.RouterGroup) {
 		userExampleRouter(group, handler.NewUserExampleHandler())

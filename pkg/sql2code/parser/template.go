@@ -89,17 +89,97 @@ type Get{{.TableName}}ByIDRespond struct {
 package api.serverNameExample.v1;
 
 import "api/types/types.proto";
-// import "validate/validate.proto";
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "tagger/tagger.proto";
+//import "validate/validate.proto";
 
 option go_package = "github.com/zhufuyi/sponge/api/serverNameExample/v1;v1";
 
+// Default settings for generating swagger documents
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  host: "localhost:8080"
+  base_path: ""
+  info: {
+    title: "serverNameExample api docs";
+    version: "v0.0.0";
+  };
+  schemes: HTTP;
+  schemes: HTTPS;
+  consumes: "application/json";
+  produces: "application/json";
+};
+
 service {{.TName}}Service {
-  rpc Create(Create{{.TableName}}Request) returns (Create{{.TableName}}Reply) {}
-  rpc DeleteByID(Delete{{.TableName}}ByIDRequest) returns (Delete{{.TableName}}ByIDReply) {}
-  rpc UpdateByID(Update{{.TableName}}ByIDRequest) returns (Update{{.TableName}}ByIDReply) {}
-  rpc GetByID(Get{{.TableName}}ByIDRequest) returns (Get{{.TableName}}ByIDReply) {}
-  rpc ListByIDs(List{{.TableName}}ByIDsRequest) returns (List{{.TableName}}ByIDsReply) {}
-  rpc List(List{{.TableName}}Request) returns (List{{.TableName}}Reply) {}
+  rpc Create(Create{{.TableName}}Request) returns (Create{{.TableName}}Reply) {
+    option (google.api.http) = {
+      post: "/api/v1/{{.TName}}"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "create a new {{.TName}}",
+      description: "submit information to create a new {{.TName}}",
+      tags: "{{.TName}}",
+    };
+  }
+
+  rpc DeleteByID(Delete{{.TableName}}ByIDRequest) returns (Delete{{.TableName}}ByIDReply) {
+    option (google.api.http) = {
+      delete: "/api/v1/{{.TName}}/{id}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "delete {{.TName}}",
+      description: "delete {{.TName}} by id",
+      tags: "{{.TName}}",
+    };
+  }
+
+  rpc UpdateByID(Update{{.TableName}}ByIDRequest) returns (Update{{.TableName}}ByIDReply) {
+    option (google.api.http) = {
+      put: "/api/v1/{{.TName}}/{id}"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "update {{.TName}} info",
+      description: "update {{.TName}} info by id",
+      tags: "{{.TName}}",
+    };
+  }
+
+  rpc GetByID(Get{{.TableName}}ByIDRequest) returns (Get{{.TableName}}ByIDReply) {
+    option (google.api.http) = {
+      get: "/api/v1/{{.TName}}/{id}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "get {{.TName}} details",
+      description: "get {{.TName}} details by id",
+      tags: "{{.TName}}",
+    };
+  }
+
+  rpc ListByIDs(List{{.TableName}}ByIDsRequest) returns (List{{.TableName}}ByIDsReply) {
+    option (google.api.http) = {
+      post: "/api/v1/{{.TName}}s/ids"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "get a list of {{.TName}} based on multiple ids",
+      description: "get a list of {{.TName}} based on multiple ids",
+      tags: "{{.TName}}",
+    };
+  }
+
+  rpc List(List{{.TableName}}Request) returns (List{{.TableName}}Reply) {
+    option (google.api.http) = {
+      post: "/api/v1/{{.TName}}s"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "get a list of {{.TName}} based on query parameters",
+      description: "get a list of {{.TName}} based on query parameters",
+      tags: "{{.TName}}",
+    };
+  }
 }
 
 // todo fill in the validate rules https://github.com/envoyproxy/protoc-gen-validate#constraint-rules
@@ -111,7 +191,7 @@ message Create{{.TableName}}Reply {
 }
 
 message Delete{{.TableName}}ByIDRequest {
-  uint64   id =1;
+  uint64   id =1 [(tagger.tags) = "uri:\"id\"" ];
 }
 
 message Delete{{.TableName}}ByIDReply {
@@ -127,7 +207,7 @@ message Update{{.TableName}}ByIDReply {
 // protoMessageDetailCode
 
 message Get{{.TableName}}ByIDRequest {
-  uint64   id =1;
+  uint64   id =1 [(tagger.tags) = "uri:\"id\"" ];
 }
 
 message Get{{.TableName}}ByIDReply {
@@ -162,7 +242,7 @@ message List{{.TableName}}Reply {
 	protoMessageUpdateTmpl    *template.Template
 	protoMessageUpdateTmplRaw = `message Update{{.TableName}}ByIDRequest {
 {{- range $i, $v := .Fields}}
-	{{$v.GoType}} {{$v.ColName}} = {{$v.AddOne $i}}; {{if $v.Comment}} // {{$v.Comment}}{{end}}
+	{{$v.GoType}} {{$v.ColName}} = {{$v.AddOneWithTag $i}}; {{if $v.Comment}} // {{$v.Comment}}{{end}}
 {{- end}}
 }`
 

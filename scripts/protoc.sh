@@ -16,13 +16,22 @@ function checkResult() {
     fi
 }
 
-function listFiles(){
+# 把生成*.pb.go代码中导入无用的package添加到这里
+function deleteUnusedPkg() {
+  file=$1
+  sed -i "s#_ \"github.com/envoyproxy/protoc-gen-validate/validate\"##g" ${file}
+  sed -i "s#_ \"github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2/options\"##g" ${file}
+  sed -i "s#_ \"github.com/srikrsna/protoc-gen-gotag/tagger\"##g" ${file}
+  sed -i "s#_ \"google.golang.org/genproto/googleapis/api/annotations\"##g" ${file}
+}
+
+function listProtoFiles(){
     cd $1
     items=$(ls)
 
     for item in $items; do
         if [ -d "$item" ]; then
-            listFiles $item
+            listProtoFiles $item
         else
             if [ "${item#*.}"x = "proto"x ];then
               file=$(pwd)/${item}
@@ -34,8 +43,24 @@ function listFiles(){
     cd ..
 }
 
+function listPbGoFiles(){
+    cd $1
+    items=$(ls)
+
+    for item in $items; do
+        if [ -d "$item" ]; then
+            listPbGoFiles $item
+        else
+            if [ "${item#*.}"x = "pb.go"x ];then
+              deleteUnusedPkg $item
+            fi
+        fi
+    done
+    cd ..
+}
+
 # 获取所有proto文件路径
-listFiles $protoBasePath
+listProtoFiles $protoBasePath
 
 # 生成文件 *_pb.go, *_grpc_pb.go，
 protoc --proto_path=. --proto_path=./third_party \
@@ -66,11 +91,19 @@ protoc --proto_path=. --proto_path=./third_party \
 
 checkResult $?
 
-# 生成_*router.pb.go
+# todo generate router code for gin here
+# delete the templates code start
+# 生成_*router.pb.go和*_logic.go，其中*_logic.go保存路径自定义
 protoc --proto_path=. --proto_path=./third_party \
-  --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugins=service \
+  --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=service \
+  --go-gin_opt=moduleName=github.com/zhufuyi/sponge --go-gin_opt=serverName=serverNameExample --go-gin_opt=out=internal/service \
   $allProtoFiles
 
 checkResult $?
+# delete the templates code end
 
+listPbGoFiles $protoBasePath
+
+go mod tidy
+checkResult $?
 echo "exec protoc command successfully."

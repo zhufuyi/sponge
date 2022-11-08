@@ -176,9 +176,18 @@ func (t tmplField) GoTypeZero() string {
 	return t.GoType
 }
 
-// AddOne 加一
+// AddOne counter
 func (t tmplField) AddOne(i int) int {
 	return i + 1
+}
+
+// AddOneWithTag counter and add id tag
+func (t tmplField) AddOneWithTag(i int) string {
+	if t.ColName == "id" {
+		return fmt.Sprintf(`%d [(tagger.tags) = "uri:\"id\"" ]`, i+1)
+	}
+
+	return fmt.Sprintf("%d", i+1)
 }
 
 const (

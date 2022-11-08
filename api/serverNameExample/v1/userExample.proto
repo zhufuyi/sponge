@@ -105,7 +105,7 @@ enum GenderType {
   FEMALE = 2;
 };
 
-// 如果使用grpc gateway，建议例外添加target，请求时可以自动校验，
+// 如果使用grpc gateway，建议添加target，请求时可以自动校验，
 // 例如 string email = 2 [(tagger.tags) = "binding:\"email\"" ];
 
 message CreateUserExampleRequest {
@@ -119,7 +119,7 @@ message CreateUserExampleRequest {
 }
 
 message CreateUserExampleReply {
-  uint64   id = 1 [(validate.rules).uint64.gte  = 1];
+  uint64   id = 1;
 }
 
 message DeleteUserExampleByIDRequest {
