@@ -13,18 +13,20 @@ func init() {
 }
 
 var (
-	handlerTmpl    *template.Template
-	handlerTmplRaw = `package handler
+	pkgImportTmplRaw = `package handler
 
 import (
 	"context"
 
-	serverNameExampleV1 "module_name_example/api/server_name_example/v1"
+	serverNameExampleV1 "moduleNameExample/api/serverNameExample/v1"
 
 	//"github.com/zhufuyi/sponge/pkg/gin/middleware"
 )
 
-var _ serverNameExampleV1.{{$.Name}}Logicer = (*{{$.LowerName}}Handler)(nil)
+`
+
+	handlerTmpl    *template.Template
+	handlerTmplRaw = `var _ serverNameExampleV1.{{$.Name}}Logicer = (*{{$.LowerName}}Handler)(nil)
 
 type {{$.LowerName}}Handler struct {
 	// example: 

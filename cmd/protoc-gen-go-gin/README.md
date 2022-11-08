@@ -1,12 +1,12 @@
 ## protoc-gen-go-gin
 
-根据protobuf生成gin注册路由代码，可以使用自己log和response替换默认值，除了生成注册路由代码，还支持生成http的handler模板代码和调用rpc服务端模板代码。
+According to protobuf to generate gin registration route code, you can use their own log and response to replace the default value, in addition to generating registration route code, but also support the generation of http handler template code and call rpc server template code.
 
 <br>
 
-## 安装
+### Installation
 
-### 安装依赖工具
+#### Installation of dependency tools
 
 ```bash
 # install protoc in linux
@@ -21,17 +21,17 @@ go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28.0
 go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2.0
 ```
 
-### 安装 protoc-gen-go-gin
+#### Install protoc-gen-go-gin
 
 > go install github.com/zhufuyi/sponge/cmd/protoc-gen-go-gin@latest
 
 <br>
 
-## 使用说明
+### Usage
 
-### proto 文件约定
+#### protobuf documentation conventions
 
-默认情况下 rpc method 命名为`方法+资源`，使用驼峰方式命名，生成代码时会进行映射，方法映射方式如下所示:
+By default the rpc method is named `method+resource`, using camel naming, which is mapped when generating code, as shown below:
 
 - `"GET", "FIND", "QUERY", "LIST", "SEARCH"`  --> `GET`
 - `"POST", "CREATE"`  --> `POST`
@@ -39,7 +39,7 @@ go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2.0
 - `"DELETE"`  --> `DELETE`
 
 
-使用 google.api.http option 指定路由
+Specify the route using the `google.api.http` option
 
 ```protobuf
 service GreeterService {
@@ -58,9 +58,11 @@ service GreeterService {
 }
 ```
 
-### 生成代码
+<br>
 
-只生成*_router.pb.go
+#### Generate code
+
+(1) Generate only *_router.pb.go
 
 ```bash
 protoc --proto_path=. --proto_path=./third_party \
@@ -70,7 +72,9 @@ protoc --proto_path=. --proto_path=./third_party \
   api/v1/*.proto
 ```
 
-生成*_router.pb.go和handler模板文件*_logic.go，用在由proto生成http的handler使用
+<br>
+
+(2) Generate *_router.pb.go and handler template file *_logic.go
 
 ```bash
 protoc --proto_path=. --proto_path=./third_party \
@@ -80,7 +84,10 @@ protoc --proto_path=. --proto_path=./third_party \
   api/v1/*.proto
 ```
 
-生成*_router.pb.go和调用rpc模板文件*_logic.go，用在rpc的gateway上
+<br>
+
+(3) Generate *_router.pb.go and call the rpc template file *_logic.go
+
 ```bash
 protoc --proto_path=. --proto_path=./third_party \
   --go_out=. --go_opt=paths=source_relative \

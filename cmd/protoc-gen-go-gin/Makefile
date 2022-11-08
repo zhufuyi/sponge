@@ -30,4 +30,4 @@ clean:
 	@rm -vrf protoc-gen-go-gin*
 	@rm -vrf internal/service
 	@rm -vrf internal/handler
-	@echo Done.
+	@rm -vrf internal/routers

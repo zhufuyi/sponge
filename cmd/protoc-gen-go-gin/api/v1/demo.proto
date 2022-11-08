@@ -7,94 +7,124 @@ import "google/api/annotations.proto";
 option go_package = "./v1;v1";
 
 service Greeter {
-  rpc Create(CreateDemoRequest) returns (CreateDemoReply) {
+  rpc Create(CreateGreeterRequest) returns (CreateGreeterReply) {
     option (google.api.http) = {
-      post: "/api/v1/demo"
+      post: "/api/v1/greeter"
       body: "*"
     };
   }
 
-  rpc DeleteByID(DeleteDemoByIDRequest) returns (DeleteDemoByIDReply) {
+  rpc DeleteByID(DeleteGreeterByIDRequest) returns (DeleteGreeterByIDReply) {
     option (google.api.http) = {
-      delete: "/api/v1/demo/{id}"
+      delete: "/api/v1/greeter/{id}"
     };
   }
 
-  rpc UpdateByID(UpdateDemoByIDRequest) returns (UpdateDemoByIDReply) {
+  rpc UpdateByID(UpdateGreeterByIDRequest) returns (UpdateGreeterByIDReply) {
     option (google.api.http) = {
-      put: "/api/v1/demo/{id}"
+      put: "/api/v1/greeter/{id}"
       body: "*"
     };
   }
 
-  rpc GetByID(GetDemoByIDRequest) returns (GetDemoByIDReply) {
+  rpc GetByID(GetGreeterByIDRequest) returns (GetGreeterByIDReply) {
     option (google.api.http) = {
-      get: "/api/v1/demo/{id}"
+      get: "/api/v1/greeter/{id}"
     };
   }
 
-  rpc List(ListDemoRequest) returns (ListDemoReply) {
+  rpc List(ListGreeterRequest) returns (ListGreeterReply) {
     option (google.api.http) = {
-      post: "/api/v1/userExamples"
+      post: "/api/v1/greeters"
       body: "*"
     };
   }
 }
 
-message CreateDemoRequest {
+message CreateGreeterRequest {
   string name = 1;
   string email = 2;
   string password = 3;
 }
 
-message CreateDemoReply {
+message CreateGreeterReply {
   uint64   id = 1;
 }
 
-message DeleteDemoByIDRequest {
+message DeleteGreeterByIDRequest {
   uint64   id = 1;
 }
 
-message DeleteDemoByIDReply {
+message DeleteGreeterByIDReply {
 
 }
 
-message UpdateDemoByIDRequest {
-  uint64   id = 1;
-  string name = 2;
-  string email = 3;
-}
-
-message UpdateDemoByIDReply {
-
-}
-
-message Demo {
+message UpdateGreeterByIDRequest {
   uint64   id = 1;
   string name = 2;
   string email = 3;
+}
+
+message UpdateGreeterByIDReply {
 
 }
 
-message GetDemoByIDRequest {
+message GreeterInfo {
+  uint64   id = 1;
+  string name = 2;
+  string email = 3;
+
+}
+
+message GetGreeterByIDRequest {
   uint64   id = 1;
 }
 
-message GetDemoByIDReply {
-  Demo userExample = 1;
+message GetGreeterByIDReply {
+  GreeterInfo userExample = 1;
 }
 
-message ListDemoRequest {
+message ListGreeterRequest {
   Params params = 1;
 }
 
-message ListDemoReply {
+message ListGreeterReply {
   int64 total =1;
-  repeated Demo userExamples = 2;
+  repeated GreeterInfo userExamples = 2;
 }
 
 message Params {
   int32 page = 1;
   int32 limit = 2;
   string sort = 3;
+}
+
+service Foo {
+  rpc CreateFoo(CreateFooRequest) returns (CreateFooReply) {
+    option (google.api.http) = {
+      post: "/api/v1/foo"
+      body: "*"
+    };
+  }
+  rpc GetFoo(GetFooRequest) returns (GetFooReply) {
+    option (google.api.http) = {
+      get: "/api/v1/foo"
+    };
+  }
+}
+
+message CreateFooRequest {
+  string name = 1;
+}
+
+message CreateFooReply {
+   int64 id = 1;
+}
+
+message GetFooRequest {
+  uint64   id = 1;
+}
+
+message GetFooReply {
+  string name = 1;
 }

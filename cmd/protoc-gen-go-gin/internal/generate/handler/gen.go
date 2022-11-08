@@ -16,6 +16,7 @@ func GenerateFile(gen *protogen.Plugin, file *protogen.File) (string, *protogen.
 
 	filename := file.GeneratedFilenamePrefix + "_logic.go"
 	g := gen.NewGeneratedFile(filename, file.GoImportPath)
+	g.P(pkgImportTmplRaw)
 
 	for _, s := range file.Services {
 		genService(g, s)

@@ -73,24 +73,34 @@ func main() {
 
 			if handlerFlag {
 				filename, gf := handler.GenerateFile(gen, f)
+				if gf == nil {
+					continue
+				}
 				content, err := gf.Content()
 				if err != nil {
-					return err
+					continue // skip error, process the next protobuf file
 				}
-				err = saveFile(moduleName, serverName, out, filename, content)
+				err = saveFile(moduleName, serverName, out, filename, content, false)
 				if err != nil {
-					return err
+					continue // skip error, process the next protobuf file
 				}
 				gf.Skip()
 			} else if serviceFlag {
-				filename, gf := service.GenerateFile(gen, f)
+				filename, routerContent, gf := service.GenerateFile(gen, f)
+				if gf == nil {
+					continue
+				}
 				content, err := gf.Content()
 				if err != nil {
-					return err
+					continue // skip error, process the next protobuf file
 				}
-				err = saveFile(moduleName, serverName, out, filename, content)
+				err = saveFile(moduleName, serverName, out, filename, content, false)
 				if err != nil {
-					return err
+					continue // skip error, process the next protobuf file
+				}
+				err = saveFile(moduleName, serverName, "internal/routers", filename, routerContent, true)
+				if err != nil {
+					continue // skip error, process the next protobuf file
 				}
 				gf.Skip()
 			}
@@ -99,7 +109,7 @@ func main() {
 	})
 }
 
-func saveFile(moduleName string, serverName string, out string, filename string, content []byte) error {
+func saveFile(moduleName string, serverName string, out string, filename string, content []byte, isNeedCovered bool) error {
 	if moduleName == "" {
 		panic("--go-gin_opt option error, 'moduleName' cannot be empty\n" +
 			"    usage example: --go-gin_opt=moduleName=yourModuleName --go-gin_opt=serverName=yourServerName --go-gin_opt=out=internal/service")
@@ -115,16 +125,16 @@ func saveFile(moduleName string, serverName string, out string, filename string,
 
 	_ = os.MkdirAll(out, 0666)
 	_, name := filepath.Split(filename)
+	if isNeedCovered {
+		name = strings.ReplaceAll(name, "_logic.go", ".go")
+	}
 	file := out + "/" + name
-	if isExists(file) {
-		err := os.Rename(file, file+".bak."+time.Now().Format("150405"))
-		if err != nil {
-			return err
-		}
+	if !isNeedCovered && isExists(file) {
+		file += ".gen." + time.Now().Format("150405")
 	}
 
-	content = bytes.ReplaceAll(content, []byte("module_name_example"), []byte(moduleName))
-	content = bytes.ReplaceAll(content, []byte("server_name_example"), []byte(serverName))
+	content = bytes.ReplaceAll(content, []byte("moduleNameExample"), []byte(moduleName))
+	content = bytes.ReplaceAll(content, []byte("serverNameExample"), []byte(serverName))
 	return os.WriteFile(file, content, 0666)
 }
 
