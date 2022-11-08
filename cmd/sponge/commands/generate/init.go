@@ -12,6 +12,8 @@ import (
 	"github.com/zhufuyi/sponge/pkg/replacer"
 )
 
+const warnSymbol = "⚠ "
+
 func init() {
 	rand.Seed(time.Now().UnixNano())
 }
@@ -33,7 +35,7 @@ func Init(name string, filepath string) error {
 		if isShowCommand() {
 			return nil
 		}
-		return fmt.Errorf("⚠ Not yet initialized, run the command 'sponge init'")
+		return fmt.Errorf("%s not yet initialized, run the command 'sponge init'", warnSymbol)
 	}
 
 	var err error

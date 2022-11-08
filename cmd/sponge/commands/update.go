@@ -26,8 +26,10 @@ func UpdateCommand() *cobra.Command {
 Examples:
   # for linux
   sponge update
+
   # for windows, need to specify the bash file
   sponge update --executor="D:\Program Files\cmder\vendor\git-for-windows\bin\bash.exe"
+
   # use goproxy https://goproxy.cn
   sponge update -g
 `,
@@ -42,7 +44,7 @@ Examples:
 			if err != nil {
 				return err
 			}
-			ver, err := CopyToTempDir()
+			ver, err := copyToTempDir()
 			if err != nil {
 				return err
 			}
@@ -74,8 +76,8 @@ func runUpdateCommand(enableCNGoProxy bool) error {
 	return nil
 }
 
-// CopyToTempDir 复制模板文件到临时目录下
-func CopyToTempDir() (string, error) {
+// 复制模板文件到临时目录下
+func copyToTempDir() (string, error) {
 	result, err := gobash.Exec("go env GOPATH")
 	if err != nil {
 		return "", fmt.Errorf("Exec() error %v", err)

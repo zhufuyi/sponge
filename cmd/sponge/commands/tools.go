@@ -29,8 +29,8 @@ var toolNames = []string{
 }
 
 var installToolCommands = map[string]string{
-	"go":                   "⚠ go: please install manually yourself, download url is https://go.dev/dl/ or https://golang.google.cn/dl/",
-	"protoc":               "⚠ protoc: please install manually yourself, download url is https://github.com/protocolbuffers/protobuf/releases/tag/v3.20.3",
+	"go":                   "go: please install manually yourself, download url is https://go.dev/dl/ or https://golang.google.cn/dl/",
+	"protoc":               "protoc: please install manually yourself, download url is https://github.com/protocolbuffers/protobuf/releases/tag/v3.20.3",
 	"protoc-gen-go":        "go install google.golang.org/protobuf/cmd/protoc-gen-go@latest",
 	"protoc-gen-go-grpc":   "go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest",
 	"protoc-gen-validate":  "go install github.com/envoyproxy/protoc-gen-validate@latest",
@@ -43,8 +43,11 @@ var installToolCommands = map[string]string{
 	"go-callvis":           "go install github.com/ofabry/go-callvis@latest",
 }
 
-var isntalledSymbol = "✔"
-var lackSymbol = "❌"
+const (
+	isntalledSymbol = "✔ "
+	lackSymbol      = "❌ "
+	warnSymbol      = "⚠ "
+)
 
 // ToolsCommand tools management
 func ToolsCommand() *cobra.Command {
@@ -60,10 +63,13 @@ func ToolsCommand() *cobra.Command {
 Examples:
   # for linux, show all dependencies tools.
   sponge tools
+
   # for windows, show all dependencies tools.
   sponge tools --executor="D:\Program Files\cmder\vendor\git-for-windows\bin\bash.exe"
+
   # use goproxy https://goproxy.cn
   sponge tools -g
+
   # install all tools.
   sponge tools --install
 `,
@@ -171,15 +177,14 @@ func installTools(lackNames []string, enableCNGoProxy bool) {
 	wg.Wait()
 
 	for _, name := range manuallyNames {
-		fmt.Println(installToolCommands[name])
+		fmt.Println(warnSymbol + " " + installToolCommands[name])
 	}
 }
 
 func checkExit(name string, err error) {
 	str := err.Error()
 	if strings.Contains(str, "exec: ") && strings.Contains(str, "file does not exist") {
-		fmt.Printf(err.Error()+"\n"+`usage: 
-    sponge %s --executor="your bash file path"
+		fmt.Printf(err.Error()+", must specify the executor location, example:\n"+`    sponge %s --executor="your bash file path"
 `, name)
 		os.Exit(1)
 	}

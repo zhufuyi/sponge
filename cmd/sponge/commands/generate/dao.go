@@ -12,7 +12,7 @@ import (
 )
 
 // DaoCommand generate dao codes
-func DaoCommand() *cobra.Command {
+func DaoCommand(parentName string) *cobra.Command {
 	var (
 		moduleName string // 服务名称，也就是包名称
 		outPath    string // 输出目录
@@ -25,19 +25,19 @@ func DaoCommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "dao",
-		Short: "Generate dao codes",
-		Long: `generate dao codes.
+		Short: "Generate dao codes based on mysql",
+		Long: fmt.Sprintf(`generate dao codes based on mysql.
 
 Examples:
   # generate dao codes and embed 'gorm.model' struct.
-  sponge dao --module-name=yourModuleName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
+  sponge %s dao --module-name=yourModuleName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
   # generate dao codes, structure fields correspond to the column names of the table.
-  sponge dao --module-name=yourModuleName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --embed=false
+  sponge %s dao --module-name=yourModuleName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --embed=false
 
   # generate dao codes and specify the output directory, Note: if the file already exists, code generation will be canceled.
-  sponge dao --module-name=yourModuleName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
-`,
+  sponge %s dao --module-name=yourModuleName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
+`, parentName, parentName, parentName),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {

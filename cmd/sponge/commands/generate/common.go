@@ -27,8 +27,7 @@ var (
 	handlerFileMark = "// todo generate the request and response struct to here"
 	handlerTestFile = "handler/userExample_test.go"
 
-	mainFile     = "serverNameExample/main.go"
-	mainFileMark = "// todo generate the code to register http and grpc services here"
+	httpFile = "server/http.go"
 
 	protoFile     = "v1/userExample.proto"
 	protoFileMark = "// todo generate the protobuf code here"
@@ -52,10 +51,13 @@ var (
 	k8sServiceFile     = "deployments/kubernetes/serverNameExample-svc.yml"
 	k8sServiceFileMark = "# todo generate k8s-svc.yml code for http or grpc here"
 
+	protoShellFile     = "scripts/protoc.sh"
+	protoShellFileMark = "# todo generate router code for gin here"
+
 	imageBuildFile = "scripts/image-build.sh"
 	readmeFile     = "sponge/README.md"
-
-	makeFile = "sponge/Makefile"
+	makeFile       = "sponge/Makefile"
+	gitIgnoreFile  = "sponge/.gitignore"
 
 	// 清除标记的模板代码片段标记
 	startMark             = []byte("// delete the templates code start")

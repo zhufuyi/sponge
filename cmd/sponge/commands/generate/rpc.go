@@ -15,8 +15,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// GRPCCommand generate grpc server codes
-func GRPCCommand() *cobra.Command {
+// RPCCommand generate rpc server codes
+func RPCCommand() *cobra.Command {
 	var (
 		moduleName  string // go.mod文件的module名称
 		serverName  string // 服务名称
@@ -32,22 +32,22 @@ func GRPCCommand() *cobra.Command {
 
 	//nolint
 	cmd := &cobra.Command{
-		Use:   "grpc",
-		Short: "Generate grpc server codes",
-		Long: `generate grpc server codes.
+		Use:   "rpc",
+		Short: "Generate rpc server codes based on mysql",
+		Long: `generate rpc server codes based on mysql.
 
 Examples:
-  # generate grpc server codes and embed 'gorm.model' struct.
-  sponge grpc --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
+  # generate rpc server codes and embed 'gorm.model' struct.
+  sponge micro rpc --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
-  # generate grpc server codes, structure fields correspond to the column names of the table.
-  sponge grpc --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --embed=false
+  # generate rpc server codes, structure fields correspond to the column names of the table.
+  sponge micro rpc --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --embed=false
 
-  # generate grpc server codes and specify the output directory, Note: if the file already exists, code generation will be canceled.
-  sponge grpc --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
+  # generate rpc server codes and specify the output directory, Note: if the file already exists, code generation will be canceled.
+  sponge micro rpc --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
 
-  # generate grpc server codes and specify the docker image repository address.
-  sponge grpc --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
+  # generate rpc server codes and specify the docker image repository address.
+  sponge micro rpc --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 `,
 		SilenceErrors: true,
 		SilenceUsage:  true,
@@ -57,7 +57,7 @@ Examples:
 				return err
 			}
 
-			return runGenGRPCCommand(moduleName, serverName, projectName, repoAddr, sqlArgs.DBDsn, codes, outPath)
+			return runGenRPCCommand(moduleName, serverName, projectName, repoAddr, sqlArgs.DBDsn, codes, outPath)
 		},
 	}
 
@@ -73,14 +73,14 @@ Examples:
 	_ = cmd.MarkFlagRequired("db-table")
 	cmd.Flags().BoolVarP(&sqlArgs.IsEmbed, "embed", "e", true, "whether to embed 'gorm.Model' struct")
 	cmd.Flags().StringVarP(&repoAddr, "repo-addr", "r", "", "docker image repository address, excluding http and repository names")
-	cmd.Flags().StringVarP(&outPath, "out", "o", "", "output directory, default is ./serverName_grpc_<time>")
+	cmd.Flags().StringVarP(&outPath, "out", "o", "", "output directory, default is ./serverName_rpc_<time>")
 
 	return cmd
 }
 
-func runGenGRPCCommand(moduleName string, serverName string, projectName string, repoAddr string,
+func runGenRPCCommand(moduleName string, serverName string, projectName string, repoAddr string,
 	dbDSN string, codes map[string]string, outPath string) error {
-	subTplName := "grpc"
+	subTplName := "rpc"
 	r := Replacers[TplNameSponge]
 	if r == nil {
 		return errors.New("replacer is nil")
@@ -100,18 +100,18 @@ func runGenGRPCCommand(moduleName string, serverName string, projectName string,
 	r.SetSubDirs(subDirs...)
 	r.SetIgnoreSubDirs(ignoreDirs...)
 	r.SetIgnoreFiles(ignoreFiles...)
-	fields := addGRPCFields(moduleName, serverName, projectName, repoAddr, r, dbDSN, codes)
+	fields := addRPCFields(moduleName, serverName, projectName, repoAddr, r, dbDSN, codes)
 	r.SetReplacementFields(fields)
 	_ = r.SetOutputDir(outPath, serverName+"_"+subTplName)
 	if err := r.SaveFiles(); err != nil {
 		return err
 	}
 
-	fmt.Printf("generate %s's grpc server codes successfully, out = %s\n\n", serverName, r.GetOutputDir())
+	fmt.Printf("generate %s's rpc server codes successfully, out = %s\n\n", serverName, r.GetOutputDir())
 	return nil
 }
 
-func addGRPCFields(moduleName string, serverName string, projectName string, repoAddr string,
+func addRPCFields(moduleName string, serverName string, projectName string, repoAddr string,
 	r replacer.Replacer, dbDSN string, codes map[string]string) []replacer.Field {
 	var fields []replacer.Field
 
@@ -129,7 +129,7 @@ func addGRPCFields(moduleName string, serverName string, projectName string, rep
 	fields = append(fields, deleteFieldsMark(r, k8sDeploymentFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, k8sServiceFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, makeFile, wellStartMark, wellEndMark)...)
-	fields = append(fields, deleteFieldsMark(r, gitignoreFile, wellStartMark, wellEndMark)...)
+	fields = append(fields, deleteFieldsMark(r, gitIgnoreFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, replaceFileContentMark(r, readmeFile, "## "+serverName)...)
 	fields = append(fields, []replacer.Field{
 		{ // 替换model/userExample.go文件内容
@@ -192,7 +192,7 @@ func addGRPCFields(moduleName string, serverName string, projectName string, rep
 		},
 		{
 			Old: "api.userExample.v1",
-			New: fmt.Sprintf("api.%s.v1", strings.ReplaceAll(serverName, "-", "_")), // proto package 不能存在"-"号
+			New: fmt.Sprintf("api.%s.v1", strings.ReplaceAll(serverName, "-", "_")), // protobuf package 不能存在"-"号
 		},
 		{
 			Old: "sponge api docs",

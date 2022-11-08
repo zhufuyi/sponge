@@ -12,7 +12,7 @@ import (
 )
 
 // ModelCommand generate model codes
-func ModelCommand() *cobra.Command {
+func ModelCommand(parentName string) *cobra.Command {
 	var (
 		outPath string // 输出目录
 		sqlArgs = sql2code.Args{
@@ -24,19 +24,19 @@ func ModelCommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "model",
-		Short: "Generate model codes",
-		Long: `generate model codes.
+		Short: "Generate model codes based on mysql",
+		Long: fmt.Sprintf(`generate model codes based on mysql.
 
 Examples:
   # generate model codes and embed 'gorm.Model' struct.
-  sponge model --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
+  sponge %s model --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
   # generate model codes, structure fields correspond to the column names of the table.
-  sponge model --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --embed=false
+  sponge %s model --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --embed=false
 
   # generate model codes and specify the output directory, Note: if the file already exists, code generation will be canceled.
-  sponge model --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
-`,
+  sponge %s model --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
+`, parentName, parentName, parentName),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {

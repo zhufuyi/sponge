@@ -95,17 +95,11 @@ func getYAMLFile(serverDir string) (map[string]configType, error) {
 	if err != nil {
 		return nil, err
 	}
-	//if len(ymlFiles) > 2 {
-	//	return nil, fmt.Errorf("config files are allowed up to 2, currently there are %d", len(ymlFiles))
-	//}
 
 	yamlFiles, err := gofile.ListFiles(configsDir, gofile.WithSuffix(".yaml"))
 	if err != nil {
 		return nil, err
 	}
-	//if len(yamlFiles) > 2 {
-	//	return nil, fmt.Errorf("config files are allowed up to 2, currently there are %d", len(yamlFiles))
-	//}
 
 	if len(ymlFiles) == 0 && len(yamlFiles) == 0 {
 		return nil, fmt.Errorf("not found config files in directory %s", configsDir)

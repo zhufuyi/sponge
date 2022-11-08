@@ -26,18 +26,18 @@ func HandlerCommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "handler",
-		Short: "Generate handler codes",
-		Long: `generate handler codes.
+		Short: "Generate handler codes based on mysql",
+		Long: `generate handler codes based on mysql.
 
 Examples:
   # generate handler codes and embed 'gorm.model' struct.
-  sponge handler --module-name=yourModuleName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
+  sponge web handler --module-name=yourModuleName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
   # generate handler codes, structure fields correspond to the column names of the table.
-  sponge handler --module-name=yourModuleName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --embed=false
+  sponge web handler --module-name=yourModuleName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --embed=false
 
   # generate handler codes and specify the output directory, Note: if the file already exists, code generation will be canceled.
-  sponge handler --module-name=yourModuleName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
+  sponge web handler --module-name=yourModuleName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
 `,
 		SilenceErrors: true,
 		SilenceUsage:  true,
@@ -76,7 +76,8 @@ func runGenHandlerCommand(moduleName string, codes map[string]string, outPath st
 		"internal/ecode", "internal/handler", "internal/routers", "internal/types"} // 只处理的指定子目录，如果为空或者没有指定的子目录，表示所有文件
 	ignoreDirs := []string{} // 指定子目录下忽略处理的目录
 	ignoreFiles := []string{"init.go", "init_test.go", "swagger_types.go", "http_systemCode.go",
-		"grpc_systemCode.go", "grpc_userExample.go", "grpc_systemCode_test.go", "routers.go", "routers_test.go"} // 指定子目录下忽略处理的文件
+		"grpc_systemCode.go", "grpc_userExample.go", "grpc_systemCode_test.go", "routers.go",
+		"routers_test.go", "routers_gwExample.go", "routers_gwExample_test.go", "userExample_gwExample.go"} // 指定子目录下忽略处理的文件
 
 	r.SetSubDirs(subDirs...)
 	r.SetIgnoreSubDirs(ignoreDirs...)

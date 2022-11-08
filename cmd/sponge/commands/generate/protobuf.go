@@ -13,8 +13,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// ProtoCommand generate protobuf codes
-func ProtoCommand() *cobra.Command {
+// ProtoBufCommand generate protobuf codes
+func ProtoBufCommand() *cobra.Command {
 	var (
 		moduleName string // go.mod文件的module名称
 		serverName string // 服务名称
@@ -23,16 +23,16 @@ func ProtoCommand() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "proto",
-		Short: "Generate protobuf codes",
-		Long: `generate protobuf codes.
+		Use:   "protobuf",
+		Short: "Generate protobuf codes based on mysql",
+		Long: `generate protobuf codes based on mysql.
 
 Examples:
   # generate protobuf codes.
-  sponge proto --module-name=yourModuleName --server-name=yourServerName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
+  sponge micro protobuf --module-name=yourModuleName --server-name=yourServerName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
   # generate protobuf codes and specify the output directory, Note: if the file already exists, code generation will be canceled.
-  sponge proto --module-name=yourModuleName --server-name=yourServerName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
+  sponge micro protobuf --module-name=yourModuleName --server-name=yourServerName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
 `,
 		SilenceErrors: true,
 		SilenceUsage:  true,
@@ -54,13 +54,13 @@ Examples:
 	_ = cmd.MarkFlagRequired("db-dsn")
 	cmd.Flags().StringVarP(&sqlArgs.DBTable, "db-table", "t", "", "table name")
 	_ = cmd.MarkFlagRequired("db-table")
-	cmd.Flags().StringVarP(&outPath, "out", "o", "", "output directory, default is ./proto_<time>")
+	cmd.Flags().StringVarP(&outPath, "out", "o", "", "output directory, default is ./protobuf_<time>")
 
 	return cmd
 }
 
 func runGenProtoCommand(moduleName string, serverName string, codes map[string]string, outPath string) error {
-	subTplName := "proto"
+	subTplName := "protobuf"
 	r := Replacers[TplNameSponge]
 	if r == nil {
 		return errors.New("replacer is nil")
@@ -74,7 +74,7 @@ func runGenProtoCommand(moduleName string, serverName string, codes map[string]s
 	subDirs := []string{"api/serverNameExample"} // 只处理的指定子目录，如果为空或者没有指定的子目录，表示所有文件
 	ignoreDirs := []string{}                     // 指定子目录下忽略处理的目录
 	ignoreFiles := []string{"userExample.pb.go", "userExample.pb.validate.go",
-		"userExample_grpc.pb.go"} // 指定子目录下忽略处理的文件
+		"userExample_grpc.pb.go", "userExample_router.pb.go"} // 指定子目录下忽略处理的文件
 
 	r.SetSubDirs(subDirs...)
 	r.SetIgnoreSubDirs(ignoreDirs...)
@@ -114,7 +114,7 @@ func addProtoFields(moduleName string, serverName string, r replacer.Replacer, c
 		},
 		{
 			Old: "api.serverNameExample.v1",
-			New: fmt.Sprintf("api.%s.v1", strings.ReplaceAll(serverName, "-", "_")), // proto package 不能存在"-"号
+			New: fmt.Sprintf("api.%s.v1", strings.ReplaceAll(serverName, "-", "_")), // protobuf package 不能存在"-"号
 		},
 		{
 			Old:             "UserExample",

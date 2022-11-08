@@ -31,21 +31,21 @@ func HTTPCommand() *cobra.Command {
 	//nolint
 	cmd := &cobra.Command{
 		Use:   "http",
-		Short: "Generate http server codes",
-		Long: `generate http server codes.
+		Short: "Generate http server codes based on mysql",
+		Long: `generate http server codes based on mysql.
 
 Examples:
   # generate http server codes and embed 'gorm.model' struct.
-  sponge http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
+  sponge web http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
   # generate http server codes, structure fields correspond to the column names of the table.
-  sponge http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --embed=false
+  sponge web http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --embed=false
 
   # generate http server codes and specify the output directory, Note: if the file already exists, code generation will be canceled.
-  sponge http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
+  sponge web http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
 
   # generate http server codes and specify the docker image repository address.
-  sponge http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
+  sponge web http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 `,
 		SilenceErrors: true,
 		SilenceUsage:  true,
@@ -86,11 +86,15 @@ func runGenHTTPCommand(moduleName string, serverName string, projectName string,
 
 	// 设置模板信息
 	subDirs := []string{} // 只处理的子目录，如果为空或者没有指定的子目录，表示所有文件
-	ignoreDirs := []string{"cmd/sponge", "sponge/.github", "sponge/.git", "sponge/api", "sponge/pkg",
-		"sponge/assets", "sponge/test", "sponge/third_party", "internal/service"} // 指定子目录下忽略处理的目录
+	ignoreDirs := []string{"cmd/sponge", "cmd/protoc-gen-go-gin", "cmd/serverNameExample_mixExample",
+		"cmd/serverNameExample_grpcExample", "cmd/serverNameExample_gwExample",
+		"sponge/.github", "sponge/.git", "sponge/api", "sponge/pkg", "sponge/assets", "sponge/test",
+		"sponge/third_party", "internal/service", "internal/rpcclient"} // 指定子目录下忽略处理的目录
 	ignoreFiles := []string{"swagger.json", "swagger.yaml", "proto.html", "protoc.sh",
 		"proto-doc.sh", "grpc.go", "grpc_option.go", "grpc_test.go", "LICENSE", "doc.go",
-		"grpc_userExample.go", "grpc_systemCode.go", "grpc_systemCode_test.go", "codecov.yml"} // 指定子目录下忽略处理的文件
+		"grpc_userExample.go", "grpc_systemCode.go", "grpc_systemCode_test.go",
+		"codecov.yml", "routers_gwExample.go", "routers_gwExample_test.go",
+		"userExample_gwExample.go", "apis.swagger.json", "apis.go"} // 指定子目录下忽略处理的文件
 
 	r.SetSubDirs(subDirs...)
 	r.SetIgnoreSubDirs(ignoreDirs...)
@@ -117,7 +121,7 @@ func addHTTPFields(moduleName string, serverName string, projectName string, rep
 	fields = append(fields, deleteFieldsMark(r, daoTestFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, handlerFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, handlerTestFile, startMark, endMark)...)
-	fields = append(fields, deleteFieldsMark(r, mainFile, startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, httpFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, dockerFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, dockerFileBuild, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, dockerComposeFile, wellStartMark, wellEndMark)...)
@@ -125,6 +129,7 @@ func addHTTPFields(moduleName string, serverName string, projectName string, rep
 	fields = append(fields, deleteFieldsMark(r, k8sServiceFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, imageBuildFile, wellOnlyGrpcStartMark, wellOnlyGrpcEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, makeFile, wellStartMark, wellEndMark)...)
+	fields = append(fields, deleteFieldsMark(r, gitIgnoreFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, replaceFileContentMark(r, readmeFile, "## "+serverName)...)
 	fields = append(fields, []replacer.Field{
 		{ // 替换model/userExample.go文件内容
@@ -138,10 +143,6 @@ func addHTTPFields(moduleName string, serverName string, projectName string, rep
 		{ // 替换handler/userExample.go文件内容
 			Old: handlerFileMark,
 			New: adjustmentOfIDType(codes[parser.CodeTypeHandler]),
-		},
-		{ // 替换main.go文件内容
-			Old: mainFileMark,
-			New: mainFileHTTPCode,
 		},
 		{ // 替换Dockerfile文件内容
 			Old: dockerFileMark,
@@ -211,8 +212,16 @@ func addHTTPFields(moduleName string, serverName string, projectName string, rep
 			New: repoHost,
 		},
 		{
-			Old: "tmp.go.mod",
-			New: "go.mod",
+			Old: "_httpExample",
+			New: "",
+		},
+		{
+			Old: "_mixExample",
+			New: "",
+		},
+		{
+			Old: "_gwExample",
+			New: "",
 		},
 		{
 			Old: "tmp.gitignore",

@@ -28,15 +28,11 @@ func NewRootCMD() *cobra.Command {
 		InitCommand(),
 		UpdateCommand(),
 		ToolsCommand(),
-		generate.ModelCommand(),
-		generate.DaoCommand(),
-		generate.HandlerCommand(),
-		generate.HTTPCommand(),
-		generate.ProtoCommand(),
-		generate.ServiceCommand(),
-		generate.GRPCCommand(),
+		NewWebCommand(),
+		MicroCommand(),
 		generate.ConfigCommand(),
 	)
+
 	return cmd
 }
 

@@ -21,8 +21,10 @@ func InitCommand() *cobra.Command {
 Examples:
   # for linux.
   sponge init
+
   # for windows.
   sponge init --executor="D:\Program Files\cmder\vendor\git-for-windows\bin\bash.exe"
+
   # use goproxy https://goproxy.cn
   sponge init -g
 `,
@@ -32,13 +34,13 @@ Examples:
 			if executor != "" {
 				gobash.SetExecutorPath(executor)
 			}
-			fmt.Println("initialize sponge code ......")
+			fmt.Println("initialize sponge codes ......")
 			// 下载sponge模板代码
 			err := runUpdateCommand(enableCNGoProxy)
 			if err != nil {
 				return err
 			}
-			_, err = CopyToTempDir()
+			_, err = copyToTempDir()
 			if err != nil {
 				return err
 			}

@@ -29,18 +29,18 @@ func ServiceCommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "service",
-		Short: "Generate grpc service codes",
-		Long: `generate grpc service codes.
+		Short: "Generate rpc service codes based on mysql",
+		Long: `generate rpc service codes based on mysql.
 
 Examples:
   # generate service codes and embed 'gorm.model' struct.
-  sponge service --module-name=yourModuleName --server-name=yourServerName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
+  sponge micro service --module-name=yourModuleName --server-name=yourServerName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
   # generate service codes, structure fields correspond to the column names of the table.
-  sponge service --module-name=yourModuleName --server-name=yourServerName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --embed=false
+  sponge micro service --module-name=yourModuleName --server-name=yourServerName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --embed=false
 
   # generate service codes and specify the output directory, Note: if the file already exists, code generation will be canceled.
-  sponge service --module-name=yourModuleName --server-name=yourServerName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
+  sponge micro service --module-name=yourModuleName --server-name=yourServerName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
 `,
 		SilenceErrors: true,
 		SilenceUsage:  true,
@@ -85,6 +85,7 @@ func runGenServiceCommand(moduleName string, serverName string, codes map[string
 	ignoreDirs := []string{} // 指定子目录下忽略处理的目录
 	ignoreFiles := []string{"init.go", "init_test.go", "http_systemCode.go", "http_userExample.go",
 		"grpc_systemCode.go", "grpc_systemCode_test.go", "service.go", "service_test.go", "userExample.pb.go",
+		"userExample_gwExample.go", "userExample_gwExample_test.go", "userExample_router.pb.go",
 		"userExample.pb.validate.go", "userExample_grpc.pb.go"} // 指定子目录下忽略处理的文件
 
 	r.SetSubDirs(subDirs...)
@@ -146,7 +147,7 @@ func addServiceFields(moduleName string, serverName string, r replacer.Replacer,
 		},
 		{
 			Old: "api.serverNameExample.v1",
-			New: fmt.Sprintf("api.%s.v1", strings.ReplaceAll(serverName, "-", "_")), // proto package 不能存在"-"号
+			New: fmt.Sprintf("api.%s.v1", strings.ReplaceAll(serverName, "-", "_")), // protobuf package 不能存在"-"号
 		},
 		{
 			Old: "userExampleNO = 1",

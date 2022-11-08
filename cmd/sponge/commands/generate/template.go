@@ -1,31 +1,6 @@
 package generate
 
 const (
-	mainFileHTTPCode = `
-	// 创建http服务
-	httpAddr := ":" + strconv.Itoa(config.Get().HTTP.Port)
-	httpRegistry, httpInstance := registryService("http", config.Get().App.Host, config.Get().HTTP.Port)
-	httpServer := server.NewHTTPServer(httpAddr,
-		server.WithHTTPReadTimeout(time.Second*time.Duration(config.Get().HTTP.ReadTimeout)),
-		server.WithHTTPWriteTimeout(time.Second*time.Duration(config.Get().HTTP.WriteTimeout)),
-		server.WithHTTPRegistry(httpRegistry, httpInstance),
-		server.WithHTTPIsProd(config.Get().App.Env == "prod"),
-	)
-	servers = append(servers, httpServer)
-`
-
-	mainFileGrpcCode = `
-	// 创建grpc服务
-	grpcAddr := ":" + strconv.Itoa(config.Get().Grpc.Port)
-	grpcRegistry, grpcInstance := registryService("grpc", config.Get().App.Host, config.Get().Grpc.Port)
-	grpcServer := server.NewGRPCServer(grpcAddr,
-		server.WithGrpcReadTimeout(time.Duration(config.Get().Grpc.ReadTimeout)*time.Second),
-		server.WithGrpcWriteTimeout(time.Duration(config.Get().Grpc.WriteTimeout)*time.Second),
-		server.WithGrpcRegistry(grpcRegistry, grpcInstance),
-	)
-	servers = append(servers, grpcServer)
-`
-
 	dockerFileHTTPCode = `# 添加curl，用在http服务的检查，如果用部署在k8s，可以不用安装
 RUN apk add curl
 
@@ -166,4 +141,14 @@ func NewCenter(configFile string) (*Center, error) {
 	return nacosConf, err
 }
 `
+
+	protoShellServiceCode = `moduleName=$(cat docs/gen.info | head -1 | cut -d , -f 1)
+serverName=$(cat docs/gen.info | head -1 | cut -d , -f 2)
+# 生成_*router.pb.go和*_logic.go，其中*_logic.go保存在参数out的自定义目录下，如果存在，生成的文件会自动添加时间后缀，不会替换文件
+protoc --proto_path=. --proto_path=./third_party \
+  --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=service \
+  --go-gin_opt=moduleName=${moduleName} --go-gin_opt=serverName=${serverName} --go-gin_opt=out=internal/service \
+  $allProtoFiles
+
+checkResult $?`
 )
