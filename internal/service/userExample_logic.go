@@ -24,36 +24,36 @@ func NewUserExampleServiceClient() serverNameExampleV1.UserExampleServiceLogicer
 
 func (c *userExampleServiceClient) Create(ctx context.Context, req *serverNameExampleV1.CreateUserExampleRequest) (*serverNameExampleV1.CreateUserExampleReply, error) {
 	// implement me
-	// If required, fill in the code to fetch data from other microservices here.
+	// If required, fill in the code to fetch data from other rpc servers here.
 	return c.userExampleServiceCli.Create(ctx, req)
 }
 
 func (c *userExampleServiceClient) DeleteByID(ctx context.Context, req *serverNameExampleV1.DeleteUserExampleByIDRequest) (*serverNameExampleV1.DeleteUserExampleByIDReply, error) {
 	// implement me
-	// If required, fill in the code to fetch data from other microservices here.
+	// If required, fill in the code to fetch data from other rpc servers here.
 	return c.userExampleServiceCli.DeleteByID(ctx, req)
 }
 
 func (c *userExampleServiceClient) UpdateByID(ctx context.Context, req *serverNameExampleV1.UpdateUserExampleByIDRequest) (*serverNameExampleV1.UpdateUserExampleByIDReply, error) {
 	// implement me
-	// If required, fill in the code to fetch data from other microservices here.
+	// If required, fill in the code to fetch data from other rpc servers here.
 	return c.userExampleServiceCli.UpdateByID(ctx, req)
 }
 
 func (c *userExampleServiceClient) GetByID(ctx context.Context, req *serverNameExampleV1.GetUserExampleByIDRequest) (*serverNameExampleV1.GetUserExampleByIDReply, error) {
 	// implement me
-	// If required, fill in the code to fetch data from other microservices here.
+	// If required, fill in the code to fetch data from other rpc servers here.
 	return c.userExampleServiceCli.GetByID(ctx, req)
 }
 
 func (c *userExampleServiceClient) ListByIDs(ctx context.Context, req *serverNameExampleV1.ListUserExampleByIDsRequest) (*serverNameExampleV1.ListUserExampleByIDsReply, error) {
 	// implement me
-	// If required, fill in the code to fetch data from other microservices here.
+	// If required, fill in the code to fetch data from other rpc servers here.
 	return c.userExampleServiceCli.ListByIDs(ctx, req)
 }
 
 func (c *userExampleServiceClient) List(ctx context.Context, req *serverNameExampleV1.ListUserExampleRequest) (*serverNameExampleV1.ListUserExampleReply, error) {
 	// implement me
-	// If required, fill in the code to fetch data from other microservices here.
+	// If required, fill in the code to fetch data from other rpc servers here.
 	return c.userExampleServiceCli.List(ctx, req)
 }

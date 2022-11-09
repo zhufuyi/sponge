@@ -1,6 +1,6 @@
 ## protoc-gen-go-gin
 
-According to protobuf to generate gin registration route code, you can use their own log and response to replace the default value, in addition to generating registration route code, but also support the generation of http handler template code and call rpc server template code.
+According to protobuf to generate gin registration route codes, you can use their own log and response to replace the default value, in addition to generating registration route code, but also support the generation of http handler template code and call rpc server template code.
 
 <br>
 
@@ -74,25 +74,29 @@ protoc --proto_path=. --proto_path=./third_party \
 
 <br>
 
-(2) Generate *_router.pb.go and handler template file *_logic.go
+(2) Generate codes with plugin handler
 
 ```bash
 protoc --proto_path=. --proto_path=./third_party \
   --go_out=. --go_opt=paths=source_relative \
   --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=handler \
-  --go-gin_opt=moduleName=yourModuleName --go-gin_opt=serverName=yourServerName --go-gin_opt=out=internal/handler \
+  --go-gin_opt=moduleName=yourModuleName --go-gin_opt=serverName=yourServerName \
   api/v1/*.proto
 ```
 
+A total of 3 files are generated: the registration route file _*router.pb.go, the injection route file *_handler.go (default save path in internal/routers), and the logic code template file *_logic.go (default save path in internal/handler)
+
 <br>
 
-(3) Generate *_router.pb.go and call the rpc template file *_logic.go
+(3) Generate codes with plugin service
 
 ```bash
 protoc --proto_path=. --proto_path=./third_party \
   --go_out=. --go_opt=paths=source_relative \
   --go-grpc_out=. --go-grpc_opt=paths=source_relative \
   --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=service \
-  --go-gin_opt=moduleName=yourModuleName --go-gin_opt=serverName=yourServerName --go-gin_opt=out=internal/service \
+  --go-gin_opt=moduleName=yourModuleName --go-gin_opt=serverName=yourServerName \
   api/v1/*.proto
 ```
+
+A total of 3 files are generated: the registration route file _*router.pb.go, the injection route file *_service.go (default save path in internal/routers), and the logic code template file *_logic.go (default save path in internal/service)

@@ -10,6 +10,10 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
+	routerTmpl, err = template.New("handlerRouter").Parse(routerTmplRaw)
+	if err != nil {
+		panic(err)
+	}
 }
 
 var (
@@ -47,5 +51,36 @@ func New{{$.Name}}Handler() serverNameExampleV1.{{$.Name}}Logicer {
 		// If required, fill in the code to implement other dao here.
 	}
 }
+`
+
+	routerTmpl    *template.Template
+	routerTmplRaw = `package routers
+
+import (
+	serverNameExampleV1 "moduleNameExample/api/serverNameExample/v1"
+	"moduleNameExample/internal/handler"
+
+	"github.com/zhufuyi/sponge/pkg/logger"
+
+	"github.com/gin-gonic/gin"
+)
+
+func init() {
+	rootRouterFns = append(rootRouterFns, func(r *gin.Engine) {
+{{- range .ServiceNames}}
+		{{.LowerName}}Router(r, handler.New{{.Name}}Handler())
+{{- end}}
+	})
+}
+
+{{- range .ServiceNames}}
+
+func {{.LowerName}}Router(r *gin.Engine, iService serverNameExampleV1.{{.Name}}Logicer) {
+	serverNameExampleV1.Register{{.Name}}Router(r, iService,
+		serverNameExampleV1.With{{.Name}}RPCResponse(),
+		serverNameExampleV1.With{{.Name}}Logger(logger.Get()),
+	)
+}
+{{- end}}
 `
 )

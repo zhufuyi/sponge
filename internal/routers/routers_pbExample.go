@@ -22,8 +22,8 @@ var (
 	rootRouterFns []func(engine *gin.Engine) // 根路由组，rpc gateway使用
 )
 
-// NewRouter_gwExample 创建一个路由
-func NewRouter_gwExample() *gin.Engine { //nolint
+// NewRouter_pbExample 创建一个路由
+func NewRouter_pbExample() *gin.Engine { //nolint
 	r := gin.New()
 
 	r.Use(gin.Recovery())

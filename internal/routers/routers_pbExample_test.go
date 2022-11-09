@@ -15,7 +15,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNewRouter_gwExample(t *testing.T) {
+func TestNewRouter_pbExample(t *testing.T) {
 	err := config.Init(configs.Path("serverNameExample.yml"))
 	if err != nil {
 		t.Fatal(err)
@@ -29,10 +29,16 @@ func TestNewRouter_gwExample(t *testing.T) {
 
 	utils.SafeRunWithTimeout(time.Second*2, func(cancel context.CancelFunc) {
 		gin.SetMode(gin.ReleaseMode)
-		r := NewRouter_gwExample()
+		r := NewRouter_pbExample()
 		assert.NotNil(t, r)
 		cancel()
 	})
+}
+
+func Test_userExampleServiceRouter(t *testing.T) {
+	gin.SetMode(gin.ReleaseMode)
+	r := gin.Default()
+	userExampleServiceRouter(r, &mockGw{})
 }
 
 type mockGw struct{}
@@ -59,10 +65,4 @@ func (m mockGw) ListByIDs(ctx context.Context, req *serverNameExampleV1.ListUser
 
 func (m mockGw) UpdateByID(ctx context.Context, req *serverNameExampleV1.UpdateUserExampleByIDRequest) (*serverNameExampleV1.UpdateUserExampleByIDReply, error) {
 	return nil, nil
-}
-
-func Test_userExampleRouter_gwExample(t *testing.T) {
-	gin.SetMode(gin.ReleaseMode)
-	r := gin.Default()
-	userExampleRouter_gwExample(r, &mockGw{})
 }

@@ -8,7 +8,7 @@ import (
 	"google.golang.org/protobuf/compiler/protogen"
 )
 
-// GenerateFile generates a service.go file.
+// GenerateFile generates  service and router files.
 func GenerateFile(gen *protogen.Plugin, file *protogen.File) (string, []byte, *protogen.GeneratedFile) {
 	if len(file.Services) == 0 {
 		return "", nil, nil
@@ -16,7 +16,6 @@ func GenerateFile(gen *protogen.Plugin, file *protogen.File) (string, []byte, *p
 
 	filename := file.GeneratedFilenamePrefix + "_logic.go"
 	g := gen.NewGeneratedFile(filename, file.GoImportPath)
-
 	g.P(pkgImportTmplRaw)
 
 	var fields []*tmplField
