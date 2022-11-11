@@ -8,22 +8,22 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// GRPCStatus grpc 状态
-type GRPCStatus struct {
+// RPCStatus grpc 状态
+type RPCStatus struct {
 	status *status.Status
 }
 
 var statusCodes = map[codes.Code]string{}
 
-// NewGRPCStatus 新建一个status
-func NewGRPCStatus(code codes.Code, msg string) *GRPCStatus {
+// NewRPCStatus 新建一个status
+func NewRPCStatus(code codes.Code, msg string) *RPCStatus {
 	if v, ok := statusCodes[code]; ok {
 		panic(fmt.Sprintf("grpc status code = %d already exists, please replace with a new error code, old msg = %s", code, v))
 	} else {
 		statusCodes[code] = msg
 	}
 
-	return &GRPCStatus{
+	return &RPCStatus{
 		status: status.New(code, msg),
 	}
 }
@@ -48,7 +48,7 @@ func Any(key string, val interface{}) Detail {
 }
 
 // Err return error
-func (g *GRPCStatus) Err(details ...Detail) error {
+func (g *RPCStatus) Err(details ...Detail) error {
 	var dts []string
 	for _, detail := range details {
 		dts = append(dts, detail.String())
@@ -60,7 +60,7 @@ func (g *GRPCStatus) Err(details ...Detail) error {
 }
 
 // ToRPCErr converted to standard RPC error
-func (g *GRPCStatus) ToRPCErr(desc ...string) error {
+func (g *RPCStatus) ToRPCErr(desc ...string) error {
 	switch g.status.Code() {
 	case StatusInternalServerError.status.Code():
 		return toRPCErr(codes.Internal, desc...)
@@ -96,7 +96,7 @@ func toRPCErr(code codes.Code, descs ...string) error {
 }
 
 // ToRPCCode converted to standard RPC error code
-func (g *GRPCStatus) ToRPCCode() codes.Code {
+func (g *RPCStatus) ToRPCCode() codes.Code {
 	switch g.status.Code() {
 	case StatusInternalServerError.status.Code():
 		return codes.Internal

@@ -1,12 +1,8 @@
 package generate
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
-	"os"
-	"path/filepath"
-	"regexp"
 
 	"github.com/zhufuyi/sponge/pkg/replacer"
 
@@ -22,7 +18,7 @@ func RPCGwCommand() *cobra.Command {
 		projectName  string // 项目名称
 		repoAddr     string // 镜像仓库地址
 		outPath      string // 输出目录
-		protobufFile string // proto file文件，指定这个文件生成路由和service
+		protobufFile string // proto file文件
 	)
 
 	//nolint
@@ -58,18 +54,22 @@ Examples:
 	_ = cmd.MarkFlagRequired("protobuf-file")
 
 	cmd.Flags().StringVarP(&repoAddr, "repo-addr", "r", "", "docker image repository address, excluding http and repository names")
-	cmd.Flags().StringVarP(&outPath, "out", "o", "", "output directory, default is ./serverName_rpc_<time>")
+	cmd.Flags().StringVarP(&outPath, "out", "o", "", "output directory, default is ./serverName_rpc-gw_<time>")
 
 	return cmd
 }
 
 func runGenRPCGwCommand(moduleName string, serverName string, projectName string, protobufFile string, repoAddr string, outPath string) error {
-	protoData, err := os.ReadFile(protobufFile)
-	if err != nil {
-		return err
-	}
-
-	err = getServiceName(protoData)
+	//protoData, err := os.ReadFile(protobufFile)
+	//if err != nil {
+	//	return err
+	//}
+	//
+	//err = getServiceName(protoData)
+	//if err != nil {
+	//	return err
+	//}
+	protobufFiles, isImportTypes, err := parseProtobufFiles(protobufFile)
 	if err != nil {
 		return err
 	}
@@ -89,19 +89,22 @@ func runGenRPCGwCommand(moduleName string, serverName string, projectName string
 		"internal/handler", "internal/types", "api/serverNameExample",
 	} // 指定子目录下忽略处理的目录
 	ignoreFiles := []string{"grpc.go", "grpc_option.go", "grpc_test.go", "LICENSE",
-		"grpc_userExample.go", "grpc_systemCode.go", "grpc_systemCode_test.go",
+		"userExample_rpc.go", "systemCode_rpc.go",
 		"codecov.yml", "routers.go", "routers_test.go", "userExample_gwExample.go", "userExample.go",
 		"routers_gwExample_test.go", "userExample_gwExample.go", "types.pb.validate.go", "types.pb.go",
 		"swagger.json", "swagger.yaml", "apis.swagger.json", "proto.html", "docs.go", "doc.go",
 	} // 指定子目录下忽略处理的文件
 
-	if !bytes.Contains(protoData, []byte("api/types/types.proto")) {
+	//if !bytes.Contains(protoData, []byte("api/types/types.proto")) {
+	//	ignoreFiles = append(ignoreFiles, "types.proto")
+	//}
+	if !isImportTypes {
 		ignoreFiles = append(ignoreFiles, "types.proto")
 	}
 
-	r.SetSubDirs(subDirs...)
+	r.SetSubDirsAndFiles(subDirs)
 	r.SetIgnoreSubDirs(ignoreDirs...)
-	r.SetIgnoreFiles(ignoreFiles...)
+	r.SetIgnoreSubFiles(ignoreFiles...)
 	fields := addRPCGwFields(moduleName, serverName, projectName, repoAddr, r)
 	r.SetReplacementFields(fields)
 	_ = r.SetOutputDir(outPath, serverName+"_"+subTplName)
@@ -109,25 +112,30 @@ func runGenRPCGwCommand(moduleName string, serverName string, projectName string
 		return err
 	}
 
+	err = saveProtobufFiles(moduleName, serverName, r.GetOutputDir(), protobufFiles)
+	if err != nil {
+		return err
+	}
+
 	fmt.Printf("generate %s's rpc gateway server codes successfully, out = %s\n\n", serverName, r.GetOutputDir())
 
-	// 保存moduleName和serverName到指定文件，给外部使用
-	genInfo := moduleName + "," + serverName
-	file := r.GetOutputDir() + "/docs/gen.info"
-	err = os.WriteFile(file, []byte(genInfo), 0666)
-	if err != nil {
-		fmt.Printf("save file %s error, %v\n", file, err)
-	}
-
-	// 复制protobuf文件
-	_, name := filepath.Split(protobufFile)
-	dir := r.GetOutputDir() + "/api/" + serverName + "/v1"
-	_ = os.MkdirAll(dir, 0666)
-	file = dir + "/" + name
-	err = os.WriteFile(file, protoData, 0666)
-	if err != nil {
-		fmt.Printf("save file %s error, %v\n", file, err)
-	}
+	//// 保存moduleName和serverName到指定文件，给外部使用
+	//genInfo := moduleName + "," + serverName
+	//file := r.GetOutputDir() + "/docs/gen.info"
+	//err = os.WriteFile(file, []byte(genInfo), 0666)
+	//if err != nil {
+	//	fmt.Printf("save file %s error, %v\n", file, err)
+	//}
+	//
+	//// 复制protobuf文件
+	//_, name := filepath.Split(protobufFile)
+	//dir := r.GetOutputDir() + "/api/" + serverName + "/v1"
+	//_ = os.MkdirAll(dir, 0666)
+	//file = dir + "/" + name
+	//err = os.WriteFile(file, protoData, 0666)
+	//if err != nil {
+	//	fmt.Printf("save file %s error, %v\n", file, err)
+	//}
 
 	return nil
 }
@@ -154,7 +162,6 @@ func addRPCGwFields(moduleName string, serverName string, projectName string, re
 	fields = append(fields, deleteFieldsMark(r, gitIgnoreFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, protoShellFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, replaceFileContentMark(r, readmeFile, "## "+serverName)...)
-	//fields = append(fields, replaceFileContentMark(r, protoFile, string(protoData))...)
 	fields = append(fields, []replacer.Field{
 		{ // 替换Dockerfile文件内容
 			Old: dockerFileMark,
@@ -235,12 +242,12 @@ func addRPCGwFields(moduleName string, serverName string, projectName string, re
 	return fields
 }
 
-func getServiceName(data []byte) error {
-	servicePattern := `\nservice (\w+)`
-	re := regexp.MustCompile(servicePattern)
-	matchArr := re.FindStringSubmatch(string(data))
-	if len(matchArr) < 2 {
-		return fmt.Errorf("not found service name in protobuf file, the protobuf file requires at least one service")
-	}
-	return nil
-}
+//func getServiceName(data []byte) error {
+//	servicePattern := `\nservice (\w+)`
+//	re := regexp.MustCompile(servicePattern)
+//	matchArr := re.FindStringSubmatch(string(data))
+//	if len(matchArr) < 2 {
+//		return fmt.Errorf("not found service name in protobuf file, the protobuf file requires at least one service")
+//	}
+//	return nil
+//}

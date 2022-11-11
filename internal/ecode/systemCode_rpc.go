@@ -6,7 +6,7 @@ import (
 	"github.com/zhufuyi/sponge/pkg/errcode"
 )
 
-// rpc系统级别错误码，有status前缀，错误码范围300000~400000
+// rpc system level error code, with status prefix, error code range 30000~40000
 var (
 	StatusSuccess = errcode.StatusSuccess
 

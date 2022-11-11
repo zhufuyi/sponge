@@ -6,7 +6,7 @@ import (
 	"github.com/zhufuyi/sponge/pkg/errcode"
 )
 
-// http系统级别错误码，无Err前缀，错误码范围100000~200000
+// http system level error code, error code range 10000~20000
 var (
 	Success             = errcode.Success
 	InvalidParams       = errcode.InvalidParams
@@ -19,8 +19,8 @@ var (
 	Forbidden           = errcode.Forbidden
 	LimitExceed         = errcode.LimitExceed
 
-	DeadlineExceeded         = errcode.DeadlineExceeded
-	AccessDenied             = errcode.AccessDenied
-	MethodNotAllowed         = errcode.MethodNotAllowed
-	MethodServiceUnavailable = errcode.MethodServiceUnavailable
+	DeadlineExceeded   = errcode.DeadlineExceeded
+	AccessDenied       = errcode.AccessDenied
+	MethodNotAllowed   = errcode.MethodNotAllowed
+	ServiceUnavailable = errcode.ServiceUnavailable
 )

@@ -6,8 +6,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGRPCStatus(t *testing.T) {
-	st := NewGRPCStatus(101, "something is wrong")
+func TestRPCStatus(t *testing.T) {
+	st := NewRPCStatus(41101, "something is wrong")
 	err := st.Err()
 	assert.Error(t, err)
 	err = st.Err(Any("foo", "bar"))
@@ -16,11 +16,11 @@ func TestGRPCStatus(t *testing.T) {
 	defer func() {
 		recover()
 	}()
-	NewGRPCStatus(101, "something is wrong")
+	NewRPCStatus(41101, "something is wrong")
 }
 
 func TestToRPCCode(t *testing.T) {
-	status := []*GRPCStatus{
+	status := []*RPCStatus{
 		StatusSuccess,
 		StatusInvalidParams,
 		StatusUnauthorized,
@@ -60,12 +60,12 @@ func TestToRPCCode(t *testing.T) {
 	t.Log(codeInt)
 }
 
-func TestGCode(t *testing.T) {
-	code := GCode(1)
+func TestRCode(t *testing.T) {
+	code := RCode(1)
 	t.Log("error code is", int(code))
 
 	defer func() {
 		recover()
 	}()
-	code = GCode(10001)
+	code = RCode(101)
 }

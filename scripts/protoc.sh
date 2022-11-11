@@ -1,10 +1,5 @@
 #!/bin/bash
 
-# 插件版本
-# protoc                               v3.20.1
-# protoc-gen-go                   v1.28.0
-# protoc-gen-validate           v0.6.7
-
 # proto文件所在的目录
 protoBasePath="api"
 allProtoFiles=""
@@ -62,6 +57,11 @@ function listPbGoFiles(){
 # 获取所有proto文件路径
 listProtoFiles $protoBasePath
 
+if [ "$protoBasePath"x = x ];then
+  echo "Error: not found protobuf file in path $protoBasePath"
+  exit 1
+fi
+
 # 生成文件 *_pb.go, *_grpc_pb.go，
 protoc --proto_path=. --proto_path=./third_party \
   --go_out=. --go_opt=paths=source_relative \
@@ -77,6 +77,15 @@ protoc --proto_path=. --proto_path=./third_party \
 
 checkResult $?
 
+# 对*_pb.go字段嵌入tag
+protoc --proto_path=. --proto_path=./third_party \
+  --gotag_out=:. --gotag_opt=paths=source_relative \
+  $allProtoFiles
+
+checkResult $?
+# todo generate router code for gin here
+# delete the templates code start
+
 # 生成swagger文档，所有文件合并到docs/apis.swagger.json
 protoc --proto_path=. --proto_path=./third_party \
   --openapiv2_out=. --openapiv2_opt=logtostderr=true --openapiv2_opt=allow_merge=true --openapiv2_opt=merge_file_name=docs/apis.json \
@@ -84,24 +93,15 @@ protoc --proto_path=. --proto_path=./third_party \
 
 checkResult $?
 
-# 对*_pb.go字段嵌入tag
-protoc --proto_path=. --proto_path=./third_party \
-  --gotag_out=:. --gotag_opt=paths=source_relative \
-  $allProtoFiles
-
-checkResult $?
-
-# todo generate router code for gin here
-# delete the templates code start
-# 生成_*router.pb.go和*_logic.go，其中*_logic.go保存路径自定义
+# 共生成4个文件，分别是注册路由文件_*router.pb.go(保存在protobuf文件同一目录)、注入路由文件*_service.pb.go(默认保存路径在internal/routers)、
+# 逻辑代码模板文件*_logic.go(默认保存路径在internal/service), 返回错误码模板文件*_http.go(默认保存路径在internal/ecode)
 protoc --proto_path=. --proto_path=./third_party \
   --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=service \
-  --go-gin_opt=moduleName=github.com/zhufuyi/sponge --go-gin_opt=serverName=serverNameExample --go-gin_opt=out=internal/service \
+  --go-gin_opt=moduleName=github.com/zhufuyi/sponge --go-gin_opt=serverName=serverNameExample \
   $allProtoFiles
 
 checkResult $?
 # delete the templates code end
-
 listPbGoFiles $protoBasePath
 
 go mod tidy

@@ -23,7 +23,7 @@ func RegisterServers() []app.IServer {
 	// 创建http服务
 	httpAddr := ":" + strconv.Itoa(cfg.HTTP.Port)
 	httpRegistry, httpInstance := registryService("http", cfg.App.Host, cfg.HTTP.Port)
-	httpServer := server.NewHTTPServer(httpAddr,
+	httpServer := server.NewHTTPServer_pbExample(httpAddr,
 		server.WithHTTPReadTimeout(time.Second*time.Duration(cfg.HTTP.ReadTimeout)),
 		server.WithHTTPWriteTimeout(time.Second*time.Duration(cfg.HTTP.WriteTimeout)),
 		server.WithHTTPRegistry(httpRegistry, httpInstance),
