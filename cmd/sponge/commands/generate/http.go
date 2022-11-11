@@ -85,26 +85,35 @@ func runGenHTTPCommand(moduleName string, serverName string, projectName string,
 	}
 
 	// 设置模板信息
-	subDirs := []string{} // 只处理的子目录，如果为空或者没有指定的子目录，表示所有文件
-	ignoreDirs := []string{"cmd/sponge", "cmd/protoc-gen-go-gin", "cmd/serverNameExample_mixExample",
-		"cmd/serverNameExample_grpcExample", "cmd/serverNameExample_gwExample",
-		"sponge/.github", "sponge/.git", "sponge/api", "sponge/pkg", "sponge/assets", "sponge/test",
-		"sponge/third_party", "internal/service", "internal/rpcclient"} // 指定子目录下忽略处理的目录
-	ignoreFiles := []string{"swagger.json", "swagger.yaml", "proto.html", "protoc.sh",
-		"proto-doc.sh", "grpc.go", "grpc_option.go", "grpc_test.go", "LICENSE", "doc.go",
-		"grpc_userExample.go", "grpc_systemCode.go", "grpc_systemCode_test.go",
-		"codecov.yml", "routers_gwExample.go", "routers_gwExample_test.go",
-		"userExample_gwExample.go", "apis.swagger.json", "apis.go"} // 指定子目录下忽略处理的文件
+	subDirs := []string{ // 指定处理的子目录
+		"cmd/serverNameExample_httpExample", "sponge/build", "sponge/configs", "sponge/deployments",
+		"sponge/docs", "sponge/scripts", "sponge/internal",
+	}
+	subFiles := []string{ // 指定处理的子文件
+		"sponge/.gitignore", "sponge/.golangci.yml", "sponge/go.mod", "sponge/go.sum",
+		"sponge/Jenkinsfile", "sponge/Makefile", "sponge/README.md",
+	}
+	ignoreDirs := []string{ // 指定子目录下忽略处理的目录
+		"internal/service", "internal/rpcclient",
+	}
+	ignoreFiles := []string{ // 指定子目录下忽略处理的文件
+		"swagger.json", "swagger.yaml", "apis.swagger.json", "apis.html", "apis.go", // sponge/docs
+		"userExample_rpc.go", "systemCode_rpc.go", // internal/ecode
+		"routers_pbExample.go", "routers_pbExample_test.go", "userExample_service.pb.go", // internal/routers
+		"grpc.go", "grpc_option.go", "grpc_test.go", // internal/server
+	}
 
-	r.SetSubDirs(subDirs...)
+	r.SetSubDirsAndFiles(subDirs, subFiles...)
 	r.SetIgnoreSubDirs(ignoreDirs...)
-	r.SetIgnoreFiles(ignoreFiles...)
+	r.SetIgnoreSubFiles(ignoreFiles...)
 	fields := addHTTPFields(moduleName, serverName, projectName, repoAddr, r, dbDSN, codes)
 	r.SetReplacementFields(fields)
 	_ = r.SetOutputDir(outPath, serverName+"_"+subTplName)
 	if err := r.SaveFiles(); err != nil {
 		return err
 	}
+
+	_ = saveGenInfo(moduleName, serverName, r.GetOutputDir())
 
 	fmt.Printf("generate %s's http server codes successfully, out = %s\n\n", serverName, r.GetOutputDir())
 	return nil
@@ -183,7 +192,7 @@ func addHTTPFields(moduleName string, serverName string, projectName string, rep
 		},
 		{
 			Old: "userExampleNO = 1",
-			New: fmt.Sprintf("userExampleNO = %d", rand.Intn(1000)),
+			New: fmt.Sprintf("userExampleNO = %d", rand.Intn(100)),
 		},
 		{
 			Old: "serverNameExample",
@@ -220,16 +229,8 @@ func addHTTPFields(moduleName string, serverName string, projectName string, rep
 			New: "",
 		},
 		{
-			Old: "_gwExample",
+			Old: "_pbExample",
 			New: "",
-		},
-		{
-			Old: "tmp.gitignore",
-			New: ".gitignore",
-		},
-		{
-			Old: "tmp.golangci.yml",
-			New: ".golangci.yml",
 		},
 		{
 			Old: "root:123456@(192.168.3.37:3306)/account",

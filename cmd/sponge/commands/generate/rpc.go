@@ -87,25 +87,37 @@ func runGenRPCCommand(moduleName string, serverName string, projectName string, 
 	}
 
 	// 设置模板信息
-	subDirs := []string{} // 只处理的指定子目录，如果为空或者没有指定的子目录，表示所有文件
-	ignoreDirs := []string{"cmd/sponge", "cmd/protoc-gen-go-gin", "cmd/serverNameExample_mixExample",
-		"cmd/serverNameExample_httpExample", "cmd/serverNameExample_gwExample",
-		"sponge/.github", "sponge/.git", "sponge/docs", "sponge/pkg", "sponge/assets", "sponge/test",
-		"internal/handler", "internal/routers", "internal/types", "internal/rpcclient"} // 指定子目录下忽略处理的目录
-	ignoreFiles := []string{"http_systemCode.go", "http_userExample.go", "http.go", "http_test.go", "http_option.go",
-		"userExample.pb.go", "userExample.pb.validate.go", "userExample_grpc.pb.go", "swag-docs.sh",
-		"userExample_gwExample.go", "userExample_gwExample_test.go", "userExample_router.pb.go",
-		"types.pb.go", "types.pb.validate.go", "LICENSE", "doc.go", "codecov.yml"} // 指定子目录下忽略处理的文件
+	subDirs := []string{ // 指定处理的子目录
+		"sponge/api", "sponge/build", "cmd/serverNameExample_grpcExample", "sponge/configs", "sponge/deployments",
+		"sponge/scripts", "sponge/internal", "sponge/third_party",
+	}
+	subFiles := []string{ // 指定处理的子文件
+		"sponge/.gitignore", "sponge/.golangci.yml", "sponge/go.mod", "sponge/go.sum",
+		"sponge/Jenkinsfile", "sponge/Makefile", "sponge/README.md",
+	}
+	ignoreDirs := []string{ // 指定子目录下忽略处理的目录
+		"internal/handler", "internal/rpcclient", "internal/routers", "internal/types",
+	}
+	ignoreFiles := []string{ // 指定子目录下忽略处理的文件
+		"types.pb.validate.go", "types.pb.go", // api/types
+		"userExample.pb.go", "userExample.pb.validate.go", "userExample_grpc.pb.go", "userExample_router.pb.go", // api/serverNameExample/v1
+		"userExample_http.go", "systemCode_http.go", // internal/ecode
+		"http.go", "http_option.go", "http_test.go", // internal/server
+		"userExample_logic.go", "userExample_logic_test.go", // internal/service
+		"scripts/swag-docs.sh", // sponge/scripts
+	}
 
-	r.SetSubDirs(subDirs...)
+	r.SetSubDirsAndFiles(subDirs, subFiles...)
 	r.SetIgnoreSubDirs(ignoreDirs...)
-	r.SetIgnoreFiles(ignoreFiles...)
+	r.SetIgnoreSubFiles(ignoreFiles...)
 	fields := addRPCFields(moduleName, serverName, projectName, repoAddr, r, dbDSN, codes)
 	r.SetReplacementFields(fields)
 	_ = r.SetOutputDir(outPath, serverName+"_"+subTplName)
 	if err := r.SaveFiles(); err != nil {
 		return err
 	}
+
+	_ = saveGenInfo(moduleName, serverName, r.GetOutputDir())
 
 	fmt.Printf("generate %s's rpc server codes successfully, out = %s\n\n", serverName, r.GetOutputDir())
 	return nil
@@ -121,6 +133,7 @@ func addRPCFields(moduleName string, serverName string, projectName string, repo
 	fields = append(fields, deleteFieldsMark(r, daoFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, daoTestFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, protoFile, startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, protoShellFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, serviceClientFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, serviceTestFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, dockerFile, wellStartMark, wellEndMark)...)
@@ -143,6 +156,10 @@ func addRPCFields(moduleName string, serverName string, projectName string, repo
 		{ // 替换v1/userExample.proto文件内容
 			Old: protoFileMark,
 			New: codes[parser.CodeTypeProto],
+		},
+		{ // 替换scripts/proto.sh文件内容
+			Old: protoShellFileMark,
+			New: "",
 		},
 		{ // 替换service/userExample_client_test.go文件内容
 			Old: serviceFileMark,
@@ -200,7 +217,7 @@ func addRPCFields(moduleName string, serverName string, projectName string, repo
 		},
 		{
 			Old: "userExampleNO = 1",
-			New: fmt.Sprintf("userExampleNO = %d", rand.Intn(1000)),
+			New: fmt.Sprintf("userExampleNO = %d", rand.Intn(100)),
 		},
 		{
 			Old: "serverNameExample",
@@ -243,18 +260,6 @@ func addRPCFields(moduleName string, serverName string, projectName string, repo
 		{
 			Old: string(wellOnlyGrpcEndMark),
 			New: "",
-		},
-		{
-			Old: "tmp.go.mod",
-			New: "go.mod",
-		},
-		{
-			Old: "tmp.gitignore",
-			New: ".gitignore",
-		},
-		{
-			Old: "tmp.golangci.yml",
-			New: ".golangci.yml",
 		},
 		{
 			Old: "root:123456@(192.168.3.37:3306)/account",

@@ -76,9 +76,9 @@ func runGenProtoCommand(moduleName string, serverName string, codes map[string]s
 	ignoreFiles := []string{"userExample.pb.go", "userExample.pb.validate.go",
 		"userExample_grpc.pb.go", "userExample_router.pb.go"} // 指定子目录下忽略处理的文件
 
-	r.SetSubDirs(subDirs...)
+	r.SetSubDirsAndFiles(subDirs)
 	r.SetIgnoreSubDirs(ignoreDirs...)
-	r.SetIgnoreFiles(ignoreFiles...)
+	r.SetIgnoreSubFiles(ignoreFiles...)
 	fields := addProtoFields(moduleName, serverName, r, codes)
 	r.SetReplacementFields(fields)
 	_ = r.SetOutputDir(outPath, subTplName)

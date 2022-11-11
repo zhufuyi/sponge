@@ -21,6 +21,7 @@ func NewWebCommand() *cobra.Command {
 		generate.DaoCommand("web"),
 		generate.HandlerCommand(),
 		generate.HTTPCommand(),
+		generate.HTTPServerCommand(),
 	)
 
 	return cmd

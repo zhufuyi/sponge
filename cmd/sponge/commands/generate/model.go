@@ -71,9 +71,9 @@ func runGenModelCommand(codes map[string]string, outPath string) error {
 	ignoreDirs := []string{}                           // 指定子目录下忽略处理的目录
 	ignoreFiles := []string{"init.go", "init_test.go"} // 指定子目录下忽略处理的文件
 
-	r.SetSubDirs(subDirs...)
+	r.SetSubDirsAndFiles(subDirs)
 	r.SetIgnoreSubDirs(ignoreDirs...)
-	r.SetIgnoreFiles(ignoreFiles...)
+	r.SetIgnoreSubFiles(ignoreFiles...)
 	fields := addModelFields(r, codes)
 	r.SetReplacementFields(fields)
 	_ = r.SetOutputDir(outPath, subTplName)

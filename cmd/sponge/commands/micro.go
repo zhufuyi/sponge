@@ -22,8 +22,8 @@ func MicroCommand() *cobra.Command {
 		generate.DaoCommand("micro"),
 		generate.ServiceCommand(),
 		generate.RPCCommand(),
-
-		generate.RPCGwCommand(),
+		generate.RPCGwPbCommand(),
+		generate.RPCPbCommand(),
 	)
 
 	return cmd

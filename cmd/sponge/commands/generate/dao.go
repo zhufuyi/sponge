@@ -74,9 +74,9 @@ func runGenDaoCommand(moduleName string, codes map[string]string, outPath string
 	ignoreDirs := []string{}                                                // 指定子目录下忽略处理的目录
 	ignoreFiles := []string{"init.go", "init_test.go"}                      // 指定子目录下忽略处理的文件
 
-	r.SetSubDirs(subDirs...)
+	r.SetSubDirsAndFiles(subDirs)
 	r.SetIgnoreSubDirs(ignoreDirs...)
-	r.SetIgnoreFiles(ignoreFiles...)
+	r.SetIgnoreSubFiles(ignoreFiles...)
 	fields := addDAOFields(moduleName, r, codes)
 	r.SetReplacementFields(fields)
 	_ = r.SetOutputDir(outPath, subTplName)

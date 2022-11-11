@@ -83,14 +83,14 @@ func runGenServiceCommand(moduleName string, serverName string, codes map[string
 	subDirs := []string{"internal/model", "internal/cache", "internal/dao",
 		"internal/ecode", "internal/service", "api/serverNameExample"} // 只处理的指定子目录，如果为空或者没有指定的子目录，表示所有文件
 	ignoreDirs := []string{} // 指定子目录下忽略处理的目录
-	ignoreFiles := []string{"init.go", "init_test.go", "http_systemCode.go", "http_userExample.go",
-		"grpc_systemCode.go", "grpc_systemCode_test.go", "service.go", "service_test.go", "userExample.pb.go",
+	ignoreFiles := []string{"init.go", "init_test.go", "systemCode_http.go", "userExample_http.go",
+		"systemCode_rpc.go", "service.go", "service_test.go", "userExample.pb.go",
 		"userExample_gwExample.go", "userExample_gwExample_test.go", "userExample_router.pb.go",
 		"userExample.pb.validate.go", "userExample_grpc.pb.go"} // 指定子目录下忽略处理的文件
 
-	r.SetSubDirs(subDirs...)
+	r.SetSubDirsAndFiles(subDirs)
 	r.SetIgnoreSubDirs(ignoreDirs...)
-	r.SetIgnoreFiles(ignoreFiles...)
+	r.SetIgnoreSubFiles(ignoreFiles...)
 	fields := addServiceFields(moduleName, serverName, r, codes)
 	r.SetReplacementFields(fields)
 	_ = r.SetOutputDir(outPath, subTplName)
@@ -151,7 +151,7 @@ func addServiceFields(moduleName string, serverName string, r replacer.Replacer,
 		},
 		{
 			Old: "userExampleNO = 1",
-			New: fmt.Sprintf("userExampleNO = %d", rand.Intn(1000)),
+			New: fmt.Sprintf("userExampleNO = %d", rand.Intn(100)),
 		},
 		{
 			Old: moduleName + "/pkg",

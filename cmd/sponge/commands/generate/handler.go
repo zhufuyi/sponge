@@ -75,13 +75,13 @@ func runGenHandlerCommand(moduleName string, codes map[string]string, outPath st
 	subDirs := []string{"internal/model", "internal/cache", "internal/dao",
 		"internal/ecode", "internal/handler", "internal/routers", "internal/types"} // 只处理的指定子目录，如果为空或者没有指定的子目录，表示所有文件
 	ignoreDirs := []string{} // 指定子目录下忽略处理的目录
-	ignoreFiles := []string{"init.go", "init_test.go", "swagger_types.go", "http_systemCode.go",
-		"grpc_systemCode.go", "grpc_userExample.go", "grpc_systemCode_test.go", "routers.go",
+	ignoreFiles := []string{"init.go", "init_test.go", "swagger_types.go", "systemCode_http.go",
+		"systemCode_rpc.go", "userExample_rpc.go", "routers.go",
 		"routers_test.go", "routers_gwExample.go", "routers_gwExample_test.go", "userExample_gwExample.go"} // 指定子目录下忽略处理的文件
 
-	r.SetSubDirs(subDirs...)
+	r.SetSubDirsAndFiles(subDirs)
 	r.SetIgnoreSubDirs(ignoreDirs...)
-	r.SetIgnoreFiles(ignoreFiles...)
+	r.SetIgnoreSubFiles(ignoreFiles...)
 	fields := addHandlerFields(moduleName, r, codes)
 	r.SetReplacementFields(fields)
 	_ = r.SetOutputDir(outPath, subTplName)
@@ -124,7 +124,7 @@ func addHandlerFields(moduleName string, r replacer.Replacer, codes map[string]s
 		},
 		{
 			Old: "userExampleNO = 1",
-			New: fmt.Sprintf("userExampleNO = %d", rand.Intn(1000)),
+			New: fmt.Sprintf("userExampleNO = %d", rand.Intn(100)),
 		},
 		{
 			Old: moduleName + "/pkg",

@@ -142,12 +142,40 @@ func NewCenter(configFile string) (*Center, error) {
 }
 `
 
-	protoShellServiceCode = `moduleName=$(cat docs/gen.info | head -1 | cut -d , -f 1)
+	protoShellHandlerCode = `
+# 生成swagger文档，所有文件合并到docs/apis.swagger.json
+protoc --proto_path=. --proto_path=./third_party \
+  --openapiv2_out=. --openapiv2_opt=logtostderr=true --openapiv2_opt=allow_merge=true --openapiv2_opt=merge_file_name=docs/apis.json \
+  $allProtoFiles
+
+checkResult $?
+
+moduleName=$(cat docs/gen.info | head -1 | cut -d , -f 1)
 serverName=$(cat docs/gen.info | head -1 | cut -d , -f 2)
-# 生成_*router.pb.go和*_logic.go，其中*_logic.go保存在参数out的自定义目录下，如果存在，生成的文件会自动添加时间后缀，不会替换文件
+# 共生成4个文件，分别是注册路由文件_*router.pb.go(保存在protobuf文件同一目录)、注入路由文件*_handler.pb.go(默认保存路径在internal/routers)、
+# 逻辑代码模板文件*_logic.go(默认保存路径在internal/handler), 返回错误码模板文件*_http.go(默认保存路径在internal/ecode)
+protoc --proto_path=. --proto_path=./third_party \
+  --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=handler \
+  --go-gin_opt=moduleName=${moduleName} --go-gin_opt=serverName=${serverName} \
+  $allProtoFiles
+
+checkResult $?`
+
+	protoShellServiceCode = `
+# 生成swagger文档，所有文件合并到docs/apis.swagger.json
+protoc --proto_path=. --proto_path=./third_party \
+  --openapiv2_out=. --openapiv2_opt=logtostderr=true --openapiv2_opt=allow_merge=true --openapiv2_opt=merge_file_name=docs/apis.json \
+  $allProtoFiles
+
+checkResult $?
+
+moduleName=$(cat docs/gen.info | head -1 | cut -d , -f 1)
+serverName=$(cat docs/gen.info | head -1 | cut -d , -f 2)
+# 共生成4个文件，分别是注册路由文件_*router.pb.go(保存在protobuf文件同一目录)、注入路由文件*_service.pb.go(默认保存路径在internal/routers)、
+# 逻辑代码模板文件*_logic.go(默认保存路径在internal/service), 返回错误码模板文件*_http.go(默认保存路径在internal/ecode)
 protoc --proto_path=. --proto_path=./third_party \
   --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=service \
-  --go-gin_opt=moduleName=${moduleName} --go-gin_opt=serverName=${serverName} --go-gin_opt=out=internal/service \
+  --go-gin_opt=moduleName=${moduleName} --go-gin_opt=serverName=${serverName} \
   $allProtoFiles
 
 checkResult $?`

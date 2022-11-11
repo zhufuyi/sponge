@@ -1,21 +1,26 @@
 package generate
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
+	"regexp"
 
+	"github.com/zhufuyi/sponge/pkg/gofile"
 	"github.com/zhufuyi/sponge/pkg/replacer"
 
 	"github.com/huandu/xstrings"
 	"github.com/spf13/cobra"
 )
 
-// RPCGwPbCommand generate rpc gateway server codes base on protobuf file
-func RPCGwPbCommand() *cobra.Command {
+// HTTPServerCommand generate http server codes based on protobuf file
+func HTTPServerCommand() *cobra.Command {
 	var (
 		moduleName   string // go.mod文件的module名称
 		serverName   string // 服务名称
-		projectName  string // 项目名称
+		projectName  string // 所属项目名称
 		repoAddr     string // 镜像仓库地址
 		outPath      string // 输出目录
 		protobufFile string // proto file文件
@@ -23,24 +28,24 @@ func RPCGwPbCommand() *cobra.Command {
 
 	//nolint
 	cmd := &cobra.Command{
-		Use:   "rpc-gw-pb",
-		Short: "Generate rpc gateway server codes based on protobuf file",
-		Long: `generate rpc gateway server codes based on protobuf file.
+		Use:   "http-pb",
+		Short: "Generate http server codes based on protobuf file",
+		Long: `generate http server codes based on protobuf file.
 
 Examples:
-  # generate rpc gateway server codes.
-  sponge micro rpc-gw-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --protobuf-file=./userExample.proto
+  # generate http server codes.
+  sponge web http-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --protobuf-file=./test.proto
 
-  # generate rpc gateway server codes and specify the output directory, Note: if the file already exists, code generation will be canceled.
-  sponge micro rpc-gw-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --protobuf-file=./userExample.proto --out=./yourServerDir
+  # generate http server codes and specify the output directory, Note: if the file already exists, code generation will be canceled.
+  sponge web http-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --protobuf-file=./test.proto --out=./yourServerDir
 
-  # generate rpc gateway server codes and specify the docker image repository address.
-  sponge micro rpc-gw-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --protobuf-file=./userExample.proto
+  # generate http server codes and specify the docker image repository address.
+  sponge web http-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --protobuf-file=./test.proto
 `,
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runGenRPCGwCommand(moduleName, serverName, projectName, protobufFile, repoAddr, outPath)
+			return runGenHTTPServerCommand(moduleName, serverName, projectName, protobufFile, repoAddr, outPath)
 		},
 	}
 
@@ -54,18 +59,18 @@ Examples:
 	_ = cmd.MarkFlagRequired("protobuf-file")
 
 	cmd.Flags().StringVarP(&repoAddr, "repo-addr", "r", "", "docker image repository address, excluding http and repository names")
-	cmd.Flags().StringVarP(&outPath, "out", "o", "", "output directory, default is ./serverName_rpc-gw-pb_<time>")
+	cmd.Flags().StringVarP(&outPath, "out", "o", "", "output directory, default is ./serverName_http-pb_<time>")
 
 	return cmd
 }
 
-func runGenRPCGwCommand(moduleName string, serverName string, projectName string, protobufFile string, repoAddr string, outPath string) error {
+func runGenHTTPServerCommand(moduleName string, serverName string, projectName string, protobufFile string, repoAddr string, outPath string) error {
 	protobufFiles, isImportTypes, err := parseProtobufFiles(protobufFile)
 	if err != nil {
 		return err
 	}
 
-	subTplName := "rpc-gw-pb"
+	subTplName := "http-pb"
 	r := Replacers[TplNameSponge]
 	if r == nil {
 		return errors.New("replacer is nil")
@@ -73,9 +78,9 @@ func runGenRPCGwCommand(moduleName string, serverName string, projectName string
 
 	// 设置模板信息
 	subDirs := []string{ // 只处理的子目录
-		"api/types", "cmd/serverNameExample_grpcGwPbExample",
+		"api/types", "cmd/serverNameExample_httpPbExample",
 		"sponge/build", "sponge/configs", "sponge/deployments", "sponge/docs", "sponge/scripts", "sponge/third_party",
-		"internal/config", "internal/ecode", "internal/routers", "internal/rpcclient", "internal/server",
+		"internal/config", "internal/ecode", "internal/routers", "internal/server",
 	}
 	subFiles := []string{ // 只处理子文件
 		"sponge/.gitignore", "sponge/.golangci.yml", "sponge/go.mod", "sponge/go.sum",
@@ -85,7 +90,7 @@ func runGenRPCGwCommand(moduleName string, serverName string, projectName string
 	ignoreFiles := []string{ // 指定子目录下忽略处理的文件
 		"types.pb.validate.go", "types.pb.go", // api/types
 		"swagger.json", "swagger.yaml", "apis.swagger.json", "apis.html", "docs.go", // sponge/docs
-		"userExample_rpc.go", "systemCode_http.go", "userExample_http.go", // internal/ecode
+		"userExample_rpc.go", "systemCode_rpc.go", "userExample_http.go", // internal/ecode
 		"routers.go", "routers_test.go", "userExample.go", "userExample_service.pb.go", // internal/routers
 		"grpc.go", "grpc_option.go", "grpc_test.go", // internal/server
 	}
@@ -97,7 +102,7 @@ func runGenRPCGwCommand(moduleName string, serverName string, projectName string
 	r.SetSubDirsAndFiles(subDirs, subFiles...)
 	r.SetIgnoreSubDirs(ignoreDirs...)
 	r.SetIgnoreSubFiles(ignoreFiles...)
-	fields := addRPCGwFields(moduleName, serverName, projectName, repoAddr, r)
+	fields := addHTTPServerFields(moduleName, serverName, projectName, repoAddr, r)
 	r.SetReplacementFields(fields)
 	_ = r.SetOutputDir(outPath, serverName+"_"+subTplName)
 	if err = r.SaveFiles(); err != nil {
@@ -107,12 +112,12 @@ func runGenRPCGwCommand(moduleName string, serverName string, projectName string
 	_ = saveProtobufFiles(moduleName, serverName, r.GetOutputDir(), protobufFiles)
 	_ = saveGenInfo(moduleName, serverName, r.GetOutputDir())
 
-	fmt.Printf("generate %s's rpc gateway server codes successfully, out = %s\n\n", serverName, r.GetOutputDir())
+	fmt.Printf("generate %s's http server codes successfully, out = %s\n\n", serverName, r.GetOutputDir())
 
 	return nil
 }
 
-func addRPCGwFields(moduleName string, serverName string, projectName string, repoAddr string,
+func addHTTPServerFields(moduleName string, serverName string, projectName string, repoAddr string,
 	r replacer.Replacer) []replacer.Field {
 	var fields []replacer.Field
 
@@ -152,7 +157,7 @@ func addRPCGwFields(moduleName string, serverName string, projectName string, re
 		},
 		{ // 替换proto.sh文件内容
 			Old: protoShellFileMark,
-			New: protoShellServiceCode,
+			New: protoShellHandlerCode,
 		},
 		{
 			Old: "github.com/zhufuyi/sponge",
@@ -193,18 +198,99 @@ func addRPCGwFields(moduleName string, serverName string, projectName string, re
 			New: repoHost,
 		},
 		{
-			Old: "_grpcGwPbExample",
-			New: "",
-		},
-		{
-			Old: "_mixExample",
+			Old: "_httpPbExample",
 			New: "",
 		},
 		{
 			Old: "_pbExample",
 			New: "",
 		},
+		{
+			Old: "_mixExample",
+			New: "",
+		},
 	}...)
 
 	return fields
+}
+
+func parseProtobufFiles(protobufFile string) ([]string, bool, error) {
+	if filepath.Ext(protobufFile) != ".proto" {
+		return nil, false, fmt.Errorf("%v is not a protobuf file", protobufFile)
+	}
+
+	protobufFiles := gofile.FuzzyMatchFiles(protobufFile)
+	countService, countImportTypes := 0, 0
+	for _, file := range protobufFiles {
+		protoData, err := os.ReadFile(file)
+		if err != nil {
+			return nil, false, err
+		}
+		if isExistServiceName(protoData) {
+			countService++
+		}
+		if isDependImport(protoData, "api/types/types.proto") {
+			countImportTypes++
+		}
+	}
+
+	if countService == 0 {
+		return nil, false, errors.New("not found service name, protobuf file requires at least one service")
+	}
+
+	return protobufFiles, countImportTypes > 0, nil
+}
+
+func saveGenInfo(moduleName string, serverName string, outputDir string) error {
+	// 保存moduleName和serverName到指定文件，给外部使用
+	genInfo := moduleName + "," + serverName
+	dir := outputDir + "/docs"
+	_ = os.MkdirAll(dir, 0666)
+	file := dir + "/gen.info"
+	err := os.WriteFile(file, []byte(genInfo), 0666)
+	if err != nil {
+		return fmt.Errorf("save file %s error, %v", file, err)
+	}
+	return nil
+}
+
+func saveProtobufFiles(moduleName string, serverName string, outputDir string, protobufFiles []string) error {
+	//// 保存moduleName和serverName到指定文件，给外部使用
+	//genInfo := moduleName + "," + serverName
+	//file := outputDir + "/docs/gen.info"
+	//err := os.WriteFile(file, []byte(genInfo), 0666)
+	//if err != nil {
+	//	return fmt.Errorf("save file %s error, %v", file, err)
+	//}
+
+	// 保存protobuf文件
+	for _, pbFile := range protobufFiles {
+		pbContent, err := os.ReadFile(pbFile)
+		if err != nil {
+			fmt.Printf("read file %s error, %v\n", pbFile, err)
+			continue
+		}
+		dir := outputDir + "/api/" + serverName + "/v1"
+		_ = os.MkdirAll(dir, 0666)
+
+		_, name := filepath.Split(pbFile)
+		file := dir + "/" + name
+		err = os.WriteFile(file, pbContent, 0666)
+		if err != nil {
+			return fmt.Errorf("save file %s error, %v", file, err)
+		}
+	}
+
+	return nil
+}
+
+func isExistServiceName(data []byte) bool {
+	servicePattern := `\nservice (\w+)`
+	re := regexp.MustCompile(servicePattern)
+	matchArr := re.FindStringSubmatch(string(data))
+	return len(matchArr) >= 2
+}
+
+func isDependImport(protoData []byte, pkgName string) bool {
+	return bytes.Contains(protoData, []byte(pkgName))
 }
