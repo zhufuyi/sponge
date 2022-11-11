@@ -31,3 +31,4 @@ clean:
 	@rm -vrf internal/service
 	@rm -vrf internal/handler
 	@rm -vrf internal/routers
+	@rm -vrf internal/ecode

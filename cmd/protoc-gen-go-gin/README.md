@@ -1,6 +1,6 @@
 ## protoc-gen-go-gin
 
-According to protobuf to generate gin registration route codes, you can use their own log and response to replace the default value, in addition to generating registration route code, but also support the generation of http handler template code and call rpc server template code.
+According to protobuf to generate gin registration route codes, you can use their own log and response to replace the default value, in addition to generating registration route code, but also support the generation of http handler template code, call rpc server template code, http or rpc error code codes.
 
 <br>
 
@@ -37,7 +37,6 @@ By default the rpc method is named `method+resource`, using camel naming, which 
 - `"POST", "CREATE"`  --> `POST`
 - `"PUT", "UPDATE"`  --> `PUT`
 - `"DELETE"`  --> `DELETE`
-
 
 Specify the route using the `google.api.http` option
 
@@ -84,7 +83,7 @@ protoc --proto_path=. --proto_path=./third_party \
   api/v1/*.proto
 ```
 
-A total of 3 files are generated: the registration route file _*router.pb.go, the injection route file *_handler.go (default save path in internal/routers), and the logic code template file *_logic.go (default save path in internal/handler)
+A total of 4 files are generated: the registration route file _*router.pb.go, the injection route file *_handler.go (default save path in internal/routers), the logic code template file *_logic.go (default save path in internal/handler), the error code file *_http.go (default save path in internal/ecode).
 
 <br>
 
@@ -99,4 +98,4 @@ protoc --proto_path=. --proto_path=./third_party \
   api/v1/*.proto
 ```
 
-A total of 3 files are generated: the registration route file _*router.pb.go, the injection route file *_service.go (default save path in internal/routers), and the logic code template file *_logic.go (default save path in internal/service)
+A total of 4 files are generated: the registration route file _*router.pb.go, the injection route file *_service.go (default save path in internal/routers), and the logic code template file *_logic.go (default save path in internal/service), the error code file *_rpc.go (default save path in internal/ecode).

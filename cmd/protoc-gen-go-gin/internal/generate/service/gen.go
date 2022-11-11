@@ -2,68 +2,55 @@ package service
 
 import (
 	"bytes"
-	"fmt"
-	"strings"
+
+	"github.com/zhufuyi/sponge/cmd/protoc-gen-go-gin/internal/parse"
 
 	"google.golang.org/protobuf/compiler/protogen"
 )
 
-// GenerateFile generates  service and router files.
-func GenerateFile(gen *protogen.Plugin, file *protogen.File) (string, []byte, *protogen.GeneratedFile) {
+// GenerateFiles generate service logic, router, error code files.
+func GenerateFiles(file *protogen.File) ([]byte, []byte, []byte) {
 	if len(file.Services) == 0 {
-		return "", nil, nil
+		return nil, nil, nil
 	}
 
-	filename := file.GeneratedFilenamePrefix + "_logic.go"
-	g := gen.NewGeneratedFile(filename, file.GoImportPath)
-	g.P(pkgImportTmplRaw)
+	pss := parse.GetServices(file)
+	logicContent := genServiceLogicFile(pss)
+	routerFileContent := genRouterFile(pss)
+	errCodeFileContent := genErrCodeFile(pss)
 
-	var fields []*tmplField
-	for _, s := range file.Services {
-		field := genService(g, s)
-		fields = append(fields, field)
-	}
-
-	rf := &routerFields{ServiceNames: fields}
-
-	return filename, rf.execute(), g
+	return logicContent, routerFileContent, errCodeFileContent
 }
 
-func genService(g *protogen.GeneratedFile, s *protogen.Service) *tmplField {
-	field := &tmplField{
-		Name:      s.GoName,
-		LowerName: strings.ToLower(s.GoName[:1]) + s.GoName[1:],
-	}
-	g.P(field.execute())
-
-	for _, m := range s.Methods {
-		funCode := fmt.Sprintf(`func (c *%sClient) %s(ctx context.Context, req *serverNameExampleV1.%s) (*serverNameExampleV1.%s, error) {
-			// implement me
-			// If required, fill in the code to fetch data from other rpc servers here.
-			return c.%sCli.%s(ctx, req)
-		}
-`, field.LowerName, m.GoName, m.Input.GoIdent.GoName, m.Output.GoIdent.GoName, field.LowerName, m.GoName)
-		g.P(m.Comments.Leading, funCode)
-	}
-
-	return field
+func genServiceLogicFile(fields []*parse.PbService) []byte {
+	lf := &serviceLogicFields{PbServices: fields}
+	return lf.execute()
 }
 
-type tmplField struct {
-	Name      string // Greeter
-	LowerName string // greeter first character to lower
+func genRouterFile(fields []*parse.PbService) []byte {
+	rf := &routerFields{PbServices: fields}
+	return rf.execute()
 }
 
-func (f *tmplField) execute() string {
+func genErrCodeFile(fields []*parse.PbService) []byte {
+	cf := &errCodeFields{PbServices: fields}
+	return cf.execute()
+}
+
+type serviceLogicFields struct {
+	PbServices []*parse.PbService
+}
+
+func (f *serviceLogicFields) execute() []byte {
 	buf := new(bytes.Buffer)
-	if err := serviceTmpl.Execute(buf, f); err != nil {
+	if err := serviceLogicTmpl.Execute(buf, f); err != nil {
 		panic(err)
 	}
-	return buf.String()
+	return buf.Bytes()
 }
 
 type routerFields struct {
-	ServiceNames []*tmplField
+	PbServices []*parse.PbService
 }
 
 func (f *routerFields) execute() []byte {
@@ -72,4 +59,16 @@ func (f *routerFields) execute() []byte {
 		panic(err)
 	}
 	return buf.Bytes()
+}
+
+type errCodeFields struct {
+	PbServices []*parse.PbService
+}
+
+func (f *errCodeFields) execute() []byte {
+	buf := new(bytes.Buffer)
+	if err := rpcErrCodeTmpl.Execute(buf, f); err != nil {
+		panic(err)
+	}
+	return bytes.ReplaceAll(buf.Bytes(), []byte("// --blank line--"), []byte{})
 }
