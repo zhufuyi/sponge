@@ -1,18 +1,18 @@
 package errcode
 
-// nolint
-// 服务级别错误码，有Err前缀
-var (
-// ErrUserCreate = NewError(HCode(1)+1, "创建用户失败")	// 200101
-// ErrUserDelete = NewError(HCode(1)+2, "删除用户失败")	// 200102
-// ErrUserUpdate = NewError(HCode(1)+3, "更新用户失败")	// 200103
-// ErrUserGet    = NewError(HCode(1)+4, "获取用户失败") 		// 200104
-)
-
-// HCode 根据编号生成200000~300000之间的错误码
+// HCode Generate an error code between 20000 and 30000 according to the number
+//
+// http service level error code, Err prefix, example.
+//
+// var (
+// ErrUserCreate = NewError(HCode(1)+1, "failed to create user")		// 200101
+// ErrUserDelete = NewError(HCode(1)+2, "failed to delete user")			// 200102
+// ErrUserUpdate = NewError(HCode(1)+3, "failed to update user")		// 200103
+// ErrUserGet    = NewError(HCode(1)+4, "failed to get user details")	// 200104
+// )
 func HCode(NO int) int {
-	if NO > 1000 {
-		panic("NO must be < 1000")
+	if NO > 99 || NO < 1 {
+		panic("NO range must be between 0 to 100")
 	}
 	return 200000 + NO*100
 }

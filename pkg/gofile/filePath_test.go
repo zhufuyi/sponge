@@ -111,3 +111,11 @@ func TestErrorPath(t *testing.T) {
 	err = walkDir2(dir, nil, nil)
 	assert.Error(t, err)
 }
+
+func TestFuzzyMatchFiles(t *testing.T) {
+	files := FuzzyMatchFiles("./README.md")
+	assert.Equal(t, 1, len(files))
+
+	files = FuzzyMatchFiles("./*_test.go")
+	assert.Equal(t, 2, len(files))
+}

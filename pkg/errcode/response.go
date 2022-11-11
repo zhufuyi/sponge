@@ -104,7 +104,7 @@ func ToHTTPErr(st *status.Status) *Error {
 	case StatusMethodNotAllowed.status.Code():
 		return MethodNotAllowed
 	case StatusServiceUnavailable.status.Code():
-		return MethodServiceUnavailable
+		return ServiceUnavailable
 	}
 
 	return &Error{

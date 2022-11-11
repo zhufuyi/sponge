@@ -17,9 +17,9 @@ var _ Replacer = (*replacerInfo)(nil)
 // Replacer 接口
 type Replacer interface {
 	SetReplacementFields(fields []Field)
-	SetIgnoreFiles(filenames ...string)
+	SetSubDirsAndFiles(subDirs []string, subFiles ...string)
 	SetIgnoreSubDirs(dirs ...string)
-	SetSubDirs(subDirs ...string)
+	SetIgnoreSubFiles(filenames ...string)
 	SetOutputDir(absDir string, name ...string) error
 	GetOutputDir() string
 	GetSourcePath() string
@@ -100,19 +100,31 @@ func (r *replacerInfo) SetReplacementFields(fields []Field) {
 	r.replacementFields = newFields
 }
 
-// SetSubDirs 设置处理指定子目录，其他目录下文件忽略处理
-func (r *replacerInfo) SetSubDirs(subDirs ...string) {
+// SetSubDirsAndFiles 设置处理指定子目录，其他目录下文件忽略处理
+func (r *replacerInfo) SetSubDirsAndFiles(subDirs []string, subFiles ...string) {
 	if len(subDirs) == 0 {
 		return
 	}
 
 	subDirs = r.covertPathsDelimiter(subDirs...)
+	subFiles = r.covertPathsDelimiter(subFiles...)
 
 	var files []string
 	isExistFile := make(map[string]struct{})
 	for _, file := range r.files {
 		for _, dir := range subDirs {
 			if isSubPath(file, dir) {
+				// 避免重复文件
+				if _, ok := isExistFile[file]; ok {
+					continue
+				} else {
+					isExistFile[file] = struct{}{}
+				}
+				files = append(files, file)
+			}
+		}
+		for _, sf := range subFiles {
+			if isMatchFile(file, sf) {
 				// 避免重复文件
 				if _, ok := isExistFile[file]; ok {
 					continue
@@ -131,7 +143,7 @@ func (r *replacerInfo) SetSubDirs(subDirs ...string) {
 }
 
 // SetIgnoreFiles 设置忽略处理的文件
-func (r *replacerInfo) SetIgnoreFiles(filenames ...string) {
+func (r *replacerInfo) SetIgnoreSubFiles(filenames ...string) {
 	r.ignoreFiles = append(r.ignoreFiles, filenames...)
 }
 
@@ -267,12 +279,16 @@ func (r *replacerInfo) SaveFiles() error {
 
 func (r *replacerInfo) isIgnoreFile(file string) bool {
 	isIgnore := false
-	_, filename := filepath.Split(file)
+	//_, filename := filepath.Split(file)
 	for _, v := range r.ignoreFiles {
-		if filename == v {
+		if isMatchFile(file, v) {
 			isIgnore = true
 			break
 		}
+		//if filename == v {
+		//	isIgnore = true
+		//	break
+		//}
 	}
 	return isIgnore
 }
@@ -383,4 +399,18 @@ func isFirstAlphabet(str string) bool {
 func isSubPath(filePath string, subPath string) bool {
 	dir, _ := filepath.Split(filePath)
 	return strings.Contains(dir, subPath)
+}
+
+func isMatchFile(filePath string, sf string) bool {
+	dir1, file1 := filepath.Split(filePath)
+	dir2, file2 := filepath.Split(sf)
+	if file1 != file2 {
+		return false
+	}
+
+	l1, l2 := len(dir1), len(dir2)
+	if l1 >= l2 && dir1[l1-l2:] == dir2 {
+		return true
+	}
+	return false
 }

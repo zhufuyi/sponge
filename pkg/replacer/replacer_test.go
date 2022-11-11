@@ -56,6 +56,7 @@ func TestNewWithFS(t *testing.T) {
 			r := tt.args.fn()
 
 			subDirs := []string{"testDir/replace"}
+			subFiles := []string{"testDir/foo.txt"}
 			ignoreDirs := []string{"testDir/ignore"}
 			ignoreFiles := []string{"test.txt"}
 			fields := []Field{
@@ -69,10 +70,10 @@ func TestNewWithFS(t *testing.T) {
 					IsCaseSensitive: true,
 				},
 			}
-			r.SetSubDirs(subDirs...)         // 只处理指定子目录，为空时表示指定全部文件
-			r.SetIgnoreFiles(ignoreDirs...)  // 忽略替换目录
-			r.SetIgnoreFiles(ignoreFiles...) // 忽略替换文件
-			r.SetReplacementFields(fields)   // 设置替换文本
+			r.SetSubDirsAndFiles(subDirs, subFiles...) // 只处理指定子目录
+			r.SetIgnoreSubDirs(ignoreDirs...)          // 忽略处理子目录
+			r.SetIgnoreSubFiles(ignoreFiles...)        // 忽略处理目录下的文件
+			r.SetReplacementFields(fields)             // 设置替换文本
 			_ = r.SetOutputDir(fmt.Sprintf("%s/replacer_test/%s_%s",
 				os.TempDir(), tt.name, time.Now().Format("150405"))) // 设置输出目录和名称
 			_, err := r.ReadFile("replace.txt")
@@ -95,8 +96,8 @@ func TestReplacerError(t *testing.T) {
 
 	r, err := New("testDir")
 	assert.NoError(t, err)
-	r.SetIgnoreFiles()
-	r.SetSubDirs()
+	r.SetIgnoreSubFiles()
+	r.SetSubDirsAndFiles(nil)
 	err = r.SetOutputDir("/tmp/yourServerName")
 	assert.NoError(t, err)
 	path := r.GetSourcePath()

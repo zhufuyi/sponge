@@ -83,7 +83,7 @@ func Output(c *gin.Context, code int, msg ...interface{}) {
 	case http.StatusTooManyRequests:
 		respJSONWithStatusCode(c, http.StatusTooManyRequests, errcode.LimitExceed.Msg(), msg...)
 	case http.StatusServiceUnavailable:
-		respJSONWithStatusCode(c, http.StatusServiceUnavailable, errcode.MethodServiceUnavailable.Msg(), msg...)
+		respJSONWithStatusCode(c, http.StatusServiceUnavailable, errcode.ServiceUnavailable.Msg(), msg...)
 
 	default:
 		respJSONWithStatusCode(c, code, http.StatusText(code), msg...)

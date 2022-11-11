@@ -8,14 +8,13 @@ import (
 )
 
 func TestNewError(t *testing.T) {
-	code := 101
+	code := 21101
 	msg := "something is wrong"
 
 	e := NewError(code, msg)
 	assert.Equal(t, code, e.Code())
 	assert.Equal(t, msg, e.Msg())
 	assert.Contains(t, e.Err().Error(), msg)
-	assert.Contains(t, e.Msgf([]interface{}{"foo", "bar"}), msg)
 	details := []string{"a", "b", "c"}
 	assert.Equal(t, details, e.WithDetails(details...).Details())
 
@@ -63,5 +62,5 @@ func TestHCode(t *testing.T) {
 	defer func() {
 		recover()
 	}()
-	code = HCode(10001)
+	code = HCode(101)
 }

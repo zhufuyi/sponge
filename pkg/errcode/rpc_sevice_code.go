@@ -13,8 +13,8 @@ import "google.golang.org/grpc/codes"
 //		StatusUserGet    = NewRPCStatus(RCode(1)+4, "failed to get user details")	// 40104
 //	)
 func RCode(NO int) codes.Code {
-	if NO > 99 {
-		panic("NO must be < 100")
+	if NO > 99 || NO < 1 {
+		panic("NO range must be between 0 to 100")
 	}
 	return codes.Code(40000 + NO*100)
 }

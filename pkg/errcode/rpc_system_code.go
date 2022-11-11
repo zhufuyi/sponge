@@ -1,22 +1,21 @@
 package errcode
 
 // nolint
-// rpc系统级别错误码，有status前缀
+// rpc system level error code with status prefix, error code range 30000~40000
 var (
 	StatusSuccess = NewRPCStatus(0, "ok")
 
-	StatusInvalidParams       = NewRPCStatus(300001, "参数错误")
-	StatusUnauthorized        = NewRPCStatus(300002, "认证错误")
-	StatusInternalServerError = NewRPCStatus(300003, "服务内部错误")
-	StatusNotFound            = NewRPCStatus(300004, "资源不存在")
-	StatusAlreadyExists       = NewRPCStatus(300005, "资源已存在")
-	StatusTimeout             = NewRPCStatus(300006, "访问超时")
-	StatusTooManyRequests     = NewRPCStatus(300007, "请求过多")
-	StatusForbidden           = NewRPCStatus(300008, "拒绝访问")
-	StatusLimitExceed         = NewRPCStatus(300009, "访问限制")
-
-	StatusDeadlineExceeded   = NewRPCStatus(300010, "已超过最后期限")
-	StatusAccessDenied       = NewRPCStatus(300011, "拒绝访问")
-	StatusMethodNotAllowed   = NewRPCStatus(300012, "不允许使用的方法")
-	StatusServiceUnavailable = NewRPCStatus(300013, "服务不可用")
+	StatusInvalidParams       = NewRPCStatus(30001, "Invalid Parameter")
+	StatusUnauthorized        = NewRPCStatus(30002, "Unauthorized")
+	StatusInternalServerError = NewRPCStatus(30003, "Internal Server Error")
+	StatusNotFound            = NewRPCStatus(30004, "Not Found")
+	StatusAlreadyExists       = NewRPCStatus(30005, "Conflict")
+	StatusTimeout             = NewRPCStatus(30006, "Request Timeout")
+	StatusTooManyRequests     = NewRPCStatus(30007, "Too Many Requests")
+	StatusForbidden           = NewRPCStatus(30008, "Forbidden")
+	StatusLimitExceed         = NewRPCStatus(30009, "Limit Exceed")
+	StatusDeadlineExceeded    = NewRPCStatus(30010, "Deadline Exceeded")
+	StatusAccessDenied        = NewRPCStatus(30011, "Access Denied")
+	StatusMethodNotAllowed    = NewRPCStatus(30012, "Method Not Allowed")
+	StatusServiceUnavailable  = NewRPCStatus(30013, "Service Unavailable")
 )

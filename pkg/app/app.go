@@ -72,7 +72,7 @@ func (a *App) watch(ctx context.Context) error {
 			_ = a.stop()
 			return ctx.Err()
 		case s := <-quit: // system notification signal
-			fmt.Printf("receive a quit signal: %s\n", s.String())
+			fmt.Printf("quit signal: %s\n", s.String())
 			if err := a.stop(); err != nil {
 				return err
 			}

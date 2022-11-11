@@ -8,14 +8,14 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// RPCStatus grpc 状态
+// RPCStatus rpc status
 type RPCStatus struct {
 	status *status.Status
 }
 
 var statusCodes = map[codes.Code]string{}
 
-// NewRPCStatus 新建一个status
+// NewRPCStatus create a new rpc status
 func NewRPCStatus(code codes.Code, msg string) *RPCStatus {
 	if v, ok := statusCodes[code]; ok {
 		panic(fmt.Sprintf("grpc status code = %d already exists, please replace with a new error code, old msg = %s", code, v))
