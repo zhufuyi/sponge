@@ -1,14 +1,9 @@
 package generate
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
-	"os"
-	"path/filepath"
-	"regexp"
 
-	"github.com/zhufuyi/sponge/pkg/gofile"
 	"github.com/zhufuyi/sponge/pkg/replacer"
 
 	"github.com/huandu/xstrings"
@@ -212,85 +207,4 @@ func addHTTPServerFields(moduleName string, serverName string, projectName strin
 	}...)
 
 	return fields
-}
-
-func parseProtobufFiles(protobufFile string) ([]string, bool, error) {
-	if filepath.Ext(protobufFile) != ".proto" {
-		return nil, false, fmt.Errorf("%v is not a protobuf file", protobufFile)
-	}
-
-	protobufFiles := gofile.FuzzyMatchFiles(protobufFile)
-	countService, countImportTypes := 0, 0
-	for _, file := range protobufFiles {
-		protoData, err := os.ReadFile(file)
-		if err != nil {
-			return nil, false, err
-		}
-		if isExistServiceName(protoData) {
-			countService++
-		}
-		if isDependImport(protoData, "api/types/types.proto") {
-			countImportTypes++
-		}
-	}
-
-	if countService == 0 {
-		return nil, false, errors.New("not found service name, protobuf file requires at least one service")
-	}
-
-	return protobufFiles, countImportTypes > 0, nil
-}
-
-func saveGenInfo(moduleName string, serverName string, outputDir string) error {
-	// 保存moduleName和serverName到指定文件，给外部使用
-	genInfo := moduleName + "," + serverName
-	dir := outputDir + "/docs"
-	_ = os.MkdirAll(dir, 0666)
-	file := dir + "/gen.info"
-	err := os.WriteFile(file, []byte(genInfo), 0666)
-	if err != nil {
-		return fmt.Errorf("save file %s error, %v", file, err)
-	}
-	return nil
-}
-
-func saveProtobufFiles(moduleName string, serverName string, outputDir string, protobufFiles []string) error {
-	//// 保存moduleName和serverName到指定文件，给外部使用
-	//genInfo := moduleName + "," + serverName
-	//file := outputDir + "/docs/gen.info"
-	//err := os.WriteFile(file, []byte(genInfo), 0666)
-	//if err != nil {
-	//	return fmt.Errorf("save file %s error, %v", file, err)
-	//}
-
-	// 保存protobuf文件
-	for _, pbFile := range protobufFiles {
-		pbContent, err := os.ReadFile(pbFile)
-		if err != nil {
-			fmt.Printf("read file %s error, %v\n", pbFile, err)
-			continue
-		}
-		dir := outputDir + "/api/" + serverName + "/v1"
-		_ = os.MkdirAll(dir, 0666)
-
-		_, name := filepath.Split(pbFile)
-		file := dir + "/" + name
-		err = os.WriteFile(file, pbContent, 0666)
-		if err != nil {
-			return fmt.Errorf("save file %s error, %v", file, err)
-		}
-	}
-
-	return nil
-}
-
-func isExistServiceName(data []byte) bool {
-	servicePattern := `\nservice (\w+)`
-	re := regexp.MustCompile(servicePattern)
-	matchArr := re.FindStringSubmatch(string(data))
-	return len(matchArr) >= 2
-}
-
-func isDependImport(protoData []byte, pkgName string) bool {
-	return bytes.Contains(protoData, []byte(pkgName))
 }

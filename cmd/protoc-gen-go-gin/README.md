@@ -41,17 +41,17 @@ By default the rpc method is named `method+resource`, using camel naming, which 
 Specify the route using the `google.api.http` option
 
 ```protobuf
-service GreeterService {
-  rpc Create(CreateDemoRequest) returns (CreateDemoReply) {
+service Greeter {
+  rpc Create(CreateRequest) returns (CreateReply) {
     option (google.api.http) = {
-      post: "/api/v1/demo"
+      post: "/api/v1/greeter"
       body: "*"
     };
   }
 
-  rpc GetByID(GetDemoByIDRequest) returns (GetDemoByIDReply) {
+  rpc GetByID(GetByIDRequest) returns (GetByIDReply) {
     option (google.api.http) = {
-      get: "/api/v1/demo/{id}"
+      get: "/api/v1/greeter/{id}"
     };
   }
 }
@@ -98,4 +98,4 @@ protoc --proto_path=. --proto_path=./third_party \
   api/v1/*.proto
 ```
 
-A total of 4 files are generated: the registration route file _*router.pb.go, the injection route file *_service.go (default save path in internal/routers), and the logic code template file *_logic.go (default save path in internal/service), the error code file *_rpc.go (default save path in internal/ecode).
+A total of 4 files are generated: the registration route file *_router.pb.go, the injection route file *_service.go (default save path in internal/routers), and the logic code template file *_logic.go (default save path in internal/service), the error code file *_rpc.go (default save path in internal/ecode).

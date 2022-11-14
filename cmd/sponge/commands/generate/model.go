@@ -29,7 +29,7 @@ func ModelCommand(parentName string) *cobra.Command {
 
 Examples:
   # generate model codes and embed 'gorm.Model' struct.
-  sponge %s model --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
+  sponge %s model --db-dsn=root:123456@(192.168.3.37:3306)/school --db-table=teacher
 
   # generate model codes, structure fields correspond to the column names of the table.
   sponge %s model --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --embed=false

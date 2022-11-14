@@ -21,6 +21,7 @@ var toolNames = []string{
 	"protoc-gen-validate",
 	"protoc-gen-gotag",
 	"protoc-gen-go-gin",
+	"protoc-gen-go-rpc-tmpl",
 	"protoc-gen-openapiv2",
 	"protoc-gen-doc",
 	"swag",
@@ -29,18 +30,19 @@ var toolNames = []string{
 }
 
 var installToolCommands = map[string]string{
-	"go":                   "go: please install manually yourself, download url is https://go.dev/dl/ or https://golang.google.cn/dl/",
-	"protoc":               "protoc: please install manually yourself, download url is https://github.com/protocolbuffers/protobuf/releases/tag/v3.20.3",
-	"protoc-gen-go":        "go install google.golang.org/protobuf/cmd/protoc-gen-go@latest",
-	"protoc-gen-go-grpc":   "go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest",
-	"protoc-gen-validate":  "go install github.com/envoyproxy/protoc-gen-validate@latest",
-	"protoc-gen-gotag":     "go install github.com/srikrsna/protoc-gen-gotag@latest",
-	"protoc-gen-go-gin":    "go install github.com/zhufuyi/sponge/cmd/protoc-gen-go-gin@latest",
-	"protoc-gen-openapiv2": "go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@latest",
-	"protoc-gen-doc":       "go install github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc@latest",
-	"golangci-lint":        "go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest",
-	"swag":                 "go install github.com/swaggo/swag/cmd/swag@latest",
-	"go-callvis":           "go install github.com/ofabry/go-callvis@latest",
+	"go":                     "go: please install manually yourself, download url is https://go.dev/dl/ or https://golang.google.cn/dl/",
+	"protoc":                 "protoc: please install manually yourself, download url is https://github.com/protocolbuffers/protobuf/releases/tag/v3.20.3",
+	"protoc-gen-go":          "go install google.golang.org/protobuf/cmd/protoc-gen-go@latest",
+	"protoc-gen-go-grpc":     "go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest",
+	"protoc-gen-validate":    "go install github.com/envoyproxy/protoc-gen-validate@latest",
+	"protoc-gen-gotag":       "go install github.com/srikrsna/protoc-gen-gotag@latest",
+	"protoc-gen-go-gin":      "go install github.com/zhufuyi/sponge/cmd/protoc-gen-go-gin@latest",
+	"protoc-gen-go-rpc-tmpl": "go install github.com/zhufuyi/sponge/cmd/protoc-gen-go-rpc-tmpl@latest",
+	"protoc-gen-openapiv2":   "go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@latest",
+	"protoc-gen-doc":         "go install github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc@latest",
+	"golangci-lint":          "go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest",
+	"swag":                   "go install github.com/swaggo/swag/cmd/swag@latest",
+	"go-callvis":             "go install github.com/ofabry/go-callvis@latest",
 }
 
 const (

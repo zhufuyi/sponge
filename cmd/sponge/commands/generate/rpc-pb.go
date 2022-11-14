@@ -29,13 +29,13 @@ func RPCPbCommand() *cobra.Command {
 
 Examples:
   # generate rpc server codes.
-  sponge micro rpc-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --protobuf-file=./userExample.proto
+  sponge micro rpc-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --protobuf-file=./demo.proto
 
   # generate rpc server codes and specify the output directory, Note: if the file already exists, code generation will be canceled.
-  sponge micro rpc-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --protobuf-file=./userExample.proto --out=./yourServerDir
+  sponge micro rpc-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --protobuf-file=./demo.proto --out=./yourServerDir
 
   # generate rpc server codes and specify the docker image repository address.
-  sponge micro rpc-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --protobuf-file=./userExample.proto
+  sponge micro rpc-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --protobuf-file=./demo.proto
 `,
 		SilenceErrors: true,
 		SilenceUsage:  true,
@@ -148,7 +148,7 @@ func addRPCPbFields(moduleName string, serverName string, projectName string, re
 		},
 		{ // 替换proto.sh文件内容
 			Old: protoShellFileMark,
-			New: "",
+			New: protoShellServiceTmplCode,
 		},
 		{
 			Old: "github.com/zhufuyi/sponge",

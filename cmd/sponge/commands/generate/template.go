@@ -172,10 +172,28 @@ checkResult $?
 moduleName=$(cat docs/gen.info | head -1 | cut -d , -f 1)
 serverName=$(cat docs/gen.info | head -1 | cut -d , -f 2)
 # 共生成4个文件，分别是注册路由文件_*router.pb.go(保存在protobuf文件同一目录)、注入路由文件*_service.pb.go(默认保存路径在internal/routers)、
-# 逻辑代码模板文件*_logic.go(默认保存路径在internal/service), 返回错误码模板文件*_http.go(默认保存路径在internal/ecode)
+# 逻辑代码模板文件*_logic.go(默认保存路径在internal/service), 返回错误码模板文件*_rpc.go(默认保存路径在internal/ecode)
 protoc --proto_path=. --proto_path=./third_party \
   --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=service \
   --go-gin_opt=moduleName=${moduleName} --go-gin_opt=serverName=${serverName} \
+  $allProtoFiles
+
+checkResult $?`
+
+	protoShellServiceTmplCode = `
+# 生成swagger文档，所有文件合并到docs/apis.swagger.json
+protoc --proto_path=. --proto_path=./third_party \
+  --openapiv2_out=. --openapiv2_opt=logtostderr=true --openapiv2_opt=allow_merge=true --openapiv2_opt=merge_file_name=docs/apis.json \
+  $allProtoFiles
+
+checkResult $?
+
+moduleName=$(cat docs/gen.info | head -1 | cut -d , -f 1)
+serverName=$(cat docs/gen.info | head -1 | cut -d , -f 2)
+# 共生成2个文件，分别是逻辑代码模板文件*.go(默认保存路径在internal/service), 返回错误码模板文件*_rpc.go(默认保存路径在internal/ecode)
+protoc --proto_path=. --proto_path=./third_party \
+  --go-rpc-tmpl_out=. --go-rpc-tmpl_opt=paths=source_relative \
+  --go-rpc-tmpl_opt=moduleName=${moduleName} --go-rpc-tmpl_opt=serverName=${serverName} \
   $allProtoFiles
 
 checkResult $?`

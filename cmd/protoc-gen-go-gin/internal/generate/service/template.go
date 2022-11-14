@@ -16,7 +16,7 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	rpcErrCodeTmpl, err = template.New("httpErrCode").Parse(rpcErrCodeTmplRaw)
+	rpcErrCodeTmpl, err = template.New("rpcErrCode").Parse(rpcErrCodeTmplRaw)
 	if err != nil {
 		panic(err)
 	}
