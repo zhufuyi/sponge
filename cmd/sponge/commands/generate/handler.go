@@ -15,8 +15,8 @@ import (
 // HandlerCommand generate handler codes
 func HandlerCommand() *cobra.Command {
 	var (
-		moduleName string // go.mod文件的module名称
-		outPath    string // 输出目录
+		moduleName string // module name for go.mod
+		outPath    string // output directory
 		sqlArgs    = sql2code.Args{
 			Package:  "model",
 			JSONTag:  true,
@@ -80,11 +80,11 @@ func runGenHandlerCommand(moduleName string, codes map[string]string, outPath st
 		return errors.New("replacer is nil")
 	}
 
-	// 设置模板信息
+	// setting up template information
 	subDirs := []string{"internal/model", "internal/cache", "internal/dao",
-		"internal/ecode", "internal/handler", "internal/routers", "internal/types"} // 只处理的指定子目录，如果为空或者没有指定的子目录，表示所有文件
-	ignoreDirs := []string{} // 指定子目录下忽略处理的目录
-	ignoreFiles := []string{ // 指定子目录下忽略处理的文件
+		"internal/ecode", "internal/handler", "internal/routers", "internal/types"} // only the specified subdirectory is processed, if empty or no subdirectory is specified, it means all files
+	ignoreDirs := []string{} // specify the directory in the subdirectory where processing is ignored
+	ignoreFiles := []string{ // specify the files in the subdirectory to be ignored for processing
 		"systemCode_http.go", "systemCode_rpc.go", "userExample_rpc.go", // internal/ecode
 		"init.go", "init_test.go", // internal/model
 		"routers.go", "routers_test.go", "routers_pbExample.go", "routers_pbExample_test.go", "userExample_service.pb.go", // internal/routers
@@ -114,15 +114,15 @@ func addHandlerFields(moduleName string, r replacer.Replacer, codes map[string]s
 	fields = append(fields, deleteFieldsMark(r, handlerFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, handlerTestFile, startMark, endMark)...)
 	fields = append(fields, []replacer.Field{
-		{ // 替换model/userExample.go文件内容
+		{ // replace the contents of the model/userExample.go file
 			Old: modelFileMark,
 			New: codes[parser.CodeTypeModel],
 		},
-		{ // 替换dao/userExample.go文件内容
+		{ // replace the contents of the dao/userExample.go file
 			Old: daoFileMark,
 			New: codes[parser.CodeTypeDAO],
 		},
-		{ // 替换handler/userExample.go文件内容
+		{ // replace the contents of the handler/userExample.go file
 			Old: handlerFileMark,
 			New: adjustmentOfIDType(codes[parser.CodeTypeHandler]),
 		},

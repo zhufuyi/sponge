@@ -1,4 +1,4 @@
-部署服务到k8s前，在已经登录镜像仓库的docker主机中，创建一个为k8s拉取镜像权限的Secret，命令如下：
+Before deploying the service to k8s, create a Secret that pulls image permissions for k8s in a docker host that is already logged into the image repository, with the following command.
 
 ```bash
 kubectl create secret generic docker-auth-secret \
@@ -8,20 +8,20 @@ kubectl create secret generic docker-auth-secret \
 
 <br>
 
-启动服务：
+run server:
 
 > kubectl apply -f ./*namespace.yml
 > kubectl apply -f ./
 
-查看启动状态：
+view the start-up status.
 
 > kubectl get all -n project-name-example
 
 <br>
 
-简单测试http端口
+simple test of http port
 
 ```bash
-# 在本机端口映射到服务的http端口
+# mapping to the http port of the service on the local port
 kubectl port-forward --address=0.0.0.0 service/<server-name-example-svc> 8080:8080 -n <project-name-example>
 ```

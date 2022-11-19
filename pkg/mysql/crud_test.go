@@ -29,7 +29,7 @@ func newUserExampleDao() *gotest.Dao {
 	testData.CreatedAt = time.Now()
 	testData.UpdatedAt = testData.CreatedAt
 
-	// 初始化mock dao
+	// init mock dao
 	d := gotest.NewDao(nil, testData)
 
 	return d

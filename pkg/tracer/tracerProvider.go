@@ -50,7 +50,7 @@ func InitWithConfig(appName string, appEnv string, appVersion string,
 		WithServiceVersion(appVersion),
 	)
 
-	// 初始化链路跟踪
+	// initializing tracing
 	exporter, err := NewJaegerAgentExporter(jaegerAgentHost, jaegerAgentPort)
 	if err != nil {
 		panic("init trace error:" + err.Error())

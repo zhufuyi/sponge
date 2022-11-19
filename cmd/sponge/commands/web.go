@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// NewWebCommand web代码命令
+// NewWebCommand web commands
 func NewWebCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:           "web",

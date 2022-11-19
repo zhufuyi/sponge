@@ -5,88 +5,91 @@ metadata:
   namespace: project-name-example
 data:
   serverNameExample.yml: |-
-    # app 设置
+    # app settings
     app:
-      name: "serverNameExample"  # 服务名称
-      env: "dev"                  # 运行环境，dev:开发环境，prod:生产环境，pre:预生产环境
-      version: "v0.0.0"         # 版本
-      host: "127.0.0.1"       # 主机名称或ip
-      enableProfile: false       # 是否开启性能分析功能，true:开启，false:关闭
-      enableMetrics: true   # 是否开启指标采集，true:开启，false:关闭
-      enableLimit: false     # 是否开启限流，true:开启，false:关闭
-      enableTracing: false    # 是否开启链路跟踪，true:开启，false:关闭
-      enableRegistryDiscovery: false    # 是否开启注册与发现，true:开启，false:关闭
+      name: "serverNameExample"  # server name
+      env: "dev"                   # runtime environment, dev: development environment, prod: production environment, test: test environment
+      version: "v0.0.0"
+      host: "192.168.3.27"   # host name or ip
+      enablePprof: true        # whether to enable performance analysis, true:enable, false:disable
+      enableStat: true         # whether to enable printing statistics, true:enable, false:disable
+      enableMetrics: true     # whether to enable indicator collection, true:enable, false:disable
+      enableLimit: false       # whether to turn on rate limiting (adaptive), true:on, false:off
+      enableCircuitBreaker: false          # whether to turn on circuit breaker(adaptive), true:on, false:off
+      enableTracing: false                    # whether to enable tracking, true:enable, false:disable, if true jaeger configuration must be set
+      tracingSamplingRate: 1.0            # tracing sampling rate, between 0 and 1, 0 means no sampling, 1 means sampling all links
+      registryDiscoveryType: ""            # registry and discovery types: consul, etcd, nacos, if empty, registration and discovery are not used
+      cacheType: "memory"                 # cache type, memory, redis, if set to redis, must set redis configuration
     
     
-    # http 设置
+    # http server settings
     http:
-      port: 8080            # 监听端口
-      readTimeout: 3    # 读超时，单位(秒)
-      writeTimeout: 90 # 写超时，单位(秒)，如果enableProfile为true，需要大于60s，pprof做profiling的默认值是60s
+      port: 8080            # listening port
+      readTimeout: 3     # read timeout, unit(second)
+      writeTimeout: 60  # write timeout, unit(second), if enablePprof is true, it needs to be greater than 60s, the default value for pprof to do profiling is 60s
     
     
-    # grpc 设置
+    # grpc server settings
     grpc:
-      port: 8282          # 监听端口
-      metricsPort: 8283   # 获取指标http端口
-      readTimeout: 3  # 读超时，单位(秒)
-      writeTimeout: 3 # 写超时，单位(秒)
+      port: 8282              # listening port
+      httpPort: 8283        # get pprof and monitor indicator ports
+      readTimeout: 3      # read timeout, unit(second)
+      writeTimeout: 3     # write timeout, unit(second)
     
     
-    # logger 设置
+    # grpc client settings, multiple rpc services can be set up
+    grpcClient:
+      - name: "serverNameExample"   # rpc service name, used for service discovery
+        host: "192.168.3.27"                # rpc service address, used for direct connection
+        port: 8282                               # rpc service port
+        registryDiscoveryType: ""         # registration and discovery types: consul, etcd, nacos, if empty, registration and discovery are not used
+    
+    
+    # logger settings
     logger:
-      level: "info"             # 输出日志级别 debug, info, warn, error，默认是debug
-      format: "console"     # 输出格式，console或json，默认是console
-      isSave: false           # false:输出到终端，true:输出到文件，默认是false
-      logFileConfig:         # isSave=true时有效
-        filename: "out.log"    # 文件名称，默认值out.log
-        maxSize: 20                     # 最大文件大小(MB)，默认值10MB
-        maxBackups: 50                # 保留旧文件的最大个数，默认值100个
-        maxAge: 15                      # 保留旧文件的最大天数，默认值30天
-        isCompression: true          # 是否压缩/归档旧文件，默认值false
+      level: "info"             # output log levels debug, info, warn, error, default is debug
+      format: "console"     # output format, console or json, default is console
+      isSave: false           # false:output to terminal, true:output to file, default is false
     
     
-    # mysql 设置
+    # mysql settings
     mysql:
-      # dsn格式：<user>:<pass>@(127.0.0.1:3306)/<db>?[k=v& ......]
+      # dsn format,  <user>:<pass>@(127.0.0.1:3306)/<db>?[k=v& ......]
       dsn: "root:123456@(192.168.3.37:3306)/account?parseTime=true&loc=Local&charset=utf8,utf8mb4"
-      enableLog: true                    # 是否开启打印所有日志
-      slowThreshold: 0                  # 如果大于0，只打印时间大于阈值的日志，优先级比enableLog高，单位(毫秒)
-      maxIdleConns: 3                 #设置空闲连接池中连接的最大数量
-      maxOpenConns: 50              # 设置打开数据库连接的最大数量
-      connMaxLifetime: 30           # 设置了连接可复用的最大时间，单位(分钟)
+      enableLog: true                    # whether to turn on printing of all logs
+      slowThreshold: 0                  # if greater than 0, only print logs with a time greater than the threshold, with a higher priority than enableLog, in (ms)
+      maxIdleConns: 3                  # set the maximum number of connections in the idle connection pool
+      maxOpenConns: 100            # set the maximum number of open database connections
+      connMaxLifetime: 30            # sets the maximum time for which the connection can be reused, in minutes
     
     
-    # redis 设置
+    # redis settings
     redis:
-      # dsn只适合redis6版本以上，默认用户为default，url格式 [user]:<pass>@]127.0.0.1:6379/[db]
-      dsn: "default:123456@192.168.3.37:6379"
-      # 适合各个版本redis
-      addr: 127.0.0.1:6379
-      password: "123456"
-      dB: 0
-      minIdleConn: 20
-      dialTimeout: 30           # 链接超时，单位(秒)
-      readTimeout: 500        # 读超时，单位(毫秒)
-      writeTimeout: 500       # 写超时，单位(毫秒)
-      poolSize: 100
-      poolTimeout: 200        # 连接池超时，单位(秒)
+      # dsn format, [user]:<pass>@]127.0.0.1:6379/[db], the default user is default
+      dsn: "default:123456@192.168.3.37:6379/0"
+      dialTimeout: 10        # connection timeout, unit(second)
+      readTimeout: 2        # read timeout, unit(second)
+      writeTimeout: 2       # write timeout, unit(second)
     
     
-    # jaeger配置
+    # jaeger settings
     jaeger:
       agentHost: "192.168.3.37"
-      agentPort: "6831"
-      samplingRate: 1.0     # 采样率，0~1之间，0表示禁止采样，大于等于1表示采样所有链路
+      agentPort: 6831
     
     
-    # etcd配置
+    # consul settings
+    consul:
+      addr: "192.168.3.37:8500"
+    
+    
+    # etcd settings
     etcd:
       addrs: ["192.168.3.37:2379"]
     
     
-    # limit配置
-    rateLimiter:
-      dimension: "path"   # 限流维度，支持path和ip两种，默认是path
-      qpsLimit: 1000    # 持续每秒允许成功请求数，默认是500
-      maxLimit: 2000  # 瞬时最大允许峰值，默认是1000，通常大于qpsLimit
+    # nacos settings, used in service registration discovery
+    nacosRd:
+      ipAddr: "192.168.3.37"
+      port: 8848
+      namespaceID: "3454d2b5-2455-4d0e-bf6d-e033b086bb4c" # namespace id

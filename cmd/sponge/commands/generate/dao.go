@@ -14,8 +14,8 @@ import (
 // DaoCommand generate dao codes
 func DaoCommand(parentName string) *cobra.Command {
 	var (
-		moduleName string // 服务名称，也就是包名称
-		outPath    string // 输出目录
+		moduleName string // go.mod module name
+		outPath    string // output directory
 		sqlArgs    = sql2code.Args{
 			Package:  "model",
 			JSONTag:  true,
@@ -78,10 +78,14 @@ func runGenDaoCommand(moduleName string, codes map[string]string, outPath string
 		return errors.New("r is nil")
 	}
 
-	// 设置模板信息
-	subDirs := []string{"internal/model", "internal/cache", "internal/dao"} // 只处理的指定子目录，如果为空或者没有指定的子目录，表示所有文件
-	ignoreDirs := []string{}                                                // 指定子目录下忽略处理的目录
-	ignoreFiles := []string{"init.go", "init_test.go"}                      // 指定子目录下忽略处理的文件
+	// setting up template information
+	subDirs := []string{ // only the specified subdirectory is processed, if empty or no subdirectory is specified, it means all files
+		"internal/model", "internal/cache", "internal/dao",
+	}
+	ignoreDirs := []string{} // specify the directory in the subdirectory where processing is ignored
+	ignoreFiles := []string{ // specify the files in the subdirectory to be ignored for processing
+		"init.go", "init_test.go",
+	}
 
 	r.SetSubDirsAndFiles(subDirs)
 	r.SetIgnoreSubDirs(ignoreDirs...)
@@ -97,6 +101,7 @@ func runGenDaoCommand(moduleName string, codes map[string]string, outPath string
 	return nil
 }
 
+// set fields
 func addDAOFields(moduleName string, r replacer.Replacer, codes map[string]string) []replacer.Field {
 	var fields []replacer.Field
 
@@ -104,11 +109,11 @@ func addDAOFields(moduleName string, r replacer.Replacer, codes map[string]strin
 	fields = append(fields, deleteFieldsMark(r, daoFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, daoTestFile, startMark, endMark)...)
 	fields = append(fields, []replacer.Field{
-		{ // 替换model/userExample.go文件内容
+		{
 			Old: modelFileMark,
 			New: codes[parser.CodeTypeModel],
 		},
-		{ // 替换dao/userExample.go文件内容
+		{
 			Old: daoFileMark,
 			New: codes[parser.CodeTypeDAO],
 		},

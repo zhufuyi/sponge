@@ -23,23 +23,23 @@ var (
 	enableConfigCenter bool
 )
 
-// Config 初始化配置
+// Config initial app configuration
 func Config() {
 	initConfig()
 	cfg := config.Get()
 
-	// 初始化日志
+	// initializing log
 	_, _ = logger.Init(
 		logger.WithLevel(cfg.Logger.Level),
 		logger.WithFormat(cfg.Logger.Format),
 		logger.WithSave(cfg.Logger.IsSave),
 	)
 
-	// 初始化数据库
+	// initializing database
 	model.InitMysql()
 	model.InitCache(cfg.App.CacheType)
 
-	// 初始化链路跟踪
+	// initializing tracing
 	if cfg.App.EnableTracing {
 		tracer.InitWithConfig(
 			cfg.App.Name,
@@ -51,13 +51,12 @@ func Config() {
 		)
 	}
 
-	// 初始化打印系统和进程资源
+	// initializing the print system and process resources
 	if cfg.App.EnableStat {
 		stat.Init(stat.WithLog(logger.Get()))
 	}
 }
 
-// 初始化配置
 func initConfig() {
 	flag.StringVar(&version, "version", "", "service Version Number")
 	flag.BoolVar(&enableConfigCenter, "enable-cc", false, "whether to get from the configuration center, "+
@@ -66,7 +65,8 @@ func initConfig() {
 	flag.Parse()
 
 	if enableConfigCenter {
-		// 从配置中心获取配置(先获取nacos配置，再根据nacos配置中心读取服务配置)
+		// get the configuration from the configuration center (first get the nacos configuration,
+		// then read the service configuration according to the nacos configuration center)
 		if configFile == "" {
 			configFile = configs.Path("serverNameExample_cc.yml")
 		}
@@ -86,7 +86,7 @@ func initConfig() {
 		}
 		config.Set(appConfig)
 	} else {
-		// 从本地配置文件获取配置
+		// get configuration from local configuration file
 		if configFile == "" {
 			configFile = configs.Path("serverNameExample.yml")
 		}

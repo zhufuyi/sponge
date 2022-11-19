@@ -14,7 +14,7 @@ func SetMaxSize(max int) {
 
 // Page 页
 type Page struct {
-	page int    // 页码，从第0页开始
+	page int    // page number, starting from page 0
 	size int    // 每一页数量
 	sort string // 字段排序
 }

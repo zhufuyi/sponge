@@ -33,8 +33,8 @@ func demo(){
 		},
 	}
 	r.SetSubDirs(subPaths...)          // 只处理指定子目录，优先级最高
-	r.SetIgnoreDirs(ignoreDirs...)   // 指定子目录下忽略处理的目录
-	r.SetIgnoreFiles(ignoreFiles...)   // 指定子目录下忽略处理的文件
+	r.SetIgnoreDirs(ignoreDirs...)   // specify the directory in the subdirectory where processing is ignored
+	r.SetIgnoreFiles(ignoreFiles...)   // specify the files in the subdirectory to be ignored for processing
 	r.SetReplacementFields(fields)   // 设置替换文本
 	r.SetOutPath("", "test")             // 设置输出目录，如果为空，根据名称和时间生成文件输出文件夹
 	err = r.SaveFiles()                   // 保存替换后文件

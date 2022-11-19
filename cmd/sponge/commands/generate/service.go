@@ -17,9 +17,9 @@ import (
 // ServiceCommand generate service codes
 func ServiceCommand() *cobra.Command {
 	var (
-		moduleName string // go.mod文件的module名称
-		serverName string // 服务名称
-		outPath    string // 输出目录
+		moduleName string // module name for go.mod
+		serverName string // server name
+		outPath    string // output directory
 		sqlArgs    = sql2code.Args{
 			Package:  "model",
 			JSONTag:  true,
@@ -93,11 +93,11 @@ func runGenServiceCommand(moduleName string, serverName string, codes map[string
 		serverName = moduleName
 	}
 
-	// 设置模板信息
+	// setting up template information
 	subDirs := []string{"internal/model", "internal/cache", "internal/dao",
-		"internal/ecode", "internal/service", "api/serverNameExample"} // 只处理的指定子目录，如果为空或者没有指定的子目录，表示所有文件
-	ignoreDirs := []string{} // 指定子目录下忽略处理的目录
-	ignoreFiles := []string{ // 指定子目录下忽略处理的文件
+		"internal/ecode", "internal/service", "api/serverNameExample"} // only the specified subdirectory is processed, if empty or no subdirectory is specified, it means all files
+	ignoreDirs := []string{} // specify the directory in the subdirectory where processing is ignored
+	ignoreFiles := []string{ // specify the files in the subdirectory to be ignored for processing
 		"userExample.pb.go", "userExample.pb.validate.go", "userExample_grpc.pb.go", "userExample_router.pb.go", // api/serverNameExample
 		"systemCode_http.go", "systemCode_rpc.go", "userExample_http.go", // internal/ecode
 		"init.go", "init_test.go", // internal/model
@@ -128,19 +128,19 @@ func addServiceFields(moduleName string, serverName string, r replacer.Replacer,
 	fields = append(fields, deleteFieldsMark(r, serviceClientFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, serviceTestFile, startMark, endMark)...)
 	fields = append(fields, []replacer.Field{
-		{ // 替换model/userExample.go文件内容
+		{ // replace the contents of the model/userExample.go file
 			Old: modelFileMark,
 			New: codes[parser.CodeTypeModel],
 		},
-		{ // 替换dao/userExample.go文件内容
+		{ // replace the contents of the dao/userExample.go file
 			Old: daoFileMark,
 			New: codes[parser.CodeTypeDAO],
 		},
-		{ // 替换v1/userExample.proto文件内容
+		{ // replace the contents of the v1/userExample.proto file
 			Old: protoFileMark,
 			New: codes[parser.CodeTypeProto],
 		},
-		{ // 替换service/userExample_client_test.go文件内容
+		{ // replace the contents of the service/userExample_client_test.go file
 			Old: serviceFileMark,
 			New: adjustmentOfIDType(codes[parser.CodeTypeService]),
 		},
@@ -152,7 +152,7 @@ func addServiceFields(moduleName string, serverName string, r replacer.Replacer,
 			Old: "github.com/zhufuyi/sponge",
 			New: moduleName,
 		},
-		// 替换目录名称
+		// replace directory name
 		{
 			Old: strings.Join([]string{"api", "serverNameExample", "v1"}, gofile.GetPathDelimiter()),
 			New: strings.Join([]string{"api", serverName, "v1"}, gofile.GetPathDelimiter()),
@@ -163,7 +163,7 @@ func addServiceFields(moduleName string, serverName string, r replacer.Replacer,
 		},
 		{
 			Old: "api.serverNameExample.v1",
-			New: fmt.Sprintf("api.%s.v1", strings.ReplaceAll(serverName, "-", "_")), // protobuf package 不能存在"-"号
+			New: fmt.Sprintf("api.%s.v1", strings.ReplaceAll(serverName, "-", "_")), // protobuf package no "-" signs allowed
 		},
 		{
 			Old: "userExampleNO       = 1",

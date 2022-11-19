@@ -1,4 +1,5 @@
-// 运行rpc服务端后再进行测试，下面对userExample各个方法进行测试和压测(复制压测报告文件路径到浏览器查看)
+// After running the rpc server and then testing, the following tests and crush tests are performed on
+// each method of userExample (copy the path to the crush test report file to view it in your browser)
 
 package service
 
@@ -40,9 +41,10 @@ func initUserExampleServiceClient() serverNameExampleV1.UserExampleServiceClient
 	}
 	if config.Get().App.RegistryDiscoveryType != "" {
 		var iDiscovery registry.Discovery
-		endpoint = "discovery:///" + config.Get().App.Name // 通过服务名称连接grpc服务
+		endpoint = "discovery:///" + config.Get().App.Name // Connecting to grpc services by service name
 
-		// 使用consul做发现，注意配置文件serverNameExample.yml的字段host需要填本机ip，不是127.0.0.1，用来做健康检查
+		// Use consul service discovery, note that the host field in the configuration file serverNameExample.yml
+		// needs to be filled with the local ip, not 127.0.0.1, to do the health check
 		if config.Get().App.RegistryDiscoveryType == "consul" {
 			cli, err := consulcli.Init(config.Get().Consul.Addr, consulcli.WithWaitTime(time.Second*2))
 			if err != nil {
@@ -51,7 +53,8 @@ func initUserExampleServiceClient() serverNameExampleV1.UserExampleServiceClient
 			iDiscovery = consul.New(cli)
 		}
 
-		// 使用etcd做服务发现，测试前使用命令etcdctl get / --prefix查看是否有服务注册，注：IDE使用代理可能会造成连接etcd服务失败
+		// Use etcd service discovery, use the command etcdctl get / --prefix to see if the service is registered before testing,
+		// note: the IDE using a proxy may cause the connection to the etcd service to fail
 		if config.Get().App.RegistryDiscoveryType == "etcd" {
 			cli, err := etcdcli.Init(config.Get().Etcd.Addrs, etcdcli.WithDialTimeout(time.Second*2))
 			if err != nil {
@@ -60,7 +63,7 @@ func initUserExampleServiceClient() serverNameExampleV1.UserExampleServiceClient
 			iDiscovery = etcd.New(cli)
 		}
 
-		// 使用nacos做服务发现
+		// Use nacos service discovery
 		if config.Get().App.RegistryDiscoveryType == "nacos" {
 			// example: endpoint = "discovery:///serverName.scheme"
 			endpoint = "discovery:///" + config.Get().App.Name + ".grpc"
@@ -95,7 +98,7 @@ func initUserExampleServiceClient() serverNameExampleV1.UserExampleServiceClient
 	return serverNameExampleV1.NewUserExampleServiceClient(conn)
 }
 
-// 通过客户端测试userExample的各个方法
+// Test each method of userExample via the client
 func Test_userExampleService_methods(t *testing.T) {
 	cli := initUserExampleServiceClient()
 	ctx, _ := context.WithTimeout(context.Background(), time.Second*3)
@@ -197,7 +200,7 @@ func Test_userExampleService_methods(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := tt.fn()
 			if (err != nil) != tt.wantErr {
-				// 如果没有开启rpc服务端，会报错transport: Error while dialing dial tcp......，这里忽略测试错误
+				// If the rpc server is not enabled, it will report the error transport: Error while dialing dial tcp...... Ignore the test error here
 				t.Logf("test '%s' error = %v, wantErr %v", tt.name, err, tt.wantErr)
 				return
 			}
@@ -206,7 +209,7 @@ func Test_userExampleService_methods(t *testing.T) {
 	}
 }
 
-// 压测userExample的各个方法，完成后复制报告路径到浏览器查看
+// Press test the individual queries of userExample and copy the press test report to your browser when finished
 func Test_userExampleService_benchmark(t *testing.T) {
 	err := config.Init(configs.Path("serverNameExample.yml"))
 	if err != nil {
@@ -214,10 +217,10 @@ func Test_userExampleService_benchmark(t *testing.T) {
 	}
 	host := fmt.Sprintf("127.0.0.1:%d", config.Get().Grpc.Port)
 	protoFile := configs.Path("../api/serverNameExample/v1/userExample.proto")
-	// 如果压测过程中缺少第三方依赖，复制到项目的third_party目录下(不包括import路径)
+	// If third-party dependencies are missing during the press test, copy them to the project's third_party directory (not including the import path)
 	importPaths := []string{
-		configs.Path("../third_party"), // third_party目录
-		configs.Path(".."),             // third_party的上一级目录
+		configs.Path("../third_party"), // third_party directory
+		configs.Path(".."),             // Previous level of third_party
 	}
 
 	tests := []struct {

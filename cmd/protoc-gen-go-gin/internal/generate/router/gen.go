@@ -25,7 +25,7 @@ const (
 
 var methodSets = make(map[string]int)
 
-// GenerateFile generates a _router.pb.go file.
+// GenerateFile generates a *_router.pb.go file.
 func GenerateFile(gen *protogen.Plugin, file *protogen.File) *protogen.GeneratedFile {
 	if len(file.Services) == 0 {
 		return nil
@@ -74,7 +74,7 @@ func genService(file *protogen.File, g *protogen.GeneratedFile, s *protogen.Serv
 func genMethod(m *protogen.Method) []*method {
 	var methods []*method
 
-	// 存在 http rule 配置
+	// http rule config
 	rule, ok := proto.GetExtension(m.Desc.Options(), annotations.E_Http).(*annotations.HttpRule)
 	if rule != nil && ok {
 		for _, bind := range rule.AdditionalBindings {
@@ -84,14 +84,13 @@ func genMethod(m *protogen.Method) []*method {
 		return methods
 	}
 
-	// 不存在走默认流程
+	// default http method mapping
 	methods = append(methods, defaultMethod(m))
 	return methods
 }
 
-// defaultMethodPath 根据函数名生成 http 路由
-// 例如: GetBlogArticles ==> get: /blog/articles
-// 如果方法名首个单词不是 http method 映射，那么默认返回 POST
+// defaultMethodPath generates an http route based on the function name
+// If the first word of the method name is not an http method mapping, then POST is returned by default
 func defaultMethod(m *protogen.Method) *method {
 	names := strings.Split(toSnakeCase(m.GoName), "_")
 	var (
@@ -212,11 +211,11 @@ func (s *tmplField) execute() string {
 
 type method struct {
 	Name    string // SayHello
-	Num     int    // 一个 rpc 方法可以对应多个 http 请求
+	Num     int    // one rpc method can correspond to multiple http requests
 	Request string // SayHelloReq
 	Reply   string // SayHelloResp
 	// http_rule
-	Path         string // 路由
+	Path         string // rule
 	Method       string // HTTP Method
 	Body         string
 	ResponseBody string
@@ -227,7 +226,7 @@ func (m *method) HandlerName() string {
 	return fmt.Sprintf("%s_%d", m.Name, m.Num)
 }
 
-// HasPathParams 是否包含路由参数
+// HasPathParams whether to include routing parameters
 func (m *method) HasPathParams() bool {
 	paths := strings.Split(m.Path, "/")
 	for _, p := range paths {
@@ -238,7 +237,7 @@ func (m *method) HasPathParams() bool {
 	return false
 }
 
-// initPathParams 转换参数路由 {xx} --> :xx
+// initPathParams conversion parameter routing {xx} --> :xx
 func (m *method) initPathParams() {
 	paths := strings.Split(m.Path, "/")
 	for i, p := range paths {

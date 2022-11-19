@@ -21,24 +21,24 @@ import (
 )
 
 func newUserExampleHandler() *gotest.Handler {
-	// todo 补充测试字段信息
+	// todo additional test field information
 	testData := &model.UserExample{}
 	testData.ID = 1
 	testData.CreatedAt = time.Now()
 	testData.UpdatedAt = testData.CreatedAt
 
-	// 初始化mock cache
+	// init mock cache
 	c := gotest.NewCache(map[string]interface{}{utils.Uint64ToStr(testData.ID): testData})
 	c.ICache = cache.NewUserExampleCache(&model.CacheType{
 		CType: "redis",
 		Rdb:   c.RedisClient,
 	})
 
-	// 初始化mock dao
+	// init mock dao
 	d := gotest.NewDao(c, testData)
 	d.IDao = dao.NewUserExampleDao(d.DB, c.ICache.(cache.UserExampleCache))
 
-	// 初始化mock handler
+	// init mock handler
 	h := gotest.NewHandler(d, testData)
 	h.IHandler = &userExampleHandler{iDao: d.IDao.(dao.UserExampleDao)}
 
@@ -96,7 +96,7 @@ func Test_userExampleHandler_Create(t *testing.T) {
 	h.MockDao.SQLMock.ExpectBegin()
 	args := h.MockDao.GetAnyArgs(h.TestData)
 	h.MockDao.SQLMock.ExpectExec("INSERT INTO .*").
-		WithArgs(args[:len(args)-1]...). // 根据实际参数数量修改
+		WithArgs(args[:len(args)-1]...). // adjusted for the amount of test data
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	h.MockDao.SQLMock.ExpectCommit()
 
@@ -139,7 +139,7 @@ func Test_userExampleHandler_DeleteByID(t *testing.T) {
 
 	h.MockDao.SQLMock.ExpectBegin()
 	h.MockDao.SQLMock.ExpectExec("UPDATE .*").
-		WithArgs(h.MockDao.AnyTime, testData.ID). // 根据测试数据数量调整
+		WithArgs(h.MockDao.AnyTime, testData.ID). // adjusted for the amount of test data
 		WillReturnResult(sqlmock.NewResult(int64(testData.ID), 1))
 	h.MockDao.SQLMock.ExpectCommit()
 
@@ -169,7 +169,7 @@ func Test_userExampleHandler_UpdateByID(t *testing.T) {
 
 	h.MockDao.SQLMock.ExpectBegin()
 	h.MockDao.SQLMock.ExpectExec("UPDATE .*").
-		WithArgs(h.MockDao.AnyTime, testData.ID). // 根据测试数据数量调整
+		WithArgs(h.MockDao.AnyTime, testData.ID). // adjusted for the amount of test data
 		WillReturnResult(sqlmock.NewResult(int64(testData.ID), 1))
 	h.MockDao.SQLMock.ExpectCommit()
 
@@ -263,7 +263,7 @@ func Test_userExampleHandler_List(t *testing.T) {
 	err := gohttp.Post(result, h.GetRequestURL("List"), &types.GetUserExamplesRequest{query.Params{
 		Page: 0,
 		Size: 10,
-		Sort: "ignore count", // 忽略测试 select count(*)
+		Sort: "ignore count", // ignore test count
 	}})
 	if err != nil {
 		t.Fatal(err)

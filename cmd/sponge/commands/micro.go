@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// MicroCommand micro命令
+// MicroCommand micro commands
 func MicroCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:           "micro",

@@ -150,10 +150,10 @@ func newTestUserDao() *Dao {
 		UpdatedAt: now,
 	}
 
-	// 初始化mock cache
+	// init mock cache
 	c := NewCache(map[string]interface{}{"no cache": testData}) // 为了测试mysql，禁止缓存
 
-	// 初始化mock dao
+	// init mock dao
 	d := NewDao(c, testData)
 	d.IDao = newUserDao(d.DB)
 

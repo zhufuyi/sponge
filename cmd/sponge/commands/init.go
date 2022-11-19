@@ -35,7 +35,7 @@ Examples:
 				gobash.SetExecutorPath(executor)
 			}
 			fmt.Println("initialize sponge codes ......")
-			// 下载sponge模板代码
+			// download sponge template code
 			err := runUpdateCommand(enableCNGoProxy)
 			if err != nil {
 				return err
@@ -45,7 +45,7 @@ Examples:
 				return err
 			}
 
-			// 安装依赖插件
+			// installing dependent plug-ins
 			_, lackNames := checkInstallTools()
 			installTools(lackNames, enableCNGoProxy)
 

@@ -19,35 +19,35 @@ import (
 )
 
 func newUserExampleService() *gotest.Service {
-	// todo 补充测试字段信息
+	// todo additional test field information
 	testData := &model.UserExample{}
 	testData.ID = 1
 	testData.CreatedAt = time.Now()
 	testData.UpdatedAt = testData.CreatedAt
 
-	// 初始化mock cache
+	// init mock cache
 	c := gotest.NewCache(map[string]interface{}{utils.Uint64ToStr(testData.ID): testData})
 	c.ICache = cache.NewUserExampleCache(&model.CacheType{
 		CType: "redis",
 		Rdb:   c.RedisClient,
 	})
 
-	// 初始化mock dao
+	// init mock dao
 	d := gotest.NewDao(c, testData)
 	d.IDao = dao.NewUserExampleDao(d.DB, c.ICache.(cache.UserExampleCache))
 
-	// 初始化mock service
+	// init mock service
 	s := gotest.NewService(d, testData)
 	serverNameExampleV1.RegisterUserExampleServiceServer(s.Server, &userExampleService{
 		UnimplementedUserExampleServiceServer: serverNameExampleV1.UnimplementedUserExampleServiceServer{},
 		iDao:                                  d.IDao.(dao.UserExampleDao),
 	})
 
-	// 启动rpc服务
+	// start up rpc server
 	s.GoGrpcServer()
 	time.Sleep(time.Millisecond * 100)
 
-	// grpc客户端
+	// grpc client
 	s.IServiceClient = serverNameExampleV1.NewUserExampleServiceClient(s.GetClientConn())
 
 	return s
@@ -62,7 +62,7 @@ func Test_userExampleService_Create(t *testing.T) {
 	s.MockDao.SQLMock.ExpectBegin()
 	args := s.MockDao.GetAnyArgs(s.TestData)
 	s.MockDao.SQLMock.ExpectExec("INSERT INTO .*").
-		WithArgs(args[:len(args)-1]...). // 根据实际参数数量修改
+		WithArgs(args[:len(args)-1]...). // Modified according to the actual number of parameters
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	s.MockDao.SQLMock.ExpectCommit()
 
@@ -98,7 +98,7 @@ func Test_userExampleService_DeleteByID(t *testing.T) {
 
 	s.MockDao.SQLMock.ExpectBegin()
 	s.MockDao.SQLMock.ExpectExec("UPDATE .*").
-		WithArgs(s.MockDao.AnyTime, testData.Id). // 根据测试数据数量调整
+		WithArgs(s.MockDao.AnyTime, testData.Id). // Modified according to the actual number of parameters
 		WillReturnResult(sqlmock.NewResult(int64(testData.Id), 1))
 	s.MockDao.SQLMock.ExpectCommit()
 
@@ -127,7 +127,7 @@ func Test_userExampleService_UpdateByID(t *testing.T) {
 
 	s.MockDao.SQLMock.ExpectBegin()
 	s.MockDao.SQLMock.ExpectExec("UPDATE .*").
-		WithArgs(s.MockDao.AnyTime, testData.Id). // 根据测试数据数量调整
+		WithArgs(s.MockDao.AnyTime, testData.Id). // Modified according to the actual number of parameters
 		WillReturnResult(sqlmock.NewResult(int64(testData.Id), 1))
 	s.MockDao.SQLMock.ExpectCommit()
 
@@ -215,7 +215,7 @@ func Test_userExampleService_List(t *testing.T) {
 		Params: &types.Params{
 			Page:  0,
 			Limit: 10,
-			Sort:  "ignore count", // 忽略测试 select count(*)
+			Sort:  "ignore count", // ignore test count
 		},
 	})
 	assert.NoError(t, err)

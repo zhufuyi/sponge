@@ -49,32 +49,32 @@ func NewServerNameExampleRPCConn() {
 			"please change to the correct service name", serverName))
 	}
 
-	// 如果没有使用服务发现，用ip和端口直连rpc服务
+	// If service discovery is not used, connect directly to the rpc service using the ip and port
 	endpoint := fmt.Sprintf("%s:%d", grpcClientCfg.Host, cfg.Grpc.Port)
 
 	switch grpcClientCfg.RegistryDiscoveryType {
-	// 使用consul发现服务
+	// discovering services using consul
 	case "consul":
-		endpoint = "discovery:///" + grpcClientCfg.Name // 通过服务名称连接grpc服务
+		endpoint = "discovery:///" + grpcClientCfg.Name // connecting to grpc services by service name
 		cli, err := consulcli.Init(cfg.Consul.Addr, consulcli.WithWaitTime(time.Second*5))
 		if err != nil {
 			panic(fmt.Sprintf("consulcli.Init error: %v, addr: %s", err, cfg.Consul.Addr))
 		}
 		iDiscovery := consul.New(cli)
 		cliOptions = append(cliOptions, grpccli.WithDiscovery(iDiscovery))
-	// 使用etcd发现服务
+	// discovering services using etcd
 	case "etcd":
-		endpoint = "discovery:///" + grpcClientCfg.Name // 通过服务名称连接grpc服务
+		endpoint = "discovery:///" + grpcClientCfg.Name // Connecting to grpc services by service name
 		cli, err := etcdcli.Init(cfg.Etcd.Addrs, etcdcli.WithDialTimeout(time.Second*5))
 		if err != nil {
-			panic(fmt.Sprintf("etcdcli.Init error: %v, addr: %s", err, cfg.Etcd.Addrs))
+			panic(fmt.Sprintf("etcdcli.Init error: %v, addr: %v", err, cfg.Etcd.Addrs))
 		}
 		iDiscovery := etcd.New(cli)
 		cliOptions = append(cliOptions, grpccli.WithDiscovery(iDiscovery))
-	// 使用nacos发现服务
+	// discovering services using nacos
 	case "nacos":
 		// example: endpoint = "discovery:///serverName.scheme"
-		endpoint = "discovery:///" + grpcClientCfg.Name + ".grpc"
+		endpoint = "discovery:///" + grpcClientCfg.Name + ".grpc" // Connecting to grpc services by service name
 		cli, err := nacoscli.NewNamingClient(
 			cfg.NacosRd.IPAddr,
 			cfg.NacosRd.Port,
@@ -97,7 +97,8 @@ func NewServerNameExampleRPCConn() {
 		cliOptions = append(cliOptions, grpccli.WithEnableMetrics())
 	}
 
-	// 如果需要安全连接，使用grpccli.Dial(ctx, endpoint, cliOptions...)，并且cliOptions设置WithCredentials指定证书路径
+	// If a secure connection is required, use grpccli.Dial(ctx, endpoint, cliOptions...) and
+	// cliOptions sets WithCredentials to specify the certificate path
 	var err error
 	serverNameExampleConn, err = grpccli.DialInsecure(context.Background(), endpoint, cliOptions...)
 	if err != nil {

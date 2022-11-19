@@ -13,12 +13,12 @@ import (
 // RPCPbCommand generate rpc server codes bash on protobuf file
 func RPCPbCommand() *cobra.Command {
 	var (
-		moduleName   string // go.mod文件的module名称
-		serverName   string // 服务名称
-		projectName  string // 项目名称
-		repoAddr     string // 镜像仓库地址
-		outPath      string // 输出目录
-		protobufFile string // proto file文件
+		moduleName   string // module name for go.mod
+		serverName   string // server name
+		projectName  string // project name for deployment name
+		repoAddr     string // image repo address
+		outPath      string // output directory
+		protobufFile string // protobuf file, support * matching
 	)
 
 	//nolint
@@ -70,18 +70,18 @@ func runGenRPCPbCommand(moduleName string, serverName string, projectName string
 		return errors.New("replacer is nil")
 	}
 
-	// 设置模板信息
-	subDirs := []string{ // 只处理的子目录
+	// setting up template information
+	subDirs := []string{ // processing-only subdirectories
 		"api/types", "cmd/serverNameExample_grpcPbExample",
 		"sponge/build", "sponge/configs", "sponge/deployments", "sponge/scripts", "sponge/third_party",
 		"internal/config", "internal/ecode", "internal/server", "internal/service",
 	}
-	subFiles := []string{ // 只处理子文件
+	subFiles := []string{ // processing of sub-documents only
 		"sponge/.gitignore", "sponge/.golangci.yml", "sponge/go.mod", "sponge/go.sum",
 		"sponge/Jenkinsfile", "sponge/Makefile", "sponge/README.md",
 	}
-	ignoreDirs := []string{} // 指定子目录下忽略处理的目录
-	ignoreFiles := []string{ // 指定子目录下忽略处理的文件
+	ignoreDirs := []string{} // specify the directory in the subdirectory where processing is ignored
+	ignoreFiles := []string{ // specify the files in the subdirectory to be ignored for processing
 		"types.pb.validate.go", "types.pb.go", // api/types
 		"userExample_rpc.go", "systemCode_http.go", "userExample_http.go", // internal/ecode
 		"http.go", "http_option.go", "http_test.go", // internal/server
@@ -126,27 +126,27 @@ func addRPCPbFields(moduleName string, serverName string, projectName string, re
 	fields = append(fields, deleteFieldsMark(r, protoShellFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, replaceFileContentMark(r, readmeFile, "## "+serverName)...)
 	fields = append(fields, []replacer.Field{
-		{ // 替换Dockerfile文件内容
+		{ // replace the contents of the Dockerfile file
 			Old: dockerFileMark,
 			New: dockerFileHTTPCode,
 		},
-		{ // 替换Dockerfile_build文件内容
+		{ // replace the contents of the Dockerfile_build file
 			Old: dockerFileBuildMark,
 			New: dockerFileBuildHTTPCode,
 		},
-		{ // 替换docker-compose.yml文件内容
+		{ // replace the contents of the docker-compose.yml file
 			Old: dockerComposeFileMark,
 			New: dockerComposeFileHTTPCode,
 		},
-		{ // 替换*-deployment.yml文件内容
+		{ // replace the contents of the *-deployment.yml file
 			Old: k8sDeploymentFileMark,
 			New: k8sDeploymentFileHTTPCode,
 		},
-		{ // 替换*-svc.yml文件内容
+		{ // replace the contents of the *-svc.yml file
 			Old: k8sServiceFileMark,
 			New: k8sServiceFileHTTPCode,
 		},
-		{ // 替换proto.sh文件内容
+		{ // replace the contents of the proto.sh file
 			Old: protoShellFileMark,
 			New: protoShellServiceTmplCode,
 		},
@@ -166,7 +166,7 @@ func addRPCPbFields(moduleName string, serverName string, projectName string, re
 			Old: "serverNameExample",
 			New: serverName,
 		},
-		// docker镜像和k8s部署脚本替换
+		// docker image and k8s deployment script replacement
 		{
 			Old: "server-name-example",
 			New: xstrings.ToKebabCase(serverName),
@@ -175,7 +175,7 @@ func addRPCPbFields(moduleName string, serverName string, projectName string, re
 			Old: "projectNameExample",
 			New: projectName,
 		},
-		// docker镜像和k8s部署脚本替换
+		// docker image and k8s deployment script replacement
 		{
 			Old: "project-name-example",
 			New: xstrings.ToKebabCase(projectName),

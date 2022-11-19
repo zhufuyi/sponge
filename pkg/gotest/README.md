@@ -93,15 +93,15 @@ func newHandler() *Handler {
 		UpdatedAt: now,
 	}
 
-	// 初始化mock cache
+	// init mock cache
 	c := gotest.NewCache(map[string]interface{}{"no cache": testData})
 	c.ICache = struct{}{} // instantiated cache interface
 
-	// 初始化mock dao
+	// init mock dao
 	d := gotest.NewDao(c, testData)
 	d.IDao = struct{}{} // instantiated dao interface
 
-	// 初始化mock handler
+	// init mock handler
 	h := gotest.NewHandler(d, testData)
 	h.IHandler = struct{}{} // instantiated handler interface
 

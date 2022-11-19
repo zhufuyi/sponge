@@ -1,10 +1,10 @@
 ## app
 
-优雅的启动和停止服务，使用[errgroup](golang.org/x/sync/errgroup)保证多个服务同时正常启动。
+Elegantly start and stop services, using [errgroup](golang.org/x/sync/errgroup) to ensure that multiple services are started properly at the same time.
 
 <br>
 
-### 使用示例
+### Example of use
 
 ```go
 func main() {
@@ -17,16 +17,16 @@ func main() {
 }
 
 func registerInits() []app.Init {
-    // 读取配置文件
+    // get configuration
 
     var inits []app.Init
 
-	// 初始化日志
+	// initializing log
 	inits = append(inits, func() {
 
 	})
 
-	// 初始化数据库
+	// initializing database
 	inits = append(inits, func() {
 
 	})
@@ -39,12 +39,12 @@ func registerInits() []app.Init {
 func registerServers() []app.IServer {
 	var servers []app.IServer
 
-	// 创建http服务
+	// creating http service
 	servers = append(servers, server.NewHTTPServer(
 
 	))
 
-	// 创建grpc服务
+	// creating grpc service
 	servers = append(servers, server.NewGRPCServer(
 
 	))
@@ -57,12 +57,12 @@ func registerServers() []app.IServer {
 func registerCloses(servers []app.IServer) []app.Close {
 	var closes []app.Close
 
-	// 关闭服务
+	// close server
 	for _, server := range servers {
 		closes = append(closes, server.Stop)
 	}
 
-	// 关闭数据库连接
+	// close other resource
 	closes = append(closes, func() error {
 
 	})

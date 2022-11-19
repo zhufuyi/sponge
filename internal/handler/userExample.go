@@ -21,7 +21,7 @@ import (
 
 var _ UserExampleHandler = (*userExampleHandler)(nil)
 
-// UserExampleHandler 定义handler接口
+// UserExampleHandler defining the handler interface
 type UserExampleHandler interface {
 	Create(c *gin.Context)
 	DeleteByID(c *gin.Context)
@@ -35,7 +35,7 @@ type userExampleHandler struct {
 	iDao dao.UserExampleDao
 }
 
-// NewUserExampleHandler 创建handler接口
+// NewUserExampleHandler creating the handler interface
 func NewUserExampleHandler() UserExampleHandler {
 	return &userExampleHandler{
 		iDao: dao.NewUserExampleDao(
@@ -45,13 +45,13 @@ func NewUserExampleHandler() UserExampleHandler {
 	}
 }
 
-// Create 创建一条记录
-// @Summary 创建userExample
-// @Description 提交信息创建userExample
+// Create a record
+// @Summary create userExample
+// @Description submit information to create userExample
 // @Tags userExample
 // @accept json
 // @Produce json
-// @Param data body types.CreateUserExampleRequest true "userExample信息"
+// @Param data body types.CreateUserExampleRequest true "userExample information"
 // @Success 200 {object} types.Result{}
 // @Router /api/v1/userExample [post]
 func (h *userExampleHandler) Create(c *gin.Context) {
@@ -81,9 +81,9 @@ func (h *userExampleHandler) Create(c *gin.Context) {
 	response.Success(c, gin.H{"id": userExample.ID})
 }
 
-// DeleteByID 根据id删除一条记录
-// @Summary 删除userExample
-// @Description 根据id删除userExample
+// DeleteByID delete a record by ID
+// @Summary delete userExample
+// @Description delete userExample by id
 // @Tags userExample
 // @accept json
 // @Produce json
@@ -106,14 +106,14 @@ func (h *userExampleHandler) DeleteByID(c *gin.Context) {
 	response.Success(c)
 }
 
-// UpdateByID 根据id更新信息
-// @Summary 更新userExample信息
-// @Description 根据id更新userExample信息
+// UpdateByID update information based on id
+// @Summary update userExample information
+// @Description update userExample information based on id
 // @Tags userExample
 // @accept json
 // @Produce json
 // @Param id path string true "id"
-// @Param data body types.UpdateUserExampleByIDRequest true "userExample信息"
+// @Param data body types.UpdateUserExampleByIDRequest true "userExample information"
 // @Success 200 {object} types.Result{}
 // @Router /api/v1/userExample/{id} [put]
 func (h *userExampleHandler) UpdateByID(c *gin.Context) {
@@ -149,9 +149,9 @@ func (h *userExampleHandler) UpdateByID(c *gin.Context) {
 	response.Success(c)
 }
 
-// GetByID 根据id获取一条记录
-// @Summary 获取userExample详情
-// @Description 根据id获取userExample详情
+// GetByID get a record based on id
+// @Summary get userExample details
+// @Description get userExample details by id
 // @Tags userExample
 // @Param id path string true "id"
 // @Accept json
@@ -188,11 +188,11 @@ func (h *userExampleHandler) GetByID(c *gin.Context) {
 	response.Success(c, gin.H{"userExample": data})
 }
 
-// ListByIDs 根据多个id获取多条记录
-// @Summary 根据多个id获取userExample列表
-// @Description 使用post请求，根据多个id获取userExample列表
+// ListByIDs get multiple records based on multiple ids
+// @Summary get multiple records based on multiple ids
+// @Description get a list of userExample based on multiple ids using a post request
 // @Tags userExample
-// @Param data body types.GetUserExamplesByIDsRequest true "id 数组"
+// @Param data body types.GetUserExamplesByIDsRequest true "id array"
 // @Accept json
 // @Produce json
 // @Success 200 {object} types.Result{}
@@ -226,13 +226,13 @@ func (h *userExampleHandler) ListByIDs(c *gin.Context) {
 	})
 }
 
-// List 通过post获取多条记录
-// @Summary 获取userExample列表
-// @Description 使用post请求获取userExample列表
+// List Get multiple records by query parameters
+// @Summary get a list of userExample
+// @Description get a list of userExamples using a post request
 // @Tags userExample
 // @accept json
 // @Produce json
-// @Param data body types.Params true "查询条件"
+// @Param data body types.Params true "query parameters"
 // @Success 200 {object} types.Result{}
 // @Router /api/v1/userExamples [post]
 func (h *userExampleHandler) List(c *gin.Context) {

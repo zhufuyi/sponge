@@ -16,11 +16,11 @@ import (
 // HTTPCommand generate http server codes
 func HTTPCommand() *cobra.Command {
 	var (
-		moduleName  string // go.mod文件的module名称
-		serverName  string // 服务名称
-		projectName string // 项目名称
-		repoAddr    string // 镜像仓库地址
-		outPath     string // 输出目录
+		moduleName  string // module name for go.mod
+		serverName  string // server name
+		projectName string // project name for deployment name
+		repoAddr    string // image repo address
+		outPath     string // output directory
 		sqlArgs     = sql2code.Args{
 			Package:  "model",
 			JSONTag:  true,
@@ -84,19 +84,19 @@ func runGenHTTPCommand(moduleName string, serverName string, projectName string,
 		return errors.New("replacer is nil")
 	}
 
-	// 设置模板信息
-	subDirs := []string{ // 指定处理的子目录
+	// setting up template information
+	subDirs := []string{ // specify the subdirectory for processing
 		"cmd/serverNameExample_httpExample", "sponge/build", "sponge/configs", "sponge/deployments",
 		"sponge/docs", "sponge/scripts", "sponge/internal",
 	}
-	subFiles := []string{ // 指定处理的子文件
+	subFiles := []string{ // specify the sub-documents to be processed
 		"sponge/.gitignore", "sponge/.golangci.yml", "sponge/go.mod", "sponge/go.sum",
 		"sponge/Jenkinsfile", "sponge/Makefile", "sponge/README.md",
 	}
-	ignoreDirs := []string{ // 指定子目录下忽略处理的目录
+	ignoreDirs := []string{ // specify the directory in the subdirectory where processing is ignored
 		"internal/service", "internal/rpcclient",
 	}
-	ignoreFiles := []string{ // 指定子目录下忽略处理的文件
+	ignoreFiles := []string{ // specify the files in the subdirectory to be ignored for processing
 		"swagger.json", "swagger.yaml", "apis.swagger.json", "apis.html", "apis.go", // sponge/docs
 		"userExample_rpc.go", "systemCode_rpc.go", // internal/ecode
 		"routers_pbExample.go", "routers_pbExample_test.go", "userExample_service.pb.go", // internal/routers
@@ -141,39 +141,39 @@ func addHTTPFields(moduleName string, serverName string, projectName string, rep
 	fields = append(fields, deleteFieldsMark(r, gitIgnoreFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, replaceFileContentMark(r, readmeFile, "## "+serverName)...)
 	fields = append(fields, []replacer.Field{
-		{ // 替换model/userExample.go文件内容
+		{ // replace the contents of the model/userExample.go file
 			Old: modelFileMark,
 			New: codes[parser.CodeTypeModel],
 		},
-		{ // 替换dao/userExample.go文件内容
+		{ // replace the contents of the dao/userExample.go file
 			Old: daoFileMark,
 			New: codes[parser.CodeTypeDAO],
 		},
-		{ // 替换handler/userExample.go文件内容
+		{ // replace the contents of the handler/userExample.go file
 			Old: handlerFileMark,
 			New: adjustmentOfIDType(codes[parser.CodeTypeHandler]),
 		},
-		{ // 替换Dockerfile文件内容
+		{ // replace the contents of the Dockerfile file
 			Old: dockerFileMark,
 			New: dockerFileHTTPCode,
 		},
-		{ // 替换Dockerfile_build文件内容
+		{ // replace the contents of the Dockerfile_build file
 			Old: dockerFileBuildMark,
 			New: dockerFileBuildHTTPCode,
 		},
-		{ // 替换docker-compose.yml文件内容
+		{ // replace the contents of the docker-compose.yml file
 			Old: dockerComposeFileMark,
 			New: dockerComposeFileHTTPCode,
 		},
-		{ // 替换*-deployment.yml文件内容
+		{ // replace the contents of the *-deployment.yml file
 			Old: k8sDeploymentFileMark,
 			New: k8sDeploymentFileHTTPCode,
 		},
-		{ // 替换*-svc.yml文件内容
+		{ // replace the contents of the *-svc.yml file
 			Old: k8sServiceFileMark,
 			New: k8sServiceFileHTTPCode,
 		},
-		// 替换github.com/zhufuyi/sponge/templates/sponge
+		// replace github.com/zhufuyi/sponge/templates/sponge
 		{
 			Old: selfPackageName + "/" + r.GetSourcePath(),
 			New: moduleName,
@@ -198,7 +198,7 @@ func addHTTPFields(moduleName string, serverName string, projectName string, rep
 			Old: "serverNameExample",
 			New: serverName,
 		},
-		// docker镜像和k8s部署脚本替换
+		// docker image and k8s deployment script replacement
 		{
 			Old: "server-name-example",
 			New: xstrings.ToKebabCase(serverName),
@@ -207,7 +207,7 @@ func addHTTPFields(moduleName string, serverName string, projectName string, rep
 			Old: "projectNameExample",
 			New: projectName,
 		},
-		// docker镜像和k8s部署脚本替换
+		// docker image and k8s deployment script replacement
 		{
 			Old: "project-name-example",
 			New: xstrings.ToKebabCase(projectName),

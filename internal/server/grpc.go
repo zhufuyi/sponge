@@ -28,9 +28,9 @@ type grpcServer struct {
 	server *grpc.Server
 	listen net.Listener
 
-	mux                   *http.ServeMux
-	httpServer            *http.Server
-	metricsHTTPServerFunc func() error
+	mux                             *http.ServeMux
+	httpServer                      *http.Server
+	registerMetricsMuxAndMethodFunc func() error
 
 	iRegistry registry.Registry
 	instance  *registry.ServiceInstance
@@ -38,6 +38,7 @@ type grpcServer struct {
 
 // Start grpc service
 func (s *grpcServer) Start() error {
+	// registration Services
 	if s.iRegistry != nil {
 		ctx, _ := context.WithTimeout(context.Background(), 5*time.Second) //nolint
 		if err := s.iRegistry.Register(ctx, s.instance); err != nil {
@@ -45,21 +46,22 @@ func (s *grpcServer) Start() error {
 		}
 	}
 
-	if s.metricsHTTPServerFunc != nil {
-		if err := s.metricsHTTPServerFunc(); err != nil {
+	if s.registerMetricsMuxAndMethodFunc != nil {
+		if err := s.registerMetricsMuxAndMethodFunc(); err != nil {
 			return err
 		}
 	}
 
-	if s.mux != nil { // 如果启用pprof或metrics任何一个，都会启动http服务
+	// if either pprof or metrics is enabled, the http service will be started
+	if s.mux != nil {
 		addr := fmt.Sprintf(":%d", config.Get().Grpc.HTTPPort)
-		httpSrv := &http.Server{
+		s.httpServer = &http.Server{
 			Addr:    addr,
 			Handler: s.mux,
 		}
 		go func() {
-			fmt.Printf("http address of pprof and metrics  %s\n", addr)
-			if err := httpSrv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			fmt.Printf("http address of pprof and metrics %s\n", addr)
+			if err := s.httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 				panic("listen and serve error: " + err.Error())
 			}
 		}()
@@ -119,7 +121,7 @@ func (s *grpcServer) serverOptions() []grpc.ServerOption {
 	// metrics interceptor
 	if config.Get().App.EnableMetrics {
 		unaryServerInterceptors = append(unaryServerInterceptors, interceptor.UnaryServerMetrics())
-		s.metricsHTTPServerFunc = s.registerHTTPMetrics()
+		s.registerMetricsMuxAndMethodFunc = s.registerMetricsMuxAndMethod()
 	}
 
 	// limit interceptor
@@ -145,7 +147,7 @@ func (s *grpcServer) serverOptions() []grpc.ServerOption {
 	return options
 }
 
-func (s *grpcServer) registerHTTPMetrics() func() error {
+func (s *grpcServer) registerMetricsMuxAndMethod() func() error {
 	return func() error {
 		if s.mux == nil {
 			s.mux = http.NewServeMux()
@@ -155,7 +157,7 @@ func (s *grpcServer) registerHTTPMetrics() func() error {
 	}
 }
 
-func (s *grpcServer) registerHTTPPprof() {
+func (s *grpcServer) registerProfMux() {
 	if s.mux == nil {
 		s.mux = http.NewServeMux()
 	}
@@ -173,7 +175,7 @@ func NewGRPCServer(addr string, opts ...GrpcOption) app.IServer {
 		instance:  o.instance,
 	}
 	if config.Get().App.EnablePprof {
-		s.registerHTTPPprof()
+		s.registerProfMux()
 	}
 
 	s.listen, err = net.Listen("tcp", addr)

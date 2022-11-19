@@ -1,28 +1,28 @@
 package types
 
-// swagger公共结构体，建议都写注释，生成的swagger.json也会带有注释，
-// 如果使用yapi，把swagger.json导入yapi后自动填写备注，避免重复填写注释。
+// swagger public structures, it is recommended to write comments to all of them,
+// if you use yapi, import swagger.json into yapi and fill in the notes automatically to avoid repeating the comments.
 
-// Result 输出数据格式
+// Result output data format
 type Result struct {
-	Code int         `json:"code"` // 返回码
-	Msg  string      `json:"msg"`  // 返回信息说明
-	Data interface{} `json:"data"` // 返回数据
+	Code int         `json:"code"` // return code
+	Msg  string      `json:"msg"`  // return information description
+	Data interface{} `json:"data"` // return data
 }
 
-// Params 查询原始参数
+// Params query parameters
 type Params struct {
-	Page int    `form:"page" binding:"gte=0" json:"page"`      // 页码
-	Size int    `form:"size" binding:"gt=0" json:"size"`       // 每页行数
-	Sort string `form:"sort" binding:"" json:"sort,omitempty"` // 排序字段，默认值为-id，字段前面有-号表示倒序，否则升序，多个字段用逗号分隔
+	Page int    `form:"page" binding:"gte=0" json:"page"`      // page number, starting from page 0
+	Size int    `form:"size" binding:"gt=0" json:"size"`       // lines per page
+	Sort string `form:"sort" binding:"" json:"sort,omitempty"` // sorted fields, multi-column sorting separated by commas
 
-	Columns []Column `json:"columns,omitempty"` // 列查询条件
+	Columns []Column `json:"columns,omitempty"` // query conditions
 }
 
-// Column 表的列查询信息
+// Column search information
 type Column struct {
-	Name  string      `json:"name"`  // 列名
-	Exp   string      `json:"exp"`   // 表达式，值为空时默认为=，有=、!=、>、>=、<、<=、like七种类型
-	Value interface{} `json:"value"` // 列值
-	Logic string      `json:"logic"` // 逻辑类型，值为空时默认为and，有&(and)、||(or)两种类型
+	Name  string      `json:"name"`  // column name
+	Exp   string      `json:"exp"`   // expressions, which default to = when the value is null, have =, ! =, >, >=, <, <=, like
+	Value interface{} `json:"value"` // column value
+	Logic string      `json:"logic"` // logical type, defaults to and when value is null, only &(and), ||(or)
 }

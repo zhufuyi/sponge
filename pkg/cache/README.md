@@ -1,12 +1,12 @@
 ## cache
 
-支持memory缓存和redis缓存。
+memory and redis cache libraries.
 
-## 使用示例
+## Example of use
 
 ```go
 
-// 实例化缓存类型，根据CType字段选择使用memory或redis
+// Choose to create a memory or redis cache depending on CType
 cache := cache.NewUserExampleCache(&model.CacheType{
   CType: "redis",
   Rdb:   c.RedisClient,
@@ -32,11 +32,11 @@ func (d *userExampleDao) GetByID(ctx context.Context, id uint64) (*model.UserExa
 	}
 
 	if errors.Is(err, model.ErrCacheNotFound) {
-		// 从mysql获取
+		// get from mysql
 		table := &model.UserExample{}
 		err = d.db.WithContext(ctx).Where("id = ?", id).First(table).Error
 		if err != nil {
-			// if data is empty, set not found cache to prevent cache penetration(防止缓存穿透)
+			// if data is empty, set not found cache to prevent cache penetration(preventing Cache Penetration)
 			if errors.Is(err, model.ErrRecordNotFound) {
 				err = d.cache.SetCacheWithNotFound(ctx, id)
 				if err != nil {

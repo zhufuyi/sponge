@@ -33,7 +33,7 @@ func main() {
 func getDialOptions() []grpc.DialOption {
 	var options []grpc.DialOption
 
-	// 禁止tls加密
+	// use insecure transfer
 	options = append(options, grpc.WithTransportCredentials(insecure.NewCredentials()))
 
 	// keepalive option

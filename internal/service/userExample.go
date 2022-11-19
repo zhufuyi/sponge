@@ -21,7 +21,7 @@ import (
 // nolint
 func init() {
 	registerFns = append(registerFns, func(server *grpc.Server) {
-		serverNameExampleV1.RegisterUserExampleServiceServer(server, NewUserExampleServiceServer()) // 把service注册到rpc服务中
+		serverNameExampleV1.RegisterUserExampleServiceServer(server, NewUserExampleServiceServer()) // register service to the rpc service
 	})
 }
 
@@ -33,7 +33,7 @@ type userExampleService struct {
 	iDao dao.UserExampleDao
 }
 
-// NewUserExampleServiceServer 创建一个实例
+// NewUserExampleServiceServer create a new service
 func NewUserExampleServiceServer() serverNameExampleV1.UserExampleServiceServer {
 	return &userExampleService{
 		iDao: dao.NewUserExampleDao(
@@ -43,7 +43,7 @@ func NewUserExampleServiceServer() serverNameExampleV1.UserExampleServiceServer 
 	}
 }
 
-// Create 创建一条记录
+// Create a record
 func (s *userExampleService) Create(ctx context.Context, req *serverNameExampleV1.CreateUserExampleRequest) (*serverNameExampleV1.CreateUserExampleReply, error) {
 	err := req.Validate()
 	if err != nil {
@@ -67,7 +67,7 @@ func (s *userExampleService) Create(ctx context.Context, req *serverNameExampleV
 	return &serverNameExampleV1.CreateUserExampleReply{Id: userExample.ID}, nil
 }
 
-// DeleteByID 根据id删除一条记录
+// DeleteByID delete a record based on id
 func (s *userExampleService) DeleteByID(ctx context.Context, req *serverNameExampleV1.DeleteUserExampleByIDRequest) (*serverNameExampleV1.DeleteUserExampleByIDReply, error) {
 	err := req.Validate()
 	if err != nil {
@@ -84,7 +84,7 @@ func (s *userExampleService) DeleteByID(ctx context.Context, req *serverNameExam
 	return &serverNameExampleV1.DeleteUserExampleByIDReply{}, nil
 }
 
-// UpdateByID 根据id更新一条记录
+// UpdateByID update a record based on id
 func (s *userExampleService) UpdateByID(ctx context.Context, req *serverNameExampleV1.UpdateUserExampleByIDRequest) (*serverNameExampleV1.UpdateUserExampleByIDReply, error) {
 	err := req.Validate()
 	if err != nil {
@@ -109,7 +109,7 @@ func (s *userExampleService) UpdateByID(ctx context.Context, req *serverNameExam
 	return &serverNameExampleV1.UpdateUserExampleByIDReply{}, nil
 }
 
-// GetByID 根据id查询一条记录
+// GetByID get a record by id
 func (s *userExampleService) GetByID(ctx context.Context, req *serverNameExampleV1.GetUserExampleByIDRequest) (*serverNameExampleV1.GetUserExampleByIDReply, error) {
 	err := req.Validate()
 	if err != nil {
@@ -136,7 +136,7 @@ func (s *userExampleService) GetByID(ctx context.Context, req *serverNameExample
 	return &serverNameExampleV1.GetUserExampleByIDReply{UserExample: data}, nil
 }
 
-// ListByIDs 根据id数组获取多条记录
+// ListByIDs get multiple records based on an array of ids
 func (s *userExampleService) ListByIDs(ctx context.Context, req *serverNameExampleV1.ListUserExampleByIDsRequest) (*serverNameExampleV1.ListUserExampleByIDsReply, error) {
 	err := req.Validate()
 	if err != nil {
@@ -163,7 +163,7 @@ func (s *userExampleService) ListByIDs(ctx context.Context, req *serverNameExamp
 	return &serverNameExampleV1.ListUserExampleByIDsReply{UserExamples: datas}, nil
 }
 
-// List 获取多条记录
+// List Get multiple records based on query parameters
 func (s *userExampleService) List(ctx context.Context, req *serverNameExampleV1.ListUserExampleRequest) (*serverNameExampleV1.ListUserExampleReply, error) {
 	err := req.Validate()
 	if err != nil {

@@ -40,8 +40,8 @@ spec:
               containerPort: 8282
             - name: metrics-port
               containerPort: 8283
-          # 根据服务类型(http或grpc)选择健康检查
-          # 就绪探测
+          # select health check according to service type (http or grpc)
+          # emotional Detection
           readinessProbe:
             httpGet:
               port: http-port
@@ -53,7 +53,7 @@ spec:
             periodSeconds: 10
             successThreshold: 1
             failureThreshold: 3
-          # 容器存活探测
+          # container Survival Detection
           livenessProbe:
             httpGet:
               port: http-port
@@ -66,7 +66,7 @@ spec:
             periodSeconds: 10
             successThreshold: 1
             failureThreshold: 3
-      # todo 对于私有仓库，需要先创建Secret(这里名称docker-auth-secret)存放登录docker的账号和密码
+      # todo for private repositories, you need to create a secret (here docker-auth-secret) to store the account and password to log into docker
       imagePullSecrets:
         - name: docker-auth-secret
       volumes:

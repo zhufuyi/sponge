@@ -14,6 +14,7 @@ install:
 	go install github.com/envoyproxy/protoc-gen-validate@latest
 	go install github.com/srikrsna/protoc-gen-gotag@latest
 	go install github.com/zhufuyi/sponge/cmd/protoc-gen-go-gin@latest
+	go install github.com/zhufuyi/sponge/cmd/protoc-gen-go-rpc-tmpl@latest
 	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@latest
 	go install github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc@latest
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest

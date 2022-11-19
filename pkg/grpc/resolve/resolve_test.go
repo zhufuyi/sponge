@@ -1,22 +1,23 @@
-package loadbalance
+package resolve
 
 import (
+	"strings"
+	"testing"
+
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/resolver"
 	"google.golang.org/grpc/serviceconfig"
-	"strings"
-	"testing"
 )
 
 var r = &ResolverBuilder{
-	SchemeVal:   "grpc",
-	ServiceName: "demo",
-	Addrs:       []string{"localhost:8282"},
+	scheme:      "grpc",
+	serviceName: "demo",
+	addrs:       []string{"localhost:8282"},
 }
 
 func TestRegister(t *testing.T) {
-	s := Register(r.SchemeVal, r.ServiceName, r.Addrs)
-	assert.Equal(t, true, strings.Contains(s, r.ServiceName))
+	s := Register(r.scheme, r.serviceName, r.addrs)
+	assert.Equal(t, true, strings.Contains(s, r.serviceName))
 }
 
 func TestResolverBuilder_Build(t *testing.T) {

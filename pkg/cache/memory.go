@@ -38,7 +38,7 @@ func NewMemoryCache(keyPrefix string, encoding encoding.Encoding, newObject func
 	}
 }
 
-// Set add cache
+// Set data
 func (m *memoryCache) Set(ctx context.Context, key string, val interface{}, expiration time.Duration) error {
 	buf, err := encoding.Marshal(m.encoding, val)
 	if err != nil {
@@ -80,7 +80,7 @@ func (m *memoryCache) Get(ctx context.Context, key string, val interface{}) erro
 	return nil
 }
 
-// Del 删除
+// Del delete data
 func (m *memoryCache) Del(ctx context.Context, keys ...string) error {
 	if len(keys) == 0 {
 		return nil
@@ -95,7 +95,7 @@ func (m *memoryCache) Del(ctx context.Context, keys ...string) error {
 	return nil
 }
 
-// MultiSet 批量set
+// MultiSet multiple set data
 func (m *memoryCache) MultiSet(ctx context.Context, valueMap map[string]interface{}, expiration time.Duration) error {
 	var err error
 	for key, value := range valueMap {
@@ -107,7 +107,7 @@ func (m *memoryCache) MultiSet(ctx context.Context, valueMap map[string]interfac
 	return nil
 }
 
-// MultiGet 批量获取
+// MultiGet multiple get data
 func (m *memoryCache) MultiGet(ctx context.Context, keys []string, value interface{}) error {
 	valueMap := reflect.ValueOf(value)
 	var err error
@@ -123,6 +123,7 @@ func (m *memoryCache) MultiGet(ctx context.Context, keys []string, value interfa
 	return nil
 }
 
+// SetCacheWithNotFound set not found
 func (m *memoryCache) SetCacheWithNotFound(ctx context.Context, key string) error {
 	cacheKey, err := BuildCacheKey(m.KeyPrefix, key)
 	if err != nil {

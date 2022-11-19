@@ -18,11 +18,11 @@ import (
 // RPCCommand generate rpc server codes
 func RPCCommand() *cobra.Command {
 	var (
-		moduleName  string // go.mod文件的module名称
-		serverName  string // 服务名称
-		projectName string // 项目名称
-		repoAddr    string // 镜像仓库地址
-		outPath     string // 输出目录
+		moduleName  string // module name for go.mod
+		serverName  string // server name
+		projectName string // project name for deployment name
+		repoAddr    string // image repo address
+		outPath     string // output directory
 		sqlArgs     = sql2code.Args{
 			Package:  "model",
 			JSONTag:  true,
@@ -86,19 +86,19 @@ func runGenRPCCommand(moduleName string, serverName string, projectName string, 
 		return errors.New("replacer is nil")
 	}
 
-	// 设置模板信息
-	subDirs := []string{ // 指定处理的子目录
+	// setting up template information
+	subDirs := []string{ // specify the subdirectory for processing
 		"sponge/api", "sponge/build", "cmd/serverNameExample_grpcExample", "sponge/configs", "sponge/deployments",
 		"sponge/scripts", "sponge/internal", "sponge/third_party",
 	}
-	subFiles := []string{ // 指定处理的子文件
+	subFiles := []string{ // specify the sub-documents to be processed
 		"sponge/.gitignore", "sponge/.golangci.yml", "sponge/go.mod", "sponge/go.sum",
 		"sponge/Jenkinsfile", "sponge/Makefile", "sponge/README.md",
 	}
-	ignoreDirs := []string{ // 指定子目录下忽略处理的目录
+	ignoreDirs := []string{ // specify the directory in the subdirectory where processing is ignored
 		"internal/handler", "internal/rpcclient", "internal/routers", "internal/types",
 	}
-	ignoreFiles := []string{ // 指定子目录下忽略处理的文件
+	ignoreFiles := []string{ // specify the files in the subdirectory to be ignored for processing
 		"types.pb.validate.go", "types.pb.go", // api/types
 		"userExample.pb.go", "userExample.pb.validate.go", "userExample_grpc.pb.go", "userExample_router.pb.go", // api/serverNameExample/v1
 		"userExample_http.go", "systemCode_http.go", // internal/ecode
@@ -145,52 +145,52 @@ func addRPCFields(moduleName string, serverName string, projectName string, repo
 	fields = append(fields, deleteFieldsMark(r, gitIgnoreFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, replaceFileContentMark(r, readmeFile, "## "+serverName)...)
 	fields = append(fields, []replacer.Field{
-		{ // 替换model/userExample.go文件内容
+		{ // replace the contents of the model/userExample.go file
 			Old: modelFileMark,
 			New: codes[parser.CodeTypeModel],
 		},
-		{ // 替换dao/userExample.go文件内容
+		{ // replace the contents of the dao/userExample.go file
 			Old: daoFileMark,
 			New: codes[parser.CodeTypeDAO],
 		},
-		{ // 替换v1/userExample.proto文件内容
+		{ // replace the contents of the v1/userExample.proto file
 			Old: protoFileMark,
 			New: codes[parser.CodeTypeProto],
 		},
-		{ // 替换scripts/proto.sh文件内容
+		{ // replace the contents of the scripts/proto.sh file
 			Old: protoShellFileMark,
 			New: "",
 		},
-		{ // 替换service/userExample_client_test.go文件内容
+		{ // replace the contents of the service/userExample_client_test.go file
 			Old: serviceFileMark,
 			New: adjustmentOfIDType(codes[parser.CodeTypeService]),
 		},
-		{ // 替换Dockerfile文件内容
+		{ // replace the contents of the Dockerfile file
 			Old: dockerFileMark,
 			New: dockerFileGrpcCode,
 		},
-		{ // 替换Dockerfile_build文件内容
+		{ // replace the contents of the Dockerfile_build file
 			Old: dockerFileBuildMark,
 			New: dockerFileBuildGrpcCode,
 		},
-		{ // 替换docker-compose.yml文件内容
+		{ // replace the contents of the docker-compose.yml file
 			Old: dockerComposeFileMark,
 			New: dockerComposeFileGrpcCode,
 		},
-		{ // 替换*-deployment.yml文件内容
+		{ // replace the contents of the *-deployment.yml file
 			Old: k8sDeploymentFileMark,
 			New: k8sDeploymentFileGrpcCode,
 		},
-		{ // 替换*-svc.yml文件内容
+		{ // replace the contents of the *-svc.yml file
 			Old: k8sServiceFileMark,
 			New: k8sServiceFileGrpcCode,
 		},
-		// 替换github.com/zhufuyi/sponge/templates/sponge
+		// replace github.com/zhufuyi/sponge/templates/sponge
 		{
 			Old: selfPackageName + "/" + r.GetSourcePath(),
 			New: moduleName,
 		},
-		// 替换目录名称
+		// replace directory name
 		{
 			Old: strings.Join([]string{"api", "userExample", "v1"}, gofile.GetPathDelimiter()),
 			New: strings.Join([]string{"api", serverName, "v1"}, gofile.GetPathDelimiter()),
@@ -209,7 +209,7 @@ func addRPCFields(moduleName string, serverName string, projectName string, repo
 		},
 		{
 			Old: "api.userExample.v1",
-			New: fmt.Sprintf("api.%s.v1", strings.ReplaceAll(serverName, "-", "_")), // protobuf package 不能存在"-"号
+			New: fmt.Sprintf("api.%s.v1", strings.ReplaceAll(serverName, "-", "_")), // protobuf package no "-" signs allowed
 		},
 		{
 			Old: "sponge api docs",
@@ -223,7 +223,7 @@ func addRPCFields(moduleName string, serverName string, projectName string, repo
 			Old: "serverNameExample",
 			New: serverName,
 		},
-		// docker镜像和k8s部署脚本替换
+		// docker image and k8s deployment script replacement
 		{
 			Old: "server-name-example",
 			New: xstrings.ToKebabCase(serverName),
@@ -232,7 +232,7 @@ func addRPCFields(moduleName string, serverName string, projectName string, repo
 			Old: "projectNameExample",
 			New: projectName,
 		},
-		// docker镜像和k8s部署脚本替换
+		// docker image and k8s deployment script replacement
 		{
 			Old: "project-name-example",
 			New: xstrings.ToKebabCase(projectName),

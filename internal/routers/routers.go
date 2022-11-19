@@ -20,66 +20,67 @@ import (
 )
 
 var (
-	routerFns []func(*gin.RouterGroup) // 路由集合
+	routerFns []func(*gin.RouterGroup) // routing Collections
 )
 
-// NewRouter 实例化路由
+// NewRouter create a new router
 func NewRouter() *gin.Engine {
 	r := gin.New()
 
 	r.Use(gin.Recovery())
 	r.Use(middleware.Cors())
 
-	// request id 中间件
+	// request id middleware
 	r.Use(middleware.RequestID())
 
-	// logger 中间件
+	// logger middleware
 	r.Use(middleware.Logging(
 		middleware.WithLog(logger.Get()),
 		middleware.WithRequestIDFromContext(),
-		middleware.WithIgnoreRoutes("/metrics"), // 忽略路由
+		middleware.WithIgnoreRoutes("/metrics"), // ignore path
 	))
 
-	// metrics 中间件
+	// metrics middleware
 	if config.Get().App.EnableMetrics {
 		r.Use(metrics.Metrics(r,
-			//metrics.WithMetricsPath("/metrics"),                // 默认是 /metrics
-			metrics.WithIgnoreStatusCodes(http.StatusNotFound), // 忽略404状态码
+			//metrics.WithMetricsPath("/metrics"),                // default is /metrics
+			metrics.WithIgnoreStatusCodes(http.StatusNotFound), // ignore 404 status codes
 		))
 	}
 
-	// limit 中间件
+	// limit middleware
 	if config.Get().App.EnableLimit {
 		r.Use(middleware.RateLimit())
 	}
 
-	// circuit breaker 中间件
+	// circuit breaker middleware
 	if config.Get().App.EnableCircuitBreaker {
 		r.Use(middleware.CircuitBreaker())
 	}
 
-	// trace 中间件
+	// trace middleware
 	if config.Get().App.EnableTracing {
 		r.Use(middleware.Tracing(config.Get().App.Name))
 	}
 
-	// pprof 性能分析
+	// pprof performance analysis
 	if config.Get().App.EnablePprof {
 		prof.Register(r, prof.WithIOWaitTime())
 	}
 
-	// 校验器
+	// validator
 	binding.Validator = validator.Init()
 
 	r.GET("/health", handlerfunc.CheckHealth)
 	r.GET("/ping", handlerfunc.Ping)
 
-	// 注册swagger路由，通过swag init生成代码
+	// register swagger routes, generate code via swag init
 	docs.SwaggerInfo.BasePath = ""
+	// access path /swagger/index.html
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	apiV1 := r.Group("/api/v1")
-	// 注册/api/v1前缀路由组
+	// register/api/v1 prefix routing group
 	for _, fn := range routerFns {
 		fn(apiV1)
 	}

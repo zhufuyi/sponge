@@ -15,12 +15,12 @@ import (
 	"github.com/zhufuyi/sponge/pkg/servicerd/registry/nacos"
 )
 
-// RegisterServers 注册app服务
+// RegisterServers register for the app service
 func RegisterServers() []app.IServer {
 	var cfg = config.Get()
 	var servers []app.IServer
 
-	// 创建http服务
+	// creating http service
 	httpAddr := ":" + strconv.Itoa(cfg.HTTP.Port)
 	httpRegistry, httpInstance := registryService("http", cfg.App.Host, cfg.HTTP.Port)
 	httpServer := server.NewHTTPServer(httpAddr,
@@ -39,7 +39,7 @@ func registryService(scheme string, host string, port int) (registry.Registry, *
 	cfg := config.Get()
 
 	switch cfg.App.RegistryDiscoveryType {
-	// 使用consul注册服务
+	// registering service with consul
 	case "consul":
 		iRegistry, instance, err := consul.NewRegistry(
 			cfg.Consul.Addr,
@@ -51,7 +51,7 @@ func registryService(scheme string, host string, port int) (registry.Registry, *
 			panic(err)
 		}
 		return iRegistry, instance
-	// 使用etcd注册服务
+	// registering service with etcd
 	case "etcd":
 		iRegistry, instance, err := etcd.NewRegistry(
 			cfg.Etcd.Addrs,
@@ -63,7 +63,7 @@ func registryService(scheme string, host string, port int) (registry.Registry, *
 			panic(err)
 		}
 		return iRegistry, instance
-	// 使用nacos注册服务
+	// registering service with nacos
 	case "nacos":
 		iRegistry, instance, err := nacos.NewRegistry(
 			cfg.NacosRd.IPAddr,

@@ -56,7 +56,7 @@ func NewUserExampleCache(cacheType *model.CacheType) UserExampleCache {
 	}
 }
 
-// GetUserExampleCacheKey 设置缓存
+// GetUserExampleCacheKey cache key
 func (c *userExampleCache) GetUserExampleCacheKey(id uint64) string {
 	return PrefixUserExampleCacheKey + utils.Uint64ToStr(id)
 }
@@ -74,7 +74,7 @@ func (c *userExampleCache) Set(ctx context.Context, id uint64, data *model.UserE
 	return nil
 }
 
-// Get 获取cache
+// Get cache value
 func (c *userExampleCache) Get(ctx context.Context, id uint64) (*model.UserExample, error) {
 	var data *model.UserExample
 	cacheKey := c.GetUserExampleCacheKey(id)
@@ -85,7 +85,7 @@ func (c *userExampleCache) Get(ctx context.Context, id uint64) (*model.UserExamp
 	return data, nil
 }
 
-// MultiSet 批量设置cache
+// MultiSet multiple set cache
 func (c *userExampleCache) MultiSet(ctx context.Context, data []*model.UserExample, duration time.Duration) error {
 	valMap := make(map[string]interface{})
 	for _, v := range data {
@@ -101,7 +101,7 @@ func (c *userExampleCache) MultiSet(ctx context.Context, data []*model.UserExamp
 	return nil
 }
 
-// MultiGet 批量获取cache，返回map中的key是id值
+// MultiGet multiple get cache, return key in map is id value
 func (c *userExampleCache) MultiGet(ctx context.Context, ids []uint64) (map[string]*model.UserExample, error) {
 	var keys []string
 	for _, v := range ids {
@@ -126,7 +126,7 @@ func (c *userExampleCache) MultiGet(ctx context.Context, ids []uint64) (map[stri
 	return retMap, nil
 }
 
-// Del 删除cache
+// Del delete cache
 func (c *userExampleCache) Del(ctx context.Context, id uint64) error {
 	cacheKey := c.GetUserExampleCacheKey(id)
 	err := c.cache.Del(ctx, cacheKey)
@@ -136,7 +136,7 @@ func (c *userExampleCache) Del(ctx context.Context, id uint64) error {
 	return nil
 }
 
-// SetCacheWithNotFound 设置空缓存
+// SetCacheWithNotFound set empty cache
 func (c *userExampleCache) SetCacheWithNotFound(ctx context.Context, id uint64) error {
 	cacheKey := c.GetUserExampleCacheKey(id)
 	err := c.cache.SetCacheWithNotFound(ctx, cacheKey)

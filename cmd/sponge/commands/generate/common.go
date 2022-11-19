@@ -14,12 +14,11 @@ import (
 )
 
 const (
-	// TplNameSponge 模板目录名称
+	// TplNameSponge name of the template
 	TplNameSponge = "sponge"
 )
 
 var (
-	// 指定文件替换标记
 	modelFile     = "model/userExample.go"
 	modelFileMark = "// todo generate model codes to here"
 
@@ -63,7 +62,7 @@ var (
 	makeFile       = "sponge/Makefile"
 	gitIgnoreFile  = "sponge/.gitignore"
 
-	// 清除标记的模板代码片段标记
+	// clear marker for template code marker
 	startMark             = []byte("// delete the templates code start")
 	endMark               = []byte("// delete the templates code end")
 	wellStartMark         = bytes.ReplaceAll(startMark, []byte("//"), []byte("#"))
@@ -73,7 +72,7 @@ var (
 	wellOnlyGrpcStartMark = bytes.ReplaceAll(onlyGrpcStartMark, []byte("//"), []byte("#"))
 	wellOnlyGrpcEndMark   = bytes.ReplaceAll(onlyGrpcEndMark, []byte("//"), []byte("#"))
 
-	// embed FS模板文件时使用
+	// embed FS template file when using
 	selfPackageName = "github.com/zhufuyi/sponge"
 )
 
@@ -115,7 +114,7 @@ func deleteFieldsMark(r replacer.Replacer, filename string, startMark []byte, en
 	}
 	if subBytes := gofile.FindSubBytes(data, startMark, endMark); len(subBytes) > 0 {
 		fields = append(fields,
-			replacer.Field{ // 清除标记的模板代码
+			replacer.Field{ // clear marked template code
 				Old: string(subBytes),
 				New: "",
 			},
@@ -142,16 +141,16 @@ func replaceFileContentMark(r replacer.Replacer, filename string, newContent str
 	return fields
 }
 
-// 解析镜像仓库host和name
+// resolving mirror repository host and name
 func parseImageRepoAddr(addr string) (string, string) {
 	splits := strings.Split(addr, "/")
 
-	// 官方仓库地址
+	// default docker hub official repo address
 	if len(splits) == 1 {
 		return "https://index.docker.io/v1", addr
 	}
 
-	// 非官方仓库地址
+	// unofficial repo address
 	l := len(splits)
 	return strings.Join(splits[:l-1], "/"), splits[l-1]
 }
@@ -185,8 +184,8 @@ func parseProtobufFiles(protobufFile string) ([]string, bool, error) {
 	return protobufFiles, countImportTypes > 0, nil
 }
 
+// save the moduleName and serverName to the specified file for external use
 func saveGenInfo(moduleName string, serverName string, outputDir string) error {
-	// 保存moduleName和serverName到指定文件，给外部使用
 	genInfo := moduleName + "," + serverName
 	dir := outputDir + "/docs"
 	_ = os.MkdirAll(dir, 0666)
@@ -217,7 +216,6 @@ func getNamesFromOutDir(dir string) (string, string) {
 }
 
 func saveProtobufFiles(moduleName string, serverName string, outputDir string, protobufFiles []string) error {
-	// 保存protobuf文件
 	for _, pbFile := range protobufFiles {
 		pbContent, err := os.ReadFile(pbFile)
 		if err != nil {

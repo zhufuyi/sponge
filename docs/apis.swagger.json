@@ -23,8 +23,8 @@
   "paths": {
     "/api/v1/userExample": {
       "post": {
-        "summary": "创建userExample",
-        "description": "提交信息创建userExample",
+        "summary": "create userExample",
+        "description": "submit information to create a userExample",
         "operationId": "userExampleService_Create",
         "responses": {
           "200": {
@@ -57,8 +57,8 @@
     },
     "/api/v1/userExample/{id}": {
       "get": {
-        "summary": "获取userExample详情",
-        "description": "根据id获取userExample详情",
+        "summary": "get userExample details",
+        "description": "get userExample details by id",
         "operationId": "userExampleService_GetByID",
         "responses": {
           "200": {
@@ -88,8 +88,8 @@
         ]
       },
       "delete": {
-        "summary": "删除userExample",
-        "description": "根据id删除userExample",
+        "summary": "delete userExample",
+        "description": "delete userExample by id",
         "operationId": "userExampleService_DeleteByID",
         "responses": {
           "200": {
@@ -119,8 +119,8 @@
         ]
       },
       "put": {
-        "summary": "更新userExample信息",
-        "description": "根据id更新userExample信息",
+        "summary": "update userExample",
+        "description": "update userExample information based on id",
         "operationId": "userExampleService_UpdateByID",
         "responses": {
           "200": {
@@ -192,8 +192,8 @@
     },
     "/api/v1/userExamples": {
       "post": {
-        "summary": "获取userExample列表",
-        "description": "使用post请求获取userExample列表",
+        "summary": "get a list of userExamples",
+        "description": "get a list of userExamples using a post request",
         "operationId": "userExampleService_List",
         "responses": {
           "200": {
@@ -226,8 +226,8 @@
     },
     "/api/v1/userExamples/ids": {
       "post": {
-        "summary": "根据多个id获取userExample列表",
-        "description": "使用post请求，根据多个id获取userExample列表",
+        "summary": "get a list of userExample based on multiple ids",
+        "description": "get a list of userExample based on multiple ids using a post request",
         "operationId": "userExampleService_ListByIDs",
         "responses": {
           "200": {

@@ -16,9 +16,9 @@ import (
 // ProtoBufCommand generate protobuf codes
 func ProtoBufCommand() *cobra.Command {
 	var (
-		moduleName string // go.mod文件的module名称
-		serverName string // 服务名称
-		outPath    string // 输出目录
+		moduleName string // module name for go.mod
+		serverName string // server name
+		outPath    string // output directory
 		sqlArgs    = sql2code.Args{}
 	)
 
@@ -84,11 +84,14 @@ func runGenProtoCommand(moduleName string, serverName string, codes map[string]s
 		serverName = moduleName
 	}
 
-	// 设置模板信息
-	subDirs := []string{"api/serverNameExample"} // 只处理的指定子目录，如果为空或者没有指定的子目录，表示所有文件
-	ignoreDirs := []string{}                     // 指定子目录下忽略处理的目录
-	ignoreFiles := []string{"userExample.pb.go", "userExample.pb.validate.go",
-		"userExample_grpc.pb.go", "userExample_router.pb.go"} // 指定子目录下忽略处理的文件
+	// setting up template information
+	subDirs := []string{ // only the specified subdirectory is processed, if empty or no subdirectory is specified, it means all files
+		"api/serverNameExample",
+	}
+	ignoreDirs := []string{} // specify the directory in the subdirectory where processing is ignored
+	ignoreFiles := []string{ // specify the files in the subdirectory to be ignored for processing
+		"userExample.pb.go", "userExample.pb.validate.go",
+		"userExample_grpc.pb.go", "userExample_router.pb.go"}
 
 	r.SetSubDirsAndFiles(subDirs)
 	r.SetIgnoreSubDirs(ignoreDirs...)
@@ -109,7 +112,7 @@ func addProtoFields(moduleName string, serverName string, r replacer.Replacer, c
 
 	fields = append(fields, deleteFieldsMark(r, protoFile, startMark, endMark)...)
 	fields = append(fields, []replacer.Field{
-		{ // 替换v1/userExample.proto文件内容
+		{ // replace the contents of the v1/userExample.proto file
 			Old: protoFileMark,
 			New: codes[parser.CodeTypeProto],
 		},
@@ -117,7 +120,7 @@ func addProtoFields(moduleName string, serverName string, r replacer.Replacer, c
 			Old: "github.com/zhufuyi/sponge",
 			New: moduleName,
 		},
-		// 替换目录名称
+		// replace directory name
 		{
 			Old: strings.Join([]string{"api", "serverNameExample", "v1"}, gofile.GetPathDelimiter()),
 			New: strings.Join([]string{"api", serverName, "v1"}, gofile.GetPathDelimiter()),
@@ -128,7 +131,7 @@ func addProtoFields(moduleName string, serverName string, r replacer.Replacer, c
 		},
 		{
 			Old: "api.serverNameExample.v1",
-			New: fmt.Sprintf("api.%s.v1", strings.ReplaceAll(serverName, "-", "_")), // protobuf package 不能存在"-"号
+			New: fmt.Sprintf("api.%s.v1", strings.ReplaceAll(serverName, "-", "_")), // protobuf package no "-" signs allowed
 		},
 		{
 			Old:             "UserExample",

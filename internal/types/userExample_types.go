@@ -11,55 +11,55 @@ var _ time.Time
 // todo generate the request and response struct to here
 // delete the templates code start
 
-// CreateUserExampleRequest 创建请求参数，所有字段是必须的，并且满足binding规则
-// binding使用说明 https://github.com/go-playground/validator
+// CreateUserExampleRequest create request parameters, all fields are mandatory and meet binding rules
+// binding instructions for use https://github.com/go-playground/validator
 type CreateUserExampleRequest struct {
-	Name     string `json:"name" binding:"min=2"`         // 名称
-	Email    string `json:"email" binding:"email"`        // 邮件
-	Password string `json:"password" binding:"md5"`       // 密码
-	Phone    string `form:"phone" binding:"e164"`         // 手机号码，e164表示<+国家编号><手机号码>
-	Avatar   string `form:"avatar" binding:"min=5"`       // 头像
-	Age      int    `form:"age" binding:"gt=0,lt=120"`    // 年龄
-	Gender   int    `form:"gender" binding:"gte=0,lte=2"` // 性别，1:男，2:女
+	Name     string `json:"name" binding:"min=2"`         // username
+	Email    string `json:"email" binding:"email"`        // email
+	Password string `json:"password" binding:"md5"`       // password
+	Phone    string `form:"phone" binding:"e164"`         // phone number, e164 means <+ country code> <cell phone number>.
+	Avatar   string `form:"avatar" binding:"min=5"`       // avatar
+	Age      int    `form:"age" binding:"gt=0,lt=120"`    // age
+	Gender   int    `form:"gender" binding:"gte=0,lte=2"` // gender, 1:Male, 2:Female, other values:unknown
 }
 
-// UpdateUserExampleByIDRequest 更新请求参数，所有字段不是必须的，字段为非零值更新
+// UpdateUserExampleByIDRequest update request parameters, all fields are not required, fields are updated with non-zero values
 type UpdateUserExampleByIDRequest struct {
 	ID       uint64 `json:"id" binding:"-"`      // id
-	Name     string `json:"name" binding:""`     // 名称
-	Email    string `json:"email" binding:""`    // 邮件
-	Password string `json:"password" binding:""` // 密码
-	Phone    string `form:"phone" binding:""`    // 手机号码
-	Avatar   string `form:"avatar" binding:""`   // 头像
-	Age      int    `form:"age" binding:""`      // 年龄
-	Gender   int    `form:"gender" binding:""`   // 性别，1:男，2:女
+	Name     string `json:"name" binding:""`     // username
+	Email    string `json:"email" binding:""`    // email
+	Password string `json:"password" binding:""` // password
+	Phone    string `form:"phone" binding:""`    // phone number
+	Avatar   string `form:"avatar" binding:""`   // avatar
+	Age      int    `form:"age" binding:""`      // age
+	Gender   int    `form:"gender" binding:""`   // gender, 1:Male, 2:Female, other values:unknown
 }
 
-// GetUserExampleByIDRespond 返回数据
+// GetUserExampleByIDRespond response data
 type GetUserExampleByIDRespond struct {
 	ID        string    `json:"id"`         // id
-	Name      string    `json:"name"`       // 名称
-	Email     string    `json:"email"`      // 邮件
-	Phone     string    `json:"phone"`      // 手机号码
-	Avatar    string    `json:"avatar"`     // 头像
-	Age       int       `json:"age"`        // 年龄
-	Gender    int       `json:"gender"`     // 性别，1:男，2:女
-	Status    int       `json:"status"`     // 账号状态
-	LoginAt   int64     `json:"login_at"`   // 登录时间戳
-	CreatedAt time.Time `json:"created_at"` // 创建时间
-	UpdatedAt time.Time `json:"updated_at"` // 更新时间
+	Name      string    `json:"name"`       // username
+	Email     string    `json:"email"`      // email
+	Phone     string    `json:"phone"`      // phone number
+	Avatar    string    `json:"avatar"`     // avatar
+	Age       int       `json:"age"`        // age
+	Gender    int       `json:"gender"`     // gender, 1:Male, 2:Female, other values:unknown
+	Status    int       `json:"status"`     // account status, 1:inactive, 2:activated, 3:blocked
+	LoginAt   int64     `json:"login_at"`   // login timestamp
+	CreatedAt time.Time `json:"created_at"` // create time
+	UpdatedAt time.Time `json:"updated_at"` // update time
 }
 
 // delete the templates code end
 
 // GetUserExamplesByIDsRequest request form ids
 type GetUserExamplesByIDsRequest struct {
-	IDs []uint64 `json:"ids" binding:"min=1"` // id列表
+	IDs []uint64 `json:"ids" binding:"min=1"` // id list
 }
 
 // GetUserExamplesRequest request form params
 type GetUserExamplesRequest struct {
-	query.Params // 查询参数
+	query.Params // query parameters
 }
 
 // ListUserExamplesRespond list data

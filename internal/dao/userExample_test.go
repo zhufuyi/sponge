@@ -23,15 +23,15 @@ func newUserExampleDao() *gotest.Dao {
 	testData.CreatedAt = time.Now()
 	testData.UpdatedAt = testData.CreatedAt
 
-	// 初始化mock cache
-	//c := gotest.NewCache(map[string]interface{}{"no cache": testData}) // 为了测试mysql，禁止缓存
+	// init mock cache
+	//c := gotest.NewCache(map[string]interface{}{"no cache": testData}) // to test mysql, disable caching
 	c := gotest.NewCache(map[string]interface{}{utils.Uint64ToStr(testData.ID): testData})
 	c.ICache = cache.NewUserExampleCache(&model.CacheType{
 		CType: "redis",
 		Rdb:   c.RedisClient,
 	})
 
-	// 初始化mock dao
+	// init mock dao
 	d := gotest.NewDao(c, testData)
 	d.IDao = NewUserExampleDao(d.DB, c.ICache.(cache.UserExampleCache))
 
@@ -194,7 +194,7 @@ func Test_userExampleDao_GetByColumns(t *testing.T) {
 	_, _, err := d.IDao.(UserExampleDao).GetByColumns(d.Ctx, &query.Params{
 		Page: 0,
 		Size: 10,
-		Sort: "ignore count", // 忽略测试 select count(*)
+		Sort: "ignore count", // ignore test count(*)
 	})
 	if err != nil {
 		t.Fatal(err)

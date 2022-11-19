@@ -21,5 +21,5 @@ sleep 0.2
 go build -o ${binaryFile} cmd/${serverName}/main.go
 checkResult $?
 
-# 运行服务
+# running server
 ./${binaryFile}

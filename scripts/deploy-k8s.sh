@@ -10,13 +10,13 @@ function checkResult() {
     fi
 }
 
-# 判断文件是否存在
+# Determining whether a file exists
 if [ ! -f "${DEPLOY_FILE}" ];then
-  echo "部署文件文件${DEPLOY_FILE}不存在"
+  echo "Deployment file file ${DEPLOY_FILE} does not exist"
   checkResult 1
 fi
 
-# 检查是否授权操作k8s
+# Check if you are authorised to operate k8s
 echo "kubectl version"
 kubectl version
 checkResult $?

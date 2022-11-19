@@ -1,12 +1,12 @@
-# 生成go struct命令：sponge config --server-dir=./serverDir
+# Generate the go struct command: sponge config --server-dir=./serverDir
 
-# nacos 设置
+# nacos settings
 nacos:
-  ipAddr: "192.168.3.37"  # 服务地址
-  port: 8848                      # 服务端口
-  scheme: "http"               # http或https
+  ipAddr: "192.168.3.37"    # server address
+  port: 8848                      # listening port
+  scheme: "http"               # http or https
   contextPath: "/nacos"     # path
-  namespaceID: "3454d2b5-2455-4d0e-bf6d-e033b086bb4c" # 名称空间id
-  group: "dev"                    # 分组，dev, prod, test
-  dataID: "serverNameExample.yml"  # 配置文件id
-  format: "yaml"                 # 配置文件类型: json,yaml,toml
+  namespaceID: "3454d2b5-2455-4d0e-bf6d-e033b086bb4c" # namespace id
+  group: "dev"                    # group name: dev, prod, test
+  dataID: "serverNameExample.yml"  # config file id
+  format: "yaml"                 # configuration file type: json,yaml,toml

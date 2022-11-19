@@ -18,19 +18,19 @@ func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
-// Replacers 模板名称对应的接口
+// Replacers replacer name
 var Replacers = map[string]replacer.Replacer{}
 
-// Template 模板信息
+// Template information
 type Template struct {
 	Name     string
 	FS       embed.FS
 	FilePath string
 }
 
-// Init 初始化模板
+// Init initializing the template
 func Init(name string, filepath string) error {
-	// 判断模板文件是否存在，不存在，提示先更新
+	// determine if the template file exists, if not, prompt to initialize first
 	if !gofile.IsExists(filepath) {
 		if isShowCommand() {
 			return nil
@@ -50,7 +50,7 @@ func Init(name string, filepath string) error {
 	return nil
 }
 
-// InitFS 初始化FS模板
+// InitFS initializing th FS templates
 func InitFS(name string, filepath string, fs embed.FS) {
 	var err error
 	if _, ok := Replacers[name]; ok {

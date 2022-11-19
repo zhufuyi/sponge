@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# proto文件所在的目录
+# the directory where the proto files are located
 protoBasePath="api"
 allProtoFiles=""
 
@@ -29,7 +29,7 @@ function listFiles(){
     cd ..
 }
 
-# 获取所有proto文件路径
+# get all proto file paths
 listFiles $protoBasePath
 
 protoc --proto_path=.  --proto_path=./third_party \

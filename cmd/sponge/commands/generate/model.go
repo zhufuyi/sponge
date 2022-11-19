@@ -14,7 +14,7 @@ import (
 // ModelCommand generate model codes
 func ModelCommand(parentName string) *cobra.Command {
 	var (
-		outPath string // 输出目录
+		outPath string // output directory
 		sqlArgs = sql2code.Args{
 			Package:  "model",
 			JSONTag:  true,
@@ -66,10 +66,12 @@ func runGenModelCommand(codes map[string]string, outPath string) error {
 		return errors.New("replacer is nil")
 	}
 
-	// 设置模板信息
-	subDirs := []string{"internal/model"}              // 只处理的指定子目录，如果为空或者没有指定的子目录，表示所有文件
-	ignoreDirs := []string{}                           // 指定子目录下忽略处理的目录
-	ignoreFiles := []string{"init.go", "init_test.go"} // 指定子目录下忽略处理的文件
+	// setting up template information
+	subDirs := []string{"internal/model"} // only the specified subdirectory is processed, if empty or no subdirectory is specified, it means all files
+	ignoreDirs := []string{}              // specify the directory in the subdirectory where processing is ignored
+	ignoreFiles := []string{              // specify the files in the subdirectory to be ignored for processing
+		"init.go", "init_test.go",
+	}
 
 	r.SetSubDirsAndFiles(subDirs)
 	r.SetIgnoreSubDirs(ignoreDirs...)
@@ -90,7 +92,7 @@ func addModelFields(r replacer.Replacer, codes map[string]string) []replacer.Fie
 
 	fields = append(fields, deleteFieldsMark(r, modelFile, startMark, endMark)...)
 	fields = append(fields, []replacer.Field{
-		{ // 替换model/userExample.go文件内容
+		{ // replace the contents of the model/userExample.go file
 			Old: modelFileMark,
 			New: codes[parser.CodeTypeModel],
 		},

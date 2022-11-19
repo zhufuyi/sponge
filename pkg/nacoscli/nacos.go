@@ -20,7 +20,7 @@ type Params struct {
 	Port        uint64 // nacos 服务端口
 	Scheme      string // http或https
 	ContextPath string // path
-	NamespaceID string // 名称空间id
+	NamespaceID string // namespace id
 	// 如果参数不为空，替换上面和ClientConfig和ServerConfig相同的字段
 	clientConfig  *constant.ClientConfig
 	serverConfigs []constant.ServerConfig

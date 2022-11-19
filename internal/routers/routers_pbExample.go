@@ -19,63 +19,64 @@ import (
 )
 
 var (
-	rootRouterFns []func(engine *gin.Engine) // 根路由组，rpc gateway使用
+	rootRouterFns []func(engine *gin.Engine) // root routing group, used by rpc gateway
 )
 
-// NewRouter_pbExample 创建一个路由
+// NewRouter_pbExample create a new router
 func NewRouter_pbExample() *gin.Engine { //nolint
 	r := gin.New()
 
 	r.Use(gin.Recovery())
 	r.Use(middleware.Cors())
 
-	// request id 中间件
+	// request id middleware
 	r.Use(middleware.RequestID())
 
-	// logger 中间件
+	// logger middleware
 	r.Use(middleware.Logging(
 		middleware.WithLog(logger.Get()),
 		middleware.WithRequestIDFromContext(),
-		middleware.WithIgnoreRoutes("/metrics"), // 忽略路由
+		middleware.WithIgnoreRoutes("/metrics"), // ignore path
 	))
 
-	// metrics 中间件
+	// metrics middleware
 	if config.Get().App.EnableMetrics {
 		r.Use(metrics.Metrics(r,
-			//metrics.WithMetricsPath("/metrics"),                // 默认是 /metrics
-			metrics.WithIgnoreStatusCodes(http.StatusNotFound), // 忽略404状态码
+			//metrics.WithMetricsPath("/metrics"),                // default is /metrics
+			metrics.WithIgnoreStatusCodes(http.StatusNotFound), // ignore 404 status codes
 		))
 	}
 
-	// limit 中间件
+	// limit middleware
 	if config.Get().App.EnableLimit {
 		r.Use(middleware.RateLimit())
 	}
 
-	// circuit breaker 中间件
+	// circuit breaker middleware
 	if config.Get().App.EnableCircuitBreaker {
 		r.Use(middleware.CircuitBreaker())
 	}
 
-	// trace 中间件
+	// trace middleware
 	if config.Get().App.EnableTracing {
 		r.Use(middleware.Tracing(config.Get().App.Name))
 	}
 
-	// pprof 性能分析
+	// pprof performance analysis
 	if config.Get().App.EnablePprof {
 		prof.Register(r, prof.WithIOWaitTime())
 	}
 
-	// 校验器
+	// validator
 	binding.Validator = validator.Init()
 
 	r.GET("/health", handlerfunc.CheckHealth)
 	r.GET("/ping", handlerfunc.Ping)
 
+	// access path /apis/swagger/index.html
 	swagger.CustomRouter(r, "apis", docs.ApiDocs)
 
-	// 注册/前缀路由组
+	// registration/Prefix Routing Groups
 	for _, fn := range rootRouterFns {
 		fn(r)
 	}

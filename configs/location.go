@@ -5,7 +5,7 @@ import (
 	"runtime"
 )
 
-// 用来定位目录
+// used to locate a directory
 
 var basePath string
 
@@ -15,7 +15,7 @@ func init() {
 	basePath = filepath.Dir(currentFile)
 }
 
-// Path 返回绝对路径
+// Path return absolute path
 func Path(rel string) string {
 	if filepath.IsAbs(rel) {
 		return rel

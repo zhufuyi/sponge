@@ -8,13 +8,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// Version 命令版本号
 var (
 	version     = "v0.0.0"
 	versionFile = os.TempDir() + "/sponge/.github/version"
 )
 
-// NewRootCMD 命令入口
+// NewRootCMD command entry
 func NewRootCMD() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:           "sponge",

@@ -9,25 +9,25 @@ discovery 服务发现，与服务注册[registry](../registry)对应，支持et
     var endpoint string
 
 	switch grpcClientCfg.RegistryDiscoveryType {
-	// 使用consul发现服务
+	// discovering services using consul
 	case "consul":
-		endpoint = "discovery:///" + grpcClientCfg.Name // 通过服务名称连接grpc服务
+		endpoint = "discovery:///" + grpcClientCfg.Name // Connecting to grpc services by service name
 		cli, err := consulcli.Init(cfg.Consul.Addr, consulcli.WithWaitTime(time.Second*5))
 		if err != nil {
 			panic(fmt.Sprintf("consulcli.Init error: %v, addr: %s", err, cfg.Consul.Addr))
 		}
 		iDiscovery := consul.New(cli)
 		cliOptions = append(cliOptions, grpccli.WithDiscovery(iDiscovery))
-	// 使用etcd发现服务
+	// discovering services using etcd
 	case "etcd":
-		endpoint = "discovery:///" + grpcClientCfg.Name // 通过服务名称连接grpc服务
+		endpoint = "discovery:///" + grpcClientCfg.Name // Connecting to grpc services by service name
 		cli, err := etcdcli.Init(cfg.Etcd.Addrs, etcdcli.WithDialTimeout(time.Second*5))
 		if err != nil {
 			panic(fmt.Sprintf("etcdcli.Init error: %v, addr: %s", err, cfg.Etcd.Addrs))
 		}
 		iDiscovery := etcd.New(cli)
 		cliOptions = append(cliOptions, grpccli.WithDiscovery(iDiscovery))
-	// 使用nacos发现服务
+	// discovering services using nacos
 	case "nacos":
 		// example: endpoint = "discovery:///serverName.scheme"
 		endpoint = "discovery:///" + grpcClientCfg.Name + ".grpc"

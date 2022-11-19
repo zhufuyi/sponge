@@ -84,9 +84,9 @@ type configType struct {
 	isConfigCenter bool
 }
 
-// 从configs目录读取所有yaml文件目录，一个是.yml，另一个是cc.yml
+// read all yaml file directories from the config directory, one is .yml and the other is cc.yml
 func getYAMLFile(serverDir string) (map[string]configType, error) {
-	// 生成目标文件:配置文件
+	// generate target file:configuration file
 	files := make(map[string]configType)
 	configsDir := serverDir + gofile.GetPathDelimiter() + "configs"
 	goConfigDir := serverDir + gofile.GetPathDelimiter() + "internal" + gofile.GetPathDelimiter() + "config"

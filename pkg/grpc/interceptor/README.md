@@ -100,7 +100,7 @@ func getServerOptions() []grpc.ServerOption {
 func getDialOptions() []grpc.DialOption {
 	var options []grpc.DialOption
 
-	// 禁用tls
+	// use insecure transfer
 	options = append(options, grpc.WithTransportCredentials(insecure.NewCredentials()))
 
 	// 重试
@@ -127,7 +127,7 @@ func getDialOptions() []grpc.DialOption {
 func getDialOptions() []grpc.DialOption {
 	var options []grpc.DialOption
 
-	// 禁用tls
+	// use insecure transfer
 	options = append(options, grpc.WithTransportCredentials(insecure.NewCredentials()))
 
 	// circuit breaker
@@ -151,7 +151,7 @@ func getDialOptions() []grpc.DialOption {
 func getDialOptions() []grpc.DialOption {
 	var options []grpc.DialOption
 
-	// 禁用tls
+	// use insecure transfer
 	options = append(options, grpc.WithTransportCredentials(insecure.NewCredentials()))
 
 	// circuit breaker
@@ -174,7 +174,7 @@ func getDialOptions() []grpc.DialOption {
 func getDialOptions() []grpc.DialOption {
 	var options []grpc.DialOption
 
-	// 禁止tls加密
+	// use insecure transfer
 	options = append(options, grpc.WithTransportCredentials(insecure.NewCredentials()))
 
 	// 超时拦截器
@@ -214,7 +214,7 @@ func InitTrace(serviceName string) {
 func getDialOptions() []grpc.DialOption {
 	var options []grpc.DialOption
 
-	// 禁用tls加密
+	// use insecure transfer
 	options = append(options, grpc.WithTransportCredentials(insecure.NewCredentials()))
 
 	// tracing跟踪

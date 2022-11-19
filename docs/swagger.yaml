@@ -9,49 +9,51 @@ definitions:
   types.Column:
     properties:
       exp:
-        description: 表达式，值为空时默认为=，有=、!=、>、>=、<、<=、like七种类型
+        description: expressions, which default to = when the value is null, have
+          =, ! =, >, >=, <, <=, like
         type: string
       logic:
-        description: 逻辑类型，值为空时默认为and，有&(and)、||(or)两种类型
+        description: logical type, defaults to and when value is null, only &(and),
+          ||(or)
         type: string
       name:
-        description: 列名
+        description: column name
         type: string
       value:
-        description: 列值
+        description: column value
     type: object
   types.CreateUserExampleRequest:
     properties:
       age:
-        description: 年龄
+        description: age
         type: integer
       avatar:
-        description: 头像
+        description: avatar
         minLength: 5
         type: string
       email:
-        description: 邮件
+        description: email
         type: string
       gender:
-        description: 性别，1:男，2:女
+        description: gender, 1:Male, 2:Female, other values:unknown
         maximum: 2
         minimum: 0
         type: integer
       name:
-        description: 名称
+        description: username
         minLength: 2
         type: string
       password:
-        description: 密码
+        description: password
         type: string
       phone:
-        description: 手机号码，e164表示<+国家编号><手机号码>
+        description: phone number, e164 means <+ country code> <cell phone number>.
         type: string
     type: object
   types.GetUserExamplesByIDsRequest:
     properties:
       ids:
-        description: id列表
+        description: id list
         items:
           type: integer
         minItems: 1
@@ -60,57 +62,57 @@ definitions:
   types.Params:
     properties:
       columns:
-        description: 列查询条件
+        description: query conditions
         items:
           $ref: '#/definitions/types.Column'
         type: array
       page:
-        description: 页码
+        description: page number, starting from page 0
         minimum: 0
         type: integer
       size:
-        description: 每页行数
+        description: lines per page
         type: integer
       sort:
-        description: 排序字段，默认值为-id，字段前面有-号表示倒序，否则升序，多个字段用逗号分隔
+        description: sorted fields, multi-column sorting separated by commas
         type: string
     type: object
   types.Result:
     properties:
       code:
-        description: 返回码
+        description: return code
         type: integer
       data:
-        description: 返回数据
+        description: return data
       msg:
-        description: 返回信息说明
+        description: return information description
         type: string
     type: object
   types.UpdateUserExampleByIDRequest:
     properties:
       age:
-        description: 年龄
+        description: age
         type: integer
       avatar:
-        description: 头像
+        description: avatar
         type: string
       email:
-        description: 邮件
+        description: email
         type: string
       gender:
-        description: 性别，1:男，2:女
+        description: gender, 1:Male, 2:Female, other values:unknown
         type: integer
       id:
         description: id
         type: integer
       name:
-        description: 名称
+        description: username
         type: string
       password:
-        description: 密码
+        description: password
         type: string
       phone:
-        description: 手机号码
+        description: phone number
         type: string
     type: object
 host: localhost:8080
@@ -124,9 +126,9 @@ paths:
     post:
       consumes:
       - application/json
-      description: 提交信息创建userExample
+      description: submit information to create userExample
       parameters:
-      - description: userExample信息
+      - description: userExample information
         in: body
         name: data
         required: true
@@ -139,14 +141,14 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/types.Result'
-      summary: 创建userExample
+      summary: create userExample
       tags:
       - userExample
   /api/v1/userExample/{id}:
     delete:
       consumes:
       - application/json
-      description: 根据id删除userExample
+      description: delete userExample by id
       parameters:
       - description: id
         in: path
@@ -160,13 +162,13 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/types.Result'
-      summary: 删除userExample
+      summary: delete userExample
       tags:
       - userExample
     get:
       consumes:
       - application/json
-      description: 根据id获取userExample详情
+      description: get userExample details by id
       parameters:
       - description: id
         in: path
@@ -180,20 +182,20 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/types.Result'
-      summary: 获取userExample详情
+      summary: get userExample details
       tags:
       - userExample
     put:
       consumes:
       - application/json
-      description: 根据id更新userExample信息
+      description: update userExample information based on id
       parameters:
       - description: id
         in: path
         name: id
         required: true
         type: string
-      - description: userExample信息
+      - description: userExample information
         in: body
         name: data
         required: true
@@ -206,16 +208,16 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/types.Result'
-      summary: 更新userExample信息
+      summary: update userExample information
       tags:
       - userExample
   /api/v1/userExamples:
     post:
       consumes:
       - application/json
-      description: 使用post请求获取userExample列表
+      description: get a list of userExamples using a post request
       parameters:
-      - description: 查询条件
+      - description: query parameters
         in: body
         name: data
         required: true
@@ -228,16 +230,16 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/types.Result'
-      summary: 获取userExample列表
+      summary: get a list of userExample
       tags:
       - userExample
   /api/v1/userExamples/ids:
     post:
       consumes:
       - application/json
-      description: 使用post请求，根据多个id获取userExample列表
+      description: get a list of userExample based on multiple ids using a post request
       parameters:
-      - description: id 数组
+      - description: id array
         in: body
         name: data
         required: true
@@ -250,7 +252,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/types.Result'
-      summary: 根据多个id获取userExample列表
+      summary: get multiple records based on multiple ids
       tags:
       - userExample
   /health:

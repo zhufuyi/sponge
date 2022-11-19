@@ -112,11 +112,11 @@ func (d *userExampleDao) GetByID(ctx context.Context, id uint64) (*model.UserExa
 	}
 
 	if errors.Is(err, model.ErrCacheNotFound) {
-		// 从mysql获取
+		// get from mysql
 		table := &model.UserExample{}
 		err = d.db.WithContext(ctx).Where("id = ?", id).First(table).Error
 		if err != nil {
-			// if data is empty, set not found cache to prevent cache penetration(防止缓存穿透)
+			// if data is empty, set not found cache to prevent cache penetration(preventing Cache Penetration)
 			if errors.Is(err, model.ErrRecordNotFound) {
 				err = d.cache.SetCacheWithNotFound(ctx, id)
 				if err != nil {
@@ -162,7 +162,7 @@ func (d *userExampleDao) GetByIDs(ctx context.Context, ids []uint64) ([]*model.U
 
 	// get missed data
 	if len(missedIDs) > 0 {
-		// 找出主动占位符的id，也就是在mysql不存在的id
+		// find the id of an active placeholder, i.e. an id that does not exist in mysql
 		var realMissedIDs []uint64
 		for _, id := range missedIDs {
 			_, err = d.cache.Get(ctx, id)
@@ -198,34 +198,34 @@ func (d *userExampleDao) GetByIDs(ctx context.Context, ids []uint64) ([]*model.U
 
 // GetByColumns filter multiple rows based on paging and column information
 //
-// params 包括分页参数和查询参数
-// 分页参数(必须):
+// params includes paging parameters and query parameters
+// paging parameters (required):
 //
-//	page: 页码，从0开始
-//	size: 每页行数
-//	sort: 排序字段，默认是id倒叙，可以在字段前添加-号表示倒序，没有-号表示升序，多个字段用逗号分隔
+//	page: page number, starting from 0
+//	size: lines per page
+//	sort: sort fields, default is id backwards, you can add - sign before the field to indicate reverse order, no - sign to indicate ascending order, multiple fields separated by comma
 //
-// 查询参数(非必须):
+// query parameters (not required):
 //
-//	name: 列名
-//	exp: 表达式，有=、!=、>、>=、<、<=、like七种类型，值为空时默认是=
-//	value: 列值
-//	logic: 表示逻辑类型，有&(and)、||(or)两种类型，值为空时默认是and
+//	name: column name
+//	exp: expressions, which default to = when the value is null, have =, ! =, >, >=, <, <=, like
+//	value: column name
+//	logic: logical type, defaults to and when value is null, only &(and), ||(or)
 //
-// 示例: 查询年龄大于20的男性
+// example: search for a male over 20 years of age
 //
 //	params = &query.Params{
 //	    Page: 0,
 //	    Size: 20,
 //	    Columns: []query.Column{
 //		{
-//			serviceName:    "age",
+//			Name:    "age",
 //			Exp: ">",
 //			Value:   20,
 //		},
 //		{
-//			serviceName:  "gender",
-//			Value: "男",
+//			Name:  "gender",
+//			Value: "male",
 //		},
 //	}
 func (d *userExampleDao) GetByColumns(ctx context.Context, params *query.Params) ([]*model.UserExample, int64, error) {
@@ -235,7 +235,7 @@ func (d *userExampleDao) GetByColumns(ctx context.Context, params *query.Params)
 	}
 
 	var total int64
-	if params.Sort != "ignore count" { // 忽略测试标记
+	if params.Sort != "ignore count" { // determine if count is required
 		err = d.db.WithContext(ctx).Model(&model.UserExample{}).Select([]string{"id"}).Where(queryStr, args...).Count(&total).Error
 		if err != nil {
 			return nil, 0, err
