@@ -17,21 +17,21 @@ type Option func(*options)
 type options struct {
 	timeout time.Duration
 
-	credentials        credentials.TransportCredentials // 安全连接credentials
-	dialOptions        []grpc.DialOption                // 自定义options
-	unaryInterceptors  []grpc.UnaryClientInterceptor    // 自定义unary拦截器
-	streamInterceptors []grpc.StreamClientInterceptor   // 自定义stream拦截器
+	credentials        credentials.TransportCredentials // secure connections
+	dialOptions        []grpc.DialOption                // custom options
+	unaryInterceptors  []grpc.UnaryClientInterceptor    // custom unary interceptor
+	streamInterceptors []grpc.StreamClientInterceptor   // custom stream interceptor
 
-	enableLog bool // 是否开启日志
+	enableLog bool // whether to turn on the log
 	log       *zap.Logger
 
-	enableTrace          bool // 是否开启链路跟踪
-	enableMetrics        bool // 是否开启指标
-	enableRetry          bool // 是否开启重试
-	enableLoadBalance    bool // 是否开启负载均衡器
-	enableCircuitBreaker bool // 是否开启熔断器
+	enableTrace          bool // whether to turn on tracing
+	enableMetrics        bool // whether to turn on metrics
+	enableRetry          bool // whether to turn on retry
+	enableLoadBalance    bool // whether to turn on load balance
+	enableCircuitBreaker bool // whether to turn on circuit breaker
 
-	discovery registry.Discovery // 服务发现接口
+	discovery registry.Discovery // if not nil means use service discovery
 }
 
 func defaultOptions() *options {

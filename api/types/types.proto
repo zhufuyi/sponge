@@ -4,16 +4,16 @@ package types;
 
 option go_package = "github.com/zhufuyi/sponge/api/types;types";
 
-message Column {
-  string  name=1;  // 列名
-  string  exp=2;   // 表达式，值为空时默认为=，有=、!=、>、>=、<、<=、like七种类型
-  string value=3; // 列值
-  string  logic=4; // 逻辑类型，值为空时默认为and，只有&(and)、||(or)两种类型
+message Params {
+  int32 page = 1; // page number, starting from 0
+  int32 limit = 2; // lines per page
+  string sort = 3; // sorted fields, multi-column sorting separated by commas
+  repeated Column columns = 4; // query conditions
 }
 
-message Params {
-  int32 page = 1; // 页码，从0开始
-  int32 limit = 2; // 每页行数
-  string sort = 3; // 排序字段，多列排序用逗号分隔
-  repeated Column columns = 4; // 查询条件
+message Column {
+  string  name=1;  // column name
+  string  exp=2;   // expressions, which default to = when the value is null, have =, ! =, >, >=, <, <=, like
+  string value=3; // column value
+  string  logic=4; // logical type, defaults to and when value is null, only &(and), ||(or)
 }

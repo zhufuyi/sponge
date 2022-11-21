@@ -2,11 +2,11 @@ package interceptor
 
 import (
 	"context"
+
 	"github.com/zhufuyi/sponge/pkg/container/group"
 	"github.com/zhufuyi/sponge/pkg/errcode"
+	"github.com/zhufuyi/sponge/pkg/shield/circuitbreaker"
 
-	"github.com/go-kratos/aegis/circuitbreaker"
-	"github.com/go-kratos/aegis/circuitbreaker/sre"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -25,7 +25,7 @@ type circuitBreakerOptions struct {
 func defaultCircuitBreakerOptions() *circuitBreakerOptions {
 	return &circuitBreakerOptions{
 		group: group.NewGroup(func() interface{} {
-			return sre.NewBreaker()
+			return circuitbreaker.NewBreaker()
 		}),
 	}
 }
@@ -107,7 +107,7 @@ func UnaryServerCircuitBreaker(opts ...CircuitBreakerOption) grpc.UnaryServerInt
 	o := defaultCircuitBreakerOptions()
 	o.apply(opts...)
 
-	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
+	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		breaker := o.group.Get(info.FullMethod).(circuitbreaker.CircuitBreaker)
 		if err := breaker.Allow(); err != nil {
 			// NOTE: when client reject request locally,

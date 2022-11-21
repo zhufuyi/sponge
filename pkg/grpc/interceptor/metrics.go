@@ -6,22 +6,22 @@ import (
 	"google.golang.org/grpc"
 )
 
-// UnaryClientMetrics 客户端指标unary拦截器
+// UnaryClientMetrics client-side metrics unary interceptor
 func UnaryClientMetrics() grpc.UnaryClientInterceptor {
 	return metrics.UnaryClientMetrics()
 }
 
-// StreamClientMetrics 客户端指标stream拦截器
+// StreamClientMetrics client-side metrics stream interceptor
 func StreamClientMetrics() grpc.StreamClientInterceptor {
 	return metrics.StreamClientMetrics()
 }
 
-// UnaryServerMetrics 服务端指标unary拦截器
-func UnaryServerMetrics(opts ...metrics.MetricsOption) grpc.UnaryServerInterceptor {
+// UnaryServerMetrics server-side metrics unary interceptor
+func UnaryServerMetrics(opts ...metrics.Option) grpc.UnaryServerInterceptor {
 	return metrics.UnaryServerMetrics(opts...)
 }
 
-// StreamServerMetrics 服务端指标stream拦截器
-func StreamServerMetrics(opts ...metrics.MetricsOption) grpc.StreamServerInterceptor {
+// StreamServerMetrics server-side metrics stream interceptor
+func StreamServerMetrics(opts ...metrics.Option) grpc.StreamServerInterceptor {
 	return metrics.StreamServerMetrics(opts...)
 }

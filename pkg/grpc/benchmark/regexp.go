@@ -33,11 +33,11 @@ func getMethodNames(data []byte, methodPattern string) []string {
 	return names
 }
 
-// 匹配名称，不区分大小写
+// match name, not case-sensitive
 func matchName(names []string, name string) string {
 	out := ""
 	for _, s := range names {
-		if strings.ToLower(s) == strings.ToLower(name) {
+		if strings.EqualFold(s, name) {
 			out = s
 			break
 		}

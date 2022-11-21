@@ -18,7 +18,7 @@ const docTemplate = `{
     "paths": {
         "/api/v1/userExample": {
             "post": {
-                "description": "提交信息创建userExample",
+                "description": "submit information to create userExample",
                 "consumes": [
                     "application/json"
                 ],
@@ -28,10 +28,10 @@ const docTemplate = `{
                 "tags": [
                     "userExample"
                 ],
-                "summary": "创建userExample",
+                "summary": "create userExample",
                 "parameters": [
                     {
-                        "description": "userExample信息",
+                        "description": "userExample information",
                         "name": "data",
                         "in": "body",
                         "required": true,
@@ -52,7 +52,7 @@ const docTemplate = `{
         },
         "/api/v1/userExample/{id}": {
             "get": {
-                "description": "根据id获取userExample详情",
+                "description": "get userExample details by id",
                 "consumes": [
                     "application/json"
                 ],
@@ -62,7 +62,7 @@ const docTemplate = `{
                 "tags": [
                     "userExample"
                 ],
-                "summary": "获取userExample详情",
+                "summary": "get userExample details",
                 "parameters": [
                     {
                         "type": "string",
@@ -82,7 +82,7 @@ const docTemplate = `{
                 }
             },
             "put": {
-                "description": "根据id更新userExample信息",
+                "description": "update userExample information based on id",
                 "consumes": [
                     "application/json"
                 ],
@@ -92,7 +92,7 @@ const docTemplate = `{
                 "tags": [
                     "userExample"
                 ],
-                "summary": "更新userExample信息",
+                "summary": "update userExample information",
                 "parameters": [
                     {
                         "type": "string",
@@ -102,7 +102,7 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "userExample信息",
+                        "description": "userExample information",
                         "name": "data",
                         "in": "body",
                         "required": true,
@@ -121,7 +121,7 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "description": "根据id删除userExample",
+                "description": "delete userExample by id",
                 "consumes": [
                     "application/json"
                 ],
@@ -131,7 +131,7 @@ const docTemplate = `{
                 "tags": [
                     "userExample"
                 ],
-                "summary": "删除userExample",
+                "summary": "delete userExample",
                 "parameters": [
                     {
                         "type": "string",
@@ -153,7 +153,7 @@ const docTemplate = `{
         },
         "/api/v1/userExamples": {
             "post": {
-                "description": "使用post请求获取userExample列表",
+                "description": "get a list of userExamples using a post request",
                 "consumes": [
                     "application/json"
                 ],
@@ -163,10 +163,10 @@ const docTemplate = `{
                 "tags": [
                     "userExample"
                 ],
-                "summary": "获取userExample列表",
+                "summary": "get a list of userExample",
                 "parameters": [
                     {
-                        "description": "查询条件",
+                        "description": "query parameters",
                         "name": "data",
                         "in": "body",
                         "required": true,
@@ -187,7 +187,7 @@ const docTemplate = `{
         },
         "/api/v1/userExamples/ids": {
             "post": {
-                "description": "使用post请求，根据多个id获取userExample列表",
+                "description": "get a list of userExample based on multiple ids using a post request",
                 "consumes": [
                     "application/json"
                 ],
@@ -197,10 +197,10 @@ const docTemplate = `{
                 "tags": [
                     "userExample"
                 ],
-                "summary": "根据多个id获取userExample列表",
+                "summary": "get multiple records based on multiple ids",
                 "parameters": [
                     {
-                        "description": "id 数组",
+                        "description": "id array",
                         "name": "data",
                         "in": "body",
                         "required": true,
@@ -275,19 +275,19 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "exp": {
-                    "description": "表达式，值为空时默认为=，有=、!=、\u003e、\u003e=、\u003c、\u003c=、like七种类型",
+                    "description": "expressions, which default to = when the value is null, have =, ! =, \u003e, \u003e=, \u003c, \u003c=, like",
                     "type": "string"
                 },
                 "logic": {
-                    "description": "逻辑类型，值为空时默认为and，有\u0026(and)、||(or)两种类型",
+                    "description": "logical type, defaults to and when value is null, only \u0026(and), ||(or)",
                     "type": "string"
                 },
                 "name": {
-                    "description": "列名",
+                    "description": "column name",
                     "type": "string"
                 },
                 "value": {
-                    "description": "列值"
+                    "description": "column value"
                 }
             }
         },
@@ -295,35 +295,35 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "age": {
-                    "description": "年龄",
+                    "description": "age",
                     "type": "integer"
                 },
                 "avatar": {
-                    "description": "头像",
+                    "description": "avatar",
                     "type": "string",
                     "minLength": 5
                 },
                 "email": {
-                    "description": "邮件",
+                    "description": "email",
                     "type": "string"
                 },
                 "gender": {
-                    "description": "性别，1:男，2:女",
+                    "description": "gender, 1:Male, 2:Female, other values:unknown",
                     "type": "integer",
                     "maximum": 2,
                     "minimum": 0
                 },
                 "name": {
-                    "description": "名称",
+                    "description": "username",
                     "type": "string",
                     "minLength": 2
                 },
                 "password": {
-                    "description": "密码",
+                    "description": "password",
                     "type": "string"
                 },
                 "phone": {
-                    "description": "手机号码，e164表示\u003c+国家编号\u003e\u003c手机号码\u003e",
+                    "description": "phone number, e164 means \u003c+ country code\u003e \u003ccell phone number\u003e.",
                     "type": "string"
                 }
             }
@@ -332,7 +332,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "ids": {
-                    "description": "id列表",
+                    "description": "id list",
                     "type": "array",
                     "minItems": 1,
                     "items": {
@@ -345,23 +345,23 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "columns": {
-                    "description": "列查询条件",
+                    "description": "query conditions",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/types.Column"
                     }
                 },
                 "page": {
-                    "description": "页码",
+                    "description": "page number, starting from page 0",
                     "type": "integer",
                     "minimum": 0
                 },
                 "size": {
-                    "description": "每页行数",
+                    "description": "lines per page",
                     "type": "integer"
                 },
                 "sort": {
-                    "description": "排序字段，默认值为-id，字段前面有-号表示倒序，否则升序，多个字段用逗号分隔",
+                    "description": "sorted fields, multi-column sorting separated by commas",
                     "type": "string"
                 }
             }
@@ -370,14 +370,14 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "code": {
-                    "description": "返回码",
+                    "description": "return code",
                     "type": "integer"
                 },
                 "data": {
-                    "description": "返回数据"
+                    "description": "return data"
                 },
                 "msg": {
-                    "description": "返回信息说明",
+                    "description": "return information description",
                     "type": "string"
                 }
             }
@@ -386,19 +386,19 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "age": {
-                    "description": "年龄",
+                    "description": "age",
                     "type": "integer"
                 },
                 "avatar": {
-                    "description": "头像",
+                    "description": "avatar",
                     "type": "string"
                 },
                 "email": {
-                    "description": "邮件",
+                    "description": "email",
                     "type": "string"
                 },
                 "gender": {
-                    "description": "性别，1:男，2:女",
+                    "description": "gender, 1:Male, 2:Female, other values:unknown",
                     "type": "integer"
                 },
                 "id": {
@@ -406,15 +406,15 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "name": {
-                    "description": "名称",
+                    "description": "username",
                     "type": "string"
                 },
                 "password": {
-                    "description": "密码",
+                    "description": "password",
                     "type": "string"
                 },
                 "phone": {
-                    "description": "手机号码",
+                    "description": "phone number",
                     "type": "string"
                 }
             }

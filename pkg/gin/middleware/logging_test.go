@@ -23,26 +23,26 @@ func runLogHTTPServer() string {
 	r := gin.Default()
 	r.Use(RequestID())
 
-	// 默认打印日志
+	// default Print Log
 	//	r.Use(Logging())
 
-	// 自定义打印日志
+	// custom print log
 	r.Use(Logging(
 		WithLog(logger.Get()),
 		WithMaxLen(40),
 		WithRequestIDFromHeader(),
 		WithRequestIDFromContext(),
-		WithIgnoreRoutes("/ping"), // 忽略/ping
+		WithIgnoreRoutes("/ping"), // ignore path /ping
 	))
 
-	// 自定义zap log
+	// custom zap log
 	//log, _ := logger.Init(logger.WithFormat("json"))
 	//r.Use(Logging(
 	//	WithLog(log),
 	//))
 
 	helloFun := func(c *gin.Context) {
-		logger.Info("test request id", utils.FieldRequestIDFromContext(c))
+		logger.Info("test request id", GCtxRequestIDField(c))
 		response.Success(c, "hello world")
 	}
 

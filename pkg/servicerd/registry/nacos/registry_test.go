@@ -3,8 +3,10 @@ package nacos
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
+	"github.com/zhufuyi/sponge/pkg/utils"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -18,12 +20,14 @@ func TestNewRegistry(t *testing.T) {
 	instanceName := "serverName"
 	instanceEndpoints := []string{"grpc://192.168.3.27:8282"}
 
-	iRegistry, instance, err := NewRegistry(nacosIPAddr, nacosPort, nacosNamespaceID, id, instanceName, instanceEndpoints)
-	if err != nil {
-		t.Log(err)
-		return
-	}
-	t.Log(iRegistry, instance)
+	utils.SafeRunWithTimeout(time.Second*2, func(cancel context.CancelFunc) {
+		iRegistry, instance, err := NewRegistry(nacosIPAddr, nacosPort, nacosNamespaceID, id, instanceName, instanceEndpoints)
+		if err != nil {
+			t.Log(err)
+			return
+		}
+		t.Log(iRegistry, instance)
+	})
 }
 
 func newNacosRegistry() *Registry {
@@ -37,9 +41,13 @@ func newNacosRegistry() *Registry {
 }
 
 func TestRegistry(t *testing.T) {
-	r := newNacosRegistry()
 	instance := registry.NewServiceInstance("foo", "bar", []string{"grpc://127.0.0.1:8282"})
+	r := &Registry{}
+	utils.SafeRunWithTimeout(time.Second*3, func(cancel context.CancelFunc) {
+		r = newNacosRegistry()
+	})
 
+	defer func() { recover() }()
 	err := r.Register(context.Background(), instance)
 	t.Log(err)
 
@@ -54,8 +62,13 @@ func TestRegistry(t *testing.T) {
 }
 
 func TestRegistry_RegisterError(t *testing.T) {
-	r := newNacosRegistry()
 	instance := registry.NewServiceInstance("", "", []string{"grpc://127.0.0.1:8282"})
+	r := &Registry{}
+	utils.SafeRunWithTimeout(time.Second*3, func(cancel context.CancelFunc) {
+		r = newNacosRegistry()
+	})
+	defer func() { recover() }()
+
 	err := r.Register(context.Background(), instance)
 	assert.Error(t, err)
 

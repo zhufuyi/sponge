@@ -1,25 +1,25 @@
-## mysql客户端
+## mysql
 
-在[gorm](gorm.io/gorm)基础上封装的库，添加了链路跟踪，分页查询等功能。
+A library wrapped on top of [gorm](gorm.io/gorm), with added features such as link tracing, paging queries, etc.
 
 <br>
 
-## 使用示例
+## Example of use
 
-### 初始化连接示例
+### Initializing the connection
 
 ```go
     var dsn = "root:123456@(192.168.1.6:3306)/test?charset=utf8mb4&parseTime=True&loc=Local"
 
-    // (1) 使用默认设置连接数据库
+    // (1) connect to the database using the default settings
     db, err := mysql.Init(dsn)
 
-    // (2) 自定义设置连接数据库
+    // (2) customised settings to connect to the database
 	db, err := Init(
 		dsn,
-		//WithLog(), // 打印所有日志
-		WithSlowThreshold(time.Millisecond*100), // 只打印执行时间超过100毫秒的日志
-		WithEnableTrace(),                       // 开启链路跟踪
+		//WithLog(), // print all logs
+		WithSlowThreshold(time.Millisecond*100), // only print logs that take longer than 100 milliseconds to execute
+		WithEnableTrace(),                       // enable tracing
 		WithMaxIdleConns(5),
 		WithMaxOpenConns(50),
 		WithConnMaxLifetime(time.Minute*3),
@@ -28,7 +28,7 @@
 
 <br>
 
-### model示例
+### Model
 
 ```go
 package model
@@ -54,14 +54,14 @@ func (table *UserExample) TableName() string {
 
 <br>
 
-### 事务示例
+### Transaction
 
 ```go
 func createUser() error {
-	// 注意，当你在一个事务中应使用 tx 作为数据库句柄
+	// note that you should use tx as the database handle when you are in a transaction
 	tx := db.Begin()
 	defer func() {
-		if err := recover(); err != nil { // 在事务执行过程发生panic后回滚
+		if err := recover(); err != nil { // rollback after a panic during transaction execution
 			tx.Rollback()
 			fmt.Printf("transaction failed, err = %v\n", err)
 		}
@@ -77,9 +77,9 @@ func createUser() error {
 		return err
 	}
 
-	panic("发生了异常")
+	panic("mock panic")
 
-	if err = tx.Create(&userExample{Name: "lisi", Age: table.Age + 2, Gender: "男"}).Error; err != nil {
+	if err = tx.Create(&userExample{Name: "Mr Li", Age: table.Age + 2, Gender: "male"}).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -89,7 +89,7 @@ func createUser() error {
 ```
 <br>
 
-更多使用查看gorm的使用指南
+## gorm User Guide
 
 - https://gorm.io/zh_CN/docs/index.html
 - https://learnku.com/docs/gorm/v2

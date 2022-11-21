@@ -2,12 +2,13 @@ package gofile
 
 import (
 	"os"
+	"path"
 	"path/filepath"
 	"runtime"
 	"strings"
 )
 
-// IsExists 判断文件或文件夹是否存在
+// IsExists determine if a file or folder exists
 func IsExists(path string) bool {
 	_, err := os.Stat(path)
 	if err != nil {
@@ -16,7 +17,7 @@ func IsExists(path string) bool {
 	return true
 }
 
-// GetRunPath 获取程序执行的绝对路径
+// GetRunPath get the absolute path of the program execution
 func GetRunPath() string {
 	dir, err := os.Executable()
 	if err != nil {
@@ -26,18 +27,18 @@ func GetRunPath() string {
 	return filepath.Dir(dir)
 }
 
-// GetFilename 获取文件名
+// GetFilename get file name
 func GetFilename(filePath string) string {
 	_, name := filepath.Split(filePath)
 	return name
 }
 
-// IsWindows 判断是否window环境
+// IsWindows determining whether a window environment
 func IsWindows() bool {
 	return runtime.GOOS == "windows"
 }
 
-// GetPathDelimiter 根据系统类型获取分隔符
+// GetPathDelimiter get separator by system type
 func GetPathDelimiter() string {
 	delimiter := "/"
 	if IsWindows() {
@@ -47,7 +48,7 @@ func GetPathDelimiter() string {
 	return delimiter
 }
 
-// ListFiles 遍历指定目录下所有文件，返回文件的绝对路径
+// ListFiles iterates over all files in the specified directory, returning the absolute path to the file
 func ListFiles(dirPath string, opts ...Option) ([]string, error) {
 	files := []string{}
 	err := error(nil)
@@ -72,7 +73,7 @@ func ListFiles(dirPath string, opts ...Option) ([]string, error) {
 	return files, walkDir(dirPath, &files)
 }
 
-// ListDirsAndFiles 遍历指定目录下所有子目录文件，返回文件的绝对路径
+// ListDirsAndFiles iterates through all subdirectories of the specified directory, returning the absolute path to the file
 func ListDirsAndFiles(dirPath string) (map[string][]string, error) {
 	df := make(map[string][]string, 2)
 
@@ -94,7 +95,31 @@ func ListDirsAndFiles(dirPath string) (map[string][]string, error) {
 	return df, nil
 }
 
-// 带过滤条件通过迭代方式遍历文件
+// FuzzyMatchFiles fuzzy matching of documents, * only
+func FuzzyMatchFiles(f string) []string {
+	var files []string
+	dir, filenameReg := filepath.Split(f)
+	if !strings.Contains(filenameReg, "*") {
+		files = append(files, f)
+		return files
+	}
+
+	lFiles, err := ListFiles(dir)
+	if err != nil {
+		return files
+	}
+	for _, file := range lFiles {
+		_, filename := filepath.Split(file)
+		isMatch, _ := path.Match(filenameReg, filename)
+		if isMatch {
+			files = append(files, file)
+		}
+	}
+
+	return files
+}
+
+// iterative traversal of documents with filter conditions
 func walkDirWithFilter(dirPath string, allFiles *[]string, filter filterFn) error {
 	files, err := os.ReadDir(dirPath)
 	if err != nil {
@@ -142,7 +167,7 @@ func walkDir2(dirPath string, allDirs *[]string, allFiles *[]string) error {
 
 type filterFn func(string) bool
 
-// 后缀匹配
+// suffix matching
 func matchSuffix(suffixName string) filterFn {
 	return func(filename string) bool {
 		if suffixName == "" {
@@ -150,14 +175,14 @@ func matchSuffix(suffixName string) filterFn {
 		}
 
 		size := len(filename) - len(suffixName)
-		if size >= 0 && filename[size:] == suffixName { // 后缀
+		if size >= 0 && filename[size:] == suffixName {
 			return true
 		}
 		return false
 	}
 }
 
-// 前缀匹配
+// prefix Matching
 func matchPrefix(prefixName string) filterFn {
 	return func(filePath string) bool {
 		if prefixName == "" {
@@ -165,14 +190,14 @@ func matchPrefix(prefixName string) filterFn {
 		}
 		filename := GetFilename(filePath)
 		size := len(filename) - len(prefixName)
-		if size >= 0 && filename[:len(prefixName)] == prefixName { // 前缀
+		if size >= 0 && filename[:len(prefixName)] == prefixName {
 			return true
 		}
 		return false
 	}
 }
 
-// 包含字符串
+// contains the string
 func matchContain(containName string) filterFn {
 	return func(filePath string) bool {
 		if containName == "" {
@@ -183,7 +208,7 @@ func matchContain(containName string) filterFn {
 	}
 }
 
-// 通过迭代方式遍历文件
+// traversing the document by iteration
 func walkDir(dirPath string, allFiles *[]string) error {
 	files, err := os.ReadDir(dirPath)
 	if err != nil {

@@ -23,11 +23,11 @@ func ConfigCommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "config",
-		Short: "Generate go config code from yaml file",
-		Long: `generate go config code from yaml file.
+		Short: "Generate go config codes from yaml file",
+		Long: `generate go config codes from yaml file.
 
 Examples:
-  # generate config code in server directory, the yaml configuration file must be in <yourServerDir>/configs directory.
+  # generate config codes in server directory, the yaml configuration file must be in <yourServerDir>/configs directory.
   sponge config --server-dir=/yourServerDir
 `,
 		SilenceErrors: true,
@@ -84,9 +84,9 @@ type configType struct {
 	isConfigCenter bool
 }
 
-// 从configs目录读取所有yaml文件目录，一个是.yml，另一个是cc.yml
+// read all yaml file directories from the config directory, one is .yml and the other is cc.yml
 func getYAMLFile(serverDir string) (map[string]configType, error) {
-	// 生成目标文件:配置文件
+	// generate target file:configuration file
 	files := make(map[string]configType)
 	configsDir := serverDir + gofile.GetPathDelimiter() + "configs"
 	goConfigDir := serverDir + gofile.GetPathDelimiter() + "internal" + gofile.GetPathDelimiter() + "config"
@@ -95,16 +95,10 @@ func getYAMLFile(serverDir string) (map[string]configType, error) {
 	if err != nil {
 		return nil, err
 	}
-	if len(ymlFiles) > 2 {
-		return nil, fmt.Errorf("config files are allowed up to 2, currently there are %d", len(ymlFiles))
-	}
 
 	yamlFiles, err := gofile.ListFiles(configsDir, gofile.WithSuffix(".yaml"))
 	if err != nil {
 		return nil, err
-	}
-	if len(yamlFiles) > 2 {
-		return nil, fmt.Errorf("config files are allowed up to 2, currently there are %d", len(yamlFiles))
 	}
 
 	if len(ymlFiles) == 0 && len(yamlFiles) == 0 {

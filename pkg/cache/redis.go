@@ -25,7 +25,7 @@ type redisCache struct {
 	newObject         func() interface{}
 }
 
-// NewRedisCache new一个cache, client 参数是可传入的，方便进行单元测试
+// NewRedisCache new a cache, client parameter can be passed in for unit testing
 func NewRedisCache(client *redis.Client, keyPrefix string, encoding encoding.Encoding, newObject func() interface{}) Cache {
 	return &redisCache{
 		client:    client,
@@ -70,7 +70,7 @@ func (c *redisCache) Get(ctx context.Context, key string, val interface{}) error
 		return err
 	}
 
-	// 防止data为空时，Unmarshal报错
+	// prevent Unmarshal from reporting an error if data is empty
 	if string(bytes) == "" {
 		return nil
 	}
@@ -93,17 +93,17 @@ func (c *redisCache) MultiSet(ctx context.Context, valueMap map[string]interface
 	if expiration == 0 {
 		expiration = DefaultExpireTime
 	}
-	// key-value是成对的，所以这里的容量是map的2倍
+	// the key-value is paired and has twice the capacity of a map
 	paris := make([]interface{}, 0, 2*len(valueMap))
 	for key, value := range valueMap {
 		buf, err := encoding.Marshal(c.encoding, value)
 		if err != nil {
-			//logger.Warn("marshal data error", logger.Err(err), logger.Any("value", value))
+			fmt.Printf("encoding.Marshal error, %v, value:%v\n", err, value)
 			continue
 		}
 		cacheKey, err := BuildCacheKey(c.KeyPrefix, key)
 		if err != nil {
-			//logger.Warn("build cache key error", logger.Err(err), logger.String("key", key))
+			fmt.Printf("BuildCacheKey error, %v, key:%v\n", err, key)
 			continue
 		}
 		paris = append(paris, []byte(cacheKey))
@@ -147,7 +147,7 @@ func (c *redisCache) MultiGet(ctx context.Context, keys []string, value interfac
 		return fmt.Errorf("c.client.MGet error: %v, keys=%+v", err, cacheKeys)
 	}
 
-	// 通过反射注入到map
+	// Injection into map via reflection
 	valueMap := reflect.ValueOf(value)
 	for i, v := range values {
 		if v == nil {
@@ -156,7 +156,7 @@ func (c *redisCache) MultiGet(ctx context.Context, keys []string, value interfac
 		object := c.newObject()
 		err = encoding.Unmarshal(c.encoding, []byte(v.(string)), object)
 		if err != nil {
-			//logger.Warnf("unmarshal data error: %+v, key=%s, cacheKey=%s type=%v", err, keys[i], cacheKeys[i], reflect.TypeOf(value))
+			fmt.Printf("unmarshal data error: %+v, key=%s, cacheKey=%s type=%v\n", err, keys[i], cacheKeys[i], reflect.TypeOf(value))
 			continue
 		}
 		valueMap.SetMapIndex(reflect.ValueOf(cacheKeys[i]), reflect.ValueOf(object))
@@ -170,12 +170,10 @@ func (c *redisCache) Del(ctx context.Context, keys ...string) error {
 		return nil
 	}
 
-	// 批量构建cacheKey
 	cacheKeys := make([]string, len(keys))
 	for index, key := range keys {
 		cacheKey, err := BuildCacheKey(c.KeyPrefix, key)
 		if err != nil {
-			//logger.Warnf("build cache key err: %+v, key is %+v", err, key)
 			continue
 		}
 		cacheKeys[index] = cacheKey
@@ -197,7 +195,7 @@ func (c *redisCache) SetCacheWithNotFound(ctx context.Context, key string) error
 	return c.client.Set(ctx, cacheKey, NotFoundPlaceholder, DefaultNotFoundExpireTime).Err()
 }
 
-// BuildCacheKey 构建一个带有前缀的缓存key
+// BuildCacheKey construct a cache key with a prefix
 func BuildCacheKey(keyPrefix string, key string) (string, error) {
 	if key == "" {
 		return "", errors.New("[cache] key should not be empty")

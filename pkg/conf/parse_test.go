@@ -42,17 +42,17 @@ func Test_replacePWD(t *testing.T) {
 	fmt.Printf(replacePWD(str))
 }
 
-// 测试监听配置文件更新
+// test listening for profile updates
 func TestWatch(t *testing.T) {
 	time.Sleep(time.Second)
 	conf := make(map[string]interface{})
 
 	fs := []func(){
 		func() {
-			fmt.Println("更新字段1")
+			fmt.Println("update field 1")
 		},
 		func() {
-			fmt.Println("更新字段2")
+			fmt.Println("update field 2")
 		},
 	}
 
@@ -66,8 +66,8 @@ func TestWatch(t *testing.T) {
 	content, _ := os.ReadFile("test.yml")
 	contentChange := append(content, byte('#'))
 	time.Sleep(time.Millisecond * 100)
-	_ = os.WriteFile("test.yml", contentChange, 0666) // 修改文件
+	_ = os.WriteFile("test.yml", contentChange, 0666) // change file
 	time.Sleep(time.Millisecond * 100)
-	_ = os.WriteFile("test.yml", content, 0666) // 还原文件
+	_ = os.WriteFile("test.yml", content, 0666) // recovery documents
 	time.Sleep(time.Millisecond * 100)
 }

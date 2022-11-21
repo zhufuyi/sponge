@@ -9,12 +9,12 @@ import (
 	sdkTrace "go.opentelemetry.io/otel/sdk/trace"
 )
 
-// NewConsoleExporter 输出到控台
+// NewConsoleExporter output to console
 func NewConsoleExporter() (sdkTrace.SpanExporter, error) {
 	return stdout.New(stdout.WithPrettyPrint())
 }
 
-// NewFileExporter 输出到文件，程序结束前要关闭文件句柄
+// NewFileExporter output to file, note: close the file before ending
 func NewFileExporter(filename string) (sdkTrace.SpanExporter, *os.File, error) {
 	if filename == "" {
 		filename = "traces.json"

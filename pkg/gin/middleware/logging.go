@@ -16,11 +16,7 @@ var (
 	defaultMaxLength = 300
 
 	// default zap log
-	defaultLogger, _ = zap.NewDevelopment()
-
-	// Default request id name
-	defaultRequestIDNameInHeader  = "X-Request-Id"
-	defaultRequestIDNameInContext = "request_id"
+	defaultLogger, _ = zap.NewProduction()
 
 	// Ignore route list
 	defaultIgnoreRoutes = map[string]struct{}{
@@ -88,7 +84,7 @@ func WithRequestIDFromHeader(name ...string) Option {
 	if len(name) > 0 && name[0] != "" {
 		requestIDName = name[0]
 	} else {
-		requestIDName = defaultRequestIDNameInHeader
+		requestIDName = HeaderXRequestIDKey
 	}
 	return func(o *options) {
 		o.requestIDFrom = 1
@@ -102,7 +98,7 @@ func WithRequestIDFromContext(name ...string) Option {
 	if len(name) > 0 && name[0] != "" {
 		requestIDName = name[0]
 	} else {
-		requestIDName = defaultRequestIDNameInContext
+		requestIDName = ContextRequestIDKey
 	}
 	return func(o *options) {
 		o.requestIDFrom = 2
@@ -127,7 +123,7 @@ func getBodyData(buf *bytes.Buffer, maxLen int) string {
 
 	if buf.Len() > maxLen {
 		body = string(buf.Bytes()[:maxLen]) + " ...... "
-		// 如果有敏感数据需要过滤掉，比如明文密码
+		// If there is sensitive data that needs to be filtered out, such as plaintext passwords
 	} else {
 		body = buf.String()
 	}
@@ -143,13 +139,13 @@ func Logging(opts ...Option) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		start := time.Now()
 
-		// 忽略打印指定的路由
+		// ignore printing of the specified route
 		if _, ok := o.ignoreRoutes[c.Request.URL.Path]; ok {
 			c.Next()
 			return
 		}
 
-		//  处理前打印输入信息
+		// print input information before processing
 		buf := bytes.Buffer{}
 		_, _ = buf.ReadFrom(c.Request.Body)
 
@@ -179,14 +175,14 @@ func Logging(opts ...Option) gin.HandlerFunc {
 
 		c.Request.Body = io.NopCloser(&buf)
 
-		//  替换writer
+		// replace writer
 		newWriter := &bodyLogWriter{body: &bytes.Buffer{}, ResponseWriter: c.Writer}
 		c.Writer = newWriter
 
-		//  处理请求
+		// processing requests
 		c.Next()
 
-		// 处理后打印返回信息
+		// print return message after processing
 		fields = []zap.Field{
 			zap.Int("code", c.Writer.Status()),
 			zap.String("method", c.Request.Method),

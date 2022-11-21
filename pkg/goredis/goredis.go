@@ -14,10 +14,10 @@ const (
 	DefaultRedisName = "default"
 )
 
-// Init 连接redis
-// dsn 支持格式：
-// 没有密码，没有db：localhost:6379
-// 有密码，有db：<user>:<pass>@localhost:6379/2
+// Init connecting to redis
+// dsn supported formats.
+// no password, no db: localhost:6379
+// with password and db: <user>:<pass>@localhost:6379/2
 func Init(dsn string, opts ...Option) (*redis.Client, error) {
 	o := defaultOptions()
 	o.apply(opts...)
@@ -29,7 +29,7 @@ func Init(dsn string, opts ...Option) (*redis.Client, error) {
 
 	rdb := redis.NewClient(opt)
 
-	if o.enableTrace { // 根据设置是否开启链路跟踪
+	if o.enableTrace { // tracing is enabled or not depending on the setting
 		rdb.AddHook(redisotel.TracingHook{})
 	}
 
@@ -39,7 +39,7 @@ func Init(dsn string, opts ...Option) (*redis.Client, error) {
 func getRedisOpt(dsn string, opts *options) (*redis.Options, error) {
 	if len(dsn) > 8 {
 		if !strings.Contains(dsn[len(dsn)-3:], "/") {
-			dsn += "/0" // 默认使用db 0
+			dsn += "/0" // use db 0 by default
 		}
 
 		if dsn[:8] != "redis://" {
@@ -65,7 +65,7 @@ func getRedisOpt(dsn string, opts *options) (*redis.Options, error) {
 	return redisOpts, nil
 }
 
-// Init2 连接redis
+// Init2 connecting to redis
 func Init2(addr string, password string, db int, opts ...Option) *redis.Client {
 	o := defaultOptions()
 	o.apply(opts...)
@@ -79,7 +79,7 @@ func Init2(addr string, password string, db int, opts ...Option) *redis.Client {
 		WriteTimeout: o.writeTimeout,
 	})
 
-	if o.enableTrace { // 根据设置是否开启链路跟踪
+	if o.enableTrace { // tracing is enabled or not depending on the setting
 		rdb.AddHook(redisotel.TracingHook{})
 	}
 

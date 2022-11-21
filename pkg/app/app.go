@@ -10,34 +10,25 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-// Init app initialization
-type Init func()
-
-// Close app close
-type Close func() error
-
-// IServer http or grpc server interface
+// IServer server interface
 type IServer interface {
 	Start() error
 	Stop() error
 	String() string
 }
 
+// Close app close
+type Close func() error
+
 // App servers
 type App struct {
-	inits   []Init
 	servers []IServer
 	closes  []Close
 }
 
 // New create an app
-func New(inits []Init, servers []IServer, closes []Close) *App {
-	for _, init := range inits {
-		init()
-	}
-
+func New(servers []IServer, closes []Close) *App {
 	return &App{
-		inits:   inits,
 		servers: servers,
 		closes:  closes,
 	}
@@ -81,7 +72,7 @@ func (a *App) watch(ctx context.Context) error {
 			_ = a.stop()
 			return ctx.Err()
 		case s := <-quit: // system notification signal
-			fmt.Printf("receive a quit signal: %s\n", s.String())
+			fmt.Printf("quit signal: %s\n", s.String())
 			if err := a.stop(); err != nil {
 				return err
 			}

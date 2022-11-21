@@ -1,11 +1,12 @@
 
-启动服务之前先把配置文件复制到configs目录下
+copy the configuration file to the configs directory before starting the service
+
 ```
 ├── configs
 │         └── serverNameExample.yml
 └── docker-compose.yml
 ```
 
-启动服务：
+running services:
 
 > docker-compose up

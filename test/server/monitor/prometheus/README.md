@@ -1,17 +1,16 @@
-启动前把 `prometheus_data` 目录权限改为0777，启动prometheus：
+Change the `prometheus_data` directory permissions to 0777 before starting prometheus.
 
 > docker-compose up -d
 
-
-在浏览器打开 http://localhost:9090
+Open in your browser http://localhost:9090
 
 <br>
 
-### prometheus 采集常用目标服务指标示例
+### prometheus examples of common target service indicators collected
 
-#### consoul 服务自动发现
+#### consoul automatic service discovery
 
-常用于集群监控，利用consoul的注册与发现功能，prometheus实现exporter自动发现，并且支持标签属性。
+Commonly used for cluster monitoring, using consoul's registration and discovery features, prometheus implements exporter auto-discovery and supports tagging attributes.
 
 ```yaml
   - job_name: 'consul-node-exporter'
@@ -31,6 +30,7 @@
 #### linux
 
 ```yaml
+  # from configuration
   - job_name: 'node-exporter'
     #scrape_interval: 5s
     static_configs:
@@ -38,7 +38,7 @@
         labels:
           env: 'dev'
 
-  # 通过导入文件方式
+  # from file
  - job_name: "node-exporter-2"
    file_sd_configs:
    - refresh_interval: 1m
@@ -46,7 +46,9 @@
       - "/etc/prometheus/conf.d/node-exporter/*.yml"
 ```
 
-使用文件导入方式，导入的文件内容示例：
+<br>
+
+Example of the contents of an imported file, using the file import method.
 
 ```yaml
 - targets: ['node-exporter:9100']
@@ -69,7 +71,7 @@
 
 <br>
 
-#### 进程
+#### process
 
 ```yaml
   - job_name: 'process-exporter'
@@ -121,7 +123,7 @@
 
 </br>
 
-#### 容器
+#### containers
 
 ```yaml
   - job_name: 'cadvisor'

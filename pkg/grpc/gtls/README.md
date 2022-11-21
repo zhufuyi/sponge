@@ -1,15 +1,15 @@
 ## gtls
 
-#### 使用示例
+#### Example of use
 
 #### grpc server
 
 ```go
 func main() {
-	// 单向认证(服务端认证)
+	// one-way authentication (server-side authentication)
 	//credentials, err := gtls.GetServerTLSCredentials(certfile.Path("/one-way/server.crt"), certfile.Path("/one-way/server.key"))
 
-	// 双向认证
+	// two-way authentication
 	credentials, err := gtls.GetServerTLSCredentialsByCA(
 		certfile.Path("two-way/ca.pem"),
 		certfile.Path("two-way/server/server.pem"),
@@ -19,12 +19,11 @@ func main() {
 		panic(err)
 	}
 
-	// 拦截器
+	// interceptor
 	opts := []grpc.ServerOption{
 		grpc.Creds(credentials),
 	}
 
-	// 创建grpc server对象，拦截器可以在这里注入
 	server := grpc.NewServer(opts...)
 
 	// ......
@@ -37,10 +36,10 @@ func main() {
 
 ```go
 func main() {
-	// 单向认证
+	// one-way authentication
 	//credentials, err := gtls.GetClientTLSCredentials("localhost", certfile.Path("/one-way/server.crt"))
 
-	// 双向认证
+	// two-way authentication
 	credentials, err := gtls.GetClientTLSCredentialsByCA(
 		"localhost",
 		certfile.Path("two-way/ca.pem"),

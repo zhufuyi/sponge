@@ -1,24 +1,20 @@
 package model
 
 import (
+	"context"
 	"testing"
 	"time"
 
 	"github.com/zhufuyi/sponge/configs"
 	"github.com/zhufuyi/sponge/internal/config"
 
+	"github.com/zhufuyi/sponge/pkg/utils"
+
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )
 
-// 测试时需要连接真实数据
 func TestInitMysql(t *testing.T) {
-	defer func() {
-		if e := recover(); e != nil {
-			t.Log("ignore connect mysql error info")
-		}
-	}()
-
 	err := config.Init(configs.Path("serverNameExample.yml"))
 	if err != nil {
 		panic(err)
@@ -26,20 +22,19 @@ func TestInitMysql(t *testing.T) {
 
 	config.Get().App.EnableTracing = true
 	config.Get().Mysql.EnableLog = true
-	gdb := GetDB()
-	assert.NotNil(t, gdb)
+
 	time.Sleep(time.Millisecond * 10)
 	err = CloseMysql()
 	assert.NoError(t, err)
+
+	utils.SafeRunWithTimeout(time.Second*2, func(cancel context.CancelFunc) {
+		gdb := GetDB()
+		assert.NotNil(t, gdb)
+		cancel()
+	})
 }
 
 func TestInitMysqlError(t *testing.T) {
-	defer func() {
-		if e := recover(); e != nil {
-			t.Log("ignore connect mysql error info")
-		}
-	}()
-
 	err := config.Init(configs.Path("serverNameExample.yml"))
 	if err != nil {
 		panic(err)
@@ -47,8 +42,13 @@ func TestInitMysqlError(t *testing.T) {
 
 	// change config error test
 	config.Get().Mysql.Dsn = "root:123456@(127.0.0.1:3306)/test"
-	_ = CloseMysql()
-	InitMysql()
+
+	utils.SafeRunWithTimeout(time.Second*2, func(cancel context.CancelFunc) {
+		_ = CloseMysql()
+		InitMysql()
+		assert.NotNil(t, db)
+		cancel()
+	})
 }
 
 func TestCloseMysql(t *testing.T) {

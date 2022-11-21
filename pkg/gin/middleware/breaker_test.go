@@ -12,10 +12,10 @@ import (
 	"github.com/zhufuyi/sponge/pkg/container/group"
 	"github.com/zhufuyi/sponge/pkg/gin/response"
 	"github.com/zhufuyi/sponge/pkg/gohttp"
+	"github.com/zhufuyi/sponge/pkg/shield/circuitbreaker"
 	"github.com/zhufuyi/sponge/pkg/utils"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-kratos/aegis/circuitbreaker/sre"
 )
 
 func runCircuitBreakerHTTPServer() string {
@@ -24,7 +24,7 @@ func runCircuitBreakerHTTPServer() string {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
 	r.Use(CircuitBreaker(WithGroup(group.NewGroup(func() interface{} {
-		return sre.NewBreaker()
+		return circuitbreaker.NewBreaker()
 	}))))
 
 	r.GET("/hello", func(c *gin.Context) {

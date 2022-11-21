@@ -86,3 +86,35 @@ func NewHTTPServer(addr string, opts ...HTTPOption) app.IServer {
 		instance:  o.instance,
 	}
 }
+
+// delete the templates code start
+
+// NewHTTPServer_pbExample creates a new web server
+func NewHTTPServer_pbExample(addr string, opts ...HTTPOption) app.IServer { //nolint
+	o := defaultHTTPOptions()
+	o.apply(opts...)
+
+	if o.isProd {
+		gin.SetMode(gin.ReleaseMode)
+	} else {
+		gin.SetMode(gin.DebugMode)
+	}
+
+	router := routers.NewRouter_pbExample()
+	server := &http.Server{
+		Addr:           addr,
+		Handler:        router,
+		ReadTimeout:    o.readTimeout,
+		WriteTimeout:   o.writeTimeout,
+		MaxHeaderBytes: 1 << 20,
+	}
+
+	return &httpServer{
+		addr:      addr,
+		server:    server,
+		iRegistry: o.iRegistry,
+		instance:  o.instance,
+	}
+}
+
+// delete the templates code end

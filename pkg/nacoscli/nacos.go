@@ -14,20 +14,20 @@ import (
 	"github.com/spf13/viper"
 )
 
-// Params nacos参数
+// Params nacos parameters
 type Params struct {
-	IPAddr      string // nacos 服务地址
-	Port        uint64 // nacos 服务端口
-	Scheme      string // http或https
+	IPAddr      string // server address
+	Port        uint64 // port
+	Scheme      string // http or https
 	ContextPath string // path
-	NamespaceID string // 名称空间id
-	// 如果参数不为空，替换上面和ClientConfig和ServerConfig相同的字段
+	NamespaceID string // namespace id
+	// if the parameter is not empty, replace the same fields as ClientConfig and ServerConfig above
 	clientConfig  *constant.ClientConfig
 	serverConfigs []constant.ServerConfig
 
-	Group  string // 分组，dev, prod, test
-	DataID string // 配置文件id
-	Format string // 配置文件类型: json,yaml,toml
+	Group  string // group, example: dev, prod, test
+	DataID string // config file id
+	Format string // configuration file type: json,yaml,toml
 }
 
 func (p *Params) valid() error {
@@ -59,7 +59,7 @@ func setParams(params *Params, opts ...Option) {
 	params.clientConfig = o.clientConfig
 	params.serverConfigs = o.serverConfigs
 
-	// 创建clientConfig
+	// create clientConfig
 	if params.clientConfig == nil {
 		params.clientConfig = &constant.ClientConfig{
 			NamespaceId:         params.NamespaceID,
@@ -70,7 +70,7 @@ func setParams(params *Params, opts ...Option) {
 		}
 	}
 
-	// 创建serverConfig
+	// create serverConfig
 	if params.serverConfigs == nil {
 		params.serverConfigs = []constant.ServerConfig{
 			{
@@ -83,7 +83,7 @@ func setParams(params *Params, opts ...Option) {
 	}
 }
 
-// Init 从nacos获取配置并解析到struct
+// Init get configuration from nacos and parse to struct
 func Init(obj interface{}, params *Params, opts ...Option) error {
 	err := params.valid()
 	if err != nil {
@@ -92,7 +92,7 @@ func Init(obj interface{}, params *Params, opts ...Option) error {
 
 	setParams(params, opts...)
 
-	// 创建动态配置客户端
+	// create a dynamic configuration client
 	configClient, err := clients.NewConfigClient(
 		vo.NacosClientParam{
 			ClientConfig:  params.clientConfig,
@@ -103,7 +103,7 @@ func Init(obj interface{}, params *Params, opts ...Option) error {
 		return err
 	}
 
-	// 读取配置内容
+	// read config content
 	content, err := configClient.GetConfig(vo.ConfigParam{
 		DataId: params.DataID,
 		Group:  params.Group,
@@ -112,7 +112,7 @@ func Init(obj interface{}, params *Params, opts ...Option) error {
 		return err
 	}
 
-	// 解析配置
+	// parse config
 	viper.SetConfigType(params.Format)
 	err = viper.ReadConfig(bytes.NewBuffer([]byte(content)))
 	if err != nil {
@@ -126,7 +126,7 @@ func Init(obj interface{}, params *Params, opts ...Option) error {
 	return nil
 }
 
-// NewNamingClient 实例化服务注册和发现nacos客户端
+// NewNamingClient create a service registration and discovery of nacos client
 func NewNamingClient(nacosIPAddr string, nacosPort int, nacosNamespaceID string, opts ...Option) (naming_client.INamingClient, error) {
 	params := &Params{
 		IPAddr:      nacosIPAddr,
@@ -142,14 +142,3 @@ func NewNamingClient(nacosIPAddr string, nacosPort int, nacosNamespaceID string,
 		},
 	)
 }
-
-//func NewNamingClient(params *Params, opts ...Option) (naming_client.INamingClient, error) {
-//	setParams(params, opts...)
-//
-//	return clients.NewNamingClient(
-//		vo.NacosClientParam{
-//			ClientConfig:  params.clientConfig,
-//			ServerConfigs: params.serverConfigs,
-//		},
-//	)
-//}

@@ -2,135 +2,131 @@ pipeline {
     agent any
 
     stages  {
-        stage("检查构建分支") {
+        stage("Check Build Branch") {
             steps {
-                echo "检查构建分支中......"
-                // 判断分支是否允许构建，根据实际情况修改
+                echo "Checking build branch in progress ......"
                 script {
                     if (env.GIT_BRANCH ==~ /^v([0-9])+\.([0-9])+\.([0-9])+.*/)  {
-                        echo "构建生产环境，tag=${env.GIT_BRANCH}"
+                        echo "building production environment, tag=${env.GIT_BRANCH}"
                     } else if (env.GIT_BRANCH ==~ /^test-([0-9])+\.([0-9])+\.([0-9])+.*/) {
-                        echo "构建测试环境，tag=${env.GIT_BRANCH}"
+                        echo "building test environment, tag=${env.GIT_BRANCH}"
                     } else if (env.GIT_BRANCH ==~ /(origin\/develop)/) {
-                        echo "构建开发环境，/origin/develop"
+                        echo "building development environment, /origin/develop"
                     } else {
-                        echo "构建分支${env.GIT_BRANCH}不合法，允许构建开发环境分支(/origin/develop)，测试环境分支(例如：test-1.0.0)，生产环境分支(例如：v1.0.0)"
+                        echo "The build branch ${env.GIT_BRANCH} is not legal, allowing to build the development environment branch (/origin/develop), the test environment branch (e.g. test-1.0.0), and the production environment branch (e.g. v1.0.0)"
                         sh 'exit 1'
                     }
                 }
-                echo "检查构建分支完成."
+                echo "Check build branch complete."
             }
         }
 
-        stage("代码检查") {
+        stage("Check Code") {
             steps {
-                echo "代码检查中......"
+                echo "Checking code in progress ......"
                 sh 'make ci-lint'
-                echo "代码检查完成."
+                echo "Check code complete."
             }
         }
 
-        stage("单元测试") {
+        stage("Unit Testing") {
             steps {
-                echo "单元测试中......"
+                echo "Unit testing in progress ......"
                 sh 'make test'
-                echo "单元测试完成."
+                echo "Unit testing complete."
             }
         }
 
-        stage("编译代码") {
+        stage("Compile Code") {
             steps {
-                echo "编译代码中......"
+                echo "Compiling code  in progress ......"
                 sh 'make build'
-                echo "编译代码完成."
+                echo "compile code complete."
             }
         }
 
-        stage("构建镜像") {
+        stage("Build Image") {
             steps {
-                echo "构建镜像中......"
-                // 兼容自动构建和参数构建
+                echo "building image in progress ......"
                 script {
                     registryHost=""
                     tagName=""
                     if (env.GIT_BRANCH ==~ /^v([0-9])+\.([0-9])+\.([0-9])+.*/) {
                         if (env.PROD_REPO_HOST == null) {
-                            echo "环境变量PROD_REPO_HOST值为空，请在【Jenkins管理】--> 【系统设置】-->【环境变量】设置PROD_REPO_HOST值"
+                            echo "The value of environment variable PROD_REPO_HOST is empty, please set the value of PROD_REPO_HOST in [Jenkins Management] --> [System Settings] --> [Environment Variables]."
                             sh 'exit 1'
                         }
-                        echo "使用生产环境镜像仓库 ${env.PROD_REPO_HOST}"
+                        echo "Use the production environment image repository ${env.PROD_REPO_HOST}"
                         registryHost=env.PROD_REPO_HOST
                         tagName=env.GIT_BRANCH
                     }
                     else if (env.GIT_BRANCH ==~ /^test-([0-9])+\.([0-9])+\.([0-9])+.*/) {
                           if (env.TEST_REPO_HOST == null) {
-                              echo "环境变量TEST_REPO_HOST值为空，请在【Jenkins管理】--> 【系统设置】-->【环境变量】设置TEST_REPO_HOST值"
+                              echo "The value of environment variable TEST_REPO_HOST is empty, please set the value of TEST_REPO_HOST in [Jenkins Management] --> [System Settings] --> [Environment Variables]."
                               sh 'exit 1'
                           }
-                          echo "使用测试环境镜像仓库 ${env.TEST_REPO_HOST}"
+                          echo "Use the test environment image repository ${env.TEST_REPO_HOST}"
                           registryHost=env.TEST_REPO_HOST
                           tagName=env.GIT_BRANCH
                     }
                     else {
                         if (env.DEV_REPO_HOST == null) {
-                            echo "环境变量DEV_REPO_HOST值为空，请在【Jenkins管理】--> 【系统设置】-->【环境变量】设置DEV_REPO_HOST值"
+                            echo "The value of environment variable DEV_REPO_HOST is empty, please set the value of DEV_REPO_HOST in [Jenkins Management] --> [System Settings] --> [Environment Variables]."
                             sh 'exit 1'
                         }
-                        echo "使用开发环境 ${env.DEV_REPO_HOST}"
+                        echo "Using the development environment ${env.DEV_REPO_HOST}"
                         registryHost=env.DEV_REPO_HOST
                     }
                     sh "make image-build REPO_HOST=$registryHost TAG=$tagName"
                 }
-                echo "构建镜像完成"
+                echo "Build image complete"
             }
         }
 
-        stage("上传镜像") {
+        stage("Push Image") {
             steps {
-                echo "上传镜像中......"
-                // 兼容自动构建和参数构建
+                echo "pushing image in progress ......"
                 script {
                     registryHost=""
                     tagName=""
                     if (env.GIT_BRANCH ==~ /^v([0-9])+\.([0-9])+\.([0-9])+.*/) {
                         if (env.PROD_REPO_HOST == null) {
-                            echo "环境变量PROD_REPO_HOST值为空，请在【Jenkins管理】--> 【系统设置】-->【环境变量】设置PROD_REPO_HOST值"
+                            echo "The value of environment variable PROD_REPO_HOST is empty, please set the value of PROD_REPO_HOST in [Jenkins Management] --> [System Settings] --> [Environment Variables]."
                             sh 'exit 1'
                         }
-                        echo "使用生产环境镜像仓库 ${env.PROD_REPO_HOST}"
+                        echo "Use the production environment image repository ${env.PROD_REPO_HOST}"
                         registryHost=env.PROD_REPO_HOST
                         tagName=env.GIT_BRANCH
                     }
                     else if (env.GIT_BRANCH ==~ /^test-([0-9])+\.([0-9])+\.([0-9])+.*/) {
                           if (env.TEST_REPO_HOST == null) {
-                              echo "环境变量TEST_REPO_HOST值为空，请在【Jenkins管理】--> 【系统设置】-->【环境变量】设置TEST_REPO_HOST值"
+                              echo "The value of environment variable TEST_REPO_HOST is empty, please set the value of TEST_REPO_HOST in [Jenkins Management] --> [System Settings] --> [Environment Variables]."
                               sh 'exit 1'
                           }
-                          echo "使用测试环境镜像仓库 ${env.TEST_REPO_HOST}"
+                          echo "Use the test environment image repository ${env.TEST_REPO_HOST}"
                           registryHost=env.TEST_REPO_HOST
                           tagName=env.GIT_BRANCH
                     }
                     else {
                         if (env.DEV_REPO_HOST == null) {
-                            echo "环境变量DEV_REPO_HOST值为空，请在【Jenkins管理】--> 【系统设置】-->【环境变量】设置DEV_REPO_HOST值"
+                            echo "The value of environment variable DEV_REPO_HOST is empty, please set the value of DEV_REPO_HOST in [Jenkins Management] --> [System Settings] --> [Environment Variables]."
                             sh 'exit 1'
                         }
-                        echo "使用开发环境 ${env.DEV_REPO_HOST}"
+                        echo "Using the development environment ${env.DEV_REPO_HOST}"
                         registryHost=env.DEV_REPO_HOST
                     }
                     sh "make image-push REPO_HOST=$registryHost TAG=$tagName"
                 }
-                echo "上传镜像完成，清除镜像完成。"
+                echo "push image complete, clear image complete."
             }
         }
 
-        stage("部署到k8s") {
-            // 判断分支是否允许部署到k8s，根据实际情况更改
+        stage("Deploy to k8s") {
             when { expression { return env.GIT_BRANCH ==~ /(origin\/staging|origin\/develop)/ } }
             steps {
-                echo "部署到k8s..."
+                echo "Deploying to k8s in progress ......"
                 sh 'make deploy-k8s'
-                echo "部署到k8s完成"
+                echo "Deploy to k8s complete."
             }
         }
     }
@@ -154,32 +150,30 @@ pipeline {
    }
 }
 
-// todo 如果使用钉钉通知，填写手机号码和钉钉机器人token
+// Notifications using dingding
 void SendDingding(res)
 {
-	// 填写相应的手机号码，在钉钉群指定通知某个人
+	// Fill in the corresponding cell phone number and specify a person to be notified in the pinned group
 	tel_num="xxxxxxxxxxx"
-	// 钉钉机器人的地址
-	dingding_url="https://oapi.dingtalk.com/robot/send\\?access_token\\=你的钉钉机器人token"
+	dingding_url="https://oapi.dingtalk.com/robot/send\\?access_token\\=your dingding robot token"
 
     branchName=""
     if (env.GIT_BRANCH ==~ /^v([0-9])+\.([0-9])+\.([0-9])+.*/) {
-        branchName="${env.SERVER_PLATFORM}生产环境 tag=${env.GIT_BRANCH},  ${env.JOB_NAME}"
+        branchName="${env.SERVER_PLATFORM} production environment, tag=${env.GIT_BRANCH},  ${env.JOB_NAME}"
     }
     else if (env.GIT_BRANCH ==~ /^test-([0-9])+\.([0-9])+\.([0-9])+.*/){
-        branchName="${env.SERVER_PLATFORM}测试环境 tag=${env.GIT_BRANCH},  ${env.JOB_NAME}"
+        branchName="${env.SERVER_PLATFORM} test environment, tag=${env.GIT_BRANCH},  ${env.JOB_NAME}"
     }
     else {
-        branchName="${env.SERVER_PLATFORM}开发环境 branch=${env.GIT_BRANCH},  ${env.JOB_NAME}"
+        branchName="${env.SERVER_PLATFORM} develop environment, branch=${env.GIT_BRANCH},  ${env.JOB_NAME}"
     }
 
-    // 发送内容
 	json_msg=""
 	if( res == "success" ) {
-		json_msg='{\\"msgtype\\":\\"text\\",\\"text\\":{\\"content\\":\\"@' + tel_num +' [OK] ' + "${branchName} 第${env.BUILD_NUMBER}次构建，"  + '构建成功。 \\"},\\"at\\":{\\"atMobiles\\":[\\"' + tel_num + '\\"],\\"isAtAll\\":false}}'
+		json_msg='{\\"msgtype\\":\\"text\\",\\"text\\":{\\"content\\":\\"@' + tel_num +' [OK] ' + "${branchName} ${env.BUILD_NUMBER}th "  + 'build success. \\"},\\"at\\":{\\"atMobiles\\":[\\"' + tel_num + '\\"],\\"isAtAll\\":false}}'
 	}
 	else {
-		json_msg='{\\"msgtype\\":\\"text\\",\\"text\\":{\\"content\\":\\"@' + tel_num +' [大哭] ' + "${branchName} 第${env.BUILD_NUMBER}次构建，"  + '构建失败，请及时处理！ \\"},\\"at\\":{\\"atMobiles\\":[\\"' + tel_num + '\\"],\\"isAtAll\\":false}}'
+		json_msg='{\\"msgtype\\":\\"text\\",\\"text\\":{\\"content\\":\\"@' + tel_num +' [cry] ' + "${branchName} ${env.BUILD_NUMBER}th "  + 'build failed, please deal with it promptly! \\"},\\"at\\":{\\"atMobiles\\":[\\"' + tel_num + '\\"],\\"isAtAll\\":false}}'
 	}
 
     post_header="Content-Type:application/json;charset=utf-8"
@@ -187,21 +181,20 @@ void SendDingding(res)
 	sh sh_cmd
 }
 
-// todo 如果使用邮件通知，填写邮箱地址
+// Notifications using email
 void SendEmail(res)
 {
-	//在这里定义邮箱地址
 	addr="xxx@xxx.com"
 	if( res == "success" )
 	{
 		mail to: addr,
-		subject: "构建成功 ：${currentBuild.fullDisplayName}",
-		body: "\n发布成功。 \n\n任务名称： ${env.JOB_NAME} 第 ${env.BUILD_NUMBER} 次构建 \n\n 更多信息请查看 : ${env.BUILD_URL}"
+		subject: "Build Success: ${currentBuild.fullDisplayName}",
+		body: "\nJob name: ${env.JOB_NAME} ${env.BUILD_NUMBER}th build. \n\n For more information, please see: ${env.BUILD_URL}"
 	}
 	else
 	{
 		mail to: addr,
-		subject: "构建失败 ：${currentBuild.fullDisplayName}",
-		body: "\n发布失败！ \n\n任务名称： ${env.JOB_NAME} 第 ${env.BUILD_NUMBER} 次构建 \n\n 更多信息请查看 : ${env.BUILD_URL}"
+		subject: "Build Failed: ${currentBuild.fullDisplayName}",
+		body: "\nJob name: ${env.JOB_NAME} ${env.BUILD_NUMBER}th build. \n\n For more information, please see: ${env.BUILD_URL}"
 	}
 }

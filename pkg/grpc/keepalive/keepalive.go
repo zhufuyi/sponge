@@ -17,7 +17,7 @@ var kacp = keepalive.ClientParameters{
 	PermitWithoutStream: true,             // send pings even without active streams
 }
 
-// ClientKeepAlive 保持连接设置
+// ClientKeepAlive keep the connection set
 func ClientKeepAlive() grpc.DialOption {
 	return grpc.WithKeepaliveParams(kacp)
 }
@@ -44,7 +44,7 @@ var kasp = keepalive.ServerParameters{
 	Timeout:               1 * time.Second,              // Wait 1 second for the ping ack before assuming the connection is dead
 }
 
-// ServerKeepAlive 保持连接设置
+// ServerKeepAlive keep the connection set
 func ServerKeepAlive() []grpc.ServerOption {
 	return []grpc.ServerOption{
 		grpc.KeepaliveEnforcementPolicy(kaep),

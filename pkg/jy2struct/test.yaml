@@ -2,19 +2,16 @@ serverName: "demo"
 serverPort: 8080
 runMode: "dev"
 
-# jwt配置
+
 jwt:
   signingKey: "abcd"
-  expire: 86400  # 单位(秒)
+  expire: 86400
 
-# email配置
 email:
   sender: "foo@bar.com"
   password: "1234"
 
-# 日志配置
 log:
-  level: "debug" # 输出日志级别 debug, info, warn, error，默认是debug
-  format: "console" # 输出格式，console或json，默认是console
-  isSave: true # false:输出到终端，true:输出到文件，默认是false
-
+  level: "debug"
+  format: "console"
+  isSave: true

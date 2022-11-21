@@ -1,21 +1,21 @@
 ## conf
 
-解析yaml、json、toml配置文件到go struct。
+Parsing yaml, json, toml configuration files to go struct.
 
 <br>
 
-### 使用示例
+### Example of use
 
 ```go
-    // 方式一：无监听配置文件
+    // Way 1: No listening profile
 	conf := &App{}
 	err := Parse("test.yml", conf)
 
-    // 方式二：开启监听配置文件
+    // Way 2: Enable listening profile
 	conf := &App{}
 	fs := []func(){
 		func() {
-			fmt.Println("监听到配置文件有更新")
+			fmt.Println("Listening for updates to the configuration file")
 		},
 	}
 	err := Parse("test.yml", conf, fs...)

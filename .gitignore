@@ -5,8 +5,6 @@
 *.so
 *.dylib
 *.log
-cmd/serverNameExample/serverNameExample
-cmd/sponge/sponge
 
 # Test binary, built with `go test -c`
 *.test
@@ -23,3 +21,16 @@ dist/
 *.iml
 *.ipr
 *.iws
+
+cmd/serverNameExample/serverNameExample
+# delete the templates code start
+cmd/protoc-gen-go-gin/protoc-gen-go-gin
+cmd/protoc-gen-go-rpc-tmpl/protoc-gen-go-rpc-tmpl
+cmd/serverNameExample_grpcExample/serverNameExample_grpcExample
+cmd/serverNameExample_grpcPbExample/serverNameExample_grpcPbExample
+cmd/serverNameExample_httpExample/serverNameExample_httpExample
+cmd/serverNameExample_grpcGwPbExample/serverNameExample_grpcGwPbExample
+cmd/serverNameExample_httpPbExample/serverNameExample_httpPbExample
+cmd/serverNameExample_mixExample/serverNameExample_mixExample
+cmd/sponge/sponge
+# delete the templates code end

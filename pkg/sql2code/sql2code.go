@@ -8,21 +8,21 @@ import (
 	"github.com/zhufuyi/sponge/pkg/sql2code/parser"
 )
 
-// Args 参数
+// Args generate code arguments
 type Args struct {
 	SQL string // DDL sql
 
-	DDLFile string // 读取文件的DDL sql
+	DDLFile string // DDL file
 
-	DBDsn   string // 从db获取表的DDL sql
+	DBDsn   string // connecting to mysql's dsn
 	DBTable string
 
-	Package        string // 生成字段的包名(只有model类型有效)
-	GormType       bool   // 是否显示gorm type名称(只有model类型代码有效)
-	JSONTag        bool   // 是否包括json tag
-	JSONNamedType  int    // json命名类型，0:和列名一致，其他值表示驼峰
-	IsEmbed        bool   // 是否嵌入gorm.Model
-	CodeType       string // 指定生成代码用途，支持4中类型，分别是 model(默认), json, dao, handler
+	Package        string // specify the package name (only valid for model types)
+	GormType       bool   // whether to display the gorm type name (only valid for model type codes)
+	JSONTag        bool   // does it include a json tag
+	JSONNamedType  int    // json naming type, 0: consistent with the column name, other values indicate a hump
+	IsEmbed        bool   // is gorm.Model embedded
+	CodeType       string // specify the different types of code to be generated, namely model (default), json, dao, handler, proto
 	ForceTableName bool
 	Charset        string
 	Collation      string
@@ -116,7 +116,7 @@ func getOptions(args *Args) []parser.Option {
 	return opts
 }
 
-// GenerateOne 根据sql生成gorm代码，sql可以从参数、文件、db三种方式获取，优先从高到低
+// GenerateOne generate gorm code from sql, which can be obtained from parameters, files and db, with priority from highest to lowest
 func GenerateOne(args *Args) (string, error) {
 	codes, err := Generate(args)
 	if err != nil {
@@ -124,7 +124,7 @@ func GenerateOne(args *Args) (string, error) {
 	}
 
 	if args.CodeType == "" {
-		args.CodeType = parser.CodeTypeModel // 默认为model code
+		args.CodeType = parser.CodeTypeModel // default is model code
 	}
 	out, ok := codes[args.CodeType]
 	if !ok {
@@ -134,7 +134,7 @@ func GenerateOne(args *Args) (string, error) {
 	return out, nil
 }
 
-// Generate 生成model, json, dao, handler不同用途代码
+// Generate model, json, dao, handler, proto codes
 func Generate(args *Args) (map[string]string, error) {
 	if err := args.checkValid(); err != nil {
 		return nil, err

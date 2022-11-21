@@ -11,7 +11,8 @@ import (
 
 var tp *trace.TracerProvider
 
-// Init 初始化链路跟踪，fraction为分数，默认为1.0，值>=1.0表示全部链路都采样, 值<=0表示全部都不采样，0<值<1只采样百分比
+// Init Initialize tracer, parameter fraction is fraction, default is 1.0, value >= 1.0 means all links are sampled,
+// value <= 0 means all are not sampled, 0 < value < 1 only samples percentage
 func Init(exporter trace.SpanExporter, res *resource.Resource, fractions ...float64) {
 	var fraction = 1.0
 	if len(fractions) > 0 {
@@ -25,15 +26,15 @@ func Init(exporter trace.SpanExporter, res *resource.Resource, fractions ...floa
 	tp = trace.NewTracerProvider(
 		trace.WithBatcher(exporter),
 		trace.WithResource(res),
-		trace.WithSampler(trace.ParentBased(trace.TraceIDRatioBased(fraction))), // 采样率
+		trace.WithSampler(trace.ParentBased(trace.TraceIDRatioBased(fraction))), // sampling rate
 	)
-	// 将TracerProvider注册为全局，这样将来任何导入包go.opentelemetry.io/otel/trace后，就可以默认使用它。
+	// register the TracerProvider as global so that any future imports of package go.opentelemetry.io/otel/trace will use it by default.
 	otel.SetTracerProvider(tp)
-	// 跨进程传播context
+	// propagation of context across processes
 	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
 }
 
-// Close 停止
+// Close tracer
 func Close(ctx context.Context) error {
 	if tp == nil {
 		return nil
@@ -41,7 +42,8 @@ func Close(ctx context.Context) error {
 	return tp.Shutdown(ctx)
 }
 
-// InitWithConfig 根据配置初始化链路跟踪，fraction为分数，默认为1.0，值>=1.0表示全部链路都采样, 值<=0表示全部都不采样，0<值<1只采样百分比
+// InitWithConfig Initialize tracer according to configuration, fraction is fraction, default is 1.0, value >= 1.0 means all links are sampled,
+// value <= 0 means all are not sampled, 0 < value < 1 only samples percentage
 func InitWithConfig(appName string, appEnv string, appVersion string,
 	jaegerAgentHost string, jaegerAgentPort string, jaegerSamplingRate float64) {
 	res := NewResource(
@@ -50,11 +52,11 @@ func InitWithConfig(appName string, appEnv string, appVersion string,
 		WithServiceVersion(appVersion),
 	)
 
-	// 初始化链路跟踪
+	// initializing tracing
 	exporter, err := NewJaegerAgentExporter(jaegerAgentHost, jaegerAgentPort)
 	if err != nil {
 		panic("init trace error:" + err.Error())
 	}
 
-	Init(exporter, res, jaegerSamplingRate) // 如果SamplingRate=0.5表示只采样50%
+	Init(exporter, res, jaegerSamplingRate)
 }

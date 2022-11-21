@@ -11,10 +11,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// ModelCommand generate model code
-func ModelCommand() *cobra.Command {
+// ModelCommand generate model codes
+func ModelCommand(parentName string) *cobra.Command {
 	var (
-		outPath string // 输出目录
+		outPath string // output directory
 		sqlArgs = sql2code.Args{
 			Package:  "model",
 			JSONTag:  true,
@@ -24,19 +24,19 @@ func ModelCommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "model",
-		Short: "Generate model code",
-		Long: `generate model code.
+		Short: "Generate model codes based on mysql",
+		Long: fmt.Sprintf(`generate model codes based on mysql.
 
 Examples:
-  # generate model code and embed 'gorm.Model' struct.
-  sponge model --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
+  # generate model codes and embed 'gorm.Model' struct.
+  sponge %s model --db-dsn=root:123456@(192.168.3.37:3306)/school --db-table=teacher
 
-  # generate model code, structure fields correspond to the column names of the table.
-  sponge model --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --embed=false
+  # generate model codes, structure fields correspond to the column names of the table.
+  sponge %s model --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --embed=false
 
-  # generate model code and specify the output directory, Note: if the file already exists, code generation will be canceled.
-  sponge model --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
-`,
+  # generate model codes and specify the output directory, Note: if the file already exists, code generation will be canceled.
+  sponge %s model --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
+`, parentName, parentName, parentName),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -66,14 +66,16 @@ func runGenModelCommand(codes map[string]string, outPath string) error {
 		return errors.New("replacer is nil")
 	}
 
-	// 设置模板信息
-	subDirs := []string{"internal/model"}              // 只处理的指定子目录，如果为空或者没有指定的子目录，表示所有文件
-	ignoreDirs := []string{}                           // 指定子目录下忽略处理的目录
-	ignoreFiles := []string{"init.go", "init_test.go"} // 指定子目录下忽略处理的文件
+	// setting up template information
+	subDirs := []string{"internal/model"} // only the specified subdirectory is processed, if empty or no subdirectory is specified, it means all files
+	ignoreDirs := []string{}              // specify the directory in the subdirectory where processing is ignored
+	ignoreFiles := []string{              // specify the files in the subdirectory to be ignored for processing
+		"init.go", "init_test.go",
+	}
 
-	r.SetSubDirs(subDirs...)
+	r.SetSubDirsAndFiles(subDirs)
 	r.SetIgnoreSubDirs(ignoreDirs...)
-	r.SetIgnoreFiles(ignoreFiles...)
+	r.SetIgnoreSubFiles(ignoreFiles...)
 	fields := addModelFields(r, codes)
 	r.SetReplacementFields(fields)
 	_ = r.SetOutputDir(outPath, subTplName)
@@ -81,7 +83,7 @@ func runGenModelCommand(codes map[string]string, outPath string) error {
 		return err
 	}
 
-	fmt.Printf("generate '%s' code successfully, out = %s\n\n", subTplName, r.GetOutputDir())
+	fmt.Printf("generate '%s' codes successfully, out = %s\n\n", subTplName, r.GetOutputDir())
 	return nil
 }
 
@@ -90,7 +92,7 @@ func addModelFields(r replacer.Replacer, codes map[string]string) []replacer.Fie
 
 	fields = append(fields, deleteFieldsMark(r, modelFile, startMark, endMark)...)
 	fields = append(fields, []replacer.Field{
-		{ // 替换model/userExample.go文件内容
+		{ // replace the contents of the model/userExample.go file
 			Old: modelFileMark,
 			New: codes[parser.CodeTypeModel],
 		},

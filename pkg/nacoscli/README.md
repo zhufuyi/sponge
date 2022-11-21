@@ -1,11 +1,11 @@
 ## nacoscli
 
-从nacos配置中心获取配置并解析到结构体。
+Get the configuration from the nacos configuration center and parse it into a structure.
 
-### 使用示例
+### Example of use
 
 ```go
-	// 方式一：设置参数
+	// Way 1: Setting parameters
 	a := &config{}
 	params := &Params{
 		IpAddr:      "192.168.3.37",
@@ -17,7 +17,7 @@
 	}
 	err := Init(a, params)
 
-	// 方式二：设置ClientConfig和ServerConfig
+	// Way 2: Setting up ClientConfig and ServerConfig
 	a = &config{}
 	params = &Params{
 		Group:  "dev",

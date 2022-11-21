@@ -7,13 +7,13 @@ import (
 )
 
 var (
-	// registerFns 注册方法集合
+	// registerFns collection of registration methods
 	registerFns []func(server *grpc.Server)
 )
 
-// RegisterAllService 注册所有service到服务中
+// RegisterAllService register all services to the service
 func RegisterAllService(server *grpc.Server) {
-	healthPB.RegisterHealthServer(server, health.NewServer()) // 注册健康检测
+	healthPB.RegisterHealthServer(server, health.NewServer()) // Register for Health Screening
 
 	for _, fn := range registerFns {
 		fn(server)

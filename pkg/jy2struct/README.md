@@ -1,46 +1,40 @@
 ## jy2struct
 
-json和yaml转go struct代码。
+A library for generating go struct code, supporting json and yaml.
 
 <br>
 
-### 安装
+### Example of use
 
-> go get -u github.com/zhufuyi/pkg/jy2struct
-
-<br>
-
-### 使用示例
-
-主要设置参数：
+Main setting parameters.
 
 ```go
 type Args struct {
-	Format    string // 文档格式，json或yaml
-	Data      string // json或yaml内容
-	InputFile string // 文件
-	Name      string // 结构体名称
-	SubStruct bool   // 子结构体是否分开
-	Tags      string // 添加额外tag，多个tag用逗号分隔
+	Format    string // document format, json or yaml
+	Data      string // json or yaml content
+	InputFile string // file
+	Name      string // name of structure
+	SubStruct bool   // are sub-structures separated
+	Tags      string // add additional tags, multiple tags separated by commas
 }
 ```
 
 <br>
 
-转换示例：
+Example of conversion.
 
 ```go
-    // json转struct
+    // json covert to struct
     code, err := jy2struct.Covert(&jy2struct.Args{
         Format: "json",
-        // InputFile: "user.json", // 来源于json文件
+        // InputFile: "user.json", // source from json file
         SubStruct: true,
     })
 
-    // json转struct
+    // yaml covert to struct
     code, err := jy2struct.Covert(&jy2struct.Args{
         Format: "yaml",
-        // InputFile: "user.yaml", // 来源于yaml文件
+        // InputFile: "user.yaml", // Source from yaml file
         SubStruct: true,
     })
 ```

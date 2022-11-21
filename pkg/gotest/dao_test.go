@@ -54,7 +54,7 @@ func TestAnyTime_Match(t *testing.T) {
 	t.Log(d.AnyTime.Match(time.Now()), d.AnyTime.Match("test"))
 }
 
-// -------------------------- 增删改查示例 --------------------------------
+// ----------- Example of adding, deleting and checking --------------------
 
 type User struct {
 	ID        uint64    `gorm:"column:id;AUTO_INCREMENT;primary_key" json:"id"`
@@ -71,12 +71,10 @@ func newUserDao(db *gorm.DB) *userDao {
 	return &userDao{db: db}
 }
 
-// Create 创建一条记录，插入记录后，id值被回写到table中
 func (d *userDao) Create(ctx context.Context, table *User) error {
 	return d.db.WithContext(ctx).Create(table).Error
 }
 
-// DeleteByID 根据id删除一条记录
 func (d *userDao) DeleteByID(ctx context.Context, id uint64) error {
 	err := d.db.WithContext(ctx).Where("id = ?", id).Delete(&User{}).Error
 	if err != nil {
@@ -86,7 +84,6 @@ func (d *userDao) DeleteByID(ctx context.Context, id uint64) error {
 	return nil
 }
 
-// UpdateByID 根据id更新记录
 func (d *userDao) UpdateByID(ctx context.Context, table *User) error {
 	if table.ID < 1 {
 		return errors.New("id cannot be 0")
@@ -105,7 +102,6 @@ func (d *userDao) UpdateByID(ctx context.Context, table *User) error {
 	return nil
 }
 
-// GetByID 根据id获取一条记录
 func (d *userDao) GetByID(ctx context.Context, id uint64) (*User, error) {
 	table := &User{}
 	err := d.db.WithContext(ctx).Where("id = ?", id).First(table).Error
@@ -139,7 +135,7 @@ func (d *userDao) GetByColumns(ctx context.Context, params *query.Params) ([]*Us
 	return records, total, err
 }
 
-// ---------------------------------------测试示例---------------------------------------------------
+// --------------------------------------- Test example --------------------------------------------
 
 func newTestUserDao() *Dao {
 	now := time.Now()
@@ -150,10 +146,10 @@ func newTestUserDao() *Dao {
 		UpdatedAt: now,
 	}
 
-	// 初始化mock cache
-	c := NewCache(map[string]interface{}{"no cache": testData}) // 为了测试mysql，禁止缓存
+	// init mock cache, to test mysql, disable caching
+	c := NewCache(map[string]interface{}{"no cache": testData})
 
-	// 初始化mock dao
+	// init mock dao
 	d := NewDao(c, testData)
 	d.IDao = newUserDao(d.DB)
 
@@ -165,11 +161,11 @@ func TestUserDao_Create(t *testing.T) {
 	defer d.Close()
 	testData := d.TestData.(*User)
 
-	d.SqlMock.ExpectBegin()
-	d.SqlMock.ExpectExec("INSERT INTO .*").
+	d.SQLMock.ExpectBegin()
+	d.SQLMock.ExpectExec("INSERT INTO .*").
 		WithArgs(testData.Name, testData.CreatedAt, testData.UpdatedAt, testData.ID).
 		WillReturnResult(sqlmock.NewResult(int64(testData.ID), 1))
-	d.SqlMock.ExpectCommit()
+	d.SQLMock.ExpectCommit()
 
 	err := d.IDao.(*userDao).Create(d.Ctx, testData)
 	if err != nil {
@@ -182,11 +178,11 @@ func TestUserDao_Update(t *testing.T) {
 	defer d.Close()
 	testData := d.TestData.(*User)
 
-	d.SqlMock.ExpectBegin()
-	d.SqlMock.ExpectExec("UPDATE .*").
+	d.SQLMock.ExpectBegin()
+	d.SQLMock.ExpectExec("UPDATE .*").
 		WithArgs(testData.Name, d.AnyTime, testData.ID).
 		WillReturnResult(sqlmock.NewResult(1, 1))
-	d.SqlMock.ExpectCommit()
+	d.SQLMock.ExpectCommit()
 
 	err := d.IDao.(*userDao).UpdateByID(d.Ctx, testData)
 	if err != nil {
@@ -199,11 +195,11 @@ func TestUserDao_Delete(t *testing.T) {
 	defer d.Close()
 	testData := d.TestData.(*User)
 
-	d.SqlMock.ExpectBegin()
-	d.SqlMock.ExpectExec("DELETE  FROM .*").
+	d.SQLMock.ExpectBegin()
+	d.SQLMock.ExpectExec("DELETE  FROM .*").
 		WithArgs(testData.ID).
 		WillReturnResult(sqlmock.NewResult(1, 1))
-	d.SqlMock.ExpectCommit()
+	d.SQLMock.ExpectCommit()
 
 	err := d.IDao.(*userDao).DeleteByID(d.Ctx, testData.ID)
 	if err != nil {
@@ -218,7 +214,7 @@ func TestUserDao_GetByID(t *testing.T) {
 
 	rows := sqlmock.NewRows([]string{"id", "name"}).AddRow(testData.ID, testData.Name)
 
-	d.SqlMock.ExpectQuery("SELECT .*").
+	d.SQLMock.ExpectQuery("SELECT .*").
 		WithArgs(testData.ID).
 		WillReturnRows(rows)
 
@@ -227,7 +223,7 @@ func TestUserDao_GetByID(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = d.SqlMock.ExpectationsWereMet()
+	err = d.SQLMock.ExpectationsWereMet()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -239,7 +235,7 @@ func TestUserDao_GetByColumns(t *testing.T) {
 	testData := d.TestData.(*User)
 
 	rows := sqlmock.NewRows([]string{"id", "name"}).AddRow(testData.ID, testData.Name)
-	d.SqlMock.ExpectQuery("SELECT .*").WillReturnRows(rows)
+	d.SQLMock.ExpectQuery("SELECT .*").WillReturnRows(rows)
 
 	_, _, err := d.IDao.(*userDao).GetByColumns(d.Ctx, &query.Params{
 		Page: 0,
@@ -250,7 +246,7 @@ func TestUserDao_GetByColumns(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = d.SqlMock.ExpectationsWereMet()
+	err = d.SQLMock.ExpectationsWereMet()
 	if err != nil {
 		t.Fatal(err)
 	}

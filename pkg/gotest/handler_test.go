@@ -14,15 +14,15 @@ func newHandler() *Handler {
 		"2": "bar",
 	}
 
-	// 初始化mock cache
+	// init mock cache
 	c := NewCache(map[string]interface{}{"no cache": testData})
 	c.ICache = struct{}{} // instantiated cache interface
 
-	// 初始化mock dao
+	// init mock dao
 	d := NewDao(c, testData)
 	d.IDao = struct{}{} // instantiated dao interface
 
-	// 初始化mock handler
+	// init mock handler
 	h := NewHandler(d, testData)
 	h.IHandler = struct{}{} // instantiated handler interface
 
@@ -49,7 +49,7 @@ func TestHandler_GoRunHttpServer(t *testing.T) {
 		c.String(http.StatusOK, "hello world!")
 	}
 
-	h.GoRunHttpServer([]RouterInfo{
+	h.GoRunHTTPServer([]RouterInfo{
 		{
 			FuncName:    "create",
 			Method:      http.MethodPost,

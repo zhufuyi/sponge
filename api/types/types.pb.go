@@ -25,10 +25,10 @@ type Column struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Name  string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`   // 列名
-	Exp   string `protobuf:"bytes,2,opt,name=exp,proto3" json:"exp,omitempty"`     // 表达式，值为空时默认为=，有=、!=、>、>=、<、<=、like七种类型
-	Value string `protobuf:"bytes,3,opt,name=value,proto3" json:"value,omitempty"` // 列值
-	Logic string `protobuf:"bytes,4,opt,name=logic,proto3" json:"logic,omitempty"` // 逻辑类型，值为空时默认为and，只有&(and)、||(or)两种类型
+	Name  string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`   // column name
+	Exp   string `protobuf:"bytes,2,opt,name=exp,proto3" json:"exp,omitempty"`     // expressions, which default to = when the value is null, have =, ! =, >, >=, <, <=, like
+	Value string `protobuf:"bytes,3,opt,name=value,proto3" json:"value,omitempty"` // column value
+	Logic string `protobuf:"bytes,4,opt,name=logic,proto3" json:"logic,omitempty"` // logical type, defaults to and when value is null, only &(and), ||(or)
 }
 
 func (x *Column) Reset() {
@@ -96,10 +96,10 @@ type Params struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Page    int32     `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`      // 页码，从0开始
-	Limit   int32     `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`    // 每页行数
-	Sort    string    `protobuf:"bytes,3,opt,name=sort,proto3" json:"sort,omitempty"`       // 排序字段，多列排序用逗号分隔
-	Columns []*Column `protobuf:"bytes,4,rep,name=columns,proto3" json:"columns,omitempty"` // 查询条件
+	Page    int32     `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`      // page number, starting from 0
+	Limit   int32     `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`    // lines per page
+	Sort    string    `protobuf:"bytes,3,opt,name=sort,proto3" json:"sort,omitempty"`       // sorted fields, multi-column sorting separated by commas
+	Columns []*Column `protobuf:"bytes,4,rep,name=columns,proto3" json:"columns,omitempty"` // query conditions
 }
 
 func (x *Params) Reset() {

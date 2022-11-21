@@ -6,7 +6,7 @@ services:
     restart: always
     environment:
       - discovery.type=single-node
-      # 鉴权配置，如果想取消鉴权，注释下面4行配置
+      # for authentication configuration, comment the following 4 lines if you want to remove authentication
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
       - xpack.security.enabled=true 
       - http.cors.enabled=true 

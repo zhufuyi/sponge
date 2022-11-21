@@ -1,20 +1,19 @@
-#### 启动 elasticsearch 服务
+### Start the elasticsearch service
 
-切换到elasticsearch目录，启动服务
+Switch to the elasticsearch directory and start the service
 
 > docker-compose up -d
 
 <br>
 
-#### 启动jaeger 服务
+### Start jaeger service
 
-切换到jaeger目录，打开.env环境变量，填写elasticsearch的url、登录账号、密码
+Switch to the jaeger directory, open the. env environment variable, and fill in the url, login account, and password of elastic search
 
-启动jaeger
+Start jaeger
 
 > docker-compose up -d
 
-查看是否正常
+Check whether it is normal
 
 > docker-compose ps
-

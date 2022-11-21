@@ -1,16 +1,19 @@
 package middleware
 
 import (
+	"context"
+
 	"github.com/zhufuyi/sponge/pkg/krand"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 const (
 	// ContextRequestIDKey context request id for context
 	ContextRequestIDKey = "request_id"
 
-	// HeaderXRequestIDKey http header request ID key
+	// HeaderXRequestIDKey http header request id key
 	HeaderXRequestIDKey = "X-Request-ID"
 )
 
@@ -22,7 +25,7 @@ func RequestID() gin.HandlerFunc {
 
 		// Create request id
 		if requestID == "" {
-			requestID = krand.String(krand.R_All, 12) // 生成长度为12的随机字符串
+			requestID = krand.String(krand.R_All, 12) // generate a random string of length 12
 			c.Request.Header.Set(HeaderXRequestIDKey, requestID)
 			// Expose it for use in the application
 			c.Set(ContextRequestIDKey, requestID)
@@ -35,18 +38,41 @@ func RequestID() gin.HandlerFunc {
 	}
 }
 
-// GetRequestIDFromContext returns 'RequestID' from the given context if present.
-func GetRequestIDFromContext(c *gin.Context) string {
-	if v, ok := c.Get(ContextRequestIDKey); ok {
+// GCtxRequestID get request id from gin.Context
+func GCtxRequestID(c *gin.Context) string {
+	if v, isExist := c.Get(ContextRequestIDKey); isExist {
 		if requestID, ok := v.(string); ok {
 			return requestID
 		}
 	}
-
 	return ""
 }
 
-// GetRequestIDFromHeaders returns 'RequestID' from the headers if present.
-func GetRequestIDFromHeaders(c *gin.Context) string {
+// GCtxRequestIDField get request id field from gin.Context
+func GCtxRequestIDField(c *gin.Context) zap.Field {
+	return zap.String(ContextRequestIDKey, GCtxRequestID(c))
+}
+
+// CtxRequestID get request id from context.Context
+func CtxRequestID(ctx context.Context) string {
+	v := ctx.Value(ContextRequestIDKey)
+	if str, ok := v.(string); ok {
+		return str
+	}
+	return ""
+}
+
+// CtxRequestIDField get request id field from context.Context
+func CtxRequestIDField(ctx context.Context) zap.Field {
+	return zap.String(ContextRequestIDKey, CtxRequestID(ctx))
+}
+
+// HeaderRequestID get request id from the header
+func HeaderRequestID(c *gin.Context) string {
 	return c.Request.Header.Get(HeaderXRequestIDKey)
+}
+
+// HeaderRequestIDField get request id field from header
+func HeaderRequestIDField(c *gin.Context) zap.Field {
+	return zap.String(HeaderXRequestIDKey, HeaderRequestID(c))
 }

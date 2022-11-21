@@ -1,11 +1,11 @@
 ## grpccli
 
-grpc 客户端，支持服务发现、日志、负载均衡、链路跟踪、指标、重试、熔断。
+grpc client with support for service discovery, logging, load balancing, link tracking, metrics, retries, circuit breaker.
 
-### 使用示例
+### Example of use
 
 ```go
-func grpcClientExample() pb.UserExampleServiceClient {
+func grpcClientExample() serverNameV1.UserExampleServiceClient {
 	err := config.Init(third_party.Path("../config/conf.yml"))
 	if err != nil {
 		panic(err)
@@ -31,7 +31,7 @@ func grpcClientExample() pb.UserExampleServiceClient {
 		panic(err)
 	}
 
-	return pb.NewUserExampleServiceClient(conn)
+	return serverNameV1.NewUserExampleServiceClient(conn)
 }
 
 func discoveryETCD(endpoints []string) registry.Discovery {

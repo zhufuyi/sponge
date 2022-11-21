@@ -127,7 +127,7 @@ func jyParse(input io.Reader, parser Parser, structName, pkgName string, tags []
 	case []interface{}:
 		//src := fmt.Sprintf("package %s\n\ntype %s %s\n", pkgName, structName, typeForValue(iresult, structName, tags, subStructMap, convertFloats))
 		src := fmt.Sprintf("\ntype %s %s\n", structName, typeForValue(iresult, structName, tags, subStructMap, convertFloats))
-		// 补上子结构体
+		// supplementary sub-structures
 		for k, v := range subStructMap {
 			src += fmt.Sprintf("\n\ntype %s %s\n\n", v, k)
 		}
@@ -206,7 +206,7 @@ func generateTypes(obj map[string]interface{}, structName string, tags []string,
 							subName = val
 						} else {
 							//subName = fmt.Sprintf("%v_sub%v", structName, len(subStructMap)+1)
-							subName = FmtFieldName(key) // 使用字段名字
+							subName = FmtFieldName(key) // use the field name word
 							subStructMap[sub] = subName
 						}
 					}
@@ -223,7 +223,7 @@ func generateTypes(obj map[string]interface{}, structName string, tags []string,
 					subName = val
 				} else {
 					//subName = fmt.Sprintf("%v_sub%v", structName, len(subStructMap)+1)
-					subName = FmtFieldName(key) // 使用字段名字
+					subName = FmtFieldName(key) // use the field name word
 					subStructMap[sub] = subName
 				}
 			}
@@ -237,7 +237,7 @@ func generateTypes(obj map[string]interface{}, structName string, tags []string,
 					subName = val
 				} else {
 					//subName = fmt.Sprintf("%v_sub%v", structName, len(subStructMap)+1)
-					subName = FmtFieldName(key) // 使用字段名字
+					subName = FmtFieldName(key) // use the field name word
 					subStructMap[sub] = subName
 				}
 			}

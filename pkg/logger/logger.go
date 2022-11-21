@@ -28,12 +28,12 @@ func getLogger() *zap.Logger {
 	return defaultLogger.WithOptions(zap.AddCallerSkip(1))
 }
 
-// Init 初始化打印设置
-// 在终端打印debug级别日志示例：Init()
-// 在终端打印info级别日志示例：Init(WithLevel("info"))
-// 在终端打印json格式、debug级别日志示例：Init(WithFormat("json"))
-// 把日志输出到文件out.log，使用默认的切割日志相关参数，debug级别日志示例：Init(WithSave())
-// 把日志输出到指定文件，自定义设置日志文件切割日志参数，json格式，debug级别日志示例：
+// Init initial log settings
+// print the debug level log in the terminal, example: Init()
+// print the info level log in the terminal, example: Init(WithLevel("info"))
+// print the json format, debug level log in the terminal, example: Init(WithFormat("json"))
+// output the log to the file out.log, using the default cut log-related parameters, debug-level log, example: Init(WithSave())
+// output the log to the specified file, custom set the log file cut log parameters, json format, debug level log, example:
 // Init(
 //
 //	  WithFormat("json"),
@@ -55,7 +55,7 @@ func Init(opts ...Option) (*zap.Logger, error) {
 	var err error
 	var zapLog *zap.Logger
 	var str string
-	if !isSave { // 在终端打印
+	if !isSave {
 		zapLog, err = log2Terminal(levelName, encoding)
 		if err != nil {
 			panic(err)
@@ -72,7 +72,6 @@ func Init(opts ...Option) (*zap.Logger, error) {
 	return defaultLogger, err
 }
 
-// 在终端打印
 func log2Terminal(levelName string, encoding string) (*zap.Logger, error) {
 	js := fmt.Sprintf(`{
       		"level": "%s",
@@ -88,37 +87,36 @@ func log2Terminal(levelName string, encoding string) (*zap.Logger, error) {
 	}
 
 	config.EncoderConfig = zap.NewProductionEncoderConfig()
-	config.EncoderConfig.EncodeTime = timeFormatter                // 默认时间格式
-	config.EncoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder // 在日志文件中使用大写字母记录日志级别
+	config.EncoderConfig.EncodeTime = timeFormatter                // default time format
+	config.EncoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder // logging levels in the log file using upper case letters
 	return config.Build()
 }
 
-// 输出到文件
 func log2File(encoding string, levelName string, fo *fileOptions) *zap.Logger {
 	encoderConfig := zap.NewProductionEncoderConfig()
-	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder   // 修改时间编码器
-	encoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder // 在日志文件中使用大写字母记录日志级别
+	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder   // modify Time Encoder
+	encoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder // logging levels in the log file using upper case letters
 	var encoder zapcore.Encoder
-	if encoding == formatConsole { // console格式
+	if encoding == formatConsole { // console format
 		encoder = zapcore.NewConsoleEncoder(encoderConfig)
-	} else { // json格式
+	} else { // json format
 		encoder = zapcore.NewJSONEncoder(encoderConfig)
 	}
 
 	ws := zapcore.AddSync(&lumberjack.Logger{
-		Filename:   fo.filename,      // 日志文件的位置；
-		MaxSize:    fo.maxSize,       // 在进行切割之前，日志文件的最大值(单位MB)
-		MaxBackups: fo.maxBackups,    // 保留旧文件的最大个数
-		MaxAge:     fo.maxAge,        // 保留旧文件的最大天数
-		Compress:   fo.isCompression, // 是否压缩/归档旧文件
+		Filename:   fo.filename,      // file name
+		MaxSize:    fo.maxSize,       // maximum file size (MB)
+		MaxBackups: fo.maxBackups,    // maximum number of old files
+		MaxAge:     fo.maxAge,        // maximum number of days for old documents
+		Compress:   fo.isCompression, // whether to compress and archive old files
 	})
 	core := zapcore.NewCore(encoder, ws, getLevelSize(levelName))
 
-	// zap.AddCaller()  添加将调用函数信息记录到日志中的功能。
+	// add the function call information log to the log.
 	return zap.New(core, zap.AddCaller())
 }
 
-// DEBUG(默认), INFO, WARN, ERROR
+// DEBUG(default), INFO, WARN, ERROR
 func getLevelSize(levelName string) zapcore.Level {
 	levelName = strings.ToUpper(levelName)
 	switch levelName {
@@ -138,13 +136,13 @@ func timeFormatter(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
 	enc.AppendString(t.Format("2006-01-02 15:04:05.000"))
 }
 
-// GetWithSkip 获取defaultLogger，设置跳过的caller值，自定义显示代码行数
+// GetWithSkip get defaultLogger, set the skipped caller value, customize the number of lines of code displayed
 func GetWithSkip(skip int) *zap.Logger {
 	checkNil()
 	return defaultLogger.WithOptions(zap.AddCallerSkip(skip))
 }
 
-// Get 获取logger对象
+// Get logger
 func Get() *zap.Logger {
 	checkNil()
 	return defaultLogger
@@ -152,7 +150,7 @@ func Get() *zap.Logger {
 
 func checkNil() {
 	if defaultLogger == nil {
-		_, err := Init() // 默认输出到控台
+		_, err := Init() // default output to console
 		if err != nil {
 			panic(err)
 		}

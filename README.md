@@ -10,7 +10,8 @@
 [![codecov](https://codecov.io/gh/zhufuyi/sponge/branch/main/graph/badge.svg)](https://codecov.io/gh/zhufuyi/sponge)
 [![Go Reference](https://pkg.go.dev/badge/github.com/zhufuyi/sponge.svg)](https://pkg.go.dev/github.com/zhufuyi/sponge)
 [![Go](https://github.com/zhufuyi/sponge/workflows/Go/badge.svg?branch=main)](https://github.com/zhufuyi/sponge/actions)
-[![License: MIT](https://img.shields.io/github/license/zhufuyi/sponge)](https://img.shields.io/github/license/zhufuyi/sponge) [![Join the chat at https://gitter.im/zhufuyi/sponge](https://badges.gitter.im/zhufuyi/sponge.svg)](https://gitter.im/zhufuyi/sponge?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![License: MIT](https://img.shields.io/github/license/zhufuyi/sponge)](https://img.shields.io/github/license/zhufuyi/sponge)
+[![Join the chat at https://gitter.im/zhufuyi/sponge](https://badges.gitter.im/zhufuyi/sponge.svg)](https://gitter.im/zhufuyi/sponge?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 </div>
 
@@ -48,8 +49,8 @@ Features :
 - Documentation [swagger](https://github.com/swaggo/swag)
 - Authorization [jwt](https://github.com/golang-jwt/jwt)
 - Validator [validator](https://github.com/go-playground/validator)
-- Rate limiter [aegis](https://github.com/go-kratos/aegis)
-- Circuit Breaker [aegis](https://github.com/go-kratos/aegis)
+- Rate limiter [ratelimit](pkg/shield/ratelimit)
+- Circuit Breaker [circuitbreaker](pkg/shield/circuitbreaker)
 - Tracing [opentelemetry](https://go.opentelemetry.io/otel)
 - Monitoring [prometheus](https://github.com/prometheus/client_golang/prometheus), [grafana](https://github.com/grafana/grafana)
 - Service registry and discovery [etcd](https://github.com/etcd-io/etcd), [consul](https://github.com/hashicorp/consul), [nacos](https://github.com/alibaba/)
@@ -124,11 +125,11 @@ sponge http \
   --db-table=student
 ```
 
-**(2) If using the default configuration, skip this step. Modify the configuration file configs/<server name>.yml**
+**(2) If using the default configuration, skip this step, modify the configuration file configs/<server name>.yml**
 
 - If the field `cacheType` is `redis`, the `redis` address must be set.
 - If the field `enableTracing` is true, the `jaeger` address must be set.
-- If the field `enableRegistryDiscovery` is true, the configuration of the corresponding type of `registryDiscoveryType` must be set.
+- If the field `registryDiscoveryType` is not be empty, the configuration of corresponding values must be set.
 
 **(3) Generate swagger documentation**
 
@@ -218,7 +219,7 @@ sponge grpc \
 
 - If the field `cacheType` is `redis`, the `redis` address must be set.
 - If the field `enableTracing` is true, the `jaeger` address must be set.
-- If the field `enableRegistryDiscovery` is true, the configuration of the corresponding type of `registryDiscoveryType` must be set.
+- If the field `registryDiscoveryType` is not be empty, the configuration of corresponding values must be set.
 
 **(3) Generating grpc code**
 

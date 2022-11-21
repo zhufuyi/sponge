@@ -4,11 +4,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/zhufuyi/sponge/pkg/gin/response"
-
 	"github.com/gin-gonic/gin"
-	rl "github.com/go-kratos/aegis/ratelimit"
-	"github.com/go-kratos/aegis/ratelimit/bbr"
+	"github.com/zhufuyi/sponge/pkg/gin/response"
+	rl "github.com/zhufuyi/sponge/pkg/shield/ratelimit"
 )
 
 // ErrLimitExceed is returned when the rate limiter is
@@ -71,11 +69,11 @@ func WithCPUQuota(quota float64) RateLimitOption {
 func RateLimit(opts ...RateLimitOption) gin.HandlerFunc {
 	o := defaultRatelimitOptions()
 	o.apply(opts...)
-	limiter := bbr.NewLimiter(
-		bbr.WithWindow(o.window),
-		bbr.WithBucket(o.bucket),
-		bbr.WithCPUThreshold(o.cpuThreshold),
-		bbr.WithCPUQuota(o.cpuQuota),
+	limiter := rl.NewLimiter(
+		rl.WithWindow(o.window),
+		rl.WithBucket(o.bucket),
+		rl.WithCPUThreshold(o.cpuThreshold),
+		rl.WithCPUQuota(o.cpuQuota),
 	)
 
 	return func(c *gin.Context) {

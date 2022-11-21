@@ -171,7 +171,42 @@ func (r *Registry) heartBeat(ctx context.Context, leaseID clientv3.LeaseID, key 
 
 	for {
 		if curLeaseID == 0 {
-			r.retry(ctx, curLeaseID, key, value, kac)
+			// try to registerWithKV
+			retreat := []int{}
+			for retryCnt := 0; retryCnt < r.opts.maxRetry; retryCnt++ {
+				if ctx.Err() != nil {
+					return
+				}
+				// prevent infinite blocking
+				idChan := make(chan clientv3.LeaseID, 1)
+				errChan := make(chan error, 1)
+				cancelCtx, cancel := context.WithCancel(ctx)
+				go func() {
+					defer cancel()
+					id, registerErr := r.registerWithKV(cancelCtx, key, value)
+					if registerErr != nil {
+						errChan <- registerErr
+					} else {
+						idChan <- id
+					}
+				}()
+
+				select {
+				case <-time.After(3 * time.Second):
+					cancel()
+					continue
+				case <-errChan:
+					continue
+				case curLeaseID = <-idChan:
+				}
+
+				kac, err = r.client.KeepAlive(ctx, curLeaseID)
+				if err == nil {
+					break
+				}
+				retreat = append(retreat, 1<<retryCnt)
+				time.Sleep(time.Duration(retreat[rand.Intn(len(retreat))]) * time.Second)
+			}
 			if _, ok := <-kac; !ok {
 				// retry failed
 				return
@@ -192,44 +227,5 @@ func (r *Registry) heartBeat(ctx context.Context, leaseID clientv3.LeaseID, key 
 		case <-r.opts.ctx.Done():
 			return
 		}
-	}
-}
-
-func (r *Registry) retry(ctx context.Context, curLeaseID clientv3.LeaseID, key string, value string, kac <-chan *clientv3.LeaseKeepAliveResponse) {
-	retreat := []int{}
-	for retryCnt := 0; retryCnt < r.opts.maxRetry; retryCnt++ {
-		if ctx.Err() != nil {
-			return
-		}
-		// prevent infinite blocking
-		idChan := make(chan clientv3.LeaseID, 1)
-		errChan := make(chan error, 1)
-		cancelCtx, cancel := context.WithCancel(ctx)
-		go func() {
-			defer cancel()
-			id, registerErr := r.registerWithKV(cancelCtx, key, value)
-			if registerErr != nil {
-				errChan <- registerErr
-			} else {
-				idChan <- id
-			}
-		}()
-
-		select {
-		case <-time.After(3 * time.Second):
-			cancel()
-			continue
-		case <-errChan:
-			continue
-		case curLeaseID = <-idChan:
-		}
-
-		var err error
-		kac, err = r.client.KeepAlive(ctx, curLeaseID)
-		if err == nil {
-			break
-		}
-		retreat = append(retreat, 1<<retryCnt)
-		time.Sleep(time.Duration(retreat[rand.Intn(len(retreat))]) * time.Second)
 	}
 }

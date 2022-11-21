@@ -1,52 +1,50 @@
 ## discovery
 
-discovery 服务发现，与服务注册[registry](../registry)对应，支持etcd、consul、nacos三种方式。
+Service discovery, corresponding to the service [registry](../registry), supports etcd, consul and nacos.
 
-### 使用示例
-
-#### etcd
+### Example of use
 
 ```go
-func getETCDDiscovery(etcdEndpoints []string) registry.Discovery {
-	cli, err := clientv3.New(clientv3.Config{
-		Endpoints: etcdEndpoints,
-		DialTimeout: 10 * time.Second,
-		DialOptions: []grpc.DialOption{
-			grpc.WithBlock(),
-			grpc.WithTransportCredentials(insecure.NewCredentials()),
-		},
-	})
-	if err != nil {
-		panic(err)
+    var cliOptions = []grpccli.Option{}
+    var endpoint string
+
+	switch grpcClientCfg.RegistryDiscoveryType {
+	// discovering services using consul
+	case "consul":
+		endpoint = "discovery:///" + grpcClientCfg.Name // Connecting to grpc services by service name
+		cli, err := consulcli.Init(cfg.Consul.Addr, consulcli.WithWaitTime(time.Second*5))
+		if err != nil {
+			panic(fmt.Sprintf("consulcli.Init error: %v, addr: %s", err, cfg.Consul.Addr))
+		}
+		iDiscovery := consul.New(cli)
+		cliOptions = append(cliOptions, grpccli.WithDiscovery(iDiscovery))
+	// discovering services using etcd
+	case "etcd":
+		endpoint = "discovery:///" + grpcClientCfg.Name // Connecting to grpc services by service name
+		cli, err := etcdcli.Init(cfg.Etcd.Addrs, etcdcli.WithDialTimeout(time.Second*5))
+		if err != nil {
+			panic(fmt.Sprintf("etcdcli.Init error: %v, addr: %s", err, cfg.Etcd.Addrs))
+		}
+		iDiscovery := etcd.New(cli)
+		cliOptions = append(cliOptions, grpccli.WithDiscovery(iDiscovery))
+	// discovering services using nacos
+	case "nacos":
+		// example: endpoint = "discovery:///serverName.scheme"
+		endpoint = "discovery:///" + grpcClientCfg.Name + ".grpc"
+		cli, err := nacoscli.NewNamingClient(
+			cfg.NacosRd.IPAddr,
+			cfg.NacosRd.Port,
+			cfg.NacosRd.NamespaceID)
+		if err != nil {
+			panic(fmt.Sprintf("nacoscli.NewNamingClient error: %v, ipAddr: %s, port: %d",
+				err, cfg.NacosRd.IPAddr, cfg.NacosRd.Port))
+		}
+		iDiscovery := nacos.New(cli)
+		cliOptions = append(cliOptions, grpccli.WithDiscovery(iDiscovery))
 	}
 
-	return etcd.New(cli)
-}
-
-func discoveryExample() {
-    etcdDiscovery := getETCDDiscovery([]string{"192.168.1.6:2379"})
-
-    // 服务发现的endpoint固定格式discovery:///serviceName
-	endpoint := "discovery:///" + "serviceName"
-    // grpc客户端
-	conn, err := grpccli.DialInsecure(ctx, endpoint,
-		grpccli.WithUnaryInterceptors(interceptor.UnaryClientLog(logger.Get())),
-		grpccli.WithDiscovery(etcdDiscovery),
-	)
-	if err != nil {
-		panic(err)
-	}
-
-	// ......
-}
+    serverNameExampleConn, err = grpccli.DialInsecure(context.Background(), endpoint, cliOptions...)
+    if err != nil {
+        panic(fmt.Sprintf("dial rpc server failed: %v, endpoint: %s", err, endpoint))
+    }
 ```
-
-<br>
-
-#### consul
-
-<br>
-
-#### nacos
-
-

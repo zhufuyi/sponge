@@ -40,8 +40,8 @@ func runAuthHTTPServer() string {
 	}
 
 	r.GET("/token", tokenFun)
-	r.GET("/user/:id", Auth(), userFun)       // 需要鉴权
-	r.GET("/admin/:id", AuthAdmin(), userFun) // 需要鉴权
+	r.GET("/user/:id", Auth(), userFun)
+	r.GET("/admin/:id", AuthAdmin(), userFun)
 
 	go func() {
 		err := r.Run(serverAddr)
@@ -58,7 +58,7 @@ func TestAuth(t *testing.T) {
 	role = ""
 	requestAddr := runAuthHTTPServer()
 
-	// 获取token
+	// get token
 	result := &gohttp.StdResult{}
 	err := gohttp.Get(result, requestAddr+"/token")
 	if err != nil {
@@ -66,7 +66,7 @@ func TestAuth(t *testing.T) {
 	}
 	token := result.Data.(string)
 
-	// 正确的请求
+	// the right request
 	authorization := fmt.Sprintf("Bearer %s", token)
 	val, err := getUser(requestAddr, authorization)
 	if err != nil {
@@ -74,21 +74,21 @@ func TestAuth(t *testing.T) {
 	}
 	t.Log(val)
 
-	// 错误的 authorization
+	// wrong authorization
 	val, err = getUser(requestAddr, "Bearer ")
 	if err != nil {
 		t.Fatal(err)
 	}
 	t.Log(val)
 
-	// 错误的 authorization
+	// wrong authorization
 	val, err = getUser(requestAddr, token)
 	if err != nil {
 		t.Fatal(err)
 	}
 	t.Log(val)
 
-	// 需要管理员访问权限
+	// administrator access required
 	val, err = getAdmin(requestAddr, authorization)
 	if err != nil {
 		t.Fatal(err)
@@ -99,7 +99,7 @@ func TestAuth(t *testing.T) {
 func TestAdminAuth(t *testing.T) {
 	requestAddr := runAuthHTTPServer()
 
-	// 获取token
+	// get token
 	result := &gohttp.StdResult{}
 	err := gohttp.Get(result, requestAddr+"/token")
 	if err != nil {
@@ -107,7 +107,7 @@ func TestAdminAuth(t *testing.T) {
 	}
 	token := result.Data.(string)
 
-	// 正确请求
+	// the right request
 	authorization := fmt.Sprintf("Bearer %s", token)
 	val, err := getAdmin(requestAddr, authorization)
 	if err != nil {
@@ -115,14 +115,14 @@ func TestAdminAuth(t *testing.T) {
 	}
 	t.Log(val)
 
-	// 错误的 authorization
+	// wrong authorization
 	val, err = getAdmin(requestAddr, "Bearer ")
 	if err != nil {
 		t.Fatal(err)
 	}
 	t.Log(val)
 
-	// 错误的 authorization
+	// wrong authorization
 	val, err = getAdmin(requestAddr, token)
 	if err != nil {
 		t.Fatal(err)

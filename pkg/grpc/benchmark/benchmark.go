@@ -8,28 +8,29 @@ import (
 
 	"github.com/bojand/ghz/printer"
 	"github.com/bojand/ghz/runner"
-	"github.com/golang/protobuf/proto"
+	"google.golang.org/protobuf/proto"
 )
 
+// Runner interface
 type Runner interface {
 	Run() error
 }
 
-// bench 压测参数
+// bench pressing parameters
 type bench struct {
-	rpcServerHost string // rpc server端地址
+	rpcServerHost string // rpc server address
 
 	protoFile     string        // proto file
-	packageName   string        // proto file的package
-	serviceName   string        // proto file的Service
-	methodName    string        // 当前压测方法名称
-	methodRequest proto.Message // 压测输入参数，也就也方法参数
+	packageName   string        // proto file package name
+	serviceName   string        // proto file service name
+	methodName    string        // name of pressure test method
+	methodRequest proto.Message // input parameters corresponding to the method
 
-	total       uint     // 请求数量
-	importPaths []string // 依赖第三方protobuf文件位置
+	total       uint     // number of requests
+	importPaths []string // reliance on third party protobuf file locations
 }
 
-// New 创建一个压测实例
+// New create a pressure test instance
 func New(host string, protoFile string, methodName string, req proto.Message, total uint, importPaths ...string) (Runner, error) {
 	data, err := os.ReadFile(protoFile)
 	if err != nil {
@@ -64,12 +65,12 @@ func New(host string, protoFile string, methodName string, req proto.Message, to
 	}, nil
 }
 
+// Run operational performance benchmarking
 func (b *bench) Run() error {
 	callMethod := fmt.Sprintf("%s.%s/%s", b.packageName, b.serviceName, b.methodName)
 	fmt.Printf("benchmark '%s', total %d requests\n", callMethod, b.total)
 
-	buf := proto.Buffer{}
-	err := buf.EncodeMessage(b.methodRequest)
+	data, err := proto.Marshal(b.methodRequest)
 	if err != nil {
 		return err
 	}
@@ -78,26 +79,28 @@ func (b *bench) Run() error {
 		callMethod, //  'package.Service/method' or 'package.Service.Method'
 		b.rpcServerHost,
 		runner.WithProtoFile(b.protoFile, b.importPaths),
-		runner.WithBinaryData(buf.Bytes()),
+		runner.WithBinaryData(data),
 		runner.WithInsecure(true),
 		runner.WithTotalRequests(b.total),
-		// 并发参数
+		// concurrent parameter
 		//runner.WithConcurrencySchedule(runner.ScheduleLine),
-		//runner.WithConcurrencyStep(5),  // 每秒增加5个worker
+		//runner.WithConcurrencyStep(5),  // add 5 workers per second
 		//runner.WithConcurrencyStart(1), //
-		//runner.WithConcurrencyEnd(20),  // 最大并发数
+		//runner.WithConcurrencyEnd(20),  // maximum number of concurrent
 	)
 	if err != nil {
 		return err
 	}
 
-	// 指定输出路径
+	// specify the output path
 	outputFile := fmt.Sprintf("%sreport_%s.html", os.TempDir()+gofile.GetPathDelimiter(), b.methodName)
 	file, err := os.Create(outputFile)
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+	defer func() {
+		_ = file.Close()
+	}()
 
 	rp := printer.ReportPrinter{
 		Out:    file,

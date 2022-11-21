@@ -3,10 +3,11 @@ package replacer
 import (
 	"embed"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 //go:embed testDir
@@ -55,6 +56,7 @@ func TestNewWithFS(t *testing.T) {
 			r := tt.args.fn()
 
 			subDirs := []string{"testDir/replace"}
+			subFiles := []string{"testDir/foo.txt"}
 			ignoreDirs := []string{"testDir/ignore"}
 			ignoreFiles := []string{"test.txt"}
 			fields := []Field{
@@ -68,15 +70,15 @@ func TestNewWithFS(t *testing.T) {
 					IsCaseSensitive: true,
 				},
 			}
-			r.SetSubDirs(subDirs...)         // 只处理指定子目录，为空时表示指定全部文件
-			r.SetIgnoreFiles(ignoreDirs...)  // 忽略替换目录
-			r.SetIgnoreFiles(ignoreFiles...) // 忽略替换文件
-			r.SetReplacementFields(fields)   // 设置替换文本
+			r.SetSubDirsAndFiles(subDirs, subFiles...)
+			r.SetIgnoreSubDirs(ignoreDirs...)
+			r.SetIgnoreSubFiles(ignoreFiles...)
+			r.SetReplacementFields(fields)
 			_ = r.SetOutputDir(fmt.Sprintf("%s/replacer_test/%s_%s",
-				os.TempDir(), tt.name, time.Now().Format("150405"))) // 设置输出目录和名称
+				os.TempDir(), tt.name, time.Now().Format("150405")))
 			_, err := r.ReadFile("replace.txt")
 			assert.NoError(t, err)
-			err = r.SaveFiles() // 保存替换后文件
+			err = r.SaveFiles()
 			if (err != nil) != tt.wantErr {
 				t.Logf("SaveFiles() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -94,8 +96,8 @@ func TestReplacerError(t *testing.T) {
 
 	r, err := New("testDir")
 	assert.NoError(t, err)
-	r.SetIgnoreFiles()
-	r.SetSubDirs()
+	r.SetIgnoreSubFiles()
+	r.SetSubDirsAndFiles(nil)
 	err = r.SetOutputDir("/tmp/yourServerName")
 	assert.NoError(t, err)
 	path := r.GetSourcePath()

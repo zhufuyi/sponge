@@ -1,7 +1,6 @@
 
-启动前把`grafana-data`目录权限改为0777，启动grafana
+Change the `grafana-data` directory permissions to 0777 before starting grafana
 
 > docker-compose up -d
 
-在浏览器打开 `http://localhost:33000`，登录账号密码都是 `admin`
-
+Open `http://localhost:33000` in your browser, the login password is `admin`.

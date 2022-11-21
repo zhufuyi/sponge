@@ -1,8 +1,12 @@
 package nacoscli
 
 import (
+	"context"
 	"os"
 	"testing"
+	"time"
+
+	"github.com/zhufuyi/sponge/pkg/utils"
 
 	"github.com/nacos-group/nacos-sdk-go/v2/common/constant"
 	"github.com/stretchr/testify/assert"
@@ -15,7 +19,6 @@ var (
 )
 
 func TestParse(t *testing.T) {
-	// 方式一：
 	conf := new(map[string]interface{})
 	params := &Params{
 		IPAddr:      ipAddr,
@@ -25,11 +28,12 @@ func TestParse(t *testing.T) {
 		DataID:      "serverNameExample.yml",
 		Format:      "yaml",
 	}
-	err := Init(conf, params)
-	//assert.NoError(t, err)
-	t.Log(err, conf)
 
-	// 方式二：直接设置ClientConfig和ServerConfig
+	utils.SafeRunWithTimeout(time.Second*2, func(cancel context.CancelFunc) {
+		err := Init(conf, params)
+		t.Log(err, conf)
+	})
+
 	conf = new(map[string]interface{})
 	params = &Params{
 		Group:  "dev",
@@ -49,19 +53,20 @@ func TestParse(t *testing.T) {
 			Port:   uint64(port),
 		},
 	}
-	err = Init(conf, params,
-		WithClientConfig(clientConfig),
-		WithServerConfigs(serverConfigs),
-	)
-	//assert.NoError(t, err)
-	t.Log(err, conf)
+	utils.SafeRunWithTimeout(time.Second*2, func(cancel context.CancelFunc) {
+		err := Init(conf, params,
+			WithClientConfig(clientConfig),
+			WithServerConfigs(serverConfigs),
+		)
+		t.Log(err, conf)
+	})
 }
 
 func TestNewNamingClient(t *testing.T) {
-	namingClient, err := NewNamingClient(ipAddr, port, namespaceID)
-	//assert.NoError(t, err)
-	//assert.NotNil(t, namingClient)
-	t.Log(err, namingClient)
+	utils.SafeRunWithTimeout(time.Second*2, func(cancel context.CancelFunc) {
+		namingClient, err := NewNamingClient(ipAddr, port, namespaceID)
+		t.Log(err, namingClient)
+	})
 }
 
 func TestError(t *testing.T) {

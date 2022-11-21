@@ -1,0 +1,68 @@
+{
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "http server api docs",
+        "title": "test api docs",
+        "contact": {},
+        "version": "v0.0.0"
+    },
+    "host": "localhost:8080",
+    "paths": {
+        "/health": {
+            "get": {
+                "description": "check health",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "check health",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlerfunc.checkHealthResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/ping": {
+            "get": {
+                "description": "ping",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "ping",
+                "responses": {}
+            }
+        }
+    },
+    "definitions": {
+        "handlerfunc.checkHealthResponse": {
+            "type": "object",
+            "properties": {
+                "hostname": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

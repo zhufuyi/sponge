@@ -1,30 +1,27 @@
-## render
+## middleware
 
-gin中间件插件。
+gin middleware plugin.
 
 <br>
 
-## 使用示例
+## Example of use
 
-### 日志中间件
+### logging middleware
 
-可以设置打印最大长度、添加请求id字段、忽略打印path、自定义[zap](go.uber.org/zap) log
+You can set the maximum length for printing, add a request id field, ignore print path, customize [zap](go.uber.org/zap) log
 
 ```go
     r := gin.Default()
-
-    // 默认打印日志
+	
     r.Use(middleware.Logging())
 
-    // 自定义打印日志
     r.Use(middleware.Logging(
-        middleware.WithMaxLen(400), // 打印body最大长度，超过则忽略
-		//WithRequestIDFromHeader(), // 支持自定义requestID名称
-		WithRequestIDFromContext(), // 支持自定义requestID名称
-        //middleware.WithIgnoreRoutes("/hello"), // 忽略/hello
+        middleware.WithMaxLen(400),
+		//WithRequestIDFromHeader(),
+		WithRequestIDFromContext(),
+        //middleware.WithIgnoreRoutes("/hello"),
     ))
 
-    // 自定义zap log
     log, _ := logger.Init(logger.WithFormat("json"))
     r.Use(middlewareLogging(
         middleware.WithLog(log),
@@ -33,7 +30,7 @@ gin中间件插件。
 
 <br>
 
-### 允许跨域请求
+### Allow cross-domain requests middleware
 
 ```go
     r := gin.Default()
@@ -42,9 +39,9 @@ gin中间件插件。
 
 <br>
 
-### 限流
+### rate limiter middleware
 
-#### 方式一：根据硬件资源自适应限流
+Adaptive flow limitation based on hardware resources.
 
 ```go
 	r := gin.Default()
@@ -63,7 +60,7 @@ gin中间件插件。
 
 <br>
 
-### 熔断器
+### Circuit Breaker middleware
 
 ```go
     r := gin.Default()
@@ -71,18 +68,17 @@ gin中间件插件。
 ```
 <br>
 
-### jwt鉴权
+### jwt authorization middleware
 
 ```go
     r := gin.Default()
-    r.GET("/user/:id", middleware.JWT(), userFun) // 需要鉴权
+    r.GET("/user/:id", middleware.JWT(), userFun)
 ```
 <br>
 
-### 链路跟踪
+### tracing middleware
 
 ```go
-// 初始化trace
 func InitTrace(serviceName string) {
 	exporter, err := tracer.NewJaegerAgentExporter("192.168.3.37", "6831")
 	if err != nil {
@@ -95,7 +91,7 @@ func InitTrace(serviceName string) {
 		tracer.WithServiceVersion("demo"),
 	)
 
-	tracer.Init(exporter, resource) // 默认采集全部
+	tracer.Init(exporter, resource) // collect all by default
 }
 
 func NewRouter(
@@ -105,11 +101,11 @@ func NewRouter(
     // ......
 )
 
-// 如果有需要，可以在程序创建一个span
+// if necessary, you can create a span in the program
 func SpanDemo(serviceName string, spanName string, ctx context.Context) {
 	_, span := otel.Tracer(serviceName).Start(
 		ctx, spanName,
-		trace.WithAttributes(attribute.String(spanName, time.Now().String())), // 自定义属性
+		trace.WithAttributes(attribute.String(spanName, time.Now().String())),
 	)
 	defer span.End()
 
@@ -119,7 +115,7 @@ func SpanDemo(serviceName string, spanName string, ctx context.Context) {
 
 <br>
 
-### 监控指标
+### Metrics middleware
 
 ```go
 	r := gin.Default()

@@ -1,16 +1,16 @@
 ## benchmark
 
-压测rpc方法，并生成报告结果。
+Compression testing of rpc methods and generation of reported results.
 
-### 使用示例
+### Example of use
 
 ```go
 func benchmarkExample() error {
 	host := "127.0.0.1:8282"
 	protoFile := "api/serverNameExample/v1/userExample.proto"
-	// 如果压测过程中缺少第三方依赖，复制到项目的third_party目录下(不包括import路径)
+	// if third-party dependencies are missing during the press test, copy them to the project's third_party directory (not including the import path)
 	importPaths := []string{"third_party"}
-	message := &pb.GetUserExampleByIDRequest{
+	message := &serverNameV1.GetUserExampleByIDRequest{
 		ID: 2,
 	}
 
@@ -22,4 +22,4 @@ func benchmarkExample() error {
 }
 ```
 
-压测完毕后，复制输出的html文件路径到浏览器查看详细的压测报告。
+Once the crush is complete, copy the output html file path to your browser to view the detailed crush report.

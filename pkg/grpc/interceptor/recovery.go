@@ -9,7 +9,7 @@ import (
 
 // ---------------------------------- server interceptor ----------------------------------
 
-// UnaryServerRecovery recovery unary拦截器
+// UnaryServerRecovery recovery unary interceptor
 func UnaryServerRecovery() grpc.UnaryServerInterceptor {
 	// https://pkg.go.dev/github.com/grpc-ecosystem/go-grpc-middleware/recovery
 	customFunc := func(p interface{}) (err error) {
@@ -22,7 +22,7 @@ func UnaryServerRecovery() grpc.UnaryServerInterceptor {
 	return grpc_recovery.UnaryServerInterceptor(opts...)
 }
 
-// StreamServerRecovery recovery stream拦截器
+// StreamServerRecovery recovery stream interceptor
 func StreamServerRecovery() grpc.StreamServerInterceptor {
 	// https://pkg.go.dev/github.com/grpc-ecosystem/go-grpc-middleware/recovery
 	customFunc := func(p interface{}) (err error) {

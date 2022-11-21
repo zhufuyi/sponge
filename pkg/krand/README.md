@@ -1,42 +1,42 @@
 ## krand
 
-生成随机字符串、整数、浮点数。
+Generate random strings, integers, floating point numbers.
 
 <br>
 
-## 使用示例
+## Example of use
 
-### 生成随机字符串
+### Generate a random string
 
 ```go
     /*
-	R_NUM = 1      // R_NUM 纯数字
-	R_UPPER = 2   // R_UPPER 大写字母
-	R_LOWER = 4  // R_LOWER 小写字母
-	R_All = 7	       // R_All 数字、大小写字母
+	R_NUM = 1      // only number
+	R_UPPER = 2   // only capital letters
+	R_LOWER = 4  // only lowercase letters
+	R_All = 7	       // numbers, upper and lower case letters
     */
 
-	// 通过|或组合出不同类型
-    kind := krand.R_NUM|krand.R_UPPER    // 大写字母和数字
-    // kind := krand.R_All    // 大小写字母和数字
+	// by | or combining different types
+    kind := krand.R_NUM|krand.R_UPPER    // capital letters and numbers
 
-    krand.String(kind, 10)   // 长度为10，大写字母和数字组成的随机字符串
+	// a random string of length 10, consisting of upper case letters and numbers
+    krand.String(kind, 10)
 ```
 
 <br>
 
-### 生成随机整数
+### Generate random integers
 
 ```go
-    krand.Int(200)            // 随机数范围0 ~ 200
-    krand.Int(1000, 2000)  // 随机数范围1000 ~ 2000
+    krand.Int(200)            // random number range 0 ~ 200
+    krand.Int(1000, 2000)  // random number range 1000 ~ 2000
 ```
 
 <br>
 
-### 生成随机浮点数
+### Generate random floating point numbers
 
 ```go
-    krand.Float64(1, 200)            // 1位小数点的浮点数，范围0~200
-    krand.Float64(2, 100,1000)            // 2位小数点的浮点数，范围100~1000
+    krand.Float64(1, 200)            // floating point number with 1 decimal point, range 0~200
+    krand.Float64(2, 100,1000)            // floating point number with 2 decimal places, range 100~1000
 ```

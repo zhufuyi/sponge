@@ -1,42 +1,17 @@
 package generate
 
 const (
-	mainFileHTTPCode = `
-	// 创建http服务
-	httpAddr := ":" + strconv.Itoa(config.Get().HTTP.Port)
-	httpRegistry, httpInstance := registryService("http", config.Get().App.Host, config.Get().HTTP.Port)
-	httpServer := server.NewHTTPServer(httpAddr,
-		server.WithHTTPReadTimeout(time.Second*time.Duration(config.Get().HTTP.ReadTimeout)),
-		server.WithHTTPWriteTimeout(time.Second*time.Duration(config.Get().HTTP.WriteTimeout)),
-		server.WithHTTPRegistry(httpRegistry, httpInstance),
-		server.WithHTTPIsProd(config.Get().App.Env == "prod"),
-	)
-	servers = append(servers, httpServer)
-`
-
-	mainFileGrpcCode = `
-	// 创建grpc服务
-	grpcAddr := ":" + strconv.Itoa(config.Get().Grpc.Port)
-	grpcRegistry, grpcInstance := registryService("grpc", config.Get().App.Host, config.Get().Grpc.Port)
-	grpcServer := server.NewGRPCServer(grpcAddr,
-		server.WithGrpcReadTimeout(time.Duration(config.Get().Grpc.ReadTimeout)*time.Second),
-		server.WithGrpcWriteTimeout(time.Duration(config.Get().Grpc.WriteTimeout)*time.Second),
-		server.WithGrpcRegistry(grpcRegistry, grpcInstance),
-	)
-	servers = append(servers, grpcServer)
-`
-
-	dockerFileHTTPCode = `# 添加curl，用在http服务的检查，如果用部署在k8s，可以不用安装
+	dockerFileHTTPCode = `# add curl, used for http service checking, can be installed without it if deployed in k8s
 RUN apk add curl
 
 COPY configs/ /app/configs/
 COPY serverNameExample /app/serverNameExample
 RUN chmod +x /app/serverNameExample
 
-# http端口
+# http port
 EXPOSE 8080`
 
-	dockerFileGrpcCode = `# 添加grpc_health_probe，用在grpc服务的健康检查
+	dockerFileGrpcCode = `# add grpc_health_probe for health check of grpc services
 COPY grpc_health_probe /bin/grpc_health_probe
 RUN chmod +x /bin/grpc_health_probe
 
@@ -44,31 +19,31 @@ COPY configs/ /app/configs/
 COPY serverNameExample /app/serverNameExample
 RUN chmod +x /app/serverNameExample`
 
-	dockerFileBuildHTTPCode = `# 添加curl，用在http服务的检查，如果用部署在k8s，可以不用安装
+	dockerFileBuildHTTPCode = `# add curl, used for http service checking, can be installed without it if deployed in k8s
 RUN apk add curl
 
 COPY --from=build /serverNameExample /app/serverNameExample
 COPY --from=build /go/src/serverNameExample/configs/serverNameExample.yml /app/configs/serverNameExample.yml
 
-# http端口
+# http port
 EXPOSE 8080`
 
-	dockerFileBuildGrpcCode = `# 添加grpc_health_probe，用在grpc服务的健康检查
+	dockerFileBuildGrpcCode = `# add grpc_health_probe for health check of grpc services
 COPY --from=build /grpc_health_probe /bin/grpc_health_probe
 COPY --from=build /serverNameExample /app/serverNameExample
 COPY --from=build /go/src/serverNameExample/configs/serverNameExample.yml /app/configs/serverNameExample.yml`
 
 	dockerComposeFileHTTPCode = `    ports:
-      - "8080:8080"   # http端口
+      - "8080:8080"   # http port
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]   # http健康检查，注：镜像必须包含curl命令`
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]   # http health check, note: mirror must contain curl command`
 
 	dockerComposeFileGrpcCode = `
     ports:
-      - "8282:8282"   # grpc服务端口
-      - "8283:8283"   # grpc metrics端口
+      - "8282:8282"   # grpc port
+      - "8283:8283"   # grpc metrics or pprof port
     healthcheck:
-      test: ["CMD", "grpc_health_probe", "-addr=localhost:8282"]    # grpc健康检查，注：镜像必须包含grpc_health_probe命令`
+      test: ["CMD", "grpc_health_probe", "-addr=localhost:8282"]    # grpc health check, note: the image must contain the grpc_health_probe command`
 
 	k8sDeploymentFileHTTPCode = `
           ports:
@@ -166,4 +141,55 @@ func NewCenter(configFile string) (*Center, error) {
 	return nacosConf, err
 }
 `
+
+	protoShellHandlerCode = `
+# generate the swagger document and merge all files into docs/apis.swagger.json
+protoc --proto_path=. --proto_path=./third_party \
+  --openapiv2_out=. --openapiv2_opt=logtostderr=true --openapiv2_opt=allow_merge=true --openapiv2_opt=merge_file_name=docs/apis.json \
+  $allProtoFiles
+
+checkResult $?
+
+moduleName=$(cat docs/gen.info | head -1 | cut -d , -f 1)
+serverName=$(cat docs/gen.info | head -1 | cut -d , -f 2)
+# A total of four files are generated, namely the registration route file _*router.pb.go (saved in the same directory as the protobuf file), 
+# the injection route file *_handler.pb.go (saved by default in the path internal/routers), the logical code template file*_logic.go (default path is in internal/handler), 
+# return error code template file*_http.go (default path is in internal/ecode)
+protoc --proto_path=. --proto_path=./third_party \
+  --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=handler \
+  --go-gin_opt=moduleName=${moduleName} --go-gin_opt=serverName=${serverName} \
+  $allProtoFiles
+
+checkResult $?`
+
+	protoShellServiceCode = `
+# Generate the swagger document and merge all files into docs/apis.swagger.json
+protoc --proto_path=. --proto_path=./third_party \
+  --openapiv2_out=. --openapiv2_opt=logtostderr=true --openapiv2_opt=allow_merge=true --openapiv2_opt=merge_file_name=docs/apis.json \
+  $allProtoFiles
+
+checkResult $?
+
+moduleName=$(cat docs/gen.info | head -1 | cut -d , -f 1)
+serverName=$(cat docs/gen.info | head -1 | cut -d , -f 2)
+# A total of 4 files are generated, namely the registration route file _*router.pb.go (saved in the same directory as the protobuf file), 
+# the injection route file *_service.pb.go (default save path in internal/routers), the logical code template file*_logic.go (saved in internal/service by default), 
+# return error code template file*_rpc.go (saved in internal/ecode by default)
+protoc --proto_path=. --proto_path=./third_party \
+  --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=service \
+  --go-gin_opt=moduleName=${moduleName} --go-gin_opt=serverName=${serverName} \
+  $allProtoFiles
+
+checkResult $?`
+
+	protoShellServiceTmplCode = `
+moduleName=$(cat docs/gen.info | head -1 | cut -d , -f 1)
+serverName=$(cat docs/gen.info | head -1 | cut -d , -f 2)
+# Generate 2 files, a logic code template file *.go (default save path in internal/service), a return error code template file *_rpc.go (default save path in internal/ecode)
+protoc --proto_path=. --proto_path=./third_party \
+  --go-rpc-tmpl_out=. --go-rpc-tmpl_opt=paths=source_relative \
+  --go-rpc-tmpl_opt=moduleName=${moduleName} --go-rpc-tmpl_opt=serverName=${serverName} \
+  $allProtoFiles
+
+checkResult $?`
 )

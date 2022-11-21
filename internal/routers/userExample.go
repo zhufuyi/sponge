@@ -6,10 +6,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// nolint
 func init() {
-	routerFns = append(routerFns, func() {
-		userExampleRouter(apiV1, handler.NewUserExampleHandler()) // 加入到路由组
+	routerFns = append(routerFns, func(group *gin.RouterGroup) {
+		userExampleRouter(group, handler.NewUserExampleHandler())
 	})
 }
 
@@ -19,5 +18,5 @@ func userExampleRouter(group *gin.RouterGroup, h handler.UserExampleHandler) {
 	group.PUT("/userExample/:id", h.UpdateByID)
 	group.GET("/userExample/:id", h.GetByID)
 	group.POST("/userExamples/ids", h.ListByIDs)
-	group.POST("/userExamples", h.List) // 通过post任意列组合查询
+	group.POST("/userExamples", h.List)
 }

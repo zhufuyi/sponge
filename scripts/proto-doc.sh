@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# proto文件所在的目录
+# the directory where the proto files are located
 protoBasePath="api"
 allProtoFiles=""
 
@@ -29,15 +29,15 @@ function listFiles(){
     cd ..
 }
 
-# 获取所有proto文件路径
+# get all proto file paths
 listFiles $protoBasePath
 
 protoc --proto_path=.  --proto_path=./third_party \
-  --doc_out=. --doc_opt=html,proto.html \
+  --doc_out=. --doc_opt=html,apis.html \
   $allProtoFiles
 
 checkResult $?
 
-mv -f proto.html docs/proto.html
+mv -f apis.html docs/apis.html
 
-echo "generate proto doc file successfully, see by 'docs/proto.html'"
+echo "generate proto doc file successfully, see by 'docs/apis.html'"

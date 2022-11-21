@@ -1,10 +1,10 @@
-## render
+## validator
 
-gin请求参数校验。
+gin request parameter check library.
 
 <br>
 
-## 使用示例
+## Example of use
 
 ```go
 package main
@@ -25,7 +25,6 @@ func main() {
 	r.Run(":8080")
 }
 
-// 从请求body获取
 type createUserRequest struct {
 	Name  string `json:"name" form:"name" binding:"required"`
 	Password string `json:"password" form:"password" binding:"required"`
@@ -43,7 +42,6 @@ func CreateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"msg": "ok"})
 }
 
-// 从请求url参数获取
 type getUserRequest struct {
 	Page int    `json:"page" form:"page" binding:"gte=0"`
 	Size int    `json:"size" form:"size" binding:"gt=0"`
@@ -69,5 +67,3 @@ func GetUsers(c *gin.Context) {
 
 func getUsers(req *getUserRequest) ([]User,error){}
 ```
-
-

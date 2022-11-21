@@ -8,33 +8,30 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// Version 命令版本号
 var (
 	version     = "v0.0.0"
 	versionFile = os.TempDir() + "/sponge/.github/version"
 )
 
-// NewRootCMD 命令入口
+// NewRootCMD command entry
 func NewRootCMD() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:           "sponge",
-		Long:          "sponge management tools",
+		Long:          "sponge is a microservices framework for quickly creating http or grpc code.",
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		Version:       getVersion(),
 	}
 
 	cmd.AddCommand(
-		generate.ModelCommand(),
-		generate.DaoCommand(),
-		generate.HandlerCommand(),
-		generate.HTTPCommand(),
-		generate.ProtoCommand(),
-		generate.ServiceCommand(),
-		generate.GRPCCommand(),
-		generate.ConfigCommand(),
+		InitCommand(),
 		UpdateCommand(),
+		ToolsCommand(),
+		NewWebCommand(),
+		MicroCommand(),
+		generate.ConfigCommand(),
 	)
+
 	return cmd
 }
 

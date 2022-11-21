@@ -26,7 +26,7 @@ func TestVerifyTokenStandard(t *testing.T) {
 
 	Init(WithSigningKey("123456"))
 
-	// 正常验证
+	// normal verify
 	token, err := GenerateTokenStandard()
 	if err != nil {
 		t.Fatal(err)
@@ -37,17 +37,17 @@ func TestVerifyTokenStandard(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// 无效token格式
+	// invalid token format
 	token2 := "xxx.xxx.xxx"
 	err = VerifyTokenStandard(token2)
 	assert.Equal(t, err, errFormat)
 
-	// 签名失败
+	// signature failure
 	token3 := token + "xxx"
 	err = VerifyTokenStandard(token3)
 	assert.Equal(t, err, errSignature)
 
-	// token已过期
+	// token has expired
 	Init(
 		WithSigningKey("123456"),
 		WithExpire(time.Second),

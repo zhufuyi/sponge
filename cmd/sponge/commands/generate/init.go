@@ -3,31 +3,39 @@ package generate
 import (
 	"embed"
 	"fmt"
+	"math/rand"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/zhufuyi/sponge/pkg/gofile"
 	"github.com/zhufuyi/sponge/pkg/replacer"
 )
 
-// Replacers 模板名称对应的接口
+const warnSymbol = "⚠ "
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
+
+// Replacers replacer name
 var Replacers = map[string]replacer.Replacer{}
 
-// Template 模板信息
+// Template information
 type Template struct {
 	Name     string
 	FS       embed.FS
 	FilePath string
 }
 
-// Init 初始化模板
+// Init initializing the template
 func Init(name string, filepath string) error {
-	// 判断模板文件是否存在，不存在，提示先更新
+	// determine if the template file exists, if not, prompt to initialize first
 	if !gofile.IsExists(filepath) {
 		if isShowCommand() {
 			return nil
 		}
-		return fmt.Errorf(`Hint: for the first time, run the command "sponge update"`)
+		return fmt.Errorf("%s not yet initialized, run the command 'sponge init'", warnSymbol)
 	}
 
 	var err error
@@ -42,7 +50,7 @@ func Init(name string, filepath string) error {
 	return nil
 }
 
-// InitFS 初始化FS模板
+// InitFS initializing th FS templates
 func InitFS(name string, filepath string, fs embed.FS) {
 	var err error
 	if _, ok := Replacers[name]; ok {
@@ -64,13 +72,13 @@ func isShowCommand() bool {
 
 	// sponge update or sponge -h
 	if l == 2 {
-		if os.Args[1] == "update" || os.Args[1] == "-h" {
+		if os.Args[1] == "init" || os.Args[1] == "-h" {
 			return true
 		}
 		return false
 	}
 	if l > 2 {
-		return strings.Contains(strings.Join(os.Args[:3], ""), "update")
+		return strings.Contains(strings.Join(os.Args[:3], ""), "init")
 	}
 
 	return false

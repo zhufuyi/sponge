@@ -13,7 +13,7 @@ var dsn = "root:123456@(192.168.3.37:3306)/test?charset=utf8mb4&parseTime=True&l
 func TestInit(t *testing.T) {
 	db, err := Init(dsn, WithEnableTrace())
 	if err != nil {
-		// 忽略无法连接真实mysql的测试错误
+		// ignore test error about not being able to connect to real mysql
 		t.Logf(fmt.Sprintf("connect to mysql failed, err=%v, dsn=%s", err, dsn))
 		return
 	}

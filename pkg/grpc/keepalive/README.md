@@ -1,13 +1,12 @@
 ## keepalive
 
-### 使用示例
+### Example of use
 
 #### grpc server
 
 ```go
 func getServerOptions() []grpc.ServerOption {
 	var options []grpc.ServerOption
-	// 默认是每15秒向客户端发送一次ping，修改为间隔20秒发送一次ping
 	options = append(options, keepalive.ServerKeepAlive()...)
 
 	return options
@@ -33,7 +32,7 @@ func main() {
 func getDialOptions() []grpc.DialOption {
 	var options []grpc.DialOption
 
-	// 禁止tls加密
+	// use insecure transfer
 	options = append(options, grpc.WithTransportCredentials(insecure.NewCredentials()))
 
 	// keepalive option

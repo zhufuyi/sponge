@@ -9,14 +9,17 @@ GO_FILES := $(shell find . -name '*.go' | grep -v /vendor/ | grep -v _test.go)
 .PHONY: install
 # installation of dependent tools
 install:
-	go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28.0
-	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2.0
-	go install github.com/envoyproxy/protoc-gen-validate@v0.6.7
-	go install github.com/srikrsna/protoc-gen-gotag@v0.6.2
-	go install github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc@v1.5.1
-	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.49.0
-	go install github.com/swaggo/swag/cmd/swag@v1.8.6
-	go install github.com/ofabry/go-callvis@v0.6.1
+	go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+	go install github.com/envoyproxy/protoc-gen-validate@latest
+	go install github.com/srikrsna/protoc-gen-gotag@latest
+	go install github.com/zhufuyi/sponge/cmd/protoc-gen-go-gin@latest
+	go install github.com/zhufuyi/sponge/cmd/protoc-gen-go-rpc-tmpl@latest
+	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@latest
+	go install github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc@latest
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+	go install github.com/swaggo/swag/cmd/swag@latest
+	go install github.com/ofabry/go-callvis@latest
 	go install golang.org/x/pkgsite/cmd/pkgsite@latest
 
 
@@ -53,7 +56,7 @@ test:
 .PHONY: cover
 # generate test coverage
 cover:
-	go test -race -short -coverprofile=cover.out -covermode=atomic ${PKG_LIST}
+	go test -short -coverprofile=cover.out -covermode=atomic ${PKG_LIST}
 	go tool cover -html=cover.out
 
 
@@ -67,9 +70,9 @@ docs: mod fmt
 # generate interactive visual function dependency graphs
 graph:
 	@echo "generating graph ......"
-	@cp -f cmd/serverNameExample/main.go .
-	go-callvis -skipbrowser -format=svg -nostd -file=serverNameExample github.com/zhufuyi/sponge
-	@rm -f main.go serverNameExample.gv
+	@cp -f cmd/serverNameExample_mixExample/main.go .
+	go-callvis -skipbrowser -format=svg -nostd -file=serverNameExample_mixExample github.com/zhufuyi/sponge
+	@rm -f main.go serverNameExample_mixExample.gv
 
 
 .PHONY: proto
@@ -85,10 +88,10 @@ proto-doc:
 
 
 .PHONY: build
-# build serverNameExample for linux amd64 binary
+# build serverNameExample_mixExample for linux amd64 binary
 build:
-	@echo "building 'serverNameExample', binary file will output to 'cmd/serverNameExample'"
-	@cd cmd/serverNameExample && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GOPROXY=https://goproxy.cn,direct go build -gcflags "all=-N -l"
+	@echo "building 'serverNameExample_mixExample', binary file will output to 'cmd/serverNameExample_mixExample'"
+	@cd cmd/serverNameExample_mixExample && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GOPROXY=https://goproxy.cn,direct go build -gcflags "all=-N -l"
 
 # delete the templates code start
 .PHONY: build-sponge
@@ -108,7 +111,7 @@ run:
 # build docker image, use binary files to build
 docker-image: build
 	@bash scripts/grpc_health_probe.sh
-	@mv -f cmd/serverNameExample/serverNameExample build/
+	@mv -f cmd/serverNameExample_mixExample/serverNameExample_mixExample build/serverNameExample
 	@mkdir -p build/configs && cp -f configs/serverNameExample.yml build/configs/
 	docker build -t project-name-example.server-name-example:latest build/
 	@rm -rf build/serverNameExample build/configs build/grpc_health_probe
@@ -147,8 +150,9 @@ deploy-docker:
 .PHONY: clean
 # clean binary file, cover.out, redundant dependency packages
 clean:
-	@rm -vrf cmd/serverNameExample/serverNameExample
+	@rm -vrf cmd/serverNameExample_mixExample/serverNameExample_mixExample
 	@rm -vrf cover.out
+	@rm -rf main.go serverNameExample_mixExample.gv
 	go mod tidy
 	@echo "clean finished"
 

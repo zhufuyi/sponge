@@ -1,16 +1,15 @@
 ## response
 
-封装gin返回同一个格式的json数据。
+The wrapper gin returns json data in the same format.
 
 <br>
 
-## 使用示例
+## Example of use
 
-`Output`函数返回兼容http状态码
+- `Output`  return a compatible http status code.
+- `Success` and `Error` return a uniform status code of 200, with a custom status code in data.code
 
-`Success`和`Error`统一返回状态码200，在data.code自定义状态码
-
-所有请求统一返回json
+all requests return a uniform json
 
 ```json
 {
@@ -21,15 +20,15 @@
 ```
 
 ```go
-    // c是*gin.Context
+    // c is *gin.Context
 
-    // 返回成功
+    // return success
     response.Success(c)
-    // 返回成功，并返回数据
+    // return success and return data
     response.Success(c, gin.H{"users":users})
 
-    // 返回失败
+    // return failure
     response.Error(c, errcode.SendEmailErr)
-    // 返回失败，并返回数据
+    // returns a failure and returns the data
     response.Error(c,  errcode.SendEmailErr, gin.H{"user":user})
 ```

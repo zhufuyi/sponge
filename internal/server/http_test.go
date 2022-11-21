@@ -27,23 +27,33 @@ func TestHTTPServer(t *testing.T) {
 	config.Get().App.EnableTracing = true
 	config.Get().App.EnablePprof = true
 	config.Get().App.EnableLimit = true
+	config.Get().App.EnableCircuitBreaker = true
 
 	port, _ := utils.GetAvailablePort()
 	addr := fmt.Sprintf(":%d", port)
 	gin.SetMode(gin.ReleaseMode)
 
-	defer func() {
-		if e := recover(); e != nil {
-			t.Log("ignore connect mysql error info")
-		}
-	}()
-	server := NewHTTPServer(addr,
-		WithHTTPReadTimeout(time.Second),
-		WithHTTPWriteTimeout(time.Second),
-		WithHTTPIsProd(true),
-		WithHTTPRegistry(&iRegistry{}, &registry.ServiceInstance{}),
-	)
-	assert.NotNil(t, server)
+	utils.SafeRunWithTimeout(time.Second*2, func(cancel context.CancelFunc) {
+		server := NewHTTPServer(addr,
+			WithHTTPReadTimeout(time.Second),
+			WithHTTPWriteTimeout(time.Second),
+			WithHTTPIsProd(true),
+			WithHTTPRegistry(&iRegistry{}, &registry.ServiceInstance{}),
+		)
+		assert.NotNil(t, server)
+		cancel()
+	})
+
+	utils.SafeRunWithTimeout(time.Second*2, func(cancel context.CancelFunc) {
+		server := NewHTTPServer_pbExample(addr,
+			WithHTTPReadTimeout(time.Second),
+			WithHTTPWriteTimeout(time.Second),
+			WithHTTPIsProd(true),
+			WithHTTPRegistry(&iRegistry{}, &registry.ServiceInstance{}),
+		)
+		assert.NotNil(t, server)
+		cancel()
+	})
 }
 
 func TestHTTPServerMock(t *testing.T) {
@@ -55,7 +65,7 @@ func TestHTTPServerMock(t *testing.T) {
 	config.Get().App.EnableTracing = true
 	config.Get().App.EnablePprof = true
 	config.Get().App.EnableLimit = true
-	config.Get().App.EnableRegistryDiscovery = true
+	config.Get().App.EnableCircuitBreaker = true
 
 	port, _ := utils.GetAvailablePort()
 	addr := fmt.Sprintf(":%d", port)

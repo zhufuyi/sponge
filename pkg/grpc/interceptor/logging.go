@@ -12,21 +12,21 @@ import (
 
 // ---------------------------------- client interceptor ----------------------------------
 
-// UnaryClientLog 客户端日志unary拦截器
+// UnaryClientLog client log unary interceptor
 func UnaryClientLog(logger *zap.Logger, opts ...grpc_zap.Option) grpc.UnaryClientInterceptor {
 	return grpc_zap.UnaryClientInterceptor(logger, opts...)
 }
 
-// StreamClientLog 客户端日志stream拦截器
+// StreamClientLog client log stream interceptor
 func StreamClientLog(logger *zap.Logger, opts ...grpc_zap.Option) grpc.StreamClientInterceptor {
 	return grpc_zap.StreamClientInterceptor(logger, opts...)
 }
 
 // ---------------------------------- server interceptor ----------------------------------
 
-var ignoreLogMethods = map[string]struct{}{} // 忽略打印的方法
+var ignoreLogMethods = map[string]struct{}{} // ignore printing methods
 
-// LogOption 日志设置
+// LogOption log settings
 type LogOption func(*logOptions)
 
 type logOptions struct {
@@ -36,8 +36,8 @@ type logOptions struct {
 
 func defaultLogOptions() *logOptions {
 	return &logOptions{
-		fields:        make(map[string]interface{}), // 自定义打印kv
-		ignoreMethods: make(map[string]struct{}),    // 忽略打印日志的方法
+		fields:        make(map[string]interface{}),
+		ignoreMethods: make(map[string]struct{}),
 	}
 }
 
@@ -47,7 +47,7 @@ func (o *logOptions) apply(opts ...LogOption) {
 	}
 }
 
-// WithLogFields 添加自定义打印字段
+// WithLogFields adding a custom print field
 func WithLogFields(kvs map[string]interface{}) LogOption {
 	return func(o *logOptions) {
 		if len(kvs) == 0 {
@@ -57,9 +57,9 @@ func WithLogFields(kvs map[string]interface{}) LogOption {
 	}
 }
 
-// WithLogIgnoreMethods 忽略打印的方法
-// fullMethodName格式: /packageName.serviceName/methodName，
-// 示例/api.userExample.v1.userExampleService/GetByID
+// WithLogIgnoreMethods ignore printing methods
+// fullMethodName format: /packageName.serviceName/methodName,
+// example /api.userExample.v1.userExampleService/GetByID
 func WithLogIgnoreMethods(fullMethodNames ...string) LogOption {
 	return func(o *logOptions) {
 		for _, method := range fullMethodNames {
@@ -68,7 +68,7 @@ func WithLogIgnoreMethods(fullMethodNames ...string) LogOption {
 	}
 }
 
-// UnaryServerLog 服务端日志unary拦截器
+// UnaryServerLog server-side log unary interceptor
 func UnaryServerLog(logger *zap.Logger, opts ...LogOption) grpc.UnaryServerInterceptor {
 	o := defaultLogOptions()
 	o.apply(opts...)
@@ -79,21 +79,21 @@ func UnaryServerLog(logger *zap.Logger, opts ...LogOption) grpc.UnaryServerInter
 	}
 	grpc_zap.ReplaceGrpcLoggerV2(logger)
 
-	// 日志设置，默认打印客户端断开连接信息，示例 https://pkg.go.dev/github.com/grpc-ecosystem/go-grpc-middleware/logging/zap
+	// log settings, default printing of client disconnection information, example https://pkg.go.dev/github.com/grpc-ecosystem/go-grpc-middleware/logging/zap
 	zapOptions := []grpc_zap.Option{
 		grpc_zap.WithDurationField(func(duration time.Duration) zapcore.Field {
-			return zap.Int64("grpc.time_us", duration.Microseconds()) // 默认打印耗时字段
+			return zap.Int64("grpc.time_us", duration.Microseconds())
 		}),
 	}
 
-	// 自定义打印字段
+	// custom log fields
 	for key, val := range o.fields {
 		zapOptions = append(zapOptions, grpc_zap.WithDurationField(func(duration time.Duration) zapcore.Field {
 			return zap.Any(key, val)
 		}))
 	}
 
-	// 自定义跳过打印日志的调用方法
+	// custom call method for skipping log
 	if len(ignoreLogMethods) > 0 {
 		zapOptions = append(zapOptions, grpc_zap.WithDecider(func(fullMethodName string, err error) bool {
 			if err == nil {
@@ -108,12 +108,12 @@ func UnaryServerLog(logger *zap.Logger, opts ...LogOption) grpc.UnaryServerInter
 	return grpc_zap.UnaryServerInterceptor(logger, zapOptions...)
 }
 
-// UnaryServerCtxTags extractor field unary拦截器
+// UnaryServerCtxTags extractor field unary interceptor
 func UnaryServerCtxTags() grpc.UnaryServerInterceptor {
 	return grpc_ctxtags.UnaryServerInterceptor(grpc_ctxtags.WithFieldExtractor(grpc_ctxtags.CodeGenRequestFieldExtractor))
 }
 
-// StreamServerLog 服务端日志stream拦截器
+// StreamServerLog Server-side log stream interceptor
 func StreamServerLog(logger *zap.Logger, opts ...LogOption) grpc.StreamServerInterceptor {
 	o := defaultLogOptions()
 	o.apply(opts...)
@@ -124,21 +124,21 @@ func StreamServerLog(logger *zap.Logger, opts ...LogOption) grpc.StreamServerInt
 	}
 	grpc_zap.ReplaceGrpcLoggerV2(logger)
 
-	// 日志设置，默认打印客户端断开连接信息，示例 https://pkg.go.dev/github.com/grpc-ecosystem/go-grpc-middleware/logging/zap
+	// log settings, default printing of client disconnection information, example https://pkg.go.dev/github.com/grpc-ecosystem/go-grpc-middleware/logging/zap
 	zapOptions := []grpc_zap.Option{
 		grpc_zap.WithDurationField(func(duration time.Duration) zapcore.Field {
-			return zap.Int64("grpc.time_us", duration.Microseconds()) // 默认打印耗时字段
+			return zap.Int64("grpc.time_us", duration.Microseconds())
 		}),
 	}
 
-	// 自定义打印字段
+	// custom log fields
 	for key, val := range o.fields {
 		zapOptions = append(zapOptions, grpc_zap.WithDurationField(func(duration time.Duration) zapcore.Field {
 			return zap.Any(key, val)
 		}))
 	}
 
-	// 自定义跳过打印日志的调用方法
+	// custom call method for skipping log
 	if len(ignoreLogMethods) > 0 {
 		zapOptions = append(zapOptions, grpc_zap.WithDecider(func(fullMethodName string, err error) bool {
 			if err == nil {
@@ -153,7 +153,7 @@ func StreamServerLog(logger *zap.Logger, opts ...LogOption) grpc.StreamServerInt
 	return grpc_zap.StreamServerInterceptor(logger, zapOptions...)
 }
 
-// StreamServerCtxTags extractor field stream拦截器
+// StreamServerCtxTags extractor field stream interceptor
 func StreamServerCtxTags() grpc.StreamServerInterceptor {
 	return grpc_ctxtags.StreamServerInterceptor(grpc_ctxtags.WithFieldExtractor(grpc_ctxtags.CodeGenRequestFieldExtractor))
 }

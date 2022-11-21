@@ -1,27 +1,27 @@
 ## gofile
 
-对文件和目录管理库。
+For file and directory management libraries.
 
 <br>
 
-## 使用示例
+## Example of use
 
 ```go
-    // 判断文件或文件夹是否存在
+    // determine if a file or folder exists
     gofile.IsExists("/tmp/test/")
 
-    // 获取程序执行的路径
+    // get the path to program execution
     gofile.GetRunPath()
 
-    // 获取目录下的所有文件(绝对路径)
+    // get all files in a directory (absolute path)
     gofile.ListFiles("/tmp/")
 
-    // 根据前缀获取目录下的所有文件(绝对路径)
+    // get all files in a directory by prefix (absolute path)
     gofile.ListFiles(dir, WithPrefix("READ"))
 
-    // 根据后缀获取目录下的所有文件(绝对路径)
+    // get all files in a directory by suffix (absolute path)
     gofile.ListFiles(dir, WithSuffix(".go"))
 
-    // 根据字符串获取目录下的所有文件(绝对路径)
+    // get all files in a directory based on a string (absolute path)
     gofile.ListFiles(dir, WithContain("file"))
 ```

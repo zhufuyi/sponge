@@ -5,9 +5,8 @@ import (
 	"time"
 
 	"github.com/zhufuyi/sponge/pkg/errcode"
+	rl "github.com/zhufuyi/sponge/pkg/shield/ratelimit"
 
-	rl "github.com/go-kratos/aegis/ratelimit"
-	"github.com/go-kratos/aegis/ratelimit/bbr"
 	"google.golang.org/grpc"
 )
 
@@ -73,11 +72,11 @@ func WithCPUQuota(quota float64) RatelimitOption {
 func UnaryServerRateLimit(opts ...RatelimitOption) grpc.UnaryServerInterceptor {
 	o := defaultRatelimitOptions()
 	o.apply(opts...)
-	limiter := bbr.NewLimiter(
-		bbr.WithWindow(o.window),
-		bbr.WithBucket(o.bucket),
-		bbr.WithCPUThreshold(o.cpuThreshold),
-		bbr.WithCPUQuota(o.cpuQuota),
+	limiter := rl.NewLimiter(
+		rl.WithWindow(o.window),
+		rl.WithBucket(o.bucket),
+		rl.WithCPUThreshold(o.cpuThreshold),
+		rl.WithCPUQuota(o.cpuQuota),
 	)
 
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
@@ -96,11 +95,11 @@ func UnaryServerRateLimit(opts ...RatelimitOption) grpc.UnaryServerInterceptor {
 func StreamServerRateLimit(opts ...RatelimitOption) grpc.StreamServerInterceptor {
 	o := defaultRatelimitOptions()
 	o.apply(opts...)
-	limiter := bbr.NewLimiter(
-		bbr.WithWindow(o.window),
-		bbr.WithBucket(o.bucket),
-		bbr.WithCPUThreshold(o.cpuThreshold),
-		bbr.WithCPUQuota(o.cpuQuota),
+	limiter := rl.NewLimiter(
+		rl.WithWindow(o.window),
+		rl.WithBucket(o.bucket),
+		rl.WithCPUThreshold(o.cpuThreshold),
+		rl.WithCPUQuota(o.cpuQuota),
 	)
 
 	return func(srv interface{}, ss grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {

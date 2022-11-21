@@ -1,40 +1,40 @@
 ## errcode
 
-错误码通常包括系统级错误码和服务级错误码，一共6位十进制数字组成，例如200101
+Error codes usually include system-level error codes and service-level error codes, consisting of a total of 5 decimal digits, e.g. 20101
 
-| 10 | 01 | 01 |
-| :------ | :------ | :------ |
-| 对于http错误码，20表示服务级错误(10为系统级错误) | 服务模块代码 | 具体错误代码 |
-| 对于grpc错误码，40表示服务级错误(30为系统级错误) | 服务模块代码 | 具体错误代码 |
+| First digit                       | Middle two digits | Last two digits |
+|:----------------------------|:-------|:-------|
+| For http error codes, 2 indicates a service level error (1 is a system level error) | Service Module Code | Specific error codes |
+| For grpc error codes, 4 indicates a service level error (3 is a system level error) | Service Module Code | Specific error codes |
 
-- 错误级别占2位数：10(http)和30(grpc)表示系统级错误，20(http)和40(grpc)表示服务级错误，通常是由用户非法操作引起的。
-- 服务模块占两位数：一个大型系统的服务模块通常不超过两位数，如果超过，说明这个系统该拆分了。
-- 错误码占两位数：防止一个模块定制过多的错误码，后期不好维护。
+- Error levels occupy one digit: 1 (http) and 3 (grpc) indicate system-level errors, 2 (http) and 4 (grpc) indicate service-level errors, usually caused by illegal user operations.
+- Double-digit service modules: A large system usually has no more than two service modules; if it exceeds that, it's time to split the system.
+- Error codes take up two digits: prevents a module from being customised with too many error codes, which are not well maintained later.
 
 <br>
 
-### 使用示例
+### Example of use
 
-### http错误码使用示例
+### Example of http error code usage
 
 ```go
-    // 定义错误码
-    var ErrLogin = errcode.NewError(200101, "用户名或密码错误")
+    // defining error codes
+    var ErrLogin = errcode.NewError(20101, "incorrect username or password")
 
-    // 请求返回
+    // return error
     response.Error(c, errcode.LoginErr)
 ```
 
 <br>
 
-### grpc错误码使用示例
+### Example of grpc error code usage
 
 ```go
-    // 定义错误码
-    var ErrLogin = NewRPCStatus(400101, "用户名或密码错误")
+    // defining error codes
+    var ErrLogin = NewRPCStatus(40101, "incorrect username or password")
 
-    // 返回错误
+    // return error
     errcode.ErrLogin.Err()
-    // 返回附带错误详情信息
+    // return with error details
     errcode.ErrLogin.Err(errcode.Any("err", err))
 ```

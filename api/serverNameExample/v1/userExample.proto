@@ -7,16 +7,96 @@ package api.serverNameExample.v1;
 
 import "validate/validate.proto";
 import "api/types/types.proto";
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "tagger/tagger.proto";
 
 option go_package = "github.com/zhufuyi/sponge/api/serverNameExample/v1;v1";
 
+// default settings for generating *.swagger.json documents
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  host: "localhost:8080"
+  base_path: ""
+  info: {
+    title: "serverNameExample api docs";
+    version: "v0.0.0";
+  };
+  schemes: HTTP;
+  schemes: HTTPS;
+  consumes: "application/json";
+  produces: "application/json";
+};
+
 service userExampleService {
-  rpc Create(CreateUserExampleRequest) returns (CreateUserExampleReply) {}
-  rpc DeleteByID(DeleteUserExampleByIDRequest) returns (DeleteUserExampleByIDReply) {}
-  rpc UpdateByID(UpdateUserExampleByIDRequest) returns (UpdateUserExampleByIDReply) {}
-  rpc GetByID(GetUserExampleByIDRequest) returns (GetUserExampleByIDReply) {}
-  rpc ListByIDs(ListUserExampleByIDsRequest) returns (ListUserExampleByIDsReply) {}
-  rpc List(ListUserExampleRequest) returns (ListUserExampleReply) {}
+  rpc Create(CreateUserExampleRequest) returns (CreateUserExampleReply) {
+    option (google.api.http) = {
+      post: "/api/v1/userExample"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "create userExample",
+      description: "submit information to create a userExample",
+      tags: "userExample",
+    };
+  }
+
+  rpc DeleteByID(DeleteUserExampleByIDRequest) returns (DeleteUserExampleByIDReply) {
+    option (google.api.http) = {
+      delete: "/api/v1/userExample/{id}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "delete userExample",
+      description: "delete userExample by id",
+      tags: "userExample",
+    };
+  }
+
+  rpc UpdateByID(UpdateUserExampleByIDRequest) returns (UpdateUserExampleByIDReply) {
+    option (google.api.http) = {
+      put: "/api/v1/userExample/{id}"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "update userExample",
+      description: "update userExample information based on id",
+      tags: "userExample",
+    };
+  }
+
+  rpc GetByID(GetUserExampleByIDRequest) returns (GetUserExampleByIDReply) {
+    option (google.api.http) = {
+      get: "/api/v1/userExample/{id}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "get userExample details",
+      description: "get userExample details by id",
+      tags: "userExample",
+    };
+  }
+
+  rpc ListByIDs(ListUserExampleByIDsRequest) returns (ListUserExampleByIDsReply) {
+    option (google.api.http) = {
+      post: "/api/v1/userExamples/ids"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "get a list of userExample based on multiple ids",
+      description: "get a list of userExample based on multiple ids using a post request",
+      tags: "userExample",
+    };
+  }
+
+  rpc List(ListUserExampleRequest) returns (ListUserExampleReply) {
+    option (google.api.http) = {
+      post: "/api/v1/userExamples"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "get a list of userExamples",
+      description: "get a list of userExamples using a post request",
+      tags: "userExample",
+    };
+  }
 }
 
 enum GenderType {
@@ -25,22 +105,25 @@ enum GenderType {
   FEMALE = 2;
 };
 
+// if using a grpc gateway, it is recommended to add target, which can be automatically verified on request.
+// example: string email = 2 [(tagger.tags) = "binding:\"email\"" ];
+
 message CreateUserExampleRequest {
-  string name = 1 [(validate.rules).string.min_len  = 2];         // 名称
-  string email = 2 [(validate.rules).string.email = true];          // 邮件
-  string password = 3 [(validate.rules).string.min_len = 10];   // 密码
-  string phone=4 [(validate.rules).string = {pattern: "^1[3456789]\\d{9}$"}];    // 手机号码
-  string avatar=5 [(validate.rules).string.uri = true];       // 头像
-  int32  age=6 [(validate.rules).int32  = {gte:0, lte: 120}];    // 年龄
-  GenderType  gender=7 [(validate.rules).enum.defined_only = true];  // 性别，0:未知，1:男，2:女
+  string name = 1 [(validate.rules).string.min_len  = 2];         // name
+  string email = 2 [(validate.rules).string.email = true];          // email
+  string password = 3 [(validate.rules).string.min_len = 10];   // password
+  string phone=4 [(validate.rules).string = {pattern: "^1[3456789]\\d{9}$"}];    // phone number
+  string avatar=5 [(validate.rules).string.uri = true];       // avatar
+  int32  age=6 [(validate.rules).int32  = {gte:0, lte: 120}];    // age
+  GenderType  gender=7 [(validate.rules).enum.defined_only = true];  // gender, 1:Male, 2:Female, other values:unknown
 }
 
 message CreateUserExampleReply {
-  uint64   id = 1 [(validate.rules).uint64.gte  = 1];
+  uint64   id = 1;
 }
 
 message DeleteUserExampleByIDRequest {
-  uint64   id = 1 [(validate.rules).uint64.gte  = 1];
+  uint64   id = 1 [(validate.rules).uint64.gte  = 1, (tagger.tags) = "uri:\"id\"" ];
 }
 
 message DeleteUserExampleByIDReply {
@@ -48,16 +131,16 @@ message DeleteUserExampleByIDReply {
 }
 
 message UpdateUserExampleByIDRequest {
-  uint64   id = 1 [(validate.rules).uint64.gte  = 1];
-  string name = 2;         // 名称
-  string email = 3;         // 邮件
-  string password = 4;   // 密码
-  string phone=5;          // 手机号码
-  string avatar=6;         // 头像
-  int32  age=7;             // 年龄
-  GenderType  gender=8;        // 性别，1:男，2:女
-  int32  status=9;         // 账号状态
-  int64  login_at=10;     // 登录时间戳
+  uint64   id = 1 [(validate.rules).uint64.gte  = 1 , (tagger.tags) = "uri:\"id\"" ];
+  string name = 2;         // name
+  string email = 3;         // email
+  string password = 4;   // password
+  string phone=5;          // phone number
+  string avatar=6;         // avatar
+  int32  age=7;             // age
+  GenderType  gender=8;        // gender, 1:Male, 2:Female, other values:unknown
+  int32  status=9;         // account status
+  int64  login_at=10;     // login timestamp
 }
 
 message UpdateUserExampleByIDReply {
@@ -66,20 +149,20 @@ message UpdateUserExampleByIDReply {
 
 message UserExample {
   uint64   id = 1;
-  string name = 2;          // 名称
-  string email = 3;          // 邮件
-  string phone=4;           // 手机号码
-  string avatar=5;           // 头像
-  int32  age=6;               // 年龄
-  GenderType  gender=7; // 性别，1:男，2:女
-  int32  status=8;           // 账号状态
-  int64  login_at=9;        // 登录时间戳
-  int64 created_at=10;   // 创建时间
-  int64 updated_at=11;  // 更新时间
+  string name = 2;          // name
+  string email = 3;          // email
+  string phone=4;           // phone number
+  string avatar=5;           // avatar
+  int32  age=6;               // age
+  GenderType  gender=7; // gender, 1:Male, 2:Female, other values:unknown
+  int32  status=8;           // account status
+  int64  login_at=9;        // login timestamp
+  int64 created_at=10;   // creation time
+  int64 updated_at=11;  // update time
 }
 
 message GetUserExampleByIDRequest {
-  uint64   id = 1 [(validate.rules).uint64.gte  = 1];
+  uint64   id = 1 [(validate.rules).uint64.gte  = 1, (tagger.tags) = "uri:\"id\"" ];
 }
 
 message GetUserExampleByIDReply {

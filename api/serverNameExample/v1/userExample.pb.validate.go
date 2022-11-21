@@ -299,16 +299,7 @@ func (m *CreateUserExampleReply) validate(all bool) error {
 
 	var errors []error
 
-	if m.GetId() < 1 {
-		err := CreateUserExampleReplyValidationError{
-			field:  "Id",
-			reason: "value must be greater than or equal to 1",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Id
 
 	if len(errors) > 0 {
 		return CreateUserExampleReplyMultiError(errors)

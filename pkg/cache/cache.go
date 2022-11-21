@@ -7,14 +7,15 @@ import (
 )
 
 var (
-	// DefaultExpireTime 默认过期时间
+	// DefaultExpireTime default expiry time
 	DefaultExpireTime = time.Hour * 24
-	// DefaultNotFoundExpireTime 结果为空时的过期时间 1分钟, 常用于数据为空时的缓存时间(缓存穿透)
+	// DefaultNotFoundExpireTime expiry time when result is empty 1 minute,
+	// often used for cache time when data is empty (cache pass-through)
 	DefaultNotFoundExpireTime = time.Minute
-	// NotFoundPlaceholder 占位符
+	// NotFoundPlaceholder placeholder
 	NotFoundPlaceholder = "*"
 
-	// DefaultClient 生成一个缓存客户端，其中keyPrefix 一般为业务前缀
+	// DefaultClient generate a cache client, where keyPrefix is generally the business prefix
 	DefaultClient Cache
 
 	// ErrPlaceholder .
@@ -23,7 +24,7 @@ var (
 	ErrSetMemoryWithNotFound = errors.New("cache: set memory cache err for not found")
 )
 
-// Cache 定义cache驱动接口
+// Cache driver interface
 type Cache interface {
 	Set(ctx context.Context, key string, val interface{}, expiration time.Duration) error
 	Get(ctx context.Context, key string, val interface{}) error
@@ -33,27 +34,27 @@ type Cache interface {
 	SetCacheWithNotFound(ctx context.Context, key string) error
 }
 
-// Set 数据
+// Set data
 func Set(ctx context.Context, key string, val interface{}, expiration time.Duration) error {
 	return DefaultClient.Set(ctx, key, val, expiration)
 }
 
-// Get 数据
+// Get data
 func Get(ctx context.Context, key string, val interface{}) error {
 	return DefaultClient.Get(ctx, key, val)
 }
 
-// MultiSet 批量set
+// MultiSet multiple set data
 func MultiSet(ctx context.Context, valMap map[string]interface{}, expiration time.Duration) error {
 	return DefaultClient.MultiSet(ctx, valMap, expiration)
 }
 
-// MultiGet 批量获取
+// MultiGet multiple get data
 func MultiGet(ctx context.Context, keys []string, valueMap interface{}) error {
 	return DefaultClient.MultiGet(ctx, keys, valueMap)
 }
 
-// Del 批量删除
+// Del multiple delete data
 func Del(ctx context.Context, keys ...string) error {
 	return DefaultClient.Del(ctx, keys...)
 }

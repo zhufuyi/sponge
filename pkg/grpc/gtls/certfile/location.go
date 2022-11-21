@@ -12,7 +12,7 @@ func init() {
 	basepath = filepath.Dir(currentFile)
 }
 
-// Path 返回绝对路径
+// Path return absolute path
 func Path(rel string) string {
 	if filepath.IsAbs(rel) {
 		return rel

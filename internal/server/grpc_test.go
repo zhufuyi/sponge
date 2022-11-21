@@ -17,7 +17,6 @@ import (
 	"google.golang.org/grpc"
 )
 
-// need real database to test
 func TestGRPCServer(t *testing.T) {
 	err := config.Init(configs.Path("serverNameExample.yml"))
 	if err != nil {
@@ -28,23 +27,21 @@ func TestGRPCServer(t *testing.T) {
 	config.Get().App.EnableTracing = true
 	config.Get().App.EnablePprof = true
 	config.Get().App.EnableLimit = true
-	config.Get().App.EnableRegistryDiscovery = true
+	config.Get().App.EnableCircuitBreaker = true
 
 	port, _ := utils.GetAvailablePort()
 	addr := fmt.Sprintf(":%d", port)
 	instance := registry.NewServiceInstance("foo", "bar", []string{"grpc://127.0.0.1:8282"})
 
-	defer func() {
-		if e := recover(); e != nil {
-			t.Log("ignore connect mysql error info")
-		}
-	}()
-	server := NewGRPCServer(addr,
-		WithGrpcReadTimeout(time.Second),
-		WithGrpcWriteTimeout(time.Second),
-		WithGrpcRegistry(nil, instance),
-	)
-	assert.NotNil(t, server)
+	utils.SafeRunWithTimeout(time.Second*2, func(cancel context.CancelFunc) {
+		server := NewGRPCServer(addr,
+			WithGrpcReadTimeout(time.Second),
+			WithGrpcWriteTimeout(time.Second),
+			WithGrpcRegistry(nil, instance),
+		)
+		assert.NotNil(t, server)
+		cancel()
+	})
 }
 
 func TestGRPCServerMock(t *testing.T) {
@@ -56,7 +53,7 @@ func TestGRPCServerMock(t *testing.T) {
 	config.Get().App.EnableTracing = true
 	config.Get().App.EnablePprof = true
 	config.Get().App.EnableLimit = true
-	config.Get().App.EnableRegistryDiscovery = true
+	config.Get().App.EnableCircuitBreaker = true
 
 	port, _ := utils.GetAvailablePort()
 	addr := fmt.Sprintf(":%d", port)
@@ -70,7 +67,7 @@ func TestGRPCServerMock(t *testing.T) {
 		iRegistry: o.iRegistry,
 		instance:  o.instance,
 	}
-	s.pprofHTTPServerFunc = s.pprofServer()
+
 	s.listen, err = net.Listen("tcp", addr)
 	if err != nil {
 		t.Fatal(err)

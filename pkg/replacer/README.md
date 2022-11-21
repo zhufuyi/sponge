@@ -1,16 +1,10 @@
-## replace
+## replacer
 
-一个替换目录下文件内容库，支持本地目录下文件和通过embed嵌入目录文件替换。
-
-<br>
-
-### 安装
-
-> go get -u github.com/zhufuyi/pkg/replacer
+A library of replacement file content, supports replacement of files in local directories and embedded directory files via embed.
 
 <br>
 
-### 使用示例
+### Example of use
 
 ```go
 //go:embed dir
@@ -25,25 +19,27 @@ func demo(){
 	if err != nil {
 		panic(err)
 	}
-
-	ignoreFiles := []string{}
-	fields := []replacer.Field{
-		{
-			Old: "1234",
-			New: "8080",
-		},
-		{
-			Old:             "abcde",
-			New:             "hello",
-			IsCaseSensitive: true,  // abcde-->hello, Abcde-->Hello
-		},
-	}
-	r.SetSubDirs(subPaths...)          // 只处理指定子目录，优先级最高
-	r.SetIgnoreDirs(ignoreDirs...)   // 指定子目录下忽略处理的目录
-	r.SetIgnoreFiles(ignoreFiles...)   // 指定子目录下忽略处理的文件
-	r.SetReplacementFields(fields)   // 设置替换文本
-	r.SetOutPath("", "test")             // 设置输出目录，如果为空，根据名称和时间生成文件输出文件夹
-	err = r.SaveFiles()                   // 保存替换后文件
+    subDirs := []string{"testDir/replace"}
+    subFiles := []string{"testDir/foo.txt"}
+    ignoreDirs := []string{"testDir/ignore"}
+    ignoreFiles := []string{"test.txt"}
+    fields := []Field{
+        {
+            Old: "1234",
+            New: "....",
+        },
+        {
+            Old:             "abcdef",
+            New:             "hello_",
+            IsCaseSensitive: true,
+        },
+    }
+    r.SetSubDirsAndFiles(subDirs, subFiles...) // process only specified subdirectories and files
+	r.SetIgnoreDirs(ignoreDirs...)   // specify the directory in the subdirectory where processing is ignored
+	r.SetIgnoreFiles(ignoreFiles...)   // specify the files in the subdirectory to be ignored for processing
+	r.SetReplacementFields(fields)   // set replacement fields
+	r.SetOutPath("", "test")             // set output directory, if empty, generate file output folder based on name and time
+	err = r.SaveFiles()                   // save the replaced file
 	if err != nil {
 		panic(err)
 	}

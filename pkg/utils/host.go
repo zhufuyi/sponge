@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-// GetHostname 获取主机名
+// GetHostname get hostname
 func GetHostname() string {
 	name, err := os.Hostname()
 	if err != nil {
@@ -15,7 +15,7 @@ func GetHostname() string {
 	return name
 }
 
-// GetLocalHTTPAddrPairs 获取可用的http服务端和请求地址
+// GetLocalHTTPAddrPairs get available http server and request address
 func GetLocalHTTPAddrPairs() (string, string) {
 	port, err := GetAvailablePort()
 	if err != nil {
@@ -27,7 +27,7 @@ func GetLocalHTTPAddrPairs() (string, string) {
 	return serverAddr, requestAddr
 }
 
-// GetAvailablePort 获取可用端口
+// GetAvailablePort get available port
 func GetAvailablePort() (int, error) {
 	address, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("%s:0", "0.0.0.0"))
 	if err != nil {

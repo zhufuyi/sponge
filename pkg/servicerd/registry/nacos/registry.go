@@ -3,11 +3,12 @@ package nacos
 import (
 	"context"
 	"fmt"
-	"github.com/zhufuyi/sponge/pkg/nacoscli"
-	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
 	"net"
 	"net/url"
 	"strconv"
+
+	"github.com/zhufuyi/sponge/pkg/nacoscli"
+	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
 
 	"github.com/nacos-group/nacos-sdk-go/v2/clients/naming_client"
 	"github.com/nacos-group/nacos-sdk-go/v2/common/constant"

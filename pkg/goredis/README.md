@@ -1,10 +1,10 @@
 ## goredis
 
-在 [go-redis]github.com/go-redis/redis 基础上封装的库。
+A library wrapped on top of [go-redis](github.com/go-redis/redis).
 
 <br>
 
-## 使用示例
+## Example of use
 
 ```go
 	redisCli, err := goredis.Init(config.Get().RedisURL, goredis.WithEnableTrace())
@@ -15,4 +15,4 @@
 
 <br>
 
-官方文档 https://redis.uptrace.dev/guide/
+Official Documents https://redis.uptrace.dev/guide/

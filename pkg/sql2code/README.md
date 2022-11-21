@@ -1,46 +1,40 @@
 ## sql2code
 
-根据sql生成不同用途代码，支持生成json、gorm model、dao、handler代码，sql可以从参数、文件、db三种方式获取，优先从高到低。
+Generate code for different purposes according to sql, support generating json, gorm model, update parameter, request parameter code, sql can be obtained from parameter, file, db three ways, priority from high to low.
 
 <br>
 
-### 安装
+### Example of use
 
-> go get -u github.com/zhufuyi/pkg/sql2code
-
-<br>
-
-### 使用示例
-
-主要设置参数
+Main setting parameters.
 
 ```go
 type Args struct {
 	SQL string // DDL sql
 
-	DDLFile string // 读取文件的DDL sql
+	DDLFile string // DDL file
 
-	DBDsn   string // 从db获取表的DDL sql
-	DBTable string
+	DBDsn   string // connecting to mysql's dsn
+	DBTable string // table name
 
-	Package        string // 生成字段的包名(只有model类型有效)
+	Package        string // specify the package name (only valid for model types)
 	GormType       bool   // gorm type
-	JSONTag        bool   // 是否包括json tag
-	JSONNamedType  int    // json命名类型，0:和列名一致，其他值表示驼峰
-	IsEmbed        bool   // 是否嵌入gorm.Model
-	CodeType       string // 指定生成代码用途，支持4中类型，分别是 model(默认), json, dao, handler
+	JSONTag        bool   // does it include a json tag
+	JSONNamedType  int    // json naming type, 0: consistent with the column name, other values indicate a hump
+	IsEmbed        bool   // is gorm.Model embedded
+	CodeType       string // specify the different types of code to be generated, namely model (default), json, dao, handler, proto
 }
 ```
 
 <br>
 
-生成代码示例：
+Generated code example.
 
 ```go
-    // 生成gorm model 代码
+    // generate gorm model code
     code, err := sql2code.GenerateOne(&sql2code.Args{
-        SQL: sqlData,  // 来源于sql语句
-        // DDLFile: "user.sql", // 来源于sql文件
+        SQL: sqlData,  // source from sql text
+        // DDLFile: "user.sql", // source from sql file
         // DBDsn: "root:123456@(127.0.0.1:3306)/account"
         // DBTable "user"
         GormType: true,
@@ -49,15 +43,15 @@ type Args struct {
         CodeType: "model"
     })
 
-      // 生成json、model、dao、handler代码
+      // generate json, model, dao, handler code
       codes, err := sql2code.Generate(&sql2code.Args{
-          SQL: sqlData,  // 来源于sql语句
-          // DDLFile: "user.sql", // 来源于sql文件
+          SQL: sqlData,  // source from sql text
+          // DDLFile: "user.sql", // source from sql file
           // DBDsn: "root:123456@(127.0.0.1:3306)/account"
           // DBTable "user"
           GormType: true,
           JSONTag: true,
           IsEmbed: true,
-          CodeType: "model"
+          CodeType: "dao"
       })
 ```

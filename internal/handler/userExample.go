@@ -9,6 +9,7 @@ import (
 	"github.com/zhufuyi/sponge/internal/model"
 	"github.com/zhufuyi/sponge/internal/types"
 
+	"github.com/zhufuyi/sponge/pkg/gin/middleware"
 	"github.com/zhufuyi/sponge/pkg/gin/response"
 	"github.com/zhufuyi/sponge/pkg/logger"
 	"github.com/zhufuyi/sponge/pkg/mysql/query"
@@ -20,7 +21,7 @@ import (
 
 var _ UserExampleHandler = (*userExampleHandler)(nil)
 
-// UserExampleHandler 定义handler接口
+// UserExampleHandler defining the handler interface
 type UserExampleHandler interface {
 	Create(c *gin.Context)
 	DeleteByID(c *gin.Context)
@@ -34,7 +35,7 @@ type userExampleHandler struct {
 	iDao dao.UserExampleDao
 }
 
-// NewUserExampleHandler 创建handler接口
+// NewUserExampleHandler creating the handler interface
 func NewUserExampleHandler() UserExampleHandler {
 	return &userExampleHandler{
 		iDao: dao.NewUserExampleDao(
@@ -44,20 +45,20 @@ func NewUserExampleHandler() UserExampleHandler {
 	}
 }
 
-// Create 创建
-// @Summary 创建userExample
-// @Description 提交信息创建userExample
+// Create a record
+// @Summary create userExample
+// @Description submit information to create userExample
 // @Tags userExample
 // @accept json
 // @Produce json
-// @Param data body types.CreateUserExampleRequest true "userExample信息"
+// @Param data body types.CreateUserExampleRequest true "userExample information"
 // @Success 200 {object} types.Result{}
 // @Router /api/v1/userExample [post]
 func (h *userExampleHandler) Create(c *gin.Context) {
 	form := &types.CreateUserExampleRequest{}
 	err := c.ShouldBindJSON(form)
 	if err != nil {
-		logger.Warn("ShouldBindJSON error: ", logger.Err(err), utils.FieldRequestIDFromContext(c))
+		logger.Warn("ShouldBindJSON error: ", logger.Err(err), middleware.GCtxRequestIDField(c))
 		response.Error(c, ecode.InvalidParams)
 		return
 	}
@@ -65,14 +66,14 @@ func (h *userExampleHandler) Create(c *gin.Context) {
 	userExample := &model.UserExample{}
 	err = copier.Copy(userExample, form)
 	if err != nil {
-		logger.Warn("Copy error", logger.Err(err), logger.Any("form", form), utils.FieldRequestIDFromContext(c))
+		logger.Warn("Copy error", logger.Err(err), logger.Any("form", form), middleware.GCtxRequestIDField(c))
 		response.Error(c, ecode.ErrCreateUserExample)
 		return
 	}
 
 	err = h.iDao.Create(c.Request.Context(), userExample)
 	if err != nil {
-		logger.Error("Create error", logger.Err(err), logger.Any("form", form), utils.FieldRequestIDFromContext(c))
+		logger.Error("Create error", logger.Err(err), logger.Any("form", form), middleware.GCtxRequestIDField(c))
 		response.Output(c, ecode.InternalServerError.ToHTTPCode())
 		return
 	}
@@ -80,9 +81,9 @@ func (h *userExampleHandler) Create(c *gin.Context) {
 	response.Success(c, gin.H{"id": userExample.ID})
 }
 
-// DeleteByID 根据id删除一条记录
-// @Summary 删除userExample
-// @Description 根据id删除userExample
+// DeleteByID delete a record by ID
+// @Summary delete userExample
+// @Description delete userExample by id
 // @Tags userExample
 // @accept json
 // @Produce json
@@ -97,7 +98,7 @@ func (h *userExampleHandler) DeleteByID(c *gin.Context) {
 
 	err := h.iDao.DeleteByID(c.Request.Context(), id)
 	if err != nil {
-		logger.Error("DeleteByID error", logger.Err(err), logger.Any("id", id), utils.FieldRequestIDFromContext(c))
+		logger.Error("DeleteByID error", logger.Err(err), logger.Any("id", id), middleware.GCtxRequestIDField(c))
 		response.Output(c, ecode.InternalServerError.ToHTTPCode())
 		return
 	}
@@ -105,14 +106,14 @@ func (h *userExampleHandler) DeleteByID(c *gin.Context) {
 	response.Success(c)
 }
 
-// UpdateByID 根据id更新信息
-// @Summary 更新userExample信息
-// @Description 根据id更新userExample信息
+// UpdateByID update information based on id
+// @Summary update userExample information
+// @Description update userExample information based on id
 // @Tags userExample
 // @accept json
 // @Produce json
 // @Param id path string true "id"
-// @Param data body types.UpdateUserExampleByIDRequest true "userExample信息"
+// @Param data body types.UpdateUserExampleByIDRequest true "userExample information"
 // @Success 200 {object} types.Result{}
 // @Router /api/v1/userExample/{id} [put]
 func (h *userExampleHandler) UpdateByID(c *gin.Context) {
@@ -124,7 +125,7 @@ func (h *userExampleHandler) UpdateByID(c *gin.Context) {
 	form := &types.UpdateUserExampleByIDRequest{}
 	err := c.ShouldBindJSON(form)
 	if err != nil {
-		logger.Warn("ShouldBindJSON error: ", logger.Err(err), utils.FieldRequestIDFromContext(c))
+		logger.Warn("ShouldBindJSON error: ", logger.Err(err), middleware.GCtxRequestIDField(c))
 		response.Error(c, ecode.InvalidParams)
 		return
 	}
@@ -133,14 +134,14 @@ func (h *userExampleHandler) UpdateByID(c *gin.Context) {
 	userExample := &model.UserExample{}
 	err = copier.Copy(userExample, form)
 	if err != nil {
-		logger.Warn("Copy error", logger.Err(err), logger.Any("form", form), utils.FieldRequestIDFromContext(c))
+		logger.Warn("Copy error", logger.Err(err), logger.Any("form", form), middleware.GCtxRequestIDField(c))
 		response.Error(c, ecode.ErrUpdateUserExample)
 		return
 	}
 
 	err = h.iDao.UpdateByID(c.Request.Context(), userExample)
 	if err != nil {
-		logger.Error("UpdateByID error", logger.Err(err), logger.Any("form", form), utils.FieldRequestIDFromContext(c))
+		logger.Error("UpdateByID error", logger.Err(err), logger.Any("form", form), middleware.GCtxRequestIDField(c))
 		response.Output(c, ecode.InternalServerError.ToHTTPCode())
 		return
 	}
@@ -148,9 +149,9 @@ func (h *userExampleHandler) UpdateByID(c *gin.Context) {
 	response.Success(c)
 }
 
-// GetByID 根据id获取一条记录
-// @Summary 获取userExample详情
-// @Description 根据id获取userExample详情
+// GetByID get a record based on id
+// @Summary get userExample details
+// @Description get userExample details by id
 // @Tags userExample
 // @Param id path string true "id"
 // @Accept json
@@ -166,10 +167,10 @@ func (h *userExampleHandler) GetByID(c *gin.Context) {
 	userExample, err := h.iDao.GetByID(c.Request.Context(), id)
 	if err != nil {
 		if errors.Is(err, query.ErrNotFound) {
-			logger.Warn("GetByID not found", logger.Err(err), logger.Any("id", id), utils.FieldRequestIDFromContext(c))
+			logger.Warn("GetByID not found", logger.Err(err), logger.Any("id", id), middleware.GCtxRequestIDField(c))
 			response.Error(c, ecode.NotFound)
 		} else {
-			logger.Error("GetByID error", logger.Err(err), logger.Any("id", id), utils.FieldRequestIDFromContext(c))
+			logger.Error("GetByID error", logger.Err(err), logger.Any("id", id), middleware.GCtxRequestIDField(c))
 			response.Output(c, ecode.InternalServerError.ToHTTPCode())
 		}
 		return
@@ -178,7 +179,7 @@ func (h *userExampleHandler) GetByID(c *gin.Context) {
 	data := &types.GetUserExampleByIDRespond{}
 	err = copier.Copy(data, userExample)
 	if err != nil {
-		logger.Warn("Copy error", logger.Err(err), logger.Any("id", id), utils.FieldRequestIDFromContext(c))
+		logger.Warn("Copy error", logger.Err(err), logger.Any("id", id), middleware.GCtxRequestIDField(c))
 		response.Error(c, ecode.ErrGetUserExample)
 		return
 	}
@@ -187,11 +188,11 @@ func (h *userExampleHandler) GetByID(c *gin.Context) {
 	response.Success(c, gin.H{"userExample": data})
 }
 
-// ListByIDs 根据多个id获取多条记录
-// @Summary 根据多个id获取userExample列表
-// @Description 使用post请求，根据多个id获取userExample列表
+// ListByIDs get multiple records based on multiple ids
+// @Summary get multiple records based on multiple ids
+// @Description get a list of userExample based on multiple ids using a post request
 // @Tags userExample
-// @Param data body types.GetUserExamplesByIDsRequest true "id 数组"
+// @Param data body types.GetUserExamplesByIDsRequest true "id array"
 // @Accept json
 // @Produce json
 // @Success 200 {object} types.Result{}
@@ -200,14 +201,14 @@ func (h *userExampleHandler) ListByIDs(c *gin.Context) {
 	form := &types.GetUserExamplesByIDsRequest{}
 	err := c.ShouldBindJSON(form)
 	if err != nil {
-		logger.Warn("ShouldBindJSON error: ", logger.Err(err), utils.FieldRequestIDFromContext(c))
+		logger.Warn("ShouldBindJSON error: ", logger.Err(err), middleware.GCtxRequestIDField(c))
 		response.Error(c, ecode.InvalidParams)
 		return
 	}
 
 	userExamples, err := h.iDao.GetByIDs(c.Request.Context(), form.IDs)
 	if err != nil {
-		logger.Error("GetByIDs error", logger.Err(err), logger.Any("form", form), utils.FieldRequestIDFromContext(c))
+		logger.Error("GetByIDs error", logger.Err(err), logger.Any("form", form), middleware.GCtxRequestIDField(c))
 		response.Output(c, ecode.InternalServerError.ToHTTPCode())
 
 		return
@@ -215,7 +216,7 @@ func (h *userExampleHandler) ListByIDs(c *gin.Context) {
 
 	data, err := convertUserExamples(userExamples)
 	if err != nil {
-		logger.Warn("Copy error", logger.Err(err), logger.Any("form", form), utils.FieldRequestIDFromContext(c))
+		logger.Warn("Copy error", logger.Err(err), logger.Any("form", form), middleware.GCtxRequestIDField(c))
 		response.Error(c, ecode.ErrListUserExample)
 		return
 	}
@@ -225,34 +226,34 @@ func (h *userExampleHandler) ListByIDs(c *gin.Context) {
 	})
 }
 
-// List 通过post获取多条记录
-// @Summary 获取userExample列表
-// @Description 使用post请求获取userExample列表
+// List Get multiple records by query parameters
+// @Summary get a list of userExample
+// @Description get a list of userExamples using a post request
 // @Tags userExample
 // @accept json
 // @Produce json
-// @Param data body types.Params true "查询条件"
+// @Param data body types.Params true "query parameters"
 // @Success 200 {object} types.Result{}
 // @Router /api/v1/userExamples [post]
 func (h *userExampleHandler) List(c *gin.Context) {
 	form := &types.GetUserExamplesRequest{}
 	err := c.ShouldBindJSON(form)
 	if err != nil {
-		logger.Warn("ShouldBindJSON error: ", logger.Err(err), utils.FieldRequestIDFromContext(c))
+		logger.Warn("ShouldBindJSON error: ", logger.Err(err), middleware.GCtxRequestIDField(c))
 		response.Error(c, ecode.InvalidParams)
 		return
 	}
 
 	userExamples, total, err := h.iDao.GetByColumns(c.Request.Context(), &form.Params)
 	if err != nil {
-		logger.Error("GetByColumns error", logger.Err(err), logger.Any("form", form), utils.FieldRequestIDFromContext(c))
+		logger.Error("GetByColumns error", logger.Err(err), logger.Any("form", form), middleware.GCtxRequestIDField(c))
 		response.Output(c, ecode.InternalServerError.ToHTTPCode())
 		return
 	}
 
 	data, err := convertUserExamples(userExamples)
 	if err != nil {
-		logger.Warn("Copy error", logger.Err(err), logger.Any("form", form), utils.FieldRequestIDFromContext(c))
+		logger.Warn("Copy error", logger.Err(err), logger.Any("form", form), middleware.GCtxRequestIDField(c))
 		response.Error(c, ecode.ErrListUserExample)
 		return
 	}
@@ -267,7 +268,7 @@ func getUserExampleIDFromPath(c *gin.Context) (string, uint64, bool) {
 	idStr := c.Param("id")
 	id, err := utils.StrToUint64E(idStr)
 	if err != nil || id == 0 {
-		logger.Warn("StrToUint64E error: ", logger.String("idStr", idStr), utils.FieldRequestIDFromContext(c))
+		logger.Warn("StrToUint64E error: ", logger.String("idStr", idStr), middleware.GCtxRequestIDField(c))
 		response.Error(c, ecode.InvalidParams)
 		return "", 0, true
 	}

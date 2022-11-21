@@ -1,5 +1,5 @@
-## 生成单向和双向认证证书
+## Generate one-way and two-way authentication certificates
 
-openssl.cnf是openssl的文件，配置已经改为生成SAN证书，如果使用go1.15以上的tls包必须使用SAN证书。
+openssl.cnf is the openssl file, the configuration has been changed to generate SAN certificates, if you use the go1.15 or higher tls package you must use SAN certificates.
 
-gencert.sh是生成证书脚本，执行命令 `bash gencert.sh` 同时生成生成单向和双向认证证书。
+gencert.sh is a certificate generation script that executes the command `bash gencert.sh` to generate both one-way and two-way authentication certificates.

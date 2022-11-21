@@ -1,21 +1,21 @@
 ## tracer
 
-在[go.opentelemetry.io/otel](go.opentelemetry.io/otel)基础上封装的链路跟踪库。
+Tracer library wrapped in [go.opentelemetry.io/otel](go.opentelemetry.io/otel).
 
 <br>
 
-## 使用示例
+## Example of use
 
-初始化trace，指定exporter和resource。
+Initialize the trace, specifying exporter and resource.
 
 ```go
 func initTrace() {
-    // exporter := tracer.NewConsoleExporter() // 输出到终端
+    // exporter := tracer.NewConsoleExporter() // output to terminal
 
-    // exporter, f, err := tracer.NewFileExporter("trace.json") // 输出到文件
+    // exporter, f, err := tracer.NewFileExporter("trace.json") // output to file
 
-	// exporter, err := tracer.NewJaegerExporter("http://localhost:14268/api/traces") // 输出到jaeger，使用collector http
-	exporter, err := tracer.NewJaegerAgentExporter("192.168.3.37", "6831") // 输出到jaeger，使用agent udp
+	// exporter, err := tracer.NewJaegerExporter("http://localhost:14268/api/traces") // output to jaeger, using collector http
+	exporter, err := tracer.NewJaegerAgentExporter("192.168.3.37", "6831") // output to jaeger, using agent udp
 
 	resource := tracer.NewResource(
 		tracer.WithServiceName("your-service-name"),
@@ -23,20 +23,20 @@ func initTrace() {
 		tracer.WithServiceVersion("demo"),
 	)
 
-	tracer.Init(exporter, resource) // 默认采集全部
-	// tracer.Init(exporter, resource, 0.5) // 采集一半
+	tracer.Init(exporter, resource) // collect all by default
+	// tracer.Init(exporter, resource, 0.5) // collect half
 }
 ```
 
 <br>
 
-在程序中创建一个span，ctx来源于上一个parent span。
+Create a span in the program with ctx derived from the previous parent span.
 
 ```go
 	_, span := otel.Tracer(serviceName).Start(
 		ctx,
 		spanName,
-		trace.WithAttributes(attribute.String("foo", "bar")), // 自定义属性
+		trace.WithAttributes(attribute.String("foo", "bar")), // customised attributes
 	)
 	defer span.End()
 

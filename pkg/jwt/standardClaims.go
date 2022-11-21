@@ -6,9 +6,7 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
-/* Standard Claims 的payload没有附加字段 */
-
-// GenerateTokenStandard 生成token
+// GenerateTokenStandard generate token
 func GenerateTokenStandard() (string, error) {
 	if opt == nil {
 		return "", errInit
@@ -23,7 +21,7 @@ func GenerateTokenStandard() (string, error) {
 	return token.SignedString(opt.signingKey)
 }
 
-// VerifyTokenStandard 验证token
+// VerifyTokenStandard verify token
 func VerifyTokenStandard(tokenString string) error {
 	if opt == nil {
 		return errInit
@@ -33,7 +31,6 @@ func VerifyTokenStandard(tokenString string) error {
 		return opt.signingKey, nil
 	})
 
-	// token有效
 	if token.Valid {
 		return nil
 	}
@@ -49,7 +46,7 @@ func VerifyTokenStandard(tokenString string) error {
 		} else if ve.Errors&jwt.ValidationErrorSignatureInvalid != 0 {
 			return errSignature
 		} else {
-			return ve // 其他错误
+			return ve // other error
 		}
 	}
 

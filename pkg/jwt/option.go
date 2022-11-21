@@ -9,7 +9,7 @@ import (
 
 var opt *options
 
-// Init 初始化jwt
+// Init initialize jwt
 func Init(opts ...Option) {
 	o := defaultOptions()
 	o.apply(opts...)
@@ -17,9 +17,9 @@ func Init(opts ...Option) {
 }
 
 var (
-	defaultSigningKey    = []byte("zaq12wsxmko0") // 默认
-	defaultSigningMethod = jwt.SigningMethodHS256 // 默认HS256
-	defaultExpire        = 2 * time.Hour          // 默认过期时长
+	defaultSigningKey    = []byte("zaq12wsxmko0") // default key
+	defaultSigningMethod = jwt.SigningMethodHS256 // default HS256
+	defaultExpire        = 2 * time.Hour          // default expiration
 	defaultIssuer        = ""
 )
 

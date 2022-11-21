@@ -12,8 +12,8 @@ import (
 func TestParseSql(t *testing.T) {
 	sql := `CREATE TABLE t_person_info (
   age INT(11) unsigned NULL,
-  id BIGINT(11) PRIMARY KEY AUTO_INCREMENT NOT NULL COMMENT '这是id',
-  name VARCHAR(30) NOT NULL DEFAULT 'default_name' COMMENT '这是名字',
+  id BIGINT(11) PRIMARY KEY AUTO_INCREMENT NOT NULL COMMENT 'id',
+  name VARCHAR(30) NOT NULL DEFAULT 'default_name' COMMENT 'name',
   created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   login_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   sex VARCHAR(2) NULL,
@@ -24,9 +24,6 @@ func TestParseSql(t *testing.T) {
 	codes, err := ParseSQL(sql, WithTablePrefix("t_"), WithJSONTag(0))
 	assert.Nil(t, err)
 	for k, v := range codes {
-		//if k == CodeTypeModel {
-		//	t.Log(v)
-		//}
 		assert.NotEmpty(t, k)
 		assert.NotEmpty(t, v)
 	}
@@ -90,6 +87,9 @@ func TestParseSQLs(t *testing.T) {
 			continue
 		}
 		for k, v := range codes {
+			if len(v) > 100 {
+				v = v[:100]
+			}
 			t.Log(i+1, k, v)
 		}
 	}

@@ -2,6 +2,7 @@ package interceptor
 
 import (
 	"context"
+
 	"github.com/zhufuyi/sponge/pkg/jwt"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
@@ -17,16 +18,17 @@ var (
 	// auth Scheme
 	authScheme = "Bearer"
 
-	// 鉴权信息在ctx中key名
+	// authentication information in ctx key name
 	authCtxClaimsName = "tokenInfo"
 
-	// 跳过认证方法集合
+	// collection of skip authentication methods
 	authIgnoreMethods = map[string]struct{}{}
 )
 
-// AuthOption 鉴权设置
+// AuthOption setting the Authentication Field
 type AuthOption func(*AuthOptions)
 
+// AuthOptions settings
 type AuthOptions struct {
 	authScheme    string
 	ctxClaimsName string
@@ -37,7 +39,7 @@ func defaultAuthOptions() *AuthOptions {
 	return &AuthOptions{
 		authScheme:    authScheme,
 		ctxClaimsName: authCtxClaimsName,
-		ignoreMethods: make(map[string]struct{}), // 忽略鉴权的方法
+		ignoreMethods: make(map[string]struct{}), // ways to ignore forensics
 	}
 }
 
@@ -47,23 +49,23 @@ func (o *AuthOptions) apply(opts ...AuthOption) {
 	}
 }
 
-// WithAuthScheme 设置鉴权的信息前缀
+// WithAuthScheme set the message prefix for authentication
 func WithAuthScheme(scheme string) AuthOption {
 	return func(o *AuthOptions) {
 		o.authScheme = scheme
 	}
 }
 
-// WithAuthClaimsName 设置鉴权的信息在ctx的key名称
+// WithAuthClaimsName set the key name of the information in ctx for authentication
 func WithAuthClaimsName(claimsName string) AuthOption {
 	return func(o *AuthOptions) {
 		o.ctxClaimsName = claimsName
 	}
 }
 
-// WithAuthIgnoreMethods 忽略鉴权的方法
-// fullMethodName格式: /packageName.serviceName/methodName，
-// 示例/api.userExample.v1.userExampleService/GetByID
+// WithAuthIgnoreMethods ways to ignore forensics
+// fullMethodName format: /packageName.serviceName/methodName,
+// example /api.userExample.v1.userExampleService/GetByID
 func WithAuthIgnoreMethods(fullMethodNames ...string) AuthOption {
 	return func(o *AuthOptions) {
 		for _, method := range fullMethodNames {
@@ -72,17 +74,17 @@ func WithAuthIgnoreMethods(fullMethodNames ...string) AuthOption {
 	}
 }
 
-// GetAuthorization 根据token组合成鉴权信息
+// GetAuthorization combining tokens into authentication information
 func GetAuthorization(token string) string {
 	return authScheme + " " + token
 }
 
-// GetAuthCtxKey 获取Claims的名称
+// GetAuthCtxKey get the name of Claims
 func GetAuthCtxKey() string {
 	return authCtxClaimsName
 }
 
-// JwtVerify 从context获取authorization来验证是否合法，authorization组成格式：authScheme token
+// JwtVerify get authorization from context to verify legitimacy, authorization composition format: authScheme token
 func JwtVerify(ctx context.Context) (context.Context, error) {
 	token, err := grpc_auth.AuthFromMD(ctx, authScheme)
 	if err != nil {
@@ -94,12 +96,12 @@ func JwtVerify(ctx context.Context) (context.Context, error) {
 		return nil, status.Errorf(codes.Unauthenticated, "%v", err)
 	}
 
-	newCtx := context.WithValue(ctx, authCtxClaimsName, cc) //nolint 后面方法可以通过ctx.Value(interceptor.GetAuthCtxKey()).(*jwt.CustomClaims)
+	newCtx := context.WithValue(ctx, authCtxClaimsName, cc) // get value by ctx.Value(interceptor.GetAuthCtxKey()).(*jwt.CustomClaims)
 
 	return newCtx, nil
 }
 
-// UnaryServerJwtAuth jwt鉴权unary拦截器
+// UnaryServerJwtAuth jwt unary interceptor
 func UnaryServerJwtAuth(opts ...AuthOption) grpc.UnaryServerInterceptor {
 	o := defaultAuthOptions()
 	o.apply(opts...)
@@ -124,7 +126,7 @@ func UnaryServerJwtAuth(opts ...AuthOption) grpc.UnaryServerInterceptor {
 	}
 }
 
-// StreamServerJwtAuth jwt鉴权stream拦截器
+// StreamServerJwtAuth jwt stream interceptor
 func StreamServerJwtAuth(opts ...AuthOption) grpc.StreamServerInterceptor {
 	o := defaultAuthOptions()
 	o.apply(opts...)

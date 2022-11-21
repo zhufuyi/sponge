@@ -4,7 +4,7 @@ import (
 	"github.com/hashicorp/consul/api"
 )
 
-// Init 连接consul服务
+// Init connecting to the consul service
 func Init(addr string, opts ...Option) (*api.Client, error) {
 	o := defaultOptions()
 	o.apply(opts...)

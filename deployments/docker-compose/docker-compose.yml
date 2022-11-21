@@ -11,15 +11,15 @@ services:
 # todo generate docker-compose.yml code for http or grpc here
 # delete the templates code start
     ports:
-      - "8080:8080"   # http端口
-      - "8282:8282"   # grpc服务端口
-      - "8283:8283"   # grpc metrics端口
-    # todo 根据服务类型(http或grpc)选择健康检查
+      - "8080:8080"   # http port
+      - "8282:8282"   # rpc port
+      - "8283:8283"   # rpc metrics or pprof port
+    # select health check according to service type (http or grpc)
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]   # http健康检查，注：镜像必须包含curl命令
-      #test: ["CMD", "grpc_health_probe", "-addr=localhost:8282"]    # grpc健康检查，注：镜像必须包含grpc_health_probe命令
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]   # http health check, note: mirror must contain curl command
+      #test: ["CMD", "grpc_health_probe", "-addr=localhost:8282"]    # grpc health check, note: the image must contain the grpc_health_probe command
 # delete the templates code end
-      interval: 10s         # 间隔时间
-      timeout: 5s           # 超时时间
-      retries: 3              # 重试次数
-      start_period: 10s  # 启动多久后开始检查
+      interval: 10s         # interval time
+      timeout: 5s           # timeout time
+      retries: 3              # number of retries
+      start_period: 10s  # how long after start-up does the check begin

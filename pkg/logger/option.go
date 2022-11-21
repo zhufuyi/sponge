@@ -3,16 +3,15 @@ package logger
 import "strings"
 
 var (
-	defaultLevel    = "debug" //  输出日志级别 debug, info, warn, error，默认是debug
+	defaultLevel    = "debug" // output log levels debug, info, warn, error, default is debug
 	defaultEncoding = formatConsole
-	defaultIsSave   = false // false:输出到终端，true:输出到文件，默认是false
+	defaultIsSave   = false // false:output to terminal, true:output to file, default is false
 
-	// 保存文件相关默认设置
-	defaultFilename      = "out.log" // 文件名称
-	defaultMaxSize       = 10        // 最大文件大小(MB)
-	defaultMaxBackups    = 100       // 保留旧文件的最大个数
-	defaultMaxAge        = 30        // 保留旧文件的最大天数
-	defaultIsCompression = false     // 是否压缩归档旧文件
+	defaultFilename      = "out.log" // file name
+	defaultMaxSize       = 10        // maximum file size (MB)
+	defaultMaxBackups    = 100       // maximum number of old files
+	defaultMaxAge        = 30        // maximum number of days for old documents
+	defaultIsCompression = false     // whether to compress and archive old files
 )
 
 type options struct {
@@ -20,7 +19,6 @@ type options struct {
 	encoding string
 	isSave   bool
 
-	// 保存文件相关默认设置
 	fileConfig *fileOptions
 }
 
@@ -41,7 +39,7 @@ func (o *options) apply(opts ...Option) {
 // Option set the logger options.
 type Option func(*options)
 
-// WithLevel 输出日志级别
+// WithLevel setting the log level
 func WithLevel(levelName string) Option {
 	return func(o *options) {
 		levelName = strings.ToUpper(levelName)
@@ -54,7 +52,7 @@ func WithLevel(levelName string) Option {
 	}
 }
 
-// WithFormat 设置输出日志格式，console或json
+// WithFormat set the output log format, console or json
 func WithFormat(format string) Option {
 	return func(o *options) {
 		if strings.ToLower(format) == formatJSON {
@@ -63,7 +61,7 @@ func WithFormat(format string) Option {
 	}
 }
 
-// WithSave 保存日志到指定文件
+// WithSave save log to file
 func WithSave(isSave bool, opts ...FileOption) Option {
 	return func(o *options) {
 		if isSave {
@@ -104,7 +102,7 @@ func (o *fileOptions) apply(opts ...FileOption) {
 // FileOption set the file options.
 type FileOption func(*fileOptions)
 
-// WithFileName 自定义文件名称
+// WithFileName set log filename
 func WithFileName(filename string) FileOption {
 	return func(f *fileOptions) {
 		if filename != "" {
@@ -113,7 +111,7 @@ func WithFileName(filename string) FileOption {
 	}
 }
 
-// WithFileMaxSize 自定义最大文件大小(MB)
+// WithFileMaxSize set maximum file size (MB)
 func WithFileMaxSize(maxSize int) FileOption {
 	return func(f *fileOptions) {
 		if f.maxSize > 0 {
@@ -122,7 +120,7 @@ func WithFileMaxSize(maxSize int) FileOption {
 	}
 }
 
-// WithFileMaxBackups 自定义保留旧文件的最大个数
+// WithFileMaxBackups set maximum number of old files
 func WithFileMaxBackups(maxBackups int) FileOption {
 	return func(f *fileOptions) {
 		if f.maxBackups > 0 {
@@ -131,7 +129,7 @@ func WithFileMaxBackups(maxBackups int) FileOption {
 	}
 }
 
-// WithFileMaxAge 保留旧文件的最大天数
+// WithFileMaxAge set maximum number of days for old documents
 func WithFileMaxAge(maxAge int) FileOption {
 	return func(f *fileOptions) {
 		if f.maxAge > 0 {
@@ -140,7 +138,7 @@ func WithFileMaxAge(maxAge int) FileOption {
 	}
 }
 
-// WithFileIsCompression 自定义是否压缩归档旧文件
+// WithFileIsCompression set whether to compress log files
 func WithFileIsCompression(isCompression bool) FileOption {
 	return func(f *fileOptions) {
 		f.isCompression = isCompression

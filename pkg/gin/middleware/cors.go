@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Cors 跨域
+// Cors cross domain
 func Cors() gin.HandlerFunc {
 	return cors.New(
 		cors.Config{

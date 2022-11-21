@@ -10,7 +10,7 @@ import (
 	"github.com/golang/snappy"
 )
 
-// JSONEncoding json格式
+// JSONEncoding json format
 type JSONEncoding struct{}
 
 // Marshal json encode
@@ -58,7 +58,7 @@ func (jz JSONGzipEncoding) Unmarshal(data []byte, value interface{}) error {
 	return nil
 }
 
-// GzipEncode 编码
+// GzipEncode encoding
 func GzipEncode(in []byte) ([]byte, error) {
 	var (
 		buffer bytes.Buffer
@@ -86,7 +86,7 @@ func GzipEncode(in []byte) ([]byte, error) {
 	return buffer.Bytes(), nil
 }
 
-// GzipDecode 解码
+// GzipDecode decode
 func GzipDecode(in []byte) ([]byte, error) {
 	reader, err := gzip.NewReader(bytes.NewReader(in))
 	if err != nil {
@@ -103,10 +103,10 @@ func GzipDecode(in []byte) ([]byte, error) {
 	return io.ReadAll(reader)
 }
 
-// JSONSnappyEncoding json格式和snappy压缩
+// JSONSnappyEncoding json format and snappy compression
 type JSONSnappyEncoding struct{}
 
-// Marshal 序列化
+// Marshal serialisation
 func (s JSONSnappyEncoding) Marshal(v interface{}) (data []byte, err error) {
 	b, err := json.Marshal(v)
 	if err != nil {
@@ -116,7 +116,7 @@ func (s JSONSnappyEncoding) Marshal(v interface{}) (data []byte, err error) {
 	return d, nil
 }
 
-// Unmarshal 反序列化
+// Unmarshal deserialization
 func (s JSONSnappyEncoding) Unmarshal(data []byte, value interface{}) error {
 	b, err := snappy.Decode(nil, data)
 	if err != nil {

@@ -1,9 +1,9 @@
-启动nacos服务，在浏览器打开ui界面 `http://<ip>:8848/nacos/index.html`
+Start the nacos service and open the ui interface in your browser `http://<ip>:8848/nacos/index.html`
 
-- 名称空间: 区分不同服务
-- 组: 用来区分不同环境
-- 配置集：具体服务配置
+- Namespaces: to distinguish between different services
+- Groups: used to distinguish between different environments
+- Configuration sets: specific service configurations
 
-创建一个开发环境服务配置流程：
+To create a development environment service configuration process.
 
-点击左边菜单栏【名称空间】--> 点击【新建名称空间】，示例：ID为空，名称空间名:serverName，描述:xxx服务，然后点击左边菜单栏【配置管理】-->【配置列表】-->【serverName】--> 【+】新建配置，输入Data ID: serverName.yml，Group: dev，配置格式: yaml，天界配置内容。
+Click the left menu bar [Namespace] --> Click [New Namespace], example: ID is empty, namespace name: serverName, description: xxx service, then click the left menu bar [Configuration Management] --> [Configuration List] --> [serverName] --> [+] New Configuration, enter Data ID: serverName .yml, Group: dev, Configuration format: yaml, fill in the configuration content.

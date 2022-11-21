@@ -14,80 +14,79 @@ import (
 // https://github.com/grpc-ecosystem/go-grpc-prometheus/tree/master/examples/grpc-server-with-prometheus
 
 var (
-	// 创建一个Registry
+	// create a Registry
 	srvReg = prometheus.NewRegistry()
 
-	// 初始化服务端默认的metrics
+	// initialize server-side default metrics
 	grpcServerMetrics = grpc_prometheus.NewServerMetrics()
 
 	// go metrics
 	goMetrics = collectors.NewGoCollector()
 
-	// 用户自定义指标 https://prometheus.io/docs/concepts/metric_types/#histogram
+	// user-defined metrics https://prometheus.io/docs/concepts/metric_types/#histogram
 	customizedCounterMetrics   = []*prometheus.CounterVec{}
 	customizedSummaryMetrics   = []*prometheus.SummaryVec{}
 	customizedGaugeMetrics     = []*prometheus.GaugeVec{}
 	customizedHistogramMetrics = []*prometheus.HistogramVec{}
 
-	// 执行一次
 	srvOnce sync.Once
 )
 
-// MetricsOption 设置metrics
-type MetricsOption func(*metricsOptions)
+// Option set metrics
+type Option func(*options)
 
-type metricsOptions struct{}
+type options struct{}
 
-func defaultMetricsOptions() *metricsOptions {
-	return &metricsOptions{}
+func defaultMetricsOptions() *options {
+	return &options{}
 }
 
-func (o *metricsOptions) apply(opts ...MetricsOption) {
+func (o *options) apply(opts ...Option) {
 	for _, opt := range opts {
 		opt(o)
 	}
 }
 
-// WithCounterMetrics 添加Counter类型指标
-func WithCounterMetrics(metrics ...*prometheus.CounterVec) MetricsOption {
-	return func(o *metricsOptions) {
+// WithCounterMetrics add Counter type indicator
+func WithCounterMetrics(metrics ...*prometheus.CounterVec) Option {
+	return func(o *options) {
 		customizedCounterMetrics = append(customizedCounterMetrics, metrics...)
 	}
 }
 
-// WithSummaryMetrics 添加Summary类型指标
-func WithSummaryMetrics(metrics ...*prometheus.SummaryVec) MetricsOption {
-	return func(o *metricsOptions) {
+// WithSummaryMetrics add Summary type indicator
+func WithSummaryMetrics(metrics ...*prometheus.SummaryVec) Option {
+	return func(o *options) {
 		customizedSummaryMetrics = append(customizedSummaryMetrics, metrics...)
 	}
 }
 
-// WithGaugeMetrics 添加Gauge类型指标
-func WithGaugeMetrics(metrics ...*prometheus.GaugeVec) MetricsOption {
-	return func(o *metricsOptions) {
+// WithGaugeMetrics add Gauge type indicator
+func WithGaugeMetrics(metrics ...*prometheus.GaugeVec) Option {
+	return func(o *options) {
 		customizedGaugeMetrics = append(customizedGaugeMetrics, metrics...)
 	}
 }
 
-// WithHistogramMetrics 添加Histogram类型指标
-func WithHistogramMetrics(metrics ...*prometheus.HistogramVec) MetricsOption {
-	return func(o *metricsOptions) {
+// WithHistogramMetrics adding Histogram type indicators
+func WithHistogramMetrics(metrics ...*prometheus.HistogramVec) Option {
+	return func(o *options) {
 		customizedHistogramMetrics = append(customizedHistogramMetrics, metrics...)
 	}
 }
 
 func srvRegisterMetrics() {
 	srvOnce.Do(func() {
-		// 开启了对RPCs处理时间的记录
+		// enable time record
 		grpcServerMetrics.EnableHandlingTimeHistogram()
 
-		// 注册go metrics
+		// register go metrics
 		srvReg.MustRegister(goMetrics)
 
-		// 注册metrics才能进行采集，自定义的metrics也需要注册
+		// register metrics to capture, custom metrics also need to be registered
 		srvReg.MustRegister(grpcServerMetrics)
 
-		// 注册自定义counter metric
+		// register custom Counter metrics
 		for _, metric := range customizedCounterMetrics {
 			srvReg.MustRegister(metric)
 		}
@@ -103,21 +102,30 @@ func srvRegisterMetrics() {
 	})
 }
 
-// GoHTTPService 初始化服务端的prometheus的exporter服务，使用 http://ip:port/metrics 获取数据
+// Register for http routing and grpc methods
+func Register(mux *http.ServeMux, grpcServer *grpc.Server) {
+	// register for http routing
+	mux.Handle("/metrics", promhttp.HandlerFor(srvReg, promhttp.HandlerOpts{}))
+
+	// register all gRPC methods to metrics
+	grpcServerMetrics.InitializeMetrics(grpcServer)
+}
+
+// GoHTTPService initialize the prometheus exporter service on the server side and fetch data using http://ip:port/metrics
 func GoHTTPService(addr string, grpcServer *grpc.Server) *http.Server {
 	httpServer := &http.Server{
 		Addr:    addr,
 		Handler: promhttp.HandlerFor(srvReg, promhttp.HandlerOpts{}),
 	}
 
-	// 启动http服务
+	// run http server
 	go func() {
 		if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			panic("listen and serve error: " + err.Error())
 		}
 	}()
 
-	// 所有gRPC方法初始化Metrics
+	// initialising gRPC methods Metrics
 	grpcServerMetrics.InitializeMetrics(grpcServer)
 
 	return httpServer
@@ -125,18 +133,18 @@ func GoHTTPService(addr string, grpcServer *grpc.Server) *http.Server {
 
 // ---------------------------------- server interceptor ----------------------------------
 
-// UnaryServerMetrics metrics unary拦截器
-func UnaryServerMetrics(opts ...MetricsOption) grpc.UnaryServerInterceptor {
+// UnaryServerMetrics metrics unary interceptor
+func UnaryServerMetrics(opts ...Option) grpc.UnaryServerInterceptor {
 	o := defaultMetricsOptions()
 	o.apply(opts...)
-	srvRegisterMetrics() // 在拦截器之前完成注册metrics，只执行一次
+	srvRegisterMetrics()
 	return grpcServerMetrics.UnaryServerInterceptor()
 }
 
-// StreamServerMetrics metrics stream拦截器
-func StreamServerMetrics(opts ...MetricsOption) grpc.StreamServerInterceptor {
+// StreamServerMetrics metrics stream interceptor
+func StreamServerMetrics(opts ...Option) grpc.StreamServerInterceptor {
 	o := defaultMetricsOptions()
 	o.apply(opts...)
-	srvRegisterMetrics() // 在拦截器之前完成注册metrics，只执行一次
+	srvRegisterMetrics()
 	return grpcServerMetrics.StreamServerInterceptor()
 }

@@ -1,0 +1,479 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "serverNameExample api docs",
+    "version": "v0.0.0"
+  },
+  "tags": [
+    {
+      "name": "userExampleService"
+    }
+  ],
+  "host": "localhost:8080",
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v1/userExample": {
+      "post": {
+        "summary": "create userExample",
+        "description": "submit information to create a userExample",
+        "operationId": "userExampleService_Create",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreateUserExampleReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateUserExampleRequest"
+            }
+          }
+        ],
+        "tags": [
+          "userExample"
+        ]
+      }
+    },
+    "/api/v1/userExample/{id}": {
+      "get": {
+        "summary": "get userExample details",
+        "description": "get userExample details by id",
+        "operationId": "userExampleService_GetByID",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetUserExampleByIDReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "uint64"
+          }
+        ],
+        "tags": [
+          "userExample"
+        ]
+      },
+      "delete": {
+        "summary": "delete userExample",
+        "description": "delete userExample by id",
+        "operationId": "userExampleService_DeleteByID",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DeleteUserExampleByIDReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "uint64"
+          }
+        ],
+        "tags": [
+          "userExample"
+        ]
+      },
+      "put": {
+        "summary": "update userExample",
+        "description": "update userExample information based on id",
+        "operationId": "userExampleService_UpdateByID",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpdateUserExampleByIDReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "uint64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                },
+                "phone": {
+                  "type": "string"
+                },
+                "avatar": {
+                  "type": "string"
+                },
+                "age": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "gender": {
+                  "$ref": "#/definitions/v1GenderType"
+                },
+                "status": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "loginAt": {
+                  "type": "string",
+                  "format": "int64"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "userExample"
+        ]
+      }
+    },
+    "/api/v1/userExamples": {
+      "post": {
+        "summary": "get a list of userExamples",
+        "description": "get a list of userExamples using a post request",
+        "operationId": "userExampleService_List",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListUserExampleReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ListUserExampleRequest"
+            }
+          }
+        ],
+        "tags": [
+          "userExample"
+        ]
+      }
+    },
+    "/api/v1/userExamples/ids": {
+      "post": {
+        "summary": "get a list of userExample based on multiple ids",
+        "description": "get a list of userExample based on multiple ids using a post request",
+        "operationId": "userExampleService_ListByIDs",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListUserExampleByIDsReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ListUserExampleByIDsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "userExample"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "typesColumn": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "exp": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        },
+        "logic": {
+          "type": "string"
+        }
+      }
+    },
+    "typesParams": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "limit": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "sort": {
+          "type": "string"
+        },
+        "columns": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/typesColumn"
+          }
+        }
+      }
+    },
+    "v1CreateUserExampleReply": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "v1CreateUserExampleRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "avatar": {
+          "type": "string"
+        },
+        "age": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "gender": {
+          "$ref": "#/definitions/v1GenderType"
+        }
+      }
+    },
+    "v1DeleteUserExampleByIDReply": {
+      "type": "object"
+    },
+    "v1GenderType": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "MALE",
+        "FEMALE"
+      ],
+      "default": "UNKNOWN"
+    },
+    "v1GetUserExampleByIDReply": {
+      "type": "object",
+      "properties": {
+        "userExample": {
+          "$ref": "#/definitions/v1UserExample"
+        }
+      }
+    },
+    "v1ListUserExampleByIDsReply": {
+      "type": "object",
+      "properties": {
+        "userExamples": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1UserExample"
+          }
+        }
+      }
+    },
+    "v1ListUserExampleByIDsRequest": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uint64"
+          }
+        }
+      }
+    },
+    "v1ListUserExampleReply": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": "string",
+          "format": "int64"
+        },
+        "userExamples": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1UserExample"
+          }
+        }
+      }
+    },
+    "v1ListUserExampleRequest": {
+      "type": "object",
+      "properties": {
+        "params": {
+          "$ref": "#/definitions/typesParams"
+        }
+      }
+    },
+    "v1UpdateUserExampleByIDReply": {
+      "type": "object"
+    },
+    "v1UserExample": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "avatar": {
+          "type": "string"
+        },
+        "age": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "gender": {
+          "$ref": "#/definitions/v1GenderType"
+        },
+        "status": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "loginAt": {
+          "type": "string",
+          "format": "int64"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    }
+  }
+}
