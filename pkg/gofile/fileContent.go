@@ -4,7 +4,7 @@ import (
 	"bytes"
 )
 
-// FindSubBytes 查找子字符串，包括开始和结束标记
+// FindSubBytes find substrings, including start and end marks
 func FindSubBytes(data []byte, start []byte, end []byte) []byte {
 	startIndex := bytes.Index(data, start)
 	endIndex := bytes.Index(data, end)
@@ -17,7 +17,7 @@ func FindSubBytes(data []byte, start []byte, end []byte) []byte {
 	return data[startIndex:endIndex]
 }
 
-// FindSubBytesNotIn 查找子字符串，不包括开始和结束标记
+// FindSubBytesNotIn find substrings, excluding start and end tags
 func FindSubBytesNotIn(data []byte, start []byte, end []byte) []byte {
 	startIndex := bytes.Index(data, start)
 	endIndex := bytes.Index(data, end)

@@ -1,10 +1,10 @@
 ## prof
 
-封装官方`net/http/pprof`路由，添加profile io wait time路由。
+Wrap the official `net/http/pprof` route and add the profile io wait time route.
 
 <br>
 
-### 使用示例
+### Example of use
 
 ```go
 	mux := http.NewServeMux()

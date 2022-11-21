@@ -5,22 +5,22 @@ import (
 	"google.golang.org/grpc"
 )
 
-// UnaryClientTracing 客户端链路跟踪unary拦截器
+// UnaryClientTracing client-side tracing unary interceptor
 func UnaryClientTracing() grpc.UnaryClientInterceptor {
 	return otelgrpc.UnaryClientInterceptor()
 }
 
-// StreamClientTracing 客户端链路跟踪stream拦截器
+// StreamClientTracing client-side tracing stream interceptor
 func StreamClientTracing() grpc.StreamClientInterceptor {
 	return otelgrpc.StreamClientInterceptor()
 }
 
-// UnaryServerTracing 服务端链路跟踪unary拦截器
+// UnaryServerTracing server-side tracing unary interceptor
 func UnaryServerTracing() grpc.UnaryServerInterceptor {
 	return otelgrpc.UnaryServerInterceptor()
 }
 
-// StreamServerTracing 服务端链路跟踪stream拦截器
+// StreamServerTracing server-side tracing stream interceptor
 func StreamServerTracing() grpc.StreamServerInterceptor {
 	return otelgrpc.StreamServerInterceptor()
 }

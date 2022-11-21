@@ -1,6 +1,6 @@
 ## resolve
 
-### 使用示例
+### Example of use
 
 #### grpc client
 
@@ -11,7 +11,8 @@ func getDialOptions() []grpc.DialOption {
 	// use insecure transfer
 	options = append(options, grpc.WithTransportCredentials(insecure.NewCredentials()))
 
-	// 负载均衡策略，轮询，https://github.com/grpc/grpc-go/tree/master/examples/features/load_balancing 和 https://github.com/grpc/grpc/blob/master/doc/service_config.md
+	// load balancing policy, polling https://github.com/grpc/grpc-go/tree/master/examples/features/load_balancing
+	// https://github.com/grpc/grpc/blob/master/doc/service_config.md
 	options = append(options, grpc.WithDefaultServiceConfig(`{"loadBalancingConfig": [{"round_robin":{}}]}`))
 
 	return options

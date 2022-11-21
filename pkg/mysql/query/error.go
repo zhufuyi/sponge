@@ -3,6 +3,6 @@ package query
 import "gorm.io/gorm"
 
 var (
-	// ErrNotFound 空记录
+	// ErrNotFound record
 	ErrNotFound = gorm.ErrRecordNotFound
 )

@@ -1,14 +1,14 @@
 ## gohttp
 
-http请求客户端，只支持返回json格式。
+The http request client, which only supports returning json format.
 
 <br>
 
-## 使用示例
+## Example of use
 
-### 标准CURD
+### Standard CURD
 
-Get、Delete请求示例
+Get, Delete request example.
 
 ```go
 	req := gohttp.Request{}
@@ -23,13 +23,13 @@ Get、Delete请求示例
 	resp, err := req.GET()
 	// resp, err := req.Delete()
 
-	result := &gohttp.StdResult{} // 可以定义其他结构体接收数据
+	result := &gohttp.StdResult{} // other structures can be defined to receive data
 	err = resp.BindJSON(result)
 ```
 
 <br>
 
-Post、Put、Patch请求示例
+Post, Put, Patch request example.
 
 ```go
 	req := gohttp.Request{}
@@ -38,34 +38,34 @@ Post、Put、Patch请求示例
 		"Authorization": "Bearer token",
 	})
 
-	// body为结构体
+	// body is a structure
     type User struct{
         Name string
         Email string
     }
     body := &User{"foo", "foo@bar.com"}
     req.SetJSONBody(body)
-    // 或者 body为json
+    // or body as json
     // req.SetBody(`{"name":"foo", "email":"foo@bar.com"}`)
 
 	resp, err := req.Post()
 	// resp, err := req.Put()
 	// resp, err := req.Patch()
 
-	result := &gohttp.StdResult{} // 可以定义其他结构体接收数据
+	result := &gohttp.StdResult{} // other structures can be defined to receive data
 	err = resp.BindJSON(result)
 ```
 
 <br>
 
-### 简化版CRUD
+### simplified version of CRUD
 
-不支持设置header、超时等
+No support for setting header, timeout, etc.
 
 ```go
     url := "http://localhost:8080/user"
     params := gohttp.KV{"id":123}
-    result := &gohttp.StdResult{} // 可以定义其他结构体接收数据
+    result := &gohttp.StdResult{} // other structures can be defined to receive data
 
     // Get
     err := gohttp.Get(result, url)

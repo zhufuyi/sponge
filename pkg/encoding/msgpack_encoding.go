@@ -2,7 +2,7 @@ package encoding
 
 import "github.com/vmihailenco/msgpack"
 
-// MsgPackEncoding msgpack 格式
+// MsgPackEncoding msgpack format
 type MsgPackEncoding struct{}
 
 // Marshal msgpack encode

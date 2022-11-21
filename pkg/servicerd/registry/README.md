@@ -1,8 +1,8 @@
 ## registry
 
-registry 服务注册，与服务注册[discovery](../discovery)对应，支持etcd、consul、nacos三种方式。
+Service registry, corresponding to service [discovery](../discovery) corresponds to and supports etcd, consul and nacos.
 
-### 使用示例
+### Example of use
 
 ```go
 func registryService(scheme string, host string, port int) (registry.Registry, *registry.ServiceInstance) {
@@ -57,13 +57,13 @@ func registryService(scheme string, host string, port int) (registry.Registry, *
 
     iRegistry, serviceInstance := registryService("http", "127.0.0.1", 8080)
     
-    // 注册
+    // register service
     ctx, _ := context.WithTimeout(context.Background(), 3*time.Second)
     if err := iRegistry.Register(ctx, serviceInstance); err != nil {
         panic(err)
     }
     
-    // 取消注册
+    // deregister service
     ctx, _ = context.WithTimeout(context.Background(), 3*time.Second)
     if err := iRegistry.Deregister(ctx, serviceInstance); err != nil {
         return err

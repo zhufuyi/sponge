@@ -25,18 +25,18 @@ func (o *options) apply(opts ...Option) {
 	}
 }
 
-// 默认设置
+// default settings
 func defaultOptions() *options {
 	return &options{
-		isLog:         false,            // 是否输出日志，默认关闭
-		slowThreshold: time.Duration(0), // 如果大于0，只打印时间大于阈值的日志，优先级比isLog高
+		isLog:         false,            // whether to output logs, default off
+		slowThreshold: time.Duration(0), // if greater than 0, only print logs that are longer than the threshold, higher priority than isLog
 
-		maxIdleConns:    3,                // 设置空闲连接池中连接的最大数量
-		maxOpenConns:    50,               // 设置打开数据库连接的最大数量
-		connMaxLifetime: 30 * time.Minute, // 设置了连接可复用的最大时间
+		maxIdleConns:    3,                // set the maximum number of connections in the idle connection pool
+		maxOpenConns:    50,               // set the maximum number of open database connections
+		connMaxLifetime: 30 * time.Minute, // sets the maximum amount of time a connection can be reused
 
-		disableForeignKey: true,  // 禁止使用外键，生产环境建议设置为true，默认开启
-		enableTrace:       false, // 是否开启链路跟踪，默认关闭
+		disableForeignKey: true,  // disables the use of foreign keys, true is recommended for production environments, enabled by default
+		enableTrace:       false, // whether to enable link tracing, default is off
 	}
 }
 

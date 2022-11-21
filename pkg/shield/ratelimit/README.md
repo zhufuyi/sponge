@@ -1,12 +1,12 @@
 ## ratelimit
 
-ratelimit 只适用于linux系统。
+Adaptive rate limit, only available for linux systems.
 
 <br>
 
-### 使用示例
+### Example of use
 
-**gin ratelimit 限流中间件示例**
+**gin ratelimit middleware**
 
 ```go
 func RateLimit(opts ...RateLimitOption) gin.HandlerFunc {

@@ -54,7 +54,7 @@ func TestAnyTime_Match(t *testing.T) {
 	t.Log(d.AnyTime.Match(time.Now()), d.AnyTime.Match("test"))
 }
 
-// -------------------------- 增删改查示例 --------------------------------
+// ----------- Example of adding, deleting and checking --------------------
 
 type User struct {
 	ID        uint64    `gorm:"column:id;AUTO_INCREMENT;primary_key" json:"id"`
@@ -71,12 +71,10 @@ func newUserDao(db *gorm.DB) *userDao {
 	return &userDao{db: db}
 }
 
-// Create 创建一条记录，插入记录后，id值被回写到table中
 func (d *userDao) Create(ctx context.Context, table *User) error {
 	return d.db.WithContext(ctx).Create(table).Error
 }
 
-// DeleteByID 根据id删除一条记录
 func (d *userDao) DeleteByID(ctx context.Context, id uint64) error {
 	err := d.db.WithContext(ctx).Where("id = ?", id).Delete(&User{}).Error
 	if err != nil {
@@ -86,7 +84,6 @@ func (d *userDao) DeleteByID(ctx context.Context, id uint64) error {
 	return nil
 }
 
-// UpdateByID 根据id更新记录
 func (d *userDao) UpdateByID(ctx context.Context, table *User) error {
 	if table.ID < 1 {
 		return errors.New("id cannot be 0")
@@ -105,7 +102,6 @@ func (d *userDao) UpdateByID(ctx context.Context, table *User) error {
 	return nil
 }
 
-// GetByID 根据id获取一条记录
 func (d *userDao) GetByID(ctx context.Context, id uint64) (*User, error) {
 	table := &User{}
 	err := d.db.WithContext(ctx).Where("id = ?", id).First(table).Error
@@ -139,7 +135,7 @@ func (d *userDao) GetByColumns(ctx context.Context, params *query.Params) ([]*Us
 	return records, total, err
 }
 
-// ---------------------------------------测试示例---------------------------------------------------
+// --------------------------------------- Test example --------------------------------------------
 
 func newTestUserDao() *Dao {
 	now := time.Now()
@@ -150,8 +146,8 @@ func newTestUserDao() *Dao {
 		UpdatedAt: now,
 	}
 
-	// init mock cache
-	c := NewCache(map[string]interface{}{"no cache": testData}) // 为了测试mysql，禁止缓存
+	// init mock cache, to test mysql, disable caching
+	c := NewCache(map[string]interface{}{"no cache": testData})
 
 	// init mock dao
 	d := NewDao(c, testData)

@@ -54,21 +54,21 @@ var logicMap = map[string]string{
 	"||": " OR ",
 }
 
-// Params 查询原始参数
+// Params query parameters
 type Params struct {
 	Page int    `form:"page" binding:"gte=0" json:"page"`
 	Size int    `form:"size" binding:"gt=0" json:"size"`
 	Sort string `form:"sort" binding:"" json:"sort,omitempty"`
 
-	Columns []Column `json:"columns,omitempty"` // 非必须
+	Columns []Column `json:"columns,omitempty"` // not required
 }
 
-// Column 表的列查询信息
+// Column search information
 type Column struct {
-	Name  string      `json:"name"`  // 列名
-	Exp   string      `json:"exp"`   // 表达式，值为空时默认为=，有=、!=、>、>=、<、<=、like七种类型
-	Value interface{} `json:"value"` // 列值
-	Logic string      `json:"logic"` // 逻辑类型，值为空时默认为and，有&(and)、||(or)两种类型
+	Name  string      `json:"name"`  // column name
+	Exp   string      `json:"exp"`   // expressions, which default to = when the value is null, have =, ! =, >, >=, <, <=, like
+	Value interface{} `json:"value"` // column value
+	Logic string      `json:"logic"` // logical type, defaults to and when the value is null, with &(and), ||(or)
 }
 
 func (c *Column) checkValid() error {
@@ -81,7 +81,7 @@ func (c *Column) checkValid() error {
 	return nil
 }
 
-// 把ExpType转换为sql表达式，把LogicType转换为sql使用字符
+// converting ExpType to sql expressions and LogicType to sql using characters
 func (c *Column) convert() error {
 	if c.Exp == "" {
 		c.Exp = Eq
@@ -107,7 +107,7 @@ func (c *Column) convert() error {
 	return nil
 }
 
-// ConvertToPage 根据参数page size sort转换成符合gorm规则参数
+// ConvertToPage converted to conform to gorm rules based on the page size sort parameter
 func (p *Params) ConvertToPage() (order string, limit int, offset int) {
 	page := NewPage(p.Page, p.Size, p.Sort)
 	order = page.sort
@@ -116,8 +116,8 @@ func (p *Params) ConvertToPage() (order string, limit int, offset int) {
 	return
 }
 
-// ConvertToGormConditions 根据参数Columns转换成符合gorm规则参数
-// 无论是一列还是多列查询，忽略最后一列的逻辑类型
+// ConvertToGormConditions conversion to gorm-compliant parameters based on the Columns parameter
+// ignore the logical type of the last column, whether it is a one-column or multi-column query
 func (p *Params) ConvertToGormConditions() (string, []interface{}, error) {
 	str := ""
 	args := []interface{}{}
@@ -142,7 +142,7 @@ func (p *Params) ConvertToGormConditions() (string, []interface{}, error) {
 			return "", nil, err
 		}
 
-		if i == l-1 { // 忽略最后一列的逻辑类型
+		if i == l-1 { // ignore the logical type of the last column
 			str += column.Name + column.Exp + "?"
 		} else {
 			str += column.Name + column.Exp + "?" + column.Logic
@@ -190,7 +190,7 @@ func getExpsAndLogics(keyLen int, paramSrc string) ([]string, []string) { //noli
 		fields = append(fields, kv)
 	}
 
-	// 根据不重复的key分为num组，在每组中判断exp和logic是否存在
+	// divide into num groups based on non-repeating keys, and determine in each group whether exp and logic exist
 	group := map[string]string{}
 	for _, field := range fields {
 		split := strings.SplitN(field, "=", 2)
@@ -199,7 +199,7 @@ func getExpsAndLogics(keyLen int, paramSrc string) ([]string, []string) { //noli
 		}
 
 		if _, ok := group[split[0]]; ok {
-			// 在一组中，如果exp不存在则填充默认值空，logic不存在则填充充默认值空
+			// if exp does not exist, the default value of null is filled, and if logic does not exist, the default value of null is filled.
 			exps = append(exps, group["exp"])
 			logics = append(logics, group["logic"])
 
@@ -210,7 +210,7 @@ func getExpsAndLogics(keyLen int, paramSrc string) ([]string, []string) { //noli
 		}
 	}
 
-	// 处理最后一组
+	// handling the last group
 	exps = append(exps, group["exp"])
 	logics = append(logics, group["logic"])
 

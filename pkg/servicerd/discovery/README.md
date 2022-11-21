@@ -1,8 +1,8 @@
 ## discovery
 
-discovery 服务发现，与服务注册[registry](../registry)对应，支持etcd、consul、nacos三种方式。
+Service discovery, corresponding to the service [registry](../registry), supports etcd, consul and nacos.
 
-### 使用示例
+### Example of use
 
 ```go
     var cliOptions = []grpccli.Option{}

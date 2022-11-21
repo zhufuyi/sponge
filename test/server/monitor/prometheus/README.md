@@ -30,6 +30,7 @@ Commonly used for cluster monitoring, using consoul's registration and discovery
 #### linux
 
 ```yaml
+  # from configuration
   - job_name: 'node-exporter'
     #scrape_interval: 5s
     static_configs:
@@ -37,7 +38,7 @@ Commonly used for cluster monitoring, using consoul's registration and discovery
         labels:
           env: 'dev'
 
-  # 通过导入文件方式
+  # from file
  - job_name: "node-exporter-2"
    file_sd_configs:
    - refresh_interval: 1m
@@ -122,7 +123,7 @@ Example of the contents of an imported file, using the file import method.
 
 </br>
 
-#### 容器
+#### containers
 
 ```yaml
   - job_name: 'cadvisor'

@@ -10,7 +10,7 @@ import (
 
 //type Model = gorm.Model
 
-// Model 表内嵌字段，嵌入到其他表结构体时添加 `gorm:"embedded"`
+// Model embedded structs, add `gorm: "embedded"` when defining table structs
 type Model struct {
 	ID        uint64         `gorm:"column:id;AUTO_INCREMENT;primary_key" json:"id"`
 	CreatedAt time.Time      `gorm:"column:created_at" json:"created_at"`
@@ -18,10 +18,10 @@ type Model struct {
 	DeletedAt gorm.DeletedAt `gorm:"column:deleted_at;index" json:"-"`
 }
 
-// KV map类型
+// KV map type
 type KV = map[string]interface{}
 
-// GetTableName 获取表名
+// GetTableName get table name
 func GetTableName(object interface{}) string {
 	tableName := ""
 

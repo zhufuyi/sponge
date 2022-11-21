@@ -4,7 +4,7 @@ import "strings"
 
 var defaultMaxSize = 1000
 
-// SetMaxSize 修改默认每页数量最大值
+// SetMaxSize change the default maximum number of pages per page
 func SetMaxSize(max int) {
 	if max < 10 {
 		max = 10
@@ -12,34 +12,34 @@ func SetMaxSize(max int) {
 	defaultMaxSize = max
 }
 
-// Page 页
+// Page info
 type Page struct {
 	page int    // page number, starting from page 0
-	size int    // 每一页数量
-	sort string // 字段排序
+	size int    // number per page
+	sort string // sort fields, default is id backwards, you can add - sign before the field to indicate reverse order, no - sign to indicate ascending order, multiple fields separated by comma
 }
 
-// Page 页码
+// Page get page value
 func (p *Page) Page() int {
 	return p.page
 }
 
-// Size 每一页数量
+// Size number per page
 func (p *Page) Size() int {
 	return p.size
 }
 
-// Sort 排序
+// Sort get sort field
 func (p *Page) Sort() string {
 	return p.sort
 }
 
-// Offset 偏移量
+// Offset get offset value
 func (p *Page) Offset() int {
 	return p.page * p.size
 }
 
-// DefaultPage 默认page，每页数量20，按id倒叙排序
+// DefaultPage default page, number 20 per page, sorted by id backwards
 func DefaultPage(page int) *Page {
 	if page < 0 {
 		page = 0
@@ -51,9 +51,9 @@ func DefaultPage(page int) *Page {
 	}
 }
 
-// NewPage 自定义page，从第0页开始，
-// 参数columnNames表示排序字段，如果为空表示id降序，如果有多个列名，用逗号分隔，
-// 每一个列名称前面有'-'号，表示降序，否则升序
+// NewPage custom page, starting from page 0.
+// the parameter columnNames indicates a sort field, if empty means id descending, if there are multiple column names, separated by a comma,
+// a '-' sign in front of each column name indicates descending order, otherwise ascending order.
 func NewPage(page int, size int, columnNames string) *Page {
 	if page < 0 {
 		page = 0
@@ -69,11 +69,12 @@ func NewPage(page int, size int, columnNames string) *Page {
 	}
 }
 
-// 转换为mysql 排序，每一个列名称前面有'-'号，表示降序，否则升序，示例：
-// columnNames="name"表示按name升序排序
-// columnNames="-name"表示按name降排序
-// columnNames="name,age"表示按name升序排序前提下，按age升序排序
-// columnNames="-name,-age"表示按name降排序前提下，按age降序排序
+// convert to mysql sort, each column name preceded by a '-' sign, indicating descending order, otherwise ascending order, example:
+//
+//	columnNames="name" means sort by name in ascending order,
+//	columnNames="-name" means sort by name descending,
+//	columnNames="name,age" means sort by name in ascending order, otherwise sort by age in ascending order,
+//	columnNames="-name,-age" means sort by name descending before sorting by age descending.
 func getSort(columnNames string) string {
 	columnNames = strings.Replace(columnNames, " ", "", -1)
 	if columnNames == "" {

@@ -45,7 +45,7 @@ func WithLog(l *zap.Logger) Option {
 	}
 }
 
-// Init 初始化
+// Init initialize statistical information
 func Init(opts ...Option) {
 	o := &options{}
 	o.apply(opts...)
@@ -99,18 +99,18 @@ func printUsageInfo() {
 }
 
 type system struct {
-	CPUUsage float64 `json:"cpu_usage"` // 系统cpu使用率
-	CPUCores int32   `json:"cpu_cores"` // cpu核数，多个cpu累加
-	MemFree  uint64  `json:"mem_free"`  // 可用物理内存容量，单位(M)
-	MemUsage float64 `json:"mem_usage"` // 内存使用率，单位(%)
+	CPUUsage float64 `json:"cpu_usage"` // system cpu usage, unit(%)
+	CPUCores int32   `json:"cpu_cores"` // cpu cores, multiple cpu accumulation
+	MemFree  uint64  `json:"mem_free"`  // system free physical memory, unit(M)
+	MemUsage float64 `json:"mem_usage"` // system memory usage, unit(%)
 }
 
 type process struct {
-	CPUUsage   float64 `json:"cpu_usage"`   // 进程cpu使用率
-	RSS        uint64  `json:"rss"`         // 使用物理内存，单位(M)
-	VMS        uint64  `json:"vms"`         // 使用虚拟内存，单位(M)
-	Alloc      uint64  `json:"alloc"`       // 分配内存容量，单位(M)
-	TotalAlloc uint64  `json:"total_alloc"` // 累计分配内存容量，单位(M)
-	Sys        uint64  `json:"sys"`         // 从系统申请内存容量，单位(M)
-	NumGc      uint32  `json:"num_gc"`      // 已完成的GC周期的数量
+	CPUUsage   float64 `json:"cpu_usage"`   // process cpu usage, unit(%)
+	RSS        uint64  `json:"rss"`         // use of physical memory, unit(M)
+	VMS        uint64  `json:"vms"`         // use of virtual memory, unit(M)
+	Alloc      uint64  `json:"alloc"`       // allocated memory capacity, unit(M)
+	TotalAlloc uint64  `json:"total_alloc"` // cumulative allocated memory capacity, unit(M)
+	Sys        uint64  `json:"sys"`         // requesting memory capacity from the system, unit(M)
+	NumGc      uint32  `json:"num_gc"`      // number of GC cycles
 }

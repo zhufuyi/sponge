@@ -18,10 +18,10 @@ func (o *options) apply(opts ...Option) {
 	}
 }
 
-// 默认设置
+// default settings
 func defaultOptions() *options {
 	return &options{
-		enableTrace: false, // 是否开启链路跟踪，默认关闭
+		enableTrace: false, // whether to enable link tracking, default off
 	}
 }
 

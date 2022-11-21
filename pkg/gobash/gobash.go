@@ -13,13 +13,13 @@ import (
 // linux default executor
 var executor = "/bin/bash"
 
-// SetExecutorPath 设置执行器
+// SetExecutorPath setting the executor
 func SetExecutorPath(path string) {
 	executor = path
 }
 
-// Exec 适合执行单条非阻塞命令，输出标准和错误日志，但日志输出不是实时，
-// 注：如果执行命令永久阻塞，会造成协程泄露
+// Exec suitable for executing a single non-blocking command, outputting standard and error logs, but the log output is not real time,
+// Note: If the execution of a command blocks permanently, it can cause a concurrent leak.
 func Exec(command string) ([]byte, error) {
 	cmd := exec.Command(executor, "-c", command)
 
@@ -49,12 +49,12 @@ func Exec(command string) ([]byte, error) {
 	return bytes, nil
 }
 
-// Run 执行命令，可以主动结束命令，执行结果实时返回在Result.StdOut中
+// Run execute the command, you can actively end the command, the execution results are returned in real time in Result.StdOut
 func Run(ctx context.Context, command string) *Result {
 	result := &Result{StdOut: make(chan string), Err: error(nil)}
 
 	go func() {
-		defer func() { close(result.StdOut) }() // 执行完毕，关闭通道
+		defer func() { close(result.StdOut) }() // execution complete, channel closed
 
 		cmd := exec.CommandContext(ctx, executor, "-c", command)
 		handleExec(ctx, cmd, result)
@@ -63,10 +63,10 @@ func Run(ctx context.Context, command string) *Result {
 	return result
 }
 
-// Result 执行命令的结果
+// Result of the execution of the command
 type Result struct {
 	StdOut chan string
-	Err    error // 执行完毕命令后，如果为nil，执行命令成功
+	Err    error // If nil after the command is executed, the command is executed successfully
 }
 
 func handleExec(ctx context.Context, cmd *exec.Cmd, result *Result) {
@@ -79,12 +79,12 @@ func handleExec(ctx context.Context, cmd *exec.Cmd, result *Result) {
 	}
 
 	reader := bufio.NewReader(stdout)
-	// 实时读取每行内容
+	// reads each line in real time
 	line := ""
 	for {
 		line, err = reader.ReadString('\n')
 		if err != nil {
-			if errors.Is(err, io.EOF) { // 判断是否已经读取完毕
+			if errors.Is(err, io.EOF) { // determine if it has been read
 				break
 			}
 			result.Err = err
@@ -98,7 +98,7 @@ func handleExec(ctx context.Context, cmd *exec.Cmd, result *Result) {
 		}
 	}
 
-	// 捕获错误日志
+	// capture error logs
 	bytesErr, err := io.ReadAll(stderr)
 	if err != nil {
 		result.Err = err

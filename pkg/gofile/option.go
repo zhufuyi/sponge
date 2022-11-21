@@ -7,7 +7,7 @@ const (
 )
 
 var (
-	defaultFilterType = "" // 有prefix、suffix、contain，默认不过滤
+	defaultFilterType = "" // with prefix, suffix, contain, no filter by default
 )
 
 type options struct {
@@ -30,7 +30,7 @@ func (o *options) apply(opts ...Option) {
 	}
 }
 
-// WithSuffix 后缀匹配
+// WithSuffix set suffix matching
 func WithSuffix(name string) Option {
 	return func(o *options) {
 		o.filter = suffix
@@ -38,7 +38,7 @@ func WithSuffix(name string) Option {
 	}
 }
 
-// WithPrefix 前缀匹配
+// WithPrefix set prefix matching
 func WithPrefix(name string) Option {
 	return func(o *options) {
 		o.filter = prefix
@@ -46,7 +46,7 @@ func WithPrefix(name string) Option {
 	}
 }
 
-// WithContain 包含字符串
+// WithContain set contain matching
 func WithContain(name string) Option {
 	return func(o *options) {
 		o.filter = contain

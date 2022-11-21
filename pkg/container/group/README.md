@@ -1,8 +1,8 @@
 ## group
 
-连接etcd服务客户端。
+group libraries.
 
-### 使用示例
+### Example of use
 
 ```go
     type foo struct {

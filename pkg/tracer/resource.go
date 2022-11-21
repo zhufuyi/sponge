@@ -65,7 +65,7 @@ type resourceConfig struct {
 
 // NewResource returns a resource describing this application.
 func NewResource(opts ...ResourceOption) *resource.Resource {
-	// 默认值
+	// default values
 	rc := &resourceConfig{
 		serviceName:    "demo-service",
 		serviceVersion: "v0.0.0",

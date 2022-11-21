@@ -61,7 +61,7 @@ func GetCodec(contentSubtype string) Codec {
 	return registeredCodecs[contentSubtype]
 }
 
-// Encoding 编码接口定义
+// Encoding definition of coding interfaces
 type Encoding interface {
 	Marshal(v interface{}) ([]byte, error)
 	Unmarshal(data []byte, v interface{}) error

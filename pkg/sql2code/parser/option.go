@@ -17,7 +17,7 @@ type options struct {
 	Charset        string
 	Collation      string
 	JSONTag        bool
-	JSONNamedType  int // json命名类型，0:默认，其他值表示驼峰
+	JSONNamedType  int
 	TablePrefix    string
 	ColumnPrefix   string
 	NoNullType     bool
@@ -25,7 +25,7 @@ type options struct {
 	Package        string
 	GormType       bool
 	ForceTableName bool
-	IsEmbed        bool // 是否嵌入gorm.Model
+	IsEmbed        bool // is gorm.Model embedded
 }
 
 var defaultOptions = options{
@@ -61,7 +61,7 @@ func WithColumnPrefix(p string) Option {
 	}
 }
 
-// WithJSONTag json名称命名类型，0:表示默认，其他值表示驼峰
+// WithJSONTag set json tag, 0 for underscore, other values for hump
 func WithJSONTag(namedType int) Option {
 	return func(o *options) {
 		o.JSONTag = true

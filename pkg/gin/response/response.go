@@ -10,11 +10,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Result 输出数据格式
+// Result output data format
 type Result struct {
-	Code int         `json:"code"` // 返回码
-	Msg  string      `json:"msg"`  // 返回信息说明
-	Data interface{} `json:"data"` // 返回数据
+	Code int         `json:"code"`
+	Msg  string      `json:"msg"`
+	Data interface{} `json:"data"`
 }
 
 func newResp(code int, msg string, data interface{}) *Result {
@@ -23,7 +23,7 @@ func newResp(code int, msg string, data interface{}) *Result {
 		Msg:  msg,
 	}
 
-	// 保证返回时data字段不为nil，注意resp.Data=[]interface {}时不为nil，经过序列化变成了null
+	// ensure that the data field is not nil on return, note that it is not nil when resp.data=[]interface {}, it is serialized to null
 	if data == nil {
 		resp.Data = &struct{}{}
 	} else {
@@ -61,7 +61,7 @@ func respJSONWithStatusCode(c *gin.Context, code int, msg string, data ...interf
 	writeJSON(c, code, resp)
 }
 
-// Output 根据http status code返回json数据
+// Output return json data based on http status code
 func Output(c *gin.Context, code int, msg ...interface{}) {
 	switch code {
 	case http.StatusOK:
@@ -90,7 +90,7 @@ func Output(c *gin.Context, code int, msg ...interface{}) {
 	}
 }
 
-// 状态码统一200，自定义错误码在data.code
+// status code flat 200, custom error codes in data.code
 func respJSONWith200(c *gin.Context, code int, msg string, data ...interface{}) {
 	var FirstData interface{}
 	if len(data) > 0 {
@@ -101,12 +101,12 @@ func respJSONWith200(c *gin.Context, code int, msg string, data ...interface{}) 
 	writeJSON(c, http.StatusOK, resp)
 }
 
-// Success 正确
+// Success return success
 func Success(c *gin.Context, data ...interface{}) {
 	respJSONWith200(c, 0, "ok", data...)
 }
 
-// Error 错误
+// Error return error
 func Error(c *gin.Context, err *errcode.Error, data ...interface{}) {
 	respJSONWith200(c, err.Code(), err.Msg(), data...)
 }

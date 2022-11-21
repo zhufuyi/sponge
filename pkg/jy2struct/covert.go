@@ -7,14 +7,14 @@ import (
 	"strings"
 )
 
-// Args  参数
+// Args  covert arguments
 type Args struct {
-	Format    string // 文档格式，json或yaml
-	Data      string // json或yaml内容
-	InputFile string // 文件
-	Name      string // 结构体名称
-	SubStruct bool   // 子结构体是否分开
-	Tags      string // 字段tag，多个tag用逗号分隔
+	Format    string // document format, json or yaml
+	Data      string // json or yaml content
+	InputFile string // file
+	Name      string // name of structure
+	SubStruct bool   // are sub-structures separated
+	Tags      string // add additional tags, multiple tags separated by commas
 
 	tags          []string
 	convertFloats bool
@@ -48,7 +48,7 @@ func (j *Args) checkValid() error {
 	return nil
 }
 
-// Covert json或yaml转go struct
+// Covert json or yaml to go struct
 func Covert(args *Args) (string, error) {
 	err := args.checkValid()
 	if err != nil {
@@ -59,7 +59,6 @@ func Covert(args *Args) (string, error) {
 	if args.Data != "" {
 		data = []byte(args.Data)
 	} else {
-		// 读取文件
 		data, err = os.ReadFile(args.InputFile)
 		if err != nil {
 			return "", err

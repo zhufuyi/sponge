@@ -22,9 +22,9 @@ func TestRun(t *testing.T) {
 	}
 
 	for _, cmd := range cmds {
-		ctx, _ := context.WithTimeout(context.Background(), time.Millisecond*500) // 超时控制
-		result := Run(ctx, cmd)                                                   // 执行
-		for v := range result.StdOut {                                            // 实时输出日志和错误信息
+		ctx, _ := context.WithTimeout(context.Background(), time.Millisecond*500)
+		result := Run(ctx, cmd)
+		for v := range result.StdOut { // Real-time output of logs and error messages
 			t.Logf(v)
 		}
 		if result.Err != nil {

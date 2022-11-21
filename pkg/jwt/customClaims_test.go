@@ -33,7 +33,7 @@ func TestVerifyToken(t *testing.T) {
 		WithSigningMethod(HS512),
 	)
 
-	// 正常验证
+	// normal verify
 	token, err := GenerateToken(uid, role)
 	if err != nil {
 		t.Fatal(err)
@@ -45,17 +45,17 @@ func TestVerifyToken(t *testing.T) {
 	}
 	fmt.Println(v)
 
-	// 无效token格式
+	// invalid token format
 	token2 := "xxx.xxx.xxx"
 	v, err = VerifyToken(token2)
 	assert.Equal(t, err, errFormat)
 
-	// 签名失败
+	// signature failure
 	token3 := token + "xxx"
 	v, err = VerifyToken(token3)
 	assert.Equal(t, err, errSignature)
 
-	// token已过期
+	// token has expired
 	token, err = GenerateToken(uid, role)
 	if err != nil {
 		t.Fatal(err)

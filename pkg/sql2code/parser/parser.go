@@ -34,7 +34,7 @@ const (
 	CodeTypeService = "service"
 )
 
-// Codes 生成的代码
+// Codes content
 type Codes struct {
 	Model         []string // model code
 	UpdateFields  []string // update fields code
@@ -42,14 +42,14 @@ type Codes struct {
 	HandlerStruct []string // handler request and respond code
 }
 
-// modelCodes 生成的代码
+// modelCodes model code
 type modelCodes struct {
 	Package    string
 	ImportPath []string
 	StructCode []string
 }
 
-// ParseSQL 根据sql生成不同用途代码
+// ParseSQL generate different usage codes based on sql
 func ParseSQL(sql string, options ...Option) (map[string]string, error) {
 	initTemplate()
 	opt := parseOption(options)
@@ -146,7 +146,7 @@ func (t tmplField) ConditionZero() string {
 	return `!= ` + t.GoType
 }
 
-// GoZero type of 0 逗号分隔
+// GoZero type of 0
 func (t tmplField) GoZero() string {
 	switch t.GoType {
 	case "int8", "int16", "int32", "int64", "int", "uint8", "uint16", "uint32", "uint64", "uint", "float64", "float32", //nolint
@@ -161,7 +161,7 @@ func (t tmplField) GoZero() string {
 	return `= ` + t.GoType
 }
 
-// GoTypeZero type of 0 逗号分隔
+// GoTypeZero type of 0
 func (t tmplField) GoTypeZero() string {
 	switch t.GoType {
 	case "int8", "int16", "int32", "int64", "int", "uint8", "uint16", "uint32", "uint64", "uint", "float64", "float32", //nolint
@@ -336,7 +336,7 @@ func makeCode(stmt *ast.CreateTableStmt, opt options) (*codeText, error) {
 
 		if opt.JSONTag {
 			if opt.JSONNamedType != 0 {
-				colName = xstrings.FirstRuneToLower(xstrings.ToCamelCase(colName)) // 使用驼峰类型json名称
+				colName = xstrings.FirstRuneToLower(xstrings.ToCamelCase(colName)) // use hump type json names
 			}
 			tags = append(tags, "json", colName)
 		}
@@ -399,11 +399,10 @@ func makeCode(stmt *ast.CreateTableStmt, opt options) (*codeText, error) {
 }
 
 func getModelStructCode(data tmplData, importPaths []string, isEmbed bool) (string, []string, error) {
-	// 过滤忽略字段字段
+	// filter to ignore field fields
 	var newFields = []tmplField{}
 	var newImportPaths = []string{}
 	if isEmbed {
-		// 嵌入字段
 		newFields = append(newFields, tmplField{
 			Name:    __mysqlModel__,
 			ColName: __mysqlModel__,
@@ -424,7 +423,7 @@ func getModelStructCode(data tmplData, importPaths []string, isEmbed bool) (stri
 		}
 		data.Fields = newFields
 
-		// 过滤time包名
+		// filter time package name
 		if isHaveTimeType {
 			newImportPaths = importPaths
 		} else {
@@ -455,7 +454,7 @@ func getModelStructCode(data tmplData, importPaths []string, isEmbed bool) (stri
 		return "", nil, fmt.Errorf("modelStructTmpl format.Source error: %v", err)
 	}
 	structCode := string(code)
-	// 还原真实的嵌入字段
+	// restore the real embedded fields
 	if isEmbed {
 		structCode = strings.ReplaceAll(structCode, __mysqlModel__, replaceFields[__mysqlModel__])
 		structCode = strings.ReplaceAll(structCode, __type__, replaceFields[__type__])
@@ -480,13 +479,10 @@ func getModelCode(data modelCodes) (string, error) {
 }
 
 func getUpdateFieldsCode(data tmplData, isEmbed bool) (string, error) {
-	// 过滤字段
+	// filter fields
 	var newFields = []tmplField{}
 	for _, field := range data.Fields {
 		falseColumns := []string{}
-		//if !isEmbed {
-		//falseColumns = append(falseColumns, columnCreatedAt, columnUpdatedAt, columnDeletedAt)
-		//}
 		if isIgnoreFields(field.ColName, falseColumns...) {
 			continue
 		}
@@ -527,7 +523,7 @@ func getHandlerStructCodes(data tmplData) (string, error) {
 	return postStructCode + putStructCode + getStructCode, nil
 }
 
-// 自定义过滤字段
+// customised filter fields
 func tmplExecuteWithFilter(data tmplData, tmpl *template.Template, reservedColumns ...string) (string, error) {
 	var newFields = []tmplField{}
 	for _, field := range data.Fields {

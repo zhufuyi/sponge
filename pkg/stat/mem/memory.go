@@ -7,19 +7,19 @@ import (
 	"github.com/shirou/gopsutil/v3/mem"
 )
 
-// System 系统内存信息
+// System memory information
 type System struct {
-	Total        uint64  `json:"total"`         // 物理内存总容量，单位(M)
-	Free         uint64  `json:"free"`          // 可用物理内存容量，单位(M)
-	UsagePercent float64 `json:"usage_percent"` // 内存使用率，单位(%)
+	Total        uint64  `json:"total"`         // total physical memory capacity, unit(M)
+	Free         uint64  `json:"free"`          // free physical memory capacity, unit(M)
+	UsagePercent float64 `json:"usage_percent"` // memory usage, unit(%)
 }
 
-// Process 进程内存信息
+// Process memory information
 type Process struct {
-	Alloc      uint64 `json:"alloc"`       // 分配内存容量，单位(M)
-	TotalAlloc uint64 `json:"total_alloc"` // 累计分配内存容量，单位(M)
-	Sys        uint64 `json:"sys"`         // 从系统申请内存容量，单位(M)
-	NumGc      uint32 `json:"num_gc"`      // 已完成的GC周期的数量
+	Alloc      uint64 `json:"alloc"`       // allocated memory capacity, unit(M)
+	TotalAlloc uint64 `json:"total_alloc"` // cumulative allocated memory capacity, unit(M)
+	Sys        uint64 `json:"sys"`         // requesting memory capacity from the system, unit(M)
+	NumGc      uint32 `json:"num_gc"`      // number of GC cycles
 }
 
 // GetSystemMemory get system memory

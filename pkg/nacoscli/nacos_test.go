@@ -19,7 +19,6 @@ var (
 )
 
 func TestParse(t *testing.T) {
-	// 方式一：
 	conf := new(map[string]interface{})
 	params := &Params{
 		IPAddr:      ipAddr,
@@ -35,7 +34,6 @@ func TestParse(t *testing.T) {
 		t.Log(err, conf)
 	})
 
-	// 方式二：直接设置ClientConfig和ServerConfig
 	conf = new(map[string]interface{})
 	params = &Params{
 		Group:  "dev",

@@ -16,11 +16,11 @@ const defaultTimeout = 10 * time.Second
 
 // Request HTTP request
 type Request struct {
-	customRequest func(req *http.Request, data *bytes.Buffer) // 用于定义HEADER, 如添加sign等
+	customRequest func(req *http.Request, data *bytes.Buffer) // used to define HEADER, e.g. to add sign, etc.
 	url           string
-	params        map[string]interface{} // URL后的参数
-	body          string                 // Body数据
-	bodyJSON      interface{}            // 可JSON Marshal 的Body的数据
+	params        map[string]interface{} // parameters after URL
+	body          string                 // Body data
+	bodyJSON      interface{}            // JSON marshal body data
 	timeout       time.Duration          // Client timeout
 	headers       map[string]string
 
@@ -52,13 +52,13 @@ func (req *Request) Reset() {
 	req.err = nil
 }
 
-// SetURL 设置URL
+// SetURL set URL
 func (req *Request) SetURL(path string) *Request {
 	req.url = path
 	return req
 }
 
-// SetParams 设置URL后的参数
+// SetParams parameters after setting the URL
 func (req *Request) SetParams(params map[string]interface{}) *Request {
 	if req.params == nil {
 		req.params = params
@@ -70,7 +70,7 @@ func (req *Request) SetParams(params map[string]interface{}) *Request {
 	return req
 }
 
-// SetParam 设置URL后的参数
+// SetParam parameters after setting the URL
 func (req *Request) SetParam(k string, v interface{}) *Request {
 	if req.params == nil {
 		req.params = make(map[string]interface{})
@@ -79,31 +79,31 @@ func (req *Request) SetParam(k string, v interface{}) *Request {
 	return req
 }
 
-// SetBody 设置Body数据
+// SetBody set body data
 func (req *Request) SetBody(body string) *Request {
 	req.body = body
 	return req
 }
 
-// SetJSONBody 设置Body数据, JSON格式
+// SetJSONBody set Body data, JSON format
 func (req *Request) SetJSONBody(body interface{}) *Request {
 	req.bodyJSON = body
 	return req
 }
 
-// SetTimeout 超时时间
+// SetTimeout set timeout
 func (req *Request) SetTimeout(t time.Duration) *Request {
 	req.timeout = t
 	return req
 }
 
-// SetContentType 设置ContentType
+// SetContentType set ContentType
 func (req *Request) SetContentType(a string) *Request {
 	req.SetHeader("Content-Type", a)
 	return req
 }
 
-// SetHeader 设置Request Header 的值
+// SetHeader set the value of the request header
 func (req *Request) SetHeader(k, v string) *Request {
 	if req.headers == nil {
 		req.headers = make(map[string]string)
@@ -112,7 +112,7 @@ func (req *Request) SetHeader(k, v string) *Request {
 	return req
 }
 
-// SetHeaders 设置Request Headers 的值
+// SetHeaders set the value of Request Headers
 func (req *Request) SetHeaders(headers map[string]string) *Request {
 	if req.headers == nil {
 		req.headers = make(map[string]string)
@@ -123,37 +123,37 @@ func (req *Request) SetHeaders(headers map[string]string) *Request {
 	return req
 }
 
-// CustomRequest 自定义Request, 如添加sign, 设置header等
+// CustomRequest customize request, e.g. add sign, set header, etc.
 func (req *Request) CustomRequest(f func(req *http.Request, data *bytes.Buffer)) *Request {
 	req.customRequest = f
 	return req
 }
 
-// GET 发送GET请求
+// GET send a GET request
 func (req *Request) GET() (*Response, error) {
 	req.method = http.MethodGet
 	return req.pull()
 }
 
-// DELETE 发送DELETE请求
+// DELETE send a DELETE request
 func (req *Request) DELETE() (*Response, error) {
 	req.method = http.MethodDelete
 	return req.pull()
 }
 
-// POST 发送POST请求
+// POST send a POST request
 func (req *Request) POST() (*Response, error) {
 	req.method = http.MethodPost
 	return req.push()
 }
 
-// PUT 发送PUT请求
+// PUT send a PUT request
 func (req *Request) PUT() (*Response, error) {
 	req.method = http.MethodPut
 	return req.push()
 }
 
-// PATCH 发送PATCH请求
+// PATCH send PATCH requests
 func (req *Request) PATCH() (*Response, error) {
 	req.method = http.MethodPatch
 	return req.push()
@@ -276,7 +276,7 @@ func (resp *Response) Error() error {
 	return resp.err
 }
 
-// BodyString 返回HttpResponse的body数据
+// BodyString returns the body data of the HttpResponse
 func (resp *Response) BodyString() (string, error) {
 	if resp.err != nil {
 		return "", resp.err
@@ -285,7 +285,7 @@ func (resp *Response) BodyString() (string, error) {
 	return string(body), err
 }
 
-// ReadBody 返回HttpResponse的body数据
+// ReadBody returns the body data of the HttpResponse
 func (resp *Response) ReadBody() ([]byte, error) {
 	if resp.err != nil {
 		return []byte{}, resp.err
@@ -318,9 +318,9 @@ func (resp *Response) BindJSON(v interface{}) error {
 
 // -------------------------------------------------------------------------------------------------
 
-// 简单的crud函数，不支持设置header、超时等
+// Simple crud function, no support for setting header, timeout, etc.
 
-// Get 请求，返回自定义json格式
+// Get request, return custom json format
 func Get(result interface{}, url string, params ...KV) error {
 	var pms KV
 	if len(params) > 0 {
@@ -329,7 +329,7 @@ func Get(result interface{}, url string, params ...KV) error {
 	return gDo("GET", result, url, pms)
 }
 
-// Delete 请求，返回自定义json格式
+// Delete request, return custom json format
 func Delete(result interface{}, url string, params ...KV) error {
 	var pms KV
 	if len(params) > 0 {
@@ -338,17 +338,17 @@ func Delete(result interface{}, url string, params ...KV) error {
 	return gDo("DELETE", result, url, pms)
 }
 
-// Post 请求，返回自定义json格式
+// Post request, return custom json format
 func Post(result interface{}, url string, body interface{}) error {
 	return do("POST", result, url, body)
 }
 
-// Put 请求，返回自定义json格式
+// Put request, return custom json format
 func Put(result interface{}, url string, body interface{}) error {
 	return do("PUT", result, url, body)
 }
 
-// Patch 请求，返回自定义json格式
+// Patch request, return custom json format
 func Patch(result interface{}, url string, body interface{}) error {
 	return do("PATCH", result, url, body)
 }
@@ -372,7 +372,7 @@ func do(method string, result interface{}, url string, body interface{}, params 
 	}
 
 	req := &Request{}
-	req.SetURL(url) // url地址固定
+	req.SetURL(url)
 	req.SetContentType("application/json")
 	if len(params) > 0 {
 		req.SetParams(params[0])
@@ -436,7 +436,7 @@ func gDo(method string, result interface{}, url string, params KV) error {
 	return nil
 }
 
-// StdResult 标准返回数据
+// StdResult standard return data
 type StdResult struct {
 	Code int         `json:"code"`
 	Msg  string      `json:"msg"`

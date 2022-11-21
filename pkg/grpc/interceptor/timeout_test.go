@@ -8,16 +8,16 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestUnaryTimeout(t *testing.T) {
-	interceptor := UnaryTimeout(time.Second)
+func TestUnaryClientTimeout(t *testing.T) {
+	interceptor := UnaryClientTimeout(time.Second)
 	assert.NotNil(t, interceptor)
 
 	err := interceptor(context.Background(), "/test", nil, nil, nil, unaryClientInvoker)
 	assert.NoError(t, err)
 }
 
-func TestStreamTimeout(t *testing.T) {
-	interceptor := StreamTimeout(time.Second)
+func TestStreamClientTimeout(t *testing.T) {
+	interceptor := StreamClientTimeout(time.Second)
 	assert.NotNil(t, interceptor)
 
 	_, err := interceptor(context.Background(), nil, nil, "/test", streamClientFunc)

@@ -8,37 +8,37 @@ import (
 	"google.golang.org/grpc/credentials"
 )
 
-// GetClientTLSCredentialsByCA 通过CA颁发的根证书，双向认证
+// GetClientTLSCredentialsByCA two-way authentication via CA-issued root certificate
 func GetClientTLSCredentialsByCA(serverName string, caFile string, certFile string, keyFile string) (credentials.TransportCredentials, error) {
-	// 从证书相关文件中读取和解析信息，得到证书公钥、密钥对
+	// read and parse the information from the certificate file to obtain the certificate public key, key pair
 	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
 	if err != nil {
 		return nil, err
 	}
 
-	// 创建一个新的、空的 CertPool
+	// create an empty CertPool
 	certPool := x509.NewCertPool()
 	ca, err := os.ReadFile(caFile)
 	if err != nil {
 		return nil, err
 	}
 
-	//尝试解析所传入的 PEM 编码的证书。如果解析成功会将其加到 CertPool 中，便于后面的使用
+	// attempts to parse the incoming PEM-encoded certificate. If the parsing is successful it will be added to the CertPool for later use
 	if ok := certPool.AppendCertsFromPEM(ca); !ok {
 		return nil, err
 	}
 
-	//构建基于 TLS 的 TransportCredentials 选项
+	// building TLS-based TransportCredentials options
 	c := credentials.NewTLS(&tls.Config{
-		Certificates: []tls.Certificate{cert}, //设置证书链，允许包含一个或多个
-		ServerName:   serverName,              // 要求必须校验客户端的证书
+		Certificates: []tls.Certificate{cert}, // set up a certificate chain that allows the inclusion of one or more
+		ServerName:   serverName,              // requirement to verify the client's certificate
 		RootCAs:      certPool,
 	})
 
 	return c, err
 }
 
-// GetClientTLSCredentials TLS加密
+// GetClientTLSCredentials TLS encryption
 func GetClientTLSCredentials(serverName string, certFile string) (credentials.TransportCredentials, error) {
 	c, err := credentials.NewClientTLSFromFile(certFile, serverName)
 	if err != nil {

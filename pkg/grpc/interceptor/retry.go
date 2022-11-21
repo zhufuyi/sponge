@@ -11,7 +11,7 @@ import (
 // ---------------------------------- client interceptor ----------------------------------
 
 var (
-	// 默认触发重试的错误码
+	// default error code for triggering a retry
 	defaultErrCodes = []codes.Code{codes.Internal}
 )
 
@@ -26,9 +26,9 @@ type retryOptions struct {
 
 func defaultRetryOptions() *retryOptions {
 	return &retryOptions{
-		times:    2,                      // 重试次数
-		interval: time.Millisecond * 100, // 重试间隔100毫秒
-		errCodes: defaultErrCodes,        // 默认触发重试的错误码
+		times:    2,                      // default retry times
+		interval: time.Millisecond * 100, // default retry interval 100 ms
+		errCodes: defaultErrCodes,        // default error code for triggering a retry
 	}
 }
 
@@ -38,7 +38,7 @@ func (o *retryOptions) apply(opts ...RetryOption) {
 	}
 }
 
-// WithRetryTimes 设置重试次数，最大10次
+// WithRetryTimes set number of retries, max 10
 func WithRetryTimes(n uint) RetryOption {
 	return func(o *retryOptions) {
 		if n > 10 {
@@ -48,7 +48,7 @@ func WithRetryTimes(n uint) RetryOption {
 	}
 }
 
-// WithRetryInterval 设置重试时间间隔，范围1毫秒到10秒
+// WithRetryInterval set the retry interval from 1 ms to 10 seconds
 func WithRetryInterval(t time.Duration) RetryOption {
 	return func(o *retryOptions) {
 		if t < time.Millisecond {
@@ -60,7 +60,7 @@ func WithRetryInterval(t time.Duration) RetryOption {
 	}
 }
 
-// WithRetryErrCodes 设置触发重试错误码
+// WithRetryErrCodes set the trigger retry error code
 func WithRetryErrCodes(errCodes ...codes.Code) RetryOption {
 	for _, errCode := range errCodes {
 		switch errCode {
@@ -74,30 +74,30 @@ func WithRetryErrCodes(errCodes ...codes.Code) RetryOption {
 	}
 }
 
-// UnaryClientRetry 重试unary拦截器
+// UnaryClientRetry client-side retry unary interceptor
 func UnaryClientRetry(opts ...RetryOption) grpc.UnaryClientInterceptor {
 	o := defaultRetryOptions()
 	o.apply(opts...)
 
 	return grpc_retry.UnaryClientInterceptor(
-		grpc_retry.WithMax(o.times), // 设置重试次数
-		grpc_retry.WithBackoff(func(attempt uint) time.Duration { // 设置重试间隔
+		grpc_retry.WithMax(o.times), // set the number of retries
+		grpc_retry.WithBackoff(func(attempt uint) time.Duration { // set retry interval
 			return o.interval
 		}),
-		grpc_retry.WithCodes(o.errCodes...), // 设置重试错误码
+		grpc_retry.WithCodes(o.errCodes...), // set retry error code
 	)
 }
 
-// StreamClientRetry 重试stream拦截器
+// StreamClientRetry client-side retry stream interceptor
 func StreamClientRetry(opts ...RetryOption) grpc.StreamClientInterceptor {
 	o := defaultRetryOptions()
 	o.apply(opts...)
 
 	return grpc_retry.StreamClientInterceptor(
-		grpc_retry.WithMax(o.times), // 设置重试次数
-		grpc_retry.WithBackoff(func(attempt uint) time.Duration { // 设置重试间隔
+		grpc_retry.WithMax(o.times), // set the number of retries
+		grpc_retry.WithBackoff(func(attempt uint) time.Duration { // set retry interval
 			return o.interval
 		}),
-		grpc_retry.WithCodes(o.errCodes...), // 设置重试错误码
+		grpc_retry.WithCodes(o.errCodes...), // set retry error code
 	)
 }

@@ -70,15 +70,15 @@ func TestNewWithFS(t *testing.T) {
 					IsCaseSensitive: true,
 				},
 			}
-			r.SetSubDirsAndFiles(subDirs, subFiles...) // 只处理指定子目录
-			r.SetIgnoreSubDirs(ignoreDirs...)          // 忽略处理子目录
-			r.SetIgnoreSubFiles(ignoreFiles...)        // 忽略处理目录下的文件
-			r.SetReplacementFields(fields)             // 设置替换文本
+			r.SetSubDirsAndFiles(subDirs, subFiles...)
+			r.SetIgnoreSubDirs(ignoreDirs...)
+			r.SetIgnoreSubFiles(ignoreFiles...)
+			r.SetReplacementFields(fields)
 			_ = r.SetOutputDir(fmt.Sprintf("%s/replacer_test/%s_%s",
-				os.TempDir(), tt.name, time.Now().Format("150405"))) // 设置输出目录和名称
+				os.TempDir(), tt.name, time.Now().Format("150405")))
 			_, err := r.ReadFile("replace.txt")
 			assert.NoError(t, err)
-			err = r.SaveFiles() // 保存替换后文件
+			err = r.SaveFiles()
 			if (err != nil) != tt.wantErr {
 				t.Logf("SaveFiles() error = %v, wantErr %v", err, tt.wantErr)
 				return

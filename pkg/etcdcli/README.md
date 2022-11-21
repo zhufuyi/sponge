@@ -1,8 +1,8 @@
 ## etcdcli
 
-连接etcd服务客户端。
+Connect to the etcd service client.
 
-### 使用示例
+### Example of use
 
 ```go
 	endpoints := []string{"192.168.3.37:2379"}

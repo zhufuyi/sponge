@@ -124,7 +124,6 @@ func (r *Registry) Watch(ctx context.Context, name string) (registry.Watcher, er
 		r.registry[name] = set
 	}
 
-	// 初始化watcher
 	w := &watcher{
 		event: make(chan struct{}, 1),
 	}

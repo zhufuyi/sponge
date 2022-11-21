@@ -7,14 +7,10 @@ import (
 
 // nolint
 const (
-	// R_NUM 纯数字
-	R_NUM = 1
-	// R_UPPER 大写字母
-	R_UPPER = 2
-	// R_LOWER 小写字母
-	R_LOWER = 4
-	// R_All 数字、大小写字母
-	R_All = 7
+	R_NUM   = 1 // only number
+	R_UPPER = 2 // only capital letters
+	R_LOWER = 4 // only lowercase letters
+	R_All   = 7 // numbers, upper and lower case letters
 )
 
 var (
@@ -26,24 +22,24 @@ func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
-// String 生成多种类型的任意长度的随机字符串，如果参数size为空，默认长度为6
-// example：String(R_ALL), String(R_ALL, 16), String(R_NUM|R_LOWER, 16)
+// String generate random strings of any length of multiple types, default length is 6 if size is empty
+// example: String(R_ALL), String(R_ALL, 16), String(R_NUM|R_LOWER, 16)
 func String(kind int, size ...int) string {
 	return string(Bytes(kind, size...))
 }
 
-// Bytes 生成多种类型的任意长度的随机字符串，如果参数bytesLen为空，默认长度为6
-// example：Bytes(R_ALL), Bytes(R_ALL, 16), Bytes(R_NUM|R_LOWER, 16)
+// Bytes generate random strings of any length of multiple types, default length is 6 if bytesLen is empty
+// example: Bytes(R_ALL), Bytes(R_ALL, 16), Bytes(R_NUM|R_LOWER, 16)
 func Bytes(kind int, bytesLen ...int) []byte {
 	if kind > 7 || kind < 1 {
 		kind = R_All
 	}
 
-	length := 6 // 默认长度
+	length := 6 // default length 6
 	if len(bytesLen) > 0 {
-		length = bytesLen[0] // 只有第0个值有效，忽略其它值
+		length = bytesLen[0]
 		if length < 1 {
-			length = 6 // 默认长度
+			length = 6
 		}
 	}
 
@@ -55,11 +51,12 @@ func Bytes(kind int, bytesLen ...int) []byte {
 	return result
 }
 
-// Int 生成指定范围大小随机数，兼容Int()，Int(max)，Int(min, max)，Int(max, min)4种方式，min<=随机数<=max
+// Int generate random numbers of specified range size,
+// compatible with Int(), Int(max), Int(min, max), Int(max, min) 4 ways, min<=random number<=max
 func Int(rangeSize ...int) int {
 	switch len(rangeSize) {
 	case 0:
-		return rand.Intn(101) // 默认0~100
+		return rand.Intn(101) // default 0~100
 	case 1:
 		return rand.Intn(rangeSize[0] + 1)
 	default:
@@ -70,8 +67,9 @@ func Int(rangeSize ...int) int {
 	}
 }
 
-// Float64 生成指定范围大小随机浮点数，
-// 支持4种传参方式：Float64(dpLength)，Float64(dpLength, max)，Float64(dpLength, min, max)，Float64(dpLength, max, min)，min<=随机数<=max
+// Float64 generates a random floating point number of the specified range size,
+// Four types of passing references are supported, example: Float64(dpLength), Float64(dpLength, max),
+// Float64(dpLength, min, max), Float64(dpLength, max, min), min<=random numbers<=max
 func Float64(dpLength int, rangeSize ...int) float64 {
 	dp := 0.0
 	if dpLength > 0 {
@@ -84,7 +82,7 @@ func Float64(dpLength int, rangeSize ...int) float64 {
 
 	switch len(rangeSize) {
 	case 0:
-		return float64(rand.Intn(101)) + dp // 默认0~100
+		return float64(rand.Intn(101)) + dp // default 0~100
 	case 1:
 		return float64(rand.Intn(rangeSize[0]+1)) + dp
 	default:

@@ -13,7 +13,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-// Parse 解析配置文件到struct，包括yaml、toml、json等文件，如果fs不为空，开启监听配置文件变化
+// Parse configuration files to struct, including yaml, toml, json, etc., and turn on listening for configuration file changes if fs is not empty
 func Parse(configFile string, obj interface{}, fs ...func()) error {
 	confFileAbs, err := filepath.Abs(configFile)
 	if err != nil {
@@ -22,11 +22,11 @@ func Parse(configFile string, obj interface{}, fs ...func()) error {
 
 	filePathStr, filename := filepath.Split(confFileAbs)
 	ext := strings.TrimLeft(path.Ext(filename), ".")
-	filename = strings.ReplaceAll(filename, "."+ext, "") // 不包括后缀名
+	filename = strings.ReplaceAll(filename, "."+ext, "") // excluding suffix names
 
-	viper.AddConfigPath(filePathStr) // 路径
-	viper.SetConfigName(filename)    // 名称
-	viper.SetConfigType(ext)         // 从文件名中获取配置类型
+	viper.AddConfigPath(filePathStr) // path
+	viper.SetConfigName(filename)    // file name
+	viper.SetConfigType(ext)         // get the configuration type from the file name
 	err = viper.ReadInConfig()
 	if err != nil {
 		return err
@@ -44,7 +44,7 @@ func Parse(configFile string, obj interface{}, fs ...func()) error {
 	return nil
 }
 
-// 监听配置文件更新
+// listening for profile updates
 func watchConfig(obj interface{}, fs ...func()) {
 	viper.WatchConfig()
 	viper.OnConfigChange(func(e fsnotify.Event) {
@@ -59,7 +59,7 @@ func watchConfig(obj interface{}, fs ...func()) {
 	})
 }
 
-// Show 打印配置信息(去掉敏感信息)
+// Show print configuration information (remove sensitive information)
 func Show(obj interface{}, keywords ...string) string {
 	var out string
 
@@ -83,7 +83,7 @@ func Show(obj interface{}, keywords ...string) string {
 	return out
 }
 
-// 替换密码
+// replace password
 func replacePWD(line string, keywords ...string) string {
 	for _, keyword := range keywords {
 		if strings.Contains(line, keyword) {
@@ -98,7 +98,7 @@ func replacePWD(line string, keywords ...string) string {
 	return line
 }
 
-// 替换dsn的密码
+// replace dsn's password
 func replaceDSN(str string) string {
 	mysqlPWD := []byte(str)
 	start, end := 0, 0

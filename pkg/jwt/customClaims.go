@@ -6,16 +6,14 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
-/* Custom Claims 在StandardClaims的payload基础上添加自定义字段 */
-
-// CustomClaims 自定义Claims
+// CustomClaims add custom fields to StandardClaims' payload
 type CustomClaims struct {
 	UID  string `json:"uid"`
 	Role string `json:"role"`
 	jwt.StandardClaims
 }
 
-// GenerateToken 生成token
+// GenerateToken generate token
 func GenerateToken(uid string, role ...string) (string, error) {
 	if opt == nil {
 		return "", errInit
@@ -38,7 +36,7 @@ func GenerateToken(uid string, role ...string) (string, error) {
 	return token.SignedString(opt.signingKey)
 }
 
-// VerifyToken 验证token
+// VerifyToken verify token
 func VerifyToken(tokenString string) (*CustomClaims, error) {
 	if opt == nil {
 		return nil, errInit

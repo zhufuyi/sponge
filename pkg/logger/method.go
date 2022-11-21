@@ -6,62 +6,62 @@ import (
 	"go.uber.org/zap"
 )
 
-// Debug debug级别信息
+// Debug level information
 func Debug(msg string, fields ...Field) {
 	getLogger().Debug(msg, fields...)
 }
 
-// Info info级别信息
+// Info level information
 func Info(msg string, fields ...Field) {
 	getLogger().Info(msg, fields...)
 }
 
-// Warn warn级别信息
+// Warn level information
 func Warn(msg string, fields ...Field) {
 	getLogger().Warn(msg, fields...)
 }
 
-// Error error级别信息
+// Error level information
 func Error(msg string, fields ...Field) {
 	getLogger().Error(msg, fields...)
 }
 
-// Panic panic级别信息
+// Panic level information
 func Panic(msg string, fields ...Field) {
 	getLogger().Panic(msg, fields...)
 }
 
-// Fatal fatal级别信息
+// Fatal level information
 //func Fatal(msg string, fields ...Field) {
 //	getLogger().Fatal(msg, fields...)
 //}
 
-// Debugf 带格式化debug级别信息
+// Debugf format level information
 func Debugf(format string, a ...interface{}) {
 	getLogger().Debug(fmt.Sprintf(format, a...))
 }
 
-// Infof 带格式化info级别信息
+// Infof format level information
 func Infof(format string, a ...interface{}) {
 	getLogger().Info(fmt.Sprintf(format, a...))
 }
 
-// Warnf 带格式化warn级别信息
+// Warnf format level information
 func Warnf(format string, a ...interface{}) {
 	getLogger().Warn(fmt.Sprintf(format, a...))
 }
 
-// Errorf 带格式化error级别信息
+// Errorf format level information
 func Errorf(format string, a ...interface{}) {
 	getLogger().Error(fmt.Sprintf(format, a...))
 }
 
-// Fatalf 带格式化fatal级别信息
+// Fatalf format level information
 //func Fatalf(format string, a ...interface{}) {
 //	getLogger().Fatal(fmt.Sprintf(format, a...))
 //}
 
-// WithFields 携带字段信息
+// WithFields carrying field information
 func WithFields(fields ...Field) *zap.Logger {
 	return getLogger().With(fields...)
 }

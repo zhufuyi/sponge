@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Auth 鉴权
+// Auth authorization
 func Auth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authorization := c.GetHeader("Authorization")
@@ -19,7 +19,7 @@ func Auth() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		token := authorization[7:] // 去掉Bearer 前缀
+		token := authorization[7:] // remove Bearer prefix
 		claims, err := jwt.VerifyToken(token)
 		if err != nil {
 			logger.Warn("VerifyToken error", logger.Err(err))
@@ -33,7 +33,7 @@ func Auth() gin.HandlerFunc {
 	}
 }
 
-// AuthAdmin 管理员鉴权
+// AuthAdmin admin authentication
 func AuthAdmin() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authorization := c.GetHeader("Authorization")
@@ -43,7 +43,7 @@ func AuthAdmin() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		token := authorization[7:] // 去掉Bearer 前缀
+		token := authorization[7:] // remove Bearer prefix
 		claims, err := jwt.VerifyToken(token)
 		if err != nil {
 			logger.Warn("VerifyToken error", logger.Err(err))
@@ -52,7 +52,7 @@ func AuthAdmin() gin.HandlerFunc {
 			return
 		}
 
-		// 判断是否为管理员
+		// determine if it is an administrator
 		if claims.Role != "admin" {
 			logger.Warn("prohibition of access", logger.String("uid", claims.UID), logger.String("role", claims.Role))
 			response.Error(c, errcode.Forbidden)

@@ -1,12 +1,12 @@
 ## circuitbreaker
 
-circuitbreaker 熔断器。
+Circuit Breaker for gin middleware.
 
 <br>
 
-### 使用示例
+### Example of use
 
-**gin circuitbreaker 熔断器中间件示例**
+**gin circuit breaker middleware**
 
 ```go
 func CircuitBreaker(opts ...CircuitBreakerOption) gin.HandlerFunc {

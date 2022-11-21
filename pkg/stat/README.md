@@ -1,10 +1,10 @@
 ## stat
 
-统计系统和进程的cpu和内存信息。
+Statistics on system and process cpu and memory information.
 
 <br>
 
-### 使用示例
+### Example of use
 
 ```go
 	l, _ := zap.NewDevelopment()

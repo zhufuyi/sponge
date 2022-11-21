@@ -19,7 +19,7 @@ func (o *jaegerOptions) apply(opts ...JaegerOption) {
 	}
 }
 
-// 默认设置
+// default setting
 func defaultJaegerOptions() *jaegerOptions {
 	return &jaegerOptions{}
 }

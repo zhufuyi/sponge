@@ -10,16 +10,16 @@ import (
 type Option func(*options)
 
 type options struct {
-	dialTimeout time.Duration // 连接超时时间，单位(秒)
+	dialTimeout time.Duration // connection timeout, unit(second)
 
 	username string
 	password string
 
 	isSecure           bool
-	serverNameOverride string // etcd 域名
-	certFile           string // 证书文件路径
+	serverNameOverride string // etcd domain
+	certFile           string // path to certificate file
 
-	autoSyncInterval time.Duration // 自动同步member list的间隔
+	autoSyncInterval time.Duration // automatic synchronisation of member list intervals
 	logger           *zap.Logger
 }
 

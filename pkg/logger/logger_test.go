@@ -26,10 +26,10 @@ func printInfo() {
 		Name string `json:"name"`
 		Age  int    `json:"age"`
 	}
-	p := &people{"张三", 11}
-	ps := []people{{"张三", 11}, {"李四", 12}}
+	p := &people{"Mr Zhang", 11}
+	ps := []people{{"Mr Zhang", 11}, {"Mr Li", 12}}
 	pMap := map[string]*people{"123": p, "456": p}
-	Info("this is debug object", Any("object1", p), Any("object2", ps), Any("object3", pMap)) // 使用debug不能打印这一句
+	Info("this is debug object", Any("object1", p), Any("object2", ps), Any("object3", pMap)) // this sentence cannot be printed using debug
 
 	Panic("this is panic")
 }
@@ -109,7 +109,7 @@ func BenchmarkInt(b *testing.B) {
 
 func BenchmarkAny(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		Info("benchmark type any", Any(fmt.Sprintf("object_%d", i), map[string]int{"张三": 11}))
+		Info("benchmark type any", Any(fmt.Sprintf("object_%d", i), map[string]int{"Mr Zhang": 11}))
 	}
 }
 

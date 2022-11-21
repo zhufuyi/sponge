@@ -1,14 +1,14 @@
 ## gotest
 
-gotest是一个模拟测试cache、dao、handler的库。
+gotest is a library that simulates the testing of cache, dao and handler.
 
 <br>
 
-## 使用示例
+## Example of use
 
-### 模拟测试cache
+### mock test cache
 
-缓存接口示例
+Example of a cache interface.
 
 ```go
 // UserExampleCache cache interface
@@ -30,7 +30,9 @@ func NewUserExampleCache(rdb *redis.Client) UserExampleCache {
 }
 ```
 
-测试缓存示例
+<br>
+
+Test cache example
 
 ```go
 func newUserExampleCache() *gotest.RedisCache {
@@ -75,13 +77,13 @@ func Test_userExampleCache_Get(t *testing.T) {
 
 <br>
 
-### 模拟测试dao
+### Simulation test dao
 
-点击查看具体[示例](dao_test.go)。
+Click to see the specific [example](dao_test.go).
 
 <br>
 
-### 模拟测试handler
+### Mock Test Handler
 
 ```go
 func newHandler() *Handler {

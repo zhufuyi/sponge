@@ -8,70 +8,70 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-// Field 字段类型
+// Field type
 type Field = zapcore.Field
 
-// Int int类型
+// Int type
 func Int(key string, val int) Field {
 	return zap.Int(key, val)
 }
 
-// Int64 int64类型
+// Int64 type
 func Int64(key string, val int64) Field {
 	return zap.Int64(key, val)
 }
 
-// Uint uint类型
+// Uint type
 func Uint(key string, val uint) Field {
 	return zap.Uint(key, val)
 }
 
-// Uint64 uint64类型
+// Uint64 type
 func Uint64(key string, val uint64) Field {
 	return zap.Uint64(key, val)
 }
 
-// Uintptr uintptr类型
+// Uintptr type
 func Uintptr(key string, val uintptr) Field {
 	return zap.Uintptr(key, val)
 }
 
-// Float64 float64类型
+// Float64 type
 func Float64(key string, val float64) Field {
 	return zap.Float64(key, val)
 }
 
-// Bool bool类型
+// Bool type
 func Bool(key string, val bool) Field {
 	return zap.Bool(key, val)
 }
 
-// String string类型
+// String type
 func String(key string, val string) Field {
 	return zap.String(key, val)
 }
 
-// Stringer stringer类型
+// Stringer type
 func Stringer(key string, val fmt.Stringer) Field {
 	return zap.Stringer(key, val)
 }
 
-// Time time.Time类型
+// Time type
 func Time(key string, val time.Time) Field {
 	return zap.Time(key, val)
 }
 
-// Duration time.Duration类型
+// Duration type
 func Duration(key string, val time.Duration) Field {
 	return zap.Duration(key, val)
 }
 
-// Err err类型
+// Err type
 func Err(err error) Field {
 	return zap.Error(err)
 }
 
-// Any 任意类型，如果是对象、slice、map等复合类型，使用Any
+// Any type, if it is a composite type such as object, slice, map, etc., use Any
 func Any(key string, val interface{}) Field {
 	return zap.Any(key, val)
 }

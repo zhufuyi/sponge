@@ -64,7 +64,7 @@ enum LaunchStage {
   GA = 4;
 
   // Deprecated features are scheduled to be shut down and removed. For more
-  // information, see the “Deprecation Policy” section of our [Terms of
+  // information, see the "Deprecation Policy" section of our [Terms of
   // Service](https://cloud.google.com/terms/)
   // and the [Google Cloud Platform Subject to the Deprecation
   // Policy](https://cloud.google.com/terms/deprecation) documentation.

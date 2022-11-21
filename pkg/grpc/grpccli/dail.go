@@ -13,12 +13,12 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-// Dial 安全连接
+// Dial secure connections
 func Dial(ctx context.Context, endpoint string, opts ...Option) (*grpc.ClientConn, error) {
 	return dial(ctx, endpoint, true, opts...)
 }
 
-// DialInsecure 不安全连接
+// DialInsecure unsafe connections
 func DialInsecure(ctx context.Context, endpoint string, opts ...Option) (*grpc.ClientConn, error) {
 	return dial(ctx, endpoint, false, opts...)
 }
@@ -32,7 +32,7 @@ func dial(ctx context.Context, endpoint string, isSecure bool, opts ...Option) (
 
 	var clientOptions []grpc.DialOption
 
-	// 第一个clientOptions是服务发现
+	// determining whether to use service discovery
 	if o.discovery != nil {
 		clientOptions = append(clientOptions, grpc.WithResolvers(
 			discovery.NewBuilder(
@@ -41,7 +41,7 @@ func dial(ctx context.Context, endpoint string, isSecure bool, opts ...Option) (
 			)))
 	}
 
-	// 是否安全连接
+	// secure connection or not
 	if isSecure {
 		if o.credentials == nil {
 			return nil, errors.New("unset tls credentials")
@@ -51,27 +51,27 @@ func dial(ctx context.Context, endpoint string, isSecure bool, opts ...Option) (
 		clientOptions = append(clientOptions, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	}
 
-	// 日志
+	// logging
 	if o.enableLog {
 		unaryClientInterceptors = append(unaryClientInterceptors, interceptor.UnaryClientLog(logger.Get()))
 	}
 
-	// 指标 metrics
+	// metrics
 	if o.enableMetrics {
 		unaryClientInterceptors = append(unaryClientInterceptors, interceptor.UnaryClientMetrics())
 	}
 
-	// 负载均衡器 load balance
+	// load balance
 	if o.enableLoadBalance {
 		clientOptions = append(clientOptions, grpc.WithDefaultServiceConfig(`{"loadBalancingConfig": [{"round_robin":{}}]}`))
 	}
 
-	// 熔断器
+	// circuit breaker
 	if o.enableCircuitBreaker {
 		unaryClientInterceptors = append(unaryClientInterceptors, interceptor.UnaryClientCircuitBreaker())
 	}
 
-	// 重试 retry
+	// retry
 	if o.enableRetry {
 		unaryClientInterceptors = append(unaryClientInterceptors, interceptor.UnaryClientRetry())
 	}

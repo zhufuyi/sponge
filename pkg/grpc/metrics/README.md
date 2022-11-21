@@ -1,14 +1,14 @@
 ## metrics
 
-grpc的server和client端指标，可以使用prometheus继续采集这些指标。
+The grpc's server and client-side metrics can continue to be captured using prometheus.
 
-### 使用示例
+### Example of use
 
 #### grpc server
 
 ```go
 func UnaryServerLabels(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-	// 设置prometheus公共标签
+	// set up prometheus custom labels
 	tag := grpc_ctxtags.NewTags().
 		Set(serverNameLabelKey, serverNameLabelValue).
 		Set(envLabelKey, envLabelValue)
@@ -20,17 +20,17 @@ func UnaryServerLabels(ctx context.Context, req interface{}, info *grpc.UnarySer
 func getServerOptions() []grpc.ServerOption {
 	var options []grpc.ServerOption
 
-	// metrics拦截器
+	// metrics interceptor
 	option := grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
-		//UnaryServerLabels,                  // 标签
+		//UnaryServerLabels,                  // tag
 		metrics.UnaryServerMetrics(
-			// metrics.WithCounterMetrics(customizedCounterMetric) // 添加自定义指标
-		), // 一元rpc的metrics拦截器
+			// metrics.WithCounterMetrics(customizedCounterMetric) // adding custom metrics
+		),
 	))
 	options = append(options, option)
 
 	option = grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(
-		metrics.StreamServerMetrics(), // 流式rpc的metrics拦截器
+		metrics.StreamServerMetrics(), // metrics interceptor for streaming rpc
 	))
 	options = append(options, option)
 
@@ -51,7 +51,7 @@ func main() {
 	server := grpc.NewServer(getServerOptions()...)
     serverNameV1.RegisterGreeterServer(server, &GreeterServer{})
 
-	// 启动metrics服务器，默认采集grpc指标，开启、go指标
+	// start metrics server, collect grpc metrics by default, turn on, go metrics
 	metrics.ServerHTTPService(":9092", server)
 	fmt.Println("start metrics server", ":9092")
 
@@ -96,5 +96,4 @@ func main() {
 		}
 	}
 }
-
 ```

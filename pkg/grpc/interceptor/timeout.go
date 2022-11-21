@@ -9,9 +9,9 @@ import (
 
 // ---------------------------------- client interceptor ----------------------------------
 
-var timeoutVal = time.Second * 3 // 默认超时时间
+var timeoutVal = time.Second * 3 // default timeout 3 seconds
 
-// 默认超时
+// default timeout
 func defaultContextTimeout(ctx context.Context) (context.Context, context.CancelFunc) {
 	var cancel context.CancelFunc
 	if _, ok := ctx.Deadline(); !ok {
@@ -21,8 +21,8 @@ func defaultContextTimeout(ctx context.Context) (context.Context, context.Cancel
 	return ctx, cancel
 }
 
-// UnaryTimeout 超时unary拦截器
-func UnaryTimeout(d time.Duration) grpc.UnaryClientInterceptor {
+// UnaryClientTimeout client-side timeout unary interceptor
+func UnaryClientTimeout(d time.Duration) grpc.UnaryClientInterceptor {
 	if d > time.Millisecond {
 		timeoutVal = d
 	}
@@ -36,8 +36,8 @@ func UnaryTimeout(d time.Duration) grpc.UnaryClientInterceptor {
 	}
 }
 
-// StreamTimeout 超时stream拦截器
-func StreamTimeout(d time.Duration) grpc.StreamClientInterceptor {
+// StreamClientTimeout server-side timeout  interceptor
+func StreamClientTimeout(d time.Duration) grpc.StreamClientInterceptor {
 	if d > time.Millisecond {
 		timeoutVal = d
 	}

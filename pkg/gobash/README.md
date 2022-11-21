@@ -1,23 +1,22 @@
 ## gobash
 
-在go环境中执行命令、脚本、可执行文件，日志实时输出。
+Execute commands, scripts, executables in the go environment with live log output.
 
 <br>
 
-## 使用示例
+## Example of use
 
 ### Run
 
-Run执行命令，可以主动结束命令，实时返回日志和错误信息，推荐使用
+Run executes commands and can actively end them, returning logs and error messages in real time, recommended.
 
 ```go
 
     command := "for i in $(seq 1 5); do echo 'test cmd' $i;sleep 1; done"
-    ctx, _ := context.WithTimeout(context.Background(), 3*time.Second) // 超时控制
-	
-    // 执行
+    ctx, _ := context.WithTimeout(context.Background(), 3*time.Second) // timeout control
+
     result := Run(ctx, command)
-    // 实时输出日志和错误信息
+    // real-time output of logs and error messages
     for v := range result.StdOut {
         fmt.Printf(v)
     }
@@ -30,7 +29,7 @@ Run执行命令，可以主动结束命令，实时返回日志和错误信息�
 
 ### Exec
 
-Exec 适合执行单条非阻塞命令，输出标准和错误日志，但日志输出不是实时，注：如果执行命令永久阻塞，会造成协程泄露
+Exec is suitable for executing a single non-blocking command, outputting standard and error logs, but the log output is not real-time, note: if the execution of the command is permanently blocked, it will cause a concurrent leak
 
 ```go
     command := "for i in $(seq 1 5); do echo 'test cmd' $i;sleep 1; done"

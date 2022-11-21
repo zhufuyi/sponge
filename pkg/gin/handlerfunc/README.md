@@ -1,10 +1,10 @@
 ## handlerfunc
 
-常用公共的handler。
+Commonly used public handlers.
 
 <br>
 
-## 使用示例
+## Example of use
 
 ```go
 	r := gin.New()

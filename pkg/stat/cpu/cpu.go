@@ -10,25 +10,25 @@ import (
 	"github.com/shirou/gopsutil/v3/process"
 )
 
-// System 系统CPU信息
+// System cpu information
 type System struct {
-	UsagePercent float64   `json:"usage_percent"` // cpu使用率，单位(%)
+	UsagePercent float64   `json:"usage_percent"` // cpu usage, unit(%)
 	CPUInfo      []CPUInfo `json:"cpu_info"`
 }
 
-// CPUInfo cpu info
+// CPUInfo cpu information
 type CPUInfo struct {
 	ModelName string  `json:"modelName"`
 	Cores     int32   `json:"cores"`
-	Frequency float64 `json:"frequency"` // cpu频率，单位(Mhz)
+	Frequency float64 `json:"frequency"` // cpu frequency, unit(Mhz)
 }
 
-// Process 进程的cpu使用率
+// Process information
 type Process struct {
-	UsagePercent float64 `json:"usage_percent"` // cpu使用率，单位(%)
+	UsagePercent float64 `json:"usage_percent"` // cpu usage, unit(%)
 
-	RSS uint64 `json:"rss"` // 使用物理内存，单位(M)
-	VMS uint64 `json:"vms"` // 使用虚拟内存，单位(M)
+	RSS uint64 `json:"rss"` // use of physical memory, unit(M)
+	VMS uint64 `json:"vms"` // use of virtual memory, unit(M)
 }
 
 // GetSystemCPU get system cpu info

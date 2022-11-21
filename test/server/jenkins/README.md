@@ -1,13 +1,13 @@
-### 1 构建jenkins-go
+### 1 Build jenkins-go
 
-构建镜像：
+Build image:
 
 > docker build -t zhufuyi/jenkins-go:2.37 .
 
-推送到镜像仓库
+Push to image repository.
 
 ```shell
-# 登录镜像仓库，如果是私有镜像仓库，指定地址
+# login to the image repository, if it is a private image repository, specify the address
 docker login -u username
 
 docker push zhufuyi/jenkins-go:2.37
@@ -15,137 +15,137 @@ docker push zhufuyi/jenkins-go:2.37
 
 <br>
 
-### 2 运行jenkins-go
+### 2 run jenkins-go
 
-启动jenkins服务：
+start the jenkins server
 
 > docker-compose up -d
 
-在浏览器访问 `http://<地址>:38080`，第一启动需要初始管理员密码(通过命令`docker exec jenkins-go cat /var/jenkins_home/secrets/initialAdminPassword`获取)。
+Visit `http://<address>:38080` in your browser, the first boot requires the initial admin password (obtained via the command `docker exec jenkins-go cat /var/jenkins_home/secrets/initialAdminPassword`).
 
 <br>
 
-### 3 配置jenkins
+### 3 Configure jenkins
 
-登录之后安装插件，如果暂时不清楚需要哪些插件，点击安装推荐插件。
+After logging in to jenkins, you need to install plugins. If you are not sure which plugins you need for now, click Install Recommended Plugins.
 
-**创建管理员账号**
+**Create administrator account**
 
-例如 admin 123456
+example: admin 123456
 
 <br>
 
-**安装需要的插件**
+**Install the required plugins**
 
-点击【Manage Jenkins】-->【Manage Plugins】--> 【Available Plugins】，分别安装下面插件：
+Click [Manage Jenkins] --> [Manage Plugins] -->  [Available Plugins], Install the following plugins.
 
 ```bash
-# 中文插件
+# if required, install Chinese plugin
 Locale
 
-# 添加参数化构建插件
+# adding parametric build plugin
 Extended Choice Parameter
 
-# 添加git参数插件
+# adding the git parameters plugin
 Git Parameter
 
-# 账号管理
+# account Management
 Role-based Authorization Strategy
 ```
 
-重启jenkins服务，使插件生效。
+Restart the jenkins service to enable the plugin.
 
 <br>
 
-**配置全局参数**
+**Configure global parameters**
 
-dashboard --> 系统管理 --> 系统配置 --> 勾选环境变量
+dashboard --> System Management -->System Configuration -->Check Environment Variables
 
-设置容器镜像的仓库地址
+set the image's repository address
 
 ```bash
-# 添加环境变量
+# add environment variables
 PATH
 /opt/java/openjdk/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/go/bin
 
-# 开发环境镜像仓库
+# development environment image repository
 DEV_REPO_HOST
-示例dev.host.docker.com
+dev.host.docker.com
 
-# 生产环境镜像仓库
+# test environment image repository
 TEST_REPO_HOST
-示例test.host.docker.com
+test.host.docker.com
 
-# 生产环境镜像仓库
+# production environment image repository
 PROD_REPO_HOST
-示例prod.host.docker.com
+prod.host.docker.com
 ```
 
 <br><br>
 
-### 4 使用jenkins部署服务
+### 4 Deploy services using jenkins
 
-比较简单的配置Jenkins任务方法：新建任务的时候导入已有的模板(填写已经存在的任务名称)，然后修改git仓库地址。如果没有模板，创建新任务步骤如下：
+A relatively simple way to configure Jenkins tasks: import existing templates when creating new tasks (fill in the name of an existing task), and then modify the git repository address. If you don't have a template, create a new task as follows.
 
-**(1) 创建新的jenkins任务**
+**(1) Create a new jenkins job**
 
-![创建job](pictures/createJob.jpg)
-
-<br>
-
-**(2) 设置参数化构建**，参数名字为`GIT_PARAMETER`，如下图所示：
-
-![参数化构建](pictures/paramSetting.jpg)
+![create job](pictures/createJob.jpg)
 
 <br>
 
-**(3) 设置流水线信息**，如下图所示：
+**(2)  Set up a parametric build with the parameter name `GIT_PARAMETER`**, as shown below.
 
-![流水线](pictures/pipelineSetting.jpg)
+![parametric construction](pictures/paramSetting.jpg)
 
 <br>
 
-**(4) 构建项目**，点击左边菜单栏Build with Parameters，选择对应的参数构建，如下图所示：
+**(3) Set up pipeline information**, as shown below.
+
+![flow line](pictures/pipelineSetting.jpg)
+
+<br>
+
+**(4) Build the project**, click Build with Parameters on the left menu bar, and select the corresponding parameters to build, as shown in the following figure.
 
 ![runJob-dev](pictures/building.jpg)
 
-注：在构建之前，修改钉钉或邮件通知目标，方便查看构建部署结果，打开代码仓库下的Jenkinsfile文件，找到字段tel_num，填写手机号码。
+Note: Before building, modify the pinned or email notification target to facilitate viewing the build deployment results, open the Jenkinsfile file under the code repository, find the field tel_num, and fill in the cell phone number.
 
 <br><br>
 
-### 5 推送镜像到镜像仓库的授权设置
+### 5 Authorization settings for image repositories
 
-在执行脚本image-push.sh之前，在jenkins-go容器先要取得镜像仓库的授权，不同镜像仓库授权方式可能不大一样。
+Before executing the image-push.sh script, the jenkins-go container must first be authorized by the image repository, which may not be the same for different image repositories.
 
-**私有docker镜像仓库授权**
+**Private docker image repository authorization**
 
 ```bash
-docker login <ip:端口>
-# 账号
-# 密码
+docker login <ip:port>
+# account
+# password
 ```
 
 <br>
 
-**harbor镜像仓库授权**
+**harbor image repository authorization**
 
 ```bash
-# (1) docker登录harbor
-docker login <ip:端口>
-# 账号
-# 密码
+# (1) docker login harbor
+docker login <ip:port>
+# account
+# password
 
-# (2) 如果harbor使用私有http证书，把授权密钥放在docker的certs.d文件中，例如文件路径如下：
+# (2) if harbor uses private http certificates, put the license key in the certs.d file of docker, for example, the file path is as follows.
 /etc/docker/certs.d/<ip>/<ip>.crt
 ```
 
 <br><br>
 
-### 6 部署服务拉取镜像仓库的授权设置
+### 6 Authorization settings for pulling image repositories
 
-在k8s部署服务拉取镜像需要授权时，需要额外创建一个`Secret`，为了拉取镜像时登录使用。
+When pulling images from k8s deployment service requires authorization, you need to create an additional `Secret` for login when pulling images.
 
-创建Secret方式一：
+Way 1: Create Secret directly
 
 ```bash
 kubectl create secret docker-registry docker-auth-secret \
@@ -155,7 +155,7 @@ kubectl create secret docker-registry docker-auth-secret \
     --docker-email=DOCKER_EMAIL
 ```
 
-创建Secret方式二(推荐)：在当前已经登录镜像仓库的docker主机中创建
+Way 2: Create a Secret in the docker host that is already logged into the image repository (recommended)
 
 ```bash
 kubectl create secret generic docker-auth-secret \
@@ -165,7 +165,7 @@ kubectl create secret generic docker-auth-secret \
 
 <br>
 
-部署deployment、pod的资源配置`imagePullSecrets`来指定密钥
+Deployment, pod's resource configuration `imagePullSecrets` to specify the key
 
 ```yaml
 # ......
@@ -180,4 +180,4 @@ kubectl create secret generic docker-auth-secret \
 
 <br>
 
-注： 如果harbor需要私有https证书，需要把/etc/docker/certs.d/<ip>/<ip>.crt放到k8s的节点(master和node)同样目录下，如果是公有证书则不需要。
+Note: If harbor requires a private https certificate, you need to put /etc/docker/certs.d/<ip>/<ip>.crt into the same directory as the nodes (master and node) of k8s, but not if it is a public certificate.

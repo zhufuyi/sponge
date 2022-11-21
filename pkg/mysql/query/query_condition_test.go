@@ -38,19 +38,19 @@ func TestParams_ConvertToGormConditions(t *testing.T) {
 		want1   []interface{}
 		wantErr bool
 	}{
-		// --------------------------- 只有1列查询 ------------------------------
+		// --------------------------- only 1 column query ------------------------------
 		{
 			name: "1 column eq",
 			args: args{
 				columns: []Column{
 					{
 						Name:  "name",
-						Value: "关羽",
+						Value: "ZhangSan",
 					},
 				},
 			},
 			want:    "name = ?",
-			want1:   []interface{}{"关羽"},
+			want1:   []interface{}{"ZhangSan"},
 			wantErr: false,
 		},
 		{
@@ -59,14 +59,14 @@ func TestParams_ConvertToGormConditions(t *testing.T) {
 				columns: []Column{
 					{
 						Name:  "name",
-						Value: "关羽",
+						Value: "ZhangSan",
 						//Exp:   "neq",
 						Exp: "!=",
 					},
 				},
 			},
 			want:    "name <> ?",
-			want1:   []interface{}{"关羽"},
+			want1:   []interface{}{"ZhangSan"},
 			wantErr: false,
 		},
 		{
@@ -139,33 +139,33 @@ func TestParams_ConvertToGormConditions(t *testing.T) {
 				columns: []Column{
 					{
 						Name:  "name",
-						Value: "刘",
+						Value: "Li",
 						Exp:   Like,
 					},
 				},
 			},
 			want:    "name LIKE ?",
-			want1:   []interface{}{"%刘%"},
+			want1:   []interface{}{"%Li%"},
 			wantErr: false,
 		},
 
-		// --------------------------- 有2列查询 ------------------------------
+		// --------------------------- query 2 columns  ------------------------------
 		{
 			name: "2 columns eq and",
 			args: args{
 				columns: []Column{
 					{
 						Name:  "name",
-						Value: "关羽",
+						Value: "ZhangSan",
 					},
 					{
 						Name:  "gender",
-						Value: "男",
+						Value: "male",
 					},
 				},
 			},
 			want:    "name = ? AND gender = ?",
-			want1:   []interface{}{"关羽", "男"},
+			want1:   []interface{}{"ZhangSan", "male"},
 			wantErr: false,
 		},
 		{
@@ -174,20 +174,20 @@ func TestParams_ConvertToGormConditions(t *testing.T) {
 				columns: []Column{
 					{
 						Name:  "name",
-						Value: "关羽",
+						Value: "ZhangSan",
 						//Exp:   Neq,
 						Exp: "!=",
 					},
 					{
 						Name:  "name",
-						Value: "刘备",
+						Value: "LiSi",
 						//Exp:   Neq,
 						Exp: "!=",
 					},
 				},
 			},
 			want:    "name <> ? AND name <> ?",
-			want1:   []interface{}{"关羽", "刘备"},
+			want1:   []interface{}{"ZhangSan", "LiSi"},
 			wantErr: false,
 		},
 		{
@@ -196,7 +196,7 @@ func TestParams_ConvertToGormConditions(t *testing.T) {
 				columns: []Column{
 					{
 						Name:  "gender",
-						Value: "男",
+						Value: "male",
 					},
 					{
 						Name:  "age",
@@ -207,7 +207,7 @@ func TestParams_ConvertToGormConditions(t *testing.T) {
 				},
 			},
 			want:    "gender = ? AND age > ?",
-			want1:   []interface{}{"男", 20},
+			want1:   []interface{}{"male", 20},
 			wantErr: false,
 		},
 		{
@@ -216,7 +216,7 @@ func TestParams_ConvertToGormConditions(t *testing.T) {
 				columns: []Column{
 					{
 						Name:  "gender",
-						Value: "男",
+						Value: "male",
 					},
 					{
 						Name:  "age",
@@ -227,7 +227,7 @@ func TestParams_ConvertToGormConditions(t *testing.T) {
 				},
 			},
 			want:    "gender = ? AND age >= ?",
-			want1:   []interface{}{"男", 20},
+			want1:   []interface{}{"male", 20},
 			wantErr: false,
 		},
 		{
@@ -236,7 +236,7 @@ func TestParams_ConvertToGormConditions(t *testing.T) {
 				columns: []Column{
 					{
 						Name:  "gender",
-						Value: "女",
+						Value: "female",
 					},
 					{
 						Name:  "age",
@@ -247,7 +247,7 @@ func TestParams_ConvertToGormConditions(t *testing.T) {
 				},
 			},
 			want:    "gender = ? AND age < ?",
-			want1:   []interface{}{"女", 20},
+			want1:   []interface{}{"female", 20},
 			wantErr: false,
 		},
 		{
@@ -256,7 +256,7 @@ func TestParams_ConvertToGormConditions(t *testing.T) {
 				columns: []Column{
 					{
 						Name:  "gender",
-						Value: "女",
+						Value: "female",
 					},
 					{
 						Name:  "age",
@@ -267,7 +267,7 @@ func TestParams_ConvertToGormConditions(t *testing.T) {
 				},
 			},
 			want:    "gender = ? AND age <= ?",
-			want1:   []interface{}{"女", 20},
+			want1:   []interface{}{"female", 20},
 			wantErr: false,
 		},
 		{
@@ -298,18 +298,18 @@ func TestParams_ConvertToGormConditions(t *testing.T) {
 				columns: []Column{
 					{
 						Name:  "name",
-						Value: "刘备",
+						Value: "LiSi",
 						//Logic: OR,
 						Logic: "||",
 					},
 					{
 						Name:  "gender",
-						Value: "女",
+						Value: "female",
 					},
 				},
 			},
 			want:    "name = ? OR gender = ?",
-			want1:   []interface{}{"刘备", "女"},
+			want1:   []interface{}{"LiSi", "female"},
 			wantErr: false,
 		},
 		{
@@ -318,20 +318,20 @@ func TestParams_ConvertToGormConditions(t *testing.T) {
 				columns: []Column{
 					{
 						Name:  "name",
-						Value: "刘备",
+						Value: "LiSi",
 						//Logic: OR,
 						Logic: "||",
 					},
 					{
 						Name:  "gender",
-						Value: "男",
+						Value: "male",
 						//Exp:   Neq,
 						Exp: "!=",
 					},
 				},
 			},
 			want:    "name = ? OR gender <> ?",
-			want1:   []interface{}{"刘备", "男"},
+			want1:   []interface{}{"LiSi", "male"},
 			wantErr: false,
 		},
 
@@ -342,31 +342,31 @@ func TestParams_ConvertToGormConditions(t *testing.T) {
 				columns: []Column{
 					{
 						Name:  "name",
-						Value: "刘备",
+						Value: "LiSi",
 					},
 					{
 						Name:  "name",
-						Value: "关羽",
+						Value: "ZhangSan",
 					},
 					{
 						Name:  "name",
-						Value: "张飞",
+						Value: "WangWu",
 					},
 				},
 			},
 			want:    "name IN (?)",
-			want1:   []interface{}{[]interface{}{"刘备", "关羽", "张飞"}},
+			want1:   []interface{}{[]interface{}{"LiSi", "ZhangSan", "WangWu"}},
 			wantErr: false,
 		},
 
-		// ----------------------------error----------------------------------------------
+		// ---------------------------- error ----------------------------------------------
 		{
 			name: "exp type err",
 			args: args{
 				columns: []Column{
 					{
 						Name:  "gender",
-						Value: "男",
+						Value: "male",
 						Exp:   "xxxxxx",
 					},
 				},
@@ -381,7 +381,7 @@ func TestParams_ConvertToGormConditions(t *testing.T) {
 				columns: []Column{
 					{
 						Name:  "gender",
-						Value: "男",
+						Value: "male",
 						Logic: "xxxxxx",
 					},
 				},
@@ -447,7 +447,7 @@ func Test_getExpsAndLogics(t *testing.T) {
 			name: "1 columns",
 			args: args{
 				keyLen:   1,
-				paramSrc: "k=name&v=刘备&page=0&size=10",
+				paramSrc: "k=name&v=LiSi&page=0&size=10",
 			},
 			want:  []string{""},
 			want1: []string{""},
@@ -474,7 +474,7 @@ func Test_getExpsAndLogics(t *testing.T) {
 			name: "2 columns",
 			args: args{
 				keyLen:   2,
-				paramSrc: "k=name&v=刘备&k=gender&v=男&page=0&size=10",
+				paramSrc: "k=name&v=LiSi&k=gender&v=male&page=0&size=10",
 			},
 			want:  []string{"", ""},
 			want1: []string{"", ""},
@@ -483,7 +483,7 @@ func Test_getExpsAndLogics(t *testing.T) {
 			name: "2 columns gt",
 			args: args{
 				keyLen:   2,
-				paramSrc: "k=name&v=刘备&k=age&v=20&exp=gt&page=0&size=10",
+				paramSrc: "k=name&v=LiSi&k=age&v=20&exp=gt&page=0&size=10",
 			},
 			want:  []string{"", "gt"},
 			want1: []string{"", ""},
@@ -492,7 +492,7 @@ func Test_getExpsAndLogics(t *testing.T) {
 			name: "3 columns gt  or",
 			args: args{
 				keyLen:   3,
-				paramSrc: "k=name&v=刘备&exp=neq&k=age&v=20&exp=gt&k=gender&v=男&logic=or&page=0&size=10",
+				paramSrc: "k=name&v=LiSi&exp=neq&k=age&v=20&exp=gt&k=gender&v=male&logic=or&page=0&size=10",
 			},
 			want:  []string{"neq", "gt", ""},
 			want1: []string{"", "", "or"},
@@ -501,7 +501,7 @@ func Test_getExpsAndLogics(t *testing.T) {
 			name: "error",
 			args: args{
 				keyLen:   1,
-				paramSrc: "k=name&exp=gt&v=刘备&page=0&size=10",
+				paramSrc: "k=name&exp=gt&v=LiSi&page=0&size=10",
 			},
 			want:  []string{"gt"},
 			want1: []string{""},

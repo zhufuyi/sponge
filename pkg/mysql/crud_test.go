@@ -24,7 +24,7 @@ type userExample struct {
 }
 
 func newUserExampleDao() *gotest.Dao {
-	testData := &userExample{Name: "张三", Age: 20, Gender: "男"}
+	testData := &userExample{Name: "ZhangSan", Age: 20, Gender: "male"}
 	testData.ID = 1
 	testData.CreatedAt = time.Now()
 	testData.UpdatedAt = testData.CreatedAt
@@ -139,7 +139,7 @@ func TestGet(t *testing.T) {
 	rows := sqlmock.NewRows([]string{"id", "created_at", "updated_at", "name", "age", "gender"}).
 		AddRow(testData.ID, testData.CreatedAt, testData.UpdatedAt, testData.Name, testData.Age, testData.Gender)
 
-	d.SQLMock.ExpectQuery("SELECT .*").WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnRows(rows) // 单独时参数为1个，整个文件测试参数为2个
+	d.SQLMock.ExpectQuery("SELECT .*").WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnRows(rows) // adjusted for number of fields
 
 	err := Get(d.Ctx, d.DB, table, "name = ?", testData.Name)
 	assert.NoError(t, err)
@@ -185,7 +185,6 @@ func TestCount(t *testing.T) {
 	t.Logf("count=%d", count)
 }
 
-// 事务
 func TestTx(t *testing.T) {
 	err := createUser()
 	if err != nil {
@@ -200,13 +199,13 @@ func createUser() error {
 	rows := sqlmock.NewRows([]string{"id", "created_at", "updated_at", "name", "age", "gender"}).
 		AddRow(testData.ID, testData.CreatedAt, testData.UpdatedAt, testData.Name, testData.Age, testData.Gender)
 	d.SQLMock.ExpectBegin()
-	d.SQLMock.ExpectQuery("SELECT .*").WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnRows(rows) // 单独时参数为1个，整个文件测试参数为2个
+	d.SQLMock.ExpectQuery("SELECT .*").WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnRows(rows) // adjusted for number of fields
 	d.SQLMock.ExpectCommit()
 
-	// 注意，当你在一个事务中应使用 tx 作为数据库句柄
+	// note that you should use tx as the database handle when you are in a transaction
 	tx := d.DB.Begin()
 	defer func() {
-		if err := recover(); err != nil { // 在事务执行过程发生panic后回滚
+		if err := recover(); err != nil { // rollback after a panic during transaction execution
 			tx.Rollback()
 			fmt.Printf("transaction failed, err = %v\n", err)
 		}
@@ -222,9 +221,9 @@ func createUser() error {
 		return err
 	}
 
-	panic("发生了异常")
+	panic("mock panic")
 
-	if err = tx.WithContext(d.Ctx).Create(&userExample{Name: "lisi", Age: table.Age + 2, Gender: "男"}).Error; err != nil {
+	if err = tx.WithContext(d.Ctx).Create(&userExample{Name: "lisi", Age: table.Age + 2, Gender: "male"}).Error; err != nil {
 		tx.Rollback()
 		return err
 	}

@@ -1,10 +1,10 @@
 ## interceptor
 
-常用grpc客户端和服务端的拦截器。
+Commonly used grpc client and server-side interceptors.
 
 <br>
 
-### 使用示例
+### Example of use
 
 #### jwt
 
@@ -14,11 +14,11 @@
 func getServerOptions() []grpc.ServerOption {
 	var options []grpc.ServerOption
 
-	// token鉴权
+	// token authorization
 	options = append(options, grpc.UnaryInterceptor(
 	    interceptor.UnaryServerJwtAuth(
-	        // middleware.WithAuthClaimsName("tokenInfo"), // 设置附加到ctx的鉴权信息名称，默认是tokenInfo
-	        middleware.WithAuthIgnoreMethods( // 添加忽略token验证的方法
+	        // middleware.WithAuthClaimsName("tokenInfo"), // set the name of the forensic information attached to the ctx, the default is tokenInfo
+	        middleware.WithAuthIgnoreMethods( // add a way to ignore token validation
 	            "/proto.Account/Register",
 	        ),
 	    ),
@@ -27,16 +27,16 @@ func getServerOptions() []grpc.ServerOption {
 	return options
 }
 
-// 生成鉴权信息authorization
+// generate forensic information authorization
 func (a *Account) Register(ctx context.Context, req *serverNameV1.RegisterRequest) (*serverNameV1.RegisterReply, error) {
     // ......
 	token, err := jwt.GenerateToken(uid)
 	// handle err
-	authorization = middleware.GetAuthorization(token) // 加上前缀
+	authorization = middleware.GetAuthorization(token)
     // ......
 }
 
-// 客户端调用方法时必须把鉴权信息通过context传递进来，key名称必须是authorization
+// the client must pass in the authentication information via the context when calling the method, and the key name must be authorization
 func getUser(client serverNameV1.AccountClient, req *serverNameV1.RegisterReply) error {
 	md := metadata.Pairs("authorization", req.Authorization)
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
@@ -61,13 +61,13 @@ var logger *zap.Logger
 func getServerOptions() []grpc.ServerOption {
 	var options []grpc.ServerOption
 
-	// 日志设置，默认打印客户端断开连接信息，示例 https://pkg.go.dev/github.com/grpc-ecosystem/go-grpc-middleware/logging/zap
+	// log setting, which prints client disconnection information by default, example https://pkg.go.dev/github.com/grpc-ecosystem/go-grpc-middleware/logging/zap
 	options = append(options, grpc_middleware.WithUnaryServerChain(
 		interceptor.UnaryServerCtxTags(),
 		interceptor.UnaryServerZapLogging(
 			logger.Get(), // zap
-			// middleware.WithLogFields(map[string]interface{}{"serverName": "userExample"}), // 附加打印字段
-			middleware.WithLogIgnoreMethods("/proto.userExampleService/GetByID"), // 忽略指定方法打印，可以指定多个
+			// middleware.WithLogFields(map[string]interface{}{"serverName": "userExample"}), // additional print fields
+			middleware.WithLogIgnoreMethods("/proto.userExampleService/GetByID"), // ignore the specified method print, you can specify more than one
 		),
 	))
 
@@ -103,13 +103,13 @@ func getDialOptions() []grpc.DialOption {
 	// use insecure transfer
 	options = append(options, grpc.WithTransportCredentials(insecure.NewCredentials()))
 
-	// 重试
+	// retry
 	option := grpc.WithUnaryInterceptor(
 		grpc_middleware.ChainUnaryClient(
 			interceptor.UnaryClientRetry(
-                //middleware.WithRetryTimes(5), // 修改默认重试次数，默认3次
-                //middleware.WithRetryInterval(100*time.Millisecond), // 修改默认重试时间间隔，默认50毫秒
-                //middleware.WithRetryErrCodes(), // 添加触发重试错误码，默认codes.Internal, codes.DeadlineExceeded, codes.Unavailable
+                //middleware.WithRetryTimes(5), // modify the default number of retries to 3 by default
+                //middleware.WithRetryInterval(100*time.Millisecond), // modify the default retry interval, default 50 milliseconds
+                //middleware.WithRetryErrCodes(), // add trigger retry error code, default is codes.Internal, codes.DeadlineExceeded, codes.Unavailable
 			),
 		),
 	)
@@ -121,7 +121,7 @@ func getDialOptions() []grpc.DialOption {
 
 <br>
 
-#### 限流
+#### rate limit
 
 ```go
 func getDialOptions() []grpc.DialOption {
@@ -145,7 +145,7 @@ func getDialOptions() []grpc.DialOption {
 <br>
 
 
-#### 熔断器
+#### Circuit Breaker
 
 ```go
 func getDialOptions() []grpc.DialOption {
@@ -177,10 +177,10 @@ func getDialOptions() []grpc.DialOption {
 	// use insecure transfer
 	options = append(options, grpc.WithTransportCredentials(insecure.NewCredentials()))
 
-	// 超时拦截器
+	// timeout
 	option := grpc.WithUnaryInterceptor(
 		grpc_middleware.ChainUnaryClient(
-			middleware.ContextTimeout(time.Second), // //设置超时
+			middleware.ContextTimeout(time.Second), // set timeout
 		),
 	)
 	options = append(options, option)
@@ -194,7 +194,7 @@ func getDialOptions() []grpc.DialOption {
 #### tracing
 
 ```go
-// 初始化trace
+// initialize tracing
 func InitTrace(serviceName string) {
 	exporter, err := tracer.NewJaegerAgentExporter("192.168.3.37", "6831")
 	if err != nil {
@@ -207,17 +207,17 @@ func InitTrace(serviceName string) {
 		tracer.WithServiceVersion("demo"),
 	)
 
-	tracer.Init(exporter, resource) // 默认采集全部
+	tracer.Init(exporter, resource) // collect all by default
 }
 
-// 在客户端设置链路跟踪
+// set up link tracking on the client side
 func getDialOptions() []grpc.DialOption {
 	var options []grpc.DialOption
 
 	// use insecure transfer
 	options = append(options, grpc.WithTransportCredentials(insecure.NewCredentials()))
 
-	// tracing跟踪
+	// use tracing
 	options = append(options, grpc.WithUnaryInterceptor(
 		interceptor.UnaryClientTracing(),
 	))
@@ -225,11 +225,11 @@ func getDialOptions() []grpc.DialOption {
 	return options
 }
 
-// 在服务端设置链路跟踪
+// set up tracking on the server side
 func getServerOptions() []grpc.ServerOption {
 	var options []grpc.ServerOption
 
-	// 链路跟踪拦截器
+	// use tracing
 	options = append(options, grpc.UnaryInterceptor(
 		interceptor.UnaryServerTracing(),
 	))
@@ -237,11 +237,11 @@ func getServerOptions() []grpc.ServerOption {
 	return options
 }
 
-// 如果有需要，可以在程序创建一个span
+// if necessary, you can create a span in the program
 func SpanDemo(serviceName string, spanName string, ctx context.Context) {
 	_, span := otel.Tracer(serviceName).Start(
 		ctx, spanName,
-		trace.WithAttributes(attribute.String(spanName, time.Now().String())), // 自定义属性
+		trace.WithAttributes(attribute.String(spanName, time.Now().String())), // customised attributes
 	)
 	defer span.End()
 
@@ -253,6 +253,6 @@ func SpanDemo(serviceName string, spanName string, ctx context.Context) {
 
 #### metrics
 
-使用示例 [metrics](../metrics/README.md)。
+example [metrics](../metrics/README.md).
 
 <br>
