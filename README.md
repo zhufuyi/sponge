@@ -11,7 +11,7 @@
 [![Go Reference](https://pkg.go.dev/badge/github.com/zhufuyi/sponge.svg)](https://pkg.go.dev/github.com/zhufuyi/sponge)
 [![Go](https://github.com/zhufuyi/sponge/workflows/Go/badge.svg?branch=main)](https://github.com/zhufuyi/sponge/actions)
 [![License: MIT](https://img.shields.io/github/license/zhufuyi/sponge)](https://img.shields.io/github/license/zhufuyi/sponge)
-[![Join the chat at https://gitter.im/zhufuyi/sponge](https://badges.gitter.im/zhufuyi/sponge.svg)](https://gitter.im/zhufuyi/sponge?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join the chat at https://gitter.im/zhufuyi/sponge](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/zhufuyi/sponge?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 </div>
 
@@ -80,6 +80,7 @@ The directory structure follows [golang-standards/project-layout](https://github
 │ ├── handler      # Business function implementation for http
 │ ├── model        # Database model
 │ ├── routers      # Http routing
+│ ├── rpcclient    # Connecting to rpc services code
 │ ├── server       # Service entry, including http and grpc servers
 │ ├── service      # Business function implementation for grpc
 │ └── types        # Request and response types for http
@@ -104,25 +105,25 @@ Add `$GOROOT/bin` to the system path.
 ```bash
 go install github.com/zhufuyi/sponge/cmd/sponge@latest
 
-sponge update
+sponge init
 ```
 
 <br>
 
-### Quickly create a http project
+### Quickly create a web server
 
 #### Creating a new http server
 
 **(1) Generate http server code**
 
 ```bash
-sponge http \
-  --module-name=account \
-  --server-name=account \
-  --project-name=account \
-  --repo-addr=zhufuyi \
-  --db-dsn=root:123456@(127.0.0.1:3306)/test \
-  --db-table=student
+sponge web http \
+  --module-name=school \
+  --server-name=teacher \
+  --project-name=edusys \
+  --db-dsn=root:123456@(192.168.3.37:3306)/school \
+  --db-table=teacher \
+  --out=./teacher
 ```
 
 **(2) If using the default configuration, skip this step, modify the configuration file configs/<server name>.yml**
@@ -184,11 +185,10 @@ You can also use Jenkins to automatically build deployments to k8s.
 add a new **handler** to an existing http server.
 
 ```bash
-sponge handler \
-  --module-name=account \
-  --db-dsn=root:123456@(127.0.0.1:3306)/test \
-  --db-table=teacher \
-  --out=./account
+sponge web handler \
+  -db-dsn=root:123456@(192.168.3.37:3306)/school \
+  --db-table=course \
+  --out=./teacher
 ```
 
 Start up the server
@@ -199,20 +199,20 @@ Copy `http://localhost:8080/swagger/index.html` to your browser and test the api
 
 <br>
 
-### Quick create a grpc project
+### Quick create a rpc server
 
 #### Creating a new grpc server
 
 **(1) Generate grpc server code**
 
 ```bash
-sponge grpc \
-  --module-name=account \
-  --server-name=account \
-  --project-name=account \
-  --repo-addr=zhufuyi \
-  --db-dsn=root:123456@(127.0.0.1:3306)/test \
-  --db-table=student
+sponge micro rpc \
+  --module-name=school \
+  --server-name=teacher \
+  --project-name=edusys \
+  --db-dsn=root:123456@(192.168.3.37:3306)/school \
+  --db-table=teacher
+  --out=./teacher
 ```
 
 **(2) If using the default configuration, skip this step. Modify the configuration file configs/<server name>.yml**
@@ -274,12 +274,10 @@ You can also use Jenkins to automatically build deployments to k8s.
 add a new **service** to an existing grpc server.
 
 ```bash
-sponge service \
-  --module-name=account \
-  --server-name=account \
-  --db-dsn=root:123456@(127.0.0.1:3306)/test \
+sponge micro service \
+  --db-dsn=root:123456@(192.168.3.37:3306)/school \
   --db-table=teacher \
-  --out=./account
+  --out=./teacher
 ```
 
 Start up the server
@@ -287,6 +285,41 @@ Start up the server
 > make proto && make run
 
 Use IDE to open the file `internal/service/<table name>_client_test.go` to test the api interface of grpc.
+
+<br>
+
+### Quickly generate a new rpc gateway server
+
+(1) generate a new rpc gateway server codes
+
+```bash
+sponge micro rpc-gw-pb \
+  --module-name=school \
+  --server-name=teacher \
+  --project-name=edusys \
+  --protobuf-file=./teacher/api/teacher/v1/teacher.proto
+  --out=./teacher-gw
+```
+
+(2) Set the configuration file grpcClient to specify the address and port of the rpc server, example: 
+
+```yaml
+grpcClient:
+  - name: "teacher"                      # rpc service name, used for service discovery
+    host: "192.168.3.27"                # rpc service address, used for direct connection
+    port: 8282                               # rpc service port
+    registryDiscoveryType: ""         # registration and discovery types: consul, etcd, nacos, if empty, registration and discovery are not used
+```
+
+(3) Switch to the teacher-gw directory and generate the *.pb.go code
+
+> make proto
+
+(4) Start up the server
+
+> make run
+
+Copy `http://localhost:8080/apis/swagger/index.html` to your browser and test the api interface.
 
 <br>
 
