@@ -41,7 +41,7 @@ Examples:
   # generate http server codes, structure fields correspond to the column names of the table.
   sponge web http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --embed=false
 
-  # generate http server codes and specify the output directory, Note: if the file already exists, code generation will be canceled.
+  # generate http server codes and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge web http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
 
   # generate http server codes and specify the docker image repository address.
@@ -191,7 +191,7 @@ func addHTTPFields(moduleName string, serverName string, projectName string, rep
 			New: serverName + " api docs",
 		},
 		{
-			Old: "userExampleNO = 1",
+			Old: "userExampleNO       = 1",
 			New: fmt.Sprintf("userExampleNO = %d", rand.Intn(100)),
 		},
 		{

@@ -3,6 +3,7 @@ package generate
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/zhufuyi/sponge/pkg/replacer"
 	"github.com/zhufuyi/sponge/pkg/sql2code"
@@ -14,7 +15,9 @@ import (
 // ModelCommand generate model codes
 func ModelCommand(parentName string) *cobra.Command {
 	var (
-		outPath string // output directory
+		outPath  string // output directory
+		dbTables string // table names
+
 		sqlArgs = sql2code.Args{
 			Package:  "model",
 			JSONTag:  true,
@@ -29,29 +32,49 @@ func ModelCommand(parentName string) *cobra.Command {
 
 Examples:
   # generate model codes and embed 'gorm.Model' struct.
-  sponge %s model --db-dsn=root:123456@(192.168.3.37:3306)/school --db-table=teacher
+  sponge %s model --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
+
+  # generate model codes with multiple table names.
+  sponge %s model --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=t1,t2
 
   # generate model codes, structure fields correspond to the column names of the table.
   sponge %s model --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --embed=false
 
-  # generate model codes and specify the output directory, Note: if the file already exists, code generation will be canceled.
+  # generate model codes and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge %s model --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
-`, parentName, parentName, parentName),
+`, parentName, parentName, parentName, parentName),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			codes, err := sql2code.Generate(&sqlArgs)
-			if err != nil {
-				return err
+			tableNames := strings.Split(dbTables, ",")
+			for _, tableName := range tableNames {
+				if tableName == "" {
+					continue
+				}
+
+				sqlArgs.DBTable = tableName
+				codes, err := sql2code.Generate(&sqlArgs)
+				if err != nil {
+					return err
+				}
+
+				dir, err := runGenModelCommand(codes, outPath)
+				if err != nil {
+					return err
+				}
+				if outPath == "" {
+					outPath = dir
+				}
 			}
 
-			return runGenModelCommand(codes, outPath)
+			fmt.Printf("generate 'model' codes successfully, out = %s\n\n", outPath)
+			return nil
 		},
 	}
 
 	cmd.Flags().StringVarP(&sqlArgs.DBDsn, "db-dsn", "d", "", "db content addr, e.g. user:password@(host:port)/database")
 	_ = cmd.MarkFlagRequired("db-dsn")
-	cmd.Flags().StringVarP(&sqlArgs.DBTable, "db-table", "t", "", "table name")
+	cmd.Flags().StringVarP(&dbTables, "db-table", "t", "", "table name, multiple names separated by commas")
 	_ = cmd.MarkFlagRequired("db-table")
 	cmd.Flags().BoolVarP(&sqlArgs.IsEmbed, "embed", "e", true, "whether to embed 'gorm.Model' struct")
 	cmd.Flags().StringVarP(&outPath, "out", "o", "", "output directory, default is ./model_<time>")
@@ -59,11 +82,11 @@ Examples:
 	return cmd
 }
 
-func runGenModelCommand(codes map[string]string, outPath string) error {
+func runGenModelCommand(codes map[string]string, outPath string) (string, error) {
 	subTplName := "model"
 	r := Replacers[TplNameSponge]
 	if r == nil {
-		return errors.New("replacer is nil")
+		return "", errors.New("replacer is nil")
 	}
 
 	// setting up template information
@@ -80,11 +103,10 @@ func runGenModelCommand(codes map[string]string, outPath string) error {
 	r.SetReplacementFields(fields)
 	_ = r.SetOutputDir(outPath, subTplName)
 	if err := r.SaveFiles(); err != nil {
-		return err
+		return "", err
 	}
 
-	fmt.Printf("generate '%s' codes successfully, out = %s\n\n", subTplName, r.GetOutputDir())
-	return nil
+	return r.GetOutputDir(), nil
 }
 
 func addModelFields(r replacer.Replacer, codes map[string]string) []replacer.Field {

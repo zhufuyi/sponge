@@ -31,7 +31,7 @@ Examples:
   # generate http server codes.
   sponge web http-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --protobuf-file=./test.proto
 
-  # generate http server codes and specify the output directory, Note: if the file already exists, code generation will be canceled.
+  # generate http server codes and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge web http-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --protobuf-file=./test.proto --out=./yourServerDir
 
   # generate http server codes and specify the docker image repository address.

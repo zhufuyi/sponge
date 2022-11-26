@@ -31,7 +31,7 @@ Examples:
   # generate rpc gateway server codes.
   sponge micro rpc-gw-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --protobuf-file=./demo.proto
 
-  # generate rpc gateway server codes and specify the output directory, Note: if the file already exists, code generation will be canceled.
+  # generate rpc gateway server codes and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge micro rpc-gw-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --protobuf-file=./demo.proto --out=./yourServerDir
 
   # generate rpc gateway server codes and specify the docker image repository address.
