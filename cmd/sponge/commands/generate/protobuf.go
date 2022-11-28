@@ -154,6 +154,10 @@ func addProtoFields(moduleName string, serverName string, r replacer.Replacer, c
 			New: fmt.Sprintf("api.%s.v1", strings.ReplaceAll(serverName, "-", "_")), // protobuf package no "-" signs allowed
 		},
 		{
+			Old: "serverNameExample",
+			New: serverName,
+		},
+		{
 			Old:             "UserExample",
 			New:             codes[parser.TableName],
 			IsCaseSensitive: true,

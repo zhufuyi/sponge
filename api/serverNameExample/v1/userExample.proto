@@ -112,10 +112,10 @@ message CreateUserExampleRequest {
   string name = 1 [(validate.rules).string.min_len  = 2];         // name
   string email = 2 [(validate.rules).string.email = true];          // email
   string password = 3 [(validate.rules).string.min_len = 10];   // password
-  string phone=4 [(validate.rules).string = {pattern: "^1[3456789]\\d{9}$"}];    // phone number
-  string avatar=5 [(validate.rules).string.uri = true];       // avatar
-  int32  age=6 [(validate.rules).int32  = {gte:0, lte: 120}];    // age
-  GenderType  gender=7 [(validate.rules).enum.defined_only = true];  // gender, 1:Male, 2:Female, other values:unknown
+  string phone = 4 [(validate.rules).string = {pattern: "^1[3456789]\\d{9}$"}];    // phone number
+  string avatar = 5 [(validate.rules).string.uri = true];       // avatar
+  int32  age = 6 [(validate.rules).int32  = {gte:0, lte: 120}];    // age
+  GenderType  gender = 7 [(validate.rules).enum.defined_only = true];  // gender, 1:Male, 2:Female, other values:unknown
 }
 
 message CreateUserExampleReply {
@@ -135,12 +135,12 @@ message UpdateUserExampleByIDRequest {
   string name = 2;         // name
   string email = 3;         // email
   string password = 4;   // password
-  string phone=5;          // phone number
-  string avatar=6;         // avatar
-  int32  age=7;             // age
-  GenderType  gender=8;        // gender, 1:Male, 2:Female, other values:unknown
-  int32  status=9;         // account status
-  int64  login_at=10;     // login timestamp
+  string phone = 5;          // phone number
+  string avatar = 6;         // avatar
+  int32  age = 7;             // age
+  GenderType  gender = 8;        // gender, 1:Male, 2:Female, other values:unknown
+  int32  status = 9;         // account status
+  int64  login_at = 10;     // login timestamp
 }
 
 message UpdateUserExampleByIDReply {
@@ -151,14 +151,14 @@ message UserExample {
   uint64   id = 1;
   string name = 2;          // name
   string email = 3;          // email
-  string phone=4;           // phone number
-  string avatar=5;           // avatar
-  int32  age=6;               // age
-  GenderType  gender=7; // gender, 1:Male, 2:Female, other values:unknown
-  int32  status=8;           // account status
-  int64  login_at=9;        // login timestamp
-  int64 created_at=10;   // creation time
-  int64 updated_at=11;  // update time
+  string phone = 4;           // phone number
+  string avatar = 5;           // avatar
+  int32  age = 6;               // age
+  GenderType  gender = 7; // gender, 1:Male, 2:Female, other values:unknown
+  int32  status = 8;           // account status
+  int64  login_at = 9;        // login timestamp
+  int64 created_at = 10;   // creation time
+  int64 updated_at = 11;  // update time
 }
 
 message GetUserExampleByIDRequest {

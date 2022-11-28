@@ -10,8 +10,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// HTTPServerCommand generate http server codes based on protobuf file
-func HTTPServerCommand() *cobra.Command {
+// HTTPPbCommand generate http server codes based on protobuf file
+func HTTPPbCommand() *cobra.Command {
 	var (
 		moduleName   string // module name for go.mod
 		serverName   string // server name
