@@ -40,7 +40,7 @@ Examples:
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runGenHTTPServerCommand(moduleName, serverName, projectName, protobufFile, repoAddr, outPath)
+			return runGenHTTPPbCommand(moduleName, serverName, projectName, protobufFile, repoAddr, outPath)
 		},
 	}
 
@@ -59,7 +59,7 @@ Examples:
 	return cmd
 }
 
-func runGenHTTPServerCommand(moduleName string, serverName string, projectName string, protobufFile string, repoAddr string, outPath string) error {
+func runGenHTTPPbCommand(moduleName string, serverName string, projectName string, protobufFile string, repoAddr string, outPath string) error {
 	protobufFiles, isImportTypes, err := parseProtobufFiles(protobufFile)
 	if err != nil {
 		return err
@@ -97,7 +97,7 @@ func runGenHTTPServerCommand(moduleName string, serverName string, projectName s
 	r.SetSubDirsAndFiles(subDirs, subFiles...)
 	r.SetIgnoreSubDirs(ignoreDirs...)
 	r.SetIgnoreSubFiles(ignoreFiles...)
-	fields := addHTTPServerFields(moduleName, serverName, projectName, repoAddr, r)
+	fields := addHTTPPbFields(moduleName, serverName, projectName, repoAddr, r)
 	r.SetReplacementFields(fields)
 	_ = r.SetOutputDir(outPath, serverName+"_"+subTplName)
 	if err = r.SaveFiles(); err != nil {
@@ -112,7 +112,7 @@ func runGenHTTPServerCommand(moduleName string, serverName string, projectName s
 	return nil
 }
 
-func addHTTPServerFields(moduleName string, serverName string, projectName string, repoAddr string,
+func addHTTPPbFields(moduleName string, serverName string, projectName string, repoAddr string,
 	r replacer.Replacer) []replacer.Field {
 	var fields []replacer.Field
 
