@@ -113,8 +113,8 @@ func Test_userExampleService_methods(t *testing.T) {
 		{
 			name: "Create",
 			fn: func() (interface{}, error) {
-				// todo test after filling in parameters
-				return cli.Create(ctx, &serverNameExampleV1.CreateUserExampleRequest{
+				// todo enter parameters before testing
+				req := &serverNameExampleV1.CreateUserExampleRequest{
 					Name:     "foo7",
 					Email:    "foo7@bar.com",
 					Password: "f447b20a7fcbf53a5d5be013ea0b15af",
@@ -122,7 +122,8 @@ func Test_userExampleService_methods(t *testing.T) {
 					Avatar:   "http://internal.com/7.jpg",
 					Age:      11,
 					Gender:   2,
-				})
+				}
+				return cli.Create(ctx, req)
 			},
 			wantErr: false,
 		},
@@ -130,12 +131,13 @@ func Test_userExampleService_methods(t *testing.T) {
 		{
 			name: "UpdateByID",
 			fn: func() (interface{}, error) {
-				// todo test after filling in parameters
-				return cli.UpdateByID(ctx, &serverNameExampleV1.UpdateUserExampleByIDRequest{
+				// todo enter parameters before testing
+				req := &serverNameExampleV1.UpdateUserExampleByIDRequest{
 					Id:    7,
 					Phone: "16000000001",
 					Age:   11,
-				})
+				}
+				return cli.UpdateByID(ctx, req)
 			},
 			wantErr: false,
 		},
@@ -143,10 +145,11 @@ func Test_userExampleService_methods(t *testing.T) {
 		{
 			name: "DeleteByID",
 			fn: func() (interface{}, error) {
-				// todo test after filling in parameters
-				return cli.DeleteByID(ctx, &serverNameExampleV1.DeleteUserExampleByIDRequest{
+				// todo enter parameters before testing
+				req := &serverNameExampleV1.DeleteUserExampleByIDRequest{
 					Id: 100,
-				})
+				}
+				return cli.DeleteByID(ctx, req)
 			},
 			wantErr: false,
 		},
@@ -154,10 +157,11 @@ func Test_userExampleService_methods(t *testing.T) {
 		{
 			name: "GetByID",
 			fn: func() (interface{}, error) {
-				// todo test after filling in parameters
-				return cli.GetByID(ctx, &serverNameExampleV1.GetUserExampleByIDRequest{
+				// todo enter parameters before testing
+				req := &serverNameExampleV1.GetUserExampleByIDRequest{
 					Id: 1,
-				})
+				}
+				return cli.GetByID(ctx, req)
 			},
 			wantErr: false,
 		},
@@ -165,10 +169,11 @@ func Test_userExampleService_methods(t *testing.T) {
 		{
 			name: "ListByIDs",
 			fn: func() (interface{}, error) {
-				// todo test after filling in parameters
-				return cli.ListByIDs(ctx, &serverNameExampleV1.ListUserExampleByIDsRequest{
+				// todo enter parameters before testing
+				req := &serverNameExampleV1.ListUserExampleByIDsRequest{
 					Ids: []uint64{1, 2, 3},
-				})
+				}
+				return cli.ListByIDs(ctx, req)
 			},
 			wantErr: false,
 		},
@@ -176,8 +181,8 @@ func Test_userExampleService_methods(t *testing.T) {
 		{
 			name: "List",
 			fn: func() (interface{}, error) {
-				// todo test after filling in parameters
 				return cli.List(ctx, &serverNameExampleV1.ListUserExampleRequest{
+					// todo enter parameters before testing
 					Params: &types.Params{
 						Page:  0,
 						Limit: 10,
@@ -231,7 +236,7 @@ func Test_userExampleService_benchmark(t *testing.T) {
 		{
 			name: "GetByID",
 			fn: func() error {
-				// todo test after filling in parameters
+				// todo enter parameters before testing
 				message := &serverNameExampleV1.GetUserExampleByIDRequest{
 					Id: 1,
 				}
@@ -247,7 +252,7 @@ func Test_userExampleService_benchmark(t *testing.T) {
 		{
 			name: "ListByIDs",
 			fn: func() error {
-				// todo test after filling in parameters
+				// todo enter parameters before testing
 				message := &serverNameExampleV1.ListUserExampleByIDsRequest{
 					Ids: []uint64{1, 2, 3},
 				}
@@ -263,7 +268,7 @@ func Test_userExampleService_benchmark(t *testing.T) {
 		{
 			name: "List",
 			fn: func() error {
-				// todo test after filling in parameters
+				// todo enter parameters before testing
 				message := &serverNameExampleV1.ListUserExampleRequest{
 					Params: &types.Params{
 						Page:  0,

@@ -195,6 +195,7 @@ func saveFile(moduleName string, serverName string, out string, filePath string,
 
 	content = bytes.ReplaceAll(content, []byte("moduleNameExample"), []byte(moduleName))
 	content = bytes.ReplaceAll(content, []byte("serverNameExample"), []byte(serverName))
+	content = bytes.ReplaceAll(content, firstLetterToUpper("serverNameExample"), firstLetterToUpper(serverName))
 	return os.WriteFile(file, content, 0666)
 }
 
@@ -219,4 +220,12 @@ func isExists(path string) bool {
 		return !os.IsNotExist(err)
 	}
 	return true
+}
+
+func firstLetterToUpper(s string) []byte {
+	if s == "" {
+		return []byte{}
+	}
+
+	return []byte(strings.ToUpper(s[:1]) + s[1:])
 }

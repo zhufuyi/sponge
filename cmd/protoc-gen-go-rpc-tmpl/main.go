@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/zhufuyi/sponge/cmd/protoc-gen-go-rpc-tmpl/internal/generate/service"
@@ -70,10 +71,16 @@ func main() {
 
 func saveRPCTmplFiles(gen *protogen.Plugin, f *protogen.File, moduleName string, serverName string, tmplOut string, ecodeOut string) error {
 	filenamePrefix := f.GeneratedFilenamePrefix
-	tmplFileContent, ecodeFileContent := service.GenerateFiles(f)
+	tmplFileContent, testTmplFileContent, ecodeFileContent := service.GenerateFiles(f)
 
 	filePath := filenamePrefix + ".go"
 	err := saveFile(moduleName, serverName, tmplOut, filePath, tmplFileContent, false)
+	if err != nil {
+		return err
+	}
+
+	filePath = filenamePrefix + "_client_test.go"
+	err = saveFile(moduleName, serverName, tmplOut, filePath, testTmplFileContent, true)
 	if err != nil {
 		return err
 	}
@@ -108,6 +115,7 @@ func saveFile(moduleName string, serverName string, out string, filePath string,
 
 	content = bytes.ReplaceAll(content, []byte("moduleNameExample"), []byte(moduleName))
 	content = bytes.ReplaceAll(content, []byte("serverNameExample"), []byte(serverName))
+	content = bytes.ReplaceAll(content, firstLetterToUpper("serverNameExample"), firstLetterToUpper(serverName))
 	return os.WriteFile(file, content, 0666)
 }
 
@@ -132,4 +140,12 @@ func isExists(path string) bool {
 		return !os.IsNotExist(err)
 	}
 	return true
+}
+
+func firstLetterToUpper(s string) []byte {
+	if s == "" {
+		return []byte{}
+	}
+
+	return []byte(strings.ToUpper(s[:1]) + s[1:])
 }

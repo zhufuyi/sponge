@@ -13,7 +13,7 @@ import (
 func UnaryServerRecovery() grpc.UnaryServerInterceptor {
 	// https://pkg.go.dev/github.com/grpc-ecosystem/go-grpc-middleware/recovery
 	customFunc := func(p interface{}) (err error) {
-		return status.Errorf(codes.Internal, "panic triggered: %v", p)
+		return status.Errorf(codes.Internal, "triggered panic: %v", p)
 	}
 	opts := []grpc_recovery.Option{
 		grpc_recovery.WithRecoveryHandler(customFunc),
@@ -26,7 +26,7 @@ func UnaryServerRecovery() grpc.UnaryServerInterceptor {
 func StreamServerRecovery() grpc.StreamServerInterceptor {
 	// https://pkg.go.dev/github.com/grpc-ecosystem/go-grpc-middleware/recovery
 	customFunc := func(p interface{}) (err error) {
-		return status.Errorf(codes.Internal, "panic triggered: %v", p)
+		return status.Errorf(codes.Internal, "triggered panic: %v", p)
 	}
 	opts := []grpc_recovery.Option{
 		grpc_recovery.WithRecoveryHandler(customFunc),

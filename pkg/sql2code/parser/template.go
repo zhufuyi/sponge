@@ -258,7 +258,7 @@ message List{{.TableName}}Reply {
 		{
 			name: "Create",
 			fn: func() (interface{}, error) {
-				// todo test after filling in parameters
+				// todo enter parameters before testing
 // serviceCreateStructCode
 			},
 			wantErr: false,
@@ -267,7 +267,7 @@ message List{{.TableName}}Reply {
 		{
 			name: "UpdateByID",
 			fn: func() (interface{}, error) {
-				// todo test after filling in parameters
+				// todo enter parameters before testing
 // serviceUpdateStructCode
 			},
 			wantErr: false,

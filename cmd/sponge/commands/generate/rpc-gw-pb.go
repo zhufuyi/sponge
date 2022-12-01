@@ -167,8 +167,9 @@ func addRPCGwFields(moduleName string, serverName string, projectName string, re
 			New: serverName + " api docs",
 		},
 		{
-			Old: "serverNameExample",
-			New: serverName,
+			Old:             "serverNameExample",
+			New:             serverName,
+			IsCaseSensitive: true,
 		},
 		// docker image and k8s deployment script replacement
 		{
