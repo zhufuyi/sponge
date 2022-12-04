@@ -7,7 +7,7 @@ import (
 
 	"github.com/zhufuyi/sponge/configs"
 	"github.com/zhufuyi/sponge/internal/config"
-	"github.com/zhufuyi/sponge/internal/rpcclient"
+	//"github.com/zhufuyi/sponge/internal/rpcclient"
 
 	"github.com/zhufuyi/sponge/pkg/logger"
 	"github.com/zhufuyi/sponge/pkg/nacoscli"
@@ -47,8 +47,9 @@ func Config() {
 		)
 	}
 
-	// initializing the rpc service connection
-	rpcclient.NewServerNameExampleRPCConn()
+	// initializing the rpc server connection
+	// example:
+	//rpcclient.NewServerNameExampleRPCConn()
 
 	// initializing the print system and process resources
 	if cfg.App.EnableStat {

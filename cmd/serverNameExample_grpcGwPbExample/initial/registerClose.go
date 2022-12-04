@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/zhufuyi/sponge/internal/config"
-	"github.com/zhufuyi/sponge/internal/rpcclient"
+	//"github.com/zhufuyi/sponge/internal/rpcclient"
 
 	"github.com/zhufuyi/sponge/pkg/app"
 	"github.com/zhufuyi/sponge/pkg/tracer"
@@ -21,9 +21,10 @@ func RegisterClose(servers []app.IServer) []app.Close {
 	}
 
 	// close the rpc client connection
-	closes = append(closes, func() error {
-		return rpcclient.CloseServerNameExampleRPCConn()
-	})
+	// example:
+	//closes = append(closes, func() error {
+	//	return rpcclient.CloseServerNameExampleRPCConn()
+	//})
 
 	// close tracing
 	if config.Get().App.EnableTracing {

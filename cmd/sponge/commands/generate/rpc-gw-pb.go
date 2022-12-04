@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// RPCGwPbCommand generate rpc gateway server codes base on protobuf file
+// RPCClientCommand generate rpc gateway server codes base on protobuf file
 func RPCGwPbCommand() *cobra.Command {
 	var (
 		moduleName   string // module name for go.mod
@@ -75,7 +75,7 @@ func runGenRPCGwCommand(moduleName string, serverName string, projectName string
 	subDirs := []string{ // processing-only subdirectories
 		"api/types", "cmd/serverNameExample_grpcGwPbExample",
 		"sponge/build", "sponge/configs", "sponge/deployments", "sponge/docs", "sponge/scripts", "sponge/third_party",
-		"internal/config", "internal/ecode", "internal/routers", "internal/rpcclient", "internal/server",
+		"internal/config", "internal/ecode", "internal/routers", "internal/server",
 	}
 	subFiles := []string{ // processing of sub-documents only
 		"sponge/.gitignore", "sponge/.golangci.yml", "sponge/go.mod", "sponge/go.sum",

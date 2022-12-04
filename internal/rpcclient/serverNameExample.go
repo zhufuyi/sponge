@@ -46,11 +46,11 @@ func NewServerNameExampleRPCConn() {
 	}
 	if grpcClientCfg.Name == "" {
 		panic(fmt.Sprintf("not found server name '%v' in yaml config file (field GrpcClient), "+
-			"please change to the correct service name", serverName))
+			"please change to the correct server name", serverName))
 	}
 
 	// If service discovery is not used, connect directly to the rpc service using the ip and port
-	endpoint := fmt.Sprintf("%s:%d", grpcClientCfg.Host, cfg.Grpc.Port)
+	endpoint := fmt.Sprintf("%s:%d", grpcClientCfg.Host, grpcClientCfg.Port)
 
 	switch grpcClientCfg.RegistryDiscoveryType {
 	// discovering services using consul

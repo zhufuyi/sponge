@@ -80,7 +80,7 @@ Examples:
 		},
 	}
 
-	cmd.Flags().StringVarP(&moduleName, "module-name", "p", "", "module-name is the name of the module in the 'go.mod' file")
+	cmd.Flags().StringVarP(&moduleName, "module-name", "m", "", "module-name is the name of the module in the 'go.mod' file")
 	//_ = cmd.MarkFlagRequired("module-name")
 	cmd.Flags().StringVarP(&serverName, "server-name", "s", "", "server name")
 	//_ = cmd.MarkFlagRequired("server-name")

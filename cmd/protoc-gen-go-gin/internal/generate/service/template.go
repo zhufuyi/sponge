@@ -32,7 +32,7 @@ import (
 	"context"
 
 	serverNameExampleV1 "moduleNameExample/api/serverNameExample/v1"
-	"moduleNameExample/internal/rpcclient"
+	//"moduleNameExample/internal/rpcclient"
 )
 
 {{- range .PbServices}}
@@ -40,25 +40,29 @@ import (
 var _ serverNameExampleV1.{{.Name}}Logicer = (*{{.LowerName}}Client)(nil)
 
 type {{.LowerName}}Client struct {
-	{{.LowerName}}Cli serverNameExampleV1.{{.Name}}Client
-	// If required, fill in the definition of the other service client code here.
+	// defining rpc clients object
+
+	// example:
+	//{{.LowerName}}Cli serverNameExampleV1.{{.Name}}Client
 }
 
 // New{{.Name}}Client creating rpc clients
 func New{{.Name}}Client() serverNameExampleV1.{{.Name}}Logicer {
 	return &{{.LowerName}}Client{
-		{{.LowerName}}Cli: serverNameExampleV1.New{{.Name}}Client(rpcclient.GetServerNameExampleRPCConn()),
-		// If required, fill in the code to implement other service clients here.
+		// example:
+		//{{.LowerName}}Cli: serverNameExampleV1.New{{.Name}}Client(rpcclient.GetServerNameExampleRPCConn()),
 	}
 }
 
 {{- range .Methods}}
 
 func (c *{{.LowerServiceName}}Client) {{.MethodName}}(ctx context.Context, req *serverNameExampleV1.{{.Request}}) (*serverNameExampleV1.{{.Reply}}, error) {
-	// implement me
-	// If required, fill in the code to fetch data from other rpc servers here.
+	// fill in the business code
 
-	return c.{{.LowerServiceName}}Cli.{{.MethodName}}(ctx, req)
+	// example:
+	//return c.{{.LowerServiceName}}Cli.{{.MethodName}}(ctx, req)
+
+	panic("implement me")
 }
 
 {{- end}}

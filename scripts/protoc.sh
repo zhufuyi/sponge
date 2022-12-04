@@ -38,13 +38,13 @@ function listProtoFiles(){
     cd ..
 }
 
-function listPbGoFiles(){
+function handlePbGoFiles(){
     cd $1
     items=$(ls)
 
     for item in $items; do
         if [ -d "$item" ]; then
-            listPbGoFiles $item
+            handlePbGoFiles $item
         else
             if [ "${item#*.}"x = "pb.go"x ];then
               deleteUnusedPkg $item
@@ -54,58 +54,76 @@ function listPbGoFiles(){
     cd ..
 }
 
-# get all proto file paths
-listProtoFiles $protoBasePath
+function generateByAllProto(){
+  # get all proto file paths
+  listProtoFiles $protoBasePath
+  if [ "$allProtoFiles"x = x ];then
+    echo "Error: not found protobuf file in path $protoBasePath"
+    exit 1
+  fi
 
-if [ "$protoBasePath"x = x ];then
-  echo "Error: not found protobuf file in path $protoBasePath"
-  exit 1
-fi
+  # generate files *_pb.go, *_grpc_pb.go
+  protoc --proto_path=. --proto_path=./third_party \
+    --go_out=. --go_opt=paths=source_relative \
+    --go-grpc_out=. --go-grpc_opt=paths=source_relative \
+    $allProtoFiles
 
-# generate files *_pb.go, *_grpc_pb.go
-protoc --proto_path=. --proto_path=./third_party \
-  --go_out=. --go_opt=paths=source_relative \
-  --go-grpc_out=. --go-grpc_opt=paths=source_relative \
-  $allProtoFiles
+  checkResult $?
 
-checkResult $?
+  # generate the file *_pb.validate.go
+  protoc --proto_path=. --proto_path=./third_party \
+    --validate_out=lang=go:. --validate_opt=paths=source_relative \
+    $allProtoFiles
 
-# generate the file *_pb.validate.go
-protoc --proto_path=. --proto_path=./third_party \
-  --validate_out=lang=go:. --validate_opt=paths=source_relative \
-  $allProtoFiles
+  checkResult $?
 
-checkResult $?
+  # embed the tag field into *_pb.go
+  protoc --proto_path=. --proto_path=./third_party \
+    --gotag_out=:. --gotag_opt=paths=source_relative \
+    $allProtoFiles
 
-# embed the tag field into *_pb.go
-protoc --proto_path=. --proto_path=./third_party \
-  --gotag_out=:. --gotag_opt=paths=source_relative \
-  $allProtoFiles
+  checkResult $?
+}
 
-checkResult $?
-# todo generate router code for gin here
-# delete the templates code start
+function generateBySpecifiedProto(){
+  # get the proto file of the serverNameExample server
+  allProtoFiles=""
+  listProtoFiles ${protoBasePath}/serverNameExample
+  cd ..
+  specifiedProtoFiles=$allProtoFiles
+  # todo generate router code for gin here
+  # delete the templates code start
 
-# generate the swagger document and merge all files into docs/apis.swagger.json
-protoc --proto_path=. --proto_path=./third_party \
-  --openapiv2_out=. --openapiv2_opt=logtostderr=true --openapiv2_opt=allow_merge=true --openapiv2_opt=merge_file_name=docs/apis.json \
-  $allProtoFiles
+  # generate the swagger document and merge all files into docs/apis.swagger.json
+  protoc --proto_path=. --proto_path=./third_party \
+    --openapiv2_out=. --openapiv2_opt=logtostderr=true --openapiv2_opt=allow_merge=true --openapiv2_opt=merge_file_name=docs/apis.json \
+    $specifiedProtoFiles
 
-checkResult $?
+  checkResult $?
 
-# A total of four files are generated: the registration route file **router.pb.go (saved in the same directory as the protobuf file),
-# the injection route file *_service.pb.go (saved in internal/routers by default), the logic code template file *_logic.go (saved in internal/service by default),
-# and the return error code template file *_http.go (saved in internal/ecode by default). internal/service),
-# return error code template file *_http.go (default path in internal/ecode)
-protoc --proto_path=. --proto_path=./third_party \
-  --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=service \
-  --go-gin_opt=moduleName=github.com/zhufuyi/sponge --go-gin_opt=serverName=serverNameExample \
-  $allProtoFiles
+  # A total of four files are generated: the registration route file **router.pb.go (saved in the same directory as the protobuf file),
+  # the injection route file *_service.pb.go (saved in internal/routers by default), the logic code template file *_logic.go (saved in internal/service by default),
+  # and the return error code template file *_http.go (saved in internal/ecode by default). internal/service),
+  # return error code template file *_http.go (default path in internal/ecode)
+  protoc --proto_path=. --proto_path=./third_party \
+    --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=service \
+    --go-gin_opt=moduleName=github.com/zhufuyi/sponge --go-gin_opt=serverName=serverNameExample \
+    $specifiedProtoFiles
 
-checkResult $?
-# delete the templates code end
-listPbGoFiles $protoBasePath
+  checkResult $?
+  # delete the templates code end
+}
+
+# generate pb.go by all proto files
+generateByAllProto
+
+# generate pb.go by specified proto files
+generateBySpecifiedProto
+
+# delete unused packages in pb.go
+handlePbGoFiles $protoBasePath
 
 go mod tidy
 checkResult $?
+
 echo "exec protoc command successfully."

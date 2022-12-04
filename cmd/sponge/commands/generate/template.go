@@ -143,53 +143,53 @@ func NewCenter(configFile string) (*Center, error) {
 `
 
 	protoShellHandlerCode = `
-# generate the swagger document and merge all files into docs/apis.swagger.json
-protoc --proto_path=. --proto_path=./third_party \
-  --openapiv2_out=. --openapiv2_opt=logtostderr=true --openapiv2_opt=allow_merge=true --openapiv2_opt=merge_file_name=docs/apis.json \
-  $allProtoFiles
+  # generate the swagger document and merge all files into docs/apis.swagger.json
+  protoc --proto_path=. --proto_path=./third_party \
+    --openapiv2_out=. --openapiv2_opt=logtostderr=true --openapiv2_opt=allow_merge=true --openapiv2_opt=merge_file_name=docs/apis.json \
+    $specifiedProtoFiles
 
-checkResult $?
+  checkResult $?
 
-moduleName=$(cat docs/gen.info | head -1 | cut -d , -f 1)
-serverName=$(cat docs/gen.info | head -1 | cut -d , -f 2)
-# A total of four files are generated, namely the registration route file _*router.pb.go (saved in the same directory as the protobuf file), 
-# the injection route file *_handler.pb.go (saved by default in the path internal/routers), the logical code template file*_logic.go (default path is in internal/handler), 
-# return error code template file*_http.go (default path is in internal/ecode)
-protoc --proto_path=. --proto_path=./third_party \
-  --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=handler \
-  --go-gin_opt=moduleName=${moduleName} --go-gin_opt=serverName=${serverName} \
-  $allProtoFiles
+  moduleName=$(cat docs/gen.info | head -1 | cut -d , -f 1)
+  serverName=$(cat docs/gen.info | head -1 | cut -d , -f 2)
+  # A total of four files are generated, namely the registration route file _*router.pb.go (saved in the same directory as the protobuf file), 
+  # the injection route file *_handler.pb.go (saved by default in the path internal/routers), the logical code template file*_logic.go (default path is in internal/handler), 
+  # return error code template file*_http.go (default path is in internal/ecode)
+  protoc --proto_path=. --proto_path=./third_party \
+    --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=handler \
+    --go-gin_opt=moduleName=${moduleName} --go-gin_opt=serverName=${serverName} \
+    $specifiedProtoFiles
 
-checkResult $?`
+  checkResult $?`
 
 	protoShellServiceCode = `
-# Generate the swagger document and merge all files into docs/apis.swagger.json
-protoc --proto_path=. --proto_path=./third_party \
-  --openapiv2_out=. --openapiv2_opt=logtostderr=true --openapiv2_opt=allow_merge=true --openapiv2_opt=merge_file_name=docs/apis.json \
-  $allProtoFiles
+  # Generate the swagger document and merge all files into docs/apis.swagger.json
+  protoc --proto_path=. --proto_path=./third_party \
+    --openapiv2_out=. --openapiv2_opt=logtostderr=true --openapiv2_opt=allow_merge=true --openapiv2_opt=merge_file_name=docs/apis.json \
+    $specifiedProtoFiles
 
-checkResult $?
+  checkResult $?
 
-moduleName=$(cat docs/gen.info | head -1 | cut -d , -f 1)
-serverName=$(cat docs/gen.info | head -1 | cut -d , -f 2)
-# A total of 4 files are generated, namely the registration route file _*router.pb.go (saved in the same directory as the protobuf file), 
-# the injection route file *_service.pb.go (default save path in internal/routers), the logical code template file*_logic.go (saved in internal/service by default), 
-# return error code template file*_rpc.go (saved in internal/ecode by default)
-protoc --proto_path=. --proto_path=./third_party \
-  --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=service \
-  --go-gin_opt=moduleName=${moduleName} --go-gin_opt=serverName=${serverName} \
-  $allProtoFiles
+  moduleName=$(cat docs/gen.info | head -1 | cut -d , -f 1)
+  serverName=$(cat docs/gen.info | head -1 | cut -d , -f 2)
+  # A total of 4 files are generated, namely the registration route file _*router.pb.go (saved in the same directory as the protobuf file), 
+  # the injection route file *_service.pb.go (default save path in internal/routers), the logical code template file*_logic.go (saved in internal/service by default), 
+  # return error code template file*_rpc.go (saved in internal/ecode by default)
+  protoc --proto_path=. --proto_path=./third_party \
+    --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=service \
+    --go-gin_opt=moduleName=${moduleName} --go-gin_opt=serverName=${serverName} \
+    $specifiedProtoFiles
 
-checkResult $?`
+  checkResult $?`
 
 	protoShellServiceTmplCode = `
-moduleName=$(cat docs/gen.info | head -1 | cut -d , -f 1)
-serverName=$(cat docs/gen.info | head -1 | cut -d , -f 2)
-# Generate 2 files, a logic code template file *.go (default save path in internal/service), a return error code template file *_rpc.go (default save path in internal/ecode)
-protoc --proto_path=. --proto_path=./third_party \
-  --go-rpc-tmpl_out=. --go-rpc-tmpl_opt=paths=source_relative \
-  --go-rpc-tmpl_opt=moduleName=${moduleName} --go-rpc-tmpl_opt=serverName=${serverName} \
-  $allProtoFiles
+  moduleName=$(cat docs/gen.info | head -1 | cut -d , -f 1)
+  serverName=$(cat docs/gen.info | head -1 | cut -d , -f 2)
+  # Generate 2 files, a logic code template file *.go (default save path in internal/service), a return error code template file *_rpc.go (default save path in internal/ecode)
+  protoc --proto_path=. --proto_path=./third_party \
+    --go-rpc-tmpl_out=. --go-rpc-tmpl_opt=paths=source_relative \
+    --go-rpc-tmpl_opt=moduleName=${moduleName} --go-rpc-tmpl_opt=serverName=${serverName} \
+    $specifiedProtoFiles
 
-checkResult $?`
+  checkResult $?`
 )
