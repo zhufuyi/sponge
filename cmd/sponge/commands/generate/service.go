@@ -14,7 +14,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// RPCClientCommand generate service codes
+// ServiceCommand generate service codes
 func ServiceCommand() *cobra.Command {
 	var (
 		moduleName string // module name for go.mod

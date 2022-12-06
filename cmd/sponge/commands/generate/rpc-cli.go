@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/spf13/cobra"
 	"github.com/zhufuyi/sponge/pkg/replacer"
+
+	"github.com/spf13/cobra"
 )
 
 // RPCClientCommand generate rpc client codes

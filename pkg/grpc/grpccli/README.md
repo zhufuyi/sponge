@@ -1,6 +1,6 @@
 ## grpccli
 
-grpc client with support for service discovery, logging, load balancing, link tracking, metrics, retries, circuit breaker.
+grpc client with support for service discovery, logging, load balancing, trace, metrics, retries, circuit breaker.
 
 ### Example of use
 

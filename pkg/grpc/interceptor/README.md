@@ -210,7 +210,7 @@ func InitTrace(serviceName string) {
 	tracer.Init(exporter, resource) // collect all by default
 }
 
-// set up link tracking on the client side
+// set up trace on the client side
 func getDialOptions() []grpc.DialOption {
 	var options []grpc.DialOption
 

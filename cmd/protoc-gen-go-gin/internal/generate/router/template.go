@@ -119,12 +119,7 @@ func (r *{{$.LowerName}}Router) {{ .HandlerName }} (c *gin.Context) {
 		return
 	}
 {{end}}
-	md := metadata.New(nil)
-	for k, v := range c.Request.Header {
-		md.Set(k, v...)
-	}
-	newCtx := metadata.NewIncomingContext(c, md)
-	out, err := r.iLogic.{{.Name}}(newCtx, req)
+	out, err := r.iLogic.{{.Name}}(c.Request.Context(), req)
 	if err != nil {
 		isIgnore := r.iResponse.Error(c, err)
 		if !isIgnore {

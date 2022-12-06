@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// RPCClientCommand generate rpc gateway server codes base on protobuf file
+// RPCGwPbCommand generate rpc gateway server codes base on protobuf file
 func RPCGwPbCommand() *cobra.Command {
 	var (
 		moduleName   string // module name for go.mod

@@ -24,7 +24,7 @@ func TestHTTPServer(t *testing.T) {
 		t.Fatal(err)
 	}
 	config.Get().App.EnableMetrics = true
-	config.Get().App.EnableTracing = true
+	config.Get().App.EnableTrace = true
 	config.Get().App.EnablePprof = true
 	config.Get().App.EnableLimit = true
 	config.Get().App.EnableCircuitBreaker = true
@@ -62,7 +62,7 @@ func TestHTTPServerMock(t *testing.T) {
 		t.Fatal(err)
 	}
 	config.Get().App.EnableMetrics = true
-	config.Get().App.EnableTracing = true
+	config.Get().App.EnableTrace = true
 	config.Get().App.EnablePprof = true
 	config.Get().App.EnableLimit = true
 	config.Get().App.EnableCircuitBreaker = true

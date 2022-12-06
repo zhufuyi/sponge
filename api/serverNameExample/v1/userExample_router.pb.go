@@ -8,7 +8,6 @@ import (
 	errcode "github.com/zhufuyi/sponge/pkg/errcode"
 	middleware "github.com/zhufuyi/sponge/pkg/gin/middleware"
 	zap "go.uber.org/zap"
-	metadata "google.golang.org/grpc/metadata"
 )
 
 // import packages: context. errcode. middleware. zap. gin. metadata.
@@ -106,12 +105,7 @@ func (r *userExampleServiceRouter) Create_0(c *gin.Context) {
 		return
 	}
 
-	md := metadata.New(nil)
-	for k, v := range c.Request.Header {
-		md.Set(k, v...)
-	}
-	newCtx := metadata.NewIncomingContext(c, md)
-	out, err := r.iLogic.Create(newCtx, req)
+	out, err := r.iLogic.Create(c.Request.Context(), req)
 	if err != nil {
 		isIgnore := r.iResponse.Error(c, err)
 		if !isIgnore {
@@ -138,12 +132,7 @@ func (r *userExampleServiceRouter) DeleteByID_0(c *gin.Context) {
 		return
 	}
 
-	md := metadata.New(nil)
-	for k, v := range c.Request.Header {
-		md.Set(k, v...)
-	}
-	newCtx := metadata.NewIncomingContext(c, md)
-	out, err := r.iLogic.DeleteByID(newCtx, req)
+	out, err := r.iLogic.DeleteByID(c.Request.Context(), req)
 	if err != nil {
 		isIgnore := r.iResponse.Error(c, err)
 		if !isIgnore {
@@ -170,12 +159,7 @@ func (r *userExampleServiceRouter) UpdateByID_0(c *gin.Context) {
 		return
 	}
 
-	md := metadata.New(nil)
-	for k, v := range c.Request.Header {
-		md.Set(k, v...)
-	}
-	newCtx := metadata.NewIncomingContext(c, md)
-	out, err := r.iLogic.UpdateByID(newCtx, req)
+	out, err := r.iLogic.UpdateByID(c.Request.Context(), req)
 	if err != nil {
 		isIgnore := r.iResponse.Error(c, err)
 		if !isIgnore {
@@ -202,12 +186,7 @@ func (r *userExampleServiceRouter) GetByID_0(c *gin.Context) {
 		return
 	}
 
-	md := metadata.New(nil)
-	for k, v := range c.Request.Header {
-		md.Set(k, v...)
-	}
-	newCtx := metadata.NewIncomingContext(c, md)
-	out, err := r.iLogic.GetByID(newCtx, req)
+	out, err := r.iLogic.GetByID(c.Request.Context(), req)
 	if err != nil {
 		isIgnore := r.iResponse.Error(c, err)
 		if !isIgnore {
@@ -228,12 +207,7 @@ func (r *userExampleServiceRouter) ListByIDs_0(c *gin.Context) {
 		return
 	}
 
-	md := metadata.New(nil)
-	for k, v := range c.Request.Header {
-		md.Set(k, v...)
-	}
-	newCtx := metadata.NewIncomingContext(c, md)
-	out, err := r.iLogic.ListByIDs(newCtx, req)
+	out, err := r.iLogic.ListByIDs(c.Request.Context(), req)
 	if err != nil {
 		isIgnore := r.iResponse.Error(c, err)
 		if !isIgnore {
@@ -254,12 +228,7 @@ func (r *userExampleServiceRouter) List_0(c *gin.Context) {
 		return
 	}
 
-	md := metadata.New(nil)
-	for k, v := range c.Request.Header {
-		md.Set(k, v...)
-	}
-	newCtx := metadata.NewIncomingContext(c, md)
-	out, err := r.iLogic.List(newCtx, req)
+	out, err := r.iLogic.List(c.Request.Context(), req)
 	if err != nil {
 		isIgnore := r.iResponse.Error(c, err)
 		if !isIgnore {

@@ -76,6 +76,10 @@ func dial(ctx context.Context, endpoint string, isSecure bool, opts ...Option) (
 		unaryClientInterceptors = append(unaryClientInterceptors, interceptor.UnaryClientRetry())
 	}
 
+	if o.enableTrace {
+		unaryClientInterceptors = append(unaryClientInterceptors, interceptor.UnaryClientTracing())
+	}
+
 	unaryClientInterceptors = append(unaryClientInterceptors, o.unaryInterceptors...)
 	streamClientInterceptors = append(streamClientInterceptors, o.streamInterceptors...)
 

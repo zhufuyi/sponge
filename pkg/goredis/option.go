@@ -21,7 +21,7 @@ func (o *options) apply(opts ...Option) {
 // default settings
 func defaultOptions() *options {
 	return &options{
-		enableTrace: false, // whether to enable link tracking, default off
+		enableTrace: false, // whether to enable trace, default off
 	}
 }
 

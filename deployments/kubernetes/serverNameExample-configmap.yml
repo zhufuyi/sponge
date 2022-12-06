@@ -16,7 +16,7 @@ data:
       enableMetrics: true     # whether to enable indicator collection, true:enable, false:disable
       enableLimit: false       # whether to turn on rate limiting (adaptive), true:on, false:off
       enableCircuitBreaker: false          # whether to turn on circuit breaker(adaptive), true:on, false:off
-      enableTracing: false                    # whether to enable tracking, true:enable, false:disable, if true jaeger configuration must be set
+      enableTrace: false                      # whether to enable trace, true:enable, false:disable, if true jaeger configuration must be set
       tracingSamplingRate: 1.0            # tracing sampling rate, between 0 and 1, 0 means no sampling, 1 means sampling all links
       registryDiscoveryType: ""            # registry and discovery types: consul, etcd, nacos, if empty, registration and discovery are not used
       cacheType: "memory"                 # cache type, memory, redis, if set to redis, must set redis configuration

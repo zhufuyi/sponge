@@ -59,4 +59,6 @@ func InitWithConfig(appName string, appEnv string, appVersion string,
 	}
 
 	Init(exporter, res, jaegerSamplingRate)
+
+	SetTraceName(appName)
 }

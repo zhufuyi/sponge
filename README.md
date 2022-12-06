@@ -129,7 +129,7 @@ sponge web http \
 **(2) If using the default configuration, skip this step, modify the configuration file configs/<server name>.yml**
 
 - If the field `cacheType` is `redis`, the `redis` address must be set.
-- If the field `enableTracing` is true, the `jaeger` address must be set.
+- If the field `enableTrace` is true, the `jaeger` address must be set.
 - If the field `registryDiscoveryType` is not be empty, the configuration of corresponding values must be set.
 
 **(3) Generate swagger documentation**
@@ -218,7 +218,7 @@ sponge micro rpc \
 **(2) If using the default configuration, skip this step. Modify the configuration file configs/<server name>.yml**
 
 - If the field `cacheType` is `redis`, the `redis` address must be set.
-- If the field `enableTracing` is true, the `jaeger` address must be set.
+- If the field `enableTrace` is true, the `jaeger` address must be set.
 - If the field `registryDiscoveryType` is not be empty, the configuration of corresponding values must be set.
 
 **(3) Generating grpc code**

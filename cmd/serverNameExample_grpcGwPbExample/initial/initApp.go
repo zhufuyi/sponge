@@ -7,6 +7,7 @@ import (
 
 	"github.com/zhufuyi/sponge/configs"
 	"github.com/zhufuyi/sponge/internal/config"
+
 	//"github.com/zhufuyi/sponge/internal/rpcclient"
 
 	"github.com/zhufuyi/sponge/pkg/logger"
@@ -36,7 +37,7 @@ func Config() {
 	)
 
 	// initializing tracing
-	if cfg.App.EnableTracing {
+	if cfg.App.EnableTrace {
 		tracer.InitWithConfig(
 			cfg.App.Name,
 			cfg.App.Env,

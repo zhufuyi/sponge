@@ -44,7 +44,7 @@ func InitMysql() {
 		opts = append(opts, mysql.WithLog())
 	}
 
-	if config.Get().App.EnableTracing {
+	if config.Get().App.EnableTrace {
 		opts = append(opts, mysql.WithEnableTrace())
 	}
 
@@ -119,7 +119,7 @@ func InitRedis() {
 		goredis.WithReadTimeout(time.Duration(config.Get().Redis.ReadTimeout) * time.Second),
 		goredis.WithWriteTimeout(time.Duration(config.Get().Redis.WriteTimeout) * time.Second),
 	}
-	if config.Get().App.EnableTracing {
+	if config.Get().App.EnableTrace {
 		opts = append(opts, goredis.WithEnableTrace())
 	}
 

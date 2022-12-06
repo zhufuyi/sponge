@@ -80,7 +80,7 @@ func initUserExampleServiceClient() serverNameExampleV1.UserExampleServiceClient
 		cliOptions = append(cliOptions, grpccli.WithDiscovery(iDiscovery))
 	}
 
-	if config.Get().App.EnableTracing {
+	if config.Get().App.EnableTrace {
 		cliOptions = append(cliOptions, grpccli.WithEnableTrace())
 	}
 	if config.Get().App.EnableCircuitBreaker {

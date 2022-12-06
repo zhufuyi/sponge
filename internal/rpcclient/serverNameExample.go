@@ -87,7 +87,7 @@ func NewServerNameExampleRPCConn() {
 		cliOptions = append(cliOptions, grpccli.WithDiscovery(iDiscovery))
 	}
 
-	if cfg.App.EnableTracing {
+	if cfg.App.EnableTrace {
 		cliOptions = append(cliOptions, grpccli.WithEnableTrace())
 	}
 	if cfg.App.EnableCircuitBreaker {

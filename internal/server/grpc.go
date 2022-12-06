@@ -135,7 +135,7 @@ func (s *grpcServer) serverOptions() []grpc.ServerOption {
 	}
 
 	// trace interceptor
-	if config.Get().App.EnableTracing {
+	if config.Get().App.EnableTrace {
 		unaryServerInterceptors = append(unaryServerInterceptors, interceptor.UnaryServerTracing())
 	}
 

@@ -20,7 +20,7 @@ func TestInitMysql(t *testing.T) {
 		panic(err)
 	}
 
-	config.Get().App.EnableTracing = true
+	config.Get().App.EnableTrace = true
 	config.Get().Mysql.EnableLog = true
 
 	time.Sleep(time.Millisecond * 10)
@@ -78,7 +78,7 @@ func TestInitRedis(t *testing.T) {
 	assert.NoError(t, err)
 
 	// change config error test
-	config.Get().App.EnableTracing = true
+	config.Get().App.EnableTrace = true
 	config.Get().Redis.Dsn = "default:123456@127.0.0.1:6379/0"
 	redisCli = nil
 	_ = CloseRedis()

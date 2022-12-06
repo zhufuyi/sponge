@@ -40,7 +40,7 @@ func Config() {
 	model.InitCache(cfg.App.CacheType)
 
 	// initializing tracing
-	if cfg.App.EnableTracing {
+	if cfg.App.EnableTrace {
 		tracer.InitWithConfig(
 			cfg.App.Name,
 			cfg.App.Env,

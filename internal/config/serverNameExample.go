@@ -63,7 +63,7 @@ type App struct {
 	EnableMetrics         bool    `yaml:"enableMetrics" json:"enableMetrics"`
 	EnablePprof           bool    `yaml:"enablePprof" json:"enablePprof"`
 	EnableStat            bool    `yaml:"enableStat" json:"enableStat"`
-	EnableTracing         bool    `yaml:"enableTracing" json:"enableTracing"`
+	EnableTrace           bool    `yaml:"enableTrace" json:"enableTrace"`
 	Env                   string  `yaml:"env" json:"env"`
 	Host                  string  `yaml:"host" json:"host"`
 	Name                  string  `yaml:"name" json:"name"`

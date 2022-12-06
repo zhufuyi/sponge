@@ -59,7 +59,7 @@ func NewRouter() *gin.Engine {
 	}
 
 	// trace middleware
-	if config.Get().App.EnableTracing {
+	if config.Get().App.EnableTrace {
 		r.Use(middleware.Tracing(config.Get().App.Name))
 	}
 
