@@ -40,7 +40,7 @@ func getServerOptions() []grpc.ServerOption {
 func main() {
 	rand.Seed(time.Now().UnixNano())
 
-	addr := ":8080"
+	addr := ":8282"
 	fmt.Println("start rpc server", addr)
 
 	list, err := net.Listen("tcp", addr)
@@ -52,8 +52,8 @@ func main() {
     serverNameV1.RegisterGreeterServer(server, &GreeterServer{})
 
 	// start metrics server, collect grpc metrics by default, turn on, go metrics
-	metrics.ServerHTTPService(":9092", server)
-	fmt.Println("start metrics server", ":9092")
+	metrics.ServerHTTPService(":8283", server)
+	fmt.Println("start metrics server", ":8283")
 
 	err = server.Serve(list)
 	if err != nil {
@@ -80,10 +80,10 @@ func getDialOptions() []grpc.DialOption {
 }
 
 func main() {
-	conn, err := grpc.Dial("127.0.0.1:8080", getDialOptions()...)
+	conn, err := grpc.Dial("127.0.0.1:8282", getDialOptions()...)
 
-	metrics.ClientHTTPService(":9094")
-	fmt.Println("start metrics server", ":9094")
+	metrics.ClientHTTPService(":8284")
+	fmt.Println("start metrics server", ":8284")
 
 	client := serverNameV1.NewGreeterClient(conn)
 	i := 0

@@ -1,8 +1,14 @@
-Change the `prometheus_data` directory permissions to 0777 before starting prometheus.
+### Running
+
+Change the `prometheus_data` directory permissions to `0777`
+
+Change the `prometheus.yml` file permissions to `0777`
+
+Start up prometheus service:
 
 > docker-compose up -d
 
-Open in your browser http://localhost:9090
+Open in your browser `http://localhost:9090`
 
 <br>
 

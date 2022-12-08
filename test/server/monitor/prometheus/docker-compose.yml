@@ -7,13 +7,13 @@ services:
         #user: root
         restart: always
         volumes:
-            - $PWD/prometheus.yaml:/etc/prometheus/prometheus.yaml
+            - $PWD/prometheus.yaml:/etc/prometheus/prometheus.yml
             - $PWD/prometheus_data:/prometheus
             - $PWD/conf.d:/etc/prometheus/conf.d
             - $PWD/rules.d:/etc/prometheus/rules.d
             - /usr/share/zoneinfo/Asia/Shanghai:/etc/localtime:ro
         command:
-            - '--config.file=/etc/prometheus/prometheus.yaml'
+            - '--config.file=/etc/prometheus/prometheus.yml'
             - '--storage.tsdb.path=/prometheus'
             - '--storage.tsdb.max-block-duration=30m'
             - '--storage.tsdb.min-block-duration=30m'

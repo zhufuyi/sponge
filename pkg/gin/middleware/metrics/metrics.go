@@ -19,7 +19,7 @@ var (
 		prometheus.CounterOpts{
 			Namespace: namespace,
 			Name:      "uptime",
-			Help:      "HTTP service uptime.",
+			Help:      "HTTP service uptime, updated every minute",
 		}, nil,
 	)
 
@@ -62,9 +62,9 @@ func initPrometheus() {
 	go recordUptime()
 }
 
-// recordUptime increases service uptime per 30 second.
+// recordUptime increases service uptime per 1 minute.
 func recordUptime() {
-	for range time.Tick(time.Second * 30) {
+	for range time.Tick(time.Minute) {
 		uptime.WithLabelValues().Inc()
 	}
 }

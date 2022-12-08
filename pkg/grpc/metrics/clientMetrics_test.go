@@ -2,6 +2,7 @@ package metrics
 
 import (
 	"context"
+	"net/http"
 	"testing"
 	"time"
 
@@ -32,4 +33,9 @@ func TestUnaryClientMetrics(t *testing.T) {
 
 func Test_cliRegisterMetrics(t *testing.T) {
 	cliRegisterMetrics()
+}
+
+func TestClientRegister(t *testing.T) {
+	SetClientPattern("/rpc_client/metrics")
+	ClientRegister(http.NewServeMux())
 }

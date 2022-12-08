@@ -2,6 +2,7 @@ package metrics
 
 import (
 	"context"
+	"net/http"
 	"testing"
 	"time"
 
@@ -69,9 +70,14 @@ func Test_metricsOptions_apply(t *testing.T) {
 	assert.Contains(t, customizedSummaryMetrics, testData)
 }
 
-func TestGoHTTPService(t *testing.T) {
+func TestRegister(t *testing.T) {
+	SetServerPattern("/rpc_server/metrics")
+	Register(http.NewServeMux(), grpc.NewServer())
+}
+
+func TestServerHTTPService(t *testing.T) {
 	serverAddr, _ := utils.GetLocalHTTPAddrPairs()
-	s := GoHTTPService(serverAddr, grpc.NewServer())
+	s := ServerHTTPService(serverAddr, grpc.NewServer())
 	ctx, _ := context.WithTimeout(context.Background(), time.Second)
 	time.Sleep(time.Millisecond * 100)
 	err := s.Shutdown(ctx)

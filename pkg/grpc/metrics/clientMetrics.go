@@ -13,6 +13,9 @@ import (
 // https://github.com/grpc-ecosystem/go-grpc-prometheus/tree/master/examples/grpc-server-with-prometheus
 
 var (
+	// client side default router
+	clientPattern = "/rpc_client/metrics"
+
 	// create a Registry
 	cliReg = prometheus.NewRegistry()
 
@@ -27,6 +30,19 @@ func cliRegisterMetrics() {
 		// register metrics, including custom metrics
 		cliReg.MustRegister(grpcClientMetrics)
 	})
+}
+
+// SetClientPattern set the client pattern
+func SetClientPattern(pattern string) {
+	if pattern != "" {
+		clientPattern = pattern
+	}
+}
+
+// ClientRegister for http routing and grpc methods
+func ClientRegister(mux *http.ServeMux) {
+	// register for http routing
+	mux.Handle(clientPattern, promhttp.HandlerFor(cliReg, promhttp.HandlerOpts{}))
 }
 
 // ClientHTTPService initialize the client's prometheus exporter service and use http://ip:port/metrics to fetch data

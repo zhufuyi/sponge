@@ -16,7 +16,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": 26,
-  "iteration": 1661249753390,
+  "iteration": 1670389325121,
   "links": [],
   "panels": [
     {
@@ -35,7 +35,7 @@
         },
         "overrides": []
       },
-      "format": "dateTimeAsUS",
+      "format": "dateTimeAsSystem",
       "gauge": {
         "maxValue": 100,
         "minValue": 0,
@@ -86,9 +86,11 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "(time() - gin_uptime{job=~\"$job\"}) * 1000",
+          "expr": "(time() - 60*(gin_uptime{job=~\"$job\"})) * 1000",
           "format": "time_series",
+          "interval": "",
           "intervalFactor": 1,
+          "legendFormat": "",
           "refId": "A"
         }
       ],
@@ -225,7 +227,7 @@
         },
         "overrides": []
       },
-      "format": "s",
+      "format": "m",
       "gauge": {
         "maxValue": 100,
         "minValue": 0,
@@ -710,31 +712,14 @@
       {
         "allValue": null,
         "current": {
-          "text": "",
-          "value": ""
+          "selected": false,
+          "text": "edusys-http",
+          "value": "edusys-http"
         },
         "datasource": "Prometheus",
         "definition": "label_values(gin_http_request_count_total, job)",
         "description": null,
-        "error": {
-          "config": {
-            "headers": {
-              "X-Grafana-Org-Id": 1
-            },
-            "hideFromInspector": true,
-            "method": "GET",
-            "retry": 0,
-            "url": "api/datasources/proxy/8/api/v1/series?match%5B%5D=gin_http_request_count_total&start=1661247954&end=1661249754"
-          },
-          "data": {
-            "error": "Bad Gateway",
-            "message": "Bad Gateway",
-            "response": ""
-          },
-          "message": "Bad Gateway",
-          "status": 502,
-          "statusText": "Bad Gateway"
-        },
+        "error": null,
         "hide": 0,
         "includeAll": false,
         "label": "Job",
@@ -856,25 +841,7 @@
         "datasource": "Prometheus",
         "definition": "label_values(gin_http_request_count_total{path!~\"/metrics\", status!=\"404\", job=~\"$job\"}, path)",
         "description": null,
-        "error": {
-          "config": {
-            "headers": {
-              "X-Grafana-Org-Id": 1
-            },
-            "hideFromInspector": true,
-            "method": "GET",
-            "retry": 0,
-            "url": "api/datasources/proxy/8/api/v1/series?match%5B%5D=gin_http_request_count_total%7Bpath%21%7E%22%2Fmetrics%22%2C+status%21%3D%22404%22%2C+job%3D%7E%22%22%7D&start=1661247954&end=1661249754"
-          },
-          "data": {
-            "error": "Bad Gateway",
-            "message": "Bad Gateway",
-            "response": ""
-          },
-          "message": "Bad Gateway",
-          "status": 502,
-          "statusText": "Bad Gateway"
-        },
+        "error": null,
         "hide": 0,
         "includeAll": true,
         "label": "Path",
@@ -898,31 +865,14 @@
       {
         "allValue": null,
         "current": {
+          "selected": false,
           "text": "GET",
           "value": "GET"
         },
         "datasource": "Prometheus",
         "definition": "label_values(gin_http_request_count_total, method)",
         "description": null,
-        "error": {
-          "config": {
-            "headers": {
-              "X-Grafana-Org-Id": 1
-            },
-            "hideFromInspector": true,
-            "method": "GET",
-            "retry": 0,
-            "url": "api/datasources/proxy/8/api/v1/series?match%5B%5D=gin_http_request_count_total&start=1661247954&end=1661249754"
-          },
-          "data": {
-            "error": "Bad Gateway",
-            "message": "Bad Gateway",
-            "response": ""
-          },
-          "message": "Bad Gateway",
-          "status": 502,
-          "statusText": "Bad Gateway"
-        },
+        "error": null,
         "hide": 0,
         "includeAll": true,
         "label": "Method",
@@ -946,31 +896,14 @@
       {
         "allValue": null,
         "current": {
+          "selected": false,
           "text": "200",
           "value": "200"
         },
         "datasource": "Prometheus",
         "definition": "label_values(gin_http_request_count_total, status)",
         "description": null,
-        "error": {
-          "config": {
-            "headers": {
-              "X-Grafana-Org-Id": 1
-            },
-            "hideFromInspector": true,
-            "method": "GET",
-            "retry": 0,
-            "url": "api/datasources/proxy/8/api/v1/series?match%5B%5D=gin_http_request_count_total&start=1661247954&end=1661249754"
-          },
-          "data": {
-            "error": "Bad Gateway",
-            "message": "Bad Gateway",
-            "response": ""
-          },
-          "message": "Bad Gateway",
-          "status": 502,
-          "statusText": "Bad Gateway"
-        },
+        "error": null,
         "hide": 0,
         "includeAll": true,
         "label": "Status",
@@ -1059,5 +992,5 @@
   "timezone": "browser",
   "title": "Prometheus Gin",
   "uid": "EyaoypOZz",
-  "version": 1
+  "version": 3
 }
