@@ -22,7 +22,7 @@ func TestNewRouter(t *testing.T) {
 
 	config.Get().App.EnableMetrics = false
 	config.Get().App.EnableTrace = true
-	config.Get().App.EnablePprof = true
+	config.Get().App.EnableHTTPProfile = true
 	config.Get().App.EnableLimit = true
 	config.Get().App.EnableCircuitBreaker = true
 

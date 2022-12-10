@@ -61,7 +61,7 @@ type App struct {
 	EnableCircuitBreaker  bool    `yaml:"enableCircuitBreaker" json:"enableCircuitBreaker"`
 	EnableLimit           bool    `yaml:"enableLimit" json:"enableLimit"`
 	EnableMetrics         bool    `yaml:"enableMetrics" json:"enableMetrics"`
-	EnablePprof           bool    `yaml:"enablePprof" json:"enablePprof"`
+	EnableHTTPProfile     bool    `yaml:"enableHTTPProfile" json:"enableHTTPProfile"`
 	EnableStat            bool    `yaml:"enableStat" json:"enableStat"`
 	EnableTrace           bool    `yaml:"enableTrace" json:"enableTrace"`
 	Env                   string  `yaml:"env" json:"env"`

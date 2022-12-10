@@ -174,7 +174,7 @@ func NewGRPCServer(addr string, opts ...GrpcOption) app.IServer {
 		iRegistry: o.iRegistry,
 		instance:  o.instance,
 	}
-	if config.Get().App.EnablePprof {
+	if config.Get().App.EnableHTTPProfile {
 		s.registerProfMux()
 	}
 

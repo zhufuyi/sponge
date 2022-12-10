@@ -1,6 +1,6 @@
 ## app
 
-Elegantly start and stop services, using [errgroup](golang.org/x/sync/errgroup) to ensure that multiple services are started properly at the same time.
+Start and stop services gracefully, using [errgroup](golang.org/x/sync/errgroup) to ensure that multiple services are started properly at the same time.
 
 <br>
 
@@ -8,32 +8,22 @@ Elegantly start and stop services, using [errgroup](golang.org/x/sync/errgroup) 
 
 ```go
 func main() {
-	inits := registerInits()
+    initApp()
 	servers := registerServers()
 	closes := registerCloses(servers)
 
-	s := app.New(inits, servers, closes)
-	s.Run()
+    a := app.New(servers, closes)
+    a.Run()
 }
 
-func registerInits() []app.Init {
+func initApp() {
     // get configuration
 
-    var inits []app.Init
-
 	// initializing log
-	inits = append(inits, func() {
-
-	})
 
 	// initializing database
-	inits = append(inits, func() {
-
-	})
 
     // ......
-
-	return inits
 }
 
 func registerServers() []app.IServer {

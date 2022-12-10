@@ -25,7 +25,7 @@ func TestGRPCServer(t *testing.T) {
 
 	config.Get().App.EnableMetrics = true
 	config.Get().App.EnableTrace = true
-	config.Get().App.EnablePprof = true
+	config.Get().App.EnableHTTPProfile = true
 	config.Get().App.EnableLimit = true
 	config.Get().App.EnableCircuitBreaker = true
 
@@ -51,7 +51,7 @@ func TestGRPCServerMock(t *testing.T) {
 	}
 	config.Get().App.EnableMetrics = true
 	config.Get().App.EnableTrace = true
-	config.Get().App.EnablePprof = true
+	config.Get().App.EnableHTTPProfile = true
 	config.Get().App.EnableLimit = true
 	config.Get().App.EnableCircuitBreaker = true
 

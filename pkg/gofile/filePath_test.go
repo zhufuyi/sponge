@@ -71,6 +71,9 @@ func TestListDirsAndFiles(t *testing.T) {
 func TestGetFilename(t *testing.T) {
 	name := GetFilename("./README.md")
 	assert.Equal(t, "README.md", name)
+
+	name = GetFilenameWithoutSuffix("./README.md")
+	assert.Equal(t, "README", name)
 }
 
 func TestGetPathDelimiter(t *testing.T) {
@@ -118,4 +121,14 @@ func TestFuzzyMatchFiles(t *testing.T) {
 
 	files = FuzzyMatchFiles("./*_test.go")
 	assert.Equal(t, 2, len(files))
+}
+
+func TestJoin(t *testing.T) {
+	elements := []string{"a/b", "c"}
+	path := Join(elements...)
+	t.Log(path)
+
+	elements = []string{"a\\b", "c"}
+	path = Join(elements...)
+	t.Log(path)
 }

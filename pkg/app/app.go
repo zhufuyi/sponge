@@ -7,6 +7,8 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/zhufuyi/sponge/pkg/prof"
+
 	"golang.org/x/sync/errgroup"
 )
 
@@ -63,21 +65,28 @@ func (a *App) Run() {
 
 // watch the os signal and the ctx signal from the errgroup, and stop the service if either signal is triggered
 func (a *App) watch(ctx context.Context) error {
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
+	sig := make(chan os.Signal, 1)
+	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP, syscall.SIGTRAP)
+	profile := prof.NewProfile()
 
 	for {
 		select {
-		case <-ctx.Done(): // service error signals
+		case <-ctx.Done(): // service error
 			_ = a.stop()
 			return ctx.Err()
-		case s := <-quit: // system notification signal
-			fmt.Printf("quit signal: %s\n", s.String())
-			if err := a.stop(); err != nil {
-				return err
+
+		case sigType := <-sig: // system notification signal
+			fmt.Printf("received system notification signal: %s\n", sigType.String())
+			switch sigType {
+			case syscall.SIGTRAP:
+				profile.StartOrStop() // start or stop sampling profile
+			case syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP:
+				if err := a.stop(); err != nil {
+					return err
+				}
+				fmt.Println("stop app successfully")
+				return nil
 			}
-			fmt.Println("stop app successfully")
-			return nil
 		}
 	}
 }

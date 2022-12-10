@@ -6,7 +6,7 @@ app:
   env: "dev"                   # runtime environment, dev: development environment, prod: production environment, test: test environment
   version: "v0.0.0"
   host: "192.168.3.27"   # host name or ip
-  enablePprof: true        # whether to enable performance analysis, true:enable, false:disable
+  enableHTTPProfile: false        # whether to enable performance analysis, true:enable, false:disable
   enableStat: true         # whether to enable printing statistics, true:enable, false:disable
   enableMetrics: true     # whether to enable indicator collection, true:enable, false:disable
   enableLimit: false       # whether to turn on rate limiting (adaptive), true:on, false:off
@@ -19,15 +19,15 @@ app:
 
 # http server settings
 http:
-  port: 8080            # listening port
+  port: 8080            # listen port
   readTimeout: 3     # read timeout, unit(second)
-  writeTimeout: 60  # write timeout, unit(second), if enablePprof is true, it needs to be greater than 60s, the default value for pprof to do profiling is 60s
+  writeTimeout: 60  # write timeout, unit(second), if enableHTTPProfile is true, it needs to be greater than 60s, the default value for pprof to do profiling is 60s
 
 
 # grpc server settings
 grpc:
-  port: 8282              # listening port
-  httpPort: 8283        # get pprof and monitor indicator ports
+  port: 8282              # listen port
+  httpPort: 8283        # profile and metrics ports
   readTimeout: 3      # read timeout, unit(second)
   writeTimeout: 3     # write timeout, unit(second)
 
@@ -37,7 +37,7 @@ grpcClient:
   - name: "serverNameExample"   # rpc service name, used for service discovery
     host: "192.168.3.27"                # rpc service address, used for direct connection
     port: 8282                               # rpc service port
-    registryDiscoveryType: ""         # registration and discovery types: consul, etcd, nacos, if empty, registration and discovery are not used
+    registryDiscoveryType: ""         # registration and discovery types: consul, etcd, nacos, if empty, connecting to server using host and port
 
 
 # logger settings

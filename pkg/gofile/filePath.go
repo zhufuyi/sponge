@@ -33,6 +33,24 @@ func GetFilename(filePath string) string {
 	return name
 }
 
+// GetFilenameWithoutSuffix get file name without suffix
+func GetFilenameWithoutSuffix(filePath string) string {
+	_, name := filepath.Split(filePath)
+
+	return strings.TrimSuffix(name, path.Ext(name))
+}
+
+// Join joins any number of path elements into a single path
+func Join(elem ...string) string {
+	path := strings.Join(elem, "/")
+
+	if IsWindows() {
+		return strings.ReplaceAll(path, "/", "\\")
+	}
+
+	return path
+}
+
 // IsWindows determining whether a window environment
 func IsWindows() bool {
 	return runtime.GOOS == "windows"

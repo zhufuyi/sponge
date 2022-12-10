@@ -53,7 +53,10 @@ func Config() {
 
 	// initializing the print system and process resources
 	if cfg.App.EnableStat {
-		stat.Init(stat.WithLog(logger.Get()))
+		stat.Init(
+			stat.WithLog(logger.Get()),
+			stat.WithAlarm(), // invalid if it is windows, the default threshold for cpu and memory is 0.8, you can modify them
+		)
 	}
 }
 

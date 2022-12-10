@@ -63,7 +63,7 @@ func NewRouter_pbExample() *gin.Engine { //nolint
 	}
 
 	// pprof performance analysis
-	if config.Get().App.EnablePprof {
+	if config.Get().App.EnableHTTPProfile {
 		prof.Register(r, prof.WithIOWaitTime())
 	}
 

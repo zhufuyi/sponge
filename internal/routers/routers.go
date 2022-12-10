@@ -63,8 +63,8 @@ func NewRouter() *gin.Engine {
 		r.Use(middleware.Tracing(config.Get().App.Name))
 	}
 
-	// pprof performance analysis
-	if config.Get().App.EnablePprof {
+	// profile performance analysis
+	if config.Get().App.EnableHTTPProfile {
 		prof.Register(r, prof.WithIOWaitTime())
 	}
 
