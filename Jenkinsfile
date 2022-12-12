@@ -184,16 +184,16 @@ void SendDingding(res)
 // Notifications using email
 void SendEmail(res)
 {
-	addr="xxx@xxx.com"
+	emailAddr="xxx@xxx.com"
 	if( res == "success" )
 	{
-		mail to: addr,
+		mail to: emailAddr,
 		subject: "Build Success: ${currentBuild.fullDisplayName}",
 		body: "\nJob name: ${env.JOB_NAME} ${env.BUILD_NUMBER}th build. \n\n For more information, please see: ${env.BUILD_URL}"
 	}
 	else
 	{
-		mail to: addr,
+		mail to: emailAddr,
 		subject: "Build Failed: ${currentBuild.fullDisplayName}",
 		body: "\nJob name: ${env.JOB_NAME} ${env.BUILD_NUMBER}th build. \n\n For more information, please see: ${env.BUILD_URL}"
 	}

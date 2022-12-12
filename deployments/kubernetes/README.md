@@ -2,7 +2,7 @@ Before deploying the service to k8s, create a Secret that pulls image permission
 
 ```bash
 kubectl create secret generic docker-auth-secret \
-    --from-file=.dockerconfigjson=/root/.docker/config.json> \
+    --from-file=.dockerconfigjson=/root/.docker/config.json \
     --type=kubernetes.io/dockerconfigjson
 ```
 
@@ -10,8 +10,13 @@ kubectl create secret generic docker-auth-secret \
 
 run server:
 
-> kubectl apply -f ./*namespace.yml
-> kubectl apply -f ./
+```bash
+cd deployments
+
+kubectl apply -f ./*namespace.yml
+
+kubectl apply -f ./
+```
 
 view the start-up status.
 

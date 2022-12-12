@@ -111,7 +111,7 @@ func UnaryServerCircuitBreaker(opts ...CircuitBreakerOption) grpc.UnaryServerInt
 		breaker := o.group.Get(info.FullMethod).(circuitbreaker.CircuitBreaker)
 		if err := breaker.Allow(); err != nil {
 			// NOTE: when client reject request locally,
-			// continue add counter let the drop ratio higher.
+			// continue to add counter let the drop ratio higher.
 			breaker.MarkFailed()
 			return nil, errcode.StatusServiceUnavailable.ToRPCErr(err.Error())
 		}

@@ -9,8 +9,8 @@ Start and stop services gracefully, using [errgroup](golang.org/x/sync/errgroup)
 ```go
 func main() {
     initApp()
-	servers := registerServers()
-	closes := registerCloses(servers)
+    servers := registerServers()
+    closes := registerCloses(servers)
 
     a := app.New(servers, closes)
     a.Run()
@@ -19,46 +19,46 @@ func main() {
 func initApp() {
     // get configuration
 
-	// initializing log
+    // initializing log
 
-	// initializing database
+    // initializing database
 
     // ......
 }
 
 func registerServers() []app.IServer {
-	var servers []app.IServer
+    var servers []app.IServer
 
-	// creating http service
-	servers = append(servers, server.NewHTTPServer(
+    // creating http service
+    servers = append(servers, server.NewHTTPServer(
 
-	))
+    ))
 
-	// creating grpc service
-	servers = append(servers, server.NewGRPCServer(
+    // creating grpc service
+    servers = append(servers, server.NewGRPCServer(
 
-	))
+    ))
 
     // ......
 
-	return servers
+    return servers
 }
 
 func registerCloses(servers []app.IServer) []app.Close {
-	var closes []app.Close
+    var closes []app.Close
 
-	// close server
-	for _, server := range servers {
-		closes = append(closes, server.Stop)
-	}
+    // close server
+    for _, server := range servers {
+        closes = append(closes, server.Stop)
+    }
 
-	// close other resource
-	closes = append(closes, func() error {
+    // close other resource
+    closes = append(closes, func() error {
 
-	})
+    })
 
-	// ......
+    // ......
 
-	return closes
+    return closes
 }
 ```
