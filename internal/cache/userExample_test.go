@@ -127,3 +127,11 @@ func Test_userExampleCache_SetCacheWithNotFound(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestNewUserExampleCache(t *testing.T) {
+	c := NewUserExampleCache(&model.CacheType{
+		CType: "memory",
+	})
+
+	assert.NotNil(t, c)
+}

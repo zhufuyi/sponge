@@ -89,25 +89,25 @@ A relatively simple way to configure Jenkins tasks: import existing templates wh
 
 **(1) Create a new jenkins job**
 
-![create job](pictures/createJob.jpg)
+![create job](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/createJob.jpg)
 
 <br>
 
 **(2)  Set up a parametric build with the parameter name `GIT_PARAMETER`**, as shown below.
 
-![parametric construction](pictures/paramSetting.jpg)
+![parametric construction](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/paramSetting.jpg)
 
 <br>
 
 **(3) Set up pipeline information**, as shown below.
 
-![flow line](pictures/pipelineSetting.jpg)
+![flow line](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/pipelineSetting.jpg)
 
 <br>
 
 **(4) Build the project**, click Build with Parameters on the left menu bar, and select the corresponding parameters to build, as shown in the following figure.
 
-![runJob-dev](pictures/building.jpg)
+![runJob-dev](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/building.jpg)
 
 Note: Before building, modify the pinned or email notification target to facilitate viewing the build deployment results, open the Jenkinsfile file under the code repository, find the field tel_num, and fill in the cell phone number.
 

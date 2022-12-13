@@ -35,3 +35,11 @@ func TestGetServices(t *testing.T) {
 	}
 
 }
+
+func TestMethods(t *testing.T) {
+	sm := &ServiceMethod{}
+	t.Log(sm.AddOne(1))
+
+	s := PbService{}
+	t.Log(s.RandNumber())
+}

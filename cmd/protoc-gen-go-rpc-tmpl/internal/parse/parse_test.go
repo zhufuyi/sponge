@@ -33,5 +33,19 @@ func TestGetServices(t *testing.T) {
 			t.Logf("%+v", m)
 		}
 	}
+}
 
+func TestMethods(t *testing.T) {
+	sm := &ServiceMethod{}
+	t.Log(sm.AddOne(1))
+
+	s := PbService{}
+	t.Log(s.RandNumber())
+
+	typeNames := []string{"bool", "int32", "float", "string", "unknown"}
+	field := &RequestField{}
+	for _, v := range typeNames {
+		field.FieldType = v
+		t.Log(field.GoTypeZero())
+	}
 }

@@ -22,18 +22,3 @@ func TestInit(t *testing.T) {
 
 	time.Sleep(time.Second * 2)
 }
-
-func Test_sendSystemSignForLinux(t *testing.T) {
-	go func() {
-		select {
-		case <-notifyCh:
-			t.Log("received signal")
-		}
-	}()
-
-	time.Sleep(time.Millisecond * 200)
-	sendSystemSignForLinux()
-	time.Sleep(time.Millisecond * 200)
-	sendSystemSignForLinux()
-	time.Sleep(time.Millisecond * 200)
-}
