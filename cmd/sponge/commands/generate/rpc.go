@@ -143,6 +143,7 @@ func addRPCFields(moduleName string, serverName string, projectName string, repo
 	fields = append(fields, deleteFieldsMark(r, k8sServiceFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, makeFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, gitIgnoreFile, wellStartMark, wellEndMark)...)
+	fields = append(fields, deleteFieldsMark(r, appConfigFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, replaceFileContentMark(r, readmeFile, "## "+serverName)...)
 	fields = append(fields, []replacer.Field{
 		{ // replace the contents of the model/userExample.go file
@@ -184,6 +185,10 @@ func addRPCFields(moduleName string, serverName string, projectName string, repo
 		{ // replace the contents of the *-svc.yml file
 			Old: k8sServiceFileMark,
 			New: k8sServiceFileGrpcCode,
+		},
+		{ // replace the configuration of the *.yml file
+			Old: appConfigFileMark,
+			New: rpcServerConfigCode,
 		},
 		// replace github.com/zhufuyi/sponge/templates/sponge
 		{

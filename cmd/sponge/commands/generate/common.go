@@ -57,6 +57,9 @@ var (
 	protoShellFile     = "scripts/protoc.sh"
 	protoShellFileMark = "# todo generate router code for gin here"
 
+	appConfigFile     = "configs/serverNameExample.yml"
+	appConfigFileMark = "# todo generate http or rpc server configuration here"
+
 	imageBuildFile = "scripts/image-build.sh"
 	readmeFile     = "sponge/README.md"
 	makeFile       = "sponge/Makefile"
@@ -109,7 +112,7 @@ func deleteFieldsMark(r replacer.Replacer, filename string, startMark []byte, en
 
 	data, err := r.ReadFile(filename)
 	if err != nil {
-		fmt.Printf("read the file '%s' error: %v\n", filename, err)
+		fmt.Printf("readFile error: %v, please execute the 'sponge update' command to resolve\n ", err)
 		return fields
 	}
 	if subBytes := gofile.FindSubBytes(data, startMark, endMark); len(subBytes) > 0 {

@@ -192,4 +192,31 @@ func NewCenter(configFile string) (*Center, error) {
     $specifiedProtoFiles
 
   checkResult $?`
+
+	httpServerConfigCode = `# http server settings
+http:
+  port: 8080            # listen port
+  readTimeout: 3     # read timeout, unit(second)
+  writeTimeout: 60  # write timeout, unit(second), if enableHTTPProfile is true, it needs to be greater than 60s, the default value for pprof to do profiling is 60s`
+
+	rpcServerConfigCode = `# grpc server settings
+grpc:
+  port: 8282              # listen port
+  httpPort: 8283        # profile and metrics ports
+  readTimeout: 3       # read timeout, unit(second)
+  writeTimeout: 3      # write timeout, unit(second)`
+
+	rpcGwServerConfigCode = `# http server settings
+http:
+  port: 8080            # listen port
+  readTimeout: 3     # read timeout, unit(second)
+  writeTimeout: 60  # write timeout, unit(second), if enableHTTPProfile is true, it needs to be greater than 60s, the default value for pprof to do profiling is 60s
+
+
+# grpc client settings, multiple rpc services can be set up
+grpcClient:
+  - name: "serverNameExample"   # rpc service name, used for service discovery
+    host: "192.168.3.27"                # rpc service address, used for direct connection
+    port: 8282                               # rpc service port
+    registryDiscoveryType: ""         # registration and discovery types: consul, etcd, nacos, if empty, connecting to server using host and port`
 )

@@ -128,6 +128,7 @@ func addHTTPPbFields(moduleName string, serverName string, projectName string, r
 	fields = append(fields, deleteFieldsMark(r, makeFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, gitIgnoreFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, protoShellFile, wellStartMark, wellEndMark)...)
+	fields = append(fields, deleteFieldsMark(r, appConfigFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, replaceFileContentMark(r, readmeFile, "## "+serverName)...)
 	fields = append(fields, []replacer.Field{
 		{ // replace the contents of the Dockerfile file
@@ -149,6 +150,10 @@ func addHTTPPbFields(moduleName string, serverName string, projectName string, r
 		{ // replace the contents of the *-svc.yml file
 			Old: k8sServiceFileMark,
 			New: k8sServiceFileHTTPCode,
+		},
+		{ // replace the configuration of the *.yml file
+			Old: appConfigFileMark,
+			New: httpServerConfigCode,
 		},
 		{ // replace the contents of the proto.sh file
 			Old: protoShellFileMark,

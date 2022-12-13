@@ -17,7 +17,7 @@ var (
 func NewRootCMD() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:           "sponge",
-		Long:          "sponge is a microservices framework for quickly creating http or grpc code.",
+		Long:          "sponge a microservice framework, a tool for quickly creating microservice code.",
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		Version:       getVersion(),
