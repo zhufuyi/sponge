@@ -14,7 +14,7 @@ sponge micro rpc \
   --repo-addr=zhufuyi \
   --db-dsn=root:123456@(192.168.3.37:3306)/school \
   --db-table=teacher \
-  --out=. /edusys  
+  --out=./edusys
 ```
 
 Check the parameter description command `sponge micro rpc -h`, which generates the rpc service code in the current edusys directory with the following directory structure.
@@ -68,7 +68,7 @@ From the service startup log, you see that the default listening on port **8282*
 
 - To use redis as a cache, open the configuration file `configs/edusys.yml`, change the **cacheType** field value to redis, and fill in the **redis** configuration address and port.
 - By default, the flow limiting, fusion, link tracking, service registration and discovery functions are off, you can open the configuration file `configs/edusys.yml` to turn on the relevant functions, if you turn on the link tracking function, you need to fill in the jaeger configuration information, if you turn on the service registration and discovery function, you need to fill in one of the consul, etcd, nacos configuration information.
-- If a configuration field name is added or modified, execute the command `sponge config --server-dir=. /edusys` to update the corresponding go struct; you do not need to execute the update command to modify only the field values.
+- If a configuration field name is added or modified, execute the command `sponge config --server-dir=./edusys` to update the corresponding go struct; you do not need to execute the update command to modify only the field values.
 - Modify the error code and error message corresponding to the CRUD method, open `ingernal/ecode/teacher_rpc.go`, modify the variable **teacherNO** value (the value is unique), the return message description is modified according to your needs, the interface error messages for the teacher table operations are added here.
 
 <br>
@@ -81,7 +81,7 @@ Two new tables course and teach were added, the structure of the data table is s
 sponge micro service \
   --db-dsn=root:123456@(192.168.3.37:3306)/school \
   --db-table=course,teach \
-  --out=. /edusys
+  --out=./edusys
 ```
 
 View the parameter description command `sponge micro service -h`, parameter `out` specifies the existing rpc service folder edusys, if parameter `out` is empty, you must specify the `module-name` and `server-name` parameters, generate the service code in the current directory, and then manually copy it to the folder edusys, the effect of both ways is The effect is the same.
@@ -162,14 +162,14 @@ message LoginReply {
 
 Open a terminal and execute the command.
 
-```bash  
+```bash
 sponge micro rpc-pb \
   --module-name=edusys \
   --server-name=edusys \
   --project-name=edusys \
   --repo-addr=zhufuyi \
-  --protobuf-file=. /teacher.proto \
-  --out=. /edusys
+  --protobuf-file=./teacher.proto \
+  --out=./edusys
 ```
 
 Check the parameter description command `sponge micro rpc-pb -h`, which supports \* sign matching (example `--protobuf-file=*.proto`), indicating that code is generated based on a bulk proto file, and that multiple proto files include at least one service, otherwise no code can be generated.
@@ -265,7 +265,7 @@ sponge micro dao \
   --db-dsn=root:123456@(192.168.3.37:3306)/school \
   --db-table=teacher \
   --include-init-db=true \
-  --out=. /edusys
+  --out=./edusys
 ```
 
 Check the parameter description command `sponge micro dao -h`, the parameter `-include-init-db` is used only once in a service, remove the parameter `-include-init-db` the next time you generate `dao` code, otherwise it will cause the latest `dao` code to not be generated.
@@ -482,8 +482,8 @@ sponge micro rpc-gw-pb \
   --server-name=shopgw \
   --project-name=eshop \
   --repo-addr=zhufuyi \
-  --protobuf-file=. /shopgw/v1/shopgw.proto \
-  --out=. /shopgw
+  --protobuf-file=./shopgw/v1/shopgw.proto \
+  --out=./shopgw
 ```
 
 Viewing the parameter description command `sponge micro rpc-gw-pb -h`, the generated rpc gateway service code is in the current shopgw directory with the following directory structure.
@@ -558,7 +558,7 @@ The service does not yet have a connection to the rpc service code, and the foll
 ```bash
 sponge micro rpc-cli \
   --rpc-server-name=comment,inventory,product \
-  --out=. /shopgw
+  --out=./shopgw
 ```
 
 View the parameter description command `sponge micro rpc-cli -h`, the parameter `out` specifies the existing service folder shopgw, and the generated code is in the `internal/rpcclent` directory.
@@ -599,7 +599,7 @@ If the rpc service uses registration and discovery, the field `registryDiscovery
 Generate the corresponding go struct code.
 
 ```bash
-sponge config --server-dir=. /shopgw
+sponge config --server-dir=./shopgw
 ```
 
 <br>

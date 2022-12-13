@@ -1,6 +1,36 @@
-### 2.2 Installing sponge
+## 2 Install sponge and dependency tools
 
-**(1) Installation go**
+### 2.1 Window environment installation dependencies
+
+If you use the windows environment, you need to install the relevant dependencies first, and just ignore the other environments.
+
+**(1) Installing mingw64**
+
+mingw64 stands for Minimalist GNUfor Windows, a freely available and freely distributed collection of Windows-specific header files and import libraries using the GNU toolset, download the pre-compiled source generated binaries at
+
+https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/8.1.0/threads-posix/seh/x86_64-8.1.0-release-posix-seh-rt_v6-rev0.7z
+
+After downloading and extracting to the `D:\Program Files\mingw64` directory, modify the system environment variable PATH to add `D:\Program Files\mingw64\bin`.
+
+**Install the make command**
+
+Switch to the `D:\Program Files\mingw64\bin` directory, find the `mingw32-make.exe` executable, copy it and rename it to `make.exe`.
+
+<br>
+
+**(2) Installation cmder**
+
+**cmder** is an enhanced command line tool that contains some sponge dependent commands (bash, git, etc.), cmder download at
+
+https://github.com/cmderdev/cmder/releases/download/v1.3.20/cmder.zip
+
+After downloading and extracting to the `D:\Program Files\cmder` directory, modify the system environment variable PATH to add `D:\Program Files\cmder`.
+
+<br>
+
+### 2.2 Install sponge
+
+**(1) Install go**
 
 Download at https://go.dev/dl/ or https://golang.google.cn/dl/ Select version (>=1.16) to install, add `$GOROOT/bin` to the system path.
 
@@ -8,21 +38,21 @@ Note: If you don't have scientific internet access, it is recommended to set up 
 
 <br>
 
-**(2) Installation of protoc**
+**(2) Install protoc**
 
 Download it from https://github.com/protocolbuffers/protobuf/releases/tag/v3.20.3 and add the directory where the **protoc** file is located under systempath.
 
 <br>
 
-**(3) Installation of sponge**
+**(3) Install sponge**
 
 > go install github.com/zhufuyi/sponge/cmd/sponge@latest
 
-Note: The directory where the sponge binary is located must be under systempath.
+Note: The directory where the sponge binary is located must be under system path.
 
 <br>
 
-**(4) Installation of dependency plug-ins and tools**
+**(4) Install plug-ins and tools**
 
 > sponge init
 

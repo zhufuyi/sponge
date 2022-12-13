@@ -45,7 +45,7 @@ Import the SQL DDL into mysql to create a database school, with a table teacher 
 
 Open a terminal and execute the command.
 
-```bash  
+```bash
 sponge web http \
   --module-name=edusys \
   --server-name=edusys \
@@ -53,7 +53,7 @@ sponge web http \
   --repo-addr=zhufuyi \
   --db-dsn=root:123456@(192.168.3.37:3306)/school \
   --db-table=teacher \
-  --out=. /edusys  
+  --out=./edusys
 ```
 
 Check the parameter description command `sponge web http -h`, note that the parameter **repo-addr** is the image repository address, if you use the [official docker image repository](https://hub.docker.com/), you only need to fill in the username of the registered docker repository, if you use the private repository address, you need to fill in the full repository address.
@@ -99,6 +99,7 @@ make run
 Copy http://localhost:8080/swagger/index.html to your browser to test the CRUD interface, as shown in Figure 3-1.
 
 ![sponge-framework](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/http-swag.jpg)
+
 * Figure 3-1 http swagger documentation interface*
 
 <br>
@@ -107,7 +108,7 @@ By default, the service is only enabled for the metrics collection interface, pe
 
 - To use redis as a cache, open the configuration file `configs/edusys.yml`, change the **cacheType** field value to redis, and fill in the **redis** configuration address and port.
 - By default, the flow limiting, fusion, link tracking, service registration and discovery functions are off, you can open the configuration file `configs/edusys.yml` to turn on the relevant functions, if you turn on the link tracking function, you must fill in the jaeger configuration information; if you turn on the service registration and discovery function, you must fill in one of the consul, etcd, nacos configuration information.
-- If a configuration field name is added or modified, execute the command `sponge config --server-dir=. /edusys` to update the corresponding go struct; it is not necessary to execute the update command to modify only the field values.
+- If a configuration field name is added or modified, execute the command `sponge config --server-dir=./edusys` to update the corresponding go struct; it is not necessary to execute the update command to modify only the field values.
 - Modify the error code information corresponding to the CRUD interface, open `ingernal/ecode/teacher_http.go`, modify the variable **teacherNO** value, which is the only value that does not repeat, the return message description is modified according to your needs, the interface custom error codes for the teacher table operations are added here.
 
 <br>
@@ -171,7 +172,7 @@ Generate handler code that contains CRUD business logic.
 sponge web handler \
   --db-dsn=root:123456@(192.168.3.37:3306)/school \
   --db-table=course,teach \
-  --out=. /edusys
+  --out=./edusys
 ```
 
 Check the parameter description command `sponge web handler -h`, the parameter `out` is to specify the existing service folder edusys, if the parameter `out` is empty, you must specify the `module-name` parameter, generate the handler submodule code in the current directory, then copy the handler code to the folder edusys, the effect of both ways are The effect is the same.
@@ -205,6 +206,7 @@ make run
 Copy http://localhost:8080/swagger/index.html to your browser to test the CRUD interface, as shown in Figure 3-2.
 
 ![sponge-framework](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/http-swag2.jpg)
+
 * Figure 3-2 http swagger documentation interface*
 
 The actual use requires modifying the custom CRUD interface to return error codes and messages, opening the file `ingernal/ecode/course_http.go` to modify the variable **courseNO** value, and opening the file `ingernal/ecode/teach_http.go` to modify the variable **teachNO** values.
@@ -299,14 +301,14 @@ message LoginReply {
 
 Open a terminal and execute the command.
 
-```bash  
+```bash
 sponge web http-pb \
   --module-name=edusys \
   --server-name=edusys \
   --project-name=edusys \
   --repo-addr=zhufuyi \
-  --protobuf-file=. /teacher.proto \
-  --out=. /edusys
+  --protobuf-file=./teacher.proto \
+  --out=./edusys
 ```
 
 Check the parameter description command `sponge web http-pb -h`, which supports \* sign matching (example `--protobuf-file=*.proto`), indicating that code is generated based on a bulk proto file, and multiple proto files include at least one service, otherwise code generation is not allowed.
@@ -405,7 +407,7 @@ sponge web dao \
   --db-dsn=root:123456@(192.168.3.37:3306)/school \
   --db-table=teacher \
   --include-init-db=true \
-  --out=. /edusys
+  --out=./edusys
 ```
 
 Check the parameter description command `sponge web dao -h`, the parameter `-include-init-db` is used only once in a service, remove the parameter `-include-init-db` the next time you generate `dao` code, otherwise it will result in not generating the latest `dao` code, because the db initialization code already exists.

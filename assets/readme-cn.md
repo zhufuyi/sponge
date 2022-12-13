@@ -31,7 +31,6 @@
 sponge创建的微服务代码框架如图1-2所示，这是典型的微服务分层结构，包含常用的服务治理功能。
 
 ![sponge-framework](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/microservices-framework.png)
-
 *图1-2 微服务框架图*
 
 <br>
@@ -223,7 +222,7 @@ sponge web http \
   --repo-addr=zhufuyi \
   --db-dsn=root:123456@(192.168.3.37:3306)/school \
   --db-table=teacher \
-  --out=./edusys  
+  --out=./edusys
 ```
 
 查看参数说明命令`sponge web http -h`，注意参数**repo-addr**是镜像仓库地址，如果使用[docker官方镜像仓库](https://hub.docker.com/)，只需填写注册docker仓库的用户名，如果使用私有仓库地址，需要填写完整仓库地址。
@@ -376,6 +375,8 @@ make run
 
 ![sponge-framework](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/http-swag2.jpg)
 *图3-2 http swagger文档界面*
+
+<br>
 
 实际使用中需要修改自定义的CRUD接口返回错误码和信息，打开文件`ingernal/ecode/course_http.go`修改变量**courseNO**值，打开文件`ingernal/ecode/teach_http.go`修改变量**teachNO**值。
 
@@ -624,7 +625,7 @@ sponge micro rpc \
   --repo-addr=zhufuyi \
   --db-dsn=root:123456@(192.168.3.37:3306)/school \
   --db-table=teacher \
-  --out=./edusys  
+  --out=./edusys
 ```
 
 查看参数说明命令 `sponge micro rpc -h`，生成rpc服务代码在当前edusys目录下，目录结构如下：
@@ -673,6 +674,8 @@ rpc服务包括了CRUD逻辑代码，也包括rpc客户端测试和压测代码�
 
 ![sponge-framework](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/performance-test.jpg)
 *图4-1 性能测试报告界面*
+
+<br>
 
 从服务启动日志看到默认监听**8282**端口(rpc服务)和**8283**端口(采集metrics或profile)，开启了每分钟的打印资源统计信息。在实际应用中，根据需要做一些修改：
 
@@ -1388,6 +1391,8 @@ defer span.End()
 ![multi-servers-trace](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/multi-servers-trace.jpg)
 *图5-2 多服务链路跟踪页面*
 
+<br>
+
 从图中可以看到共有10个span，主要链路：
 
 - 请求接口/api/v1/detail
@@ -1656,6 +1661,8 @@ sponge生成的服务默认支持[Nacos](https://nacos.io/zh-cn/docs/v2/what-is-
 ![nacos-config](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/nacos-config.jpg)
 *图5-3 nacos添加服务配置*
 
+<br>
+
 打开edusys目录下配置中心文件`configs/edusys_cc.yml`，填写nacos配置信息：
 
 ```yaml
@@ -1889,6 +1896,6 @@ sponge生成的服务包括了Jenkinsfile、构建和上传镜像脚本、k8s部
 
 <br><br>
 
-如果对你有用给个star，也欢迎加入微信群交流。
+如果对你有用给个star ⭐，也欢迎加入微信群交流。
 
 ![wechat-group](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/wechat-group.png)

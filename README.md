@@ -1,4 +1,4 @@
-## sponge [中文](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/readme-cn.md)
+## sponge [中文](assets/readme-cn.md)
 
 <p align="center">
 <img align="center" width="500px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/logo.png">
@@ -115,11 +115,11 @@ The web service and rpc service directory structures are basically the same, wit
 
 ### Documentation
 
-- [Installation](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/install-sponge.md)
-- [Quickly create web projects](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/create-web-project.md)
-- [Quick creation of microservices projects](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/create-micro-project.md)
-- [Service governance introduction](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/service-governance.md)
-- [Continuous Integration And Deployment](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/cicd.md)
+- [Installation](assets/install-sponge.md)
+- [Quickly create web projects](assets/create-web-project.md)
+- [Quickly create microservices projects](assets/create-micro-project.md)
+- [Service governance introduction](assets/service-governance.md)
+- [Continuous Integration And Continuous Deployment](assets/cicd.md)
 
 If it's useful to you, give it a star ⭐.
 

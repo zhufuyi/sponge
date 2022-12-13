@@ -140,11 +140,11 @@ kubectl create secret generic docker-auth-secret \
 cd deployments/kubernetes
 
 # Create namespace, name corresponds to spong create service parameter project-name
-kubectl apply -f . /*namespace.yml
+kubectl apply -f ./*namespace.yml
 
 # Create configmap, service
-kubectl apply -f . /*configmap.yml
-kubectl apply -f . /*svc.yml
+kubectl apply -f ./*configmap.yml
+kubectl apply -f ./*svc.yml
 ```
 
 (5) If you want to use pinned notifications to view the build deployment results, open the **Jenkinsfile** file under the code base, find the field **tel_num** and fill in the mobile number, and find **access_token** and fill in the token value.
