@@ -67,7 +67,7 @@ The rpc service includes the CRUD logic code as well as the rpc client test and 
 From the service startup log, you see that the default listening on port **8282** (rpc service) and port **8283** (collecting metrics or profiles) is turned on to print resource statistics per minute. In practice, some modifications are made as needed.
 
 - To use redis as a cache, open the configuration file `configs/edusys.yml`, change the **cacheType** field value to redis, and fill in the **redis** configuration address and port.
-- By default, the flow limiting, fusion, link tracking, service registration and discovery functions are off, you can open the configuration file `configs/edusys.yml` to turn on the relevant functions, if you turn on the link tracking function, you need to fill in the jaeger configuration information, if you turn on the service registration and discovery function, you need to fill in one of the consul, etcd, nacos configuration information.
+- By default, the rate limiter, circuit breaker, trace, service registration and discovery functions are off, you can open the configuration file `configs/edusys.yml` to turn on the relevant functions, if you turn on the trace function, you need to fill in the jaeger configuration information, if you turn on the service registration and discovery function, you need to fill in one of the consul, etcd, nacos configuration information.
 - If a configuration field name is added or modified, execute the command `sponge config --server-dir=./edusys` to update the corresponding go struct; you do not need to execute the update command to modify only the field values.
 - Modify the error code and error message corresponding to the CRUD method, open `ingernal/ecode/teacher_rpc.go`, modify the variable **teacherNO** value (the value is unique), the return message description is modified according to your needs, the interface error messages for the teacher table operations are added here.
 
@@ -691,4 +691,4 @@ The generation of rpc service code is based on both mysql and proto files, accor
 
 According to the actual scenario choose to generate the corresponding service code, if the main is to add, delete and check the data table, according to mysql generate rpc service can write less code; if more custom methods, according to the proto generate rpc service is more appropriate; rpc to http use rpc gateway service.
 
-<br><br>
+<br>

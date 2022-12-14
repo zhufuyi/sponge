@@ -15,7 +15,7 @@
 
 </div>
 
-[sponge](https://github.com/zhufuyi/sponge) is a microservice framework, a tool for quickly creating microservice code. sponge has a rich generating code commands, a total of 12 different functional code, these functional code can be combined into a complete service (similar to artificially broken sponge cells can be automatically reorganized into a new sponge ). Microservice code features include logging, service registration and discovery, registry, rate limit, circuit breaker, trace, metrics monitoring, pprof performance analysis, statistics, caching, CICD. The code uses a decoupled layered structure and it's easy to add or replace functional code. As an efficiency-enhancing tool, commonly repeated code is basically generated automatically and only business logic code needs to be populated based on the generated template code examples.
+[sponge](https://github.com/zhufuyi/sponge) is a microservice framework, a tool for quickly creating microservice code. sponge has a rich generating code commands, a total of 12 different functional code, these functional code can be combined into a complete service (similar to artificially broken sponge cells can be automatically reorganized into a new sponge ). Microservice code features include logging, service registration and discovery, registry, rate limiter, circuit breaker, trace, metrics monitoring, pprof performance analysis, statistics, caching, CICD. The code uses a decoupled layered structure and it's easy to add or replace functional code. As an efficiency-enhancing tool, commonly repeated code is basically generated automatically and only business logic code needs to be populated based on the generated template code examples.
 
 <br>
 
@@ -72,6 +72,7 @@ Microservices main functions:
 - Circuit Breaker [circuitbreaker](pkg/shield/circuitbreaker)
 - Tracing [opentelemetry](https://go.opentelemetry.io/otel)
 - Monitoring [prometheus](https://github.com/prometheus/client_golang/prometheus), [grafana](https://github.com/grafana/grafana)
+- Statistics [gopsutil](https://github.com/shirou/gopsutil)
 - Service registry and discovery [etcd](https://github.com/etcd-io/etcd), [consul](https://github.com/hashicorp/consul), [nacos](https://github.com/alibaba/)
 - Performance analysis [go profile](https://go.dev/blog/pprof)
 - Code inspection [golangci-lint](https://github.com/golangci/golangci-lint)

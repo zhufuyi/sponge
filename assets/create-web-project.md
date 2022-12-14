@@ -107,7 +107,7 @@ Copy http://localhost:8080/swagger/index.html to your browser to test the CRUD i
 By default, the service is only enabled for the metrics collection interface, per-minute resource statistics information, and other service governance is off by default. In practical applications, some adjustments are made as needed.
 
 - To use redis as a cache, open the configuration file `configs/edusys.yml`, change the **cacheType** field value to redis, and fill in the **redis** configuration address and port.
-- By default, the flow limiting, fusion, link tracking, service registration and discovery functions are off, you can open the configuration file `configs/edusys.yml` to turn on the relevant functions, if you turn on the link tracking function, you must fill in the jaeger configuration information; if you turn on the service registration and discovery function, you must fill in one of the consul, etcd, nacos configuration information.
+- By default, rate limiter, circuit breaker, trace, service registration and discovery functions are off, you can open the configuration file `configs/edusys.yml` to turn on the relevant functions, if you turn on the trace function, you must fill in the jaeger configuration information; if you turn on the service registration and discovery function, you must fill in one of the consul, etcd, nacos configuration information.
 - If a configuration field name is added or modified, execute the command `sponge config --server-dir=./edusys` to update the corresponding go struct; it is not necessary to execute the update command to modify only the field values.
 - Modify the error code information corresponding to the CRUD interface, open `ingernal/ecode/teacher_http.go`, modify the variable **teacherNO** value, which is the only value that does not repeat, the return message description is modified according to your needs, the interface custom error codes for the teacher table operations are added here.
 
@@ -425,7 +425,7 @@ Switching to the edusys directory to run the service again.
 make run
 ```
 
-Open http://localhost:8080/apis/swagger/index.html to request the interface again and it returns data properly.
+Open http://localhost:8080/apis/swagger/index.html to request the interface again, and it returns data properly.
 
 <br>
 
@@ -438,4 +438,4 @@ There are two ways to generate http service code, mysql and proto files.
 
 Both ways can complete the same http service interface, according to the actual application choose one of them, if you do backend management services, use mysql to produce CRUD interface code directly, you can write less code. For most need to customize the interface service, use the proto file way to generate the http service, this way is also more freedom, after writing the proto file, in addition to the business logic code, other code is generated through the plug-in.
 
-<br><br>
+<br>

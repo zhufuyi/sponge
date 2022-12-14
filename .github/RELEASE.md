@@ -1,17 +1,31 @@
 ## New
 
-- Support for generating http(including model,dao,handler,http) project code.
-- Support for grpc (including proto,dao,service,grpc) project code.
-- Support for config code.
+- Support for generating web project codes.
+  - model
+  - dao
+  - handler
+  - http
+  - http-pb
+- Support for generating microservice project codes.
+  - protobuf
+  - model
+  - dao
+  - service
+  - rpc
+  - rpc-pb
+  - rpc-gw-pb
+- Support for generating config codes.
+- Support for generating rpc client codes.
 - support for microservice governance features:
-    - Ratelimit
-    - Circuit Breaker
-    - service registration and discovery
-    - tracking
-    - monitoring
-    - registries center
-    - caching
+  - Rate limit
+  - Circuit breaker
+  - Service registration and discovery
+  - Trace
+  - Monitor
+  - Registries center
+  - Cache
+  - Statistics
 - support for CICD features:
-    - Jenkins
-    - Docker
-    - kubernetes
+  - Jenkins
+  - Docker
+  - kubernetes

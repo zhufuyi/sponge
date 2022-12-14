@@ -121,7 +121,7 @@ func getDialOptions() []grpc.DialOption {
 
 <br>
 
-#### rate limit
+#### rate limiter
 
 ```go
 func getDialOptions() []grpc.DialOption {
@@ -225,7 +225,7 @@ func getDialOptions() []grpc.DialOption {
 	return options
 }
 
-// set up tracking on the server side
+// set up trace on the server side
 func getServerOptions() []grpc.ServerOption {
 	var options []grpc.ServerOption
 
