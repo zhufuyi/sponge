@@ -97,7 +97,7 @@ build:
 .PHONY: build-sponge
 # build sponge for linux amd64 binary
 build-sponge:
-	@echo "building 'sponge', binary file will output to 'cmd/sponge'"
+	@echo "building 'sponge', linux amd64 binary file will output to 'cmd/sponge'"
 	@cd cmd/sponge && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GOPROXY=https://goproxy.cn,direct go build
 # delete the templates code end
 

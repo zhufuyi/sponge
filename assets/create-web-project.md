@@ -96,20 +96,20 @@ make docs
 make run
 ```
 
-Copy http://localhost:8080/swagger/index.html to your browser to test the CRUD interface, as shown in Figure 3-1.
+Copy http://localhost:8080/swagger/index.html to your browser to test the CRUD api, as shown in Figure 3-1.
 
-![sponge-framework](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/http-swag.jpg)
+![http-swag](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/http-swag.jpg)
 
-* Figure 3-1 http swagger documentation interface*
+*Figure 3-1 http swagger documentation diagram*
 
 <br>
 
-By default, the service is only enabled for the metrics collection interface, per-minute resource statistics information, and other service governance is off by default. In practical applications, some adjustments are made as needed.
+By default, the service is only enabled for the metrics collection api, per-minute resource statistics information, and other service governance is off by default. In practical applications, some adjustments are made as needed.
 
 - To use redis as a cache, open the configuration file `configs/edusys.yml`, change the **cacheType** field value to redis, and fill in the **redis** configuration address and port.
 - By default, rate limiter, circuit breaker, trace, service registration and discovery functions are off, you can open the configuration file `configs/edusys.yml` to turn on the relevant functions, if you turn on the trace function, you must fill in the jaeger configuration information; if you turn on the service registration and discovery function, you must fill in one of the consul, etcd, nacos configuration information.
 - If a configuration field name is added or modified, execute the command `sponge config --server-dir=./edusys` to update the corresponding go struct; it is not necessary to execute the update command to modify only the field values.
-- Modify the error code information corresponding to the CRUD interface, open `ingernal/ecode/teacher_http.go`, modify the variable **teacherNO** value, which is the only value that does not repeat, the return message description is modified according to your needs, the interface custom error codes for the teacher table operations are added here.
+- Modify the error code information corresponding to the CRUD api, open `ingernal/ecode/teacher_http.go`, modify the variable **teacherNO** value, which is the only value that does not repeat, the return message description is modified according to your needs, the api custom error codes for the teacher table operations are added here.
 
 <br>
 
@@ -203,23 +203,23 @@ make docs
 make run
 ```
 
-Copy http://localhost:8080/swagger/index.html to your browser to test the CRUD interface, as shown in Figure 3-2.
+Copy http://localhost:8080/swagger/index.html to your browser to test the CRUD api, as shown in Figure 3-2.
 
-![sponge-framework](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/http-swag2.jpg)
+![http-swag2](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/http-swag2.jpg)
 
-* Figure 3-2 http swagger documentation interface*
+*Figure 3-2 http swagger documentation diagram*
 
-The actual use requires modifying the custom CRUD interface to return error codes and messages, opening the file `ingernal/ecode/course_http.go` to modify the variable **courseNO** value, and opening the file `ingernal/ecode/teach_http.go` to modify the variable **teachNO** values.
+The actual use requires modifying the custom CRUD api to return error codes and messages, opening the file `ingernal/ecode/course_http.go` to modify the variable **courseNO** value, and opening the file `ingernal/ecode/teach_http.go` to modify the variable **teachNO** values.
 
-Although the CRUD interface of each data table is generated, it is not necessarily suitable for the actual business logic, so you need to add the business logic code manually, fill in the database operation code to the `internal/dao` directory, and the business logic code to the `internal/handler` directory.
+Although the CRUD api of each data table is generated, it is not necessarily suitable for the actual business logic, so you need to add the business logic code manually, fill in the database operation code to the `internal/dao` directory, and the business logic code to the `internal/handler` directory.
 
 <br>
 
 ### 3.2 Create http service from proto file
 
-If the standard CRUD interface http service code is not required, you can customize the interface in the proto file and use the spong command to generate the http service and interface template code.
+If the standard CRUD api http service code is not required, you can customize the api in the proto file and use the spong command to generate the http service and api template code.
 
-#### 3.2.1 Custom interfaces
+#### 3.2.1 Custom apis
 
 The following is a sample file, teacher.proto, where each method defines the description of the route and swagger document. The tag and validate descriptions are added to the message as needed.
 
@@ -348,20 +348,20 @@ make proto
 make run
 ```
 
-Copying http://localhost:8080/apis/swagger/index.html to the browser test interface, as shown in Figure 3-3, the request returns a 500 error because the template code (internal/handler/teacher_logic.go file) calls `panic("implement me")` directly, which is meant to prompt for business logic code to be filled in.
+Copying http://localhost:8080/apis/swagger/index.html to the browser test api, as shown in Figure 3-3, the request returns a 500 error because the template code (internal/handler/teacher_logic.go file) calls `panic("implement me")` directly, which is meant to prompt for business logic code to be filled in.
 
-![sponge-framework](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/http-pb-swag.jpg)
-*Figure 3-3 http swagger documentation interface*
+![http-pb-swag](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/http-pb-swag.jpg)
+*Figure 3-3 http swagger documentation diagram*
 
 <br>
 
-#### 3.2.3 Adding a new interface
+#### 3.2.3 Adding a new api
 
-Depending on the business requirements, new interfaces need to be added, in two cases.
+Depending on the business requirements, new apis need to be added, in two cases.
 
-**(1) Add new interface to original proto file**
+**(1) Add new api to original proto file**
 
-Open `api/edusys/v1/teacher.proto`, e.g. add the **bindPhone** method and fill in the routing and swagger documentation description information to finish adding a new interface.
+Open `api/edusys/v1/teacher.proto`, e.g. add the **bindPhone** method and fill in the routing and swagger documentation description information to finish adding a new api.
 
 Execution order.
 
@@ -372,15 +372,15 @@ make proto
 
 Generate new template files in the `internal/handler` and `internal/ecode` directories, then copy the latest generated template code into the business logic code area at.
 
-- The template code file with the suffix **.gen.datetime** is generated in the `internal/handler` directory (example teacher_logic.go.gen.xxxx225619), because teacher_logic.go already exists and will not overwrite the business logic code written, so a new file is generated. Open the file teacher_logic.go.gen.xxxx225619, copy the template code for the add method **bindPhone** interface to the teacher_logic.go file, and fill in the business logic code.
-- The template code file with the suffix **.gen.datetime** is generated in the `internal/ecode` directory, and the **bindPhone** interface error code is copied into the teacher_http.go file.
+- The template code file with the suffix **.gen.datetime** is generated in the `internal/handler` directory (example teacher_logic.go.gen.xxxx225619), because teacher_logic.go already exists and will not overwrite the business logic code written, so a new file is generated. Open the file teacher_logic.go.gen.xxxx225619, copy the template code for the add method **bindPhone** api to the teacher_logic.go file, and fill in the business logic code.
+- The template code file with the suffix **.gen.datetime** is generated in the `internal/ecode` directory, and the **bindPhone** api error code is copied into the teacher_http.go file.
 - Delete all files with the suffix **.gen.datetime**.
 
 <br>
 
-**(2) Adding interfaces to new proto files**
+**(2) Adding apis to new proto files**
 
-For example, if a new **course.proto** file is added, the interface under **course.proto** must include the routing and swagger documentation description information, check **Chapter 3.2.1** and copy the **course.proto** file to the `api/edusys/v1` directory to complete the newly added interface.
+For example, if a new **course.proto** file is added, the api under **course.proto** must include the routing and swagger documentation description information, check **Chapter 3.2.1** and copy the **course.proto** file to the `api/edusys/v1` directory to complete the newly added api.
 
 Execution order.
 
@@ -421,11 +421,13 @@ Whether you implement the `dao` code yourself or use the `dao` code generated by
 Switching to the edusys directory to run the service again.
 
 ```bash
+go mod tidy
+
 # Compile and run services
 make run
 ```
 
-Open http://localhost:8080/apis/swagger/index.html to request the interface again, and it returns data properly.
+Open http://localhost:8080/apis/swagger/index.html to request the api again, and it returns data properly.
 
 <br>
 
@@ -433,9 +435,9 @@ Open http://localhost:8080/apis/swagger/index.html to request the interface agai
 
 There are two ways to generate http service code, mysql and proto files.
 
-- According to mysql generated http service code includes CRUD interface code for each data table, subsequent addition of new interfaces, you can refer to the CRUD way to add business logic code, the newly added interfaces need to manually fill in the swagger description information.
-- The http service generated from the proto file does not include the manipulation database code though, nor the CRUD interface logic code, which can be generated using the `sponge web dao` command to manipulate the database code as needed. With the addition of the new interface, in addition to generating handler template code, swagger documentation, route registration code, and error codes for the interface are automatically generated.
+- According to mysql generated http service code includes CRUD api code for each data table, subsequent addition of new apis, you can refer to the CRUD way to add business logic code, the newly added apis need to manually fill in the swagger description information.
+- The http service generated from the proto file does not include the manipulation database code though, nor the CRUD api logic code, which can be generated using the `sponge web dao` command to manipulate the database code as needed. With the addition of the new api, in addition to generating handler template code, swagger documentation, route registration code, and error codes for the api are automatically generated.
 
-Both ways can complete the same http service interface, according to the actual application choose one of them, if you do backend management services, use mysql to produce CRUD interface code directly, you can write less code. For most need to customize the interface service, use the proto file way to generate the http service, this way is also more freedom, after writing the proto file, in addition to the business logic code, other code is generated through the plug-in.
+Both ways can complete the same http service api, according to the actual application choose one of them, if you do backend management services, use mysql to produce CRUD api code directly, you can write less code. For most need to customize the api service, use the proto file way to generate the http service, this way is also more freedom, after writing the proto file, in addition to the business logic code, other code is generated through the plug-in.
 
 <br>

@@ -87,22 +87,22 @@ A relatively simple way to create a new task for jenkins is to import an existin
 
 **(1) Create a new task**, as shown in Figure 6-1.
 
-![create job](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/createJob.jpg)
-* Figure 6-1 Task creation screen*
+![create-job](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/createJob.jpg)
+*Figure 6-1 Task creation screen diagram*
 
 <br>
 
 **(2) Parameterized configuration setting**, using the parameter name `GIT_parameter`, as shown in Figure 6-2.
 
-![parametric construction](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/paramSetting.jpg)
-*Figure 6-2 Setting up the parametric build interface*
+![parametric-construction](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/paramSetting.jpg)
+*Figure 6-2 Setting up the parametric build diagram*
 
 <br>
 
 **(3) Set up the pipeline**, as shown in Figure 6-3.
 
-![flow line](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/pipelineSetting.jpg)
-*Figure 6-3 Setup pipeline screen*
+![pipeline](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/pipelineSetting.jpg)
+*Figure 6-3 Setup pipeline screen diagram*
 
 <br>
 
@@ -110,8 +110,8 @@ A relatively simple way to create a new task for jenkins is to import an existin
 
 Click **Build with Parameters** on the left menu bar, and then select the branch or tag you want to branch or tag, as shown in Figure 6-4.
 
-![run job](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/building.jpg)
-* Figure 6-4 Parametric build interface*
+![start-build](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/building.jpg)
+*Figure 6-4 Parametric build diagram*
 
 <br>
 
@@ -153,8 +153,8 @@ kubectl apply -f ./*svc.yml
 
 After the prep, create a new task (name edusys) in the jenkins interface, using the template created above (name sponge), then modify the git repository, save the task and start the parametric build, the result of the construction is shown in Figure 6-5.
 
-![run job](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/jenkins-build.jpg)
-*Figure 6-5 jenkins build result interface*
+![run-job](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/jenkins-build.jpg)
+*Figure 6-5 jenkins build result diagram*
 
 <br>
 

@@ -15,7 +15,7 @@
 
 </div>
 
-[sponge](https://github.com/zhufuyi/sponge) is a microservice framework, a tool for quickly creating microservice code. sponge has a rich generating code commands, a total of 12 different functional code, these functional code can be combined into a complete service (similar to artificially broken sponge cells can be automatically reorganized into a new sponge ). Microservice code features include logging, service registration and discovery, registry, rate limiter, circuit breaker, trace, metrics monitoring, pprof performance analysis, statistics, caching, CICD. The code uses a decoupled layered structure and it's easy to add or replace functional code. As an efficiency-enhancing tool, commonly repeated code is basically generated automatically and only business logic code needs to be populated based on the generated template code examples.
+[sponge](https://github.com/zhufuyi/sponge) is a microservice framework, a tool to quickly generate web and microservice code. sponge has a rich generating code commands, a total of 12 different functional code, these functional code can be combined into a complete service (similar to artificially broken sponge cells can be automatically reorganized into a new sponge). Microservice code features include logging, service registration and discovery, registry, rate limiter, circuit breaker, trace, metrics monitoring, pprof performance analysis, statistics, caching, CICD. The code uses a decoupled layered structure and it's easy to add or replace functional code. As an efficiency-enhancing tool, commonly repeated code is basically generated automatically and only business logic code needs to be populated based on the generated template code examples.
 
 <br>
 
@@ -116,11 +116,11 @@ The web service and rpc service directory structures are basically the same, wit
 
 ### Documentation
 
-- [Installation](assets/install-sponge.md)
-- [Quickly create web projects](assets/create-web-project.md)
-- [Quickly create microservices projects](assets/create-micro-project.md)
-- [Service governance introduction](assets/service-governance.md)
-- [Continuous Integration And Continuous Deployment](assets/cicd.md)
+- [2 Installation](assets/install-sponge.md)
+- [3 Quickly create web projects](assets/create-web-project.md)
+- [4 Quickly create microservices projects](assets/create-micro-project.md)
+- [5 Service governance introduction](assets/service-governance.md)
+- [6 Continuous Integration And Continuous Deployment](assets/cicd.md)
 
 If it's useful to you, give it a star ⭐.
 

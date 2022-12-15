@@ -58,6 +58,10 @@ Note: The directory where the sponge binary is located must be under system path
 
 Dependency plugins and tools are automatically installed after executing the command: [protoc-gen-go](https://google.golang.org/protobuf/cmd/protoc-gen-go), [protoc-gen-go-grpc](https://google.golang.org/grpc/cmd/protoc-gen-go-grpc), [protoc-gen-validate](https://github.com/envoyproxy/protoc-gen-validate), [protoc-gen-gotag](https://github.com/srikrsna/protoc-gen-gotag), [protoc-gen-go-gin](https://github.com/zhufuyi/sponge/cmd/protoc-gen-go-gin), [protoc-gen-go-rpc-tmpl](https://github.com/zhufuyi/sponge/cmd/protoc-gen-go-rpc-tmpl), [protoc-gen-openapiv2](https://github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2), [protoc-gen-doc](https://github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc), [golangci-lint](https://github.com/golangci/golangci-lint/cmd/golangci-lint), [swag](https://github.com/swaggo/swag/cmd/swag), [go-callvis](https://github.com/ofabry/go-callvis).
 
+If there is a dependency tool installation error, execute the command to retry.
+
+> sponge tools --install
+
 To view the installation of dependency tools.
 
 ```bash
@@ -66,6 +70,25 @@ sponge tools
 
 # windows environment, need to specify bash.exe location
 sponge tools --executor="D:\Program Files\cmder\vendor\git-for-windows\bin\bash.exe"
+```
+
+List of all dependent tools.
+
+```
+Installed dependency tools:
+    ✔  go
+    ✔  protoc
+    ✔  protoc-gen-go
+    ✔  protoc-gen-go-grpc
+    ✔  protoc-gen-validate
+    ✔  protoc-gen-gotag
+    ✔  protoc-gen-go-gin
+    ✔  protoc-gen-go-rpc-tmpl
+    ✔  protoc-gen-openapiv2
+    ✔  protoc-gen-doc
+    ✔  swag
+    ✔  golangci-lint
+    ✔  go-callvis
 ```
 
 <br>

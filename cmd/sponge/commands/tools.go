@@ -113,6 +113,12 @@ func checkInstallTools() ([]string, []string) {
 		installedNames = append(installedNames, name)
 	}
 
+	data, _ := os.ReadFile(versionFile)
+	v := string(data)
+	if v != "" {
+		version = v
+	}
+
 	return installedNames, lackNames
 }
 
@@ -162,6 +168,8 @@ func installTools(lackNames []string, enableCNGoProxy bool) {
 			if !ok {
 				return
 			}
+			command = adaptInternalCommand(name, command)
+			fmt.Println(command)
 			if enableCNGoProxy {
 				command = "GOPROXY=https://goproxy.cn,direct && " + command
 			}
@@ -190,4 +198,14 @@ func checkExit(name string, err error) {
 `, name)
 		os.Exit(1)
 	}
+}
+
+func adaptInternalCommand(name string, command string) string {
+	if name == "protoc-gen-go-gin" || name == "protoc-gen-go-rpc-tmpl" {
+		if version != "v0.0.0" {
+			return strings.ReplaceAll(command, "@latest", "@"+version)
+		}
+	}
+
+	return command
 }

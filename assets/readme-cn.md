@@ -1,4 +1,4 @@
-[sponge](https://github.com/zhufuyi/sponge) 是一个微服务框架，一个快速创建微服务代码工具。sponge拥有丰富的生成代码命令，一共生成12种不同功能代码，这些功能代码可以组合成完整的服务(类似人为打散的海绵细胞可以自动重组成一个新的海绵)。微服务代码功能包括日志、服务注册与发现、注册中心、限流、熔断、链路跟踪、指标监控、pprof性能分析、统计、缓存、CICD等功能，开箱即用。代码使用解耦分层结构，很容易的添加或替换功能代码。作为一个提升效率工具，常用的重复代码基本是自动生成，只需要根据生成的模板代码示例填充业务逻辑代码。
+[sponge](https://github.com/zhufuyi/sponge) 是一个微服务框架，一个快速创建web和微服务代码工具。sponge拥有丰富的生成代码命令，一共生成12种不同功能代码，这些功能代码可以组合成完整的服务(类似人为打散的海绵细胞可以自动重组成一个新的海绵)。微服务代码功能包括日志、服务注册与发现、注册中心、限流、熔断、链路跟踪、指标监控、pprof性能分析、统计、缓存、CICD等功能，开箱即用。代码使用解耦分层结构，很容易的添加或替换功能代码。作为一个提升效率工具，常用的重复代码基本是自动生成，只需要根据生成的模板代码示例填充业务逻辑代码。
 
 <br>
 
@@ -30,7 +30,7 @@
 
 sponge创建的微服务代码框架如图1-2所示，这是典型的微服务分层结构，包含常用的服务治理功能。
 
-![sponge-framework](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/microservices-framework.png)
+![microservice-framework](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/microservices-framework.png)
 *图1-2 微服务框架图*
 
 <br>
@@ -151,6 +151,10 @@ https://github.com/cmderdev/cmder/releases/download/v1.3.20/cmder.zip
 
 执行命令后自动安装了依赖插件和工具：[protoc-gen-go](https://google.golang.org/protobuf/cmd/protoc-gen-go)、 [protoc-gen-go-grpc](https://google.golang.org/grpc/cmd/protoc-gen-go-grpc)、 [protoc-gen-validate](https://github.com/envoyproxy/protoc-gen-validate)、 [protoc-gen-gotag](https://github.com/srikrsna/protoc-gen-gotag)、 [protoc-gen-go-gin](https://github.com/zhufuyi/sponge/cmd/protoc-gen-go-gin)、 [protoc-gen-go-rpc-tmpl](https://github.com/zhufuyi/sponge/cmd/protoc-gen-go-rpc-tmpl)、 [protoc-gen-openapiv2](https://github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2)、 [protoc-gen-doc](https://github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc)、 [golangci-lint](https://github.com/golangci/golangci-lint/cmd/golangci-lint)、 [swag](https://github.com/swaggo/swag/cmd/swag)、 [go-callvis](https://github.com/ofabry/go-callvis)
 
+如果有插件或工具安装出错，执行命令重试：
+
+> sponge tools --install
+
 查看依赖工具安装情况：
 
 ```bash
@@ -159,6 +163,25 @@ sponge tools
 
 # windows环境，需要指定bash.exe位置
 sponge tools --executor="D:\Program Files\cmder\vendor\git-for-windows\bin\bash.exe"
+```
+
+所有依赖工具列表：
+
+```
+Installed dependency tools:
+    ✔  go
+    ✔  protoc
+    ✔  protoc-gen-go
+    ✔  protoc-gen-go-grpc
+    ✔  protoc-gen-validate
+    ✔  protoc-gen-gotag
+    ✔  protoc-gen-go-gin
+    ✔  protoc-gen-go-rpc-tmpl
+    ✔  protoc-gen-openapiv2
+    ✔  protoc-gen-doc
+    ✔  swag
+    ✔  golangci-lint
+    ✔  go-callvis
 ```
 
 <br>
@@ -267,7 +290,7 @@ make run
 
 复制 http://localhost:8080/swagger/index.html 到浏览器测试CRUD接口，如图3-1所示。
 
-![sponge-framework](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/http-swag.jpg)
+![http-swag](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/http-swag.jpg)
 *图3-1 http swagger文档界面*
 
 <br>
@@ -373,7 +396,7 @@ make run
 
 复制 http://localhost:8080/swagger/index.html 到浏览器测试CRUD接口，如图3-2所示。
 
-![sponge-framework](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/http-swag2.jpg)
+![http-swag2](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/http-swag2.jpg)
 *图3-2 http swagger文档界面*
 
 <br>
@@ -519,7 +542,7 @@ make run
 
 复制 http://localhost:8080/apis/swagger/index.html 到浏览器测试接口，如图3-3所示，请求会返回500错误，因为模板代码(internal/handler/teacher_logic.go文件)直接调用`panic("implement me")`，这是为了提示要填写业务逻辑代码。
 
-![sponge-framework](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/http-pb-swag.jpg)
+![http-pb-swag](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/http-pb-swag.jpg)
 *图3-3 http swagger文档界面*
 
 <br>
@@ -590,6 +613,8 @@ sponge web dao \
 切换到edusys目录下再次运行服务：
 
 ```bash
+go mod tidy
+
 # 编译和运行服务
 make run
 ```
@@ -672,7 +697,7 @@ rpc服务包括了CRUD逻辑代码，也包括rpc客户端测试和压测代码�
 - 对 **Test_teacherService_methods** 下的方法测试，测试前要先填写测试参数。
 - 执 **Test_teacherService_benchmark** 下的方法压测，测试前要先填写压测参数，执行结束后生成压测报告，复制压测报告文件路径到浏览器查看统计信息，如图4-1所示。
 
-![sponge-framework](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/performance-test.jpg)
+![performance-test](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/performance-test.jpg)
 *图4-1 性能测试报告界面*
 
 <br>
@@ -892,6 +917,8 @@ sponge micro dao \
 切换到edusys目录下再次运行服务：
 
 ```bash
+go mod tidy
+
 # 编译和运行服务
 make run
 ```
@@ -904,7 +931,7 @@ make run
 
 微服务通常提供的是细粒度的API，实际提供给客户端是粗粒度的API，需要从不同微服务获取数据聚合在一起组成符合实际需求的API，这是rpc gateway的作用，rpc gateway本身也是一个http服务，如图4-2所示。
 
-![sponge-framework](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/rpc-gateway.png)
+![rpc-gateway](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/rpc-gateway.png)
 *图4-2 rpc gateway框架图*
 
 <br>
@@ -1157,8 +1184,8 @@ make run
 
 复制 http://localhost:8080/apis/swagger/index.html 到浏览器测试接口，如图4-3所示。请求会返回500错误，因为模板代码(internal/service/shopgw_logic.go文件)直接调用`panic("implement me")`，这是为了提示要填写业务逻辑代码。
 
-![sponge-framework](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/rpc-gw-swag.jpg)
-*图4-3 rpc gatewy的swagger文档界面*
+![rpc-gw-swag](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/rpc-gw-swag.jpg)
+*图4-3 rpc gateway的swagger文档界面*
 
 <br>
 
@@ -1284,6 +1311,8 @@ func (c *shopGwClient) GetDetailsByProductID(ctx context.Context, req *shopgwV1.
 再次启动服务：
 
 ```bash
+go mod tidy
+
 # 编译和运行服务
 make run
 ```
@@ -1791,21 +1820,21 @@ PROD_REGISTRY_HOST http://localhost:29090
 
 **(1) 创建新的任务**，如图6-1所示。
 
-![create job](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/createJob.jpg)
+![create-job](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/createJob.jpg)
 *图6-1 创建任务界面*
 
 <br>
 
 **(2) 参数化构设置**，使用参数名`GIT_parameter`，如图6-2所示。
 
-![parametric construction](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/paramSetting.jpg)
+![parametric-construction](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/paramSetting.jpg)
 *图6-2 设置参数化构建界面*
 
 <br>
 
 **(3) 设置流水线**，如图6-3所示。
 
-![flow line](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/pipelineSetting.jpg)
+![pipeline](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/pipelineSetting.jpg)
 *图6-3 设置流水线界面*
 
 <br>
@@ -1814,7 +1843,7 @@ PROD_REGISTRY_HOST http://localhost:29090
 
 单击左侧菜单栏上的 **Build with Parameters**，然后选择要分支或tag，如图6-4所示。
 
-![run job](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/building.jpg)
+![start-build](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/building.jpg)
 *图6-4 参数化构建界面*
 
 <br>
@@ -1857,7 +1886,7 @@ kubectl apply -f ./*svc.yml
 
 前期准备好之后，在jenkins界面创建一个新任务(名称edusys)，使用上面创建的模板(名称sponge)，然后修改git仓库，保存任务，开始参数化构建，构建结果如图6-5所示：
 
-![run job](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/jenkins-build.jpg)
+![run-job](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/jenkins-build.jpg)
 *图6-5 jenkins构建结果界面*
 
 <br>
