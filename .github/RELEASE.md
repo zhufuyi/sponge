@@ -1,31 +1,4 @@
 ## New
 
-- Support for generating web project codes.
-  - model
-  - dao
-  - handler
-  - http
-  - http-pb
-- Support for generating microservice project codes.
-  - protobuf
-  - model
-  - dao
-  - service
-  - rpc
-  - rpc-pb
-  - rpc-gw-pb
-- Support for generating config codes.
-- Support for generating rpc client codes.
-- support for microservice governance features:
-  - Rate limit
-  - Circuit breaker
-  - Service registration and discovery
-  - Trace
-  - Monitor
-  - Registries center
-  - Cache
-  - Statistics
-- support for CICD features:
-  - Jenkins
-  - Docker
-  - kubernetes
+- Update document
+- Fix some issues

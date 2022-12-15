@@ -8,7 +8,7 @@
 // repeated code is basically generated automatically and only business logic code needs to be populated
 // based on the generated template code examples.
 //
-// https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/README.md
+// https://github.com/zhufuyi/sponge/blob/main/README.md
 //
 //	sponge -h
 //	sponge a microservice framework, a tool for quickly creating microservice code.
