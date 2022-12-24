@@ -8,45 +8,41 @@ import (
 	"io"
 	"os/exec"
 	"strings"
+	"sync"
 )
 
-// linux default executor
-var executor = "/bin/bash"
+var (
+	// linux default executor
+	executor = "/bin/bash"
+
+	once sync.Once
+)
 
 // SetExecutorPath setting the executor
 func SetExecutorPath(path string) {
-	executor = path
+	once.Do(func() {
+		executor = path
+	})
 }
 
 // Exec suitable for executing a single non-blocking command, outputting standard and error logs, but the log output is not real time,
 // Note: If the execution of a command blocks permanently, it can cause a concurrent leak.
 func Exec(command string) ([]byte, error) {
 	cmd := exec.Command(executor, "-c", command)
+	return getResult(cmd)
+}
 
-	stdout, stderr, err := getCmdReader(cmd)
+// ExecC suitable for executing a single non-blocking command, outputting standard and error logs,
+// but the log output is not real time, no execution, command name must be in system path,
+// Note: If the execution of a command blocks permanently, it can cause a concurrent leak.
+func ExecC(name string, args ...string) ([]byte, error) {
+	cmdName, err := exec.LookPath(name) // cmdName is absolute path
 	if err != nil {
 		return nil, err
 	}
 
-	bytes, err := io.ReadAll(stdout)
-	if err != nil {
-		return nil, err
-	}
-
-	bytesErr, err := io.ReadAll(stderr)
-	if err != nil {
-		return nil, err
-	}
-
-	err = cmd.Wait()
-	if err != nil {
-		if len(bytesErr) != 0 {
-			return nil, errors.New(string(bytesErr))
-		}
-		return nil, err
-	}
-
-	return bytes, nil
+	cmd := exec.Command(cmdName, args...)
+	return getResult(cmd)
 }
 
 // Run execute the command, you can actively end the command, the execution results are returned in real time in Result.StdOut
@@ -57,6 +53,25 @@ func Run(ctx context.Context, command string) *Result {
 		defer func() { close(result.StdOut) }() // execution complete, channel closed
 
 		cmd := exec.CommandContext(ctx, executor, "-c", command)
+		handleExec(ctx, cmd, result)
+	}()
+
+	return result
+}
+
+// RunC execute the command, no execution, command name must be in system path,
+// you can actively end the command, the execution results are returned in real time in Result.StdOut
+func RunC(ctx context.Context, name string, args ...string) *Result {
+	result := &Result{StdOut: make(chan string), Err: error(nil)}
+
+	go func() {
+		defer func() { close(result.StdOut) }() // execution complete, channel closed
+		cmdName, err := exec.LookPath(name)     // cmdName is absolute path
+		if err != nil {
+			result.Err = err
+			return
+		}
+		cmd := exec.CommandContext(ctx, cmdName, args...)
 		handleExec(ctx, cmd, result)
 	}()
 
@@ -132,4 +147,31 @@ func getCmdReader(cmd *exec.Cmd) (io.ReadCloser, io.ReadCloser, error) {
 	}
 
 	return stdout, stderr, nil
+}
+
+func getResult(cmd *exec.Cmd) ([]byte, error) {
+	stdout, stderr, err := getCmdReader(cmd)
+	if err != nil {
+		return nil, err
+	}
+
+	bytes, err := io.ReadAll(stdout)
+	if err != nil {
+		return nil, err
+	}
+
+	bytesErr, err := io.ReadAll(stderr)
+	if err != nil {
+		return nil, err
+	}
+
+	err = cmd.Wait()
+	if err != nil {
+		if len(bytesErr) != 0 {
+			return nil, errors.New(string(bytesErr))
+		}
+		return nil, err
+	}
+
+	return bytes, nil
 }

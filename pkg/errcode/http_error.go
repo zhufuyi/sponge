@@ -51,11 +51,9 @@ func (e *Error) Details() []string {
 
 // WithDetails add error details
 func (e *Error) WithDetails(details ...string) *Error {
-	newError := *e
-	newError.details = []string{}
-	newError.details = append(newError.details, details...)
-
-	return &newError
+	newError := &Error{code: e.code, msg: e.msg}
+	newError.msg += ", " + strings.Join(details, ", ")
+	return newError
 }
 
 // ToHTTPCode convert to http error code

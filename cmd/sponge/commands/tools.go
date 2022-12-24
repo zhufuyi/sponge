@@ -75,8 +75,8 @@ Examples:
   # install all tools.
   sponge tools --install
 `,
-		SilenceErrors: true,
-		SilenceUsage:  true,
+		//SilenceErrors: true,
+		//SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if executor != "" {
 				gobash.SetExecutorPath(executor)

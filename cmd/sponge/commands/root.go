@@ -30,6 +30,7 @@ func NewRootCMD() *cobra.Command {
 		NewWebCommand(),
 		MicroCommand(),
 		generate.ConfigCommand(),
+		NewRunCommand(),
 	)
 
 	return cmd
