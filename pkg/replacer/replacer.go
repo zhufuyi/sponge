@@ -267,6 +267,12 @@ func (r *replacerInfo) SaveFiles() error {
 	}
 
 	for file, data := range writeData {
+		if isForbiddenFile(file, r.path) {
+			return fmt.Errorf("disable writing file(%s) to directory(%s), file size=%d", file, r.path, len(data))
+		}
+	}
+
+	for file, data := range writeData {
 		err := saveToNewFile(file, data)
 		if err != nil {
 			return err
@@ -297,6 +303,14 @@ func (r *replacerInfo) isInIgnoreDir(file string) bool {
 		}
 	}
 	return isIgnore
+}
+
+func isForbiddenFile(file string, path string) bool {
+	if gofile.IsWindows() {
+		path = strings.ReplaceAll(path, "/", "\\")
+		file = strings.ReplaceAll(file, "/", "\\")
+	}
+	return strings.Contains(file, path)
 }
 
 func (r *replacerInfo) getNewFilePath(file string) string {

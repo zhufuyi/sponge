@@ -14,10 +14,17 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var httpResponseCodes = []int{
-	http.StatusOK, http.StatusBadRequest, http.StatusUnauthorized, http.StatusForbidden,
-	http.StatusNotFound, http.StatusRequestTimeout, http.StatusConflict, http.StatusInternalServerError,
-}
+var (
+	httpResponseCodes = []int{
+		http.StatusOK, http.StatusBadRequest, http.StatusUnauthorized, http.StatusForbidden,
+		http.StatusNotFound, http.StatusRequestTimeout, http.StatusConflict, http.StatusInternalServerError,
+	}
+	outs = []*errcode.Error{
+		errcode.Success, errcode.InvalidParams, errcode.Unauthorized, errcode.InternalServerError, errcode.NotFound,
+		errcode.AlreadyExists, errcode.Timeout, errcode.TooManyRequests, errcode.Forbidden,
+		errcode.MethodNotAllowed, errcode.ServiceUnavailable,
+	}
+)
 
 func runResponseHTTPServer() string {
 	serverAddr, requestAddr := utils.GetLocalHTTPAddrPairs()
@@ -29,6 +36,10 @@ func runResponseHTTPServer() string {
 	for _, code := range httpResponseCodes {
 		code := code
 		r.GET(fmt.Sprintf("/code/%d", code), func(c *gin.Context) { Output(c, code) })
+	}
+	for _, out := range outs {
+		out := out
+		r.GET(fmt.Sprintf("/out/code/%d", out.ToHTTPCode()), func(c *gin.Context) { Out(c, out) })
 	}
 
 	go func() {
@@ -60,6 +71,17 @@ func TestRespond(t *testing.T) {
 		url := fmt.Sprintf("%s/code/%d", requestAddr, code)
 		err := gohttp.Get(result, url)
 		if code == http.StatusOK {
+			assert.NoError(t, err)
+			assert.Equal(t, http.StatusOK, result.Code)
+			continue
+		}
+		assert.Error(t, err)
+	}
+	for _, out := range outs {
+		result := &gohttp.StdResult{}
+		url := fmt.Sprintf("%s/out/code/%d", requestAddr, out.ToHTTPCode())
+		err := gohttp.Get(result, url)
+		if out.ToHTTPCode() == http.StatusOK {
 			assert.NoError(t, err)
 			assert.Equal(t, http.StatusOK, result.Code)
 			continue

@@ -69,14 +69,18 @@ func (e *Error) ToHTTPCode() int {
 		return http.StatusUnauthorized
 	case TooManyRequests.Code(), LimitExceed.Code():
 		return http.StatusTooManyRequests
-	case Forbidden.Code():
+	case Forbidden.Code(), AccessDenied.Code():
 		return http.StatusForbidden
 	case NotFound.Code():
 		return http.StatusNotFound
 	case AlreadyExists.Code():
 		return http.StatusConflict
-	case Timeout.Code():
+	case Timeout.Code(), DeadlineExceeded.Code():
 		return http.StatusRequestTimeout
+	case MethodNotAllowed.Code():
+		return http.StatusMethodNotAllowed
+	case ServiceUnavailable.Code():
+		return http.StatusServiceUnavailable
 	}
 
 	return e.Code()
