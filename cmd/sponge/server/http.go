@@ -8,6 +8,8 @@ import (
 
 // RunHTTPServer run http server
 func RunHTTPServer(addr string) {
+	initRecord()
+
 	router := NewRouter()
 	server := &http.Server{
 		Addr:           addr,

@@ -1,9 +1,12 @@
 package generate
 
 import (
+	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/zhufuyi/sponge/pkg/gofile"
 	"github.com/zhufuyi/sponge/pkg/jy2struct"
@@ -15,10 +18,12 @@ import (
 func ConfigCommand() *cobra.Command {
 	var (
 		ysArgs = jy2struct.Args{
+			Format:    "yaml",
 			Tags:      "json",
 			SubStruct: true,
 		}
 		serverDir = ""
+		outPath   string // output directory
 	)
 
 	cmd := &cobra.Command{
@@ -29,10 +34,21 @@ func ConfigCommand() *cobra.Command {
 Examples:
   # generate config codes in server directory, the yaml configuration file must be in <yourServerDir>/configs directory.
   sponge config --server-dir=/yourServerDir
+
+  # generate config codes from yaml file.
+  sponge config --yaml-file=yourConfig.yml
 `,
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if ysArgs.InputFile != "" {
+				return convertToGoFile(ysArgs, outPath)
+			}
+
+			if serverDir == "" {
+				return errors.New("set at least one of the parameters 'server-dir' and 'yaml-file'")
+			}
+
 			files, err := getYAMLFile(serverDir)
 			if err != nil {
 				return err
@@ -48,7 +64,8 @@ Examples:
 	}
 
 	cmd.Flags().StringVarP(&serverDir, "server-dir", "d", "", "server directory")
-	_ = cmd.MarkFlagRequired("server-dir")
+	cmd.Flags().StringVarP(&ysArgs.InputFile, "yaml-file", "f", "", "yaml file")
+	cmd.Flags().StringVarP(&outPath, "out", "o", "", "output directory, default is ./config_<time>")
 
 	return cmd
 }
@@ -139,5 +156,42 @@ func saveFile(inputFile string, outputFile string, code string) error {
 		return err
 	}
 	fmt.Printf("%s ----> %s\n", inputFile, outputFile)
+	return nil
+}
+
+func convertToGoFile(ysArgs jy2struct.Args, outPath string) error {
+	ysArgs.Name = "Config"
+	data, err := jy2struct.Covert(&ysArgs)
+	if err != nil {
+		return err
+	}
+	if outPath == "" {
+		outPath, err = os.Getwd()
+		if err != nil {
+			return err
+		}
+		outPath += "/yaml-to-go-struct-" + time.Now().Format("150405") + "/internal/config"
+	} else {
+		outPath, err = filepath.Abs(outPath)
+		if err != nil {
+			return err
+		}
+		outPath += "/internal/config"
+	}
+	_ = os.MkdirAll(outPath, 0666)
+	name := gofile.GetFilenameWithoutSuffix(ysArgs.InputFile)
+
+	outPath += "/" + name + ".go"
+	if gofile.IsWindows() {
+		outPath = strings.ReplaceAll(outPath, "/", "\\")
+	}
+
+	err = os.WriteFile(outPath, []byte(configFileCode+data), 0666)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("covert yaml to go struct successfully, out=%s\n", outPath)
+
 	return nil
 }
