@@ -27,8 +27,8 @@ var (
 	saveDir = os.TempDir() + "/sponge_temp"
 )
 
-type testMysqlForm struct {
-	Dsn string `json:"dsn"  binding:"min=10"`
+type mysqlForm struct {
+	Dsn string `json:"dsn" binding:"required"`
 }
 
 type kv struct {
@@ -38,7 +38,7 @@ type kv struct {
 
 // ListTables list tables
 func ListTables(c *gin.Context) {
-	form := &testMysqlForm{}
+	form := &mysqlForm{}
 	err := c.ShouldBindJSON(form)
 	if err != nil {
 		response.Error(c, ecode.InvalidParams.WithDetails(err.Error()))
@@ -71,8 +71,8 @@ func ListTables(c *gin.Context) {
 
 // GenerateCodeForm generate code form
 type GenerateCodeForm struct {
-	Arg  string `json:"arg" binding:"min=1"`
-	Path string `json:"path" binding:"min=2"`
+	Arg  string `json:"arg" binding:"required"`
+	Path string `json:"path" binding:"required"`
 }
 
 // GenerateCode generate code

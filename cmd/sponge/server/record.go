@@ -38,12 +38,6 @@ type record struct {
 }
 
 func initRecord() {
-	// first look up the data from the binary directory
-	//cmdName, err := exec.LookPath("sponge")
-	//if err == nil {
-	//	dataFile = cmdName + ".data" // binary file and data in the same directory
-	//}
-
 	rcd = &record{
 		mux:        new(sync.Mutex),
 		HostRecord: make(map[string]*parameters),
