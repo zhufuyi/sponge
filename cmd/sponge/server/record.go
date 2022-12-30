@@ -4,17 +4,17 @@ import (
 	"context"
 	"encoding/json"
 	"os"
-	"os/exec"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/zhufuyi/sponge/pkg/gofile"
 	"github.com/zhufuyi/sponge/pkg/logger"
 	"github.com/zhufuyi/sponge/pkg/utils"
 )
 
 var (
-	dataFile = os.TempDir() + "/sponge.data"
+	dataFile = saveDir + "/data.json"
 	rcd      *record
 )
 
@@ -24,6 +24,7 @@ type parameters struct {
 	ModuleName    string `json:"moduleName"`
 	RepoAddr      string `json:"repoAddr"`
 	ProtobufFile  string `json:"-"`
+	YamlFile      string `json:"-"`
 	Dsn           string `json:"dsn"`
 	TableName     string `json:"tableName"`
 	Embed         bool   `json:"embed"`
@@ -38,10 +39,10 @@ type record struct {
 
 func initRecord() {
 	// first look up the data from the binary directory
-	cmdName, err := exec.LookPath("sponge")
-	if err == nil {
-		dataFile = cmdName + ".data" // binary file and data in the same directory
-	}
+	//cmdName, err := exec.LookPath("sponge")
+	//if err == nil {
+	//	dataFile = cmdName + ".data" // binary file and data in the same directory
+	//}
 
 	rcd = &record{
 		mux:        new(sync.Mutex),
@@ -66,6 +67,7 @@ func (r *record) set(ip string, commandType string, params *parameters) {
 			r.mux.Unlock()
 			cancel()
 		}()
+
 		key := getKey(ip, commandType)
 		r.HostRecord[key] = params
 		data, err := json.Marshal(r.HostRecord)
@@ -73,9 +75,16 @@ func (r *record) set(ip string, commandType string, params *parameters) {
 			logger.Warn("json marshal error", logger.Err(err))
 			return
 		}
-		err = os.WriteFile(dataFile, data, 0666)
+
+		var file = dataFile
+		if gofile.IsWindows() {
+			file = strings.ReplaceAll(dataFile, "/", "\\")
+		}
+		dir := gofile.GetFileDir(file)
+		_ = gofile.CreateDir(dir)
+		err = os.WriteFile(file, data, 0666)
 		if err != nil {
-			logger.Warn("WriteFile sponge.data error", logger.Err(err))
+			logger.Warn("WriteFile error", logger.Err(err))
 			return
 		}
 	})
@@ -135,6 +144,8 @@ func parseCommandArgs(args []string) *parameters {
 				params.RepoAddr = val
 			case "--protobuf-file":
 				params.ProtobufFile = val
+			case "--yaml-file":
+				params.YamlFile = val
 			}
 		}
 	}

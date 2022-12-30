@@ -20,6 +20,6 @@ func RunHTTPServer(addr string) {
 	}
 
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		panic(fmt.Errorf("listen server error: %v", err))
+		panic(fmt.Errorf("ListenAndServe error: %v", err))
 	}
 }

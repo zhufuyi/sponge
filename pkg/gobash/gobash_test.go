@@ -34,9 +34,9 @@ func TestRun(t *testing.T) {
 }
 func TestRunC(t *testing.T) {
 	cmds := map[string][]string{
-		"ping": []string{"www.baidu.com"},
-		"pwd":  []string{},
-		"go":   []string{"env"},
+		"ping": {"www.baidu.com"},
+		"pwd":  {},
+		"go":   {"env"},
 	}
 
 	for cmd, args := range cmds {
@@ -71,9 +71,9 @@ func TestExec(t *testing.T) {
 
 func TestExecC(t *testing.T) {
 	cmds := map[string][]string{
-		"pwd":    []string{},
-		"go":     []string{"env"},
-		"sponge": []string{"-h"},
+		"pwd":    {},
+		"go":     {"env"},
+		"sponge": {"-h"},
 	}
 
 	for cmd, args := range cmds {

@@ -72,6 +72,12 @@ func TestGetFilename(t *testing.T) {
 	name := GetFilename("./README.md")
 	assert.Equal(t, "README.md", name)
 
+	name = GetFileDir("gofile/README.md")
+	assert.Equal(t, "gofile/", name)
+
+	err := CreateDir("./")
+	assert.Nil(t, err)
+
 	name = GetFilenameWithoutSuffix("./README.md")
 	assert.Equal(t, "README", name)
 }

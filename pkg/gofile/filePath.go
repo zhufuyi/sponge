@@ -33,6 +33,20 @@ func GetFilename(filePath string) string {
 	return name
 }
 
+// GetFileDir get dir
+func GetFileDir(filePath string) string {
+	dir, _ := filepath.Split(filePath)
+	return dir
+}
+
+// CreateDir create dir
+func CreateDir(dir string) error {
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		return os.MkdirAll(dir, 0666)
+	}
+	return nil
+}
+
 // GetFilenameWithoutSuffix get file name without suffix
 func GetFilenameWithoutSuffix(filePath string) string {
 	_, name := filepath.Split(filePath)

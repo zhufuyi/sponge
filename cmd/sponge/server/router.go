@@ -2,11 +2,11 @@ package server
 
 import (
 	"embed"
+	"net/http"
+
 	"github.com/zhufuyi/sponge/pkg/gin/handlerfunc"
 	"github.com/zhufuyi/sponge/pkg/gin/middleware"
 	"github.com/zhufuyi/sponge/pkg/gin/validator"
-	"github.com/zhufuyi/sponge/pkg/logger"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -17,10 +17,11 @@ var staticFS embed.FS // index.html in the static directory
 
 // NewRouter create a router
 func NewRouter() *gin.Engine {
+	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
 	r.Use(gin.Recovery())
 	r.Use(middleware.Cors())
-	r.Use(middleware.Logging(middleware.WithLog(logger.Get())))
+	//r.Use(middleware.Logging(middleware.WithLog(logger.Get())))
 	binding.Validator = validator.Init()
 
 	// solve vue using history route 404 problem

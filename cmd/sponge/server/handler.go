@@ -9,7 +9,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"runtime"
 	"strings"
 	"time"
 
@@ -24,7 +23,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type TestMysqlForm struct {
+var (
+	saveDir = os.TempDir() + "/sponge_temp"
+)
+
+type testMysqlForm struct {
 	Dsn string `json:"dsn"  binding:"min=10"`
 }
 
@@ -35,7 +38,7 @@ type kv struct {
 
 // ListTables list tables
 func ListTables(c *gin.Context) {
-	form := &TestMysqlForm{}
+	form := &testMysqlForm{}
 	err := c.ShouldBindJSON(form)
 	if err != nil {
 		response.Error(c, ecode.InvalidParams.WithDetails(err.Error()))
@@ -101,9 +104,7 @@ func generateCode(c *gin.Context, path string, arg string) {
 	args := strings.Split(arg, " ")
 	ctx, _ := context.WithTimeout(context.Background(), time.Second*10) // nolint
 	result := gobash.RunC(ctx, "sponge", args...)
-	var data []string
-	for v := range result.StdOut {
-		data = append(data, v)
+	for range result.StdOut {
 	}
 	if result.Err != nil {
 		responseErr(c, result.Err, ecode.InternalServerError)
@@ -131,21 +132,23 @@ func generateCode(c *gin.Context, path string, arg string) {
 
 	_ = os.RemoveAll(out)
 	_ = os.RemoveAll(zipFile)
-	if strings.Contains(path, "-pb") {
-		dir, _ := filepath.Split(params.ProtobufFile)
-		_ = os.RemoveAll(dir)
+	if params.ProtobufFile != "" && strings.Contains(params.ProtobufFile, "sponge_temp") {
+		_ = os.RemoveAll(gofile.GetFileDir(params.ProtobufFile))
+	}
+	if params.YamlFile != "" && strings.Contains(params.YamlFile, "sponge_temp") {
+		_ = os.RemoveAll(gofile.GetFileDir(params.YamlFile))
 	}
 }
 
 // GetRecord generate run command record
 func GetRecord(c *gin.Context) {
-	path := c.Param("path")
-	if path == "" {
-		response.Out(c, ecode.InvalidParams.WithDetails("path is empty"))
+	pathParam := c.Param("path")
+	if pathParam == "" {
+		response.Out(c, ecode.InvalidParams.WithDetails("path param is empty"))
 		return
 	}
 
-	params := recordObj().get(c.ClientIP(), path)
+	params := recordObj().get(c.ClientIP(), pathParam)
 	if params == nil {
 		params = &parameters{Embed: true}
 	}
@@ -160,7 +163,7 @@ func responseErr(c *gin.Context, err error, ec *errcode.Error) {
 	response.Out(c, e)
 }
 
-// UploadFiles 批量上传文件
+// UploadFiles batch files upload
 func UploadFiles(c *gin.Context) {
 	form, err := c.MultipartForm()
 	if err != nil {
@@ -187,7 +190,7 @@ func UploadFiles(c *gin.Context) {
 		for _, file := range files {
 			filename := filepath.Base(file.Filename)
 			fileType = path.Ext(filename)
-			if !checkNameType(filename) {
+			if !checkFileType(filename) {
 				response.Error(c, ecode.InvalidParams.WithDetails("only .proto or yaml files are allowed to be uploaded"))
 				return
 			}
@@ -207,40 +210,23 @@ func UploadFiles(c *gin.Context) {
 
 	if fileType == ".proto" {
 		filePath = savePath + "/*.proto"
-	} else {
-		files, err := gofile.ListFiles(savePath)
-		if err != nil {
-			response.Error(c, ecode.InternalServerError.WithDetails(err.Error()))
-		}
-		if len(files) > 0 {
-			filePath = files[0]
-		}
 	}
 
 	response.Success(c, filePath)
 }
 
-func getFormValue(valueMap map[string][]string, key string) (string, error) {
-	valueSlice := valueMap[key]
-	if len(valueSlice) == 0 {
-		return "", fmt.Errorf("form '%s' is empty", key)
-	}
+//func getFormValue(valueMap map[string][]string, key string) (string, error) {
+//	valueSlice := valueMap[key]
+//	if len(valueSlice) == 0 {
+//		return "", fmt.Errorf("form '%s' is empty", key)
+//	}
+//
+//	return valueSlice[0], nil
+//}
 
-	return valueSlice[0], nil
-}
-
-// 清空已上传的文件
-func removeFiles(files []string) {
-	for _, file := range files {
-		_ = os.RemoveAll(file)
-	}
-}
-
-func checkNameType(filename string) bool {
-	tmpStr := strings.ToLower(filename)
-	if strings.TrimRight(tmpStr, ".proto") != tmpStr ||
-		strings.TrimRight(tmpStr, ".yml") != tmpStr ||
-		strings.TrimRight(tmpStr, ".yaml") != tmpStr {
+func checkFileType(typeName string) bool {
+	switch typeName {
+	case ".proto", ".yml", ".yaml":
 		return true
 	}
 
@@ -257,17 +243,15 @@ func checkSameFile(files []string, file string) bool {
 }
 
 func getSavePath() string {
-	path := gofile.GetRunPath()
-	if runtime.GOOS == "windows" {
-		path = strings.ReplaceAll(path, "\\", "/")
+	var dir = saveDir
+	if gofile.IsWindows() {
+		dir = strings.ReplaceAll(saveDir, "\\", "/")
 	}
-	path = strings.TrimRight(path, "/") + "/proto/" + krand.String(krand.R_All, 8)
-
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		_ = os.MkdirAll(path, 0666)
+	dir += "/" + krand.String(krand.R_All, 8)
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		_ = os.MkdirAll(dir, 0666)
 	}
-
-	return path
+	return dir
 }
 
 // CompressPathToZip compressed directory to zip file
