@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 	"time"
 
@@ -15,32 +16,20 @@ import (
 
 // UpdateCommand update sponge binaries
 func UpdateCommand() *cobra.Command {
-	var executor string
-	var enableCNGoProxy bool
-
 	cmd := &cobra.Command{
 		Use:   "update",
 		Short: "Update sponge to the latest version",
 		Long: `update sponge to the latest version.
 
 Examples:
-  # for linux
+  # run update
   sponge update
-
-  # for windows, need to specify the bash file
-  sponge update --executor="D:\Program Files\cmder\vendor\git-for-windows\bin\bash.exe"
-
-  # use goproxy https://goproxy.cn
-  sponge update -g
 `,
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if executor != "" {
-				gobash.SetExecutorPath(executor)
-			}
 			fmt.Println("update sponge ......")
-			err := runUpdateCommand(enableCNGoProxy)
+			err := runUpdateCommand()
 			if err != nil {
 				return err
 			}
@@ -53,23 +42,15 @@ Examples:
 		},
 	}
 
-	cmd.Flags().StringVarP(&executor, "executor", "e", "", "for windows systems, you need to specify the bash executor path.")
-	cmd.Flags().BoolVarP(&enableCNGoProxy, "enable-cn-goproxy", "g", false, "is $GOPROXY turn on 'https://goproxy.cn'")
-
 	return cmd
 }
 
-func runUpdateCommand(enableCNGoProxy bool) error {
+func runUpdateCommand() error {
 	ctx, _ := context.WithTimeout(context.Background(), time.Minute*3) //nolint
-	command := "go install github.com/zhufuyi/sponge/cmd/sponge@latest"
-	if enableCNGoProxy {
-		command = "GOPROXY=https://goproxy.cn,direct && " + command
-	}
-	result := gobash.Run(ctx, command)
+	result := gobash.Run(ctx, "go", "install", "github.com/zhufuyi/sponge/cmd/sponge@latest")
 	for range result.StdOut {
 	}
 	if result.Err != nil {
-		checkExit("update", result.Err)
 		return fmt.Errorf("exec command failed, %v", result.Err)
 	}
 
@@ -78,9 +59,9 @@ func runUpdateCommand(enableCNGoProxy bool) error {
 
 // copy the template files to a temporary directory
 func copyToTempDir() (string, error) {
-	result, err := gobash.Exec("go env GOPATH")
+	result, err := gobash.Exec("go", "env", "GOPATH")
 	if err != nil {
-		return "", fmt.Errorf("Exec() error %v", err)
+		return "", fmt.Errorf("cxec command failed, %v", err)
 	}
 	gopath := strings.ReplaceAll(string(result), "\n", "")
 	if gopath == "" {
@@ -88,34 +69,53 @@ func copyToTempDir() (string, error) {
 	}
 
 	// find the new version of the sponge code directory
-	command := "ls $(go env GOPATH)/pkg/mod/github.com/zhufuyi | grep sponge@ | sort -r | head -1"
-	result, err = gobash.Exec(command)
+	arg := fmt.Sprintf("%s/pkg/mod/github.com/zhufuyi", gopath)
+	result, err = gobash.Exec("ls", adaptPathDelimiter(arg))
 	if err != nil {
-		return "", fmt.Errorf("Exec() error %v", err)
+		return "", fmt.Errorf("cxec command failed, %v", err)
 	}
-	latestSpongeDirName := strings.ReplaceAll(string(result), "\n", "")
+
+	latestSpongeDirName := getLatestVersion(string(result))
 	if latestSpongeDirName == "" {
 		return "", fmt.Errorf("not found 'sponge' directory in '$GOPATH/pkg/mod/github.com/zhufuyi'")
 	}
-	srcDir := fmt.Sprintf("%s/pkg/mod/github.com/zhufuyi/%s", gopath, latestSpongeDirName)
-	destDir := os.TempDir() + "/sponge"
+
+	srcDir := adaptPathDelimiter(fmt.Sprintf("%s/pkg/mod/github.com/zhufuyi/%s", gopath, latestSpongeDirName))
+	destDir := adaptPathDelimiter(os.TempDir() + "/sponge")
+	destDirBk := destDir + ".bk"
 
 	// copy to temporary directory
-	_ = os.RemoveAll(adaptPathDelimiter(destDir))
-	command = fmt.Sprintf(`cp -rf %s %s`, adaptPathDelimiter(srcDir), adaptPathDelimiter(destDir))
-	_, err = gobash.Exec(command)
+	_ = os.Rename(destDir, destDirBk)
+	_, err = gobash.Exec("cp", "-rf", srcDir, destDir)
 	if err != nil {
-		return "", fmt.Errorf("exec '%s' error, %v", command, err)
+		_ = os.Rename(destDirBk, destDir)
+		return "", fmt.Errorf("cxec command failed, %v", err)
 	}
+	_ = os.RemoveAll(destDirBk)
 
-	ver := strings.Replace(latestSpongeDirName, "sponge@", "", 1)
-	_ = os.WriteFile(versionFile, []byte(ver), 0666)
-	return ver, err
+	versionNum := strings.Replace(latestSpongeDirName, "sponge@", "", 1)
+	_ = os.WriteFile(versionFile, []byte(versionNum), 0666)
+	return versionNum, nil
 }
 
 func adaptPathDelimiter(filePath string) string {
 	if gofile.IsWindows() {
-		filePath = strings.ReplaceAll(filePath, "\\", "/")
+		filePath = strings.ReplaceAll(filePath, "/", "\\")
 	}
 	return filePath
+}
+
+func getLatestVersion(s string) string {
+	dirs := strings.Split(s, "\n")
+	var allVersions []string
+	for _, dirName := range dirs {
+		if strings.Contains(dirName, "sponge@") {
+			allVersions = append(allVersions, dirName)
+		}
+	}
+	if allVersions == nil {
+		return ""
+	}
+	sort.Strings(allVersions)
+	return allVersions[len(allVersions)-1]
 }

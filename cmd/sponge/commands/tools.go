@@ -32,17 +32,17 @@ var toolNames = []string{
 var installToolCommands = map[string]string{
 	"go":                     "go: please install manually yourself, download url is https://go.dev/dl/ or https://golang.google.cn/dl/",
 	"protoc":                 "protoc: please install manually yourself, download url is https://github.com/protocolbuffers/protobuf/releases/tag/v3.20.3",
-	"protoc-gen-go":          "go install google.golang.org/protobuf/cmd/protoc-gen-go@latest",
-	"protoc-gen-go-grpc":     "go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest",
-	"protoc-gen-validate":    "go install github.com/envoyproxy/protoc-gen-validate@latest",
-	"protoc-gen-gotag":       "go install github.com/srikrsna/protoc-gen-gotag@latest",
-	"protoc-gen-go-gin":      "go install github.com/zhufuyi/sponge/cmd/protoc-gen-go-gin@latest",
-	"protoc-gen-go-rpc-tmpl": "go install github.com/zhufuyi/sponge/cmd/protoc-gen-go-rpc-tmpl@latest",
-	"protoc-gen-openapiv2":   "go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@latest",
-	"protoc-gen-doc":         "go install github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc@latest",
-	"golangci-lint":          "go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest",
-	"swag":                   "go install github.com/swaggo/swag/cmd/swag@latest",
-	"go-callvis":             "go install github.com/ofabry/go-callvis@latest",
+	"protoc-gen-go":          "google.golang.org/protobuf/cmd/protoc-gen-go@latest",
+	"protoc-gen-go-grpc":     "google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest",
+	"protoc-gen-validate":    "github.com/envoyproxy/protoc-gen-validate@latest",
+	"protoc-gen-gotag":       "github.com/srikrsna/protoc-gen-gotag@latest",
+	"protoc-gen-go-gin":      "github.com/zhufuyi/sponge/cmd/protoc-gen-go-gin@latest",
+	"protoc-gen-go-rpc-tmpl": "github.com/zhufuyi/sponge/cmd/protoc-gen-go-rpc-tmpl@latest",
+	"protoc-gen-openapiv2":   "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@latest",
+	"protoc-gen-doc":         "github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc@latest",
+	"golangci-lint":          "github.com/golangci/golangci-lint/cmd/golangci-lint@latest",
+	"swag":                   "github.com/swaggo/swag/cmd/swag@latest",
+	"go-callvis":             "github.com/ofabry/go-callvis@latest",
 }
 
 const (
@@ -53,8 +53,6 @@ const (
 
 // ToolsCommand tools management
 func ToolsCommand() *cobra.Command {
-	var executor string
-	var enableCNGoProxy bool
 	var installFlag bool
 
 	cmd := &cobra.Command{
@@ -63,28 +61,18 @@ func ToolsCommand() *cobra.Command {
 		Long: `managing sponge dependency tools.
 
 Examples:
-  # for linux, show all dependencies tools.
+  # show all dependencies tools.
   sponge tools
 
-  # for windows, show all dependencies tools.
-  sponge tools --executor="D:\Program Files\cmder\vendor\git-for-windows\bin\bash.exe"
-
-  # use goproxy https://goproxy.cn
-  sponge tools -g
-
-  # install all tools.
+  # install all dependencies tools.
   sponge tools --install
 `,
-		//SilenceErrors: true,
-		//SilenceUsage:  true,
+		SilenceErrors: true,
+		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if executor != "" {
-				gobash.SetExecutorPath(executor)
-			}
-
 			installedNames, lackNames := checkInstallTools()
 			if installFlag {
-				installTools(lackNames, enableCNGoProxy)
+				installTools(lackNames)
 			} else {
 				showDependencyTools(installedNames, lackNames)
 			}
@@ -92,9 +80,6 @@ Examples:
 			return nil
 		},
 	}
-
-	cmd.Flags().StringVarP(&executor, "executor", "e", "", "for windows systems, you need to specify the bash executor path.")
-	cmd.Flags().BoolVarP(&enableCNGoProxy, "enable-cn-goproxy", "g", false, "is $GOPROXY turn on 'https://goproxy.cn'")
 	cmd.Flags().BoolVarP(&installFlag, "install", "i", false, "install dependent tools")
 
 	return cmd
@@ -103,10 +88,8 @@ Examples:
 func checkInstallTools() ([]string, []string) {
 	var installedNames, lackNames = []string{}, []string{}
 	for _, name := range toolNames {
-		command := "which " + name
-		_, err := gobash.Exec(command)
+		_, err := gobash.Exec("which", name)
 		if err != nil {
-			checkExit("tools", err)
 			lackNames = append(lackNames, name)
 			continue
 		}
@@ -137,20 +120,20 @@ func showDependencyTools(installedNames []string, lackNames []string) {
 		for _, name := range lackNames {
 			content += "    " + lackSymbol + " " + name + "\n"
 		}
-		content += "\nInstalling dependency tools using the command: sponge tools --install"
+		content += "\nInstalling dependency tools using the command: sponge tools --install\n"
 	} else {
-		content += "\nAll dependent tools installed."
+		content += "\nAll dependent tools installed.\n"
 	}
 
 	fmt.Println(content)
 }
 
-func installTools(lackNames []string, enableCNGoProxy bool) {
+func installTools(lackNames []string) {
 	if len(lackNames) == 0 {
 		fmt.Printf("\n    All dependent tools installed.\n\n")
 		return
 	}
-	fmt.Printf("install dependent tools ......\n\n")
+	fmt.Printf("install a total of %d dependent tools, need to wait a little time.\n\n", len(lackNames))
 
 	var wg = &sync.WaitGroup{}
 	var manuallyNames []string
@@ -164,16 +147,12 @@ func installTools(lackNames []string, enableCNGoProxy bool) {
 		go func(name string) {
 			defer wg.Done()
 			ctx, _ := context.WithTimeout(context.Background(), time.Minute*3) //nolint
-			command, ok := installToolCommands[name]
+			pkgAddr, ok := installToolCommands[name]
 			if !ok {
 				return
 			}
-			command = adaptInternalCommand(name, command)
-			fmt.Println(command)
-			if enableCNGoProxy {
-				command = "GOPROXY=https://goproxy.cn,direct && " + command
-			}
-			result := gobash.Run(ctx, command)
+			pkgAddr = adaptInternalCommand(name, pkgAddr)
+			result := gobash.Run(ctx, "go", "install", pkgAddr)
 			for range result.StdOut {
 			}
 			if result.Err != nil {
@@ -189,23 +168,15 @@ func installTools(lackNames []string, enableCNGoProxy bool) {
 	for _, name := range manuallyNames {
 		fmt.Println(warnSymbol + " " + installToolCommands[name])
 	}
+	fmt.Println()
 }
 
-func checkExit(name string, err error) {
-	str := err.Error()
-	if strings.Contains(str, "exec: ") && strings.Contains(str, "file does not exist") {
-		fmt.Printf(err.Error()+", must specify the executor location, example:\n"+`    sponge %s --executor="your bash file path"
-`, name)
-		os.Exit(1)
-	}
-}
-
-func adaptInternalCommand(name string, command string) string {
+func adaptInternalCommand(name string, pkgAddr string) string {
 	if name == "protoc-gen-go-gin" || name == "protoc-gen-go-rpc-tmpl" {
 		if version != "v0.0.0" {
-			return strings.ReplaceAll(command, "@latest", "@"+version)
+			return strings.ReplaceAll(pkgAddr, "@latest", "@"+version)
 		}
 	}
 
-	return command
+	return pkgAddr
 }

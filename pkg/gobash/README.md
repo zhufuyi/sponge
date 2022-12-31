@@ -12,10 +12,10 @@ Run executes commands and can actively end them, returning logs and error messag
 
 ```go
 
-    command := "for i in $(seq 1 5); do echo 'test cmd' $i;sleep 1; done"
+    arg := "for i in $(seq 1 5); do echo 'test cmd' $i;sleep 1; done"
     ctx, _ := context.WithTimeout(context.Background(), 3*time.Second) // timeout control
 
-    result := Run(ctx, command)
+    result := Run(ctx, "bash", "-c", arg)
     // real-time output of logs and error messages
     for v := range result.StdOut {
         fmt.Printf(v)
@@ -32,8 +32,8 @@ Run executes commands and can actively end them, returning logs and error messag
 Exec is suitable for executing a single non-blocking command, outputting standard and error logs, but the log output is not real-time, note: if the execution of the command is permanently blocked, it will cause a concurrent leak
 
 ```go
-    command := "for i in $(seq 1 5); do echo 'test cmd' $i;sleep 1; done"
-    out, err := gobash.Exec(command)
+    arg := "for i in $(seq 1 5); do echo 'test cmd' $i;sleep 1; done"
+    out, err := Exec("bash", "-c", arg)
     if err != nil {
         return
     }

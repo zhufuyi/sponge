@@ -91,7 +91,7 @@ func GenerateCode(c *gin.Context) {
 }
 
 func generateCode(c *gin.Context, path string, arg string) {
-	out := "-" + time.Now().Format("20060102150405")
+	out := "-" + time.Now().Format("150405")
 	if len(path) > 1 {
 		if path[0] == '/' {
 			out = path[1:] + out
@@ -99,11 +99,16 @@ func generateCode(c *gin.Context, path string, arg string) {
 			out = path + out
 		}
 	}
-	arg += fmt.Sprintf(" --out=%s", out)
 
 	args := strings.Split(arg, " ")
+	params := parseCommandArgs(args)
+	if params.ModuleName != "" {
+		out = params.ModuleName + "-" + out
+	}
+	args = append(args, fmt.Sprintf("--out=%s", out))
+
 	ctx, _ := context.WithTimeout(context.Background(), time.Second*10) // nolint
-	result := gobash.RunC(ctx, "sponge", args...)
+	result := gobash.Run(ctx, "sponge", args...)
 	for range result.StdOut {
 	}
 	if result.Err != nil {
@@ -127,7 +132,6 @@ func generateCode(c *gin.Context, path string, arg string) {
 	c.Writer.Header().Set("content-disposition", zipFile)
 	c.File(zipFile)
 
-	params := parseCommandArgs(args)
 	recordObj().set(c.ClientIP(), path, params)
 
 	_ = os.RemoveAll(out)

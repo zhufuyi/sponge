@@ -8,34 +8,12 @@ import (
 	"io"
 	"os/exec"
 	"strings"
-	"sync"
 )
 
-var (
-	// linux default executor
-	executor = "/bin/bash"
-
-	once sync.Once
-)
-
-// SetExecutorPath setting the executor
-func SetExecutorPath(path string) {
-	once.Do(func() {
-		executor = path
-	})
-}
-
-// Exec suitable for executing a single non-blocking command, outputting standard and error logs, but the log output is not real time,
-// Note: If the execution of a command blocks permanently, it can cause a concurrent leak.
-func Exec(command string) ([]byte, error) {
-	cmd := exec.Command(executor, "-c", command)
-	return getResult(cmd)
-}
-
-// ExecC suitable for executing a single non-blocking command, outputting standard and error logs,
+// Exec suitable for executing a single non-blocking command, outputting standard and error logs,
 // but the log output is not real time, no execution, command name must be in system path,
 // Note: If the execution of a command blocks permanently, it can cause a concurrent leak.
-func ExecC(name string, args ...string) ([]byte, error) {
+func Exec(name string, args ...string) ([]byte, error) {
 	cmdName, err := exec.LookPath(name) // cmdName is absolute path
 	if err != nil {
 		return nil, err
@@ -45,23 +23,15 @@ func ExecC(name string, args ...string) ([]byte, error) {
 	return getResult(cmd)
 }
 
-// Run execute the command, you can actively end the command, the execution results are returned in real time in Result.StdOut
-func Run(ctx context.Context, command string) *Result {
-	result := &Result{StdOut: make(chan string), Err: error(nil)}
-
-	go func() {
-		defer func() { close(result.StdOut) }() // execution complete, channel closed
-
-		cmd := exec.CommandContext(ctx, executor, "-c", command)
-		handleExec(ctx, cmd, result)
-	}()
-
-	return result
+// Result of the execution of the command
+type Result struct {
+	StdOut chan string
+	Err    error // If nil after the command is executed, the command is executed successfully
 }
 
-// RunC execute the command, no execution, command name must be in system path,
+// Run execute the command, no execution, command name must be in system path,
 // you can actively end the command, the execution results are returned in real time in Result.StdOut
-func RunC(ctx context.Context, name string, args ...string) *Result {
+func Run(ctx context.Context, name string, args ...string) *Result {
 	result := &Result{StdOut: make(chan string), Err: error(nil)}
 
 	go func() {
@@ -76,12 +46,6 @@ func RunC(ctx context.Context, name string, args ...string) *Result {
 	}()
 
 	return result
-}
-
-// Result of the execution of the command
-type Result struct {
-	StdOut chan string
-	Err    error // If nil after the command is executed, the command is executed successfully
 }
 
 func handleExec(ctx context.Context, cmd *exec.Cmd, result *Result) {
