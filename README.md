@@ -27,7 +27,7 @@ The generated code is based on three approaches **Yaml**, **SQL DDL** and **Prot
 <img align="center" width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/sponge-framework.png">
 </p>
 
-*Figure 1-1 spong generation code framework diagram*
+*Figure 1-1 sponge generation code framework diagram*
 
 <br>
 
