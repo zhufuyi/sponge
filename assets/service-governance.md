@@ -334,7 +334,7 @@ All of the above are manual profile collection, and it is usually desirable to a
 - Record the program's use of physical memory for 3 consecutive times (once per minute by default), and trigger an alarm when the average system memory usage exceeds 80% for 3 times.
 - If the alarm threshold is continuously exceeded, the default interval is 15 minutes between alarms.
 
-When the alarm is triggered, the program internally calls the kill function to send x system signal to notify the acquisition profile, and the acquired profile file is saved to the `/tmp/service name_profile` directory, which is actually the basis of **notifying the acquisition profile by system signal** to change the manual trigger to automatic trigger, even in the middle of the night the program's cpu or memory is too high, the next day you can also analyze the profile to find out where the program is causing the cpu or memory to be too high.
+When the alarm is triggered, the program internally calls the kill function to send system signal to notify the acquisition profile, and the acquired profile file is saved to the `/tmp/service name_profile` directory, which is actually the basis of **notifying the acquisition profile by system signal** to change the manual trigger to automatic trigger, even in the middle of the night the program's cpu or memory is too high, the next day you can also analyze the profile to find out where the program is causing the cpu or memory to be too high.
 
 Note: Automatic profile collection is not suitable for windows environment.
 

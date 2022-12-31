@@ -9,7 +9,7 @@
 生成代码基于**Yaml**、**SQL DDL**和**Protocol buffers**三种方式，每种方式拥有生成不同功能代码，生成代码的框架图如图1-1所示：
 
 ![sponge-framework](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/sponge-framework.png)
-*图1-1 spong生成代码框架图*
+*图1-1 sponge生成代码框架图*
 
 <br>
 
@@ -70,17 +70,17 @@ sponge创建的微服务代码框架如图1-2所示，这是典型的微服务�
 ├── deployments    # IaaS、PaaS、系统和容器协调部署的配置和模板目录
 ├─ docs            # 设计文档和界面文档目录
 ├── internal       # 私有应用程序和库的代码目录
-│ ├── cache        # 基于业务包装的缓存目录
-│ ├── config       # Go结构的配置文件目录
-│ ├── dao          # 数据访问目录
-│ ├── ecode        # 自定义业务错误代码目录
-│ ├── handler      # http的业务功能实现目录
-│ ├── model        # 数据库模型目录
-│ ├── routers      # http路由目录
-│ ├── rpcclient    # 连接rpc服务的客户端目录
-│ ├── server       # 服务入口，包括http、rpc等
-│ ├── service      # rpc的业务功能实现目录
-│ └── types        # http的请求和响应类型目录
+│    ├── cache        # 基于业务包装的缓存目录
+│    ├── config       # Go结构的配置文件目录
+│    ├── dao          # 数据访问目录
+│    ├── ecode        # 自定义业务错误代码目录
+│    ├── handler      # http的业务功能实现目录
+│    ├── model        # 数据库模型目录
+│    ├── routers      # http路由目录
+│    ├── rpcclient    # 连接rpc服务的客户端目录
+│    ├── server       # 服务入口，包括http、rpc等
+│    ├── service      # rpc的业务功能实现目录
+│    └── types        # http的请求和响应类型目录
 ├── pkg            # 外部应用程序可以使用的库目录
 ├── scripts        # 用于执行各种构建、安装、分析等操作的脚本目录
 ├── test           # 额外的外部测试程序和测试数据
@@ -139,7 +139,11 @@ https://github.com/cmderdev/cmder/releases/download/v1.3.20/cmder.zip
 
 **(3) 安装 sponge**
 
-> go install github.com/zhufuyi/sponge/cmd/sponge@latest
+执行命令：
+
+```bash
+go install github.com/zhufuyi/sponge/cmd/sponge@latest
+```
 
 注：sponge二进制文件所在目录必须在系统path下。
 
@@ -147,25 +151,27 @@ https://github.com/cmderdev/cmder/releases/download/v1.3.20/cmder.zip
 
 **(4) 安装依赖插件和工具**
 
-> sponge init
+执行命令：
+
+```bash
+sponge init
+```
 
 执行命令后自动安装了依赖插件和工具：[protoc-gen-go](https://google.golang.org/protobuf/cmd/protoc-gen-go)、 [protoc-gen-go-grpc](https://google.golang.org/grpc/cmd/protoc-gen-go-grpc)、 [protoc-gen-validate](https://github.com/envoyproxy/protoc-gen-validate)、 [protoc-gen-gotag](https://github.com/srikrsna/protoc-gen-gotag)、 [protoc-gen-go-gin](https://github.com/zhufuyi/sponge/cmd/protoc-gen-go-gin)、 [protoc-gen-go-rpc-tmpl](https://github.com/zhufuyi/sponge/cmd/protoc-gen-go-rpc-tmpl)、 [protoc-gen-openapiv2](https://github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2)、 [protoc-gen-doc](https://github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc)、 [golangci-lint](https://github.com/golangci/golangci-lint/cmd/golangci-lint)、 [swag](https://github.com/swaggo/swag/cmd/swag)、 [go-callvis](https://github.com/ofabry/go-callvis)
 
-如果有插件或工具安装出错，执行命令重试：
+如果有依赖工具安装出错，执行命令重试：
 
-> sponge tools --install
+```bash
+sponge tools --install
+```
 
 查看依赖工具安装情况：
 
 ```bash
-# linux 环境
 sponge tools
-
-# windows环境，需要指定bash.exe位置
-sponge tools --executor="D:\Program Files\cmder\vendor\git-for-windows\bin\bash.exe"
 ```
 
-所有依赖工具列表：
+所有依赖工具和插件：
 
 ```
 Installed dependency tools:
@@ -188,9 +194,26 @@ Installed dependency tools:
 
 **sponge**命令的帮助信息有详细的使用示例，在命令后面添加`-h`查看，例如`sponge web model -h`，这是根据mysql表生成gorm的model代码返回的帮助信息。
 
+<br>
+
+### 2.3 sponge 命令的UI界面
+
+安装完成sponge和依赖工具后，就可以开始使用了，sponge生成代码提供命令行和UI界面两种方式，其实通过UI界面方式，在后台也是执行命令。sponge UI界面支持执行命令的记忆功能，使用起来更加方便，启动UI服务：
+
+```bash
+sponge run
+```
+
+在浏览器访问 `http://localhost:24631`，打开主页如图2-1所示，根据实际需要生成代码，代码是api接口下载到本地，因此也可以把sponge的UI服务部署到服务器长期运行。
+
+![home](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/home.png)
+*图2-1 sponge ui界面*
+
 <br><br>
 
 ## 3 快速创建web项目
+
+虽然界面化命令更加方便，对于部分命令使用命令行方式更节省操作，例如：根据新的数据表或新的proto文件生成代码，直接一个命令就可以完成，下面介绍各种生成代码功能都是使用命令行方式。
 
 ### 3.1 根据mysql创建http服务
 
@@ -214,7 +237,7 @@ create table teacher
     password    varchar(100) not null comment '密码',
     email       varchar(50)  not null comment '邮件',
     phone       varchar(30)  not null comment '手机号码',
-    avatar      varchar(200) null comment '头像',
+    avatar      varchar(200) not null comment '头像',
     gender      tinyint      not null comment '性别，1:男，2:女，其他值:未知',
     age         tinyint      not null comment '年龄',
     birthday    varchar(30)  not null comment '出生日期',
@@ -248,7 +271,7 @@ sponge web http \
   --out=./edusys
 ```
 
-查看参数说明命令`sponge web http -h`，注意参数**repo-addr**是镜像仓库地址，如果使用[docker官方镜像仓库](https://hub.docker.com/)，只需填写注册docker仓库的用户名，如果使用私有仓库地址，需要填写完整仓库地址。
+查看参数说明命令`sponge web http -h`，注意参数**repo-addr**是镜像仓库地址，默认值是`image-repo-host`，这个参数用在构建docker镜像、k8s的部署脚本上，如果使用[docker官方镜像仓库](https://hub.docker.com/)，只需填写注册docker仓库的用户名，如果使用私有仓库地址，需要填写完整仓库地址。
 
 <br>
 
@@ -295,7 +318,7 @@ make run
 
 <br>
 
-服务默认只开启了指标采集接口、每分钟的资源统计信息，其他服务治理默认是关闭。在实际应用中，根据需要做一些调整：
+服务默认只开启了指标采集接口、每分钟的资源统计信息，其他服务治理默认是关闭。在实际应用中，根据需要做一些操作：
 
 - 使用redis作为缓存，打开配置文件`configs/edusys.yml`，把**cacheType**字段值改为redis，并且填写**redis**配置地址和端口。
 - 默认限流、熔断、链路跟踪、服务注册与发现功能是关闭的，可以打开配置文件`configs/edusys.yml`开启相关功能，如果开启链路跟踪功能，必须填写jaeger配置信息；如果开启服务注册与发现功能，必须填写consul、etcd、nacos其中一种配置信息。
@@ -572,7 +595,7 @@ make proto
 
 **(2) 在新proto文件添加接口**
 
-例如新添加了**course.proto**文件，**course.proto**下的接口必须包括路由和swagger文档描述信息，查看**章节3.2.1**，把**course.proto**文件复制到`api/edusys/v1`目录下，完成新添加接口。
+例如新添加了**course.proto**文件，**course.proto**下的接口必须包括路由和swagger文档描述信息，查看 **章节3.2.1**，把**course.proto**文件复制到`api/edusys/v1`目录下，完成新添加接口。
 
 执行命令：
 
@@ -604,10 +627,10 @@ sponge web dao \
 
 查看参数说明命令 `sponge web dao -h`，参数`--include-init-db`在一个服务中只使用一次，下一次生成`dao`代码时去掉参数`--include-init-db`，否则会造成无法生成最新的`dao`代码，原因是db初始化代码已经存在。
 
-无论是自己实现`dao`代码还是使用sponge生成的`dao`代码，之后都需要做一些操作：
+使用sponge生成的`dao`代码，需要做一些操作：
 
 - 在服务的初始化和释放资源代码中加入mysql和redis，打开`cmd/edusys/initial/initApp.go`文件，把调用mysql和redis初始化代码反注释掉，打开`cmd/edusys/initial/registerClose.go`文件，把调用mysql和redis释放资源代码反注释掉，初始代码是一次性更改。
-- 生成的`dao`代码，并不能和自定义方法**register**和**login**完全对应，需要手动在文件`internal/dao/teacher.go`补充代码(文件名teacher是表名称)，然后在`internal/handler/teacher.go`填写业务逻辑代码(文件名teacher是proto文件名称)，业务代码中返回错误使用`internal/ecode`目录下定义的错误码，如果直接返回错误信息，请求端会收到unknown错误信息，也就是未定义错误信息。
+- 生成的`dao`代码，并不能和自定义方法**register**和**login**完全对应，需要手动在文件`internal/dao/teacher.go`补充代码，然后在`internal/handler/teacher.go`填写业务逻辑代码，业务代码中返回错误使用`internal/ecode`目录下定义的错误码，如果直接返回错误信息，请求端会收到unknown错误信息，也就是未定义错误信息。
 - 默认使用了本地内存做缓存，改为使用redis作为缓存，在配置文件`configs/edusys.yml`修改字段**cacheType**值为redis，并填写redis地址和端口。
 
 切换到edusys目录下再次运行服务：
@@ -640,7 +663,7 @@ make run
 
 #### 4.1.1 生成rpc服务代码
 
-以**章节3.1.1**的teacher表为例，创建rpc服务：
+以 **章节3.1.1** 的teacher表为例，创建rpc服务：
 
 ```bash
 sponge micro rpc \
@@ -713,7 +736,7 @@ rpc服务包括了CRUD逻辑代码，也包括rpc客户端测试和压测代码�
 
 #### 4.1.2 生成service代码
 
-添加了两个新表course和teach，数据表的结构看章节**3.1.3**，生成service代码：
+添加了两个新表course和teach，数据表的结构看 **章节3.1.3**，生成service代码：
 
 ```bash
 sponge micro service \
@@ -847,7 +870,7 @@ make proto
 make run
 ```
 
-启动rpc服务之后，使用**Goland**或**VS Code**打开`internal/service/teacher_client_test.go`文件，对 **Test_teacher_methods** 下各个方法进行测试，测试前要先填写测试参，会发现请求返回内部错误，因为在模板代码文件`internal/service/teacher.go`(文件名teacher是proto文件名)插入了代码`panic("implement me")`，这是为了提示要填写业务逻辑代码。
+启动rpc服务之后，使用**Goland**或**VS Code**打开`internal/service/teacher_client_test.go`文件，对 **Test_teacher_methods** 下各个方法进行测试，测试前要先填写测试参，会发现请求返回内部错误，因为在模板代码文件`internal/service/teacher.go`插入了代码`panic("implement me")`，这是为了提示要填写业务逻辑代码。
 
 <br>
 
@@ -908,10 +931,10 @@ sponge micro dao \
 
 查看参数说明命令`sponge micro dao -h`，参数`--include-init-db`在一个服务中只使用一次，下一次生成`dao`代码时去掉参数`--include-init-db`，否则会造成无法生成最新的`dao`代码，
 
-无论是自己实现`dao`代码还是使用sponge生成的`dao`代码，之后都需要做一些操作：
+使用sponge生成的`dao`代码，需要做一些操作：
 
 - 在服务的初始化和释放资源代码中加入mysql和redis，打开`cmd/edusys/initial/initApp.go`文件，把调用mysql和redis初始化代码反注释掉，打开`cmd/edusys/initial/registerClose.go`文件，把调用mysql和redis释放资源代码反注释掉，初始代码是一次性更改。
-- 生成的`dao`代码，并不能和自定义方法**register**和**login**完全对应，需要手动在文件`internal/dao/teacher.go`补充代码(文件名teacher是表名称)，然后在`internal/handler/teacher.go`填写业务逻辑代码(文件名teacher是proto文件名称)，业务代码中返回错误使用`internal/ecode`目录下定义的错误码，如果直接返回错误信息，请求端会收到unknown错误信息，也就是未定义错误信息。
+- 生成的`dao`代码，并不能和自定义方法**register**和**login**完全对应，需要手动在文件`internal/dao/teacher.go`补充代码，然后在`internal/handler/teacher.go`填写业务逻辑代码，业务代码中返回错误使用`internal/ecode`目录下定义的错误码，如果直接返回错误信息，请求端会收到unknown错误信息，也就是未定义错误信息。
 - 默认使用了本地内存做缓存，改为使用redis作为缓存，在配置文件`configs/edusys.yml`修改字段**cacheType**值为redis，并填写redis地址和端口。
 
 切换到edusys目录下再次运行服务：
@@ -1057,7 +1080,7 @@ message GetByIDReply {
 
 <br>
 
-**shopgw.proto**文件内容如下，rpc网关服务的proto和其他微服务的proto有一点区别，需要指定方法的路由和swagger的描述信息。
+**shopgw.proto**文件内容如下，rpc网关服务的proto和其他rpc服务的proto有一点区别，需要指定方法的路由和swagger的描述信息。
 
 ```protobuf
 syntax = "proto3";
@@ -1216,7 +1239,7 @@ sponge micro rpc-cli \
 
 **(3) 修改配置**
 
-连接**product**、**inventory**、**comment**三个rpc服务代码已经有了，但rpc服务地址还没配置，需要在配置文件`configs/shopgw.yml`的字段`grpcClient`下添加连接product、inventory、comment三个微服务配置信息：
+连接**product**、**inventory**、**comment**三个rpc服务代码已经有了，但rpc服务地址还没配置，需要在配置文件`configs/shopgw.yml`的字段`grpcClient`下添加连接**product**、**inventory**、**comment**三个rpc服务配置信息：
 
 ```yaml
 grpcClient:
@@ -1319,7 +1342,7 @@ make run
 
 在浏览器访问 http://localhost:8080/apis/swagger/index.html ，请求返回503错误(服务不可用)，原因是**product**、**inventory**、**comment**三个rpc服务都还没运行。
 
-**product**、**inventory**、**comment**三个rpc服务代码都还没有，如何正常启动呢。这三个rpc服务的proto文件已经有了，根据章节 **4.2 根据proto文件创建rpc服务** 步骤生成代码和启动服务就很简单了。
+**product**、**inventory**、**comment**三个rpc服务代码都还没有，如何正常启动呢。这三个rpc服务的proto文件已经有了，参考 **章节 4.2 根据proto文件创建rpc服务** 步骤生成代码和启动服务就很简单了。
 
 <br>
 
@@ -1411,7 +1434,7 @@ defer span.End()
 
 #### 5.1.3 多服务链路跟踪示例
 
-以**章节4.3**生成的rpc gateway服务代码为例，一个共四个服务**shopgw**、**product**、**inventory**、**comment**，分别修改4个服务配置(在configs目录下)，开启链路跟踪功能，并且填写jaeger配置信息。
+以 **章节4.3** 生成的rpc gateway服务代码为例，一个共四个服务**shopgw**、**product**、**inventory**、**comment**，分别修改4个服务配置(在configs目录下)，开启链路跟踪功能，并且填写jaeger配置信息。
 
 在 **product**、**inventory**、**comment** 三个服务的**internal/service**目录下找到模板文件，填充代码替代`panic("implement me")`，使得代码可以正常执行，并且手动添加一个**span**，添加随机延时。
 
@@ -1425,13 +1448,13 @@ defer span.End()
 从图中可以看到共有10个span，主要链路：
 
 - 请求接口/api/v1/detail
-- shopgw 服务调用product客户端
+- shopgw 服务调用product的rpc客户端
 - product 的rpc服务端
 - product 服务中手动添加的mockDAO
-- shopgw 服务调用inventory客户端
+- shopgw 服务调用inventory的rpc客户端
 - inventory 的rpc服务端
 - inventory 服务中手动添加的mockDAO
-- shopgw 服务调用comment客户端
+- shopgw 服务调用comment的rpc客户端
 - comment 的rpc服务端
 - comment 服务中手动添加的mockDAO
 
@@ -1461,13 +1484,13 @@ shopgw服务串行调用了**product**、**inventory**、**comment** 三个服�
 
 > docker-compose up -d
 
-在浏览器访问 grafana 主页面 [http://localhost:33000](http://localhost:33000) ，设置prometheus的数据源 `http://192.168.3.37:9090` ，记住prometheus的数据源名称(这里是**Prometheus**)，后面导入监控面板的json的**datasource**值要一致。
+在浏览器访问 grafana 主页面 [http://localhost:33000](http://localhost:33000) ，设置prometheus的数据源 `http://localhost:9090` ，记住prometheus的数据源名称(这里是**Prometheus**)，后面导入监控面板的json的**datasource**值要一致。
 
 <br>
 
 #### 5.2.2 http服务监控
 
-以**章节3.1.2**生成的http服务代码为例，默认提供指标接口 [http://localhost:8080/metrics](http://localhost:8080/metrics) 。
+以 **章节3.1.2** 生成的http服务代码为例，默认提供指标接口 [http://localhost:8080/metrics](http://localhost:8080/metrics) 。
 
 **(1) 在prometheus添加监控目标**
 
@@ -1513,7 +1536,7 @@ wrk -t2 -c10 -d10s http://192.168.3.27:8080/api/v1/course/1
 
 #### 5.2.3 rpc服务监控
 
-以**章节4.1.1**生成的rpc服务代码为例，默认提供指标接口 [http://localhost:8283/metrics](http://localhost:8283/metrics) 。
+以 **章节4.1.1** 生成的rpc服务代码为例，默认提供指标接口 [http://localhost:8283/metrics](http://localhost:8283/metrics) 。
 
 **(1) 在prometheus添加监控目标**
 
@@ -1671,9 +1694,9 @@ go tool pprof -http=[host]:[port] [options] source
 
 - 记录程序的cpu使用率连续3次(默认每分钟一次)，3次平均使用率超过80%时触发告警。
 - 记录程序的使用物理内存连续3次(默认每分钟一次)，3次平均占用系统内存超过80%时触发告警。
-- 如果持续超过告警阈值，默认间隔15分钟告警一次。
+- 如果持续超过告警阈值，默认间隔15分钟发出一次告警。
 
-触发告警时，程序内部调用kill函数发送x系统信号通知采集profile，采集的profile文件保存到`/tmp/服务名_profile`目录，其实就是在**通过系统信号通知采集profile的基础**上把手动触发改为自动触发，即使在半夜程序的cpu或内存过高，第二天也可以通过分析profile来发现程序哪里造成cpu或内存过高。
+触发告警时，程序内部调用kill函数发送系统信号通知采集profile，采集的profile文件保存到`/tmp/服务名_profile`目录，其实就是在**通过系统信号通知采集profile的基础**上把手动触发改为自动触发，即使在半夜程序的cpu或内存过高，第二天也可以通过分析profile来发现程序哪里造成cpu或内存过高。
 
 注：自动采集profile不适合windows环境。
 
@@ -1793,7 +1816,9 @@ Role-based Authorization Strategy
 
 **(2) 设置中文**
 
+
 点击【Manage Jenkins】->【Configure System】选项，找到【Locale】选项，输入【zh_CN】，勾选下面的选项，最后点击【应用】。
+
 
 **(3) 配置全局参数**
 
@@ -1925,6 +1950,6 @@ sponge生成的服务包括了Jenkinsfile、构建和上传镜像脚本、k8s部
 
 <br><br>
 
-如果对你有用给个star ⭐，也欢迎加入微信群交流。
+如果觉得对你有用请给个star⭐，欢迎加入[微信群交流](https://pan.baidu.com/s/1NZgPb2v_8tAnBuwyeFyE_g?pwd=spon)。  
 
 ![wechat-group](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/wechat-group.png)

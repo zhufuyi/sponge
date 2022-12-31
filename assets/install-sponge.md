@@ -67,9 +67,6 @@ To view the installation of dependency tools.
 ```bash
 # linux environment
 sponge tools
-
-# windows environment, need to specify bash.exe location
-sponge tools --executor="D:\Program Files\cmder\vendor\git-for-windows\bin\bash.exe"
 ```
 
 List of all dependent tools.
@@ -96,3 +93,17 @@ Installed dependency tools:
 The help information for the **sponge** command has detailed usage examples, add `-h` to the end of the command to see, for example `sponge web model -h`, which is the help information returned by generating the model code for gorm based on the mysql table.
 
 <br>
+
+### 2.3 Command UI for sponge
+
+After installing sponge and the dependency tools, you can start using it. sponge provides two ways to generate code, command line and UI interface, in fact, through the UI interface way, in the background is also to execute commands. sponge UI interface supports the memory function of executing commands, it is more convenient to use, start UI service: ``bash
+
+```bash
+sponge run
+```
+
+Visit `http://localhost:24631` in the browser, open the homepage as shown in Figure 2-1, generate the code according to the actual need, the code is api interface downloaded to the local, so you can also deploy sponge's UI service to the server for long-term operation.
+
+![home](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/home.png)
+
+*Figure2-1 sponge ui diagram*
