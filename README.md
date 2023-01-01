@@ -35,7 +35,7 @@ The generated code is based on three approaches **Yaml**, **SQL DDL** and **Prot
 The microservice code framework created by sponge is shown in Figure 1-2, this is a typical microservice hierarchy with high performance, high scalability, and includes common service governance features.
 
 <p align="center">
-<img width="1200px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/microservices-framework.png">
+<img width="1000px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/microservices-framework.png">
 </p>
 <p align="center">Figure 1-2 Microservices framework diagram</p>
 

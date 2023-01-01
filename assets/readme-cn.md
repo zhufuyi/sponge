@@ -17,7 +17,7 @@
 sponge创建的微服务代码框架如图下图所示，这是典型的微服务分层结构，具有高性能，高扩展性，包含常用的服务治理功能。
 
 <p align="center">
-<img width="1200px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/microservices-framework.png">
+<img width="1000px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/microservices-framework.png">
 </p>
 
 <br>
