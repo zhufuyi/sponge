@@ -73,9 +73,11 @@ sponge run
 
 根据sql生成web项目代码的一个示例如下图所示：
 
-![web-http](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/web-http.gif)
+<p align="center">
+<img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/web-http.gif">
+</p>
 
-生成web项目代码后，执行命令启动服务：
+下载web项目代码后，执行命令启动服务：
 
 ```bash
 # 更新swagger文档

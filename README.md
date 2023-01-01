@@ -28,7 +28,7 @@ The generated code is based on three approaches **Yaml**, **SQL DDL** and **Prot
 </p>
 <p align="center">Figure 1-1 sponge generation code framework diagram</p>
 
-span
+<br>
 
 ### Microservices framework
 
@@ -67,7 +67,7 @@ Download it from `https://github.com/protocolbuffers/protobuf/releases/tag/v3.20
 
 💡 NOTICE:
 
-> If you are using `windows` environment, you need to install some additional dependency tools, see [windows dependency tools](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/readme-en.md#21-window-environment-installation-dependencies) for installation steps.
+> If you are using `windows` environment, you need to install some additional dependency tools, see [windows dependency tools](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/sponge-doc-en.md#21-window-environment-installation-dependencies) for installation steps.
 
 <br>
 
@@ -90,11 +90,13 @@ Visit `http://localhost:24631` in your browser.
 
 <br>
 
-Generate web project code from sql example.
+A sample web project code generated from sql:
 
-![web-http](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/web-http.gif)
+<p align="center">
+<img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/web-http.gif">
+</p>
 
-After generating the web project code, execute the command to start the service.
+After download the web project code, execute the command to start the service.
 
 ```bash
 # Update swagger documentation
