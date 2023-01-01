@@ -2,6 +2,7 @@ package errcode
 
 import (
 	"errors"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -16,7 +17,7 @@ func TestNewError(t *testing.T) {
 	assert.Equal(t, msg, e.Msg())
 	assert.Contains(t, e.Err().Error(), msg)
 	details := []string{"a", "b", "c"}
-	assert.Equal(t, details, e.WithDetails(details...).Details())
+	assert.Contains(t, e.WithDetails(details...).Err().Error(), strings.Join(details, ", "))
 
 	errorsCodes := []*Error{
 		Success,
