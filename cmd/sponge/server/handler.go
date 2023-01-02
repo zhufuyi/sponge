@@ -194,7 +194,7 @@ func UploadFiles(c *gin.Context) {
 		for _, file := range files {
 			filename := filepath.Base(file.Filename)
 			fileType = path.Ext(filename)
-			if !checkFileType(filename) {
+			if !checkFileType(fileType) {
 				response.Error(c, ecode.InvalidParams.WithDetails("only .proto or yaml files are allowed to be uploaded"))
 				return
 			}

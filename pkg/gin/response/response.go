@@ -62,7 +62,6 @@ func respJSONWithStatusCode(c *gin.Context, code int, msg string, data ...interf
 }
 
 // Output return json data by http status code
-// Deprecated: Output use Out() instead.
 func Output(c *gin.Context, code int, msg ...interface{}) {
 	switch code {
 	case http.StatusOK:
