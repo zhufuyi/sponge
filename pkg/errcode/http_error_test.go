@@ -33,6 +33,8 @@ func TestNewError(t *testing.T) {
 		DeadlineExceeded,
 		AccessDenied,
 		MethodNotAllowed,
+		ServiceUnavailable,
+		NewError(1010, "unknown"),
 	}
 
 	var httpCodes []int
@@ -49,6 +51,9 @@ func TestNewError(t *testing.T) {
 	e = ParseError(errors.New("unknown error"))
 	codes = append(codes, e.Code())
 	t.Log(codes)
+
+	_ = ParseError(nil)
+	_ = e.Details()
 
 	defer func() {
 		recover()

@@ -66,7 +66,6 @@ func (h *userExampleHandler) Create(c *gin.Context) {
 	userExample := &model.UserExample{}
 	err = copier.Copy(userExample, form)
 	if err != nil {
-		logger.Warn("Copy error", logger.Err(err), logger.Any("form", form), middleware.GCtxRequestIDField(c))
 		response.Error(c, ecode.ErrCreateUserExample)
 		return
 	}
@@ -134,7 +133,6 @@ func (h *userExampleHandler) UpdateByID(c *gin.Context) {
 	userExample := &model.UserExample{}
 	err = copier.Copy(userExample, form)
 	if err != nil {
-		logger.Warn("Copy error", logger.Err(err), logger.Any("form", form), middleware.GCtxRequestIDField(c))
 		response.Error(c, ecode.ErrUpdateUserExample)
 		return
 	}
@@ -179,7 +177,6 @@ func (h *userExampleHandler) GetByID(c *gin.Context) {
 	data := &types.GetUserExampleByIDRespond{}
 	err = copier.Copy(data, userExample)
 	if err != nil {
-		logger.Warn("Copy error", logger.Err(err), logger.Any("id", id), middleware.GCtxRequestIDField(c))
 		response.Error(c, ecode.ErrGetUserExample)
 		return
 	}
@@ -216,7 +213,6 @@ func (h *userExampleHandler) ListByIDs(c *gin.Context) {
 
 	data, err := convertUserExamples(userExamples)
 	if err != nil {
-		logger.Warn("Copy error", logger.Err(err), logger.Any("form", form), middleware.GCtxRequestIDField(c))
 		response.Error(c, ecode.ErrListUserExample)
 		return
 	}
@@ -253,7 +249,6 @@ func (h *userExampleHandler) List(c *gin.Context) {
 
 	data, err := convertUserExamples(userExamples)
 	if err != nil {
-		logger.Warn("Copy error", logger.Err(err), logger.Any("form", form), middleware.GCtxRequestIDField(c))
 		response.Error(c, ecode.ErrListUserExample)
 		return
 	}

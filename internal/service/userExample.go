@@ -54,7 +54,6 @@ func (s *userExampleService) Create(ctx context.Context, req *serverNameExampleV
 	userExample := &model.UserExample{}
 	err = copier.Copy(userExample, req)
 	if err != nil {
-		logger.Warn("copier.Copy error", logger.Err(err), logger.Any("req", req))
 		return nil, ecode.StatusCreateUserExample.Err()
 	}
 
@@ -95,7 +94,6 @@ func (s *userExampleService) UpdateByID(ctx context.Context, req *serverNameExam
 	userExample := &model.UserExample{}
 	err = copier.Copy(userExample, req)
 	if err != nil {
-		logger.Warn("copier.Copy error", logger.Err(err), logger.Any("req", req))
 		return nil, ecode.StatusUpdateUserExample.Err()
 	}
 	userExample.ID = req.Id
@@ -174,7 +172,6 @@ func (s *userExampleService) List(ctx context.Context, req *serverNameExampleV1.
 	params := &query.Params{}
 	err = copier.Copy(params, req.Params)
 	if err != nil {
-		logger.Warn("copier.Copy error", logger.Err(err), logger.Any("params", req.Params))
 		return nil, ecode.StatusListUserExample.Err()
 	}
 	params.Size = int(req.Params.Limit)

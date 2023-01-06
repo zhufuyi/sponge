@@ -11,7 +11,7 @@ var (
 	DefaultExpireTime = time.Hour * 24
 	// DefaultNotFoundExpireTime expiry time when result is empty 1 minute,
 	// often used for cache time when data is empty (cache pass-through)
-	DefaultNotFoundExpireTime = time.Minute
+	DefaultNotFoundExpireTime = time.Minute * 10
 	// NotFoundPlaceholder placeholder
 	NotFoundPlaceholder = "*"
 

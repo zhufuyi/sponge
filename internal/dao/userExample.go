@@ -11,8 +11,10 @@ import (
 
 	cacheBase "github.com/zhufuyi/sponge/pkg/cache"
 	"github.com/zhufuyi/sponge/pkg/mysql/query"
+	"github.com/zhufuyi/sponge/pkg/utils"
 
 	"github.com/spf13/cast"
+	"golang.org/x/sync/singleflight"
 	"gorm.io/gorm"
 )
 
@@ -31,11 +33,12 @@ type UserExampleDao interface {
 type userExampleDao struct {
 	db    *gorm.DB
 	cache cache.UserExampleCache
+	sfg   *singleflight.Group
 }
 
 // NewUserExampleDao creating the dao interface
 func NewUserExampleDao(db *gorm.DB, cache cache.UserExampleCache) UserExampleDao {
-	return &userExampleDao{db: db, cache: cache}
+	return &userExampleDao{db: db, cache: cache, sfg: new(singleflight.Group)}
 }
 
 // Create a record, insert the record and the id value is written back to the table
@@ -112,25 +115,34 @@ func (d *userExampleDao) GetByID(ctx context.Context, id uint64) (*model.UserExa
 	}
 
 	if errors.Is(err, model.ErrCacheNotFound) {
-		// get from mysql
-		table := &model.UserExample{}
-		err = d.db.WithContext(ctx).Where("id = ?", id).First(table).Error
-		if err != nil {
-			// if data is empty, set not found cache to prevent cache penetration(preventing Cache Penetration)
-			if errors.Is(err, model.ErrRecordNotFound) {
-				err = d.cache.SetCacheWithNotFound(ctx, id)
-				if err != nil {
-					return nil, err
+		// for the same id, prevent high concurrent simultaneous access to mysql
+		val, err, _ := d.sfg.Do(utils.Uint64ToStr(id), func() (interface{}, error) { //nolint
+			table := &model.UserExample{}
+			err = d.db.WithContext(ctx).Where("id = ?", id).First(table).Error
+			if err != nil {
+				// if data is empty, set not found cache to prevent cache penetration, default expiration time 10 minutes
+				if errors.Is(err, model.ErrRecordNotFound) {
+					err = d.cache.SetCacheWithNotFound(ctx, id)
+					if err != nil {
+						return nil, err
+					}
+					return nil, model.ErrRecordNotFound
 				}
-				return nil, model.ErrRecordNotFound
+				return nil, err
 			}
+			// set cache
+			err = d.cache.Set(ctx, id, table, cacheBase.DefaultExpireTime)
+			if err != nil {
+				return nil, fmt.Errorf("cache.Set error: %v, id=%d", err, id)
+			}
+			return table, nil
+		})
+		if err != nil {
 			return nil, err
 		}
-
-		// set cache
-		err = d.cache.Set(ctx, id, table, cacheBase.DefaultExpireTime)
-		if err != nil {
-			return nil, fmt.Errorf("cache.Set error: %v, id=%d", err, id)
+		table, ok := val.(*model.UserExample)
+		if !ok {
+			return nil, model.ErrRecordNotFound
 		}
 		return table, nil
 	} else if errors.Is(err, cacheBase.ErrPlaceholder) {
@@ -182,7 +194,7 @@ func (d *userExampleDao) GetByIDs(ctx context.Context, ids []uint64) ([]*model.U
 
 			if len(missedData) > 0 {
 				records = append(records, missedData...)
-				err = d.cache.MultiSet(ctx, missedData, 10*time.Minute)
+				err = d.cache.MultiSet(ctx, missedData, time.Hour*24)
 				if err != nil {
 					return nil, err
 				}
