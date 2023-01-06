@@ -48,7 +48,7 @@ protoc 下载地址 `https://github.com/protocolbuffers/protobuf/releases/tag/v3
 
 💡 注意：
 
-> 如果使用windows环境, 还需要安装额外依赖工具, 安装详情看 [windows dependency tools](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/sponge-doc-cn.md#21-window-environment-installation-dependencies).
+> 如果使用windows环境, 还需要安装额外依赖工具, 安装详情看 [windows dependency tools](https://github.com/zhufuyi/sponge/blob/main/assets/sponge-doc-cn.md#21-window%E7%8E%AF%E5%A2%83%E5%AE%89%E8%A3%85%E4%BE%9D%E8%B5%96%E5%B7%A5%E5%85%B7).
 
 <br>
 

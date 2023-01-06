@@ -54,6 +54,22 @@ func runUpdateCommand() error {
 		return fmt.Errorf("exec command failed, %v", result.Err)
 	}
 
+	ctx, _ = context.WithTimeout(context.Background(), time.Minute) //nolint
+	result = gobash.Run(ctx, "go", "install", "github.com/zhufuyi/sponge/cmd/protoc-gen-go-gin@latest")
+	for range result.StdOut {
+	}
+	if result.Err != nil {
+		return fmt.Errorf("exec command failed, %v", result.Err)
+	}
+
+	ctx, _ = context.WithTimeout(context.Background(), time.Minute) //nolint
+	result = gobash.Run(ctx, "go", "install", "github.com/zhufuyi/sponge/cmd/protoc-gen-go-rpc-tmpl@latest")
+	for range result.StdOut {
+	}
+	if result.Err != nil {
+		return fmt.Errorf("exec command failed, %v", result.Err)
+	}
+
 	return nil
 }
 

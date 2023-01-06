@@ -67,7 +67,7 @@ Download it from `https://github.com/protocolbuffers/protobuf/releases/tag/v3.20
 
 💡 NOTICE:
 
-> If you are using `windows` environment, you need to install some additional dependency tools, see [windows dependency tools](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/sponge-doc-en.md#21-window-environment-installation-dependencies) for installation steps.
+> If you are using `windows` environment, you need to install some additional dependency tools, see [windows dependency tools](https://github.com/zhufuyi/sponge/blob/main/assets/sponge-doc-en.md#21-window-environment-installation-dependencies) for installation steps.
 
 <br>
 
@@ -115,6 +115,10 @@ Generate other types of code you can try yourself.
 ### Documentation
 
 [sponge usage documentation](assets/sponge-doc-en.md)
+
+<br>
+
+**If it's useful to you, give it a star ⭐.**
 
 <br>
 
