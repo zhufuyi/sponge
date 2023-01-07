@@ -108,7 +108,7 @@ func (s *grpcServer) serverOptions() []grpc.ServerOption {
 
 	unaryServerInterceptors := []grpc.UnaryServerInterceptor{
 		interceptor.UnaryServerRecovery(),
-		interceptor.UnaryServerCtxTags(),
+		interceptor.UnaryServerRequestID(),
 	}
 
 	streamServerInterceptors := []grpc.StreamServerInterceptor{}

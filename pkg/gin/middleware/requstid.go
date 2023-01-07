@@ -25,7 +25,7 @@ func RequestID() gin.HandlerFunc {
 
 		// Create request id
 		if requestID == "" {
-			requestID = krand.String(krand.R_All, 12) // generate a random string of length 12
+			requestID = krand.String(krand.R_All, 10)
 			c.Request.Header.Set(HeaderXRequestIDKey, requestID)
 			// Expose it for use in the application
 			c.Set(ContextRequestIDKey, requestID)

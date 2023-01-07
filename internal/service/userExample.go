@@ -11,6 +11,7 @@ import (
 	"github.com/zhufuyi/sponge/internal/ecode"
 	"github.com/zhufuyi/sponge/internal/model"
 
+	"github.com/zhufuyi/sponge/pkg/grpc/interceptor"
 	"github.com/zhufuyi/sponge/pkg/logger"
 	"github.com/zhufuyi/sponge/pkg/mysql/query"
 
@@ -47,7 +48,7 @@ func NewUserExampleServiceServer() serverNameExampleV1.UserExampleServiceServer 
 func (s *userExampleService) Create(ctx context.Context, req *serverNameExampleV1.CreateUserExampleRequest) (*serverNameExampleV1.CreateUserExampleReply, error) {
 	err := req.Validate()
 	if err != nil {
-		logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req))
+		logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req), interceptor.ServerCtxRequestIDField(ctx))
 		return nil, ecode.StatusInvalidParams.Err()
 	}
 
@@ -59,7 +60,7 @@ func (s *userExampleService) Create(ctx context.Context, req *serverNameExampleV
 
 	err = s.iDao.Create(ctx, userExample)
 	if err != nil {
-		logger.Error("s.iDao.Create error", logger.Err(err), logger.Any("userExample", userExample))
+		logger.Error("s.iDao.Create error", logger.Err(err), logger.Any("userExample", userExample), interceptor.ServerCtxRequestIDField(ctx))
 		return nil, ecode.StatusInternalServerError.ToRPCErr()
 	}
 
@@ -70,13 +71,13 @@ func (s *userExampleService) Create(ctx context.Context, req *serverNameExampleV
 func (s *userExampleService) DeleteByID(ctx context.Context, req *serverNameExampleV1.DeleteUserExampleByIDRequest) (*serverNameExampleV1.DeleteUserExampleByIDReply, error) {
 	err := req.Validate()
 	if err != nil {
-		logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req))
+		logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req), interceptor.ServerCtxRequestIDField(ctx))
 		return nil, ecode.StatusInvalidParams.Err()
 	}
 
 	err = s.iDao.DeleteByID(ctx, req.Id)
 	if err != nil {
-		logger.Error("s.iDao.DeleteByID error", logger.Err(err), logger.Any("id", req.Id))
+		logger.Error("s.iDao.DeleteByID error", logger.Err(err), logger.Any("id", req.Id), interceptor.ServerCtxRequestIDField(ctx))
 		return nil, ecode.StatusInternalServerError.ToRPCErr()
 	}
 
@@ -87,7 +88,7 @@ func (s *userExampleService) DeleteByID(ctx context.Context, req *serverNameExam
 func (s *userExampleService) UpdateByID(ctx context.Context, req *serverNameExampleV1.UpdateUserExampleByIDRequest) (*serverNameExampleV1.UpdateUserExampleByIDReply, error) {
 	err := req.Validate()
 	if err != nil {
-		logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req))
+		logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req), interceptor.ServerCtxRequestIDField(ctx))
 		return nil, ecode.StatusInvalidParams.Err()
 	}
 
@@ -100,7 +101,7 @@ func (s *userExampleService) UpdateByID(ctx context.Context, req *serverNameExam
 
 	err = s.iDao.UpdateByID(ctx, userExample)
 	if err != nil {
-		logger.Error("s.iDao.UpdateByID error", logger.Err(err), logger.Any("userExample", userExample))
+		logger.Error("s.iDao.UpdateByID error", logger.Err(err), logger.Any("userExample", userExample), interceptor.ServerCtxRequestIDField(ctx))
 		return nil, ecode.StatusInternalServerError.ToRPCErr()
 	}
 
@@ -111,23 +112,23 @@ func (s *userExampleService) UpdateByID(ctx context.Context, req *serverNameExam
 func (s *userExampleService) GetByID(ctx context.Context, req *serverNameExampleV1.GetUserExampleByIDRequest) (*serverNameExampleV1.GetUserExampleByIDReply, error) {
 	err := req.Validate()
 	if err != nil {
-		logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req))
+		logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req), interceptor.ServerCtxRequestIDField(ctx))
 		return nil, ecode.StatusInvalidParams.Err()
 	}
 
 	record, err := s.iDao.GetByID(ctx, req.Id)
 	if err != nil {
 		if errors.Is(err, query.ErrNotFound) {
-			logger.Warn("s.iDao.GetByID error", logger.Err(err), logger.Any("id", req.Id))
+			logger.Warn("s.iDao.GetByID error", logger.Err(err), logger.Any("id", req.Id), interceptor.ServerCtxRequestIDField(ctx))
 			return nil, ecode.StatusNotFound.Err()
 		}
-		logger.Error("s.iDao.GetByID error", logger.Err(err), logger.Any("id", req.Id))
+		logger.Error("s.iDao.GetByID error", logger.Err(err), logger.Any("id", req.Id), interceptor.ServerCtxRequestIDField(ctx))
 		return nil, ecode.StatusInternalServerError.ToRPCErr()
 	}
 
 	data, err := covertUserExample(record)
 	if err != nil {
-		logger.Warn("covertUserExample error", logger.Err(err), logger.Any("record", record))
+		logger.Warn("covertUserExample error", logger.Err(err), logger.Any("record", record), interceptor.ServerCtxRequestIDField(ctx))
 		return nil, ecode.StatusGetUserExample.Err()
 	}
 
@@ -138,34 +139,34 @@ func (s *userExampleService) GetByID(ctx context.Context, req *serverNameExample
 func (s *userExampleService) ListByIDs(ctx context.Context, req *serverNameExampleV1.ListUserExampleByIDsRequest) (*serverNameExampleV1.ListUserExampleByIDsReply, error) {
 	err := req.Validate()
 	if err != nil {
-		logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req))
+		logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req), interceptor.ServerCtxRequestIDField(ctx))
 		return nil, ecode.StatusInvalidParams.Err()
 	}
 
 	records, err := s.iDao.GetByIDs(ctx, req.Ids)
 	if err != nil {
-		logger.Error("s.iDao.GetByID error", logger.Err(err), logger.Any("ids", req.Ids))
+		logger.Error("s.iDao.GetByID error", logger.Err(err), logger.Any("ids", req.Ids), interceptor.ServerCtxRequestIDField(ctx))
 		return nil, ecode.StatusInternalServerError.ToRPCErr()
 	}
 
-	datas := []*serverNameExampleV1.UserExample{}
+	userExamples := []*serverNameExampleV1.UserExample{}
 	for _, record := range records {
-		data, err := covertUserExample(record)
+		userExample, err := covertUserExample(record)
 		if err != nil {
-			logger.Warn("covertUserExample error", logger.Err(err), logger.Any("id", record.ID))
+			logger.Warn("covertUserExample error", logger.Err(err), logger.Any("id", record.ID), interceptor.ServerCtxRequestIDField(ctx))
 			continue
 		}
-		datas = append(datas, data)
+		userExamples = append(userExamples, userExample)
 	}
 
-	return &serverNameExampleV1.ListUserExampleByIDsReply{UserExamples: datas}, nil
+	return &serverNameExampleV1.ListUserExampleByIDsReply{UserExamples: userExamples}, nil
 }
 
 // List Get multiple records based on query parameters
 func (s *userExampleService) List(ctx context.Context, req *serverNameExampleV1.ListUserExampleRequest) (*serverNameExampleV1.ListUserExampleReply, error) {
 	err := req.Validate()
 	if err != nil {
-		logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req))
+		logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req), interceptor.ServerCtxRequestIDField(ctx))
 		return nil, ecode.StatusInvalidParams.Err()
 	}
 
@@ -179,26 +180,26 @@ func (s *userExampleService) List(ctx context.Context, req *serverNameExampleV1.
 	records, total, err := s.iDao.GetByColumns(ctx, params)
 	if err != nil {
 		if strings.Contains(err.Error(), "query params error:") {
-			logger.Warn("s.iDao.GetByColumns error", logger.Err(err), logger.Any("params", params))
+			logger.Warn("s.iDao.GetByColumns error", logger.Err(err), logger.Any("params", params), interceptor.ServerCtxRequestIDField(ctx))
 			return nil, ecode.StatusInvalidParams.Err()
 		}
-		logger.Error("s.iDao.GetByColumns error", logger.Err(err), logger.Any("params", params))
+		logger.Error("s.iDao.GetByColumns error", logger.Err(err), logger.Any("params", params), interceptor.ServerCtxRequestIDField(ctx))
 		return nil, ecode.StatusInternalServerError.ToRPCErr()
 	}
 
-	datas := []*serverNameExampleV1.UserExample{}
+	userExamples := []*serverNameExampleV1.UserExample{}
 	for _, record := range records {
-		data, err := covertUserExample(record)
+		userExample, err := covertUserExample(record)
 		if err != nil {
-			logger.Warn("covertUserExample error", logger.Err(err), logger.Any("id", record.ID))
+			logger.Warn("covertUserExample error", logger.Err(err), logger.Any("id", record.ID), interceptor.ServerCtxRequestIDField(ctx))
 			continue
 		}
-		datas = append(datas, data)
+		userExamples = append(userExamples, userExample)
 	}
 
 	return &serverNameExampleV1.ListUserExampleReply{
 		Total:        total,
-		UserExamples: datas,
+		UserExamples: userExamples,
 	}, nil
 }
 

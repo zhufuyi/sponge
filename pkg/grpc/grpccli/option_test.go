@@ -51,6 +51,13 @@ func TestWithEnableLoadBalance(t *testing.T) {
 	assert.Equal(t, true, o.enableLoadBalance)
 }
 
+func TestWithEnableRequestID(t *testing.T) {
+	opt := WithEnableRequestID()
+	o := new(options)
+	o.apply(opt)
+	assert.Equal(t, true, o.enableRequestID)
+}
+
 func TestWithEnableLog(t *testing.T) {
 	testData := zap.NewNop()
 	opt := WithEnableLog(testData)

@@ -31,9 +31,9 @@ func NewServerNameExampleRPCConn() {
 	cfg := config.Get()
 
 	var cliOptions = []grpccli.Option{
+		grpccli.WithEnableRequestID(),
 		grpccli.WithEnableLog(logger.Get()),
 		//grpccli.WithEnableLoadBalance(),
-		//grpccli.WithEnableRetry(),
 	}
 
 	serverName := "serverNameExample"

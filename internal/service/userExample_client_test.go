@@ -35,9 +35,9 @@ func initUserExampleServiceClient() serverNameExampleV1.UserExampleServiceClient
 	endpoint := fmt.Sprintf("127.0.0.1:%d", config.Get().Grpc.Port)
 
 	var cliOptions = []grpccli.Option{
+		grpccli.WithEnableRequestID(),
 		grpccli.WithEnableLog(zap.NewNop()),
 		//grpccli.WithEnableLoadBalance(),
-		//grpccli.WithEnableRetry(),
 	}
 	if config.Get().App.RegistryDiscoveryType != "" {
 		var iDiscovery registry.Discovery
@@ -159,7 +159,7 @@ func Test_userExampleService_methods(t *testing.T) {
 			fn: func() (interface{}, error) {
 				// todo enter parameters before testing
 				req := &serverNameExampleV1.GetUserExampleByIDRequest{
-					Id: 1,
+					Id: 1222,
 				}
 				return cli.GetByID(ctx, req)
 			},

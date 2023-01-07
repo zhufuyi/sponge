@@ -22,8 +22,9 @@ type options struct {
 	unaryInterceptors  []grpc.UnaryClientInterceptor    // custom unary interceptor
 	streamInterceptors []grpc.StreamClientInterceptor   // custom stream interceptor
 
-	enableLog bool // whether to turn on the log
-	log       *zap.Logger
+	enableLog       bool // whether to turn on the log
+	enableRequestID bool // whether to turn on the request id
+	log             *zap.Logger
 
 	enableTrace          bool // whether to turn on tracing
 	enableMetrics        bool // whether to turn on metrics
@@ -57,6 +58,13 @@ func (o *options) apply(opts ...Option) {
 func WithTimeout(timeout time.Duration) Option {
 	return func(o *options) {
 		o.timeout = timeout
+	}
+}
+
+// WithEnableRequestID enable request id
+func WithEnableRequestID() Option {
+	return func(o *options) {
+		o.enableRequestID = true
 	}
 }
 

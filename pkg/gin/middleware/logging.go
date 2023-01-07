@@ -187,7 +187,7 @@ func Logging(opts ...Option) gin.HandlerFunc {
 			zap.Int("code", c.Writer.Status()),
 			zap.String("method", c.Request.Method),
 			zap.String("url", c.Request.URL.Path),
-			zap.Int64("time_us", time.Since(start).Nanoseconds()/1000),
+			zap.Int64("time_us", time.Since(start).Microseconds()),
 			zap.Int("size", newWriter.body.Len()),
 			zap.String("response", strings.TrimRight(getBodyData(newWriter.body, o.maxLength), "\n")),
 		}

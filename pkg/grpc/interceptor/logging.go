@@ -2,7 +2,7 @@ package interceptor
 
 import (
 	"context"
-	"google.golang.org/grpc/status"
+	"encoding/json"
 	"time"
 
 	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
@@ -10,17 +10,75 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/status"
 )
 
 // ---------------------------------- client interceptor ----------------------------------
 
 // UnaryClientLog client log unary interceptor
-func UnaryClientLog(logger *zap.Logger, opts ...grpc_zap.Option) grpc.UnaryClientInterceptor {
+func UnaryClientLog(logger *zap.Logger) grpc.UnaryClientInterceptor {
+	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+		startTime := time.Now()
+
+		var reqIDField zap.Field
+		if requestID := ClientCtxRequestID(ctx); requestID != "" {
+			reqIDField = zap.String(ContextRequestIDKey, requestID)
+		} else {
+			reqIDField = zap.Skip()
+		}
+
+		err := invoker(ctx, method, req, reply, cc, opts...)
+
+		fields := []zap.Field{
+			zap.String("code", status.Code(err).String()),
+			zap.Error(err),
+			zap.String("rpc_type", "unary"),
+			zap.String("method", method),
+			zap.Int64("time_us", time.Since(startTime).Microseconds()),
+			reqIDField,
+		}
+
+		logger.Info("rpc client invoker", fields...)
+		return err
+	}
+}
+
+// UnaryClientLog2 client log unary interceptor
+func UnaryClientLog2(logger *zap.Logger, opts ...grpc_zap.Option) grpc.UnaryClientInterceptor {
 	return grpc_zap.UnaryClientInterceptor(logger, opts...)
 }
 
 // StreamClientLog client log stream interceptor
-func StreamClientLog(logger *zap.Logger, opts ...grpc_zap.Option) grpc.StreamClientInterceptor {
+func StreamClientLog(logger *zap.Logger) grpc.StreamClientInterceptor {
+	return func(ctx context.Context, desc *grpc.StreamDesc, cc *grpc.ClientConn, method string,
+		streamer grpc.Streamer, opts ...grpc.CallOption) (grpc.ClientStream, error) {
+		startTime := time.Now()
+
+		var reqIDField zap.Field
+		if requestID := ClientCtxRequestID(ctx); requestID != "" {
+			reqIDField = zap.String(ContextRequestIDKey, requestID)
+		} else {
+			reqIDField = zap.Skip()
+		}
+
+		clientStream, err := streamer(ctx, desc, cc, method, opts...)
+
+		fields := []zap.Field{
+			zap.String("code", status.Code(err).String()),
+			zap.Error(err),
+			zap.String("rpc_type", "stream"),
+			zap.String("method", method),
+			zap.Int64("time_us", time.Since(startTime).Microseconds()),
+			reqIDField,
+		}
+
+		logger.Info("rpc client invoker", fields...)
+		return clientStream, err
+	}
+}
+
+// StreamClientLog2 client log stream interceptor
+func StreamClientLog2(logger *zap.Logger, opts ...grpc_zap.Option) grpc.StreamClientInterceptor {
 	return grpc_zap.StreamClientInterceptor(logger, opts...)
 }
 
@@ -88,22 +146,35 @@ func UnaryServerLog(logger *zap.Logger, opts ...LogOption) grpc.UnaryServerInter
 		}
 
 		startTime := time.Now()
+		requestID := ServerCtxRequestID(ctx)
 
 		fields := []zap.Field{
 			zap.String("rpc_type", "unary"),
 			zap.String("full_method", info.FullMethod),
 			zap.Any("request", req),
 		}
+		if requestID != "" {
+			fields = append(fields, zap.String(ContextRequestIDKey, requestID))
+		}
 		logger.Info("<<<<", fields...)
 
 		resp, err := handler(ctx, req)
 
+		data, _ := json.Marshal(resp)
+		if len(data) > 300 {
+			data = append(data[:300], []byte("......")...)
+		}
+
 		fields = []zap.Field{
 			zap.String("code", status.Code(err).String()),
+			zap.Error(err),
 			zap.String("rpc_type", "unary"),
 			zap.String("full_method", info.FullMethod),
-			zap.Any("response", resp),
+			zap.String("response", string(data)),
 			zap.Int64("time_us", time.Since(startTime).Microseconds()),
+		}
+		if requestID != "" {
+			fields = append(fields, zap.String(ContextRequestIDKey, requestID))
 		}
 		logger.Info(">>>>", fields...)
 
@@ -174,10 +245,14 @@ func StreamServerLog(logger *zap.Logger, opts ...LogOption) grpc.StreamServerInt
 		}
 
 		startTime := time.Now()
+		requestID := ServerCtxRequestID(stream.Context())
 
 		fields := []zap.Field{
 			zap.String("rpc_type", "stream"),
 			zap.String("full_method", info.FullMethod),
+		}
+		if requestID != "" {
+			fields = append(fields, zap.String(ContextRequestIDKey, requestID))
 		}
 		logger.Info("<<<<", fields...)
 
@@ -188,6 +263,9 @@ func StreamServerLog(logger *zap.Logger, opts ...LogOption) grpc.StreamServerInt
 			zap.String("rpc_type", "stream"),
 			zap.String("full_method", info.FullMethod),
 			zap.Int64("time_us", time.Since(startTime).Microseconds()),
+		}
+		if requestID != "" {
+			fields = append(fields, zap.String(ContextRequestIDKey, requestID))
 		}
 		logger.Info(">>>>", fields...)
 

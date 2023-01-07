@@ -51,6 +51,10 @@ func dial(ctx context.Context, endpoint string, isSecure bool, opts ...Option) (
 		clientOptions = append(clientOptions, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	}
 
+	if o.enableRequestID {
+		unaryClientInterceptors = append(unaryClientInterceptors, interceptor.UnaryClientRequestID())
+	}
+
 	// logging
 	if o.enableLog {
 		unaryClientInterceptors = append(unaryClientInterceptors, interceptor.UnaryClientLog(logger.Get()))
