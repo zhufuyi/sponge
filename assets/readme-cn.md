@@ -64,10 +64,7 @@ sponge run
 
 💡 注意：
 
-> 不要在sponge二进制文件所在的目录下执行 "sponge run"命令，否则生成代码时会报错：
->
->> exec: "sponge": cannot run executable found relative to current directory
->>
+> 不要在sponge二进制文件所在的目录下执行 "sponge run"命令。
 
 <br>
 

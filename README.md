@@ -83,17 +83,14 @@ Visit `http://localhost:24631` in your browser.
 
 💡 NOTICE:
 
-> Do not execute the "sponge run" in the directory where the sponge file is located, as this will result in an error:
->
->> exec: "sponge": cannot run executable found relative to current directory
->>
+> Do not execute the "sponge run" in the directory where the sponge file is located.
 
 <br>
 
 A sample web project code generated from sql:
 
 <p align="center">
-<img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/web-http.gif">
+<img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/web-http-en.gif">
 </p>
 
 After download the web project code, execute the command to start the service.
