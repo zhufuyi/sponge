@@ -2,8 +2,8 @@ package benchmark
 
 import (
 	"testing"
-	"time"
 
+	"github.com/bojand/ghz/runner"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/types/pluginpb"
@@ -33,6 +33,11 @@ func Test_params_Run(t *testing.T) {
 	assert.NoError(t, err)
 
 	err = b.Run()
-	t.Log(err) //  replace github.com/golang/protobuf/proto --> google.golang.org/protobuf/proto
-	time.Sleep(time.Second)
+	t.Log(err)
+}
+
+func Test_bench_saveReport(t *testing.T) {
+	bc := &bench{methodName: "foo"}
+	err := bc.saveReport("test", &runner.Report{Name: "foo"})
+	assert.NoError(t, err)
 }

@@ -33,8 +33,17 @@ func TestWithRetryInterval(t *testing.T) {
 	o.apply(opt)
 	assert.Equal(t, testData, o.interval)
 
-	_ = WithRetryInterval(time.Microsecond)
-	_ = WithRetryInterval(time.Minute)
+	testData = time.Microsecond
+	opt = WithRetryInterval(testData)
+	o = new(retryOptions)
+	o.apply(opt)
+	assert.Equal(t, true, o.interval == time.Millisecond)
+
+	testData = time.Minute
+	opt = WithRetryInterval(testData)
+	o = new(retryOptions)
+	o.apply(opt)
+	assert.Equal(t, true, o.interval == 10*time.Second)
 }
 
 func TestWithRetryTimes(t *testing.T) {
@@ -44,7 +53,11 @@ func TestWithRetryTimes(t *testing.T) {
 	o.apply(opt)
 	assert.Equal(t, testData, o.times)
 
-	_ = WithRetryTimes(20)
+	testData = uint(20)
+	opt = WithRetryTimes(testData)
+	o = new(retryOptions)
+	o.apply(opt)
+	assert.NotEqual(t, testData, o.times)
 }
 
 func Test_defaultRetryOptions(t *testing.T) {

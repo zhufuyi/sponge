@@ -92,6 +92,10 @@ func (b *bench) Run() error {
 		return err
 	}
 
+	return b.saveReport(callMethod, report)
+}
+
+func (b *bench) saveReport(callMethod string, report *runner.Report) error {
 	// specify the output path
 	outputFile := fmt.Sprintf("%sreport_%s.html", os.TempDir()+gofile.GetPathDelimiter(), b.methodName)
 	file, err := os.Create(outputFile)

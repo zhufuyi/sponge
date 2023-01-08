@@ -18,6 +18,8 @@ func TestNewServerNameExampleRPCConn(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	config.Get().App.EnableTrace = true
+	config.Get().App.EnableCircuitBreaker = true
 
 	utils.SafeRunWithTimeout(time.Second*2, func(cancel context.CancelFunc) {
 		config.Get().GrpcClient[0].RegistryDiscoveryType = "consul"

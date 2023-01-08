@@ -2,6 +2,7 @@ package handlerfunc
 
 import (
 	"embed"
+	"github.com/zhufuyi/sponge/pkg/gohttp"
 	"net/http"
 	"testing"
 	"time"
@@ -48,6 +49,32 @@ func TestBrowserRefresh(t *testing.T) {
 	resp, err := http.Get(requestAddr + "/notfound")
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
+
+	req := &gohttp.Request{}
+	req.SetURL(requestAddr + "/notfound")
+	req.SetHeader("Accept", "text/html")
+	_, err = req.GET()
+	assert.NoError(t, err)
+}
+
+func TestBrowserRefresh2(t *testing.T) {
+	serverAddr, requestAddr := utils.GetLocalHTTPAddrPairs()
+
+	gin.SetMode(gin.ReleaseMode)
+	r := gin.New()
+	r.NoRoute(BrowserRefresh("notfound"))
+
+	go func() {
+		_ = r.Run(serverAddr)
+	}()
+
+	time.Sleep(time.Millisecond * 200)
+
+	req := &gohttp.Request{}
+	req.SetURL(requestAddr + "/notfound")
+	req.SetHeader("Accept", "text/html")
+	_, err := req.GET()
+	assert.NoError(t, err)
 }
 
 //go:embed README.md
@@ -68,4 +95,30 @@ func TestBrowserRefreshFS(t *testing.T) {
 	resp, err := http.Get(requestAddr + "/notfound")
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
+
+	req := &gohttp.Request{}
+	req.SetURL(requestAddr + "/notfound")
+	req.SetHeader("Accept", "text/html")
+	_, err = req.GET()
+	assert.NoError(t, err)
+}
+
+func TestBrowserRefreshFS2(t *testing.T) {
+	serverAddr, requestAddr := utils.GetLocalHTTPAddrPairs()
+
+	gin.SetMode(gin.ReleaseMode)
+	r := gin.New()
+	r.NoRoute(BrowserRefreshFS(readmeFS, "notfound"))
+
+	go func() {
+		_ = r.Run(serverAddr)
+	}()
+
+	time.Sleep(time.Millisecond * 200)
+
+	req := &gohttp.Request{}
+	req.SetURL(requestAddr + "/notfound")
+	req.SetHeader("Accept", "text/html")
+	_, err := req.GET()
+	assert.NoError(t, err)
 }

@@ -63,7 +63,6 @@ func getServerOptions() []grpc.ServerOption {
 
 	// log setting, which prints client disconnection information by default, example https://pkg.go.dev/github.com/grpc-ecosystem/go-grpc-middleware/logging/zap
 	options = append(options, grpc_middleware.WithUnaryServerChain(
-		interceptor.UnaryServerCtxTags(),
 		interceptor.UnaryServerZapLogging(
 			logger.Get(), // zap
 			// middleware.WithLogFields(map[string]interface{}{"serverName": "userExample"}), // additional print fields
@@ -256,3 +255,42 @@ func SpanDemo(serviceName string, spanName string, ctx context.Context) {
 example [metrics](../metrics/README.md).
 
 <br>
+
+#### Request id
+
+(1) server side
+
+```go
+func getServerOptions() []grpc.ServerOption {
+	var options []grpc.ServerOption
+
+	recoveryOption := grpc_middleware.WithUnaryServerChain(
+		interceptor.UnaryServerRequestID(),
+	)
+	options = append(options, recoveryOption)
+
+	return options
+}
+```
+
+<br>
+
+(2) client side
+
+```go
+func getDialOptions() []grpc.DialOption {
+	var options []grpc.DialOption
+
+	// use insecure transfer
+	options = append(options, grpc.WithTransportCredentials(insecure.NewCredentials()))
+
+	option := grpc.WithUnaryInterceptor(
+		grpc_middleware.ChainUnaryClient(
+			interceptor.UnaryClientRequestID(),
+		),
+	)
+	options = append(options, option)
+
+	return options
+}
+```

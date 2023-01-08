@@ -1,8 +1,10 @@
 package gofile
 
 import (
+	"os"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -77,6 +79,11 @@ func TestGetFilename(t *testing.T) {
 
 	err := CreateDir("./")
 	assert.Nil(t, err)
+	notfoundDir := os.TempDir() + "/notfoundDir"
+	err = CreateDir(notfoundDir)
+	assert.Nil(t, err)
+	time.Sleep(time.Millisecond * 100)
+	_ = os.RemoveAll(notfoundDir)
 
 	name = GetFilenameWithoutSuffix("./README.md")
 	assert.Equal(t, "README", name)

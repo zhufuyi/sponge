@@ -43,6 +43,11 @@ func TestHTTPServer(t *testing.T) {
 		assert.NotNil(t, server)
 		cancel()
 	})
+	utils.SafeRunWithTimeout(time.Second, func(cancel context.CancelFunc) {
+		server := NewHTTPServer(addr)
+		assert.NotNil(t, server)
+		cancel()
+	})
 
 	utils.SafeRunWithTimeout(time.Second*2, func(cancel context.CancelFunc) {
 		server := NewHTTPServer_pbExample(addr,
@@ -51,6 +56,11 @@ func TestHTTPServer(t *testing.T) {
 			WithHTTPIsProd(true),
 			WithHTTPRegistry(&iRegistry{}, &registry.ServiceInstance{}),
 		)
+		assert.NotNil(t, server)
+		cancel()
+	})
+	utils.SafeRunWithTimeout(time.Second, func(cancel context.CancelFunc) {
+		server := NewHTTPServer_pbExample(addr)
 		assert.NotNil(t, server)
 		cancel()
 	})

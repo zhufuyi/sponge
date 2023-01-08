@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"github.com/pkg/errors"
 	"sync"
 	"text/template"
 )
@@ -293,62 +294,67 @@ message List{{.TableName}}Reply {
 
 func initTemplate() {
 	tmplParseOnce.Do(func() {
-		var err error
+		var err, errSum error
+
 		modelStructTmpl, err = template.New("goStruct").Parse(modelStructTmplRaw)
 		if err != nil {
-			panic(err)
+			errSum = errors.Wrap(err, "modelStructTmplRaw")
 		}
 		modelTmpl, err = template.New("goFile").Parse(modelTmplRaw)
 		if err != nil {
-			panic(err)
+			errSum = errors.Wrap(errSum, "modelTmplRaw:"+err.Error())
 		}
 		updateFieldTmpl, err = template.New("goUpdateField").Parse(updateFieldTmplRaw)
 		if err != nil {
-			panic(err)
+			errSum = errors.Wrap(errSum, "updateFieldTmplRaw:"+err.Error())
 		}
 		handlerCreateStructTmpl, err = template.New("goPostStruct").Parse(handlerCreateStructTmplRaw)
 		if err != nil {
-			panic(err)
+			errSum = errors.Wrap(errSum, "handlerCreateStructTmplRaw:"+err.Error())
 		}
 		handlerUpdateStructTmpl, err = template.New("goPutStruct").Parse(handlerUpdateStructTmplRaw)
 		if err != nil {
-			panic(err)
+			errSum = errors.Wrap(errSum, "handlerUpdateStructTmplRaw:"+err.Error())
 		}
 		handlerDetailStructTmpl, err = template.New("goGetStruct").Parse(handlerDetailStructTmplRaw)
 		if err != nil {
-			panic(err)
+			errSum = errors.Wrap(errSum, "handlerDetailStructTmplRaw:"+err.Error())
 		}
 		modelJSONTmpl, err = template.New("modelJSON").Parse(modelJSONTmplRaw)
 		if err != nil {
-			panic(err)
+			errSum = errors.Wrap(errSum, "modelJSONTmplRaw:"+err.Error())
 		}
 		protoFileTmpl, err = template.New("protoFile").Parse(protoFileTmplRaw)
 		if err != nil {
-			panic(err)
+			errSum = errors.Wrap(errSum, "protoFileTmplRaw:"+err.Error())
 		}
 		protoMessageCreateTmpl, err = template.New("protoMessageCreate").Parse(protoMessageCreateTmplRaw)
 		if err != nil {
-			panic(err)
+			errSum = errors.Wrap(errSum, "protoMessageCreateTmplRaw:"+err.Error())
 		}
 		protoMessageUpdateTmpl, err = template.New("protoMessageUpdate").Parse(protoMessageUpdateTmplRaw)
 		if err != nil {
-			panic(err)
+			errSum = errors.Wrap(errSum, "protoMessageUpdateTmplRaw:"+err.Error())
 		}
 		protoMessageDetailTmpl, err = template.New("protoMessageDetail").Parse(protoMessageDetailTmplRaw)
 		if err != nil {
-			panic(err)
+			errSum = errors.Wrap(errSum, "protoMessageDetailTmplRaw:"+err.Error())
 		}
 		serviceCreateStructTmpl, err = template.New("serviceCreateStruct").Parse(serviceCreateStructTmplRaw)
 		if err != nil {
-			panic(err)
+			errSum = errors.Wrap(errSum, "serviceCreateStructTmplRaw:"+err.Error())
 		}
 		serviceUpdateStructTmpl, err = template.New("serviceUpdateStruct").Parse(serviceUpdateStructTmplRaw)
 		if err != nil {
-			panic(err)
+			errSum = errors.Wrap(errSum, "serviceUpdateStructTmplRaw:"+err.Error())
 		}
 		serviceStructTmpl, err = template.New("serviceStruct").Parse(serviceStructTmplRaw)
 		if err != nil {
-			panic(err)
+			errSum = errors.Wrap(errSum, "serviceStructTmplRaw:"+err.Error())
+		}
+
+		if errSum != nil {
+			panic(errSum)
 		}
 	})
 }

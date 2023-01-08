@@ -127,3 +127,10 @@ func SpanDemo(serviceName string, spanName string, ctx context.Context) {
 		//metrics.WithIgnoreRequestPaths("/ping", "/health"), // ignore request paths
 	))
 ```
+
+### Request id
+
+```go
+	r := gin.Default()
+    r.Use(RequestID())
+```

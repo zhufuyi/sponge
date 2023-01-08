@@ -34,6 +34,22 @@ func TestNewRouter(t *testing.T) {
 	})
 }
 
+func TestNewRouter2(t *testing.T) {
+	err := config.Init(configs.Path("serverNameExample.yml"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	config.Get().App.EnableMetrics = true
+
+	utils.SafeRunWithTimeout(time.Second*2, func(cancel context.CancelFunc) {
+		gin.SetMode(gin.ReleaseMode)
+		r := NewRouter()
+		assert.NotNil(t, r)
+		cancel()
+	})
+}
+
 type mock struct{}
 
 func (u mock) Create(c *gin.Context)     { return }

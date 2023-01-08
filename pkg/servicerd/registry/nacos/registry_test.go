@@ -47,17 +47,38 @@ func TestRegistry(t *testing.T) {
 		r = newNacosRegistry()
 	})
 
+	go func() {
+		defer func() { recover() }()
+		_, err := r.Watch(context.Background(), "foo")
+		t.Log(err)
+	}()
+
 	defer func() { recover() }()
+	time.Sleep(time.Millisecond * 10)
 	err := r.Register(context.Background(), instance)
 	t.Log(err)
+}
 
-	err = r.Deregister(context.Background(), instance)
+func TestDeregister(t *testing.T) {
+	instance := registry.NewServiceInstance("foo", "bar", []string{"grpc://127.0.0.1:8282"})
+	r := &Registry{}
+	utils.SafeRunWithTimeout(time.Second*3, func(cancel context.CancelFunc) {
+		r = newNacosRegistry()
+	})
+
+	defer func() { recover() }()
+	err := r.Deregister(context.Background(), instance)
 	t.Log(err)
+}
 
-	_, err = r.GetService(context.Background(), "foo")
-	t.Log(err)
+func TestGetService(t *testing.T) {
+	r := &Registry{}
+	utils.SafeRunWithTimeout(time.Second*3, func(cancel context.CancelFunc) {
+		r = newNacosRegistry()
+	})
 
-	_, err = r.Watch(context.Background(), "foo")
+	defer func() { recover() }()
+	_, err := r.GetService(context.Background(), "foo")
 	t.Log(err)
 }
 

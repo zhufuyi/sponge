@@ -153,6 +153,21 @@ func TestGetTableInfo(t *testing.T) {
 	t.Log(err, info)
 }
 
-func Test_templateNew(t *testing.T) {
-
+func Test_initTemplate(t *testing.T) {
+	defer func() { recover() }()
+	modelStructTmplRaw = "{{if .foo}}"
+	modelTmplRaw = "{{if .foo}}"
+	updateFieldTmplRaw = "{{if .foo}}"
+	handlerCreateStructTmplRaw = "{{if .foo}}"
+	handlerUpdateStructTmplRaw = "{{if .foo}}"
+	handlerDetailStructTmplRaw = "{{if .foo}}"
+	modelJSONTmplRaw = "{{if .foo}}"
+	protoFileTmplRaw = "{{if .foo}}"
+	protoMessageCreateTmplRaw = "{{if .foo}}"
+	protoMessageUpdateTmplRaw = "{{if .foo}}"
+	protoMessageDetailTmplRaw = "{{if .foo}}"
+	serviceCreateStructTmplRaw = "{{if .foo}}"
+	serviceUpdateStructTmplRaw = "{{if .foo}}"
+	serviceStructTmplRaw = "{{if .foo}}"
+	initTemplate()
 }

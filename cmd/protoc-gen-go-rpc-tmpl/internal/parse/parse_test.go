@@ -1,8 +1,11 @@
 package parse
 
 import (
-	"google.golang.org/protobuf/compiler/protogen"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/compiler/protogen"
 )
 
 func TestGetServices(t *testing.T) {
@@ -48,4 +51,25 @@ func TestMethods(t *testing.T) {
 		field.FieldType = v
 		t.Log(field.GoTypeZero())
 	}
+}
+
+func Test_getRequestFields(t *testing.T) {
+	fields := []*protogen.Field{
+		{
+			Desc:     &desc{},
+			GoName:   "foo1",
+			Comments: protogen.CommentSet{},
+		},
+	}
+
+	requestFields := getRequestFields(fields)
+	assert.Equal(t, 1, len(requestFields))
+}
+
+type desc struct {
+	protoreflect.FieldDescriptor
+}
+
+func (d desc) Kind() protoreflect.Kind {
+	return protoreflect.Int32Kind
 }

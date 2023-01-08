@@ -49,6 +49,8 @@ func TestRedisCache(t *testing.T) {
 	key := utils.Uint64ToStr(testData.ID)
 	err := iCache.Set(c.Ctx, key, c.TestDataMap[key], time.Minute)
 	assert.NoError(t, err)
+	err = iCache.Set(c.Ctx, key, c.TestDataMap[key], 0)
+	assert.NoError(t, err)
 
 	val := &redisUser{}
 	err = iCache.Get(c.Ctx, key, val)
@@ -59,6 +61,8 @@ func TestRedisCache(t *testing.T) {
 	assert.NoError(t, err)
 
 	err = iCache.MultiSet(c.Ctx, c.TestDataMap, time.Minute)
+	assert.NoError(t, err)
+	err = iCache.MultiSet(c.Ctx, c.TestDataMap, 0)
 	assert.NoError(t, err)
 
 	var keys []string
@@ -106,6 +110,9 @@ func TestRedisCacheError(t *testing.T) {
 	time.Sleep(time.Millisecond)
 	err = iCache.Get(c.Ctx, key, nil)
 	assert.Error(t, err)
+
+	_ = iCache.MultiSet(c.Ctx, nil, time.Minute)
+	_ = iCache.MultiGet(c.Ctx, nil, time.Minute)
 
 	// Del empty key error test
 	err = iCache.Del(c.Ctx)

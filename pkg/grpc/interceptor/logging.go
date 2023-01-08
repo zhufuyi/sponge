@@ -6,7 +6,6 @@ import (
 	"time"
 
 	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
-	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
@@ -17,6 +16,9 @@ import (
 
 // UnaryClientLog client log unary interceptor
 func UnaryClientLog(logger *zap.Logger) grpc.UnaryClientInterceptor {
+	if logger == nil {
+		logger, _ = zap.NewProduction()
+	}
 	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
 		startTime := time.Now()
 
@@ -45,11 +47,17 @@ func UnaryClientLog(logger *zap.Logger) grpc.UnaryClientInterceptor {
 
 // UnaryClientLog2 client log unary interceptor
 func UnaryClientLog2(logger *zap.Logger, opts ...grpc_zap.Option) grpc.UnaryClientInterceptor {
+	if logger == nil {
+		logger, _ = zap.NewProduction()
+	}
 	return grpc_zap.UnaryClientInterceptor(logger, opts...)
 }
 
 // StreamClientLog client log stream interceptor
 func StreamClientLog(logger *zap.Logger) grpc.StreamClientInterceptor {
+	if logger == nil {
+		logger, _ = zap.NewProduction()
+	}
 	return func(ctx context.Context, desc *grpc.StreamDesc, cc *grpc.ClientConn, method string,
 		streamer grpc.Streamer, opts ...grpc.CallOption) (grpc.ClientStream, error) {
 		startTime := time.Now()
@@ -79,6 +87,9 @@ func StreamClientLog(logger *zap.Logger) grpc.StreamClientInterceptor {
 
 // StreamClientLog2 client log stream interceptor
 func StreamClientLog2(logger *zap.Logger, opts ...grpc_zap.Option) grpc.StreamClientInterceptor {
+	if logger == nil {
+		logger, _ = zap.NewProduction()
+	}
 	return grpc_zap.StreamClientInterceptor(logger, opts...)
 }
 
@@ -223,9 +234,9 @@ func UnaryServerLog2(logger *zap.Logger, opts ...LogOption) grpc.UnaryServerInte
 }
 
 // UnaryServerCtxTags extractor field unary interceptor
-func UnaryServerCtxTags() grpc.UnaryServerInterceptor {
-	return grpc_ctxtags.UnaryServerInterceptor(grpc_ctxtags.WithFieldExtractor(grpc_ctxtags.CodeGenRequestFieldExtractor))
-}
+//func UnaryServerCtxTags() grpc.UnaryServerInterceptor {
+//	return grpc_ctxtags.UnaryServerInterceptor(grpc_ctxtags.WithFieldExtractor(grpc_ctxtags.CodeGenRequestFieldExtractor))
+//}
 
 // StreamServerLog Server-side log stream interceptor
 func StreamServerLog(logger *zap.Logger, opts ...LogOption) grpc.StreamServerInterceptor {
@@ -314,6 +325,6 @@ func StreamServerLog2(logger *zap.Logger, opts ...LogOption) grpc.StreamServerIn
 }
 
 // StreamServerCtxTags extractor field stream interceptor
-func StreamServerCtxTags() grpc.StreamServerInterceptor {
-	return grpc_ctxtags.StreamServerInterceptor(grpc_ctxtags.WithFieldExtractor(grpc_ctxtags.CodeGenRequestFieldExtractor))
-}
+//func StreamServerCtxTags() grpc.StreamServerInterceptor {
+//	return grpc_ctxtags.StreamServerInterceptor(grpc_ctxtags.WithFieldExtractor(grpc_ctxtags.CodeGenRequestFieldExtractor))
+//}

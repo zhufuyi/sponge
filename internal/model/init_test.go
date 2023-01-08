@@ -94,6 +94,16 @@ func TestGetCacheType(t *testing.T) {
 	ct := GetCacheType()
 	assert.NotNil(t, ct)
 
+	err := config.Init(configs.Path("serverNameExample.yml"))
+	if err != nil {
+		panic(err)
+	}
+
+	cacheType = nil
+	defer func() { recover() }()
+	ct = GetCacheType()
+	assert.NotNil(t, ct)
+
 	defer func() { recover() }()
 	InitCache("redis")
 	ct = GetCacheType()
