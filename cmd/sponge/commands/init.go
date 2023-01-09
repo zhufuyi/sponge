@@ -27,10 +27,11 @@ Examples:
 			if err != nil {
 				return err
 			}
-			_, err = copyToTempDir()
+			ver, err := copyToTempDir()
 			if err != nil {
 				return err
 			}
+			updateSpongeInternalPlugin(ver)
 
 			// installing dependent plug-ins
 			_, lackNames := checkInstallTools()

@@ -37,6 +37,7 @@ Examples:
 			if err != nil {
 				return err
 			}
+			updateSpongeInternalPlugin(ver)
 			fmt.Printf("update sponge version to %s successfully.\n", ver)
 			return nil
 		},
@@ -48,22 +49,6 @@ Examples:
 func runUpdateCommand() error {
 	ctx, _ := context.WithTimeout(context.Background(), time.Minute*3) //nolint
 	result := gobash.Run(ctx, "go", "install", "github.com/zhufuyi/sponge/cmd/sponge@latest")
-	for range result.StdOut {
-	}
-	if result.Err != nil {
-		return fmt.Errorf("exec command failed, %v", result.Err)
-	}
-
-	ctx, _ = context.WithTimeout(context.Background(), time.Minute) //nolint
-	result = gobash.Run(ctx, "go", "install", "github.com/zhufuyi/sponge/cmd/protoc-gen-go-gin@latest")
-	for range result.StdOut {
-	}
-	if result.Err != nil {
-		return fmt.Errorf("exec command failed, %v", result.Err)
-	}
-
-	ctx, _ = context.WithTimeout(context.Background(), time.Minute) //nolint
-	result = gobash.Run(ctx, "go", "install", "github.com/zhufuyi/sponge/cmd/protoc-gen-go-rpc-tmpl@latest")
 	for range result.StdOut {
 	}
 	if result.Err != nil {
@@ -134,4 +119,22 @@ func getLatestVersion(s string) string {
 	}
 	sort.Strings(allVersions)
 	return allVersions[len(allVersions)-1]
+}
+
+func updateSpongeInternalPlugin(latestVersionNum string) {
+	ctx, _ := context.WithTimeout(context.Background(), time.Minute) //nolint
+	result := gobash.Run(ctx, "go", "install", "github.com/zhufuyi/sponge/cmd/protoc-gen-go-gin@"+latestVersionNum)
+	for range result.StdOut {
+	}
+	if result.Err != nil {
+		fmt.Printf("update plugin 'protoc-gen-go-gin' failed, version=%s, error=%v\n", latestVersionNum, result.Err)
+	}
+
+	ctx, _ = context.WithTimeout(context.Background(), time.Minute) //nolint
+	result = gobash.Run(ctx, "go", "install", "github.com/zhufuyi/sponge/cmd/protoc-gen-go-rpc-tmpl@"+latestVersionNum)
+	for range result.StdOut {
+	}
+	if result.Err != nil {
+		fmt.Printf("update plugin 'protoc-gen-go-rpc-tmpl' failed, version=%s, error=%v\n", latestVersionNum, result.Err)
+	}
 }
