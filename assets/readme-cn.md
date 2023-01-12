@@ -1,4 +1,4 @@
-[sponge](https://github.com/zhufuyi/sponge) 是一个微服务框架，一个快速创建web和微服务代码工具。sponge拥有丰富的生成代码命令，一共生成12种不同功能代码，这些功能代码可以组合成完整的服务(类似人为打散的海绵细胞可以自动重组成一个新的海绵)。微服务代码功能包括日志、服务注册与发现、注册中心、限流、熔断、链路跟踪、指标监控、pprof性能分析、统计、缓存、CICD等功能。代码解耦模块化设计，包括了从开发到部署完整工程，常用代码和脚本是自动生成，只需在按照代码模板去编写业务逻辑代码，使得开发效率提高不少。
+[sponge](https://github.com/zhufuyi/sponge) 是一个微服务框架，一个快速创建web和微服务代码工具。sponge拥有丰富的生成代码命令，一共生成12种不同功能代码，这些功能代码可以组合成完整的服务(类似人为打散的海绵细胞可以自动重组成一个新的海绵)。微服务代码功能包括日志、服务注册与发现、注册中心、限流、熔断、链路跟踪、指标监控、pprof性能分析、统计、缓存、CICD等功能。代码解耦模块化设计，包括了从开发到部署完整工程，常用代码和脚本是自动生成，只需在按照模板去编写业务逻辑代码，从而提高开发效率。
 
 <br>
 
@@ -93,5 +93,22 @@ make run
 ### 文档
 
 [sponge 使用文档](sponge-doc-cn.md)
+
+<br>
+
+### 视频示例
+
+- [根据sql生成web服务完整工程代码](https://www.bilibili.com/video/BV1iR4y1U7Nf/)
+- [根据proto生成web服务完整工程代码](https://www.bilibili.com/video/BV13d4y1E7mC/)
+- [根据sql生成rpc服务完整工程代码](https://www.bilibili.com/video/BV15e4y1V7jZ/)
+- [根据proto生成rpc服务完整工程代码](https://www.bilibili.com/video/BV1yW4y157tz/)
+- [根据proto生成rpc gateway完整工程代码](https://www.bilibili.com/video/BV1JM411h7Pt/)
+- [十分钟搭建一个拥有多个微服务的go语言工程项目](https://www.bilibili.com/video/BV1pP4y1y7hA/)
+
+<br>
+
+如果觉得对你有用请给个star⭐，欢迎加入[微信群交流](https://pan.baidu.com/s/1NZgPb2v_8tAnBuwyeFyE_g?pwd=spon)。
+
+![wechat-group](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/wechat-group.png)
 
 <br><br>
