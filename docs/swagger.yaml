@@ -50,6 +50,15 @@ definitions:
         description: phone number, e164 means <+ country code> <cell phone number>.
         type: string
     type: object
+  types.DeleteUserExamplesByIDsRequest:
+    properties:
+      ids:
+        description: id list
+        items:
+          type: integer
+        minItems: 1
+        type: array
+    type: object
   types.GetUserExamplesByIDsRequest:
     properties:
       ids:
@@ -188,7 +197,7 @@ paths:
     put:
       consumes:
       - application/json
-      description: update userExample information based on id
+      description: update userExample information by id
       parameters:
       - description: id
         in: path
@@ -215,7 +224,8 @@ paths:
     post:
       consumes:
       - application/json
-      description: get a list of userExamples using a post request
+      description: paging and conditional fetching of userExamples lists using post
+        requests
       parameters:
       - description: query parameters
         in: body
@@ -230,14 +240,36 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/types.Result'
-      summary: get a list of userExample
+      summary: get a list of userExamples
+      tags:
+      - userExample
+  /api/v1/userExamples/delete/ids:
+    post:
+      consumes:
+      - application/json
+      description: delete userExamples by multiple id using a post request
+      parameters:
+      - description: id array
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/types.DeleteUserExamplesByIDsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.Result'
+      summary: delete userExamples by multiple id
       tags:
       - userExample
   /api/v1/userExamples/ids:
     post:
       consumes:
       - application/json
-      description: get a list of userExample based on multiple ids using a post request
+      description: get userExamples by multiple id using a post request
       parameters:
       - description: id array
         in: body
@@ -252,7 +284,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/types.Result'
-      summary: get multiple records based on multiple ids
+      summary: get userExamples by multiple id
       tags:
       - userExample
   /health:

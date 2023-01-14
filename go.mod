@@ -26,6 +26,7 @@ require (
 	github.com/jinzhu/inflection v1.0.0
 	github.com/nacos-group/nacos-sdk-go/v2 v2.1.0
 	github.com/natefinch/lumberjack v2.0.0+incompatible
+	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.13.0
 	github.com/shirou/gopsutil/v3 v3.21.8
 	github.com/spf13/cast v1.5.0
@@ -132,7 +133,6 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.1 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/prometheus/common v0.37.0 // indirect

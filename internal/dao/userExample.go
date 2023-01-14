@@ -24,6 +24,7 @@ var _ UserExampleDao = (*userExampleDao)(nil)
 type UserExampleDao interface {
 	Create(ctx context.Context, table *model.UserExample) error
 	DeleteByID(ctx context.Context, id uint64) error
+	DeleteByIDs(ctx context.Context, ids []uint64) error
 	UpdateByID(ctx context.Context, table *model.UserExample) error
 	GetByID(ctx context.Context, id uint64) (*model.UserExample, error)
 	GetByIDs(ctx context.Context, ids []uint64) ([]*model.UserExample, error)
@@ -57,6 +58,21 @@ func (d *userExampleDao) DeleteByID(ctx context.Context, id uint64) error {
 
 	// delete cache
 	_ = d.cache.Del(ctx, id)
+
+	return nil
+}
+
+// DeleteByIDs batch delete multiple records
+func (d *userExampleDao) DeleteByIDs(ctx context.Context, ids []uint64) error {
+	err := d.db.WithContext(ctx).Where("id IN (?)", ids).Delete(&model.UserExample{}).Error
+	if err != nil {
+		return err
+	}
+
+	// delete cache
+	for _, id := range ids {
+		_ = d.cache.Del(ctx, id)
+	}
 
 	return nil
 }

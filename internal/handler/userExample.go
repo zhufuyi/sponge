@@ -25,6 +25,7 @@ var _ UserExampleHandler = (*userExampleHandler)(nil)
 type UserExampleHandler interface {
 	Create(c *gin.Context)
 	DeleteByID(c *gin.Context)
+	DeleteByIDs(c *gin.Context)
 	UpdateByID(c *gin.Context)
 	GetByID(c *gin.Context)
 	ListByIDs(c *gin.Context)
@@ -105,9 +106,37 @@ func (h *userExampleHandler) DeleteByID(c *gin.Context) {
 	response.Success(c)
 }
 
-// UpdateByID update information based on id
+// DeleteByIDs delete records by multiple id
+// @Summary delete userExamples by multiple id
+// @Description delete userExamples by multiple id using a post request
+// @Tags userExample
+// @Param data body types.DeleteUserExamplesByIDsRequest true "id array"
+// @Accept json
+// @Produce json
+// @Success 200 {object} types.Result{}
+// @Router /api/v1/userExamples/delete/ids [post]
+func (h *userExampleHandler) DeleteByIDs(c *gin.Context) {
+	form := &types.DeleteUserExamplesByIDsRequest{}
+	err := c.ShouldBindJSON(form)
+	if err != nil {
+		logger.Warn("ShouldBindJSON error: ", logger.Err(err), middleware.GCtxRequestIDField(c))
+		response.Error(c, ecode.InvalidParams)
+		return
+	}
+
+	err = h.iDao.DeleteByIDs(c.Request.Context(), form.IDs)
+	if err != nil {
+		logger.Error("GetByIDs error", logger.Err(err), logger.Any("form", form), middleware.GCtxRequestIDField(c))
+		response.Output(c, ecode.InternalServerError.ToHTTPCode())
+		return
+	}
+
+	response.Success(c)
+}
+
+// UpdateByID update information by id
 // @Summary update userExample information
-// @Description update userExample information based on id
+// @Description update userExample information by id
 // @Tags userExample
 // @accept json
 // @Produce json
@@ -147,7 +176,7 @@ func (h *userExampleHandler) UpdateByID(c *gin.Context) {
 	response.Success(c)
 }
 
-// GetByID get a record based on id
+// GetByID get a record by id
 // @Summary get userExample details
 // @Description get userExample details by id
 // @Tags userExample
@@ -185,9 +214,9 @@ func (h *userExampleHandler) GetByID(c *gin.Context) {
 	response.Success(c, gin.H{"userExample": data})
 }
 
-// ListByIDs get multiple records based on multiple ids
-// @Summary get multiple records based on multiple ids
-// @Description get a list of userExample based on multiple ids using a post request
+// ListByIDs get records by multiple id
+// @Summary get userExamples by multiple id
+// @Description get userExamples by multiple id using a post request
 // @Tags userExample
 // @Param data body types.GetUserExamplesByIDsRequest true "id array"
 // @Accept json
@@ -223,8 +252,8 @@ func (h *userExampleHandler) ListByIDs(c *gin.Context) {
 }
 
 // List Get multiple records by query parameters
-// @Summary get a list of userExample
-// @Description get a list of userExamples using a post request
+// @Summary get a list of userExamples
+// @Description paging and conditional fetching of userExamples lists using post requests
 // @Tags userExample
 // @accept json
 // @Produce json

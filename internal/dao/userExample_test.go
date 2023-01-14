@@ -81,6 +81,32 @@ func Test_userExampleDao_DeleteByID(t *testing.T) {
 	assert.Error(t, err)
 }
 
+func Test_userExampleDao_DeleteByIDs(t *testing.T) {
+	d := newUserExampleDao()
+	defer d.Close()
+	testData := d.TestData.(*model.UserExample)
+
+	testData.DeletedAt = gorm.DeletedAt{
+		Time:  time.Now(),
+		Valid: false,
+	}
+
+	d.SQLMock.ExpectBegin()
+	d.SQLMock.ExpectExec("UPDATE .*").
+		WithArgs(d.AnyTime, testData.ID).
+		WillReturnResult(sqlmock.NewResult(int64(testData.ID), 1))
+	d.SQLMock.ExpectCommit()
+
+	err := d.IDao.(UserExampleDao).DeleteByID(d.Ctx, testData.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// zero id error
+	err = d.IDao.(UserExampleDao).DeleteByIDs(d.Ctx, []uint64{0})
+	assert.Error(t, err)
+}
+
 func Test_userExampleDao_UpdateByID(t *testing.T) {
 	d := newUserExampleDao()
 	defer d.Close()

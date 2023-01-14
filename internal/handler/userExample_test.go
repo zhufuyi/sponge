@@ -56,6 +56,12 @@ func newUserExampleHandler() *gotest.Handler {
 			HandlerFunc: h.IHandler.(UserExampleHandler).DeleteByID,
 		},
 		{
+			FuncName:    "DeleteByIDs",
+			Method:      http.MethodPost,
+			Path:        "/userExamples/delete/ids",
+			HandlerFunc: h.IHandler.(UserExampleHandler).DeleteByIDs,
+		},
+		{
 			FuncName:    "UpdateByID",
 			Method:      http.MethodPut,
 			Path:        "/userExample/:id",
@@ -158,6 +164,35 @@ func Test_userExampleHandler_DeleteByID(t *testing.T) {
 
 	// delete error test
 	err = gohttp.Delete(result, h.GetRequestURL("DeleteByID", 111))
+	assert.Error(t, err)
+}
+
+func Test_userExampleHandler_DeleteByIDs(t *testing.T) {
+	h := newUserExampleHandler()
+	defer h.Close()
+	testData := h.TestData.(*model.UserExample)
+
+	h.MockDao.SQLMock.ExpectBegin()
+	h.MockDao.SQLMock.ExpectExec("UPDATE .*").
+		WithArgs(h.MockDao.AnyTime, testData.ID). // adjusted for the amount of test data
+		WillReturnResult(sqlmock.NewResult(int64(testData.ID), 1))
+	h.MockDao.SQLMock.ExpectCommit()
+
+	result := &gohttp.StdResult{}
+	err := gohttp.Post(result, h.GetRequestURL("DeleteByIDs"), &types.DeleteUserExamplesByIDsRequest{IDs: []uint64{testData.ID}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result.Code != 0 {
+		t.Fatalf("%+v", result)
+	}
+
+	// zero id error test
+	err = gohttp.Post(result, h.GetRequestURL("DeleteByIDs"), nil)
+	assert.NoError(t, err)
+
+	// get error test
+	err = gohttp.Post(result, h.GetRequestURL("DeleteByIDs"), &types.DeleteUserExamplesByIDsRequest{IDs: []uint64{111}})
 	assert.Error(t, err)
 }
 

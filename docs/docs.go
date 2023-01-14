@@ -82,7 +82,7 @@ const docTemplate = `{
                 }
             },
             "put": {
-                "description": "update userExample information based on id",
+                "description": "update userExample information by id",
                 "consumes": [
                     "application/json"
                 ],
@@ -153,7 +153,7 @@ const docTemplate = `{
         },
         "/api/v1/userExamples": {
             "post": {
-                "description": "get a list of userExamples using a post request",
+                "description": "paging and conditional fetching of userExamples lists using post requests",
                 "consumes": [
                     "application/json"
                 ],
@@ -163,7 +163,7 @@ const docTemplate = `{
                 "tags": [
                     "userExample"
                 ],
-                "summary": "get a list of userExample",
+                "summary": "get a list of userExamples",
                 "parameters": [
                     {
                         "description": "query parameters",
@@ -185,9 +185,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/userExamples/ids": {
+        "/api/v1/userExamples/delete/ids": {
             "post": {
-                "description": "get a list of userExample based on multiple ids using a post request",
+                "description": "delete userExamples by multiple id using a post request",
                 "consumes": [
                     "application/json"
                 ],
@@ -197,7 +197,41 @@ const docTemplate = `{
                 "tags": [
                     "userExample"
                 ],
-                "summary": "get multiple records based on multiple ids",
+                "summary": "delete userExamples by multiple id",
+                "parameters": [
+                    {
+                        "description": "id array",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.DeleteUserExamplesByIDsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.Result"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/userExamples/ids": {
+            "post": {
+                "description": "get userExamples by multiple id using a post request",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "userExample"
+                ],
+                "summary": "get userExamples by multiple id",
                 "parameters": [
                     {
                         "description": "id array",
@@ -325,6 +359,19 @@ const docTemplate = `{
                 "phone": {
                     "description": "phone number, e164 means \u003c+ country code\u003e \u003ccell phone number\u003e.",
                     "type": "string"
+                }
+            }
+        },
+        "types.DeleteUserExamplesByIDsRequest": {
+            "type": "object",
+            "properties": {
+                "ids": {
+                    "description": "id list",
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "integer"
+                    }
                 }
             }
         },

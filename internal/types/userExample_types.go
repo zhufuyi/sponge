@@ -52,6 +52,11 @@ type GetUserExampleByIDRespond struct {
 
 // delete the templates code end
 
+// DeleteUserExamplesByIDsRequest request form ids
+type DeleteUserExamplesByIDsRequest struct {
+	IDs []uint64 `json:"ids" binding:"min=1"` // id list
+}
+
 // GetUserExamplesByIDsRequest request form ids
 type GetUserExamplesByIDsRequest struct {
 	IDs []uint64 `json:"ids" binding:"min=1"` // id list
