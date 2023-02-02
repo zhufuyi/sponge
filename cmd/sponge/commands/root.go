@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/zhufuyi/sponge/cmd/sponge/commands/generate"
@@ -10,7 +11,7 @@ import (
 
 var (
 	version     = "v0.0.0"
-	versionFile = os.TempDir() + "/sponge/.github/version"
+	versionFile = GetSpongeDir() + "/.sponge/.github/version"
 )
 
 // NewRootCMD command entry
@@ -43,4 +44,15 @@ func getVersion() string {
 		return v
 	}
 	return version
+}
+
+// GetSpongeDir get sponge home directory
+func GetSpongeDir() string {
+	dir, err := os.UserHomeDir()
+	if err != nil {
+		fmt.Println("can't get home directory'")
+		return ""
+	}
+
+	return dir
 }

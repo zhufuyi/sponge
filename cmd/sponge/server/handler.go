@@ -24,7 +24,7 @@ import (
 )
 
 var (
-	saveDir = os.TempDir() + "/sponge_temp"
+	saveDir = getSpongeDir() + "/.sponge_record"
 )
 
 type mysqlForm struct {
@@ -320,4 +320,14 @@ func compress(file *os.File, prefix string, zw *zip.Writer) error {
 	}
 
 	return nil
+}
+
+func getSpongeDir() string {
+	dir, err := os.UserHomeDir()
+	if err != nil {
+		fmt.Println("can't get home directory'")
+		return ""
+	}
+
+	return dir
 }

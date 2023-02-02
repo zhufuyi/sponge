@@ -33,10 +33,11 @@ func NewRouter() *gin.Engine {
 		staticServer.ServeHTTP(c.Writer, c.Request)
 	})
 
-	r.POST("/generate", GenerateCode)
-	r.POST("/uploadFiles", UploadFiles)
-	r.POST("/listTables", ListTables)
-	r.GET("/record/:path", GetRecord)
+	apiV1 := r.Group("/api/v1")
+	apiV1.POST("/generate", GenerateCode)
+	apiV1.POST("/uploadFiles", UploadFiles)
+	apiV1.POST("/listTables", ListTables)
+	apiV1.GET("/record/:path", GetRecord)
 
 	return r
 }

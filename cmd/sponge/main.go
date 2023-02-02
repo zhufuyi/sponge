@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	err := generate.Init(generate.TplNameSponge, os.TempDir()+gofile.GetPathDelimiter()+"sponge")
+	err := generate.Init(generate.TplNameSponge, commands.GetSpongeDir()+gofile.GetPathDelimiter()+".sponge")
 	if err != nil {
 		fmt.Printf("\n    %v\n\n", err)
 		return

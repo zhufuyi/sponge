@@ -23,7 +23,7 @@ func NewRunCommand() *cobra.Command {
 
 		RunE: func(cmd *cobra.Command, args []string) error {
 			url := fmt.Sprintf("http://localhost:%d", port)
-			fmt.Printf("sponge service started, visit %s in your browser.\n\n", url)
+			fmt.Printf("sponge command ui service started successfully, visit %s in your browser.\n\n", url)
 			go func() {
 				_ = open(url)
 			}()

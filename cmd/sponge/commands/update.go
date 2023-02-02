@@ -82,7 +82,7 @@ func copyToTempDir() (string, error) {
 	}
 
 	srcDir := adaptPathDelimiter(fmt.Sprintf("%s/pkg/mod/github.com/zhufuyi/%s", gopath, latestSpongeDirName))
-	destDir := adaptPathDelimiter(os.TempDir() + "/sponge")
+	destDir := adaptPathDelimiter(GetSpongeDir() + "/.sponge")
 	destDirBk := destDir + ".bk"
 
 	// copy to temporary directory
