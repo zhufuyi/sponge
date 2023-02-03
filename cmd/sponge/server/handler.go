@@ -24,7 +24,8 @@ import (
 )
 
 var (
-	saveDir = getSpongeDir() + "/.sponge_record"
+	recordDirName = "sponge_record"
+	saveDir       = fmt.Sprintf("%s/.%s", getSpongeDir(), recordDirName)
 )
 
 type mysqlForm struct {
@@ -136,10 +137,10 @@ func generateCode(c *gin.Context, path string, arg string) {
 
 	_ = os.RemoveAll(out)
 	_ = os.RemoveAll(zipFile)
-	if params.ProtobufFile != "" && strings.Contains(params.ProtobufFile, "sponge_temp") {
+	if params.ProtobufFile != "" && strings.Contains(params.ProtobufFile, recordDirName) {
 		_ = os.RemoveAll(gofile.GetFileDir(params.ProtobufFile))
 	}
-	if params.YamlFile != "" && strings.Contains(params.YamlFile, "sponge_temp") {
+	if params.YamlFile != "" && strings.Contains(params.YamlFile, recordDirName) {
 		_ = os.RemoveAll(gofile.GetFileDir(params.YamlFile))
 	}
 }

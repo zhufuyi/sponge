@@ -15,7 +15,7 @@
 
 </div>
 
-[sponge](https://github.com/zhufuyi/sponge) is a microservice framework, a tool to quickly generate web and microservice code. sponge has a rich generating code commands, a total of 12 different functional code, these functional code can be combined into a complete service (similar to artificially broken sponge cells can be automatically reorganized into a new sponge). Microservice code features include logging, service registration and discovery, registry, rate limiter, circuit breaker, trace, metrics monitoring, pprof performance analysis, statistics, caching, CICD. Code decoupling modular design, including the complete project from development to deployment, common code and scripts are automatically generated, only in accordance with the code template to write business logic code, making the development efficiency improved a lot.
+[sponge](https://github.com/zhufuyi/sponge) is a microservice framework and a tool for quickly creating web and microservice code. sponge has a rich set of generated code commands, generating a total of 12 different functional codes that can be combined into complete services (similar to a sponge that has been artificially broken up cells can be automatically reassembled into a new sponge). Microservice code functions include logging, service registration and discovery, registry, flow limiting, fusing, link tracking, metrics monitoring, pprof performance analysis, statistics, caching, CICD and more. The code is decoupled and modular in design, with commonly used code and scripts generated automatically, requiring only business logic code to be written according to the generated templates. The web and rpc services created include complete engineering code and scripts from development to deployment, making development in the go language easier and more efficient.
 
 <br>
 
@@ -38,6 +38,17 @@ The microservice code framework created by sponge is shown in Figure 1-2, this i
 <img width="1000px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/microservices-framework.png">
 </p>
 <p align="center">Figure 1-2 Microservices framework diagram</p>
+
+<br>
+
+### Online code generation demo
+
+Online code generation demo: [https://go-sponge.com/ui](https://go-sponge.com/ui/micro-rpc-gw-pb)
+
+💡 Warning.
+
+> Some of the generated code requires mysql account and password, do not try here to avoid the risk of being exposed.
+> Server resources are limited and may not be available later, it is recommended to build the same generation code platform locally to use.
 
 <br>
 
@@ -67,7 +78,7 @@ Download it from `https://github.com/protocolbuffers/protobuf/releases/tag/v3.20
 
 💡 NOTICE:
 
-> If you are using `windows` environment, you need to install some additional dependency tools, see [windows dependency tools](https://github.com/zhufuyi/sponge/blob/main/assets/sponge-doc-en.md#21-window-environment-installation-dependencies) for installation steps.
+> If you are using `windows` environment, you need to install some additional dependency tools, see [windows dependency tools](https://go-sponge.com/sponge-install?id=window-environment-installation-dependencies) for installation steps.
 
 <br>
 
@@ -79,39 +90,17 @@ Once you have installed sponge and the dependencies, you are ready to go, start 
 sponge run
 ```
 
-Visit `http://localhost:24631` in your browser.
+Visit `http://localhost:24631` in your browser, 12 types of codes can be generated.
 
 💡 NOTICE:
 
-> Do not execute the "sponge run" in the directory where the sponge file is located.
-
-<br>
-
-A sample web project code generated from sql:
-
-<p align="center">
-<img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/web-http-en.gif">
-</p>
-
-After download the web project code, execute the command to start the service.
-
-```bash
-# Update swagger documentation
-make docs
-
-# Compile and run the service
-make run
-```
-
-<br>
-
-Generate other types of code you can try yourself.
+> Do not execute the `sponge run` in the directory where the sponge file is located.
 
 <br>
 
 ### Documentation
 
-[sponge usage documentation](assets/sponge-doc-en.md)
+[sponge usage documentation](https://go-sponge.com/)
 
 <br>
 

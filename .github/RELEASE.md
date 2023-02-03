@@ -1,6 +1,5 @@
 ## New
 
-- Prevents cache breakdown
-- Add rpc request id
+- change command ui style
 - Update document
 - Fix some known bugs

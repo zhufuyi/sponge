@@ -1,4 +1,4 @@
-[sponge](https://github.com/zhufuyi/sponge) 是一个微服务框架，一个快速创建web和微服务代码工具。sponge拥有丰富的生成代码命令，一共生成12种不同功能代码，这些功能代码可以组合成完整的服务(类似人为打散的海绵细胞可以自动重组成一个新的海绵)。微服务代码功能包括日志、服务注册与发现、注册中心、限流、熔断、链路跟踪、指标监控、pprof性能分析、统计、缓存、CICD等功能。代码解耦模块化设计，包括了从开发到部署完整工程，常用代码和脚本是自动生成，只需在按照模板去编写业务逻辑代码，从而提高开发效率。
+[sponge](https://github.com/zhufuyi/sponge) 是一个微服务框架，也是一个快速创建web和微服务代码工具。sponge拥有丰富的生成代码命令，一共生成12种不同功能代码，这些功能代码可以组合成完整的服务(类似人为打散的海绵细胞可以自动重组成一个新的海绵)。微服务代码功能包括日志、服务注册与发现、注册中心、限流、熔断、链路跟踪、指标监控、pprof性能分析、统计、缓存、CICD等功能。代码解耦模块化设计，常用的代码和脚本自动生成，只需按照生成的模板编写业务逻辑代码。创建的web和rpc服务包括了从开发到部署完整工程代码和脚本，让使用go语言开发更加轻松和有效率。
 
 <br>
 
@@ -14,7 +14,7 @@
 
 ### 微服务框架
 
-sponge创建的微服务代码框架如图下图所示，这是典型的微服务分层结构，具有高性能，高扩展性，包含常用的服务治理功能。
+sponge创建的微服务代码框架如下图所示，这是典型的微服务分层结构，具有高性能，高扩展性，包含了常用的服务治理功能。
 
 <p align="center">
 <img width="1000px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/microservices-framework.png">
@@ -22,7 +22,18 @@ sponge创建的微服务代码框架如图下图所示，这是典型的微服�
 
 <br>
 
-### 安装
+### 在线生成代码demo
+
+在线生成代码demo： [https://go-sponge.com/ui](https://go-sponge.com/ui/micro-rpc-gw-pb)
+
+💡 警告：
+
+> 有部分生成代码需要填写mysql账号和密码，不要在这里尝试，以免被暴露风险。
+> 服务器资源有限，后面有可能无法使用，建议在本地搭建同样的生成代码平台来使用。
+
+<br>
+
+### 快速安装
 
 **(1) 安装 sponge**
 
@@ -48,7 +59,7 @@ protoc 下载地址 `https://github.com/protocolbuffers/protobuf/releases/tag/v3
 
 💡 注意：
 
-> 如果使用windows环境, 还需要安装额外依赖工具, 安装详情看 [windows dependency tools](https://github.com/zhufuyi/sponge/blob/main/assets/sponge-doc-cn.md#21-window%E7%8E%AF%E5%A2%83%E5%AE%89%E8%A3%85%E4%BE%9D%E8%B5%96%E5%B7%A5%E5%85%B7).
+> 如果使用windows环境, 还需要安装额外依赖工具, 安装详情看 [windows dependency tools](https://go-sponge.com/zh-cn/sponge-install?id=window%e7%8e%af%e5%a2%83%e5%ae%89%e8%a3%85%e4%be%9d%e8%b5%96%e5%b7%a5%e5%85%b7).
 
 <br>
 
@@ -64,11 +75,11 @@ sponge run
 
 💡 注意：
 
-> 不要在sponge二进制文件所在的目录下执行 "sponge run"命令。
+> 不要在sponge二进制文件所在的目录下执行 `sponge run` 命令。
 
 <br>
 
-根据sql生成web项目代码的一个示例如下图所示：
+根据sql生成web项目代码示例：
 
 <p align="center">
 <img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/web-http.gif">
