@@ -21,7 +21,7 @@
 
 ### sponge generates the code framework
 
-The generated code is based on three approaches **Yaml**, **SQL DDL** and **Protocol buffers**, each possessing different functional code generation, and the framework diagram of the generated code is shown in Figure 1-1.
+The generated code is based on three approaches **Yaml**, **SQL DDL** and **Protobuf**, each possessing different functional code generation, and the framework diagram of the generated code is shown in Figure 1-1.
 
 <p align="center">
 <img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/sponge-framework.png">

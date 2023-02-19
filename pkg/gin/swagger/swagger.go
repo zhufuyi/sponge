@@ -19,7 +19,7 @@ func DefaultRouter(r *gin.Engine, jsonContent []byte) {
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 }
 
-// DefaultRouterByFile  default swagger router base on file, request url is http://<ip:port>/swagger/index.html
+// DefaultRouterByFile  default swagger router from file, request url is http://<ip:port>/swagger/index.html
 func DefaultRouterByFile(r *gin.Engine, jsonFile string) {
 	jsonContent, err := os.ReadFile(jsonFile)
 	if err != nil {
@@ -36,7 +36,7 @@ func CustomRouter(r *gin.Engine, name string, jsonContent []byte) {
 	r.GET(fmt.Sprintf("/%s/swagger/*any", name), ginSwagger.WrapHandler(swaggerFiles.NewHandler(), ginSwagger.InstanceName(name)))
 }
 
-// CustomRouterByFile custom swagger router base on file, request url is http://<ip:port>/<filename prefix>/swagger/index.html
+// CustomRouterByFile custom swagger router from file, request url is http://<ip:port>/<filename prefix>/swagger/index.html
 func CustomRouterByFile(r *gin.Engine, jsonFile string) {
 	jsonContent, err := os.ReadFile(jsonFile)
 	if err != nil {
