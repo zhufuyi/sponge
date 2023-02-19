@@ -26,8 +26,8 @@ func ProtoBufCommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "protobuf",
-		Short: "Generate protobuf codes based on mysql",
-		Long: `generate protobuf codes based on mysql.
+		Short: "Generate protobuf codes based on mysql table",
+		Long: `generate protobuf codes based on mysql table.
 
 Examples:
   # generate protobuf codes.

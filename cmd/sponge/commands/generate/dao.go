@@ -29,8 +29,8 @@ func DaoCommand(parentName string) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "dao",
-		Short: "Generate dao codes based on mysql",
-		Long: fmt.Sprintf(`generate dao codes based on mysql.
+		Short: "Generate dao codes based on mysql table",
+		Long: fmt.Sprintf(`generate dao codes based on mysql table.
 
 Examples:
   # generate dao codes and embed 'gorm.model' struct.

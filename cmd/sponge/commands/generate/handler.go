@@ -29,8 +29,8 @@ func HandlerCommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "handler",
-		Short: "Generate handler codes based on mysql",
-		Long: `generate handler codes based on mysql.
+		Short: "Generate handler codes based on mysql table",
+		Long: `generate handler codes based on mysql table.
 
 Examples:
   # generate handler codes and embed 'gorm.model' struct.

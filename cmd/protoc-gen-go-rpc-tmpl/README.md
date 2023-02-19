@@ -1,6 +1,6 @@
 ## protoc-gen-go-rpc-tmpl
 
-According to protobuf to generate rpc server template codes and rpc error code codes.
+According to protobuf to generate rpc service template codes and rpc error code codes.
 
 <br>
 

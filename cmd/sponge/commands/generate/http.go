@@ -13,7 +13,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// HTTPCommand generate http server codes
+// HTTPCommand generate http service codes
 func HTTPCommand() *cobra.Command {
 	var (
 		moduleName  string // module name for go.mod
@@ -31,20 +31,20 @@ func HTTPCommand() *cobra.Command {
 	//nolint
 	cmd := &cobra.Command{
 		Use:   "http",
-		Short: "Generate http server codes based on mysql",
-		Long: `generate http server codes based on mysql.
+		Short: "Generate http service codes based on mysql table",
+		Long: `generate http service codes based on mysql table.
 
 Examples:
-  # generate http server codes and embed 'gorm.model' struct.
+  # generate http service codes and embed 'gorm.model' struct.
   sponge web http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
-  # generate http server codes, structure fields correspond to the column names of the table.
+  # generate http service codes, structure fields correspond to the column names of the table.
   sponge web http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --embed=false
 
-  # generate http server codes and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
+  # generate http service codes and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge web http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
 
-  # generate http server codes and specify the docker image repository address.
+  # generate http service codes and specify the docker image repository address.
   sponge web http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 `,
 		SilenceErrors: true,

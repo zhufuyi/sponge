@@ -15,7 +15,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// RPCCommand generate rpc server codes
+// RPCCommand generate rpc service codes
 func RPCCommand() *cobra.Command {
 	var (
 		moduleName  string // module name for go.mod
@@ -33,20 +33,20 @@ func RPCCommand() *cobra.Command {
 	//nolint
 	cmd := &cobra.Command{
 		Use:   "rpc",
-		Short: "Generate rpc server codes based on mysql",
-		Long: `generate rpc server codes based on mysql.
+		Short: "Generate rpc service codes based on mysql table",
+		Long: `generate rpc service codes based on mysql table.
 
 Examples:
-  # generate rpc server codes and embed 'gorm.model' struct.
+  # generate rpc service codes and embed 'gorm.model' struct.
   sponge micro rpc --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
-  # generate rpc server codes, structure fields correspond to the column names of the table.
+  # generate rpc service codes, structure fields correspond to the column names of the table.
   sponge micro rpc --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --embed=false
 
-  # generate rpc server codes and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
+  # generate rpc service codes and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge micro rpc --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
 
-  # generate rpc server codes and specify the docker image repository address.
+  # generate rpc service codes and specify the docker image repository address.
   sponge micro rpc --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 `,
 		SilenceErrors: true,

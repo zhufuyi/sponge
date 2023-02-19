@@ -27,8 +27,8 @@ func ModelCommand(parentName string) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "model",
-		Short: "Generate model codes based on mysql",
-		Long: fmt.Sprintf(`generate model codes based on mysql.
+		Short: "Generate model codes based on mysql table",
+		Long: fmt.Sprintf(`generate model codes based on mysql table.
 
 Examples:
   # generate model codes and embed 'gorm.Model' struct.

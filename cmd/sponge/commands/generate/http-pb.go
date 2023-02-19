@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// HTTPPbCommand generate http server codes based on protobuf file
+// HTTPPbCommand generate http service codes based on protobuf file
 func HTTPPbCommand() *cobra.Command {
 	var (
 		moduleName   string // module name for go.mod
@@ -24,17 +24,17 @@ func HTTPPbCommand() *cobra.Command {
 	//nolint
 	cmd := &cobra.Command{
 		Use:   "http-pb",
-		Short: "Generate http server codes based on protobuf file",
-		Long: `generate http server codes based on protobuf file.
+		Short: "Generate http service codes based on protobuf file",
+		Long: `generate http service codes based on protobuf file.
 
 Examples:
-  # generate http server codes.
+  # generate http service codes.
   sponge web http-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --protobuf-file=./test.proto
 
-  # generate http server codes and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
+  # generate http service codes and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge web http-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --protobuf-file=./test.proto --out=./yourServerDir
 
-  # generate http server codes and specify the docker image repository address.
+  # generate http service codes and specify the docker image repository address.
   sponge web http-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --protobuf-file=./test.proto
 `,
 		SilenceErrors: true,
