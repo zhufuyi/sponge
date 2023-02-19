@@ -98,13 +98,19 @@ build:
 # build sponge for linux amd64 binary
 build-sponge:
 	@echo "building 'sponge', linux amd64 binary file will output to 'cmd/sponge'"
-	@cd cmd/sponge && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GOPROXY=https://goproxy.cn,direct go build
+	@cd cmd/sponge && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GOPROXY=https://goproxy.cn,direct go build -ldflags "all=-s -w"
 # delete the templates code end
 
+
 .PHONY: run
-# run server
+# run service
 run:
 	@bash scripts/run.sh
+
+.PHONY: run-nohup
+# run service with nohup, if you want to stop the service, pass the parameter stop tag, e.g. make run-nohup TAG=stop
+run-nohup:
+	@bash scripts/run-nohup.sh $(TAG)
 
 
 .PHONY: docker-image
