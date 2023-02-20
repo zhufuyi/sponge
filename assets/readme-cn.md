@@ -108,9 +108,10 @@ make run
 
 <br>
 
-### 视频示例
+### 视频
 
-- [如何一步步打造一个生成web和微服务代码工具 (一)](https://www.bilibili.com/video/BV1s14y1F7Fz/)
+- [sponge的形成过程](https://www.bilibili.com/video/BV1s14y1F7Fz/)
+- [sponge的框架介绍](https://www.bilibili.com/video/BV13u4y1F7EU/)
 - [十分钟搭建一个拥有多个微服务的go语言工程项目](https://www.bilibili.com/video/BV1pP4y1y7hA/)
 
 <br>

@@ -26,7 +26,7 @@ func NewRootCMD() *cobra.Command {
 
 	cmd.AddCommand(
 		InitCommand(),
-		UpdateCommand(),
+		UpgradeCommand(),
 		ToolsCommand(),
 		NewWebCommand(),
 		MicroCommand(),

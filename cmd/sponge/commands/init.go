@@ -23,7 +23,7 @@ Examples:
 			fmt.Println("initialize sponge ......")
 
 			// download sponge template code
-			err := runUpdateCommand()
+			err := runUpgradeCommand()
 			if err != nil {
 				return err
 			}

@@ -70,7 +70,7 @@ func isShowCommand() bool {
 		return true
 	}
 
-	// sponge update or sponge -h
+	// sponge init or sponge -h
 	if l == 2 {
 		if os.Args[1] == "init" || os.Args[1] == "-h" {
 			return true

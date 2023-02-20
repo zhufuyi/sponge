@@ -10,26 +10,27 @@ import (
 
 	"github.com/zhufuyi/sponge/pkg/gobash"
 	"github.com/zhufuyi/sponge/pkg/gofile"
+	"github.com/zhufuyi/sponge/pkg/utils"
 
 	"github.com/spf13/cobra"
 )
 
-// UpdateCommand update sponge binaries
-func UpdateCommand() *cobra.Command {
+// UpgradeCommand upgrade sponge binaries
+func UpgradeCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update",
-		Short: "Update sponge to the latest version",
-		Long: `update sponge to the latest version.
+		Use:   "upgrade",
+		Short: "Upgrade sponge to the latest version",
+		Long: `upgrade sponge to the latest version.
 
 Examples:
-  # run update
-  sponge update
+  # upgrade version
+  sponge upgrade
 `,
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			fmt.Println("update sponge ......")
-			err := runUpdateCommand()
+			fmt.Println("upgrade sponge ......")
+			err := runUpgradeCommand()
 			if err != nil {
 				return err
 			}
@@ -38,7 +39,7 @@ Examples:
 				return err
 			}
 			updateSpongeInternalPlugin(ver)
-			fmt.Printf("update sponge version to %s successfully.\n", ver)
+			fmt.Printf("upgrade sponge version to %s successfully.\n", ver)
 			return nil
 		},
 	}
@@ -46,7 +47,7 @@ Examples:
 	return cmd
 }
 
-func runUpdateCommand() error {
+func runUpgradeCommand() error {
 	ctx, _ := context.WithTimeout(context.Background(), time.Minute*3) //nolint
 	result := gobash.Run(ctx, "go", "install", "github.com/zhufuyi/sponge/cmd/sponge@latest")
 	for range result.StdOut {
@@ -107,18 +108,31 @@ func adaptPathDelimiter(filePath string) string {
 }
 
 func getLatestVersion(s string) string {
+	var dirNames = make(map[int]string)
+	var nums []int
+
 	dirs := strings.Split(s, "\n")
-	var allVersions []string
 	for _, dirName := range dirs {
 		if strings.Contains(dirName, "sponge@") {
-			allVersions = append(allVersions, dirName)
+			tmp := strings.ReplaceAll(dirName, "sponge@", "")
+			ss := strings.Split(tmp, ".")
+			if len(ss) != 3 {
+				continue
+			}
+			if strings.Contains(ss[2], "v0.0.0") {
+				continue
+			}
+			num := utils.StrToInt(ss[0])*100 + utils.StrToInt(ss[1])*10 + utils.StrToInt(ss[2])
+			nums = append(nums, num)
+			dirNames[num] = dirName
 		}
 	}
-	if allVersions == nil {
+	if len(nums) == 0 {
 		return ""
 	}
-	sort.Strings(allVersions)
-	return allVersions[len(allVersions)-1]
+
+	sort.Ints(nums)
+	return dirNames[nums[len(nums)-1]]
 }
 
 func updateSpongeInternalPlugin(latestVersionNum string) {
@@ -127,7 +141,7 @@ func updateSpongeInternalPlugin(latestVersionNum string) {
 	for range result.StdOut {
 	}
 	if result.Err != nil {
-		fmt.Printf("update plugin 'protoc-gen-go-gin' failed, version=%s, error=%v\n", latestVersionNum, result.Err)
+		fmt.Printf("upgrade plugin 'protoc-gen-go-gin' failed, version=%s, error=%v\n", latestVersionNum, result.Err)
 	}
 
 	ctx, _ = context.WithTimeout(context.Background(), time.Minute) //nolint
@@ -135,6 +149,6 @@ func updateSpongeInternalPlugin(latestVersionNum string) {
 	for range result.StdOut {
 	}
 	if result.Err != nil {
-		fmt.Printf("update plugin 'protoc-gen-go-rpc-tmpl' failed, version=%s, error=%v\n", latestVersionNum, result.Err)
+		fmt.Printf("upgrade plugin 'protoc-gen-go-rpc-tmpl' failed, version=%s, error=%v\n", latestVersionNum, result.Err)
 	}
 }
