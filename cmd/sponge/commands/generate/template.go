@@ -142,6 +142,15 @@ func NewCenter(configFile string) (*Center, error) {
 }
 `
 
+	protoShellGRPCMark = `
+  # generate files *_grpc_pb.go
+  protoc --proto_path=. --proto_path=./third_party \
+    --go-grpc_out=. --go-grpc_opt=paths=source_relative \
+    $allProtoFiles
+
+  checkResult $?`
+
+	// http-pb
 	protoShellHandlerCode = `
   # generate the swagger document and merge all files into docs/apis.swagger.json
   protoc --proto_path=. --proto_path=./third_party \
@@ -149,6 +158,9 @@ func NewCenter(configFile string) (*Center, error) {
     $specifiedProtoFiles
 
   checkResult $?
+  echo ""
+  echo "run server and see docs by http://localhost:8080/apis/swagger/index.html"
+  echo ""
 
   moduleName=$(cat docs/gen.info | head -1 | cut -d , -f 1)
   serverName=$(cat docs/gen.info | head -1 | cut -d , -f 2)
@@ -162,6 +174,7 @@ func NewCenter(configFile string) (*Center, error) {
 
   checkResult $?`
 
+	// rpc-gw
 	protoShellServiceCode = `
   # Generate the swagger document and merge all files into docs/apis.swagger.json
   protoc --proto_path=. --proto_path=./third_party \
@@ -169,6 +182,9 @@ func NewCenter(configFile string) (*Center, error) {
     $specifiedProtoFiles
 
   checkResult $?
+  echo ""
+  echo "run server and see docs by http://localhost:8080/apis/swagger/index.html"
+  echo ""
 
   moduleName=$(cat docs/gen.info | head -1 | cut -d , -f 1)
   serverName=$(cat docs/gen.info | head -1 | cut -d , -f 2)
@@ -182,6 +198,7 @@ func NewCenter(configFile string) (*Center, error) {
 
   checkResult $?`
 
+	// rpc-pb
 	protoShellServiceTmplCode = `
   moduleName=$(cat docs/gen.info | head -1 | cut -d , -f 1)
   serverName=$(cat docs/gen.info | head -1 | cut -d , -f 2)

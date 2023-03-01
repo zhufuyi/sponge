@@ -133,7 +133,6 @@ func addRPCFields(moduleName string, serverName string, projectName string, repo
 	fields = append(fields, deleteFieldsMark(r, daoFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, daoTestFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, protoFile, startMark, endMark)...)
-	fields = append(fields, deleteFieldsMark(r, protoShellFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, serviceClientFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, serviceTestFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, dockerFile, wellStartMark, wellEndMark)...)
@@ -143,6 +142,8 @@ func addRPCFields(moduleName string, serverName string, projectName string, repo
 	fields = append(fields, deleteFieldsMark(r, k8sServiceFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, makeFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, gitIgnoreFile, wellStartMark, wellEndMark)...)
+	fields = append(fields, deleteFieldsMark(r, protoShellFile, wellStartMark, wellEndMark)...)
+	fields = append(fields, deleteFieldsMark(r, protoShellFile, wellStartMark2, wellEndMark2)...)
 	fields = append(fields, deleteFieldsMark(r, appConfigFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, replaceFileContentMark(r, readmeFile, "## "+serverName)...)
 	fields = append(fields, []replacer.Field{
@@ -157,6 +158,10 @@ func addRPCFields(moduleName string, serverName string, projectName string, repo
 		{ // replace the contents of the v1/userExample.proto file
 			Old: protoFileMark,
 			New: codes[parser.CodeTypeProto],
+		},
+		{ // replace the contents of the proto.sh file
+			Old: protoShellFileGRPCMark,
+			New: protoShellGRPCMark,
 		},
 		{ // replace the contents of the scripts/proto.sh file
 			Old: protoShellFileMark,

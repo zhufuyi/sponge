@@ -43,7 +43,7 @@ func getVersion() string {
 	if v != "" {
 		return v
 	}
-	return version
+	return "unknown version, execute command 'sponge init' to get version"
 }
 
 // GetSpongeDir get sponge home directory

@@ -186,7 +186,7 @@ func saveFile(moduleName string, serverName string, out string, filePath string,
 		panic(fmt.Sprintf(optErrFormat, "serverName", pluginName))
 	}
 
-	_ = os.MkdirAll(out, 0666)
+	_ = os.MkdirAll(out, 0766)
 	_, name := filepath.Split(filePath)
 	file := out + "/" + name
 	if !isNeedCovered && isExists(file) {
@@ -204,7 +204,7 @@ func saveFileSimple(out string, filePath string, content []byte, isNeedCovered b
 		return nil
 	}
 
-	_ = os.MkdirAll(out, 0666)
+	_ = os.MkdirAll(out, 0766)
 	_, name := filepath.Split(filePath)
 	file := out + "/" + name
 	if !isNeedCovered && isExists(file) {

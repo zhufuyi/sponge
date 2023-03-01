@@ -178,7 +178,7 @@ func convertToGoFile(ysArgs jy2struct.Args, outPath string) error {
 		}
 		outPath += "/internal/config"
 	}
-	_ = os.MkdirAll(outPath, 0666)
+	_ = os.MkdirAll(outPath, 0766)
 	name := gofile.GetFilenameWithoutSuffix(ysArgs.InputFile)
 
 	outPath += "/" + name + ".go"

@@ -62,13 +62,21 @@ function generateByAllProto(){
     exit 1
   fi
 
-  # generate files *_pb.go, *_grpc_pb.go
+  # generate files *_pb.go
   protoc --proto_path=. --proto_path=./third_party \
     --go_out=. --go_opt=paths=source_relative \
+    $allProtoFiles
+
+  checkResult $?
+  # todo generate grpc files here
+  # delete the templates code start
+  # generate files *_grpc_pb.go
+  protoc --proto_path=. --proto_path=./third_party \
     --go-grpc_out=. --go-grpc_opt=paths=source_relative \
     $allProtoFiles
 
   checkResult $?
+  # delete the templates code end
 
   # generate the file *_pb.validate.go
   protoc --proto_path=. --proto_path=./third_party \
@@ -92,7 +100,7 @@ function generateBySpecifiedProto(){
   cd ..
   specifiedProtoFiles=$allProtoFiles
   # todo generate router code for gin here
-  # delete the templates code start
+  # delete the templates code start 2
 
   # generate the swagger document and merge all files into docs/apis.swagger.json
   protoc --proto_path=. --proto_path=./third_party \
@@ -100,6 +108,9 @@ function generateBySpecifiedProto(){
     $specifiedProtoFiles
 
   checkResult $?
+  echo ""
+  echo "run server and see docs by http://localhost:8080/apis/swagger/index.html"
+  echo ""
 
   # A total of four files are generated: the registration route file **router.pb.go (saved in the same directory as the protobuf file),
   # the injection route file *_service.pb.go (saved in internal/routers by default), the logic code template file *_logic.go (saved in internal/service by default),
@@ -111,7 +122,7 @@ function generateBySpecifiedProto(){
     $specifiedProtoFiles
 
   checkResult $?
-  # delete the templates code end
+  # delete the templates code end 2
 }
 
 # generate pb.go by all proto files

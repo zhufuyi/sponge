@@ -254,7 +254,7 @@ func getSavePath() string {
 	}
 	dir += "/" + krand.String(krand.R_All, 8)
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
-		_ = os.MkdirAll(dir, 0666)
+		_ = os.MkdirAll(dir, 0766)
 	}
 	return dir
 }

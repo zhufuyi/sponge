@@ -128,6 +128,7 @@ func addHTTPPbFields(moduleName string, serverName string, projectName string, r
 	fields = append(fields, deleteFieldsMark(r, makeFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, gitIgnoreFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, protoShellFile, wellStartMark, wellEndMark)...)
+	fields = append(fields, deleteFieldsMark(r, protoShellFile, wellStartMark2, wellEndMark2)...)
 	fields = append(fields, deleteFieldsMark(r, appConfigFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, replaceFileContentMark(r, readmeFile, "## "+serverName)...)
 	fields = append(fields, []replacer.Field{
@@ -154,6 +155,10 @@ func addHTTPPbFields(moduleName string, serverName string, projectName string, r
 		{ // replace the configuration of the *.yml file
 			Old: appConfigFileMark,
 			New: httpServerConfigCode,
+		},
+		{ // replace the contents of the proto.sh file
+			Old: protoShellFileGRPCMark,
+			New: "",
 		},
 		{ // replace the contents of the proto.sh file
 			Old: protoShellFileMark,

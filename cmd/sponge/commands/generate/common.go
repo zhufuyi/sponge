@@ -54,8 +54,9 @@ var (
 	k8sServiceFile     = "deployments/kubernetes/serverNameExample-svc.yml"
 	k8sServiceFileMark = "# todo generate k8s-svc.yml code for http or grpc here"
 
-	protoShellFile     = "scripts/protoc.sh"
-	protoShellFileMark = "# todo generate router code for gin here"
+	protoShellFile         = "scripts/protoc.sh"
+	protoShellFileGRPCMark = "# todo generate grpc files here"
+	protoShellFileMark     = "# todo generate router code for gin here"
 
 	appConfigFile     = "configs/serverNameExample.yml"
 	appConfigFileMark = "# todo generate http or rpc server configuration here"
@@ -65,19 +66,31 @@ var (
 	makeFile       = "sponge/Makefile"
 	gitIgnoreFile  = "sponge/.gitignore"
 
-	// clear marker for template code marker
-	startMark             = []byte("// delete the templates code start")
-	endMark               = []byte("// delete the templates code end")
-	wellStartMark         = bytes.ReplaceAll(startMark, []byte("//"), []byte("#"))
-	wellEndMark           = bytes.ReplaceAll(endMark, []byte("//"), []byte("#"))
-	onlyGrpcStartMark     = []byte("// only grpc use start")
-	onlyGrpcEndMark       = []byte("// only grpc use end\n")
-	wellOnlyGrpcStartMark = bytes.ReplaceAll(onlyGrpcStartMark, []byte("//"), []byte("#"))
-	wellOnlyGrpcEndMark   = bytes.ReplaceAll(onlyGrpcEndMark, []byte("//"), []byte("#"))
+	startMarkStr          = "// delete the templates code start"
+	endMarkStr            = "// delete the templates code end"
+	startMark             = []byte(startMarkStr)
+	endMark               = []byte(endMarkStr)
+	wellStartMark         = symbolConvert(startMarkStr)
+	wellEndMark           = symbolConvert(endMarkStr)
+	wellStartMark2        = symbolConvert(startMarkStr, " 2")
+	wellEndMark2          = symbolConvert(endMarkStr, " 2")
+	onlyGrpcStartMarkStr  = "// only grpc use start"
+	onlyGrpcEndMarkStr    = "// only grpc use end\n"
+	wellOnlyGrpcStartMark = symbolConvert(onlyGrpcStartMarkStr)
+	wellOnlyGrpcEndMark   = symbolConvert(onlyGrpcEndMarkStr)
 
 	// embed FS template file when using
 	selfPackageName = "github.com/zhufuyi/sponge"
 )
+
+func symbolConvert(str string, additionalChar ...string) []byte {
+	char := ""
+	if len(additionalChar) > 0 {
+		char = additionalChar[0]
+	}
+
+	return []byte(strings.Replace(str, "//", "#", 1) + char)
+}
 
 func adjustmentOfIDType(handlerCodes string) string {
 	return idTypeToStr(idTypeFixToUint64(handlerCodes))
@@ -191,7 +204,7 @@ func parseProtobufFiles(protobufFile string) ([]string, bool, error) {
 func saveGenInfo(moduleName string, serverName string, outputDir string) error {
 	genInfo := moduleName + "," + serverName
 	dir := outputDir + "/docs"
-	_ = os.MkdirAll(dir, 0666)
+	_ = os.MkdirAll(dir, 0766)
 	file := dir + "/gen.info"
 	err := os.WriteFile(file, []byte(genInfo), 0666)
 	if err != nil {
@@ -226,7 +239,7 @@ func saveProtobufFiles(moduleName string, serverName string, outputDir string, p
 			continue
 		}
 		dir := outputDir + "/api/" + serverName + "/v1"
-		_ = os.MkdirAll(dir, 0666)
+		_ = os.MkdirAll(dir, 0766)
 
 		_, name := filepath.Split(pbFile)
 		file := dir + "/" + name
