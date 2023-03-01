@@ -21,7 +21,7 @@ func TestRun(t *testing.T) {
 			t.Logf(v)
 		}
 		if result.Err != nil {
-			t.Logf("exec command failed, %v", result.Err)
+			t.Logf("execute command failed, %v", result.Err)
 		}
 		fmt.Println()
 	}
@@ -37,7 +37,7 @@ func TestExec(t *testing.T) {
 	for cmd, args := range cmds {
 		out, err := Exec(cmd, args...)
 		if err != nil {
-			t.Logf("exec command[%s] failed, %v\n", cmd, err)
+			t.Logf("execute command[%s] failed, %v\n", cmd, err)
 			continue
 		}
 		t.Logf("%s\n", out)

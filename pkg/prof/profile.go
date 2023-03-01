@@ -326,7 +326,7 @@ func isStop() bool {
 
 func getFilePath(profileName string) string {
 	dir := joinPath(os.TempDir(), serverName+"_profile")
-	_ = os.MkdirAll(dir, 0666)
+	_ = os.MkdirAll(dir, 0766)
 
 	return joinPath(dir, fmt.Sprintf("%s_%d_%s_%s.out",
 		time.Now().Format(timeFormat), pid, serverName, profileName))

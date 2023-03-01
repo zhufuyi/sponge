@@ -42,7 +42,7 @@ func GetFileDir(filePath string) string {
 // CreateDir create dir
 func CreateDir(dir string) error {
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
-		return os.MkdirAll(dir, 0666)
+		return os.MkdirAll(dir, 0766)
 	}
 	return nil
 }

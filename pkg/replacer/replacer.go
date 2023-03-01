@@ -351,7 +351,7 @@ func (r *replacerInfo) covertPathsDelimiter(filePaths ...string) []string {
 func saveToNewFile(filePath string, data []byte) error {
 	// create directory
 	dir, _ := filepath.Split(filePath)
-	err := os.MkdirAll(dir, 0666)
+	err := os.MkdirAll(dir, 0766)
 	if err != nil {
 		return err
 	}

@@ -21,7 +21,7 @@ Run executes commands and can actively end them, returning logs and error messag
         fmt.Printf(v)
     }
     if result.Err != nil {
-        fmt.Println("exec command failed,", result.Err.Error())
+        fmt.Println("execute command failed,", result.Err.Error())
     }
 ```
 

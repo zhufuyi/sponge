@@ -53,9 +53,9 @@ func runUpgradeCommand() error {
 	for range result.StdOut {
 	}
 	if result.Err != nil {
-		return fmt.Errorf("exec command failed, %v", result.Err)
+		return fmt.Errorf("execute command failed, %v", result.Err)
 	}
-
+	fmt.Println("already downloaded the latest version of sponge.")
 	return nil
 }
 
@@ -63,7 +63,7 @@ func runUpgradeCommand() error {
 func copyToTempDir() (string, error) {
 	result, err := gobash.Exec("go", "env", "GOPATH")
 	if err != nil {
-		return "", fmt.Errorf("cxec command failed, %v", err)
+		return "", fmt.Errorf("execute command failed, %v", err)
 	}
 	gopath := strings.ReplaceAll(string(result), "\n", "")
 	if gopath == "" {
@@ -74,7 +74,7 @@ func copyToTempDir() (string, error) {
 	arg := fmt.Sprintf("%s/pkg/mod/github.com/zhufuyi", gopath)
 	result, err = gobash.Exec("ls", adaptPathDelimiter(arg))
 	if err != nil {
-		return "", fmt.Errorf("cxec command failed, %v", err)
+		return "", fmt.Errorf("execute command failed, %v", err)
 	}
 
 	latestSpongeDirName := getLatestVersion(string(result))
@@ -83,21 +83,43 @@ func copyToTempDir() (string, error) {
 	}
 
 	srcDir := adaptPathDelimiter(fmt.Sprintf("%s/pkg/mod/github.com/zhufuyi/%s", gopath, latestSpongeDirName))
-	destDir := adaptPathDelimiter(GetSpongeDir() + "/.sponge")
-	destDirBk := destDir + ".bk"
+	destDir := adaptPathDelimiter(GetSpongeDir() + "/")
+	targetDir := adaptPathDelimiter(destDir + ".sponge")
 
-	// copy to temporary directory
-	_ = os.Rename(destDir, destDirBk)
-	_, err = gobash.Exec("cp", "-rf", srcDir, destDir)
+	err = executeCommand("rm", "-rf", targetDir)
 	if err != nil {
-		_ = os.Rename(destDirBk, destDir)
-		return "", fmt.Errorf("cxec command failed, %v", err)
+		return "", err
 	}
-	_ = os.RemoveAll(destDirBk)
+	err = executeCommand("cp", "-rf", srcDir, destDir)
+	if err != nil {
+		return "", err
+	}
+	err = executeCommand("chmod", "-R", "744", destDir+latestSpongeDirName)
+	if err != nil {
+		return "", err
+	}
+	err = os.Rename(destDir+latestSpongeDirName, targetDir)
+	if err != nil {
+		return "", fmt.Errorf("rename '%s' error, %v", destDir, err)
+	}
 
 	versionNum := strings.Replace(latestSpongeDirName, "sponge@", "", 1)
 	_ = os.WriteFile(versionFile, []byte(versionNum), 0666)
+
+	fmt.Println("the code template has been updated to the latest version.")
+
 	return versionNum, nil
+}
+
+func executeCommand(name string, args ...string) error {
+	ctx, _ := context.WithTimeout(context.Background(), time.Second*30) //nolint
+	result := gobash.Run(ctx, name, args...)
+	for range result.StdOut {
+	}
+	if result.Err != nil {
+		return fmt.Errorf("execute command failed, %v", result.Err)
+	}
+	return nil
 }
 
 func adaptPathDelimiter(filePath string) string {
@@ -122,7 +144,7 @@ func getLatestVersion(s string) string {
 			if strings.Contains(ss[2], "v0.0.0") {
 				continue
 			}
-			num := utils.StrToInt(ss[0])*100 + utils.StrToInt(ss[1])*10 + utils.StrToInt(ss[2])
+			num := utils.StrToInt(ss[0])*10000 + utils.StrToInt(ss[1])*100 + utils.StrToInt(ss[2])
 			nums = append(nums, num)
 			dirNames[num] = dirName
 		}
@@ -141,7 +163,8 @@ func updateSpongeInternalPlugin(latestVersionNum string) {
 	for range result.StdOut {
 	}
 	if result.Err != nil {
-		fmt.Printf("upgrade plugin 'protoc-gen-go-gin' failed, version=%s, error=%v\n", latestVersionNum, result.Err)
+		fmt.Printf("upgrade plugin 'protoc-gen-go-gin' failed, target version=%s, error=%v, "+
+			"please use the command 'sponge tools --install' to retry.\n", latestVersionNum, result.Err)
 	}
 
 	ctx, _ = context.WithTimeout(context.Background(), time.Minute) //nolint
@@ -149,6 +172,7 @@ func updateSpongeInternalPlugin(latestVersionNum string) {
 	for range result.StdOut {
 	}
 	if result.Err != nil {
-		fmt.Printf("upgrade plugin 'protoc-gen-go-rpc-tmpl' failed, version=%s, error=%v\n", latestVersionNum, result.Err)
+		fmt.Printf("upgrade plugin 'protoc-gen-go-rpc-tmpl' failed, target version=%s, error=%v, "+
+			"please use the command 'sponge tools --install' to retry.\n", latestVersionNum, result.Err)
 	}
 }
