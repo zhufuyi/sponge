@@ -43,8 +43,6 @@ var _ serverNameExampleV1.{{.Name}}Logicer = (*{{.LowerName}}Handler)(nil)
 type {{.LowerName}}Handler struct {
 	// example: 
 	// 	{{.LowerName}}Dao dao.{{.Name}}Dao
-
-	// If required, fill in the definition of the other dao code here.
 }
 
 // New{{.Name}}Handler creating handler
@@ -55,8 +53,6 @@ func New{{.Name}}Handler() serverNameExampleV1.{{.Name}}Logicer {
 		// 		model.GetDB(),
 		// 		cache.New{{.Name}}Cache(model.GetCacheType()),
 		// 	),
-
-		// If required, fill in the code to implement other dao here.
 	}
 }
 
@@ -66,12 +62,12 @@ func (h *{{.LowerServiceName}}Handler) {{.MethodName}}(ctx context.Context, req 
 	// example:
 	// 	reply, err := h.{{.LowerServiceName}}Dao.{{.MethodName}}(ctx, req)
 	// 	if err != nil {
-	//			logger.Warn("invoke error", logger.Err(err), middleware.CtxRequestIDField(ctx))
+	//			logger.Warn("{{.MethodName}} error", logger.Err(err), middleware.CtxRequestIDField(ctx))
 	//			return nil, ecode.InternalServerError.Err()
 	//		}
 	// 	return reply, nil
-	//
-	// If required, fill in the code for getting data from other dao here
+
+	// fill in the business logic code
 
 	panic("implement me")
 }

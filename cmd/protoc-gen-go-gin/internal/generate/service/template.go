@@ -57,10 +57,10 @@ func New{{.Name}}Client() serverNameExampleV1.{{.Name}}Logicer {
 {{- range .Methods}}
 
 func (c *{{.LowerServiceName}}Client) {{.MethodName}}(ctx context.Context, req *serverNameExampleV1.{{.Request}}) (*serverNameExampleV1.{{.Reply}}, error) {
-	// fill in the business code
-
 	// example:
-	//return c.{{.LowerServiceName}}Cli.{{.MethodName}}(ctx, req)
+	//     return c.{{.LowerServiceName}}Cli.{{.MethodName}}(ctx, req)
+
+	// fill in the business logic code
 
 	panic("implement me")
 }

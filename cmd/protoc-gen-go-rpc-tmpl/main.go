@@ -71,7 +71,7 @@ func main() {
 
 func saveRPCTmplFiles(gen *protogen.Plugin, f *protogen.File, moduleName string, serverName string, tmplOut string, ecodeOut string) error {
 	filenamePrefix := f.GeneratedFilenamePrefix
-	tmplFileContent, testTmplFileContent, ecodeFileContent := service.GenerateFiles(f)
+	tmplFileContent, testTmplFileContent, ecodeFileContent := service.GenerateFiles(filenamePrefix, f)
 
 	filePath := filenamePrefix + ".go"
 	err := saveFile(moduleName, serverName, tmplOut, filePath, tmplFileContent, false)

@@ -50,6 +50,7 @@ func (t *ServiceMethod) AddOne(i int) int {
 type PbService struct {
 	Name      string           // Greeter
 	LowerName string           // greeter first character to lower
+	ProtoName string           // proto file name greeter.proto
 	Methods   []*ServiceMethod // service methods
 }
 
@@ -92,10 +93,12 @@ func getRequestFields(fields []*protogen.Field) []RequestField {
 }
 
 // GetServices parse protobuf services
-func GetServices(file *protogen.File) []*PbService {
+func GetServices(protoName string, file *protogen.File) []*PbService {
 	var pss []*PbService
 	for _, s := range file.Services {
-		pss = append(pss, parsePbService(s))
+		ps := parsePbService(s)
+		ps.ProtoName = protoName
+		pss = append(pss, ps)
 	}
 	return pss
 }

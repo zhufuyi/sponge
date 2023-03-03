@@ -2,6 +2,8 @@ package service
 
 import (
 	"bytes"
+	"github.com/zhufuyi/sponge/pkg/gofile"
+	"strings"
 
 	"github.com/zhufuyi/sponge/cmd/protoc-gen-go-rpc-tmpl/internal/parse"
 
@@ -9,12 +11,13 @@ import (
 )
 
 // GenerateFiles generate service template code and error codes
-func GenerateFiles(file *protogen.File) ([]byte, []byte, []byte) {
+func GenerateFiles(filenamePrefix string, file *protogen.File) ([]byte, []byte, []byte) {
 	if len(file.Services) == 0 {
 		return nil, nil, nil
 	}
 
-	pss := parse.GetServices(file)
+	protoName := getProtoFilename(filenamePrefix)
+	pss := parse.GetServices(protoName, file)
 	serviceTmplContent := genServiceTmplFile(pss)
 	serviceTestTmplContent := genServiceTestTmplFile(pss)
 	errCodeFileContent := genErrCodeFile(pss)
@@ -71,4 +74,18 @@ func (f *errCodeFields) execute() []byte {
 		panic(err)
 	}
 	return bytes.ReplaceAll(buf.Bytes(), []byte("// --blank line--"), []byte{})
+}
+
+func getProtoFilename(filenamePrefix string) string {
+	filenamePrefix = strings.ReplaceAll(filenamePrefix, ".proto", "")
+	filenamePrefix = strings.ReplaceAll(filenamePrefix, gofile.GetPathDelimiter(), "/")
+	ss := strings.Split(filenamePrefix, "/")
+
+	if len(ss) == 0 {
+		return ""
+	} else if len(ss) == 1 {
+		return ss[0] + ".proto"
+	}
+
+	return ss[len(ss)-1] + ".proto"
 }

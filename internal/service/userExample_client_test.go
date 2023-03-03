@@ -1,6 +1,3 @@
-// After running the rpc server and then testing, the following tests and crush tests are performed on
-// each method of userExample (copy the path to the crush test report file to view it in your browser)
-
 package service
 
 import (
@@ -14,93 +11,13 @@ import (
 	"github.com/zhufuyi/sponge/configs"
 	"github.com/zhufuyi/sponge/internal/config"
 
-	"github.com/zhufuyi/sponge/pkg/consulcli"
-	"github.com/zhufuyi/sponge/pkg/etcdcli"
 	"github.com/zhufuyi/sponge/pkg/grpc/benchmark"
-	"github.com/zhufuyi/sponge/pkg/grpc/grpccli"
-	"github.com/zhufuyi/sponge/pkg/nacoscli"
-	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
-	"github.com/zhufuyi/sponge/pkg/servicerd/registry/consul"
-	"github.com/zhufuyi/sponge/pkg/servicerd/registry/etcd"
-	"github.com/zhufuyi/sponge/pkg/servicerd/registry/nacos"
-
-	"go.uber.org/zap"
 )
 
-func initUserExampleServiceClient() serverNameExampleV1.UserExampleServiceClient {
-	err := config.Init(configs.Path("serverNameExample.yml"))
-	if err != nil {
-		panic(err)
-	}
-	endpoint := fmt.Sprintf("127.0.0.1:%d", config.Get().Grpc.Port)
-
-	var cliOptions = []grpccli.Option{
-		grpccli.WithEnableRequestID(),
-		grpccli.WithEnableLog(zap.NewNop()),
-		//grpccli.WithEnableLoadBalance(),
-	}
-	if config.Get().App.RegistryDiscoveryType != "" {
-		var iDiscovery registry.Discovery
-		endpoint = "discovery:///" + config.Get().App.Name // Connecting to grpc services by service name
-
-		// Use consul service discovery, note that the host field in the configuration file serverNameExample.yml
-		// needs to be filled with the local ip, not 127.0.0.1, to do the health check
-		if config.Get().App.RegistryDiscoveryType == "consul" {
-			cli, err := consulcli.Init(config.Get().Consul.Addr, consulcli.WithWaitTime(time.Second*2))
-			if err != nil {
-				panic(err)
-			}
-			iDiscovery = consul.New(cli)
-		}
-
-		// Use etcd service discovery, use the command etcdctl get / --prefix to see if the service is registered before testing,
-		// note: the IDE using a proxy may cause the connection to the etcd service to fail
-		if config.Get().App.RegistryDiscoveryType == "etcd" {
-			cli, err := etcdcli.Init(config.Get().Etcd.Addrs, etcdcli.WithDialTimeout(time.Second*2))
-			if err != nil {
-				panic(err)
-			}
-			iDiscovery = etcd.New(cli)
-		}
-
-		// Use nacos service discovery
-		if config.Get().App.RegistryDiscoveryType == "nacos" {
-			// example: endpoint = "discovery:///serverName.scheme"
-			endpoint = "discovery:///" + config.Get().App.Name + ".grpc"
-			cli, err := nacoscli.NewNamingClient(
-				config.Get().NacosRd.IPAddr,
-				config.Get().NacosRd.Port,
-				config.Get().NacosRd.NamespaceID)
-			if err != nil {
-				panic(err)
-			}
-			iDiscovery = nacos.New(cli)
-		}
-
-		cliOptions = append(cliOptions, grpccli.WithDiscovery(iDiscovery))
-	}
-
-	if config.Get().App.EnableTrace {
-		cliOptions = append(cliOptions, grpccli.WithEnableTrace())
-	}
-	if config.Get().App.EnableCircuitBreaker {
-		cliOptions = append(cliOptions, grpccli.WithEnableCircuitBreaker())
-	}
-	if config.Get().App.EnableMetrics {
-		cliOptions = append(cliOptions, grpccli.WithEnableMetrics())
-	}
-
-	conn, err := grpccli.DialInsecure(context.Background(), endpoint, cliOptions...)
-	if err != nil {
-		panic(err)
-	}
-
-	return serverNameExampleV1.NewUserExampleServiceClient(conn)
-}
-
-// Test each method of userExample via the client
-func Test_userExampleService_methods(t *testing.T) {
-	cli := initUserExampleServiceClient()
+// Test each method of userExample via the rpc client
+func Test_service_userExample_methods(t *testing.T) {
+	conn := getRPCClientConnForTest()
+	cli := serverNameExampleV1.NewUserExampleServiceClient(conn)
 	ctx, _ := context.WithTimeout(context.Background(), time.Second*3)
 
 	tests := []struct {
@@ -113,7 +30,7 @@ func Test_userExampleService_methods(t *testing.T) {
 		{
 			name: "Create",
 			fn: func() (interface{}, error) {
-				// todo enter parameters before testing
+				// todo enter parameters to test
 				req := &serverNameExampleV1.CreateUserExampleRequest{
 					Name:     "foo7",
 					Email:    "foo7@bar.com",
@@ -131,7 +48,7 @@ func Test_userExampleService_methods(t *testing.T) {
 		{
 			name: "UpdateByID",
 			fn: func() (interface{}, error) {
-				// todo enter parameters before testing
+				// todo enter parameters to test
 				req := &serverNameExampleV1.UpdateUserExampleByIDRequest{
 					Id:    7,
 					Phone: "16000000001",
@@ -145,7 +62,7 @@ func Test_userExampleService_methods(t *testing.T) {
 		{
 			name: "DeleteByID",
 			fn: func() (interface{}, error) {
-				// todo enter parameters before testing
+				// todo enter parameters to test
 				req := &serverNameExampleV1.DeleteUserExampleByIDRequest{
 					Id: 100,
 				}
@@ -157,9 +74,9 @@ func Test_userExampleService_methods(t *testing.T) {
 		{
 			name: "GetByID",
 			fn: func() (interface{}, error) {
-				// todo enter parameters before testing
+				// todo enter parameters to test
 				req := &serverNameExampleV1.GetUserExampleByIDRequest{
-					Id: 1222,
+					Id: 1,
 				}
 				return cli.GetByID(ctx, req)
 			},
@@ -169,7 +86,7 @@ func Test_userExampleService_methods(t *testing.T) {
 		{
 			name: "ListByIDs",
 			fn: func() (interface{}, error) {
-				// todo enter parameters before testing
+				// todo enter parameters to test
 				req := &serverNameExampleV1.ListUserExampleByIDsRequest{
 					Ids: []uint64{1, 2, 3},
 				}
@@ -182,7 +99,7 @@ func Test_userExampleService_methods(t *testing.T) {
 			name: "List",
 			fn: func() (interface{}, error) {
 				return cli.List(ctx, &serverNameExampleV1.ListUserExampleRequest{
-					// todo enter parameters before testing
+					// todo enter parameters to test
 					Params: &types.Params{
 						Page:  0,
 						Limit: 10,
@@ -209,20 +126,22 @@ func Test_userExampleService_methods(t *testing.T) {
 				t.Logf("test '%s' error = %v, wantErr %v", tt.name, err, tt.wantErr)
 				return
 			}
-			t.Logf("reply data: %+v", got)
+			fmt.Println("reply data:", got)
 		})
 	}
 }
 
-// Press test the individual queries of userExample and copy the press test report to your browser when finished
-func Test_userExampleService_benchmark(t *testing.T) {
+// Perform a stress test on {{.LowerName}}'s method and
+// copy the press test report to your browser when you are finished.
+func Test_service_userExample_benchmark(t *testing.T) {
 	err := config.Init(configs.Path("serverNameExample.yml"))
 	if err != nil {
 		panic(err)
 	}
 	host := fmt.Sprintf("127.0.0.1:%d", config.Get().Grpc.Port)
 	protoFile := configs.Path("../api/serverNameExample/v1/userExample.proto")
-	// If third-party dependencies are missing during the press test, copy them to the project's third_party directory (not including the import path)
+	// If third-party dependencies are missing during the press test,
+	// copy them to the project's third_party directory.
 	importPaths := []string{
 		configs.Path("../third_party"), // third_party directory
 		configs.Path(".."),             // Previous level of third_party
@@ -236,7 +155,7 @@ func Test_userExampleService_benchmark(t *testing.T) {
 		{
 			name: "GetByID",
 			fn: func() error {
-				// todo enter parameters before testing
+				// todo enter parameters to test
 				message := &serverNameExampleV1.GetUserExampleByIDRequest{
 					Id: 1,
 				}
@@ -252,7 +171,7 @@ func Test_userExampleService_benchmark(t *testing.T) {
 		{
 			name: "ListByIDs",
 			fn: func() error {
-				// todo enter parameters before testing
+				// todo enter parameters to test
 				message := &serverNameExampleV1.ListUserExampleByIDsRequest{
 					Ids: []uint64{1, 2, 3},
 				}
@@ -268,7 +187,7 @@ func Test_userExampleService_benchmark(t *testing.T) {
 		{
 			name: "List",
 			fn: func() error {
-				// todo enter parameters before testing
+				// todo enter parameters to test
 				message := &serverNameExampleV1.ListUserExampleRequest{
 					Params: &types.Params{
 						Page:  0,
