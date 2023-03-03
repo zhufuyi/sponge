@@ -10,10 +10,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var servicePort = 24631
+
 // NewRunCommand sponge run commands
 func NewRunCommand() *cobra.Command {
-	var port = 24631
-
 	cmd := &cobra.Command{
 		Use:           "run",
 		Short:         "Start a web service for sponge",
@@ -22,12 +22,12 @@ func NewRunCommand() *cobra.Command {
 		SilenceUsage:  true,
 
 		RunE: func(cmd *cobra.Command, args []string) error {
-			url := fmt.Sprintf("http://localhost:%d", port)
+			url := fmt.Sprintf("http://localhost:%d", servicePort)
 			fmt.Printf("sponge command ui service started successfully, visit %s in your browser.\n\n", url)
 			go func() {
 				_ = open(url)
 			}()
-			server.RunHTTPServer(fmt.Sprintf(":%d", port))
+			server.RunHTTPServer(fmt.Sprintf(":%d", servicePort))
 			return nil
 		},
 	}

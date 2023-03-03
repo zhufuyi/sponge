@@ -722,6 +722,10 @@ func goTypeToProto(fields []tmplField) []tmplField {
 			field.GoType = "uint32"
 		case "time.Time":
 			field.GoType = "int64"
+		case "float32":
+			field.GoType = "float"
+		case "float64":
+			field.GoType = "double"
 		}
 		newFields = append(newFields, field)
 	}

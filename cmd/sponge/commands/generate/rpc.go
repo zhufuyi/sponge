@@ -165,7 +165,7 @@ func addRPCFields(moduleName string, serverName string, projectName string, repo
 		},
 		{ // replace the contents of the scripts/proto.sh file
 			Old: protoShellFileMark,
-			New: "",
+			New: "  # If you need the proto file to generate additional code, fill in here",
 		},
 		{ // replace the contents of the service/userExample_client_test.go file
 			Old: serviceFileMark,
