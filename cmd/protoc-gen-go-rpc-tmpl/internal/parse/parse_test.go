@@ -1,11 +1,11 @@
 package parse
 
 import (
-	"google.golang.org/protobuf/reflect/protoreflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/compiler/protogen"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 func TestGetServices(t *testing.T) {
@@ -29,7 +29,7 @@ func TestGetServices(t *testing.T) {
 	var file = &protogen.File{
 		Services: []*protogen.Service{service},
 	}
-	pss := GetServices(file)
+	pss := GetServices("greeter", file)
 	for _, s := range pss {
 		t.Logf("%+v", s)
 		for _, m := range s.Methods {
@@ -45,7 +45,7 @@ func TestMethods(t *testing.T) {
 	s := PbService{}
 	t.Log(s.RandNumber())
 
-	typeNames := []string{"bool", "int32", "float", "string", "unknown"}
+	typeNames := []string{"bool", "int32", "float", "string", "unknown", "repeated uint64"}
 	field := &RequestField{}
 	for _, v := range typeNames {
 		field.FieldType = v

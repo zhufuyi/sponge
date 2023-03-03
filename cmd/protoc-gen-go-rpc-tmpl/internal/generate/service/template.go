@@ -135,7 +135,7 @@ func Test_service_{{.LowerName}}_methods(t *testing.T) {
 			name: "{{.MethodName}}",
 			fn: func() (interface{}, error) {
 				// todo enter parameters to test
-				req := &serverNameExampleV1.{{.MethodName}}Request{
+				req := &serverNameExampleV1.{{.Request}}{
 {{- range .RequestFields}}
 					{{.FieldName}}: {{.GoTypeZero}}, {{if .Comment}} {{.Comment}}{{end}}
 {{- end}}
@@ -185,7 +185,7 @@ func Test_service_{{.LowerName}}_benchmark(t *testing.T) {
 			name: "{{.MethodName}}",
 			fn: func() error {
 				// todo enter parameters to test
-				message := &serverNameExampleV1.{{.MethodName}}Request{
+				message := &serverNameExampleV1.{{.Request}}{
 {{- range .RequestFields}}
 					{{.FieldName}}: {{.GoTypeZero}}, {{if .Comment}} {{.Comment}}{{end}}
 {{- end}}

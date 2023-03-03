@@ -83,9 +83,14 @@ func parsePbService(s *protogen.Service) *PbService {
 func getRequestFields(fields []*protogen.Field) []RequestField {
 	var reqFields []RequestField
 	for _, field := range fields {
+		fieldType := field.Desc.Kind().String()
+		if field.Desc.Cardinality().String() == "repeated" {
+			fieldType = "[]" + fieldType
+		}
 		reqFields = append(reqFields, RequestField{
 			FieldName: field.GoName,
-			FieldType: field.Desc.Kind().String(),
+			//FieldType: field.Desc.Kind().String(),
+			FieldType: fieldType,
 			Comment:   strings.ReplaceAll(field.Comments.Trailing.String(), "\n", ""),
 		})
 	}

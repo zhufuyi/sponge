@@ -122,7 +122,7 @@ message CreateFooReply {
 }
 
 message GetFooRequest {
-  uint64   id = 1;
+  repeated uint64   ids = 1;
 }
 
 message GetFooReply {
