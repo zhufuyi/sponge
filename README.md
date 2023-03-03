@@ -15,13 +15,13 @@
 
 </div>
 
-[sponge](https://github.com/zhufuyi/sponge) is a microservice framework and a tool for quickly creating web and microservice code. sponge has a rich set of generated code commands, generating a total of 12 different functional codes that can be combined into complete services (similar to a sponge that has been artificially broken up cells can be automatically reassembled into a new sponge). Microservice code functions include logging, service registration and discovery, registry, flow limiting, fusing, link tracking, metrics monitoring, pprof performance analysis, statistics, caching, CICD and more. The code is decoupled and modular in design, with commonly used code and scripts generated automatically, requiring only business logic code to be written according to the generated templates. The web and rpc services created include complete engineering code and scripts from development to deployment, making development in the go language easier and more efficient.
+[sponge](https://github.com/zhufuyi/sponge) is a microservice framework and a tool for quickly creating web and microservice code. sponge has a rich set of generated code commands, generating a total of 12 different functional codes that can be combined into complete services (similar to a sponge that has been artificially broken up cells can be automatically reassembled into a new sponge). Microservice code functions include logging, service registration and discovery, registry, rate limit, circuit breaker, tracking, monitoring, pprof performance analysis, statistics, caching, CICD and more. The decoupled modular design makes it easy to build complete project code from development to deployment, making development in the go language more convenient, easy and efficient.
 
 <br>
 
 ### sponge generates the code framework
 
-The generated code is based on three approaches **Yaml**, **SQL DDL** and **Protobuf**, each possessing different functional code generation, and the framework diagram of the generated code is shown in Figure 1-1.
+The generated code is based on three approaches **Yaml**, **SQL** and **Protobuf**, each possessing different functional code generation, and the framework diagram of the generated code is shown in Figure 1-1.
 
 <p align="center">
 <img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/sponge-framework.png">
@@ -48,7 +48,7 @@ Online code generation demo: [https://go-sponge.com/ui](https://go-sponge.com/ui
 💡 Warning.
 
 > Some of the generated code requires mysql account and password, do not try here to avoid the risk of being exposed.
-> Server resources are limited and may not be available later, it is recommended to build the same generation code platform locally to use.
+> Server resources are limited and may not be available later. It is recommended to download the sponge binary and run the UI service to get the same generated code interface.
 
 <br>
 
@@ -92,9 +92,9 @@ sponge run
 
 Visit `http://localhost:24631` in your browser, 12 types of codes can be generated.
 
-💡 NOTICE:
+<br>
 
-> Do not execute the `sponge run` in the directory where the sponge file is located.
+💡 If you don't want to use the UI interface, you can use the sponge command line to generate code. There is a wealth of examples in the command line helper information, and some of the code generation commands are more convenient than using the UI interface.
 
 <br>
 

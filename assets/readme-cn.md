@@ -1,4 +1,4 @@
-[sponge](https://github.com/zhufuyi/sponge) 是一个微服务框架，也是一个快速创建web和微服务代码工具。sponge拥有丰富的生成代码命令，一共生成12种不同功能代码，这些功能代码可以组合成完整的服务(类似人为打散的海绵细胞可以自动重组成一个新的海绵)。微服务代码功能包括日志、服务注册与发现、注册中心、限流、熔断、链路跟踪、指标监控、pprof性能分析、统计、缓存、CICD等功能。代码解耦模块化设计，创建的web和rpc服务包括了从开发到部署完整工程代码和脚本，让使用go语言开发更加轻松和高效。
+[sponge](https://github.com/zhufuyi/sponge) 是一个快速创建web和微服务代码工具，也是一个基于gin和grpc封装的微服务框架。sponge拥有丰富的生成代码命令，一共生成12种不同功能代码，这些功能代码可以组合成完整的服务(类似人为打散的海绵细胞可以自动重组成一个新的海绵)。微服务代码功能包括日志、服务注册与发现、注册中心、限流、熔断、链路跟踪、指标监控、pprof性能分析、统计、缓存、CICD等功能。代码解耦模块化设计，很容易构建出从开发到部署的完整工程代码，让使用go语言开发更便捷、轻松、高效。
 
 <br>
 
@@ -28,8 +28,8 @@ sponge创建的微服务代码框架如下图所示，这是典型的微服务�
 
 💡 警告：
 
-> 有部分生成代码需要填写mysql账号和密码，不要在这里尝试，以免被暴露风险。
-> 服务器资源有限，后面有可能无法使用，建议在本地搭建同样的生成代码平台来使用。
+> 有部分生成代码需要填写mysql账号和密码，不要在这里尝试，以免被暴露的风险。
+> 服务器资源有限，后面有可能无法使用，建议下载sponge二进制文件，运行UI服务得到同样的生成代码界面。
 
 <br>
 
@@ -72,15 +72,11 @@ sponge init
 sponge run
 ```
 
-在浏览器访问 `http://localhost:24631`。
-
-💡 注意：
-
-> 不要在sponge二进制文件所在的目录下执行 `sponge run` 命令。
+在浏览器访问 `http://localhost:24631`，在页面上可以生成12种不同功能代码。
 
 <br>
 
-根据sql生成web项目代码示例：
+基于sql生成web项目代码示例：
 
 <p align="center">
 <img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/web-http.gif">
@@ -98,7 +94,7 @@ make run
 
 <br>
 
-这是生成12种功能代码的其中的一个示例，生成其他11种功能代码可以在ui界面上尝试。
+💡 如果不想使用ui界面，可以使用sponge命令行生成代码，命令行帮组信息里面有丰富的示例，有一些生成代码命令比使用UI界面更便捷。
 
 <br>
 
@@ -112,11 +108,13 @@ make run
 
 - [sponge的形成过程](https://www.bilibili.com/video/BV1s14y1F7Fz/)
 - [sponge的框架介绍](https://www.bilibili.com/video/BV13u4y1F7EU/)
+- [一键生成web服务完整工程代码](https://www.bilibili.com/video/BV1RY411k7SE/)
+- [一键生成API接口代码到web服务中](https://www.bilibili.com/video/BV1AY411C7J7/)
 - [十分钟搭建一个拥有多个微服务的go语言工程项目](https://www.bilibili.com/video/BV1pP4y1y7hA/)
 
 <br>
 
-觉得对你有用的话请给个star⭐，欢迎加入[go sponge微信群交流](https://pan.baidu.com/s/1NZgPb2v_8tAnBuwyeFyE_g?pwd=spon)。
+如果对您有帮组给个star⭐，欢迎加入[go sponge微信群交流](https://pan.baidu.com/s/1NZgPb2v_8tAnBuwyeFyE_g?pwd=spon)。
 
 ![wechat-group](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/wechat-group.png)
 

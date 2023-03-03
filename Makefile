@@ -154,12 +154,14 @@ deploy-docker:
 
 
 .PHONY: clean
-# clean binary file, cover.out, redundant dependency packages
+# clean binary file, cover.out, template file
 clean:
 	@rm -vrf cmd/serverNameExample_mixExample/serverNameExample_mixExample
 	@rm -vrf cover.out
-	@rm -rf main.go serverNameExample_mixExample.gv
-	go mod tidy
+	@rm -vrf main.go serverNameExample_mixExample.gv
+	@rm -vrf internal/ecode/*go.gen.*
+	@rm -vrf internal/handller/*go.gen.*
+	@rm -vrf internal/service/*go.gen.*
 	@echo "clean finished"
 
 

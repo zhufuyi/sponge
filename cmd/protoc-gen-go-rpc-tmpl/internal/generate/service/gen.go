@@ -2,10 +2,10 @@ package service
 
 import (
 	"bytes"
-	"github.com/zhufuyi/sponge/pkg/gofile"
 	"strings"
 
 	"github.com/zhufuyi/sponge/cmd/protoc-gen-go-rpc-tmpl/internal/parse"
+	"github.com/zhufuyi/sponge/pkg/gofile"
 
 	"google.golang.org/protobuf/compiler/protogen"
 )
