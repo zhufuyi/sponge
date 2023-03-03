@@ -73,3 +73,7 @@ type desc struct {
 func (d desc) Kind() protoreflect.Kind {
 	return protoreflect.Int32Kind
 }
+
+func (d desc) Cardinality() protoreflect.Cardinality {
+	return protoreflect.Repeated
+}
