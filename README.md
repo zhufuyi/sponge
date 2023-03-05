@@ -43,7 +43,7 @@ The microservice code framework created by sponge is shown in Figure 1-2, this i
 
 ### Online code generation demo
 
-Online code generation demo: [https://go-sponge.com/ui](https://go-sponge.com/ui/micro-rpc-gw-pb)
+Online code generation demo: [https://go-sponge.com/ui](https://go-sponge.com/ui)
 
 💡 Warning.
 
