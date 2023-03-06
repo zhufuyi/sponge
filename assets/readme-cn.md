@@ -106,10 +106,12 @@ make run
 
 ### 视频
 
-- [sponge的形成过程](https://www.bilibili.com/video/BV1s14y1F7Fz/)
-- [sponge的框架介绍](https://www.bilibili.com/video/BV13u4y1F7EU/)
-- [一键生成web服务完整工程代码](https://www.bilibili.com/video/BV1RY411k7SE/)
-- [一键生成API接口代码到web服务中](https://www.bilibili.com/video/BV1AY411C7J7/)
+- [01 sponge的形成过程](https://www.bilibili.com/video/BV1s14y1F7Fz/)
+- [02 sponge的框架介绍](https://www.bilibili.com/video/BV13u4y1F7EU/)
+- [03 生成web服务完整工程代码](https://www.bilibili.com/video/BV1RY411k7SE/)
+- [04 生成API接口代码到web服务中](https://www.bilibili.com/video/BV1AY411C7J7/)
+- [05 基于protobuf生成web服务定制化代码](https://www.bilibili.com/video/BV1CX4y1D7xj/)
+- [06 生成自定义API接口到web服务中](https://www.bilibili.com/video/BV1P54y1g7J9/)
 - [十分钟搭建一个拥有多个微服务的go语言工程项目](https://www.bilibili.com/video/BV1pP4y1y7hA/)
 
 <br>
