@@ -1,61 +1,35 @@
-#!/bin/bash
+#!/usr/bin/expect
 
-# chkconfig: - 85 15
-# description: serverNameExample
+set serviceName "serverNameExample"
 
-serverName="serverNameExample_mixExample"
-cmdStr="cmd/${serverName}/${serverName}"
+# parameters
+set username [lindex $argv 0]
+set password [lindex $argv 1]
+set hostname [lindex $argv 2]
 
+set timeout 30
 
-function checkResult() {
-    result=$1
-    if [ ${result} -ne 0 ]; then
-        exit ${result}
-    fi
-}
+spawn scp -r ./${serviceName}-binary.tar.gz ${username}@${hostname}:/tmp/
+#expect "*yes/no*"
+#send  "yes\r"
+expect "*password:*"
+send  "${password}\r"
+expect eof
 
-stopService(){
-    NAME=$1
+spawn ssh ${username}@${hostname}
+#expect "*yes/no*"
+#send  "yes\r"
+expect "*password:*"
+send  "${password}\r"
 
-    ID=`ps -ef | grep "$NAME" | grep -v "$0" | grep -v "grep" | awk '{print $2}'`
-    if [ -n "$ID" ]; then
-        for id in $ID
-        do
-           kill -9 $id
-           echo "Stopped ${NAME} service successfully, process ID=${ID}"
-        done
-    fi
-}
+# execute a command or script
+expect "*${username}@*"
+send "cd /tmp && tar zxvf ${serviceName}-binary.tar.gz\r"
+expect "*${username}@*"
+send "bash /tmp/${serviceName}-binary/deploy.sh\r"
 
-startService() {
-    NAME=$1
+# logging out of a session
+expect "*${username}@*"
+send "exit\r"
 
-    if [ -f "${NAME}" ] ;then
-        rm "${NAME}"
-    fi
-    sleep 0.2
-    go build -o ${cmdStr} cmd/${NAME}/main.go
-    checkResult $?
-
-    nohup ${cmdStr} > ${NAME}.log 2>&1 &
-    sleep 1
-
-    ID=`ps -ef | grep "$NAME" | grep -v "$0" | grep -v "grep" | awk '{print $2}'`
-    if [ -n "$ID" ]; then
-        echo "Start the ${NAME} service successfully, process ID=${ID}"
-    else
-        echo "Failed to start ${NAME} service"
-		    return 1
-    fi
-	return 0
-}
-
-
-stopService ${serverName}
-if [ "$1"x != "stop"x ] ;then
-  sleep 1
-  startService ${serverName}
-  checkResult $?
-else
-  echo "Service ${serverName} has stopped"
-fi
+expect eof

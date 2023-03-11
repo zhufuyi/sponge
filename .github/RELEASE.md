@@ -1,3 +1,4 @@
 ## New
 
-- Add i18n to the command line interface UI
+- Update template code
+- Add binary automated deployment scripts

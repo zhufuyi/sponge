@@ -1,5 +1,5 @@
 
-copy the configuration file to the configs directory before starting the service
+copy the configuration file to the configs directory before starting the service.
 
 ```
 ├── configs
@@ -7,6 +7,6 @@ copy the configuration file to the configs directory before starting the service
 └── docker-compose.yml
 ```
 
-running services:
+running service:
 
-> docker-compose up
+> docker-compose up -d

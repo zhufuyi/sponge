@@ -3,7 +3,7 @@ SHELL := /bin/bash
 PROJECT_NAME := "github.com/zhufuyi/sponge"
 PKG := "$(PROJECT_NAME)"
 PKG_LIST := $(shell go list ${PKG}/... | grep -v /vendor/ | grep -v /api/)
-GO_FILES := $(shell find . -name '*.go' | grep -v /vendor/ | grep -v _test.go)
+#GO_FILES := $(shell find . -name '*.go' | grep -v /vendor/ | grep -v _test.go)
 
 
 .PHONY: install
@@ -90,14 +90,14 @@ proto-doc:
 .PHONY: build
 # build serverNameExample_mixExample for linux amd64 binary
 build:
-	@echo "building 'serverNameExample_mixExample', binary file will output to 'cmd/serverNameExample_mixExample'"
+	@echo "building 'serverNameExample_mixExample', linux binary file will output to 'cmd/serverNameExample_mixExample'"
 	@cd cmd/serverNameExample_mixExample && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GOPROXY=https://goproxy.cn,direct go build -gcflags "all=-N -l"
 
 # delete the templates code start
 .PHONY: build-sponge
 # build sponge for linux amd64 binary
 build-sponge:
-	@echo "building 'sponge', linux amd64 binary file will output to 'cmd/sponge'"
+	@echo "building 'sponge', linux binary file will output to 'cmd/sponge'"
 	@cd cmd/sponge && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GOPROXY=https://goproxy.cn,direct go build -ldflags "all=-s -w"
 # delete the templates code end
 
@@ -153,6 +153,18 @@ deploy-docker:
 	@bash scripts/deploy-docker.sh
 
 
+.PHONY: binary-package
+# packaged binary files
+binary-package: build
+	@bash scripts/binary-package.sh
+
+
+.PHONY: deploy-binary
+# deploy binary, e.g. make deploy-binary USER=root PWD=123456 IP=192.168.1.10
+deploy-binary: binary-package
+	@expect scripts/deploy-binary.sh $(USER) $(PWD) $(IP)
+
+
 .PHONY: clean
 # clean binary file, cover.out, template file
 clean:
@@ -162,6 +174,7 @@ clean:
 	@rm -vrf internal/ecode/*go.gen.*
 	@rm -vrf internal/handller/*go.gen.*
 	@rm -vrf internal/service/*go.gen.*
+	@rm -rf serverNameExample-binary.tar.gz
 	@echo "clean finished"
 
 
