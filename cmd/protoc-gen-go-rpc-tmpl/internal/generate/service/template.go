@@ -80,7 +80,7 @@ func (s *{{.LowerServiceName}}) {{.MethodName}}(ctx context.Context, req *server
 	// example:
 	//	    err := req.Validate()
 	//	    if err != nil {
-	//		    logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req))
+	//		    logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req), interceptor.ServerCtxRequestIDField(ctx))
 	//		    return nil, ecode.StatusInvalidParams.Err()
 	//	    }
     //
@@ -106,6 +106,7 @@ func (s *{{.LowerServiceName}}) {{.MethodName}}(ctx context.Context, req *server
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"testing"
 	"time"
@@ -121,7 +122,7 @@ import (
 
 // Test each method of {{.LowerName}} via the rpc client
 func Test_service_{{.LowerName}}_methods(t *testing.T) {
-	conn := getRPCClientConnForTest() // this function is defined in service_test.go
+	conn := getRPCClientConnForTest()
 	cli := serverNameExampleV1.New{{.Name}}Client(conn)
 	ctx, _ := context.WithTimeout(context.Background(), time.Second*5)
 
@@ -134,7 +135,7 @@ func Test_service_{{.LowerName}}_methods(t *testing.T) {
 		{
 			name: "{{.MethodName}}",
 			fn: func() (interface{}, error) {
-				// todo enter parameters to test
+				// todo type in the parameters to test
 				req := &serverNameExampleV1.{{.Request}}{
 {{- range .RequestFields}}
 					{{.FieldName}}: {{.GoTypeZero}}, {{if .Comment}} {{.Comment}}{{end}}
@@ -154,7 +155,8 @@ func Test_service_{{.LowerName}}_methods(t *testing.T) {
 				t.Errorf("test '%s' error = %v, wantErr %v", tt.name, err, tt.wantErr)
 				return
 			}
-			fmt.Println("reply data:", got)
+			data, _ := json.MarshalIndent(got, "", "    ")
+			fmt.Println(string(data))
 		})
 	}
 }
@@ -184,13 +186,14 @@ func Test_service_{{.LowerName}}_benchmark(t *testing.T) {
 		{
 			name: "{{.MethodName}}",
 			fn: func() error {
-				// todo enter parameters to test
+				// todo type in the parameters to test
 				message := &serverNameExampleV1.{{.Request}}{
 {{- range .RequestFields}}
 					{{.FieldName}}: {{.GoTypeZero}}, {{if .Comment}} {{.Comment}}{{end}}
 {{- end}}
 				}
-				b, err := benchmark.New(host, protoFile, "{{.MethodName}}", message, 1000, importPaths...)
+				var total uint = 1000 // total number of requests
+				b, err := benchmark.New(host, protoFile, "{{.MethodName}}", message, total, importPaths...)
 				if err != nil {
 					return err
 				}

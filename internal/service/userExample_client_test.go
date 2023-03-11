@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"testing"
 	"time"
@@ -30,7 +31,7 @@ func Test_service_userExample_methods(t *testing.T) {
 		{
 			name: "Create",
 			fn: func() (interface{}, error) {
-				// todo enter parameters to test
+				// todo type in the parameters to test
 				req := &serverNameExampleV1.CreateUserExampleRequest{
 					Name:     "foo7",
 					Email:    "foo7@bar.com",
@@ -48,7 +49,7 @@ func Test_service_userExample_methods(t *testing.T) {
 		{
 			name: "UpdateByID",
 			fn: func() (interface{}, error) {
-				// todo enter parameters to test
+				// todo type in the parameters to test
 				req := &serverNameExampleV1.UpdateUserExampleByIDRequest{
 					Id:    7,
 					Phone: "16000000001",
@@ -62,7 +63,7 @@ func Test_service_userExample_methods(t *testing.T) {
 		{
 			name: "DeleteByID",
 			fn: func() (interface{}, error) {
-				// todo enter parameters to test
+				// todo type in the parameters to test
 				req := &serverNameExampleV1.DeleteUserExampleByIDRequest{
 					Id: 100,
 				}
@@ -74,7 +75,7 @@ func Test_service_userExample_methods(t *testing.T) {
 		{
 			name: "GetByID",
 			fn: func() (interface{}, error) {
-				// todo enter parameters to test
+				// todo type in the parameters to test
 				req := &serverNameExampleV1.GetUserExampleByIDRequest{
 					Id: 1,
 				}
@@ -86,7 +87,7 @@ func Test_service_userExample_methods(t *testing.T) {
 		{
 			name: "ListByIDs",
 			fn: func() (interface{}, error) {
-				// todo enter parameters to test
+				// todo type in the parameters to test
 				req := &serverNameExampleV1.ListUserExampleByIDsRequest{
 					Ids: []uint64{1, 2, 3},
 				}
@@ -98,8 +99,8 @@ func Test_service_userExample_methods(t *testing.T) {
 		{
 			name: "List",
 			fn: func() (interface{}, error) {
-				return cli.List(ctx, &serverNameExampleV1.ListUserExampleRequest{
-					// todo enter parameters to test
+				// todo type in the parameters to test
+				req := &serverNameExampleV1.ListUserExampleRequest{
 					Params: &types.Params{
 						Page:  0,
 						Limit: 10,
@@ -113,7 +114,8 @@ func Test_service_userExample_methods(t *testing.T) {
 							},
 						},
 					},
-				})
+				}
+				return cli.List(ctx, req)
 			},
 			wantErr: false,
 		},
@@ -122,11 +124,11 @@ func Test_service_userExample_methods(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := tt.fn()
 			if (err != nil) != tt.wantErr {
-				// If the rpc server is not enabled, it will report the error transport: Error while dialing dial tcp...... Ignore the test error here
 				t.Logf("test '%s' error = %v, wantErr %v", tt.name, err, tt.wantErr)
 				return
 			}
-			fmt.Println("reply data:", got)
+			data, _ := json.MarshalIndent(got, "", "    ")
+			fmt.Println(string(data))
 		})
 	}
 }
@@ -155,11 +157,12 @@ func Test_service_userExample_benchmark(t *testing.T) {
 		{
 			name: "GetByID",
 			fn: func() error {
-				// todo enter parameters to test
+				// todo type in the parameters to test
 				message := &serverNameExampleV1.GetUserExampleByIDRequest{
 					Id: 1,
 				}
-				b, err := benchmark.New(host, protoFile, "GetByID", message, 1000, importPaths...)
+				var total uint = 1000 // total number of requests
+				b, err := benchmark.New(host, protoFile, "GetByID", message, total, importPaths...)
 				if err != nil {
 					return err
 				}
@@ -171,11 +174,12 @@ func Test_service_userExample_benchmark(t *testing.T) {
 		{
 			name: "ListByIDs",
 			fn: func() error {
-				// todo enter parameters to test
+				// todo type in the parameters to test
 				message := &serverNameExampleV1.ListUserExampleByIDsRequest{
 					Ids: []uint64{1, 2, 3},
 				}
-				b, err := benchmark.New(host, protoFile, "ListByIDs", message, 1000, importPaths...)
+				var total uint = 1000 // total number of requests
+				b, err := benchmark.New(host, protoFile, "ListByIDs", message, total, importPaths...)
 				if err != nil {
 					return err
 				}
@@ -187,7 +191,7 @@ func Test_service_userExample_benchmark(t *testing.T) {
 		{
 			name: "List",
 			fn: func() error {
-				// todo enter parameters to test
+				// todo type in the parameters to test
 				message := &serverNameExampleV1.ListUserExampleRequest{
 					Params: &types.Params{
 						Page:  0,
@@ -203,7 +207,8 @@ func Test_service_userExample_benchmark(t *testing.T) {
 						},
 					},
 				}
-				b, err := benchmark.New(host, protoFile, "List", message, 100, importPaths...)
+				var total uint = 100 // total number of requests
+				b, err := benchmark.New(host, protoFile, "List", message, total, importPaths...)
 				if err != nil {
 					return err
 				}

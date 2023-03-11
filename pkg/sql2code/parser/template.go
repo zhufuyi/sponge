@@ -276,18 +276,20 @@ message List{{.TableName}}Reply {
 `
 
 	serviceCreateStructTmpl    *template.Template
-	serviceCreateStructTmplRaw = `				return cli.Create(ctx, &serverNameExampleV1.Create{{.TableName}}Request{
+	serviceCreateStructTmplRaw = `				req := &serverNameExampleV1.Create{{.TableName}}Request{
 					{{- range .Fields}}
 						{{.Name}}:  {{.GoTypeZero}}, {{if .Comment}} // {{.Comment}}{{end}}
 					{{- end}}
-				})`
+				}
+				return cli.Create(ctx, req)`
 
 	serviceUpdateStructTmpl    *template.Template
-	serviceUpdateStructTmplRaw = `				return cli.UpdateByID(ctx, &serverNameExampleV1.Update{{.TableName}}ByIDRequest{
+	serviceUpdateStructTmplRaw = `				req := &serverNameExampleV1.Update{{.TableName}}ByIDRequest{
 					{{- range .Fields}}
 						{{.Name}}:  {{.GoTypeZero}}, {{if .Comment}} // {{.Comment}}{{end}}
 					{{- end}}
-				})`
+				}
+				return cli.UpdateByID(ctx, req)`
 
 	tmplParseOnce sync.Once
 )
