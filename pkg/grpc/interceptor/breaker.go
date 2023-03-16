@@ -53,7 +53,7 @@ func UnaryClientCircuitBreaker(opts ...CircuitBreakerOption) grpc.UnaryClientInt
 		breaker := o.group.Get(method).(circuitbreaker.CircuitBreaker)
 		if err := breaker.Allow(); err != nil {
 			// NOTE: when client reject request locally,
-			// continue add counter let the drop ratio higher.
+			// continue to add counter let the drop ratio higher.
 			breaker.MarkFailed()
 			return errcode.StatusServiceUnavailable.ToRPCErr(err.Error())
 		}
@@ -73,8 +73,8 @@ func UnaryClientCircuitBreaker(opts ...CircuitBreakerOption) grpc.UnaryClientInt
 	}
 }
 
-// SteamClientCircuitBreaker client-side stream circuit breaker interceptor
-func SteamClientCircuitBreaker(opts ...CircuitBreakerOption) grpc.StreamClientInterceptor {
+// StreamClientCircuitBreaker client-side stream circuit breaker interceptor
+func StreamClientCircuitBreaker(opts ...CircuitBreakerOption) grpc.StreamClientInterceptor {
 	o := defaultCircuitBreakerOptions()
 	o.apply(opts...)
 
@@ -82,7 +82,7 @@ func SteamClientCircuitBreaker(opts ...CircuitBreakerOption) grpc.StreamClientIn
 		breaker := o.group.Get(method).(circuitbreaker.CircuitBreaker)
 		if err := breaker.Allow(); err != nil {
 			// NOTE: when client reject request locally,
-			// continue add counter let the drop ratio higher.
+			// continue to add counter let the drop ratio higher.
 			breaker.MarkFailed()
 			return nil, errcode.StatusServiceUnavailable.ToRPCErr(err.Error())
 		}
@@ -131,8 +131,8 @@ func UnaryServerCircuitBreaker(opts ...CircuitBreakerOption) grpc.UnaryServerInt
 	}
 }
 
-// SteamServerCircuitBreaker server-side stream circuit breaker interceptor
-func SteamServerCircuitBreaker(opts ...CircuitBreakerOption) grpc.StreamServerInterceptor {
+// StreamServerCircuitBreaker server-side stream circuit breaker interceptor
+func StreamServerCircuitBreaker(opts ...CircuitBreakerOption) grpc.StreamServerInterceptor {
 	o := defaultCircuitBreakerOptions()
 	o.apply(opts...)
 
@@ -140,7 +140,7 @@ func SteamServerCircuitBreaker(opts ...CircuitBreakerOption) grpc.StreamServerIn
 		breaker := o.group.Get(info.FullMethod).(circuitbreaker.CircuitBreaker)
 		if err := breaker.Allow(); err != nil {
 			// NOTE: when client reject request locally,
-			// continue add counter let the drop ratio higher.
+			// continue to add counter let the drop ratio higher.
 			breaker.MarkFailed()
 			return errcode.StatusServiceUnavailable.ToRPCErr(err.Error())
 		}

@@ -36,7 +36,7 @@ func TestUnaryClientCircuitBreaker(t *testing.T) {
 }
 
 func TestSteamClientCircuitBreaker(t *testing.T) {
-	interceptor := SteamClientCircuitBreaker()
+	interceptor := StreamClientCircuitBreaker()
 	assert.NotNil(t, interceptor)
 
 	streamer := func(ctx context.Context, desc *grpc.StreamDesc, cc *grpc.ClientConn, method string, opts ...grpc.CallOption) (grpc.ClientStream, error) {
@@ -74,7 +74,7 @@ func TestUnaryServerCircuitBreaker(t *testing.T) {
 }
 
 func TestSteamServerCircuitBreaker(t *testing.T) {
-	interceptor := SteamServerCircuitBreaker()
+	interceptor := StreamServerCircuitBreaker()
 	assert.NotNil(t, interceptor)
 
 	handler := func(srv interface{}, stream grpc.ServerStream) error {

@@ -40,7 +40,7 @@ func UnaryClientLog(logger *zap.Logger) grpc.UnaryClientInterceptor {
 			reqIDField,
 		}
 
-		logger.Info("rpc client invoker", fields...)
+		logger.Info("invoker result", fields...)
 		return err
 	}
 }
@@ -80,7 +80,7 @@ func StreamClientLog(logger *zap.Logger) grpc.StreamClientInterceptor {
 			reqIDField,
 		}
 
-		logger.Info("rpc client invoker", fields...)
+		logger.Info("invoker result", fields...)
 		return clientStream, err
 	}
 }

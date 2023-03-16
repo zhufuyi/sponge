@@ -3,8 +3,6 @@ package interceptor
 import (
 	"context"
 	"fmt"
-	"github.com/stretchr/testify/assert"
-	"google.golang.org/grpc/metadata"
 	"io"
 	"net"
 	"reflect"
@@ -15,6 +13,7 @@ import (
 	"github.com/zhufuyi/sponge/pkg/utils"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
@@ -560,16 +559,4 @@ func TestCtxRequestIDField(t *testing.T) {
 	assert.NotNil(t, field)
 	field = ServerCtxRequestIDField(context.Background())
 	assert.NotNil(t, field)
-}
-
-func Test_addClientRequestIDToCtx(t *testing.T) {
-	md := metadata.MD{"token": []string{"abcd"}}
-	ctx := addClientRequestIDToCtx(context.Background(), md)
-	t.Log(ClientCtxRequestID(ctx))
-}
-
-func Test_addServerRequestIDToCtx(t *testing.T) {
-	md := metadata.MD{"token": []string{"abcd"}}
-	ctx := addServerRequestIDToCtx(context.Background(), md)
-	t.Log(ServerCtxRequestID(ctx))
 }
