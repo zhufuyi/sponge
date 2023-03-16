@@ -8,18 +8,18 @@ data:
     # app settings
     app:
       name: "serverNameExample"  # server name
-      env: "dev"                   # runtime environment, dev: development environment, prod: production environment, test: test environment
+      env: "dev"                           # runtime environment, dev: development environment, prod: production environment, test: test environment
       version: "v0.0.0"
-      host: "192.168.3.27"   # host name or ip
-      enablePprof: true        # whether to enable performance analysis, true:enable, false:disable
-      enableStat: true         # whether to enable printing statistics, true:enable, false:disable
-      enableMetrics: true     # whether to enable indicator collection, true:enable, false:disable
-      enableLimit: false       # whether to turn on rate limiting (adaptive), true:on, false:off
-      enableCircuitBreaker: false          # whether to turn on circuit breaker(adaptive), true:on, false:off
-      enableTrace: false                      # whether to enable trace, true:enable, false:disable, if true jaeger configuration must be set
-      tracingSamplingRate: 1.0            # tracing sampling rate, between 0 and 1, 0 means no sampling, 1 means sampling all links
-      registryDiscoveryType: ""            # registry and discovery types: consul, etcd, nacos, if empty, registration and discovery are not used
-      cacheType: "memory"                 # cache type, memory, redis, if set to redis, must set redis configuration
+      host: "127.0.0.1"                  # domain or ip, for service registration
+      enablePprof: true                  # whether to turn on performance analysis, true:enable, false:disable
+      enableStat: true                    # whether to turn on printing statistics, true:enable, false:disable
+      enableMetrics: true                # whether to turn on indicator collection, true:enable, false:disable
+      enableLimit: false                   # whether to turn on rate limiting (adaptive), true:on, false:off
+      enableCircuitBreaker: false      # whether to turn on circuit breaker(adaptive), true:on, false:off
+      enableTrace: false                  # whether to turn on enable trace, true:enable, false:disable, if true jaeger configuration must be set
+      tracingSamplingRate: 1.0        # tracing sampling rate, between 0 and 1, 0 means no sampling, 1 means sampling all links
+      registryDiscoveryType: ""        # registry and discovery types: consul, etcd, nacos, if empty, registration and discovery are not used
+      cacheType: "memory"             # cache type, memory, redis, if set to redis, must set redis configuration
     
     
     # http server settings
@@ -33,17 +33,41 @@ data:
     grpc:
       port: 8282              # listening port
       httpPort: 8283        # get pprof and monitor indicator ports
-      readTimeout: 3      # read timeout, unit(second)
-      writeTimeout: 3     # write timeout, unit(second)
+      readTimeout: 5      # read timeout, unit(second)
+      writeTimeout: 5     # write timeout, unit(second)
+      enableToken: false  # whether to enable server-side token authentication, default appID=grpc, appKey=123456
+      # serverSecure parameter setting
+      # if type="", it means no secure connection, no need to fill in any parameters
+      # if type="one-way", it means server-side certification, only the fields 'certFile' and 'keyFile' should be filled in
+      # if type="two-way", it means both client and server side certification, fill in all fields
+      serverSecure:
+        type: ""               # secures type, "", "one-way", "two-way"
+        certFile: ""           # server side cert file, absolute path
+        keyFile: ""           # server side key file, absolute path
+        caFile: ""             # ca certificate file, valid only in "two-way", absolute path
     
     
     # grpc client settings, multiple rpc services can be set up
     grpcClient:
       - name: "serverNameExample"   # rpc service name, used for service discovery
-        host: "192.168.3.27"                # rpc service address, used for direct connection
-        port: 8282                               # rpc service port
+        host: "127.0.0.1"                    # rpc service address, used for direct connection
+        port: 8282                              # rpc service port
         registryDiscoveryType: ""         # registration and discovery types: consul, etcd, nacos, if empty, registration and discovery are not used
-    
+        enableLoadBalance: false         # whether to turn on the load balancer
+        # clientSecure parameter setting
+        # if type="", it means no secure connection, no need to fill in any parameters
+        # if type="one-way", it means server-side certification, only the fields 'serverName' and 'certFile' should be filled in
+        # if type="two-way", it means both client and server side certification, fill in all fields
+        clientSecure:
+          type: ""              # secures type, "", "one-way", "two-way"
+          serverName: ""   # server name, e.g. *.foo.com
+          caFile: ""            # client side ca file, valid only in "two-way", absolute path
+          certFile: ""          # client side cert file, absolute path, if secureType="one-way", fill in server side cert file here
+          keyFile: ""          # client side key file, valid only in "two-way", absolute path
+        clientToken:
+          enable: false      # whether to enable token authentication
+          appID: ""           # app id
+          appKey: ""         # app key    
     
     # logger settings
     logger:

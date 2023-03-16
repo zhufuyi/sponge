@@ -218,10 +218,44 @@ http:
 
 	rpcServerConfigCode = `# grpc server settings
 grpc:
-  port: 8282              # listen port
-  httpPort: 8283        # profile and metrics ports
-  readTimeout: 3       # read timeout, unit(second)
-  writeTimeout: 3      # write timeout, unit(second)`
+  port: 8282             # listen port
+  httpPort: 8283       # profile and metrics ports
+  readTimeout: 5      # read timeout, unit(second)
+  writeTimeout: 5     # write timeout, unit(second)
+  enableToken: false  # whether to enable server-side token authentication, default appID=grpc, appKey=123456
+  # serverSecure parameter setting
+  # if type="", it means no secure connection, no need to fill in any parameters
+  # if type="one-way", it means server-side certification, only the fields 'certFile' and 'keyFile' should be filled in
+  # if type="two-way", it means both client and server side certification, fill in all fields
+  serverSecure:
+    type: ""               # secures type, "", "one-way", "two-way"
+    certFile: ""           # server side cert file, absolute path
+    keyFile: ""           # server side key file, absolute path
+    caFile: ""             # ca certificate file, valid only in "two-way", absolute path
+
+
+
+# grpc client settings, support for setting up multiple rpc clients
+grpcClient:
+  - name: "serverNameExample"   # rpc service name, used for service discovery
+    host: "127.0.0.1"                    # rpc service address, used for direct connection
+    port: 8282                              # rpc service port
+    registryDiscoveryType: ""         # registration and discovery types: consul, etcd, nacos, if empty, connecting to server using host and port
+    enableLoadBalance: false         # whether to turn on the load balancer
+    # clientSecure parameter setting
+    # if type="", it means no secure connection, no need to fill in any parameters
+    # if type="one-way", it means server-side certification, only the fields 'serverName' and 'certFile' should be filled in
+    # if type="two-way", it means both client and server side certification, fill in all fields
+    clientSecure:
+      type: ""              # secures type, "", "one-way", "two-way"
+      serverName: ""   # server name, e.g. *.foo.com
+      caFile: ""            # client side ca file, valid only in "two-way", absolute path
+      certFile: ""          # client side cert file, absolute path, if secureType="one-way", fill in server side cert file here
+      keyFile: ""          # client side key file, valid only in "two-way", absolute path
+    clientToken:
+      enable: false      # whether to enable token authentication
+      appID: ""           # app id
+      appKey: ""         # app key`
 
 	rpcGwServerConfigCode = `# http server settings
 http:
@@ -230,10 +264,25 @@ http:
   writeTimeout: 60  # write timeout, unit(second), if enableHTTPProfile is true, it needs to be greater than 60s, the default value for pprof to do profiling is 60s
 
 
-# grpc client settings, multiple rpc services can be set up
+# grpc client settings, support for setting up multiple rpc clients
 grpcClient:
   - name: "serverNameExample"   # rpc service name, used for service discovery
-    host: "192.168.3.27"                # rpc service address, used for direct connection
-    port: 8282                               # rpc service port
-    registryDiscoveryType: ""         # registration and discovery types: consul, etcd, nacos, if empty, connecting to server using host and port`
+    host: "127.0.0.1"                    # rpc service address, used for direct connection
+    port: 8282                              # rpc service port
+    registryDiscoveryType: ""         # registration and discovery types: consul, etcd, nacos, if empty, connecting to server using host and port
+    enableLoadBalance: false         # whether to turn on the load balancer
+    # clientSecure parameter setting
+    # if type="", it means no secure connection, no need to fill in any parameters
+    # if type="one-way", it means server-side certification, only the fields 'serverName' and 'certFile' should be filled in
+    # if type="two-way", it means both client and server side certification, fill in all fields
+    clientSecure:
+      type: ""              # secures type, "", "one-way", "two-way"
+      serverName: ""   # server name, e.g. *.foo.com
+      caFile: ""            # client side ca file, valid only in "two-way", absolute path
+      certFile: ""          # client side cert file, absolute path, if secureType="one-way", fill in server side cert file here
+      keyFile: ""          # client side key file, valid only in "two-way", absolute path
+    clientToken:
+      enable: false      # whether to enable token authentication
+      appID: ""           # app id
+      appKey: ""         # app key`
 )

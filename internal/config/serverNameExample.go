@@ -56,12 +56,33 @@ type Jaeger struct {
 	AgentPort int    `yaml:"agentPort" json:"agentPort"`
 }
 
+type ClientToken struct {
+	AppID  string `yaml:"appID" json:"appID"`
+	AppKey string `yaml:"appKey" json:"appKey"`
+	Enable bool   `yaml:"enable" json:"enable"`
+}
+
+type ClientSecure struct {
+	CaFile     string `yaml:"caFile" json:"caFile"`
+	CertFile   string `yaml:"certFile" json:"certFile"`
+	KeyFile    string `yaml:"keyFile" json:"keyFile"`
+	ServerName string `yaml:"serverName" json:"serverName"`
+	Type       string `yaml:"type" json:"type"`
+}
+
+type ServerSecure struct {
+	CaFile   string `yaml:"caFile" json:"caFile"`
+	CertFile string `yaml:"certFile" json:"certFile"`
+	KeyFile  string `yaml:"keyFile" json:"keyFile"`
+	Type     string `yaml:"type" json:"type"`
+}
+
 type App struct {
 	CacheType             string  `yaml:"cacheType" json:"cacheType"`
 	EnableCircuitBreaker  bool    `yaml:"enableCircuitBreaker" json:"enableCircuitBreaker"`
+	EnableHTTPProfile     bool    `yaml:"enableHTTPProfile" json:"enableHTTPProfile"`
 	EnableLimit           bool    `yaml:"enableLimit" json:"enableLimit"`
 	EnableMetrics         bool    `yaml:"enableMetrics" json:"enableMetrics"`
-	EnableHTTPProfile     bool    `yaml:"enableHTTPProfile" json:"enableHTTPProfile"`
 	EnableStat            bool    `yaml:"enableStat" json:"enableStat"`
 	EnableTrace           bool    `yaml:"enableTrace" json:"enableTrace"`
 	Env                   string  `yaml:"env" json:"env"`
@@ -70,6 +91,16 @@ type App struct {
 	RegistryDiscoveryType string  `yaml:"registryDiscoveryType" json:"registryDiscoveryType"`
 	TracingSamplingRate   float64 `yaml:"tracingSamplingRate" json:"tracingSamplingRate"`
 	Version               string  `yaml:"version" json:"version"`
+}
+
+type GrpcClient struct {
+	ClientSecure          ClientSecure `yaml:"clientSecure" json:"clientSecure"`
+	ClientToken           ClientToken  `yaml:"clientToken" json:"clientToken"`
+	EnableLoadBalance     bool         `yaml:"enableLoadBalance" json:"enableLoadBalance"`
+	Host                  string       `yaml:"host" json:"host"`
+	Name                  string       `yaml:"name" json:"name"`
+	Port                  int          `yaml:"port" json:"port"`
+	RegistryDiscoveryType string       `yaml:"registryDiscoveryType" json:"registryDiscoveryType"`
 }
 
 type Mysql struct {
@@ -88,24 +119,19 @@ type Redis struct {
 	WriteTimeout int    `yaml:"writeTimeout" json:"writeTimeout"`
 }
 
+type Grpc struct {
+	EnableToken  bool         `yaml:"enableToken" json:"enableToken"`
+	HTTPPort     int          `yaml:"httpPort" json:"httpPort"`
+	Port         int          `yaml:"port" json:"port"`
+	ReadTimeout  int          `yaml:"readTimeout" json:"readTimeout"`
+	ServerSecure ServerSecure `yaml:"serverSecure" json:"serverSecure"`
+	WriteTimeout int          `yaml:"writeTimeout" json:"writeTimeout"`
+}
+
 type Logger struct {
 	Format string `yaml:"format" json:"format"`
 	IsSave bool   `yaml:"isSave" json:"isSave"`
 	Level  string `yaml:"level" json:"level"`
-}
-
-type Grpc struct {
-	HTTPPort     int `yaml:"httpPort" json:"httpPort"`
-	Port         int `yaml:"port" json:"port"`
-	ReadTimeout  int `yaml:"readTimeout" json:"readTimeout"`
-	WriteTimeout int `yaml:"writeTimeout" json:"writeTimeout"`
-}
-
-type GrpcClient struct {
-	Host                  string `yaml:"host" json:"host"`
-	Name                  string `yaml:"name" json:"name"`
-	Port                  int    `yaml:"port" json:"port"`
-	RegistryDiscoveryType string `yaml:"registryDiscoveryType" json:"registryDiscoveryType"`
 }
 
 type NacosRd struct {
