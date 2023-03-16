@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"testing"
 	"time"
 
@@ -36,13 +35,38 @@ func getRPCClientConnForTest() *grpc.ClientConn {
 	if err != nil {
 		panic(err)
 	}
-	endpoint := fmt.Sprintf("127.0.0.1:%d", config.Get().Grpc.Port)
 
-	var cliOptions = []grpccli.Option{
+	if len(config.Get().GrpcClient) == 0 {
+		panic("no rpc client configuration information found in the configuration file")
+	}
+
+	// Change the configuration information of the 0th client before testing
+	rpcClientCfg := config.Get().GrpcClient[0]
+
+	endpoint := rpcClientCfg.Host + ":" + utils.IntToStr(rpcClientCfg.Port)
+	var cliOptions []grpccli.Option
+
+	// secure
+	cliOptions = append(cliOptions, grpccli.WithSecure(
+		rpcClientCfg.ClientSecure.Type,
+		rpcClientCfg.ClientSecure.ServerName,
+		rpcClientCfg.ClientSecure.CaFile,
+		rpcClientCfg.ClientSecure.CertFile,
+		rpcClientCfg.ClientSecure.KeyFile,
+	))
+
+	// token
+	cliOptions = append(cliOptions, grpccli.WithToken(
+		rpcClientCfg.ClientToken.Enable,
+		rpcClientCfg.ClientToken.AppID,
+		rpcClientCfg.ClientToken.AppKey,
+	))
+
+	cliOptions = append(cliOptions,
 		grpccli.WithEnableRequestID(),
 		grpccli.WithEnableLog(zap.NewNop()),
-		//grpccli.WithEnableLoadBalance(),
-	}
+	)
+
 	if config.Get().App.RegistryDiscoveryType != "" {
 		var iDiscovery registry.Discovery
 		endpoint = "discovery:///" + config.Get().App.Name // Connecting to grpc services by service name
@@ -94,7 +118,7 @@ func getRPCClientConnForTest() *grpc.ClientConn {
 		cliOptions = append(cliOptions, grpccli.WithEnableMetrics())
 	}
 
-	conn, err := grpccli.DialInsecure(context.Background(), endpoint, cliOptions...)
+	conn, err := grpccli.Dial(context.Background(), endpoint, cliOptions...)
 	if err != nil {
 		panic(err)
 	}

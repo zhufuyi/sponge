@@ -3,7 +3,7 @@ package grpccli
 import (
 	"context"
 	"errors"
-
+	"github.com/zhufuyi/sponge/pkg/grpc/gtls"
 	"github.com/zhufuyi/sponge/pkg/grpc/interceptor"
 	"github.com/zhufuyi/sponge/pkg/logger"
 	"github.com/zhufuyi/sponge/pkg/servicerd/discovery"
@@ -13,44 +13,97 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-// Dial secure connections
+// Dial to rpc server
 func Dial(ctx context.Context, endpoint string, opts ...Option) (*grpc.ClientConn, error) {
-	return dial(ctx, endpoint, true, opts...)
-}
-
-// DialInsecure unsafe connections
-func DialInsecure(ctx context.Context, endpoint string, opts ...Option) (*grpc.ClientConn, error) {
-	return dial(ctx, endpoint, false, opts...)
-}
-
-func dial(ctx context.Context, endpoint string, isSecure bool, opts ...Option) (*grpc.ClientConn, error) {
 	o := defaultOptions()
 	o.apply(opts...)
 
-	var unaryClientInterceptors []grpc.UnaryClientInterceptor
-	var streamClientInterceptors []grpc.StreamClientInterceptor
-
 	var clientOptions []grpc.DialOption
 
-	// determining whether to use service discovery
+	// service discovery
 	if o.discovery != nil {
 		clientOptions = append(clientOptions, grpc.WithResolvers(
 			discovery.NewBuilder(
 				o.discovery,
-				discovery.WithInsecure(!isSecure),
+				discovery.WithInsecure(!o.isSecure()),
 			)))
 	}
 
-	// secure connection or not
-	if isSecure {
-		if o.credentials == nil {
-			return nil, errors.New("unset tls credentials")
-		}
-		clientOptions = append(clientOptions, grpc.WithTransportCredentials(o.credentials))
-	} else {
-		clientOptions = append(clientOptions, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	// load balance option
+	if o.enableLoadBalance {
+		clientOptions = append(clientOptions, grpc.WithDefaultServiceConfig(`{"loadBalancingConfig": [{"round_robin":{}}]}`))
 	}
 
+	// secure option
+	so, err := secureOption(o)
+	if err != nil {
+		return nil, err
+	}
+	clientOptions = append(clientOptions, so)
+
+	// token option
+	if o.enableToken {
+		clientOptions = append(clientOptions, interceptor.ClientTokenOption(
+			o.appID,
+			o.appKey,
+			o.isSecure(),
+		))
+	}
+
+	// unary options
+	clientOptions = append(clientOptions, unaryClientOptions(o))
+	// stream options
+	clientOptions = append(clientOptions, streamClientOptions(o))
+	// custom options
+	clientOptions = append(clientOptions, o.dialOptions...)
+
+	return grpc.DialContext(ctx, endpoint, clientOptions...)
+}
+
+func secureOption(o *options) (grpc.DialOption, error) {
+	switch o.secureType {
+	case secureOneWay: // server side certification
+		if o.certFile == "" {
+			return nil, errors.New("cert file is empty")
+		}
+		credentials, err := gtls.GetClientTLSCredentials(o.serverName, o.certFile)
+		if err != nil {
+			return nil, err
+		}
+		return grpc.WithTransportCredentials(credentials), nil
+
+	case secureTwoWay: // both client and server side certification
+		if o.caFile == "" {
+			return nil, errors.New("ca file is empty")
+		}
+		if o.certFile == "" {
+			return nil, errors.New("cert file is empty")
+		}
+		if o.keyFile == "" {
+			return nil, errors.New("key file is empty")
+		}
+		credentials, err := gtls.GetClientTLSCredentialsByCA(
+			o.serverName,
+			o.caFile,
+			o.certFile,
+			o.keyFile,
+		)
+		if err != nil {
+			return nil, err
+		}
+		return grpc.WithTransportCredentials(credentials), nil
+
+	default:
+		return grpc.WithTransportCredentials(insecure.NewCredentials()), nil
+	}
+}
+
+func unaryClientOptions(o *options) grpc.DialOption {
+	var unaryClientInterceptors []grpc.UnaryClientInterceptor
+
+	unaryClientInterceptors = append(unaryClientInterceptors, interceptor.UnaryClientRecovery())
+
+	// request id
 	if o.enableRequestID {
 		unaryClientInterceptors = append(unaryClientInterceptors, interceptor.UnaryClientRequestID())
 	}
@@ -65,11 +118,6 @@ func dial(ctx context.Context, endpoint string, isSecure bool, opts ...Option) (
 		unaryClientInterceptors = append(unaryClientInterceptors, interceptor.UnaryClientMetrics())
 	}
 
-	// load balance
-	if o.enableLoadBalance {
-		clientOptions = append(clientOptions, grpc.WithDefaultServiceConfig(`{"loadBalancingConfig": [{"round_robin":{}}]}`))
-	}
-
 	// circuit breaker
 	if o.enableCircuitBreaker {
 		unaryClientInterceptors = append(unaryClientInterceptors, interceptor.UnaryClientCircuitBreaker())
@@ -80,23 +128,58 @@ func dial(ctx context.Context, endpoint string, isSecure bool, opts ...Option) (
 		unaryClientInterceptors = append(unaryClientInterceptors, interceptor.UnaryClientRetry())
 	}
 
+	// trace
 	if o.enableTrace {
 		unaryClientInterceptors = append(unaryClientInterceptors, interceptor.UnaryClientTracing())
 	}
 
+	// custom unary interceptors
 	unaryClientInterceptors = append(unaryClientInterceptors, o.unaryInterceptors...)
+
+	return grpc.WithUnaryInterceptor(
+		grpc_middleware.ChainUnaryClient(unaryClientInterceptors...),
+	)
+}
+
+func streamClientOptions(o *options) grpc.DialOption {
+	var streamClientInterceptors []grpc.StreamClientInterceptor
+
+	streamClientInterceptors = append(streamClientInterceptors, interceptor.StreamClientRecovery())
+
+	// request id
+	if o.enableRequestID {
+		streamClientInterceptors = append(streamClientInterceptors, interceptor.StreamClientRequestID())
+	}
+
+	// logging
+	if o.enableLog {
+		streamClientInterceptors = append(streamClientInterceptors, interceptor.StreamClientLog(logger.Get()))
+	}
+
+	// metrics
+	if o.enableMetrics {
+		streamClientInterceptors = append(streamClientInterceptors, interceptor.StreamClientMetrics())
+	}
+
+	// circuit breaker
+	if o.enableCircuitBreaker {
+		streamClientInterceptors = append(streamClientInterceptors, interceptor.StreamClientCircuitBreaker())
+	}
+
+	// retry
+	if o.enableRetry {
+		streamClientInterceptors = append(streamClientInterceptors, interceptor.StreamClientRetry())
+	}
+
+	// trace
+	if o.enableTrace {
+		streamClientInterceptors = append(streamClientInterceptors, interceptor.StreamClientTracing())
+	}
+
+	// custom stream interceptors
 	streamClientInterceptors = append(streamClientInterceptors, o.streamInterceptors...)
 
-	o.dialOptions = append(o.dialOptions,
-		grpc.WithUnaryInterceptor(
-			grpc_middleware.ChainUnaryClient(unaryClientInterceptors...),
-		))
-	o.dialOptions = append(o.dialOptions,
-		grpc.WithStreamInterceptor(
-			grpc_middleware.ChainStreamClient(streamClientInterceptors...),
-		))
-
-	clientOptions = append(clientOptions, o.dialOptions...)
-
-	return grpc.DialContext(ctx, endpoint, clientOptions...)
+	return grpc.WithStreamInterceptor(
+		grpc_middleware.ChainStreamClient(streamClientInterceptors...),
+	)
 }

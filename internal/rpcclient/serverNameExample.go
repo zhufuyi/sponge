@@ -30,12 +30,6 @@ var (
 func NewServerNameExampleRPCConn() {
 	cfg := config.Get()
 
-	var cliOptions = []grpccli.Option{
-		grpccli.WithEnableRequestID(),
-		grpccli.WithEnableLog(logger.Get()),
-		//grpccli.WithEnableLoadBalance(),
-	}
-
 	serverName := "serverNameExample"
 	var grpcClientCfg config.GrpcClient
 	for _, cli := range cfg.GrpcClient {
@@ -49,7 +43,33 @@ func NewServerNameExampleRPCConn() {
 			"please change to the correct server name", serverName))
 	}
 
-	// If service discovery is not used, connect directly to the rpc service using the ip and port
+	var cliOptions = []grpccli.Option{
+		grpccli.WithEnableRequestID(),
+		grpccli.WithEnableLog(logger.Get()),
+	}
+
+	// load balance
+	if grpcClientCfg.EnableLoadBalance {
+		cliOptions = append(cliOptions, grpccli.WithEnableLoadBalance())
+	}
+
+	// secure
+	cliOptions = append(cliOptions, grpccli.WithSecure(
+		grpcClientCfg.ClientSecure.Type,
+		grpcClientCfg.ClientSecure.ServerName,
+		grpcClientCfg.ClientSecure.CaFile,
+		grpcClientCfg.ClientSecure.CertFile,
+		grpcClientCfg.ClientSecure.KeyFile,
+	))
+
+	// token
+	cliOptions = append(cliOptions, grpccli.WithToken(
+		grpcClientCfg.ClientToken.Enable,
+		grpcClientCfg.ClientToken.AppID,
+		grpcClientCfg.ClientToken.AppKey,
+	))
+
+	// if service discovery is not used, connect directly to the rpc service using the ip and port
 	endpoint := fmt.Sprintf("%s:%d", grpcClientCfg.Host, grpcClientCfg.Port)
 
 	switch grpcClientCfg.RegistryDiscoveryType {
@@ -97,10 +117,8 @@ func NewServerNameExampleRPCConn() {
 		cliOptions = append(cliOptions, grpccli.WithEnableMetrics())
 	}
 
-	// If a secure connection is required, use grpccli.Dial(ctx, endpoint, cliOptions...) and
-	// cliOptions sets WithCredentials to specify the certificate path
 	var err error
-	serverNameExampleConn, err = grpccli.DialInsecure(context.Background(), endpoint, cliOptions...)
+	serverNameExampleConn, err = grpccli.Dial(context.Background(), endpoint, cliOptions...)
 	if err != nil {
 		panic(fmt.Sprintf("dial rpc server failed: %v, endpoint: %s", err, endpoint))
 	}

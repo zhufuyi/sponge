@@ -13,14 +13,6 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-func TestWithCredentials(t *testing.T) {
-	testData := insecure.NewCredentials()
-	opt := WithCredentials(testData)
-	o := new(options)
-	o.apply(opt)
-	assert.Equal(t, testData, o.credentials)
-}
-
 func TestWithDialOptions(t *testing.T) {
 	testData := grpc.WithTransportCredentials(insecure.NewCredentials())
 	opt := WithDialOptions(testData)
@@ -59,8 +51,9 @@ func TestWithEnableRequestID(t *testing.T) {
 }
 
 func TestWithEnableLog(t *testing.T) {
+	opt := WithEnableLog(nil)
 	testData := zap.NewNop()
-	opt := WithEnableLog(testData)
+	opt = WithEnableLog(testData)
 	o := new(options)
 	o.apply(opt)
 	assert.Equal(t, testData, o.log)
@@ -121,4 +114,28 @@ func Test_options_apply(t *testing.T) {
 	o := new(options)
 	o.apply(opt)
 	assert.Equal(t, true, o.enableRetry)
+}
+
+func Test_options_isSecure(t *testing.T) {
+	o := new(options)
+	secure := o.isSecure()
+	assert.Equal(t, false, secure)
+	o.secureType = secureOneWay
+	secure = o.isSecure()
+	assert.Equal(t, true, secure)
+}
+
+func TestWithSecure(t *testing.T) {
+	o := new(options)
+	opt := WithSecure("foo", "", "", "", "")
+	o.apply(opt)
+	assert.Equal(t, "foo", o.secureType)
+
+	opt = WithSecure(secureOneWay, "", "", "", "")
+	o.apply(opt)
+	assert.Equal(t, secureOneWay, o.secureType)
+
+	opt = WithSecure(secureTwoWay, "", "", "", "")
+	o.apply(opt)
+	assert.Equal(t, secureTwoWay, o.secureType)
 }

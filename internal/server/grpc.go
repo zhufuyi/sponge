@@ -11,6 +11,7 @@ import (
 	"github.com/zhufuyi/sponge/internal/service"
 
 	"github.com/zhufuyi/sponge/pkg/app"
+	"github.com/zhufuyi/sponge/pkg/grpc/gtls"
 	"github.com/zhufuyi/sponge/pkg/grpc/interceptor"
 	"github.com/zhufuyi/sponge/pkg/grpc/metrics"
 	"github.com/zhufuyi/sponge/pkg/logger"
@@ -19,9 +20,16 @@ import (
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 var _ app.IServer = (*grpcServer)(nil)
+
+var (
+	defaultTokenAppID  = "grpc"
+	defaultTokenAppKey = "123456"
+)
 
 type grpcServer struct {
 	addr   string
@@ -102,21 +110,60 @@ func (s *grpcServer) String() string {
 	return "grpc service address " + s.addr
 }
 
-// InitServerOptions setting up interceptors
-func (s *grpcServer) serverOptions() []grpc.ServerOption {
-	var options []grpc.ServerOption
+// secure option
+func (s *grpcServer) secureServerOption() grpc.ServerOption {
+	switch config.Get().Grpc.ServerSecure.Type {
+	case "one-way": // server side certification
+		credentials, err := gtls.GetServerTLSCredentials(
+			config.Get().Grpc.ServerSecure.CertFile,
+			config.Get().Grpc.ServerSecure.KeyFile,
+		)
+		if err != nil {
+			panic(err)
+		}
+		logger.Info("type of security: sever-side certification")
+		return grpc.Creds(credentials)
 
+	case "two-way": // both client and server side certification
+		credentials, err := gtls.GetServerTLSCredentialsByCA(
+			config.Get().Grpc.ServerSecure.CaFile,
+			config.Get().Grpc.ServerSecure.CertFile,
+			config.Get().Grpc.ServerSecure.KeyFile,
+		)
+		if err != nil {
+			panic(err)
+		}
+		logger.Info("type of security: both client and server side certification")
+		return grpc.Creds(credentials)
+	}
+
+	logger.Info("type of security: insecure")
+	return nil
+}
+
+// setting up unary server interceptors
+func (s *grpcServer) unaryServerOptions() grpc.ServerOption {
 	unaryServerInterceptors := []grpc.UnaryServerInterceptor{
 		interceptor.UnaryServerRecovery(),
 		interceptor.UnaryServerRequestID(),
 	}
 
-	streamServerInterceptors := []grpc.StreamServerInterceptor{}
-
 	// logger interceptor
 	unaryServerInterceptors = append(unaryServerInterceptors, interceptor.UnaryServerLog(
 		logger.Get(),
 	))
+
+	// token interceptor
+	if config.Get().Grpc.EnableToken {
+		checkToken := func(appID string, appKey string) error {
+			// todo the defaultTokenAppID and defaultTokenAppKey are usually retrieved from the cache or database
+			if appID != defaultTokenAppID || appKey != defaultTokenAppKey {
+				return status.Errorf(codes.Unauthenticated, "app id or app key checksum failure")
+			}
+			return nil
+		}
+		unaryServerInterceptors = append(unaryServerInterceptors, interceptor.UnaryServerToken(checkToken))
+	}
 
 	// metrics interceptor
 	if config.Get().App.EnableMetrics {
@@ -139,10 +186,55 @@ func (s *grpcServer) serverOptions() []grpc.ServerOption {
 		unaryServerInterceptors = append(unaryServerInterceptors, interceptor.UnaryServerTracing())
 	}
 
-	unaryServer := grpc_middleware.WithUnaryServerChain(unaryServerInterceptors...)
-	streamServer := grpc_middleware.WithStreamServerChain(streamServerInterceptors...)
+	return grpc_middleware.WithUnaryServerChain(unaryServerInterceptors...)
+}
 
-	options = append(options, unaryServer, streamServer)
+// setting up stream server interceptors
+func (s *grpcServer) streamServerOptions() grpc.ServerOption {
+	streamServerInterceptors := []grpc.StreamServerInterceptor{
+		interceptor.StreamServerRecovery(),
+		interceptor.StreamServerRequestID(),
+	}
+
+	// logger interceptor
+	streamServerInterceptors = append(streamServerInterceptors, interceptor.StreamServerLog(
+		logger.Get(),
+	))
+
+	// metrics interceptor
+	if config.Get().App.EnableMetrics {
+		streamServerInterceptors = append(streamServerInterceptors, interceptor.StreamServerMetrics())
+		s.registerMetricsMuxAndMethodFunc = s.registerMetricsMuxAndMethod()
+	}
+
+	// limit interceptor
+	if config.Get().App.EnableLimit {
+		streamServerInterceptors = append(streamServerInterceptors, interceptor.StreamServerRateLimit())
+	}
+
+	// circuit breaker interceptor
+	if config.Get().App.EnableCircuitBreaker {
+		streamServerInterceptors = append(streamServerInterceptors, interceptor.StreamServerCircuitBreaker())
+	}
+
+	// trace interceptor
+	if config.Get().App.EnableTrace {
+		streamServerInterceptors = append(streamServerInterceptors, interceptor.StreamServerTracing())
+	}
+
+	return grpc_middleware.WithStreamServerChain(streamServerInterceptors...)
+}
+
+func (s *grpcServer) getOptions() []grpc.ServerOption {
+	var options []grpc.ServerOption
+
+	secureOption := s.secureServerOption()
+	if secureOption != nil {
+		options = append(options, secureOption)
+	}
+
+	options = append(options, s.unaryServerOptions())
+	options = append(options, s.streamServerOptions())
 
 	return options
 }
@@ -182,7 +274,8 @@ func NewGRPCServer(addr string, opts ...GrpcOption) app.IServer {
 	if err != nil {
 		panic(err)
 	}
-	s.server = grpc.NewServer(s.serverOptions()...)
+
+	s.server = grpc.NewServer(s.getOptions()...)
 	service.RegisterAllService(s.server) // register for all services
 	return s
 }

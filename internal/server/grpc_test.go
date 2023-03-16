@@ -10,6 +10,7 @@ import (
 	"github.com/zhufuyi/sponge/configs"
 	"github.com/zhufuyi/sponge/internal/config"
 
+	"github.com/zhufuyi/sponge/pkg/grpc/gtls/certfile"
 	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
 	"github.com/zhufuyi/sponge/pkg/utils"
 
@@ -28,6 +29,7 @@ func TestGRPCServer(t *testing.T) {
 	config.Get().App.EnableHTTPProfile = true
 	config.Get().App.EnableLimit = true
 	config.Get().App.EnableCircuitBreaker = true
+	config.Get().Grpc.EnableToken = true
 
 	port, _ := utils.GetAvailablePort()
 	addr := fmt.Sprintf(":%d", port)
@@ -54,6 +56,7 @@ func TestGRPCServerMock(t *testing.T) {
 	config.Get().App.EnableHTTPProfile = true
 	config.Get().App.EnableLimit = true
 	config.Get().App.EnableCircuitBreaker = true
+	config.Get().Grpc.EnableToken = true
 
 	port, _ := utils.GetAvailablePort()
 	addr := fmt.Sprintf(":%d", port)
@@ -72,7 +75,7 @@ func TestGRPCServerMock(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	s.server = grpc.NewServer(s.serverOptions()...)
+	s.server = grpc.NewServer(s.unaryServerOptions(), s.streamServerOptions())
 
 	go func() {
 		time.Sleep(time.Second * 3)
@@ -95,4 +98,35 @@ func (g gRegistry) Register(ctx context.Context, service *registry.ServiceInstan
 
 func (g gRegistry) Deregister(ctx context.Context, service *registry.ServiceInstance) error {
 	return nil
+}
+
+func Test_grpcServer_getOptions(t *testing.T) {
+	err := config.Init(configs.Path("serverNameExample.yml"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	s := &grpcServer{}
+
+	defer func() {
+		recover()
+	}()
+
+	config.Get().Grpc.ServerSecure.Type = ""
+	opt := s.secureServerOption()
+	assert.Equal(t, nil, opt)
+
+	config.Get().Grpc.ServerSecure.Type = "one-way"
+	config.Get().Grpc.ServerSecure.CertFile = certfile.Path("one-way/server.crt")
+	config.Get().Grpc.ServerSecure.KeyFile = certfile.Path("one-way/server.key")
+	opt = s.secureServerOption()
+	assert.NotNil(t, opt)
+
+	config.Get().Grpc.ServerSecure.Type = "two-way"
+	config.Get().Grpc.ServerSecure.CaFile = certfile.Path("two-way/ca.pem")
+	config.Get().Grpc.ServerSecure.CertFile = certfile.Path("two-way/server/server.pem")
+	config.Get().Grpc.ServerSecure.KeyFile = certfile.Path("two-way/server/server.key")
+	opt = s.secureServerOption()
+	assert.NotNil(t, opt)
+
+	fmt.Println(certfile.Path("one-way/server.crt"), certfile.Path("one-way/server.key"))
 }

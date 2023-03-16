@@ -7,7 +7,11 @@ import (
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
+)
+
+var (
+	secureOneWay = "one-way"
+	secureTwoWay = "two-way"
 )
 
 // Option grpc dial options
@@ -17,30 +21,46 @@ type Option func(*options)
 type options struct {
 	timeout time.Duration
 
-	credentials        credentials.TransportCredentials // secure connections
-	dialOptions        []grpc.DialOption                // custom options
-	unaryInterceptors  []grpc.UnaryClientInterceptor    // custom unary interceptor
-	streamInterceptors []grpc.StreamClientInterceptor   // custom stream interceptor
+	// secure setting
+	secureType string // secure type "","one-way","two-way"
+	serverName string // server name
+	caFile     string // ca file
+	certFile   string // cert file
+	keyFile    string // key file
 
-	enableLog       bool // whether to turn on the log
-	enableRequestID bool // whether to turn on the request id
-	log             *zap.Logger
+	// token setting
+	enableToken bool // whether to turn on token
+	appID       string
+	appKey      string
 
-	enableTrace          bool // whether to turn on tracing
-	enableMetrics        bool // whether to turn on metrics
-	enableRetry          bool // whether to turn on retry
-	enableLoadBalance    bool // whether to turn on load balance
-	enableCircuitBreaker bool // whether to turn on circuit breaker
+	// interceptor setting
+	enableLog            bool // whether to turn on the log
+	log                  *zap.Logger
+	enableRequestID      bool               // whether to turn on the request id
+	enableTrace          bool               // whether to turn on tracing
+	enableMetrics        bool               // whether to turn on metrics
+	enableRetry          bool               // whether to turn on retry
+	enableLoadBalance    bool               // whether to turn on load balance
+	enableCircuitBreaker bool               // whether to turn on circuit breaker
+	discovery            registry.Discovery // if not nil means use service discovery
 
-	discovery registry.Discovery // if not nil means use service discovery
+	// custom setting
+	dialOptions        []grpc.DialOption              // custom options
+	unaryInterceptors  []grpc.UnaryClientInterceptor  // custom unary interceptor
+	streamInterceptors []grpc.StreamClientInterceptor // custom stream interceptor
 }
 
 func defaultOptions() *options {
 	return &options{
+		secureType: "",
+		serverName: "localhost",
+		certFile:   "",
+		keyFile:    "",
+		caFile:     "",
+
 		enableLog: false,
 
 		timeout:            time.Second * 5,
-		credentials:        nil,
 		dialOptions:        nil,
 		unaryInterceptors:  nil,
 		streamInterceptors: nil,
@@ -72,7 +92,11 @@ func WithEnableRequestID() Option {
 func WithEnableLog(log *zap.Logger) Option {
 	return func(o *options) {
 		o.enableLog = true
-		o.log = log
+		if log != nil {
+			o.log = log
+		} else {
+			o.log = zap.NewNop()
+		}
 	}
 }
 
@@ -111,10 +135,59 @@ func WithEnableCircuitBreaker() Option {
 	}
 }
 
-// WithCredentials set dial credentials
-func WithCredentials(credentials credentials.TransportCredentials) Option {
+func (o *options) isSecure() bool {
+	if o.secureType == secureOneWay || o.secureType == secureTwoWay {
+		return true
+	}
+	return false
+}
+
+// WithSecure support setting one-way or two-way secure
+func WithSecure(t string, serverName string, caFile string, certFile string, keyFile string) Option {
+	switch t {
+	case secureOneWay:
+		return WithOneWaySecure(serverName, certFile)
+	case secureTwoWay:
+		return WithTwoWaySecure(serverName, caFile, certFile, keyFile)
+	}
+
 	return func(o *options) {
-		o.credentials = credentials
+		o.secureType = t
+	}
+}
+
+// WithOneWaySecure set one-way secure
+func WithOneWaySecure(serverName string, certFile string) Option {
+	return func(o *options) {
+		if serverName == "" {
+			serverName = "localhost"
+		}
+		o.secureType = secureOneWay
+		o.serverName = serverName
+		o.certFile = certFile
+	}
+}
+
+// WithTwoWaySecure set two-way secure
+func WithTwoWaySecure(serverName string, caFile string, certFile string, keyFile string) Option {
+	return func(o *options) {
+		if serverName == "" {
+			serverName = "localhost"
+		}
+		o.secureType = secureTwoWay
+		o.serverName = serverName
+		o.caFile = caFile
+		o.certFile = certFile
+		o.keyFile = keyFile
+	}
+}
+
+// WithToken set token
+func WithToken(enable bool, appID string, appKey string) Option {
+	return func(o *options) {
+		o.enableToken = enable
+		o.appID = appID
+		o.appKey = appKey
 	}
 }
 
