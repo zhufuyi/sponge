@@ -14,10 +14,19 @@ var servicePort = 24631
 
 // NewRunCommand sponge run commands
 func NewRunCommand() *cobra.Command {
+	var isLog bool
 	cmd := &cobra.Command{
-		Use:           "run",
-		Short:         "Start a web service for sponge",
-		Long:          "start a web service for sponge.",
+		Use:   "run",
+		Short: "Start a web service for sponge",
+		Long: `start a web service for sponge.
+
+Examples:
+  # no log for running.
+  sponge run
+
+  # log for running.
+  sponge run -l
+`,
 		SilenceErrors: true,
 		SilenceUsage:  true,
 
@@ -27,11 +36,11 @@ func NewRunCommand() *cobra.Command {
 			go func() {
 				_ = open(url)
 			}()
-			server.RunHTTPServer(fmt.Sprintf(":%d", servicePort))
+			server.RunHTTPServer(fmt.Sprintf(":%d", servicePort), isLog)
 			return nil
 		},
 	}
-
+	cmd.Flags().BoolVarP(&isLog, "log", "l", false, "enable service logging")
 	return cmd
 }
 
