@@ -9,6 +9,7 @@ import (
 	"github.com/zhufuyi/sponge/pkg/gin/handlerfunc"
 	"github.com/zhufuyi/sponge/pkg/gin/middleware"
 	"github.com/zhufuyi/sponge/pkg/gin/validator"
+	"github.com/zhufuyi/sponge/pkg/logger"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -18,12 +19,14 @@ import (
 var staticFS embed.FS // index.html in the static directory
 
 // NewRouter create a router
-func NewRouter() *gin.Engine {
+func NewRouter(isLog ...bool) *gin.Engine {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
 	r.Use(gin.Recovery())
 	r.Use(middleware.Cors())
-	//r.Use(middleware.Logging(middleware.WithLog(logger.Get())))
+	if len(isLog) > 0 && isLog[0] {
+		r.Use(middleware.Logging(middleware.WithLog(logger.Get())))
+	}
 	binding.Validator = validator.Init()
 
 	// solve vue using history route 404 problem
@@ -43,10 +46,10 @@ func NewRouter() *gin.Engine {
 }
 
 // RunHTTPServer run http server
-func RunHTTPServer(addr string) {
+func RunHTTPServer(addr string, isLog ...bool) {
 	initRecord()
 
-	router := NewRouter()
+	router := NewRouter(isLog...)
 	server := &http.Server{
 		Addr:           addr,
 		Handler:        router,

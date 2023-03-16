@@ -28,3 +28,6 @@ fi
 cd ~/app/${serviceName}-binary
 chmod +x run.sh
 ./run.sh
+checkResult $?
+
+echo "server directory is ~/app/${serviceName}-binary"
