@@ -39,9 +39,9 @@ grpc:
   # if type="two-way", it means both client and server side certification, fill in all fields
   serverSecure:
     type: ""               # secures type, "", "one-way", "two-way"
+    caFile: ""             # ca certificate file, valid only in "two-way", absolute path
     certFile: ""           # server side cert file, absolute path
     keyFile: ""           # server side key file, absolute path
-    caFile: ""             # ca certificate file, valid only in "two-way", absolute path
 
 
 

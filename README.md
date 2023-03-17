@@ -54,31 +54,8 @@ Online code generation demo: [https://go-sponge.com/ui](https://go-sponge.com/ui
 
 ### Installation
 
-**(1) install sponge**
-
-```bash
-go install github.com/zhufuyi/sponge/cmd/sponge@latest
-```
-
-**(2) install dependency plugins and tools**
-
-```bash
-sponge init
-```
-
-If there is a dependency tool installation error(except `protoc`), execute the command to retry `sponge tools --install`
-
-<br>
-
-**(3) install protoc**
-
-Download it from `https://github.com/protocolbuffers/protobuf/releases/tag/v3.20.3` and add the directory where the **protoc** file is located under system path.
-
-<br>
-
-💡 NOTICE:
-
-> If you are using `windows` environment, you need to install some additional dependency tools, see [windows dependency tools](https://go-sponge.com/sponge-install?id=window-environment-installation-dependencies) for installation steps.
+- [Install sponge in linux or macOS](https://github.com/zhufuyi/sponge/blob/main/assets/install-en.md#install-sponge-in-linux-or-macos)
+- [Install sponge in windows](https://github.com/zhufuyi/sponge/blob/main/assets/install-en.md#install-sponge-in-windows)
 
 <br>
 
@@ -94,6 +71,24 @@ Visit `http://localhost:24631` in your browser, 12 types of codes can be generat
 
 <br>
 
+Example of sql based web project code generation.
+
+<p align="center">
+<img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/web-http-en.gif">
+</p>
+
+After downloading the web project code, execute the command to start the service.
+
+```bash
+# update swagger
+make docs
+
+# build and run
+make run
+```
+
+<br>
+
 💡 If you don't want to use the UI interface, you can use the sponge command line to generate code. There is a wealth of examples in the command line helper information, and some of the code generation commands are more convenient than using the UI interface.
 
 <br>
@@ -104,7 +99,7 @@ Visit `http://localhost:24631` in your browser, 12 types of codes can be generat
 
 <br>
 
-**If it's useful to you, give it a star ⭐.**
+**If it's help to you, give it a star ⭐.**
 
 <br>
 

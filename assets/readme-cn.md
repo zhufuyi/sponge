@@ -29,38 +29,14 @@ sponge创建的微服务代码框架如下图所示，这是典型的微服务�
 💡 警告：
 
 > 有部分生成代码需要填写mysql账号和密码，不要在这里尝试，以免被暴露的风险。
-> 服务器资源有限，后面有可能无法使用，建议下载sponge二进制文件，运行UI服务得到同样的生成代码界面。
+> 服务器资源有限，有可能无法使用，建议下载sponge二进制文件，运行UI服务得到同样的生成代码界面。
 
 <br>
 
 ### 快速安装
 
-**(1) 安装 sponge**
-
-```bash
-go install github.com/zhufuyi/sponge/cmd/sponge@latest
-```
-
-<br>
-
-**(2) 安装 protoc**
-
-protoc 下载地址 `https://github.com/protocolbuffers/protobuf/releases/tag/v3.20.3`， 然后把 **protoc** 二进制文件添加到系统path下。
-
-<br>
-
-**(3) 安装依赖插件和工具**
-
-```bash
-sponge init
-```
-如果有插件安装出错 执行命令重试 `sponge tools --install`
-
-<br>
-
-💡 注意：
-
-> 如果使用windows环境, 还需要安装额外依赖工具, 安装详情看 [windows dependency tools](https://go-sponge.com/zh-cn/sponge-install?id=window%e7%8e%af%e5%a2%83%e5%ae%89%e8%a3%85%e4%be%9d%e8%b5%96%e5%b7%a5%e5%85%b7).
+- [在linux或macOS安装sponge](https://github.com/zhufuyi/sponge/blob/main/assets/install-cn.md#%E5%9C%A8linux%E6%88%96macos%E4%B8%8A%E5%AE%89%E8%A3%85sponge)
+- [在windows安装sponge](https://github.com/zhufuyi/sponge/blob/main/assets/install-cn.md#%E5%9C%A8windows%E4%B8%8A%E5%AE%89%E8%A3%85sponge)
 
 <br>
 

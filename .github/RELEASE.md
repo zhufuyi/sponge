@@ -1,4 +1,4 @@
 ## New
 
-- Update template code
-- Add binary automated deployment scripts
+- Adding secure transport to rpc
+- Adding token authentication to rpc communication
