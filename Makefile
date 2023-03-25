@@ -91,7 +91,8 @@ proto-doc:
 # build serverNameExample_mixExample for linux amd64 binary
 build:
 	@echo "building 'serverNameExample_mixExample', linux binary file will output to 'cmd/serverNameExample_mixExample'"
-	@cd cmd/serverNameExample_mixExample && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GOPROXY=https://goproxy.cn,direct go build -gcflags "all=-N -l"
+	@cd cmd/serverNameExample_mixExample && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GOPROXY=https://goproxy.cn,direct go build
+
 
 # delete the templates code start
 .PHONY: build-sponge
@@ -107,32 +108,35 @@ build-sponge:
 run:
 	@bash scripts/run.sh
 
+
 .PHONY: run-nohup
-# run service with nohup, if you want to stop the service, pass the parameter stop tag, e.g. make run-nohup TAG=stop
+# run server with nohup to local, if you want to stop the server, pass the parameter stop, e.g. make run-nohup CMD=stop
 run-nohup:
-	@bash scripts/run-nohup.sh $(TAG)
+	@bash scripts/run-nohup.sh $(CMD)
 
 
 .PHONY: docker-image
-# build docker image, use binary files to build
+# build image for local docker, tag=latest, use binary files to build
 docker-image: build
-	@bash scripts/grpc_health_probe.sh
-	@mv -f cmd/serverNameExample_mixExample/serverNameExample_mixExample build/serverNameExample
-	@mkdir -p build/configs && cp -f configs/serverNameExample.yml build/configs/
-	docker build -t project-name-example.server-name-example:latest build/
-	@rm -rf build/serverNameExample build/configs build/grpc_health_probe
+	@bash scripts/image-build-local.sh
 
 
 .PHONY: image-build
-# build docker image with parameters, use binary files to build, e.g. make image-build REPO_HOST=addr TAG=latest
+# build image for remote repositories, use binary files to build, e.g. make image-build REPO_HOST=addr TAG=latest
 image-build:
 	@bash scripts/image-build.sh $(REPO_HOST) $(TAG)
 
 
 .PHONY: image-build2
-# build docker image with parameters, phase II build, e.g. make image-build2 REPO_HOST=addr TAG=latest
+# build image for remote repositories, phase II build, e.g. make image-build2 REPO_HOST=addr TAG=latest
 image-build2:
 	@bash scripts/image-build2.sh $(REPO_HOST) $(TAG)
+
+
+.PHONY: image-build-rpc-test
+# build rpc test image for remote repositories, e.g. make image-build-rpc-test REPO_HOST=addr TAG=latest
+image-build-rpc-test:
+	@bash scripts/image-rpc-test.sh $(REPO_HOST) $(TAG)
 
 
 .PHONY: image-push
@@ -148,9 +152,9 @@ deploy-k8s:
 
 
 .PHONY: deploy-docker
-# deploy service to docker
+# deploy service to local docker, you must first run 'make docker-image' to generate a docker image, if you want to stop the server, pass the parameter stop, e.g. make deploy-docker CMD=stop
 deploy-docker:
-	@bash scripts/deploy-docker.sh
+	@bash scripts/deploy-docker.sh $(CMD)
 
 
 .PHONY: binary-package

@@ -14,6 +14,9 @@ cp -f cmd/${serviceName}_mixExample/${serviceName}_mixExample ${serviceName}-bin
 cp -f configs/${serviceName}.yml ${serviceName}-binary/configs
 cp -f configs/${serviceName}_cc.yml ${serviceName}-binary/configs
 
+# compressing binary file
+#upx -9 ${serviceName}_mixExample
+
 tar zcvf ${serviceName}-binary.tar.gz ${serviceName}-binary
 rm -rf ${serviceName}-binary
 

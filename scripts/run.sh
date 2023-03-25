@@ -17,7 +17,6 @@ function checkResult() {
 
 sleep 0.2
 
-# CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ${serverName}
 go build -o ${binaryFile} cmd/${serverName}/main.go
 checkResult $?
 

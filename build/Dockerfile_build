@@ -6,13 +6,19 @@ WORKDIR /go/src/serverNameExample
 RUN tar zxf serverNameExample.tar.gz
 RUN go env -w GOPROXY=https://goproxy.cn,direct
 RUN go mod download
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -gcflags "all=-N -l" -o /serverNameExample cmd/serverNameExample/main.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /serverNameExample cmd/serverNameExample/main.go
 
 # build grpc_health_probe
 RUN go install github.com/grpc-ecosystem/grpc-health-probe@v0.4.12
 RUN cd $GOPATH/pkg/mod/github.com/grpc-ecosystem/grpc-health-probe@v0.4.12 \
     && go mod download \
-    && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /grpc_health_probe
+    && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "all=-s -w" -o /grpc_health_probe
+
+# compressing binary files
+#cd /
+#upx -9 serverNameExample
+#upx -9 grpc_health_probe
+
 
 # building images with binary
 FROM alpine:latest
