@@ -34,6 +34,16 @@ func TestNewError(t *testing.T) {
 		AccessDenied,
 		MethodNotAllowed,
 		ServiceUnavailable,
+
+		Canceled,
+		Unknown,
+		PermissionDenied,
+		ResourceExhausted,
+		FailedPrecondition,
+		Aborted,
+		OutOfRange,
+		Unimplemented,
+		DataLoss,
 		NewError(1010, "unknown"),
 	}
 

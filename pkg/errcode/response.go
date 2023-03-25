@@ -85,26 +85,47 @@ func (resp *defaultResponse) Error(c *gin.Context, err error) bool {
 // ToHTTPErr converted to http error
 func ToHTTPErr(st *status.Status) *Error {
 	switch st.Code() {
-	case StatusSuccess.status.Code():
+	case StatusSuccess.status.Code(), codes.OK:
 		return Success
-	case StatusInternalServerError.status.Code():
-		return InternalServerError
-	case StatusInvalidParams.status.Code():
+	case StatusCanceled.status.Code(), codes.Canceled:
+		return Canceled
+	case StatusUnknown.status.Code(), codes.Unknown:
+		return Unknown
+	case StatusInvalidParams.status.Code(), codes.InvalidArgument:
 		return InvalidParams
-	case StatusUnauthorized.status.Code():
-		return Unauthorized
-	case StatusNotFound.status.Code():
-		return NotFound
-	case StatusDeadlineExceeded.status.Code():
+	case StatusDeadlineExceeded.status.Code(), codes.DeadlineExceeded:
 		return DeadlineExceeded
+	case StatusNotFound.status.Code(), codes.NotFound:
+		return NotFound
+	case StatusAlreadyExists.status.Code(), codes.AlreadyExists:
+		return AlreadyExists
+	case StatusPermissionDenied.status.Code(), codes.PermissionDenied:
+		return PermissionDenied
+	case StatusResourceExhausted.status.Code(), codes.ResourceExhausted:
+		return ResourceExhausted
+	case StatusFailedPrecondition.status.Code(), codes.FailedPrecondition:
+		return FailedPrecondition
+	case StatusAborted.status.Code(), codes.Aborted:
+		return Aborted
+	case StatusOutOfRange.status.Code(), codes.OutOfRange:
+		return OutOfRange
+	case StatusUnimplemented.status.Code(), codes.Unimplemented:
+		return Unimplemented
+	case StatusInternalServerError.status.Code(), codes.Internal:
+		return InternalServerError
+	case StatusServiceUnavailable.status.Code(), codes.Unavailable:
+		return ServiceUnavailable
+	case StatusDataLoss.status.Code(), codes.DataLoss:
+		return DataLoss
+	case StatusUnauthorized.status.Code(), codes.Unauthenticated:
+		return Unauthorized
+
 	case StatusAccessDenied.status.Code():
 		return AccessDenied
 	case StatusLimitExceed.status.Code():
 		return LimitExceed
 	case StatusMethodNotAllowed.status.Code():
 		return MethodNotAllowed
-	case StatusServiceUnavailable.status.Code():
-		return ServiceUnavailable
 	}
 
 	return &Error{
@@ -120,6 +141,9 @@ func getCodeInt(st *status.Status) int {
 	}
 
 	codeStr := code[5 : len(code)-1]
-	codeInt, _ := strconv.Atoi(codeStr)
+	codeInt, err := strconv.Atoi(codeStr)
+	if err != nil {
+		return -1
+	}
 	return codeInt
 }

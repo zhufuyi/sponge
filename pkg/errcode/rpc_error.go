@@ -62,24 +62,45 @@ func (g *RPCStatus) Err(details ...Detail) error {
 // ToRPCErr converted to standard RPC error
 func (g *RPCStatus) ToRPCErr(desc ...string) error {
 	switch g.status.Code() {
-	case StatusInternalServerError.status.Code():
-		return toRPCErr(codes.Internal, desc...)
+	case StatusCanceled.status.Code():
+		return toRPCErr(codes.Canceled, desc...)
+	case StatusUnknown.status.Code():
+		return toRPCErr(codes.Unknown, desc...)
 	case StatusInvalidParams.status.Code():
 		return toRPCErr(codes.InvalidArgument, desc...)
-	case StatusUnauthorized.status.Code():
-		return toRPCErr(codes.Unauthenticated, desc...)
-	case StatusNotFound.status.Code():
-		return toRPCErr(codes.NotFound, desc...)
 	case StatusDeadlineExceeded.status.Code():
 		return toRPCErr(codes.DeadlineExceeded, desc...)
+	case StatusNotFound.status.Code():
+		return toRPCErr(codes.NotFound, desc...)
+	case StatusAlreadyExists.status.Code():
+		return toRPCErr(codes.AlreadyExists, desc...)
+	case StatusPermissionDenied.status.Code():
+		return toRPCErr(codes.PermissionDenied, desc...)
+	case StatusResourceExhausted.status.Code():
+		return toRPCErr(codes.ResourceExhausted, desc...)
+	case StatusFailedPrecondition.status.Code():
+		return toRPCErr(codes.FailedPrecondition, desc...)
+	case StatusAborted.status.Code():
+		return toRPCErr(codes.Aborted, desc...)
+	case StatusOutOfRange.status.Code():
+		return toRPCErr(codes.OutOfRange, desc...)
+	case StatusUnimplemented.status.Code():
+		return toRPCErr(codes.Unimplemented, desc...)
+	case StatusInternalServerError.status.Code():
+		return toRPCErr(codes.Internal, desc...)
+	case StatusServiceUnavailable.status.Code():
+		return toRPCErr(codes.Unavailable, desc...)
+	case StatusDataLoss.status.Code():
+		return toRPCErr(codes.DataLoss, desc...)
+	case StatusUnauthorized.status.Code():
+		return toRPCErr(codes.Unauthenticated, desc...)
+
 	case StatusAccessDenied.status.Code():
 		return toRPCErr(codes.PermissionDenied, desc...)
 	case StatusLimitExceed.status.Code():
 		return toRPCErr(codes.ResourceExhausted, desc...)
 	case StatusMethodNotAllowed.status.Code():
 		return toRPCErr(codes.Unimplemented, desc...)
-	case StatusServiceUnavailable.status.Code():
-		return toRPCErr(codes.Unavailable, desc...)
 	}
 
 	return g.status.Err()
@@ -98,24 +119,45 @@ func toRPCErr(code codes.Code, descs ...string) error {
 // ToRPCCode converted to standard RPC error code
 func (g *RPCStatus) ToRPCCode() codes.Code {
 	switch g.status.Code() {
-	case StatusInternalServerError.status.Code():
-		return codes.Internal
+	case StatusCanceled.status.Code():
+		return codes.Canceled
+	case StatusUnknown.status.Code():
+		return codes.Unknown
 	case StatusInvalidParams.status.Code():
 		return codes.InvalidArgument
-	case StatusUnauthorized.status.Code():
-		return codes.Unauthenticated
-	case StatusNotFound.status.Code():
-		return codes.NotFound
 	case StatusDeadlineExceeded.status.Code():
 		return codes.DeadlineExceeded
+	case StatusNotFound.status.Code():
+		return codes.NotFound
+	case StatusAlreadyExists.status.Code():
+		return codes.AlreadyExists
+	case StatusPermissionDenied.status.Code():
+		return codes.PermissionDenied
+	case StatusResourceExhausted.status.Code():
+		return codes.ResourceExhausted
+	case StatusFailedPrecondition.status.Code():
+		return codes.FailedPrecondition
+	case StatusAborted.status.Code():
+		return codes.Aborted
+	case StatusOutOfRange.status.Code():
+		return codes.OutOfRange
+	case StatusUnimplemented.status.Code():
+		return codes.Unimplemented
+	case StatusInternalServerError.status.Code():
+		return codes.Internal
+	case StatusServiceUnavailable.status.Code():
+		return codes.Unavailable
+	case StatusDataLoss.status.Code():
+		return codes.DataLoss
+	case StatusUnauthorized.status.Code():
+		return codes.Unauthenticated
+
 	case StatusAccessDenied.status.Code():
 		return codes.PermissionDenied
 	case StatusLimitExceed.status.Code():
 		return codes.ResourceExhausted
 	case StatusMethodNotAllowed.status.Code():
 		return codes.Unimplemented
-	case StatusServiceUnavailable.status.Code():
-		return codes.Unavailable
 	}
 
 	return g.status.Code()

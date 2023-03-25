@@ -85,14 +85,18 @@ make run
 - [01 sponge的形成过程](https://www.bilibili.com/video/BV1s14y1F7Fz/)
 - [02 sponge的框架介绍](https://www.bilibili.com/video/BV13u4y1F7EU/)
 - [03 生成web服务完整工程代码](https://www.bilibili.com/video/BV1RY411k7SE/)
-- [04 生成API接口代码到web服务中](https://www.bilibili.com/video/BV1AY411C7J7/)
-- [05 基于protobuf生成web服务定制化代码](https://www.bilibili.com/video/BV1CX4y1D7xj/)
-- [06 生成自定义API接口到web服务中](https://www.bilibili.com/video/BV1P54y1g7J9/)
+- [04 生成CRUD接口代码到web服务](https://www.bilibili.com/video/BV1AY411C7J7/)
+- [05 基于protobuf生成web服务代码](https://www.bilibili.com/video/BV1CX4y1D7xj/)
+- [06 生成任意API接口代码到web服务](https://www.bilibili.com/video/BV1P54y1g7J9/)
+- [07 生成微服务(grpc)完整工程代码](https://www.bilibili.com/video/BV1Tg4y1b79U/)
+- [08 生成CRUD代码到rpc服务](https://www.bilibili.com/video/BV1TY411z7rY/)
+- [09 生成通用型微服务完整工程代码](https://www.bilibili.com/video/BV1WY4y1X7zH/)
+- [10 批量生成rpc方法代码到rpc服务](https://www.bilibili.com/video/BV1Yo4y1q76o/)
 - [十分钟搭建一个拥有多个微服务的go语言工程项目](https://www.bilibili.com/video/BV1pP4y1y7hA/)
 
 <br>
 
-如果对您有帮组给个star⭐，欢迎加入[go sponge微信群交流](https://pan.baidu.com/s/1NZgPb2v_8tAnBuwyeFyE_g?pwd=spon)。
+如果对您有帮助给个star⭐，欢迎加入[go sponge微信群交流](https://pan.baidu.com/s/1NZgPb2v_8tAnBuwyeFyE_g?pwd=spon)。
 
 ![wechat-group](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/wechat-group.png)
 

@@ -22,19 +22,28 @@ func TestRPCStatus(t *testing.T) {
 func TestToRPCCode(t *testing.T) {
 	status := []*RPCStatus{
 		StatusSuccess,
+		StatusCanceled,
+		StatusUnknown,
 		StatusInvalidParams,
-		StatusUnauthorized,
-		StatusInternalServerError,
+		StatusDeadlineExceeded,
 		StatusNotFound,
 		StatusAlreadyExists,
+		StatusPermissionDenied,
+		StatusResourceExhausted,
+		StatusFailedPrecondition,
+		StatusAborted,
+		StatusOutOfRange,
+		StatusUnimplemented,
+		StatusInternalServerError,
+		StatusServiceUnavailable,
+		StatusDataLoss,
+		StatusUnauthorized,
 		StatusTimeout,
 		StatusTooManyRequests,
 		StatusForbidden,
 		StatusLimitExceed,
-		StatusDeadlineExceeded,
-		StatusAccessDenied,
 		StatusMethodNotAllowed,
-		StatusServiceUnavailable,
+		StatusAccessDenied,
 	}
 
 	var codes []string

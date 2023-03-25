@@ -1,4 +1,4 @@
 ## New
 
-- Adding secure transport to rpc
-- Adding token authentication to rpc communication
+- Add rpc telemetry service test docker image.
+- Improve rpc error codes to http error codes.
