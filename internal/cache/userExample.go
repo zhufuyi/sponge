@@ -24,7 +24,7 @@ var _ UserExampleCache = (*userExampleCache)(nil)
 // UserExampleCache cache interface
 type UserExampleCache interface {
 	Set(ctx context.Context, id uint64, data *model.UserExample, duration time.Duration) error
-	Get(ctx context.Context, id uint64) (ret *model.UserExample, err error)
+	Get(ctx context.Context, id uint64) (*model.UserExample, error)
 	MultiGet(ctx context.Context, ids []uint64) (map[string]*model.UserExample, error)
 	MultiSet(ctx context.Context, data []*model.UserExample, duration time.Duration) error
 	Del(ctx context.Context, id uint64) error

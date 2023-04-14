@@ -20,7 +20,8 @@ import (
 )
 
 var (
-	routerFns []func(*gin.RouterGroup) // routing Collections
+	apiV1RouterFns []func(*gin.RouterGroup) // router functions
+	// if you have other group routes you can define them here
 )
 
 // NewRouter create a new router
@@ -79,11 +80,16 @@ func NewRouter() *gin.Engine {
 	// access path /swagger/index.html
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	apiV1 := r.Group("/api/v1")
-	// register/api/v1 prefix routing group
-	for _, fn := range routerFns {
-		fn(apiV1)
-	}
+	// register routers
+	registerRouters(r, "/api/v1", apiV1RouterFns)
+	// if you have other group routes you can add them here
 
 	return r
+}
+
+func registerRouters(r *gin.Engine, groupPath string, routerFns []func(*gin.RouterGroup), handlers ...gin.HandlerFunc) {
+	rg := r.Group(groupPath, handlers...)
+	for _, fn := range routerFns {
+		fn(rg)
+	}
 }
