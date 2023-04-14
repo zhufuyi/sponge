@@ -1,4 +1,4 @@
-## sponge [中文](assets/readme-cn.md)
+## sponge [中文文档](assets/readme-cn.md)
 
 <p align="center">
 <img width="500px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/logo.png">
@@ -15,7 +15,7 @@
 
 </div>
 
-[sponge](https://github.com/zhufuyi/sponge) is a microservice framework and a tool for quickly creating web and microservice code. sponge has a rich set of generated code commands, generating a total of 12 different functional codes that can be combined into complete services (similar to a sponge that has been artificially broken up cells can be automatically reassembled into a new sponge). Microservice code functions include logging, service registration and discovery, registry, rate limit, circuit breaker, tracking, monitoring, pprof performance analysis, statistics, caching, CICD and more. The decoupled modular design makes it easy to build complete project code from development to deployment, making development in the go language more convenient, easy and efficient.
+[sponge](https://github.com/zhufuyi/sponge) is a powerful tool for generating code for web and microservice projects, and a microservice framework based on gin and grpc packaging. sponge has a rich set of code generation commands, generating a total of 12 different functional codes that can be These can be combined into a complete service (similar to a sponge cell that can be automatically reassembled into a new sponge). Microservice code features include logging, service registration and discovery, registry, flow limiting, fusing, link tracking, metrics monitoring, pprof performance analysis, statistics, caching, CICD and more. The code decoupled modular design makes it easy to build complete project code from development to deployment, making it more convenient, easy and efficient to develop projects using the go language.
 
 <br>
 

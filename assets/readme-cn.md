@@ -2,7 +2,7 @@
 
 <br>
 
-### sponge 生成代码框架
+### 生成代码的命令框架
 
 生成代码基于**Yaml**、**SQL**和**Protobuf**三种方式，每种方式拥有生成不同功能代码，生成代码的框架图如下所示：
 
@@ -29,11 +29,11 @@ sponge创建的微服务代码框架如下图所示，这是典型的微服务�
 💡 警告：
 
 > 有部分生成代码需要填写mysql账号和密码，不要在这里尝试，以免被暴露的风险。
-> 服务器资源有限，有可能无法使用，建议下载sponge二进制文件，运行UI服务得到同样的生成代码界面。
+> 服务器资源有限，有可能无法使用，请在本地安装sponge使用。
 
 <br>
 
-### 快速安装
+### 快速安装sponge
 
 - [在linux或macOS安装sponge](https://github.com/zhufuyi/sponge/blob/main/assets/install-cn.md#%E5%9C%A8linux%E6%88%96macos%E4%B8%8A%E5%AE%89%E8%A3%85sponge)
 - [在windows安装sponge](https://github.com/zhufuyi/sponge/blob/main/assets/install-cn.md#%E5%9C%A8windows%E4%B8%8A%E5%AE%89%E8%A3%85sponge)
@@ -76,23 +76,26 @@ make run
 
 ### 文档
 
-[sponge 使用文档](sponge-doc-cn.md)
+[sponge 使用文档](https://go-sponge.com/zh-cn/)
 
 <br>
 
-### 视频
+### 视频介绍
 
 - [01 sponge的形成过程](https://www.bilibili.com/video/BV1s14y1F7Fz/)
 - [02 sponge的框架介绍](https://www.bilibili.com/video/BV13u4y1F7EU/)
-- [03 生成web服务完整工程代码](https://www.bilibili.com/video/BV1RY411k7SE/)
-- [04 生成CRUD接口代码到web服务](https://www.bilibili.com/video/BV1AY411C7J7/)
-- [05 基于protobuf生成web服务代码](https://www.bilibili.com/video/BV1CX4y1D7xj/)
-- [06 生成任意API接口代码到web服务](https://www.bilibili.com/video/BV1P54y1g7J9/)
-- [07 生成微服务(grpc)完整工程代码](https://www.bilibili.com/video/BV1Tg4y1b79U/)
-- [08 生成CRUD代码到rpc服务](https://www.bilibili.com/video/BV1TY411z7rY/)
-- [09 生成通用型微服务完整工程代码](https://www.bilibili.com/video/BV1WY4y1X7zH/)
+- [03 一键生成web服务完整项目代码](https://www.bilibili.com/video/BV1RY411k7SE/)
+- [04 批量生成CRUD接口代码到web服务](https://www.bilibili.com/video/BV1AY411C7J7/)
+- [05 一键生成通用的web服务项目代码](https://www.bilibili.com/video/BV1CX4y1D7xj/)
+- [06 批量生成任意API接口代码到web服务](https://www.bilibili.com/video/BV1P54y1g7J9/)
+- [07 一键生成rpc服务完整项目代码](https://www.bilibili.com/video/BV1Tg4y1b79U/)
+- [08 批量生成CRUD代码到rpc服务](https://www.bilibili.com/video/BV1TY411z7rY/)
+- [09 一键生成通用的rpc服务完整项目代码](https://www.bilibili.com/video/BV1WY4y1X7zH/)
 - [10 批量生成rpc方法代码到rpc服务](https://www.bilibili.com/video/BV1Yo4y1q76o/)
-- [十分钟搭建一个拥有多个微服务的go语言工程项目](https://www.bilibili.com/video/BV1pP4y1y7hA/)
+- [11 rpc测试神器，简单便捷](https://www.bilibili.com/video/BV1VT411z7oj/)
+- [12 一键生成rpc网关服务完整项目代码](https://www.bilibili.com/video/BV1mV4y1D7k9/)
+- [13 十分钟搭建一个微服务集群示例](https://www.bilibili.com/video/BV1YM4y127YK/)
+- [14 sponge实战：用chatGPT打造你的专属面试题库](https://www.bilibili.com/video/BV1V24y1w7wG/)
 
 <br>
 

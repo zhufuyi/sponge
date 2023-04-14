@@ -1,4 +1,5 @@
 ## New
 
-- Add rpc telemetry service test docker image.
-- Improve rpc error codes to http error codes.
+- Optimize the UI interface of sponge, add proto file demo.
+- Add routing groups for the web.
+- Update documentation.

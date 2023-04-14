@@ -10,6 +10,8 @@
 go version
 ```
 
+注：把go install命令编译生成的二进制文件所在目录(通常是$GOPATH/bin)添加到系统目录下。
+
 <br>
 
 #### (2) 安装 protoc，要求v3.20以上版本
@@ -60,6 +62,8 @@ sponge -v
 go version
 ```
 
+注：把go install命令编译生成的二进制文件所在目录(通常是$GOPATH/bin)添加到系统目录下。
+
 <br>
 
 #### (2) 安装 protoc，v3.20以上版本
@@ -105,12 +109,14 @@ make -v
 下载后解压到`D:\Program Files\cmder`目录下，修改系统环境变量PATH，新增`D:\Program Files\cmder`。
 
 打开`Cmder.exe`终端，检查是否支持常用的linux命令。
+
 ```bash
 ls --version
 make --version
 cp --version
 chmod --version
 rm --version
+go --version
 ```
 
 <br>
@@ -120,7 +126,7 @@ rm --version
 打开`cmder.exe`终端(不是windows自带的cmd)，执行命令安装sponge：
 
 ```bash
-# 安装sponge
+# 安装sponge，安装完后，sponge二进制文件所在目录添加到系统path
 go install github.com/zhufuyi/sponge/cmd/sponge@latest
 
 # 初始化sponge
