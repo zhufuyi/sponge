@@ -90,17 +90,17 @@ import (
 )
 
 func init() {
-	rootRouterFns = append(rootRouterFns, func(r *gin.Engine) {
+	apiV1RouterFns = append(apiV1RouterFns, func(prePath string, group *gin.RouterGroup) {
 {{- range .PbServices}}
-		{{.LowerName}}Router(r, handler.New{{.Name}}Handler())
+		{{.LowerName}}Router(prePath, group, handler.New{{.Name}}Handler())
 {{- end}}
 	})
 }
 
 {{- range .PbServices}}
 
-func {{.LowerName}}Router(r *gin.Engine, iService serverNameExampleV1.{{.Name}}Logicer) {
-	serverNameExampleV1.Register{{.Name}}Router(r, iService,
+func {{.LowerName}}Router(prePath string, group *gin.RouterGroup, iService serverNameExampleV1.{{.Name}}Logicer) {
+	serverNameExampleV1.Register{{.Name}}Router(prePath, group, iService,
 		serverNameExampleV1.With{{.Name}}RPCResponse(),
 		serverNameExampleV1.With{{.Name}}Logger(logger.Get()),
 	)

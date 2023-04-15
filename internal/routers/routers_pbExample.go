@@ -18,8 +18,12 @@ import (
 	"github.com/gin-gonic/gin/binding"
 )
 
+// nolint
 var (
-	rootRouterFns []func(engine *gin.Engine) // root routing group, used by rpc gateway
+	apiV1RouterFns_pbExample []func(prePath string, engine *gin.RouterGroup) // group router functions
+	// if you have other group routes you can define them here
+	// example:
+	//     myPrePathRouterFns []func(prePath string, engine *gin.RouterGroup)
 )
 
 // NewRouter_pbExample create a new router
@@ -76,10 +80,20 @@ func NewRouter_pbExample() *gin.Engine { //nolint
 	// access path /apis/swagger/index.html
 	swagger.CustomRouter(r, "apis", docs.ApiDocs)
 
-	// registration/Prefix Routing Groups
-	for _, fn := range rootRouterFns {
-		fn(r)
-	}
+	// register routers, middleware support
+	registerRouters_pbExample(r, "/api/v1", apiV1RouterFns_pbExample)
+	// if you have other group routes you can add them here
+	// example:
+	//    registerRouters(r, "/myPrePath", myPrePathRouterFns, middleware.Auth())
 
 	return r
+}
+
+// nolint
+func registerRouters_pbExample(r *gin.Engine, prePath string,
+	routerFns []func(prePath string, engine *gin.RouterGroup), handlers ...gin.HandlerFunc) {
+	rg := r.Group(prePath, handlers...)
+	for _, fn := range routerFns {
+		fn(prePath, rg)
+	}
 }

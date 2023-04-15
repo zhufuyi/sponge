@@ -38,7 +38,8 @@ func TestNewRouter_pbExample(t *testing.T) {
 func Test_userExampleServiceRouter(t *testing.T) {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
-	userExampleServiceRouter(r, &mockGw{})
+	rg := r.Group("")
+	userExampleServiceRouter("", rg, &mockGw{})
 }
 
 type mockGw struct{}

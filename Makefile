@@ -176,6 +176,7 @@ clean:
 	@rm -vrf cover.out
 	@rm -vrf main.go serverNameExample_mixExample.gv
 	@rm -vrf internal/ecode/*go.gen.*
+	@rm -vrf internal/routers/*go.gen.*
 	@rm -vrf internal/handller/*go.gen.*
 	@rm -vrf internal/service/*go.gen.*
 	@rm -rf serverNameExample-binary.tar.gz

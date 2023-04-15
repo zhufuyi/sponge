@@ -20,8 +20,10 @@ import (
 )
 
 var (
-	apiV1RouterFns []func(*gin.RouterGroup) // router functions
+	apiV1RouterFns []func(*gin.RouterGroup) // group router functions
 	// if you have other group routes you can define them here
+	// example:
+	//     myPrePathRouterFns []func(prePath string, engine *gin.RouterGroup)
 )
 
 // NewRouter create a new router
@@ -80,9 +82,11 @@ func NewRouter() *gin.Engine {
 	// access path /swagger/index.html
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	// register routers
+	// register routers, middleware support
 	registerRouters(r, "/api/v1", apiV1RouterFns)
 	// if you have other group routes you can add them here
+	// example:
+	//    registerRouters(r, "/myGroupPath", myGroupPathRouterFns, middleware.Auth())
 
 	return r
 }

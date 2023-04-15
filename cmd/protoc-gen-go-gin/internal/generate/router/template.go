@@ -58,7 +58,7 @@ func With{{$.Name}}Logger(zapLog *zap.Logger) {{$.Name}}Option {
 	}
 }
 
-func Register{{$.Name}}Router(iRouter gin.IRouter, iLogic {{$.Name}}Logicer, opts ...{{$.Name}}Option) {
+func Register{{$.Name}}Router(prePath string, iRouter gin.IRouter, iLogic {{$.Name}}Logicer, opts ...{{$.Name}}Option) {
 	o := &{{$.LowerName}}Options{}
 	o.apply(opts...)
 
@@ -70,6 +70,7 @@ func Register{{$.Name}}Router(iRouter gin.IRouter, iLogic {{$.Name}}Logicer, opt
 	}
 
 	r := &{{$.LowerName}}Router {
+		prePath:   prePath,
 		iRouter:   iRouter,
 		iLogic:    iLogic,
 		iResponse: o.responser,
@@ -79,6 +80,7 @@ func Register{{$.Name}}Router(iRouter gin.IRouter, iLogic {{$.Name}}Logicer, opt
 }
 
 type {{$.LowerName}}Router struct {
+	prePath   string
 	iRouter   gin.IRouter
 	iLogic    {{$.Name}}Logicer
 	iResponse errcode.Responser
@@ -86,8 +88,26 @@ type {{$.LowerName}}Router struct {
 }
 
 func (r *{{$.LowerName}}Router) register() {
-{{range .Methods}}r.iRouter.Handle("{{.Method}}", "{{.Path}}", r.{{ .HandlerName }})
+{{range .Methods}}r.iRouter.Handle("{{.Method}}", r.cutPrePath("{{.Path}}"), r.{{ .HandlerName }})
 {{end}}
+}
+
+func (r *{{$.LowerName}}Router) cutPrePath(path string)string{
+	if r.prePath==""||r.prePath=="/"{
+		return path
+	}
+	size:=len(r.prePath)
+	if len(path)<=size{
+		return path
+	}
+	if r.prePath==path[:size]{
+		cutPath:=path[size:]
+		if cutPath[0]!='/'{
+			cutPath="/"+cutPath
+		}
+		return cutPath
+	}
+	return path
 }
 
 {{range .Methods}}

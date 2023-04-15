@@ -59,7 +59,7 @@ func WithUserExampleServiceLogger(zapLog *zap.Logger) UserExampleServiceOption {
 	}
 }
 
-func RegisterUserExampleServiceRouter(iRouter gin.IRouter, iLogic UserExampleServiceLogicer, opts ...UserExampleServiceOption) {
+func RegisterUserExampleServiceRouter(prePath string, iRouter gin.IRouter, iLogic UserExampleServiceLogicer, opts ...UserExampleServiceOption) {
 	o := &userExampleServiceOptions{}
 	o.apply(opts...)
 
@@ -71,6 +71,7 @@ func RegisterUserExampleServiceRouter(iRouter gin.IRouter, iLogic UserExampleSer
 	}
 
 	r := &userExampleServiceRouter{
+		prePath:   prePath,
 		iRouter:   iRouter,
 		iLogic:    iLogic,
 		iResponse: o.responser,
@@ -84,16 +85,34 @@ type userExampleServiceRouter struct {
 	iLogic    UserExampleServiceLogicer
 	iResponse errcode.Responser
 	zapLog    *zap.Logger
+	prePath   string
 }
 
 func (r *userExampleServiceRouter) register() {
-	r.iRouter.Handle("POST", "/api/v1/userExample", r.Create_0)
-	r.iRouter.Handle("DELETE", "/api/v1/userExample/:id", r.DeleteByID_0)
-	r.iRouter.Handle("PUT", "/api/v1/userExample/:id", r.UpdateByID_0)
-	r.iRouter.Handle("GET", "/api/v1/userExample/:id", r.GetByID_0)
-	r.iRouter.Handle("POST", "/api/v1/userExamples/ids", r.ListByIDs_0)
-	r.iRouter.Handle("POST", "/api/v1/userExamples", r.List_0)
+	r.iRouter.Handle("POST", r.cutPrePath("/api/v1/userExample"), r.Create_0)
+	r.iRouter.Handle("DELETE", r.cutPrePath("/api/v1/userExample/:id"), r.DeleteByID_0)
+	r.iRouter.Handle("PUT", r.cutPrePath("/api/v1/userExample/:id"), r.UpdateByID_0)
+	r.iRouter.Handle("GET", r.cutPrePath("/api/v1/userExample/:id"), r.GetByID_0)
+	r.iRouter.Handle("POST", r.cutPrePath("/api/v1/userExamples/ids"), r.ListByIDs_0)
+	r.iRouter.Handle("POST", r.cutPrePath("/api/v1/userExamples"), r.List_0)
+}
 
+func (r *userExampleServiceRouter) cutPrePath(path string) string {
+	if r.prePath == "" || r.prePath == "/" {
+		return path
+	}
+	size := len(r.prePath)
+	if len(path) <= size {
+		return path
+	}
+	if r.prePath == path[:size] {
+		cutPath := path[size:]
+		if cutPath[0] != '/' {
+			cutPath = "/" + cutPath
+		}
+		return cutPath
+	}
+	return path
 }
 
 func (r *userExampleServiceRouter) Create_0(c *gin.Context) {
