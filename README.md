@@ -45,10 +45,7 @@ The microservice code framework created by sponge is shown in Figure 1-2, this i
 
 Online code generation demo: [https://go-sponge.com/ui](https://go-sponge.com/ui)
 
-💡 Warning.
-
-> Some of the generated code requires mysql account and password, do not try here to avoid the risk of being exposed.
-> Server resources are limited and may not be available later. It is recommended to download the sponge binary and run the UI service to get the same generated code interface.
+💡 It is recommended to install sponge locally.
 
 <br>
 
@@ -61,7 +58,7 @@ Online code generation demo: [https://go-sponge.com/ui](https://go-sponge.com/ui
 
 ### Quick start
 
-Once you have installed sponge and the dependencies, you are ready to go, start the ui service from the command line:
+After installing the sponge, start the UI service:
 
 ```bash
 sponge run
@@ -89,7 +86,18 @@ make run
 
 <br>
 
-💡 If you don't want to use the UI interface, you can use the sponge command line to generate code. There is a wealth of examples in the command line helper information, and some of the code generation commands are more convenient than using the UI interface.
+💡 If you don't want to use the UI interface, you can use the sponge command line to generate code, there is a wealth of examples in the command line helper information, and some of the code generation commands are more convenient than using the UI interface.
+
+<br>
+
+### examples
+
+- [Generate the complete web service project code](https://github.com/zhufuyi/sponge/tree/main/examples/1_web-gin-CRUD)
+- [Generate generic web service project code](https://github.com/zhufuyi/sponge/tree/main/examples/2_web-gin-protobuf)
+- [Generate complete microservice(gRPC) project code](https://github.com/zhufuyi/sponge/tree/main/examples/3_micro-grpc-CRUD)
+- [Generates generic microservice(gRPC) project code](https://github.com/zhufuyi/sponge/tree/main/examples/4_micro-grpc-protobuf)
+- [Generate rpc gateway service project code](https://github.com/zhufuyi/sponge/tree/main/examples/5_micro-gin-rpc-gateway)
+- [Generate microservice cluster project code](https://github.com/zhufuyi/sponge/tree/main/examples/6_micro-cluster)
 
 <br>
 

@@ -24,12 +24,9 @@ sponge创建的微服务代码框架如下图所示，这是典型的微服务�
 
 ### 在线生成代码demo
 
-在线生成代码demo： [https://go-sponge.com/ui](https://go-sponge.com/ui/micro-rpc-gw-pb)
+在线生成代码demo： [https://go-sponge.com/ui](https://go-sponge.com/ui)
 
-💡 警告：
-
-> 有部分生成代码需要填写mysql账号和密码，不要在这里尝试，以免被暴露的风险。
-> 服务器资源有限，有可能无法使用，请在本地安装sponge使用。
+💡 建议在本地安装sponge来使用。
 
 <br>
 
@@ -42,7 +39,7 @@ sponge创建的微服务代码框架如下图所示，这是典型的微服务�
 
 ### 快速开始
 
-启动命令行的UI服务：
+安装完成sponge后，启动UI服务：
 
 ```bash
 sponge run
@@ -52,7 +49,7 @@ sponge run
 
 <br>
 
-基于sql生成web项目代码示例：
+生成web项目代码示例：
 
 <p align="center">
 <img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/web-http.gif">
@@ -77,6 +74,17 @@ make run
 ### 文档
 
 [sponge 使用文档](https://go-sponge.com/zh-cn/)
+
+<br>
+
+### 示例
+
+- [生成完整的web服务项目代码](https://www.bilibili.com/read/cv23018269)
+- [生成通用的web服务项目代码](https://www.bilibili.com/read/cv23040234)
+- [生成完整的微服务(gRPC)项目代码](https://www.bilibili.com/read/cv23064432)
+- [生成通用的微服务(gRPC)项目代码](https://www.bilibili.com/read/cv23099236)
+- [生成rpc网关服务项目代码](https://www.bilibili.com/read/cv23189890)
+- [生成微服务集群项目代码](https://www.bilibili.com/read/cv23255594)
 
 <br>
 
