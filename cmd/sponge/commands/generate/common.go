@@ -22,6 +22,8 @@ var (
 	modelFile     = "model/userExample.go"
 	modelFileMark = "// todo generate model codes to here"
 
+	cacheFile = "cache/cacheNameExample.go"
+
 	daoFile     = "dao/userExample.go"
 	daoFileMark = "// todo generate the update fields code to here"
 	daoTestFile = "dao/userExample_test.go"

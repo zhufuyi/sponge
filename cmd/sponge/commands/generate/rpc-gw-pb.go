@@ -108,6 +108,13 @@ func runGenRPCGwCommand(moduleName string, serverName string, projectName string
 	_ = saveGenInfo(moduleName, serverName, r.GetOutputDir())
 
 	fmt.Printf("generate %s's rpc gateway service codes successfully, out = %s\n\n", serverName, r.GetOutputDir())
+	fmt.Printf(`Instructions for use:
+	1. open a terminal and execute the commands to generate the *pb.go file, generate the service template code, and update the swagger documentation: make proto
+	2. open 'internal/service/xxx_logic.go' file, replace panic("implement me") according to template code example. 
+	3. compiling and starting services: make run
+	4. copy the "http://localhost:8080/apis/swagger/index.html" to your browser to test the api interface.
+
+`)
 
 	return nil
 }

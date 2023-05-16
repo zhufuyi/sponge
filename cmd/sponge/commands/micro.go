@@ -20,11 +20,12 @@ func MicroCommand() *cobra.Command {
 		generate.ProtoBufCommand(),
 		generate.ModelCommand("micro"),
 		generate.DaoCommand("micro"),
+		generate.CacheCommand("micro"),
 		generate.ServiceCommand(),
 		generate.RPCCommand(),
 		generate.RPCGwPbCommand(),
 		generate.RPCPbCommand(),
-		generate.RPCClientCommand(),
+		generate.RPCConnectionCommand(),
 	)
 
 	return cmd

@@ -108,7 +108,13 @@ func runGenHTTPPbCommand(moduleName string, serverName string, projectName strin
 	_ = saveGenInfo(moduleName, serverName, r.GetOutputDir())
 
 	fmt.Printf("generate %s's http server codes successfully, out = %s\n\n", serverName, r.GetOutputDir())
+	fmt.Printf(`Instructions for use:
+	1. open a terminal and execute the commands to generate the *pb.go file, generate the handler template code and update the swagger documentation: make docs
+	3. open file 'internal/handler/xxx_logic.go', replace panic("implement me") according to template code example.
+	3. compiling and starting services: make run
+	4. copy the 'http://localhost:8080/apis/swagger/index.html' to your browser, and test the api interface.
 
+`)
 	return nil
 }
 
