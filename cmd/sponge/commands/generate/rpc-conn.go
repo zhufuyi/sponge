@@ -19,7 +19,7 @@ func RPCConnectionCommand() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "rpc-cli",
+		Use:   "rpc-conn",
 		Short: "Generate rpc connection codes",
 		Long: `generate rpc connection codes.
 
@@ -58,8 +58,8 @@ Examples:
 				}
 			}
 
-			fmt.Printf("generate 'rpc-conn' codes successfully, out = %s\n\n", outPath)
-			fmt.Printf(`Instructions for use:
+			fmt.Printf("generate 'rpc-conn' codes successfully, out = %s\n", outPath)
+			fmt.Printf(`help for use:
 	Move the rpc connection code to the web or microservice project.
 
 `)

@@ -58,7 +58,7 @@ func NewCacheNameExampleCache(cacheType *model.CacheType) CacheNameExampleCache 
 	}
 }
 
-// GetCacheNameExampleCacheKey cache key
+// cache key
 func (c *cacheNameExampleCache) getCacheKey(keyNameExample keyTypeExample) string {
 	return fmt.Sprintf("%s%v", cacheNameExampleCachePrefixKey, keyNameExample)
 }
@@ -69,7 +69,7 @@ func (c *cacheNameExampleCache) Set(ctx context.Context, keyNameExample keyTypeE
 	return c.cache.Set(ctx, cacheKey, &valueNameExample, duration)
 }
 
-// Get cache value
+// Get cache
 func (c *cacheNameExampleCache) Get(ctx context.Context, keyNameExample keyTypeExample) (valueTypeExample, error) {
 	var valueNameExample valueTypeExample
 	cacheKey := c.getCacheKey(keyNameExample)

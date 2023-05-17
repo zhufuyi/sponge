@@ -107,8 +107,8 @@ func runGenHTTPPbCommand(moduleName string, serverName string, projectName strin
 	_ = saveProtobufFiles(moduleName, serverName, r.GetOutputDir(), protobufFiles)
 	_ = saveGenInfo(moduleName, serverName, r.GetOutputDir())
 
-	fmt.Printf("generate %s's http server codes successfully, out = %s\n\n", serverName, r.GetOutputDir())
-	fmt.Printf(`Instructions for use:
+	fmt.Printf("generate %s's http server codes successfully, out = %s\n", serverName, r.GetOutputDir())
+	fmt.Printf(`help for use:
 	1. open a terminal and execute the commands to generate the *pb.go file, generate the handler template code and update the swagger documentation: make docs
 	3. open file 'internal/handler/xxx_logic.go', replace panic("implement me") according to template code example.
 	3. compiling and starting services: make run

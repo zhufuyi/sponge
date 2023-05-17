@@ -75,8 +75,8 @@ Examples:
 				}
 			}
 
-			fmt.Printf("generate 'protocol buffers' codes successfully, out = %s\n\n", outPath)
-			fmt.Printf(`Instructions for use:
+			fmt.Printf("generate 'protocol buffers' codes successfully, out = %s\n", outPath)
+			fmt.Printf(`help for use:
 	The proto file can be used in the following scenarios.
 	  ● generate swagger documents.
 	  ● generate the required code as a custom plug-in for protoc.

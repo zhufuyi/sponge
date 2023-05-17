@@ -76,8 +76,8 @@ Examples:
 				}
 			}
 
-			fmt.Printf("generate 'dao' codes successfully, out = %s\n\n", outPath)
-			fmt.Printf(`Instructions for use:
+			fmt.Printf("generate 'dao' codes successfully, out = %s\n", outPath)
+			fmt.Printf(`help for use:
 	Move the code to the web or rpc project folder.
 
 `)

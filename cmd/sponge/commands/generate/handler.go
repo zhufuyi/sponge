@@ -76,8 +76,8 @@ Examples:
 				}
 			}
 
-			fmt.Printf("generate 'handler' codes successfully, out = %s\n\n", outPath)
-			fmt.Printf(`Instructions for use:
+			fmt.Printf("generate 'handler' codes successfully, out = %s\n", outPath)
+			fmt.Printf(`help for use:
 	1. move the code to the web project folder.
 	2. open a terminal and execute the command to update the swagger documentation in the web project folder: make docs
 	3. compiling and starting services: make run

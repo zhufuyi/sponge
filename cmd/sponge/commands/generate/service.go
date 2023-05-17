@@ -83,8 +83,8 @@ Examples:
 				}
 			}
 
-			fmt.Printf("generate 'service' codes successfully, out = %s\n\n", outPath)
-			fmt.Printf(`Instructions for use:
+			fmt.Printf("generate 'service' codes successfully, out = %s\n", outPath)
+			fmt.Printf(`help for use:
 	1. move the code to the rpc project folder.
 	2. open a terminal and execute the command to generate code in the rpc project folder: make proto
 	3. compiling and starting services: make run

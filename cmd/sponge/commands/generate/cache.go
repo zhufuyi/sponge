@@ -51,7 +51,11 @@ Examples:
 				outPath = dir
 			}
 
-			fmt.Printf("generate 'cache' codes successfully, out = %s\n\n", outPath)
+			fmt.Printf("generate 'cache' codes successfully, out = %s\n", outPath)
+			fmt.Printf(`help for use:
+	Move the code to the web or rpc project folder.
+
+`)
 			return nil
 		},
 	}
