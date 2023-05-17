@@ -1,5 +1,5 @@
 ## New
 
-- Add 6 examples of use.
-- Optimize the UI interface of sponge.
+- Add a generate cache code command and UI interface.
+- Add a real project microservice cluster example.
 - Update documentation.

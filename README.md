@@ -15,7 +15,7 @@
 
 </div>
 
-[sponge](https://github.com/zhufuyi/sponge) is a powerful tool for generating code for web and microservice projects, and a microservice framework based on gin and grpc packaging. sponge has a rich set of code generation commands, generating a total of 12 different functional codes that can be These can be combined into a complete service (similar to a sponge cell that can be automatically reassembled into a new sponge). Microservice code features include logging, service registration and discovery, registry, flow limiting, fusing, link tracking, metrics monitoring, pprof performance analysis, statistics, caching, CICD and more. The code decoupled modular design makes it easy to build complete project code from development to deployment, making it more convenient, easy and efficient to develop projects using the go language.
+[sponge](https://github.com/zhufuyi/sponge) is a powerful tool for generating web and microservice code, as well as a microservice framework based on gin and grpc encapsulation. Sponge has a wealth of code generation commands, and different functional codes can be combined to form a complete service (similar to artificially scattered sponge cells that can automatically recombine into a new sponge). Microservice code functions include logging, service registration and discovery, registration center, flow control, fuse, link tracking, metric monitoring, pprof performance analysis, statistics, cache, CICD and other functions. The code is decoupled and modularly designed, making it easy to build complete engineering code from development to deployment, making it more convenient, easy and efficient to develop with Go language.
 
 <br>
 
@@ -41,11 +41,23 @@ The microservice code framework created by sponge is shown in Figure 1-2, this i
 
 <br>
 
-### Online code generation demo
+### Supported code types for generation
 
-Online code generation demo: [https://go-sponge.com/ui](https://go-sponge.com/ui)
+- Generate complete web service code based on MySQL tables.
+- Generate handler code based on MySQL tables, including CRUD code.
+- Generate dao code based on MySQL tables, including CRUD code.
+- Generate model code based on MySQL tables.
+- Generate complete rpc service code based on MySQL tables.
+- Generate service code based on MySQL tables, including CRUD code.
+- Generate protobuf code based on MySQL tables.
+- Generate web service code based on protobuf.
+- Generate rpc service code based on protobuf.
+- Generate rpc gateway service code based on protobuf.
+- Generate corresponding go structure code based on yaml.
+- Generate rpc connection code according to parameters.
+- Generate cache code according to parameters.
 
-💡 It is recommended to install sponge locally.
+The generated code can be combined into actual project web or microservice code, and the developer only needs to focus on writing the business logic code, online UI interface demo: [https://go-sponge.com/ui](https://go-sponge.com/ui)
 
 <br>
 
@@ -64,7 +76,7 @@ After installing the sponge, start the UI service:
 sponge run
 ```
 
-Visit `http://localhost:24631` in your browser, 12 types of codes can be generated.
+Visit `http://localhost:24631` in your browser, generate code by manipulating it on the page.
 
 <br>
 
@@ -90,7 +102,7 @@ make run
 
 <br>
 
-### examples
+### Examples of use
 
 - [Generate the complete web service project code](https://github.com/zhufuyi/sponge/tree/main/examples/1_web-gin-CRUD)
 - [Generate generic web service project code](https://github.com/zhufuyi/sponge/tree/main/examples/2_web-gin-protobuf)

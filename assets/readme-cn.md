@@ -1,4 +1,4 @@
-[sponge](https://github.com/zhufuyi/sponge) 是一个快速创建web和微服务代码工具，也是一个基于gin和grpc封装的微服务框架。sponge拥有丰富的生成代码命令，一共生成12种不同功能代码，这些功能代码可以组合成完整的服务(类似人为打散的海绵细胞可以自动重组成一个新的海绵)。微服务代码功能包括日志、服务注册与发现、注册中心、限流、熔断、链路跟踪、指标监控、pprof性能分析、统计、缓存、CICD等功能。代码解耦模块化设计，很容易构建出从开发到部署的完整工程代码，让使用go语言开发更便捷、轻松、高效。
+[sponge](https://github.com/zhufuyi/sponge) 是一个强大的生成web和微服务代码工具，也是一个基于gin和grpc封装的微服务框架。sponge拥有丰富的生成代码命令，生成不同的功能代码可以组合成完整的服务(类似人为打散的海绵细胞可以自动重组成一个新的海绵)。微服务代码功能包括日志、服务注册与发现、注册中心、限流、熔断、链路跟踪、指标监控、pprof性能分析、统计、缓存、CICD等功能。代码解耦模块化设计，很容易构建出从开发到部署的完整工程代码，让使用go语言开发更便捷、轻松、高效。
 
 <br>
 
@@ -22,11 +22,23 @@ sponge创建的微服务代码框架如下图所示，这是典型的微服务�
 
 <br>
 
-### 在线生成代码demo
+### 支持生成的代码类型
 
-在线生成代码demo： [https://go-sponge.com/ui](https://go-sponge.com/ui)
+- 基于mysql表生成完整的web服务代码。
+- 基于mysql表生成handler代码，包括CRUD代码。
+- 基于mysql表生成dao代码，包括CRUD代码。
+- 基于mysql表生成model代码。
+- 基于mysql表生成完整的rpc服务代码。
+- 基于mysql表生成service代码，包括CRUD代码。
+- 基于mysql表生成protobuf代码。
+- 基于protobuf生成web服务代码。
+- 基于protobuf生成rpc服务代码。
+- 基于protobuf生成rpc网关服务代码。
+- 基于yaml生成对应的go结构体代码。
+- 根据参数生成rpc连接代码。
+- 根据参数生成cache代码。
 
-💡 建议在本地安装sponge来使用。
+生成的这些代码可以组合成实际项目的web或微服务代码，开发者只需专注写业务逻辑代码，在线UI界面demo： [https://go-sponge.com/ui](https://go-sponge.com/ui)
 
 <br>
 
@@ -45,7 +57,7 @@ sponge创建的微服务代码框架如下图所示，这是典型的微服务�
 sponge run
 ```
 
-在浏览器访问 `http://localhost:24631`，在页面上可以生成12种不同功能代码。
+在浏览器访问 `http://localhost:24631`，在页面上操作生成代码。
 
 <br>
 
@@ -77,7 +89,7 @@ make run
 
 <br>
 
-### 示例
+### 使用示例
 
 - [生成完整的web服务项目代码](https://www.bilibili.com/read/cv23018269)
 - [生成通用的web服务项目代码](https://www.bilibili.com/read/cv23040234)
