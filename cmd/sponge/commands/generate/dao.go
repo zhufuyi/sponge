@@ -56,7 +56,7 @@ Examples:
 			}
 
 			tableNames := strings.Split(dbTables, ",")
-			for _, tableName := range tableNames {
+			for count, tableName := range tableNames {
 				if tableName == "" {
 					continue
 				}
@@ -65,6 +65,13 @@ Examples:
 				codes, err := sql2code.Generate(&sqlArgs)
 				if err != nil {
 					return err
+				}
+
+				// control to generate the initialization db code only once
+				if count == 0 && isIncludeInitDB {
+					isIncludeInitDB = true
+				} else {
+					isIncludeInitDB = false
 				}
 
 				dir, err := runGenDaoCommand(moduleName, isIncludeInitDB, codes, outPath)
@@ -112,11 +119,13 @@ func runGenDaoCommand(moduleName string, isIncludeInitDB bool, codes map[string]
 	}
 	ignoreDirs := []string{} // specify the directory in the subdirectory where processing is ignored
 	ignoreFiles := []string{ // specify the files in the subdirectory to be ignored for processing
-		"init.go", "init_test.go", // internal/dao
+		"init.go", "init_test.go", // internal/model
 		"cacheNameExample.go", "cacheNameExample_test.go", // internal/cache
 	}
 	if isIncludeInitDB {
-		ignoreFiles = []string{}
+		ignoreFiles = []string{
+			"cacheNameExample.go", "cacheNameExample_test.go", // internal/cache
+		}
 	}
 
 	r.SetSubDirsAndFiles(subDirs)

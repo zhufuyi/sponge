@@ -115,7 +115,7 @@ func idTypeToStr(handlerCodes string) string {
 	subEnd := "`" + `json:"id"` + "`"
 	if subBytes := gofile.FindSubBytesNotIn([]byte(handlerCodes), []byte(subStart), []byte(subEnd)); len(subBytes) > 0 {
 		old := subStart + string(subBytes) + subEnd
-		newStr := subStart + "\n\tID string " + subEnd + " // covert to string id\n"
+		newStr := subStart + "\n\tID string " + subEnd + " // convert to string id\n"
 		handlerCodes = strings.ReplaceAll(handlerCodes, old, newStr)
 	}
 

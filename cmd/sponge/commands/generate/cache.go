@@ -3,6 +3,7 @@ package generate
 import (
 	"errors"
 	"fmt"
+
 	"github.com/zhufuyi/sponge/pkg/replacer"
 
 	"github.com/spf13/cobra"
@@ -119,6 +120,23 @@ func addCacheFields(moduleName string, r replacer.Replacer, cacheName string, pr
 	keyType string, valueName string, valueType string) []replacer.Field {
 	var fields []replacer.Field
 	fields = append(fields, deleteFieldsMark(r, cacheFile, startMark, endMark)...)
+
+	// match the case where the value type is a pointer
+	if valueType[0] == '*' {
+		fields = append(fields, []replacer.Field{
+			{
+				Old:             "var valueNameExample valueTypeExample",
+				New:             fmt.Sprintf("%s := &%s{}", valueName, valueType[1:]),
+				IsCaseSensitive: false,
+			},
+			{
+				Old:             "&valueNameExample",
+				New:             valueName,
+				IsCaseSensitive: false,
+			},
+		}...)
+	}
+
 	fields = append(fields, []replacer.Field{
 		{
 			Old: "github.com/zhufuyi/sponge/internal/model",

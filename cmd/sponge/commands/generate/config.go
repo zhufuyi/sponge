@@ -14,7 +14,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// ConfigCommand covert yaml to struct command
+// ConfigCommand convert yaml to struct command
 func ConfigCommand() *cobra.Command {
 	var (
 		ysArgs = jy2struct.Args{
@@ -58,7 +58,7 @@ Examples:
 			if err != nil {
 				return err
 			}
-			fmt.Println("covert yaml to go struct successfully.")
+			fmt.Println("convert yaml to go struct successfully.")
 			return nil
 		},
 	}
@@ -191,7 +191,7 @@ func convertToGoFile(ysArgs jy2struct.Args, outPath string) error {
 		return err
 	}
 
-	fmt.Printf("covert yaml to go struct successfully, out=%s\n", outPath)
+	fmt.Printf("convert yaml to go struct successfully, out=%s\n", outPath)
 
 	return nil
 }
