@@ -250,3 +250,59 @@ func Test_userExampleDao_GetByColumns(t *testing.T) {
 	_, _, err = dao.GetByColumns(context.Background(), &query.Params{Columns: []query.Column{{}}})
 	t.Log(err)
 }
+
+func Test_userExampleDao_CreateByTx(t *testing.T) {
+	d := newUserExampleDao()
+	defer d.Close()
+	testData := d.TestData.(*model.UserExample)
+
+	d.SQLMock.ExpectBegin()
+	d.SQLMock.ExpectExec("INSERT INTO .*").
+		WithArgs(d.GetAnyArgs(testData)...).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+	d.SQLMock.ExpectCommit()
+
+	_, err := d.IDao.(UserExampleDao).CreateByTx(d.Ctx, d.DB, testData)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func Test_userExampleDao_DeleteByTx(t *testing.T) {
+	d := newUserExampleDao()
+	defer d.Close()
+	testData := d.TestData.(*model.UserExample)
+
+	testData.DeletedAt = gorm.DeletedAt{
+		Time:  time.Now(),
+		Valid: false,
+	}
+
+	d.SQLMock.ExpectBegin()
+	d.SQLMock.ExpectExec("UPDATE .*").
+		WithArgs(d.AnyTime, d.AnyTime, testData.ID).
+		WillReturnResult(sqlmock.NewResult(int64(testData.ID), 1))
+	d.SQLMock.ExpectCommit()
+
+	err := d.IDao.(UserExampleDao).DeleteByTx(d.Ctx, d.DB, testData.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func Test_userExampleDao_UpdateByTx(t *testing.T) {
+	d := newUserExampleDao()
+	defer d.Close()
+	testData := d.TestData.(*model.UserExample)
+
+	d.SQLMock.ExpectBegin()
+	d.SQLMock.ExpectExec("UPDATE .*").
+		WithArgs(d.AnyTime, testData.ID).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+	d.SQLMock.ExpectCommit()
+
+	err := d.IDao.(UserExampleDao).UpdateByTx(d.Ctx, d.DB, testData)
+	if err != nil {
+		t.Fatal(err)
+	}
+}

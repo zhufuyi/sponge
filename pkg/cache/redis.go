@@ -46,9 +46,9 @@ func (c *redisCache) Set(ctx context.Context, key string, val interface{}, expir
 	if err != nil {
 		return fmt.Errorf("BuildCacheKey error: %v, key=%s", err, key)
 	}
-	if expiration == 0 {
-		expiration = DefaultExpireTime
-	}
+	//if expiration == 0 {
+	//	expiration = DefaultExpireTime
+	//}
 	err = c.client.Set(ctx, cacheKey, buf, expiration).Err()
 	if err != nil {
 		return fmt.Errorf("c.client.Set error: %v, cacheKey=%s", err, cacheKey)
@@ -90,9 +90,10 @@ func (c *redisCache) MultiSet(ctx context.Context, valueMap map[string]interface
 	if len(valueMap) == 0 {
 		return nil
 	}
-	if expiration == 0 {
-		expiration = DefaultExpireTime
-	}
+	//if expiration == 0 {
+	//	expiration = DefaultExpireTime
+	//}
+
 	// the key-value is paired and has twice the capacity of a map
 	paris := make([]interface{}, 0, 2*len(valueMap))
 	for key, value := range valueMap {

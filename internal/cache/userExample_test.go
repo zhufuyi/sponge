@@ -87,7 +87,7 @@ func Test_userExampleCache_MultiGet(t *testing.T) {
 
 	expected := c.GetTestData()
 	for k, v := range expected {
-		assert.Equal(t, got[k], v.(*model.UserExample))
+		assert.Equal(t, got[utils.StrToUint64(k)], v.(*model.UserExample))
 	}
 }
 

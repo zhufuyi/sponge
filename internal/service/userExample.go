@@ -126,9 +126,9 @@ func (s *userExampleService) GetByID(ctx context.Context, req *serverNameExample
 		return nil, ecode.StatusInternalServerError.ToRPCErr()
 	}
 
-	data, err := covertUserExample(record)
+	data, err := convertUserExample(record)
 	if err != nil {
-		logger.Warn("covertUserExample error", logger.Err(err), logger.Any("record", record), interceptor.ServerCtxRequestIDField(ctx))
+		logger.Warn("convertUserExample error", logger.Err(err), logger.Any("record", record), interceptor.ServerCtxRequestIDField(ctx))
 		return nil, ecode.StatusGetUserExample.Err()
 	}
 
@@ -143,20 +143,22 @@ func (s *userExampleService) ListByIDs(ctx context.Context, req *serverNameExamp
 		return nil, ecode.StatusInvalidParams.Err()
 	}
 
-	records, err := s.iDao.GetByIDs(ctx, req.Ids)
+	userExampleMap, err := s.iDao.GetByIDs(ctx, req.Ids)
 	if err != nil {
 		logger.Error("s.iDao.GetByID error", logger.Err(err), logger.Any("ids", req.Ids), interceptor.ServerCtxRequestIDField(ctx))
 		return nil, ecode.StatusInternalServerError.ToRPCErr()
 	}
 
 	userExamples := []*serverNameExampleV1.UserExample{}
-	for _, record := range records {
-		userExample, err := covertUserExample(record)
-		if err != nil {
-			logger.Warn("covertUserExample error", logger.Err(err), logger.Any("id", record.ID), interceptor.ServerCtxRequestIDField(ctx))
-			continue
+	for _, id := range req.Ids {
+		if v, ok := userExampleMap[id]; ok {
+			record, err := convertUserExample(v)
+			if err != nil {
+				logger.Warn("convertUserExample error", logger.Err(err), logger.Any("userExample", v), interceptor.ServerCtxRequestIDField(ctx))
+				return nil, ecode.StatusInternalServerError.ToRPCErr()
+			}
+			userExamples = append(userExamples, record)
 		}
-		userExamples = append(userExamples, userExample)
 	}
 
 	return &serverNameExampleV1.ListUserExampleByIDsReply{UserExamples: userExamples}, nil
@@ -189,9 +191,9 @@ func (s *userExampleService) List(ctx context.Context, req *serverNameExampleV1.
 
 	userExamples := []*serverNameExampleV1.UserExample{}
 	for _, record := range records {
-		userExample, err := covertUserExample(record)
+		userExample, err := convertUserExample(record)
 		if err != nil {
-			logger.Warn("covertUserExample error", logger.Err(err), logger.Any("id", record.ID), interceptor.ServerCtxRequestIDField(ctx))
+			logger.Warn("convertUserExample error", logger.Err(err), logger.Any("id", record.ID), interceptor.ServerCtxRequestIDField(ctx))
 			continue
 		}
 		userExamples = append(userExamples, userExample)
@@ -203,7 +205,7 @@ func (s *userExampleService) List(ctx context.Context, req *serverNameExampleV1.
 	}, nil
 }
 
-func covertUserExample(record *model.UserExample) (*serverNameExampleV1.UserExample, error) {
+func convertUserExample(record *model.UserExample) (*serverNameExampleV1.UserExample, error) {
 	value := &serverNameExampleV1.UserExample{}
 	err := copier.Copy(value, record)
 	if err != nil {

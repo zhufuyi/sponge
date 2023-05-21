@@ -10,13 +10,13 @@ import (
 	"github.com/zhufuyi/sponge/pkg/cache"
 	"github.com/zhufuyi/sponge/pkg/encoding"
 	"github.com/zhufuyi/sponge/pkg/utils"
-
-	"github.com/spf13/cast"
 )
 
 const (
-	// PrefixUserExampleCacheKey cache prefix
-	PrefixUserExampleCacheKey = "userExample:"
+	// cache prefix key, must end with a colon
+	userExampleCachePrefixKey = "userExample:"
+	// UserExampleExpireTime expire time
+	UserExampleExpireTime = 10 * time.Minute
 )
 
 var _ UserExampleCache = (*userExampleCache)(nil)
@@ -25,7 +25,7 @@ var _ UserExampleCache = (*userExampleCache)(nil)
 type UserExampleCache interface {
 	Set(ctx context.Context, id uint64, data *model.UserExample, duration time.Duration) error
 	Get(ctx context.Context, id uint64) (*model.UserExample, error)
-	MultiGet(ctx context.Context, ids []uint64) (map[string]*model.UserExample, error)
+	MultiGet(ctx context.Context, ids []uint64) (map[uint64]*model.UserExample, error)
 	MultiSet(ctx context.Context, data []*model.UserExample, duration time.Duration) error
 	Del(ctx context.Context, id uint64) error
 	SetCacheWithNotFound(ctx context.Context, id uint64) error
@@ -58,7 +58,7 @@ func NewUserExampleCache(cacheType *model.CacheType) UserExampleCache {
 
 // GetUserExampleCacheKey cache key
 func (c *userExampleCache) GetUserExampleCacheKey(id uint64) string {
-	return PrefixUserExampleCacheKey + utils.Uint64ToStr(id)
+	return userExampleCachePrefixKey + utils.Uint64ToStr(id)
 }
 
 // Set write to cache
@@ -102,7 +102,7 @@ func (c *userExampleCache) MultiSet(ctx context.Context, data []*model.UserExamp
 }
 
 // MultiGet multiple get cache, return key in map is id value
-func (c *userExampleCache) MultiGet(ctx context.Context, ids []uint64) (map[string]*model.UserExample, error) {
+func (c *userExampleCache) MultiGet(ctx context.Context, ids []uint64) (map[uint64]*model.UserExample, error) {
 	var keys []string
 	for _, v := range ids {
 		cacheKey := c.GetUserExampleCacheKey(v)
@@ -115,11 +115,11 @@ func (c *userExampleCache) MultiGet(ctx context.Context, ids []uint64) (map[stri
 		return nil, err
 	}
 
-	retMap := make(map[string]*model.UserExample)
-	for _, v := range ids {
-		val, ok := itemMap[c.GetUserExampleCacheKey(v)]
+	retMap := make(map[uint64]*model.UserExample)
+	for _, id := range ids {
+		val, ok := itemMap[c.GetUserExampleCacheKey(id)]
 		if ok {
-			retMap[cast.ToString(v)] = val
+			retMap[id] = val
 		}
 	}
 

@@ -237,7 +237,7 @@ func Test_covertUserExample(t *testing.T) {
 	testData.CreatedAt = time.Now()
 	testData.UpdatedAt = testData.CreatedAt
 
-	data, err := covertUserExample(testData)
+	data, err := convertUserExample(testData)
 	assert.NoError(t, err)
 
 	t.Logf("%+v", data)

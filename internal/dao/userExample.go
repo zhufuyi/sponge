@@ -13,7 +13,6 @@ import (
 	"github.com/zhufuyi/sponge/pkg/mysql/query"
 	"github.com/zhufuyi/sponge/pkg/utils"
 
-	"github.com/spf13/cast"
 	"golang.org/x/sync/singleflight"
 	"gorm.io/gorm"
 )
@@ -27,8 +26,12 @@ type UserExampleDao interface {
 	DeleteByIDs(ctx context.Context, ids []uint64) error
 	UpdateByID(ctx context.Context, table *model.UserExample) error
 	GetByID(ctx context.Context, id uint64) (*model.UserExample, error)
-	GetByIDs(ctx context.Context, ids []uint64) ([]*model.UserExample, error)
+	GetByIDs(ctx context.Context, ids []uint64) (map[uint64]*model.UserExample, error)
 	GetByColumns(ctx context.Context, params *query.Params) ([]*model.UserExample, int64, error)
+
+	CreateByTx(ctx context.Context, tx *gorm.DB, table *model.UserExample) (uint64, error)
+	UpdateByTx(ctx context.Context, tx *gorm.DB, table *model.UserExample) error
+	DeleteByTx(ctx context.Context, tx *gorm.DB, id uint64) error
 }
 
 type userExampleDao struct {
@@ -77,8 +80,12 @@ func (d *userExampleDao) DeleteByIDs(ctx context.Context, ids []uint64) error {
 	return nil
 }
 
-// UpdateByID update records by id
 func (d *userExampleDao) UpdateByID(ctx context.Context, table *model.UserExample) error {
+	return d.updateByID(ctx, d.db, table)
+}
+
+// UpdateByID update records by id
+func (d *userExampleDao) updateByID(ctx context.Context, db *gorm.DB, table *model.UserExample) error {
 	if table.ID < 1 {
 		return errors.New("id cannot be 0")
 	}
@@ -112,7 +119,7 @@ func (d *userExampleDao) UpdateByID(ctx context.Context, table *model.UserExampl
 	}
 	// delete the templates code end
 
-	err := d.db.WithContext(ctx).Model(table).Updates(update).Error
+	err := db.WithContext(ctx).Model(table).Updates(update).Error
 	if err != nil {
 		return err
 	}
@@ -147,7 +154,7 @@ func (d *userExampleDao) GetByID(ctx context.Context, id uint64) (*model.UserExa
 				return nil, err
 			}
 			// set cache
-			err = d.cache.Set(ctx, id, table, cacheBase.DefaultExpireTime)
+			err = d.cache.Set(ctx, id, table, cache.UserExampleExpireTime)
 			if err != nil {
 				return nil, fmt.Errorf("cache.Set error: %v, id=%d", err, id)
 			}
@@ -170,9 +177,7 @@ func (d *userExampleDao) GetByID(ctx context.Context, id uint64) (*model.UserExa
 }
 
 // GetByIDs get multiple rows by ids
-func (d *userExampleDao) GetByIDs(ctx context.Context, ids []uint64) ([]*model.UserExample, error) {
-	records := []*model.UserExample{}
-
+func (d *userExampleDao) GetByIDs(ctx context.Context, ids []uint64) (map[uint64]*model.UserExample, error) {
 	itemMap, err := d.cache.MultiGet(ctx, ids)
 	if err != nil {
 		return nil, err
@@ -180,12 +185,11 @@ func (d *userExampleDao) GetByIDs(ctx context.Context, ids []uint64) ([]*model.U
 
 	var missedIDs []uint64
 	for _, id := range ids {
-		item, ok := itemMap[cast.ToString(id)]
+		_, ok := itemMap[id]
 		if !ok {
 			missedIDs = append(missedIDs, id)
 			continue
 		}
-		records = append(records, item)
 	}
 
 	// get missed data
@@ -209,8 +213,10 @@ func (d *userExampleDao) GetByIDs(ctx context.Context, ids []uint64) ([]*model.U
 			}
 
 			if len(missedData) > 0 {
-				records = append(records, missedData...)
-				err = d.cache.MultiSet(ctx, missedData, time.Hour*24)
+				for _, data := range missedData {
+					itemMap[data.ID] = data
+				}
+				err = d.cache.MultiSet(ctx, missedData, cache.UserExampleExpireTime)
 				if err != nil {
 					return nil, err
 				}
@@ -221,7 +227,7 @@ func (d *userExampleDao) GetByIDs(ctx context.Context, ids []uint64) ([]*model.U
 			}
 		}
 	}
-	return records, nil
+	return itemMap, nil
 }
 
 // GetByColumns filter multiple rows based on paging and column information
@@ -281,4 +287,31 @@ func (d *userExampleDao) GetByColumns(ctx context.Context, params *query.Params)
 	}
 
 	return records, total, err
+}
+
+// CreateByTx create a record in the database using the provided transaction
+func (d *userExampleDao) CreateByTx(ctx context.Context, tx *gorm.DB, table *model.UserExample) (uint64, error) {
+	err := tx.WithContext(ctx).Create(table).Error
+	return table.ID, err
+}
+
+// DeleteByTx delete a record in by id the database using the provided transaction
+func (d *userExampleDao) DeleteByTx(ctx context.Context, tx *gorm.DB, id uint64) error {
+	update := map[string]interface{}{
+		"deleted_at": time.Now(),
+	}
+	err := tx.WithContext(ctx).Model(&model.UserExample{}).Where("id = ?", id).Updates(update).Error
+	if err != nil {
+		return err
+	}
+
+	// delete cache
+	_ = d.cache.Del(ctx, id)
+
+	return nil
+}
+
+// UpdateByTx update a record by id in the database using the provided transaction
+func (d *userExampleDao) UpdateByTx(ctx context.Context, tx *gorm.DB, table *model.UserExample) error {
+	return d.updateByID(ctx, tx, table)
 }

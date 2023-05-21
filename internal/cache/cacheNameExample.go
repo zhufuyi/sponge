@@ -19,16 +19,16 @@ type valueTypeExample = string
 // delete the templates code end
 
 const (
-	// prefix key must end with a colon
+	// cache prefix key, must end with a colon
 	cacheNameExampleCachePrefixKey = "prefixKeyExample:"
 	// CacheNameExampleExpireTime expire time
-	CacheNameExampleExpireTime = 10 * time.Minute
+	CacheNameExampleExpireTime = 10 * time.Minute // nolint
 )
 
 var _ CacheNameExampleCache = (*cacheNameExampleCache)(nil)
 
 // CacheNameExampleCache cache interface
-type CacheNameExampleCache interface {
+type CacheNameExampleCache interface { // nolint
 	Set(ctx context.Context, keyNameExample keyTypeExample, valueNameExample valueTypeExample, duration time.Duration) error
 	Get(ctx context.Context, keyNameExample keyTypeExample) (valueTypeExample, error)
 	Del(ctx context.Context, keyNameExample keyTypeExample) error
@@ -75,7 +75,7 @@ func (c *cacheNameExampleCache) Get(ctx context.Context, keyNameExample keyTypeE
 	cacheKey := c.getCacheKey(keyNameExample)
 	err := c.cache.Get(ctx, cacheKey, &valueNameExample)
 	if err != nil {
-		return "", err
+		return valueNameExample, err
 	}
 	return valueNameExample, nil
 }

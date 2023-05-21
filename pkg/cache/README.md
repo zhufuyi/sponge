@@ -48,7 +48,7 @@ func (d *userExampleDao) GetByID(ctx context.Context, id uint64) (*model.UserExa
 		}
 
 		// set cache
-		err = d.cache.Set(ctx, id, table, cacheBase.DefaultExpireTime)
+		err = d.cache.Set(ctx, id, table, 10*time.Minute)
 		if err != nil {
 			return nil, fmt.Errorf("cache.Set error: %v, id=%d", err, id)
 		}

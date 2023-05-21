@@ -232,7 +232,7 @@ func (h *userExampleHandler) ListByIDs(c *gin.Context) {
 		return
 	}
 
-	userExamples, err := h.iDao.GetByIDs(c.Request.Context(), form.IDs)
+	userExampleMap, err := h.iDao.GetByIDs(c.Request.Context(), form.IDs)
 	if err != nil {
 		logger.Error("GetByIDs error", logger.Err(err), logger.Any("form", form), middleware.GCtxRequestIDField(c))
 		response.Output(c, ecode.InternalServerError.ToHTTPCode())
@@ -240,14 +240,20 @@ func (h *userExampleHandler) ListByIDs(c *gin.Context) {
 		return
 	}
 
-	data, err := convertUserExamples(userExamples)
-	if err != nil {
-		response.Error(c, ecode.ErrListUserExample)
-		return
+	userExamples := []*types.GetUserExampleByIDRespond{}
+	for _, id := range form.IDs {
+		if v, ok := userExampleMap[id]; ok {
+			record, err := convertUserExample(v)
+			if err != nil {
+				response.Error(c, ecode.ErrListUserExample)
+				return
+			}
+			userExamples = append(userExamples, record)
+		}
 	}
 
 	response.Success(c, gin.H{
-		"userExamples": data,
+		"userExamples": userExamples,
 	})
 }
 
@@ -300,15 +306,23 @@ func getUserExampleIDFromPath(c *gin.Context) (string, uint64, bool) {
 	return idStr, id, false
 }
 
+func convertUserExample(userExample *model.UserExample) (*types.GetUserExampleByIDRespond, error) {
+	data := &types.GetUserExampleByIDRespond{}
+	err := copier.Copy(data, userExample)
+	if err != nil {
+		return nil, err
+	}
+	data.ID = utils.Uint64ToStr(userExample.ID)
+	return data, nil
+}
+
 func convertUserExamples(fromValues []*model.UserExample) ([]*types.GetUserExampleByIDRespond, error) {
 	toValues := []*types.GetUserExampleByIDRespond{}
 	for _, v := range fromValues {
-		data := &types.GetUserExampleByIDRespond{}
-		err := copier.Copy(data, v)
+		data, err := convertUserExample(v)
 		if err != nil {
 			return nil, err
 		}
-		data.ID = utils.Uint64ToStr(v.ID)
 		toValues = append(toValues, data)
 	}
 
