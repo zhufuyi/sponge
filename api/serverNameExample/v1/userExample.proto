@@ -76,7 +76,7 @@ service userExampleService {
 
   rpc ListByIDs(ListUserExampleByIDsRequest) returns (ListUserExampleByIDsReply) {
     option (google.api.http) = {
-      post: "/api/v1/userExamples/ids"
+      post: "/api/v1/userExample/list/ids"
       body: "*"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -88,7 +88,7 @@ service userExampleService {
 
   rpc List(ListUserExampleRequest) returns (ListUserExampleReply) {
     option (google.api.http) = {
-      post: "/api/v1/userExamples"
+      post: "/api/v1/userExample/list"
       body: "*"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {

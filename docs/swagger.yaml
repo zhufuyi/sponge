@@ -1,12 +1,5 @@
 definitions:
-  handlerfunc.checkHealthResponse:
-    properties:
-      hostname:
-        type: string
-      status:
-        type: string
-    type: object
-  types.Column:
+  github_com_zhufuyi_sponge_internal_types.Column:
     properties:
       exp:
         description: expressions, which default to = when the value is null, have
@@ -21,6 +14,31 @@ definitions:
         type: string
       value:
         description: column value
+    type: object
+  github_com_zhufuyi_sponge_internal_types.Params:
+    properties:
+      columns:
+        description: query conditions
+        items:
+          $ref: '#/definitions/github_com_zhufuyi_sponge_internal_types.Column'
+        type: array
+      page:
+        description: page number, starting from page 0
+        minimum: 0
+        type: integer
+      size:
+        description: lines per page
+        type: integer
+      sort:
+        description: sorted fields, multi-column sorting separated by commas
+        type: string
+    type: object
+  handlerfunc.checkHealthResponse:
+    properties:
+      hostname:
+        type: string
+      status:
+        type: string
     type: object
   types.CreateUserExampleRequest:
     properties:
@@ -67,24 +85,6 @@ definitions:
           type: integer
         minItems: 1
         type: array
-    type: object
-  types.Params:
-    properties:
-      columns:
-        description: query conditions
-        items:
-          $ref: '#/definitions/types.Column'
-        type: array
-      page:
-        description: page number, starting from page 0
-        minimum: 0
-        type: integer
-      size:
-        description: lines per page
-        type: integer
-      sort:
-        description: sorted fields, multi-column sorting separated by commas
-        type: string
     type: object
   types.Result:
     properties:
@@ -220,30 +220,7 @@ paths:
       summary: update userExample information
       tags:
       - userExample
-  /api/v1/userExamples:
-    post:
-      consumes:
-      - application/json
-      description: paging and conditional fetching of userExamples lists using post
-        requests
-      parameters:
-      - description: query parameters
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/types.Params'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.Result'
-      summary: get a list of userExamples
-      tags:
-      - userExample
-  /api/v1/userExamples/delete/ids:
+  /api/v1/userExample/delete/ids:
     post:
       consumes:
       - application/json
@@ -265,7 +242,30 @@ paths:
       summary: delete userExamples by multiple id
       tags:
       - userExample
-  /api/v1/userExamples/ids:
+  /api/v1/userExample/list:
+    post:
+      consumes:
+      - application/json
+      description: paging and conditional fetching of userExamples lists using post
+        requests
+      parameters:
+      - description: query parameters
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_zhufuyi_sponge_internal_types.Params'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.Result'
+      summary: get a list of userExamples
+      tags:
+      - userExample
+  /api/v1/userExample/list/ids:
     post:
       consumes:
       - application/json
@@ -316,4 +316,10 @@ paths:
 schemes:
 - http
 - https
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer your-jwt-token" to Value
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

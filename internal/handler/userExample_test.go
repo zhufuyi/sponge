@@ -58,7 +58,7 @@ func newUserExampleHandler() *gotest.Handler {
 		{
 			FuncName:    "DeleteByIDs",
 			Method:      http.MethodPost,
-			Path:        "/userExamples/delete/ids",
+			Path:        "/userExample/delete/ids",
 			HandlerFunc: h.IHandler.(UserExampleHandler).DeleteByIDs,
 		},
 		{
@@ -76,13 +76,13 @@ func newUserExampleHandler() *gotest.Handler {
 		{
 			FuncName:    "ListByIDs",
 			Method:      http.MethodPost,
-			Path:        "/userExamples/ids",
+			Path:        "/userExample/list/ids",
 			HandlerFunc: h.IHandler.(UserExampleHandler).ListByIDs,
 		},
 		{
 			FuncName:    "List",
 			Method:      http.MethodPost,
-			Path:        "/userExamples",
+			Path:        "/userExample/list",
 			HandlerFunc: h.IHandler.(UserExampleHandler).List,
 		},
 	}

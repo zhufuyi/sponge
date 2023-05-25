@@ -160,24 +160,24 @@ service {{.TName}}Service {
 
   rpc ListByIDs(List{{.TableName}}ByIDsRequest) returns (List{{.TableName}}ByIDsReply) {
     option (google.api.http) = {
-      post: "/api/v1/{{.TName}}s/ids"
+      post: "/api/v1/{{.TName}}/list/ids"
       body: "*"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "get a list of {{.TName}} based on multiple ids",
-      description: "get a list of {{.TName}} based on multiple ids",
+      summary: "get a list of {{.TName}} by multiple ids",
+      description: "get a list of {{.TName}} by multiple ids",
       tags: "{{.TName}}",
     };
   }
 
   rpc List(List{{.TableName}}Request) returns (List{{.TableName}}Reply) {
     option (google.api.http) = {
-      post: "/api/v1/{{.TName}}s"
+      post: "/api/v1/{{.TName}}/list"
       body: "*"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "get a list of {{.TName}} based on query parameters",
-      description: "get a list of {{.TName}} based on query parameters",
+      summary: "get a list of {{.TName}} by parameters",
+      description: "get a list of {{.TName}} by parameters",
       tags: "{{.TName}}",
     };
   }

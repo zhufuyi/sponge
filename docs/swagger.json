@@ -46,6 +46,108 @@
                 }
             }
         },
+        "/api/v1/userExample/delete/ids": {
+            "post": {
+                "description": "delete userExamples by multiple id using a post request",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "userExample"
+                ],
+                "summary": "delete userExamples by multiple id",
+                "parameters": [
+                    {
+                        "description": "id array",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.DeleteUserExamplesByIDsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.Result"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/userExample/list": {
+            "post": {
+                "description": "paging and conditional fetching of userExamples lists using post requests",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "userExample"
+                ],
+                "summary": "get a list of userExamples",
+                "parameters": [
+                    {
+                        "description": "query parameters",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_zhufuyi_sponge_internal_types.Params"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.Result"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/userExample/list/ids": {
+            "post": {
+                "description": "get userExamples by multiple id using a post request",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "userExample"
+                ],
+                "summary": "get userExamples by multiple id",
+                "parameters": [
+                    {
+                        "description": "id array",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.GetUserExamplesByIDsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.Result"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/userExample/{id}": {
             "get": {
                 "description": "get userExample details by id",
@@ -147,108 +249,6 @@
                 }
             }
         },
-        "/api/v1/userExamples": {
-            "post": {
-                "description": "paging and conditional fetching of userExamples lists using post requests",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "userExample"
-                ],
-                "summary": "get a list of userExamples",
-                "parameters": [
-                    {
-                        "description": "query parameters",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/types.Params"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/types.Result"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/userExamples/delete/ids": {
-            "post": {
-                "description": "delete userExamples by multiple id using a post request",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "userExample"
-                ],
-                "summary": "delete userExamples by multiple id",
-                "parameters": [
-                    {
-                        "description": "id array",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/types.DeleteUserExamplesByIDsRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/types.Result"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/userExamples/ids": {
-            "post": {
-                "description": "get userExamples by multiple id using a post request",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "userExample"
-                ],
-                "summary": "get userExamples by multiple id",
-                "parameters": [
-                    {
-                        "description": "id array",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/types.GetUserExamplesByIDsRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/types.Result"
-                        }
-                    }
-                }
-            }
-        },
         "/health": {
             "get": {
                 "description": "check health",
@@ -290,18 +290,7 @@
         }
     },
     "definitions": {
-        "handlerfunc.checkHealthResponse": {
-            "type": "object",
-            "properties": {
-                "hostname": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string"
-                }
-            }
-        },
-        "types.Column": {
+        "github_com_zhufuyi_sponge_internal_types.Column": {
             "type": "object",
             "properties": {
                 "exp": {
@@ -318,6 +307,42 @@
                 },
                 "value": {
                     "description": "column value"
+                }
+            }
+        },
+        "github_com_zhufuyi_sponge_internal_types.Params": {
+            "type": "object",
+            "properties": {
+                "columns": {
+                    "description": "query conditions",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_zhufuyi_sponge_internal_types.Column"
+                    }
+                },
+                "page": {
+                    "description": "page number, starting from page 0",
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "size": {
+                    "description": "lines per page",
+                    "type": "integer"
+                },
+                "sort": {
+                    "description": "sorted fields, multi-column sorting separated by commas",
+                    "type": "string"
+                }
+            }
+        },
+        "handlerfunc.checkHealthResponse": {
+            "type": "object",
+            "properties": {
+                "hostname": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
                 }
             }
         },
@@ -384,31 +409,6 @@
                 }
             }
         },
-        "types.Params": {
-            "type": "object",
-            "properties": {
-                "columns": {
-                    "description": "query conditions",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/types.Column"
-                    }
-                },
-                "page": {
-                    "description": "page number, starting from page 0",
-                    "type": "integer",
-                    "minimum": 0
-                },
-                "size": {
-                    "description": "lines per page",
-                    "type": "integer"
-                },
-                "sort": {
-                    "description": "sorted fields, multi-column sorting separated by commas",
-                    "type": "string"
-                }
-            }
-        },
         "types.Result": {
             "type": "object",
             "properties": {
@@ -461,6 +461,14 @@
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "description": "Type \"Bearer your-jwt-token\" to Value",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }

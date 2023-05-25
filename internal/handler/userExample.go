@@ -114,7 +114,7 @@ func (h *userExampleHandler) DeleteByID(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Success 200 {object} types.Result{}
-// @Router /api/v1/userExamples/delete/ids [post]
+// @Router /api/v1/userExample/delete/ids [post]
 func (h *userExampleHandler) DeleteByIDs(c *gin.Context) {
 	form := &types.DeleteUserExamplesByIDsRequest{}
 	err := c.ShouldBindJSON(form)
@@ -222,7 +222,7 @@ func (h *userExampleHandler) GetByID(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Success 200 {object} types.Result{}
-// @Router /api/v1/userExamples/ids [post]
+// @Router /api/v1/userExample/list/ids [post]
 func (h *userExampleHandler) ListByIDs(c *gin.Context) {
 	form := &types.GetUserExamplesByIDsRequest{}
 	err := c.ShouldBindJSON(form)
@@ -265,7 +265,7 @@ func (h *userExampleHandler) ListByIDs(c *gin.Context) {
 // @Produce json
 // @Param data body types.Params true "query parameters"
 // @Success 200 {object} types.Result{}
-// @Router /api/v1/userExamples [post]
+// @Router /api/v1/userExample/list [post]
 func (h *userExampleHandler) List(c *gin.Context) {
 	form := &types.GetUserExamplesRequest{}
 	err := c.ShouldBindJSON(form)
