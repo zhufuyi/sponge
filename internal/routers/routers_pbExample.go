@@ -18,13 +18,10 @@ import (
 	"github.com/gin-gonic/gin/binding"
 )
 
-// nolint
-var (
-	apiV1RouterFns_pbExample []func(prePath string, engine *gin.RouterGroup) // group router functions
-	// if you have other group routes you can define them here
-	// example:
-	//     myPrePathRouterFns []func(prePath string, engine *gin.RouterGroup)
-)
+type routeFns = []func(r *gin.Engine, groupPathMiddlewares map[string][]gin.HandlerFunc, singlePathMiddlewares map[string][]gin.HandlerFunc)
+
+// all route functions
+var allRouteFns = make(routeFns, 0)
 
 // NewRouter_pbExample create a new router
 func NewRouter_pbExample() *gin.Engine { //nolint
@@ -80,20 +77,73 @@ func NewRouter_pbExample() *gin.Engine { //nolint
 	// access path /apis/swagger/index.html
 	swagger.CustomRouter(r, "apis", docs.ApiDocs)
 
-	// register routers, middleware support
-	registerRouters_pbExample(r, "/api/v1", apiV1RouterFns_pbExample)
-	// if you have other group routes you can add them here
+	c := newMiddlewareConfig()
+
+	// set up the middleware for the route group, route group is left prefix rules,
+	// it can be viewed in the register() function in the api/serverNameExample/v1/xxx_route.go file
 	// example:
-	//    registerRouters(r, "/myPrePath", myPrePathRouterFns, middleware.Auth())
+	//		c.setMiddlewaresForGroupPath("/api/v1", middleware.Auth())
+	//		c.setMiddlewaresForGroupPath("/api/v2", middleware.Auth(), middleware.RateLimit())
+
+	// set up single route middleware, route must be full path,
+	// it can be viewed in the register() function in the api/serverNameExample/v1/xxx_route.go file
+	// example:
+	//		c.setMiddlewaresForSinglePath("/api/v1/userExample", middleware.Auth())
+	//		c.setMiddlewaresForSinglePath("/api/v1/userExample/list", middleware.Auth(), middleware.RateLimit())
+
+	// register all routes
+	registerAllRoutes(r, c, allRouteFns)
 
 	return r
 }
 
-// nolint
-func registerRouters_pbExample(r *gin.Engine, prePath string,
-	routerFns []func(prePath string, engine *gin.RouterGroup), handlers ...gin.HandlerFunc) {
-	rg := r.Group(prePath, handlers...)
-	for _, fn := range routerFns {
-		fn(prePath, rg)
+func registerAllRoutes(r *gin.Engine, c *middlewareConfig, routeFns routeFns) {
+	if c == nil {
+		c = newMiddlewareConfig()
 	}
+	for _, fn := range routeFns {
+		fn(r, c.groupPathMiddlewares, c.singlePathMiddlewares)
+	}
+}
+
+type middlewareConfig struct {
+	groupPathMiddlewares  map[string][]gin.HandlerFunc // middleware function corresponding to route group
+	singlePathMiddlewares map[string][]gin.HandlerFunc // middleware functions corresponding to a single route
+}
+
+func newMiddlewareConfig() *middlewareConfig {
+	return &middlewareConfig{
+		groupPathMiddlewares:  make(map[string][]gin.HandlerFunc),
+		singlePathMiddlewares: make(map[string][]gin.HandlerFunc),
+	}
+}
+
+func (c *middlewareConfig) setMiddlewaresForGroupPath(groupPath string, handlers ...gin.HandlerFunc) { // nolint
+	if groupPath == "" {
+		return
+	}
+	if groupPath[0] != '/' {
+		groupPath = "/" + groupPath
+	}
+
+	handlerFns, ok := c.groupPathMiddlewares[groupPath]
+	if !ok {
+		c.groupPathMiddlewares[groupPath] = handlers
+		return
+	}
+
+	c.groupPathMiddlewares[groupPath] = append(handlerFns, handlers...)
+}
+
+func (c *middlewareConfig) setMiddlewaresForSinglePath(singlePath string, handlers ...gin.HandlerFunc) { // nolint
+	if singlePath == "" {
+		return
+	}
+	handlerFns, ok := c.singlePathMiddlewares[singlePath]
+	if !ok {
+		c.singlePathMiddlewares[singlePath] = handlers
+		return
+	}
+
+	c.singlePathMiddlewares[singlePath] = append(handlerFns, handlers...)
 }

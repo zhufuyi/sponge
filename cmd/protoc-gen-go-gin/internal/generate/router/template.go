@@ -58,7 +58,13 @@ func With{{$.Name}}Logger(zapLog *zap.Logger) {{$.Name}}Option {
 	}
 }
 
-func Register{{$.Name}}Router(prePath string, iRouter gin.IRouter, iLogic {{$.Name}}Logicer, opts ...{{$.Name}}Option) {
+func Register{{$.Name}}Router(
+	iRouter gin.IRouter,
+	groupPathMiddlewares map[string][]gin.HandlerFunc,
+	singlePathMiddlewares map[string][]gin.HandlerFunc,
+	iLogic {{$.Name}}Logicer,
+	opts ...{{$.Name}}Option) {
+
 	o := &{{$.LowerName}}Options{}
 	o.apply(opts...)
 
@@ -70,8 +76,9 @@ func Register{{$.Name}}Router(prePath string, iRouter gin.IRouter, iLogic {{$.Na
 	}
 
 	r := &{{$.LowerName}}Router {
-		prePath:   prePath,
 		iRouter:   iRouter,
+		groupPathMiddlewares:  groupPathMiddlewares,
+		singlePathMiddlewares: singlePathMiddlewares,
 		iLogic:    iLogic,
 		iResponse: o.responser,
 		zapLog:    o.zapLog,
@@ -80,34 +87,43 @@ func Register{{$.Name}}Router(prePath string, iRouter gin.IRouter, iLogic {{$.Na
 }
 
 type {{$.LowerName}}Router struct {
-	prePath   string
 	iRouter   gin.IRouter
+	groupPathMiddlewares  map[string][]gin.HandlerFunc
+	singlePathMiddlewares map[string][]gin.HandlerFunc
 	iLogic    {{$.Name}}Logicer
 	iResponse errcode.Responser
 	zapLog    *zap.Logger
 }
 
 func (r *{{$.LowerName}}Router) register() {
-{{range .Methods}}r.iRouter.Handle("{{.Method}}", r.cutPrePath("{{.Path}}"), r.{{ .HandlerName }})
+{{range .Methods}}r.iRouter.Handle("{{.Method}}", "{{.Path}}", r.withMiddleware("{{.Path}}", r.{{ .HandlerName }})...)
 {{end}}
 }
 
-func (r *{{$.LowerName}}Router) cutPrePath(path string)string{
-	if r.prePath==""||r.prePath=="/"{
-		return path
-	}
-	size:=len(r.prePath)
-	if len(path)<=size{
-		return path
-	}
-	if r.prePath==path[:size]{
-		cutPath:=path[size:]
-		if cutPath[0]!='/'{
-			cutPath="/"+cutPath
+func (r *{{$.LowerName}}Router) withMiddleware(path string, fn gin.HandlerFunc) []gin.HandlerFunc {
+	handlerFns := []gin.HandlerFunc{}
+
+	// determine if a route group is hit or miss, left prefix rule
+	for groupPath, fns := range r.groupPathMiddlewares {
+		if groupPath == "" || groupPath == "/" {
+			handlerFns = append(handlerFns, fns...)
+			continue
 		}
-		return cutPath
+		size := len(groupPath)
+		if len(path) < size {
+			continue
+		}
+		if groupPath == path[:size] {
+			handlerFns = append(handlerFns, fns...)
+		}
 	}
-	return path
+
+	// determine if a single route has been hit
+	if fns, ok := r.singlePathMiddlewares[path]; ok {
+		handlerFns = append(handlerFns, fns...)
+	}
+
+	return append(handlerFns, fn)
 }
 
 {{range .Methods}}

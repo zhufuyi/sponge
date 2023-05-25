@@ -10,13 +10,22 @@ import (
 )
 
 func init() {
-	apiV1RouterFns_pbExample = append(apiV1RouterFns_pbExample, func(prePath string, group *gin.RouterGroup) {
-		userExampleServiceRouter(prePath, group, service.NewUserExampleServiceClient())
-	})
+	allRouteFns = append(allRouteFns,
+		func(r *gin.Engine, groupPathMiddlewares map[string][]gin.HandlerFunc, singlePathMiddlewares map[string][]gin.HandlerFunc) {
+			userExampleServiceRouter(r, groupPathMiddlewares, singlePathMiddlewares, service.NewUserExampleServiceClient())
+		})
 }
 
-func userExampleServiceRouter(prePath string, group *gin.RouterGroup, iService serverNameExampleV1.UserExampleServiceLogicer) {
-	serverNameExampleV1.RegisterUserExampleServiceRouter(prePath, group, iService,
+func userExampleServiceRouter(
+	r *gin.Engine,
+	groupPathMiddlewares map[string][]gin.HandlerFunc,
+	singlePathMiddlewares map[string][]gin.HandlerFunc,
+	iService serverNameExampleV1.UserExampleServiceLogicer) {
+	serverNameExampleV1.RegisterUserExampleServiceRouter(
+		r,
+		groupPathMiddlewares,
+		singlePathMiddlewares,
+		iService,
 		serverNameExampleV1.WithUserExampleServiceRPCResponse(),
 		serverNameExampleV1.WithUserExampleServiceLogger(logger.Get()),
 	)

@@ -9,6 +9,7 @@ import (
 	"github.com/zhufuyi/sponge/configs"
 	"github.com/zhufuyi/sponge/internal/config"
 
+	"github.com/zhufuyi/sponge/pkg/gin/middleware"
 	"github.com/zhufuyi/sponge/pkg/utils"
 
 	"github.com/gin-gonic/gin"
@@ -35,11 +36,25 @@ func TestNewRouter_pbExample(t *testing.T) {
 	})
 }
 
+func Test_middlewareConfig(t *testing.T) {
+	c := newMiddlewareConfig()
+
+	c.setMiddlewaresForGroupPath("/api/v1", middleware.Auth())
+	assert.Equal(t, 1, len(c.groupPathMiddlewares["/api/v1"]))
+	c.setMiddlewaresForGroupPath("/api/v1", middleware.RateLimit(), middleware.RequestID())
+	assert.Equal(t, 3, len(c.groupPathMiddlewares["/api/v1"]))
+
+	c.setMiddlewaresForSinglePath("/api/v1/userExample", middleware.Auth())
+	assert.Equal(t, 1, len(c.singlePathMiddlewares["/api/v1/userExample"]))
+	c.setMiddlewaresForSinglePath("/api/v1/userExample/list", middleware.RateLimit(), middleware.RequestID())
+	assert.Equal(t, 2, len(c.singlePathMiddlewares["/api/v1/userExample/list"]))
+}
+
 func Test_userExampleServiceRouter(t *testing.T) {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
-	rg := r.Group("")
-	userExampleServiceRouter("", rg, &mockGw{})
+	c := newMiddlewareConfig()
+	userExampleServiceRouter(r, c.groupPathMiddlewares, c.singlePathMiddlewares, &mockGw{})
 }
 
 type mockGw struct{}
