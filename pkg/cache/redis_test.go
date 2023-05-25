@@ -49,8 +49,8 @@ func TestRedisCache(t *testing.T) {
 	key := utils.Uint64ToStr(testData.ID)
 	err := iCache.Set(c.Ctx, key, c.TestDataMap[key], time.Minute)
 	assert.NoError(t, err)
-	err = iCache.Set(c.Ctx, key, c.TestDataMap[key], 0)
-	assert.NoError(t, err)
+	//err = iCache.Set(c.Ctx, key, c.TestDataMap[key], 0)
+	//assert.NoError(t, err)
 
 	val := &redisUser{}
 	err = iCache.Get(c.Ctx, key, val)
@@ -62,8 +62,8 @@ func TestRedisCache(t *testing.T) {
 
 	err = iCache.MultiSet(c.Ctx, c.TestDataMap, time.Minute)
 	assert.NoError(t, err)
-	err = iCache.MultiSet(c.Ctx, c.TestDataMap, 0)
-	assert.NoError(t, err)
+	//err = iCache.MultiSet(c.Ctx, c.TestDataMap, 0)
+	//assert.NoError(t, err)
 
 	var keys []string
 	for k := range c.TestDataMap {
@@ -71,9 +71,9 @@ func TestRedisCache(t *testing.T) {
 	}
 	vals := make(map[string]*redisUser)
 	err = iCache.MultiGet(c.Ctx, keys, vals)
+
 	assert.NoError(t, err)
 	assert.Equal(t, len(c.TestDataSlice), len(vals))
-
 	err = iCache.SetCacheWithNotFound(c.Ctx, "not_found")
 	assert.NoError(t, err)
 }

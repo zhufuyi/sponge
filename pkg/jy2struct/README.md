@@ -24,15 +24,15 @@ type Args struct {
 Example of conversion.
 
 ```go
-    // json covert to struct
-    code, err := jy2struct.Covert(&jy2struct.Args{
+    // json convert to struct
+    code, err := jy2struct.Convert(&jy2struct.Args{
         Format: "json",
         // InputFile: "user.json", // source from json file
         SubStruct: true,
     })
 
-    // yaml covert to struct
-    code, err := jy2struct.Covert(&jy2struct.Args{
+    // yaml convert to struct
+    code, err := jy2struct.Convert(&jy2struct.Args{
         Format: "yaml",
         // InputFile: "user.yaml", // Source from yaml file
         SubStruct: true,

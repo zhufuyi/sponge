@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-// Args  covert arguments
+// Args  convert arguments
 type Args struct {
 	Format    string // document format, json or yaml
 	Data      string // json or yaml content
@@ -48,8 +48,8 @@ func (j *Args) checkValid() error {
 	return nil
 }
 
-// Covert json or yaml to go struct
-func Covert(args *Args) (string, error) {
+// Convert json or yaml to go struct
+func Convert(args *Args) (string, error) {
 	err := args.checkValid()
 	if err != nil {
 		return "", err

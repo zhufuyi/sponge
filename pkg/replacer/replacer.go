@@ -107,8 +107,8 @@ func (r *replacerInfo) SetSubDirsAndFiles(subDirs []string, subFiles ...string) 
 		return
 	}
 
-	subDirs = r.covertPathsDelimiter(subDirs...)
-	subFiles = r.covertPathsDelimiter(subFiles...)
+	subDirs = r.convertPathsDelimiter(subDirs...)
+	subFiles = r.convertPathsDelimiter(subFiles...)
 
 	var files []string
 	isExistFile := make(map[string]struct{}) // use map to avoid duplicate files
@@ -148,7 +148,7 @@ func (r *replacerInfo) SetIgnoreSubFiles(filenames ...string) {
 
 // SetIgnoreSubDirs specify subdirectories to be ignored
 func (r *replacerInfo) SetIgnoreSubDirs(dirs ...string) {
-	dirs = r.covertPathsDelimiter(dirs...)
+	dirs = r.convertPathsDelimiter(dirs...)
 	r.ignoreDirs = append(r.ignoreDirs, dirs...)
 }
 
@@ -188,7 +188,7 @@ func (r *replacerInfo) GetSourcePath() string {
 
 // ReadFile read file content
 func (r *replacerInfo) ReadFile(filename string) ([]byte, error) {
-	filename = r.covertPathDelimiter(filename)
+	filename = r.convertPathDelimiter(filename)
 
 	foundFile := []string{}
 	for _, file := range r.files {
@@ -329,7 +329,7 @@ func (r *replacerInfo) getNewFilePath(file string) string {
 }
 
 // if windows, convert the path splitter
-func (r *replacerInfo) covertPathDelimiter(filePath string) string {
+func (r *replacerInfo) convertPathDelimiter(filePath string) string {
 	if r.isActual && gofile.IsWindows() {
 		filePath = strings.ReplaceAll(filePath, "/", "\\")
 	}
@@ -337,7 +337,7 @@ func (r *replacerInfo) covertPathDelimiter(filePath string) string {
 }
 
 // if windows, batch convert path splitters
-func (r *replacerInfo) covertPathsDelimiter(filePaths ...string) []string {
+func (r *replacerInfo) convertPathsDelimiter(filePaths ...string) []string {
 	if r.isActual && gofile.IsWindows() {
 		filePathsTmp := []string{}
 		for _, dir := range filePaths {

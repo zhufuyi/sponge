@@ -81,7 +81,12 @@ func (d *userExampleDao) DeleteByIDs(ctx context.Context, ids []uint64) error {
 }
 
 func (d *userExampleDao) UpdateByID(ctx context.Context, table *model.UserExample) error {
-	return d.updateByID(ctx, d.db, table)
+	err := d.updateByID(ctx, d.db, table)
+
+	// delete cache
+	_ = d.cache.Del(ctx, table.ID)
+
+	return err
 }
 
 // UpdateByID update records by id
@@ -119,15 +124,7 @@ func (d *userExampleDao) updateByID(ctx context.Context, db *gorm.DB, table *mod
 	}
 	// delete the templates code end
 
-	err := db.WithContext(ctx).Model(table).Updates(update).Error
-	if err != nil {
-		return err
-	}
-
-	// delete cache
-	_ = d.cache.Del(ctx, table.ID)
-
-	return nil
+	return db.WithContext(ctx).Model(table).Updates(update).Error
 }
 
 // GetByID get a record based on id
@@ -227,6 +224,7 @@ func (d *userExampleDao) GetByIDs(ctx context.Context, ids []uint64) (map[uint64
 			}
 		}
 	}
+
 	return itemMap, nil
 }
 
@@ -313,5 +311,10 @@ func (d *userExampleDao) DeleteByTx(ctx context.Context, tx *gorm.DB, id uint64)
 
 // UpdateByTx update a record by id in the database using the provided transaction
 func (d *userExampleDao) UpdateByTx(ctx context.Context, tx *gorm.DB, table *model.UserExample) error {
-	return d.updateByID(ctx, tx, table)
+	err := d.updateByID(ctx, tx, table)
+
+	// delete cache
+	_ = d.cache.Del(ctx, table.ID)
+
+	return err
 }

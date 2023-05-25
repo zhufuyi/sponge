@@ -83,7 +83,7 @@ func runGenConfigCommand(files map[string]configType, ysArgs jy2struct.Args) err
 			ysArgs.Name = "Config"
 			startCode = configFileCode
 		}
-		structCodes, err := jy2struct.Covert(&ysArgs)
+		structCodes, err := jy2struct.Convert(&ysArgs)
 		if err != nil {
 			return err
 		}
@@ -161,7 +161,7 @@ func saveFile(inputFile string, outputFile string, code string) error {
 
 func convertToGoFile(ysArgs jy2struct.Args, outPath string) error {
 	ysArgs.Name = "Config"
-	data, err := jy2struct.Covert(&ysArgs)
+	data, err := jy2struct.Convert(&ysArgs)
 	if err != nil {
 		return err
 	}

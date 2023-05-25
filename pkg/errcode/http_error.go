@@ -26,7 +26,7 @@ func NewError(code int, msg string) *Error {
 	return e
 }
 
-// Err covert to standard error
+// Err convert to standard error
 func (e *Error) Err() error {
 	if len(e.details) == 0 {
 		return fmt.Errorf("code = %d, msg = %s", e.code, e.msg)

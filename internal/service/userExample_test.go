@@ -231,7 +231,7 @@ func Test_userExampleService_List(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func Test_covertUserExample(t *testing.T) {
+func Test_convertUserExample(t *testing.T) {
 	testData := &model.UserExample{}
 	testData.ID = 1
 	testData.CreatedAt = time.Now()

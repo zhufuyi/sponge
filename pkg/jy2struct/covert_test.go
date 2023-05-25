@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestCovert(t *testing.T) {
+func TestConvert(t *testing.T) {
 	type args struct {
 		args *Args
 	}
@@ -61,20 +61,20 @@ age: 10`,
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Covert(tt.args.args)
+			got, err := Convert(tt.args.args)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Covert() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Convert() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			t.Log(got)
 		})
 	}
 
-	// test Covert error
+	// test Convert error
 	arg := &Args{Format: "unknown"}
-	_, err := Covert(arg)
+	_, err := Convert(arg)
 	assert.Error(t, err)
 	arg = &Args{Format: "yaml", InputFile: "notfound.yaml"}
-	_, err = Covert(arg)
+	_, err = Convert(arg)
 	assert.Error(t, err)
 }
