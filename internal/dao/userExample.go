@@ -52,7 +52,7 @@ func (d *userExampleDao) Create(ctx context.Context, table *model.UserExample) e
 	return err
 }
 
-// DeleteByID delete a record based on id
+// DeleteByID delete a record by id
 func (d *userExampleDao) DeleteByID(ctx context.Context, id uint64) error {
 	err := d.db.WithContext(ctx).Where("id = ?", id).Delete(&model.UserExample{}).Error
 	if err != nil {
@@ -65,7 +65,7 @@ func (d *userExampleDao) DeleteByID(ctx context.Context, id uint64) error {
 	return nil
 }
 
-// DeleteByIDs batch delete multiple records
+// DeleteByIDs delete records by batch id
 func (d *userExampleDao) DeleteByIDs(ctx context.Context, ids []uint64) error {
 	err := d.db.WithContext(ctx).Where("id IN (?)", ids).Delete(&model.UserExample{}).Error
 	if err != nil {
@@ -80,6 +80,7 @@ func (d *userExampleDao) DeleteByIDs(ctx context.Context, ids []uint64) error {
 	return nil
 }
 
+// UpdateByID update a record by id
 func (d *userExampleDao) UpdateByID(ctx context.Context, table *model.UserExample) error {
 	err := d.updateByID(ctx, d.db, table)
 
@@ -89,7 +90,6 @@ func (d *userExampleDao) UpdateByID(ctx context.Context, table *model.UserExampl
 	return err
 }
 
-// UpdateByID update records by id
 func (d *userExampleDao) updateByID(ctx context.Context, db *gorm.DB, table *model.UserExample) error {
 	if table.ID < 1 {
 		return errors.New("id cannot be 0")
@@ -127,7 +127,7 @@ func (d *userExampleDao) updateByID(ctx context.Context, db *gorm.DB, table *mod
 	return db.WithContext(ctx).Model(table).Updates(update).Error
 }
 
-// GetByID get a record based on id
+// GetByID get a record by id
 func (d *userExampleDao) GetByID(ctx context.Context, id uint64) (*model.UserExample, error) {
 	record, err := d.cache.Get(ctx, id)
 	if err == nil {
@@ -173,7 +173,7 @@ func (d *userExampleDao) GetByID(ctx context.Context, id uint64) (*model.UserExa
 	return nil, err
 }
 
-// GetByIDs get multiple rows by ids
+// GetByIDs list of records by batch id
 func (d *userExampleDao) GetByIDs(ctx context.Context, ids []uint64) (map[uint64]*model.UserExample, error) {
 	itemMap, err := d.cache.MultiGet(ctx, ids)
 	if err != nil {
@@ -228,7 +228,10 @@ func (d *userExampleDao) GetByIDs(ctx context.Context, ids []uint64) (map[uint64
 	return itemMap, nil
 }
 
-// GetByColumns filter multiple rows based on paging and column information
+// GetByColumns get records by paging and column information,
+// Note: suitable for scenarios where the number of rows in the table is not very large,
+//
+//	performance is lower if the data table is large because of the use of offset.
 //
 // params includes paging parameters and query parameters
 // paging parameters (required):
@@ -293,7 +296,7 @@ func (d *userExampleDao) CreateByTx(ctx context.Context, tx *gorm.DB, table *mod
 	return table.ID, err
 }
 
-// DeleteByTx delete a record in by id the database using the provided transaction
+// DeleteByTx delete a record by id in the database using the provided transaction
 func (d *userExampleDao) DeleteByTx(ctx context.Context, tx *gorm.DB, id uint64) error {
 	update := map[string]interface{}{
 		"deleted_at": time.Now(),

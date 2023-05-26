@@ -71,7 +71,17 @@ func Test_service_userExample_methods(t *testing.T) {
 			},
 			wantErr: false,
 		},
-
+		{
+			name: "DeleteByIDs",
+			fn: func() (interface{}, error) {
+				// todo type in the parameters to test
+				req := &serverNameExampleV1.DeleteUserExampleByIDsRequest{
+					Ids: []uint64{100},
+				}
+				return cli.DeleteByIDs(ctx, req)
+			},
+			wantErr: false,
+		},
 		{
 			name: "GetByID",
 			fn: func() (interface{}, error) {

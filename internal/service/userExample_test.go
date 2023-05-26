@@ -117,6 +117,35 @@ func Test_userExampleService_DeleteByID(t *testing.T) {
 	assert.Error(t, err)
 }
 
+func Test_userExampleService_DeleteByIDs(t *testing.T) {
+	s := newUserExampleService()
+	defer s.Close()
+	data := s.TestData.(*model.UserExample)
+	testData := &serverNameExampleV1.DeleteUserExampleByIDsRequest{
+		Ids: []uint64{data.ID},
+	}
+
+	s.MockDao.SQLMock.ExpectBegin()
+	s.MockDao.SQLMock.ExpectExec("UPDATE .*").
+		WithArgs(s.MockDao.AnyTime, data.ID). // Modified according to the actual number of parameters
+		WillReturnResult(sqlmock.NewResult(int64(data.ID), 1))
+	s.MockDao.SQLMock.ExpectCommit()
+
+	reply, err := s.IServiceClient.(serverNameExampleV1.UserExampleServiceClient).DeleteByIDs(s.Ctx, testData)
+	assert.NoError(t, err)
+	t.Log(reply.String())
+
+	// zero id error test
+	testData.Ids = []uint64{}
+	reply, err = s.IServiceClient.(serverNameExampleV1.UserExampleServiceClient).DeleteByIDs(s.Ctx, testData)
+	assert.Error(t, err)
+
+	// delete error test
+	testData.Ids = []uint64{111}
+	reply, err = s.IServiceClient.(serverNameExampleV1.UserExampleServiceClient).DeleteByIDs(s.Ctx, testData)
+	assert.Error(t, err)
+}
+
 func Test_userExampleService_UpdateByID(t *testing.T) {
 	s := newUserExampleService()
 	defer s.Close()

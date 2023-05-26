@@ -34,6 +34,12 @@ func (c *userExampleServiceClient) DeleteByID(ctx context.Context, req *serverNa
 	return c.userExampleServiceCli.DeleteByID(ctx, req)
 }
 
+func (c *userExampleServiceClient) DeleteByIDs(ctx context.Context, req *serverNameExampleV1.DeleteUserExampleByIDsRequest) (*serverNameExampleV1.DeleteUserExampleByIDsReply, error) {
+	// implement me
+	// If required, fill in the code to fetch data from other rpc servers here.
+	return c.userExampleServiceCli.DeleteByIDs(ctx, req)
+}
+
 func (c *userExampleServiceClient) UpdateByID(ctx context.Context, req *serverNameExampleV1.UpdateUserExampleByIDRequest) (*serverNameExampleV1.UpdateUserExampleByIDReply, error) {
 	// implement me
 	// If required, fill in the code to fetch data from other rpc servers here.

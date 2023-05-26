@@ -67,7 +67,7 @@ func (s *userExampleService) Create(ctx context.Context, req *serverNameExampleV
 	return &serverNameExampleV1.CreateUserExampleReply{Id: userExample.ID}, nil
 }
 
-// DeleteByID delete a record based on id
+// DeleteByID delete a record by id
 func (s *userExampleService) DeleteByID(ctx context.Context, req *serverNameExampleV1.DeleteUserExampleByIDRequest) (*serverNameExampleV1.DeleteUserExampleByIDReply, error) {
 	err := req.Validate()
 	if err != nil {
@@ -84,7 +84,24 @@ func (s *userExampleService) DeleteByID(ctx context.Context, req *serverNameExam
 	return &serverNameExampleV1.DeleteUserExampleByIDReply{}, nil
 }
 
-// UpdateByID update a record based on id
+// DeleteByIDs delete records by batch id
+func (s *userExampleService) DeleteByIDs(ctx context.Context, req *serverNameExampleV1.DeleteUserExampleByIDsRequest) (*serverNameExampleV1.DeleteUserExampleByIDsReply, error) {
+	err := req.Validate()
+	if err != nil {
+		logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req), interceptor.ServerCtxRequestIDField(ctx))
+		return nil, ecode.StatusInvalidParams.Err()
+	}
+
+	err = s.iDao.DeleteByIDs(ctx, req.Ids)
+	if err != nil {
+		logger.Error("s.iDao.DeleteByID error", logger.Err(err), logger.Any("ids", req.Ids), interceptor.ServerCtxRequestIDField(ctx))
+		return nil, ecode.StatusInternalServerError.ToRPCErr()
+	}
+
+	return &serverNameExampleV1.DeleteUserExampleByIDsReply{}, nil
+}
+
+// UpdateByID update a record by id
 func (s *userExampleService) UpdateByID(ctx context.Context, req *serverNameExampleV1.UpdateUserExampleByIDRequest) (*serverNameExampleV1.UpdateUserExampleByIDReply, error) {
 	err := req.Validate()
 	if err != nil {
@@ -135,7 +152,7 @@ func (s *userExampleService) GetByID(ctx context.Context, req *serverNameExample
 	return &serverNameExampleV1.GetUserExampleByIDReply{UserExample: data}, nil
 }
 
-// ListByIDs get multiple records based on an array of ids
+// ListByIDs list of records by batch id
 func (s *userExampleService) ListByIDs(ctx context.Context, req *serverNameExampleV1.ListUserExampleByIDsRequest) (*serverNameExampleV1.ListUserExampleByIDsReply, error) {
 	err := req.Validate()
 	if err != nil {
@@ -164,7 +181,7 @@ func (s *userExampleService) ListByIDs(ctx context.Context, req *serverNameExamp
 	return &serverNameExampleV1.ListUserExampleByIDsReply{UserExamples: userExamples}, nil
 }
 
-// List Get multiple records based on query parameters
+// List of records by query parameters
 func (s *userExampleService) List(ctx context.Context, req *serverNameExampleV1.ListUserExampleRequest) (*serverNameExampleV1.ListUserExampleReply, error) {
 	err := req.Validate()
 	if err != nil {

@@ -24,6 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 type UserExampleServiceClient interface {
 	Create(ctx context.Context, in *CreateUserExampleRequest, opts ...grpc.CallOption) (*CreateUserExampleReply, error)
 	DeleteByID(ctx context.Context, in *DeleteUserExampleByIDRequest, opts ...grpc.CallOption) (*DeleteUserExampleByIDReply, error)
+	DeleteByIDs(ctx context.Context, in *DeleteUserExampleByIDsRequest, opts ...grpc.CallOption) (*DeleteUserExampleByIDsReply, error)
 	UpdateByID(ctx context.Context, in *UpdateUserExampleByIDRequest, opts ...grpc.CallOption) (*UpdateUserExampleByIDReply, error)
 	GetByID(ctx context.Context, in *GetUserExampleByIDRequest, opts ...grpc.CallOption) (*GetUserExampleByIDReply, error)
 	ListByIDs(ctx context.Context, in *ListUserExampleByIDsRequest, opts ...grpc.CallOption) (*ListUserExampleByIDsReply, error)
@@ -50,6 +51,15 @@ func (c *userExampleServiceClient) Create(ctx context.Context, in *CreateUserExa
 func (c *userExampleServiceClient) DeleteByID(ctx context.Context, in *DeleteUserExampleByIDRequest, opts ...grpc.CallOption) (*DeleteUserExampleByIDReply, error) {
 	out := new(DeleteUserExampleByIDReply)
 	err := c.cc.Invoke(ctx, "/api.serverNameExample.v1.userExampleService/DeleteByID", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userExampleServiceClient) DeleteByIDs(ctx context.Context, in *DeleteUserExampleByIDsRequest, opts ...grpc.CallOption) (*DeleteUserExampleByIDsReply, error) {
+	out := new(DeleteUserExampleByIDsReply)
+	err := c.cc.Invoke(ctx, "/api.serverNameExample.v1.userExampleService/DeleteByIDs", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -98,6 +108,7 @@ func (c *userExampleServiceClient) List(ctx context.Context, in *ListUserExample
 type UserExampleServiceServer interface {
 	Create(context.Context, *CreateUserExampleRequest) (*CreateUserExampleReply, error)
 	DeleteByID(context.Context, *DeleteUserExampleByIDRequest) (*DeleteUserExampleByIDReply, error)
+	DeleteByIDs(context.Context, *DeleteUserExampleByIDsRequest) (*DeleteUserExampleByIDsReply, error)
 	UpdateByID(context.Context, *UpdateUserExampleByIDRequest) (*UpdateUserExampleByIDReply, error)
 	GetByID(context.Context, *GetUserExampleByIDRequest) (*GetUserExampleByIDReply, error)
 	ListByIDs(context.Context, *ListUserExampleByIDsRequest) (*ListUserExampleByIDsReply, error)
@@ -114,6 +125,9 @@ func (UnimplementedUserExampleServiceServer) Create(context.Context, *CreateUser
 }
 func (UnimplementedUserExampleServiceServer) DeleteByID(context.Context, *DeleteUserExampleByIDRequest) (*DeleteUserExampleByIDReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteByID not implemented")
+}
+func (UnimplementedUserExampleServiceServer) DeleteByIDs(context.Context, *DeleteUserExampleByIDsRequest) (*DeleteUserExampleByIDsReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteByIDs not implemented")
 }
 func (UnimplementedUserExampleServiceServer) UpdateByID(context.Context, *UpdateUserExampleByIDRequest) (*UpdateUserExampleByIDReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateByID not implemented")
@@ -172,6 +186,24 @@ func _UserExampleService_DeleteByID_Handler(srv interface{}, ctx context.Context
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserExampleServiceServer).DeleteByID(ctx, req.(*DeleteUserExampleByIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserExampleService_DeleteByIDs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteUserExampleByIDsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserExampleServiceServer).DeleteByIDs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.serverNameExample.v1.userExampleService/DeleteByIDs",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserExampleServiceServer).DeleteByIDs(ctx, req.(*DeleteUserExampleByIDsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -262,6 +294,10 @@ var UserExampleService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteByID",
 			Handler:    _UserExampleService_DeleteByID_Handler,
+		},
+		{
+			MethodName: "DeleteByIDs",
+			Handler:    _UserExampleService_DeleteByIDs_Handler,
 		},
 		{
 			MethodName: "UpdateByID",

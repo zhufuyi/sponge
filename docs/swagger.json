@@ -8,7 +8,7 @@
         "description": "http server api docs",
         "title": "serverNameExample api docs",
         "contact": {},
-        "version": "v0.0.0"
+        "version": "2.0"
     },
     "host": "localhost:8080",
     "paths": {
@@ -48,7 +48,7 @@
         },
         "/api/v1/userExample/delete/ids": {
             "post": {
-                "description": "delete userExamples by multiple id using a post request",
+                "description": "delete userExamples by batch id",
                 "consumes": [
                     "application/json"
                 ],
@@ -58,7 +58,7 @@
                 "tags": [
                     "userExample"
                 ],
-                "summary": "delete userExamples by multiple id",
+                "summary": "delete userExamples",
                 "parameters": [
                     {
                         "description": "id array",
@@ -82,7 +82,7 @@
         },
         "/api/v1/userExample/list": {
             "post": {
-                "description": "paging and conditional fetching of userExamples lists using post requests",
+                "description": "list of userExamples by paging and conditions",
                 "consumes": [
                     "application/json"
                 ],
@@ -92,7 +92,7 @@
                 "tags": [
                     "userExample"
                 ],
-                "summary": "get a list of userExamples",
+                "summary": "list of userExamples by query parameters",
                 "parameters": [
                     {
                         "description": "query parameters",
@@ -116,7 +116,7 @@
         },
         "/api/v1/userExample/list/ids": {
             "post": {
-                "description": "get userExamples by multiple id using a post request",
+                "description": "list of userExamples by batch id",
                 "consumes": [
                     "application/json"
                 ],
@@ -126,7 +126,7 @@
                 "tags": [
                     "userExample"
                 ],
-                "summary": "get userExamples by multiple id",
+                "summary": "list of userExamples by batch id",
                 "parameters": [
                     {
                         "description": "id array",
@@ -150,7 +150,7 @@
         },
         "/api/v1/userExample/{id}": {
             "get": {
-                "description": "get userExample details by id",
+                "description": "get userExample detail by id",
                 "consumes": [
                     "application/json"
                 ],
@@ -160,7 +160,7 @@
                 "tags": [
                     "userExample"
                 ],
-                "summary": "get userExample details",
+                "summary": "get userExample detail",
                 "parameters": [
                     {
                         "type": "string",
@@ -190,7 +190,7 @@
                 "tags": [
                     "userExample"
                 ],
-                "summary": "update userExample information",
+                "summary": "update userExample",
                 "parameters": [
                     {
                         "type": "string",

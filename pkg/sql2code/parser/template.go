@@ -98,28 +98,40 @@ import "tagger/tagger.proto";
 option go_package = "github.com/zhufuyi/sponge/api/serverNameExample/v1;v1";
 
 // Default settings for generating swagger documents
+// Reference https://github.com/grpc-ecosystem/grpc-gateway/blob/db7fbefff7c04877cdb32e16d4a248a024428207/examples/internal/proto/examplepb/a_bit_of_everything.proto  
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   host: "localhost:8080"
   base_path: ""
   info: {
     title: "serverNameExample api docs";
-    version: "v0.0.0";
-  };
+    version: "2.0";
+  }
   schemes: HTTP;
   schemes: HTTPS;
   consumes: "application/json";
   produces: "application/json";
+  security_definitions: {
+    security: {
+      key: "BearerAuth";
+      value: {
+        type: TYPE_API_KEY;
+        in: IN_HEADER;
+        name: "Authorization";
+        description: "Input a \"Bearer your-jwt-token\" to Value";
+      }
+    }
+  }
 };
 
-service {{.TName}}Service {
+service {{.TName}} {
   rpc Create(Create{{.TableName}}Request) returns (Create{{.TableName}}Reply) {
     option (google.api.http) = {
       post: "/api/v1/{{.TName}}"
       body: "*"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "create a new {{.TName}}",
-      description: "submit information to create a new {{.TName}}",
+      summary: "create {{.TName}}",
+      description: "submit information to create {{.TName}}",
       tags: "{{.TName}}",
     };
   }
@@ -132,6 +144,30 @@ service {{.TName}}Service {
       summary: "delete {{.TName}}",
       description: "delete {{.TName}} by id",
       tags: "{{.TName}}",
+      //security: {
+      //  security_requirement: {
+      //    key: "BearerAuth";
+      //    value: {}
+      //  }
+      //}
+    };
+  }
+
+  rpc DeleteByIDs(Delete{{.TableName}}ByIDsRequest) returns (Delete{{.TableName}}ByIDsReply) {
+    option (google.api.http) = {
+      post: "/api/v1/{{.TName}}/delete/ids"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "delete {{.TName}}s by batch id",
+      description: "delete {{.TName}}s by batch id",
+      tags: "{{.TName}}",
+      //security: {
+      //  security_requirement: {
+      //    key: "BearerAuth";
+      //    value: {}
+      //  }
+      //}
     };
   }
 
@@ -141,9 +177,15 @@ service {{.TName}}Service {
       body: "*"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "update {{.TName}} info",
-      description: "update {{.TName}} info by id",
+      summary: "update {{.TName}}",
+      description: "update {{.TName}} by id",
       tags: "{{.TName}}",
+      //security: {
+      //  security_requirement: {
+      //    key: "BearerAuth";
+      //    value: {}
+      //  }
+      //}
     };
   }
 
@@ -152,9 +194,15 @@ service {{.TName}}Service {
       get: "/api/v1/{{.TName}}/{id}"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "get {{.TName}} details",
-      description: "get {{.TName}} details by id",
+      summary: "get {{.TName}} detail",
+      description: "get {{.TName}} detail by id",
       tags: "{{.TName}}",
+      //security: {
+      //  security_requirement: {
+      //    key: "BearerAuth";
+      //    value: {}
+      //  }
+      //}
     };
   }
 
@@ -164,9 +212,15 @@ service {{.TName}}Service {
       body: "*"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "get a list of {{.TName}} by multiple ids",
-      description: "get a list of {{.TName}} by multiple ids",
+      summary: "list of {{.TName}}s by batch id",
+      description: "list of {{.TName}}s by batch id",
       tags: "{{.TName}}",
+      //security: {
+      //  security_requirement: {
+      //    key: "BearerAuth";
+      //    value: {}
+      //  }
+      //}
     };
   }
 
@@ -176,9 +230,15 @@ service {{.TName}}Service {
       body: "*"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "get a list of {{.TName}} by parameters",
-      description: "get a list of {{.TName}} by parameters",
+      summary: "list of {{.TName}}s by parameters",
+      description: "list of {{.TName}}s by paging and conditions",
       tags: "{{.TName}}",
+      //security: {
+      //  security_requirement: {
+      //    key: "BearerAuth";
+      //    value: {}
+      //  }
+      //}
     };
   }
 }
@@ -196,6 +256,14 @@ message Delete{{.TableName}}ByIDRequest {
 }
 
 message Delete{{.TableName}}ByIDReply {
+
+}
+
+message Delete{{.TableName}}ByIDsRequest {
+  repeated uint64 ids = 1;
+}
+
+message Delete{{.TableName}}ByIDsReply {
 
 }
 

@@ -597,6 +597,212 @@ var _ interface {
 	ErrorName() string
 } = DeleteUserExampleByIDReplyValidationError{}
 
+// Validate checks the field values on DeleteUserExampleByIDsRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DeleteUserExampleByIDsRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DeleteUserExampleByIDsRequest with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// DeleteUserExampleByIDsRequestMultiError, or nil if none found.
+func (m *DeleteUserExampleByIDsRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DeleteUserExampleByIDsRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return DeleteUserExampleByIDsRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// DeleteUserExampleByIDsRequestMultiError is an error wrapping multiple
+// validation errors returned by DeleteUserExampleByIDsRequest.ValidateAll()
+// if the designated constraints aren't met.
+type DeleteUserExampleByIDsRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DeleteUserExampleByIDsRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DeleteUserExampleByIDsRequestMultiError) AllErrors() []error { return m }
+
+// DeleteUserExampleByIDsRequestValidationError is the validation error
+// returned by DeleteUserExampleByIDsRequest.Validate if the designated
+// constraints aren't met.
+type DeleteUserExampleByIDsRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DeleteUserExampleByIDsRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DeleteUserExampleByIDsRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DeleteUserExampleByIDsRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DeleteUserExampleByIDsRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DeleteUserExampleByIDsRequestValidationError) ErrorName() string {
+	return "DeleteUserExampleByIDsRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DeleteUserExampleByIDsRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDeleteUserExampleByIDsRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DeleteUserExampleByIDsRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DeleteUserExampleByIDsRequestValidationError{}
+
+// Validate checks the field values on DeleteUserExampleByIDsReply with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DeleteUserExampleByIDsReply) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DeleteUserExampleByIDsReply with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DeleteUserExampleByIDsReplyMultiError, or nil if none found.
+func (m *DeleteUserExampleByIDsReply) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DeleteUserExampleByIDsReply) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return DeleteUserExampleByIDsReplyMultiError(errors)
+	}
+
+	return nil
+}
+
+// DeleteUserExampleByIDsReplyMultiError is an error wrapping multiple
+// validation errors returned by DeleteUserExampleByIDsReply.ValidateAll() if
+// the designated constraints aren't met.
+type DeleteUserExampleByIDsReplyMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DeleteUserExampleByIDsReplyMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DeleteUserExampleByIDsReplyMultiError) AllErrors() []error { return m }
+
+// DeleteUserExampleByIDsReplyValidationError is the validation error returned
+// by DeleteUserExampleByIDsReply.Validate if the designated constraints
+// aren't met.
+type DeleteUserExampleByIDsReplyValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DeleteUserExampleByIDsReplyValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DeleteUserExampleByIDsReplyValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DeleteUserExampleByIDsReplyValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DeleteUserExampleByIDsReplyValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DeleteUserExampleByIDsReplyValidationError) ErrorName() string {
+	return "DeleteUserExampleByIDsReplyValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DeleteUserExampleByIDsReplyValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDeleteUserExampleByIDsReply.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DeleteUserExampleByIDsReplyValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DeleteUserExampleByIDsReplyValidationError{}
+
 // Validate checks the field values on UpdateUserExampleByIDRequest with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.

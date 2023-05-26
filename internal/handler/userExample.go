@@ -81,7 +81,7 @@ func (h *userExampleHandler) Create(c *gin.Context) {
 	response.Success(c, gin.H{"id": userExample.ID})
 }
 
-// DeleteByID delete a record by ID
+// DeleteByID delete a record by id
 // @Summary delete userExample
 // @Description delete userExample by id
 // @Tags userExample
@@ -106,9 +106,9 @@ func (h *userExampleHandler) DeleteByID(c *gin.Context) {
 	response.Success(c)
 }
 
-// DeleteByIDs delete records by multiple id
-// @Summary delete userExamples by multiple id
-// @Description delete userExamples by multiple id using a post request
+// DeleteByIDs delete records by batch id
+// @Summary delete userExamples
+// @Description delete userExamples by batch id
 // @Tags userExample
 // @Param data body types.DeleteUserExamplesByIDsRequest true "id array"
 // @Accept json
@@ -135,7 +135,7 @@ func (h *userExampleHandler) DeleteByIDs(c *gin.Context) {
 }
 
 // UpdateByID update information by id
-// @Summary update userExample information
+// @Summary update userExample
 // @Description update userExample information by id
 // @Tags userExample
 // @accept json
@@ -177,8 +177,8 @@ func (h *userExampleHandler) UpdateByID(c *gin.Context) {
 }
 
 // GetByID get a record by id
-// @Summary get userExample details
-// @Description get userExample details by id
+// @Summary get userExample detail
+// @Description get userExample detail by id
 // @Tags userExample
 // @Param id path string true "id"
 // @Accept json
@@ -214,9 +214,9 @@ func (h *userExampleHandler) GetByID(c *gin.Context) {
 	response.Success(c, gin.H{"userExample": data})
 }
 
-// ListByIDs get records by multiple id
-// @Summary get userExamples by multiple id
-// @Description get userExamples by multiple id using a post request
+// ListByIDs list of records by batch id
+// @Summary list of userExamples by batch id
+// @Description list of userExamples by batch id
 // @Tags userExample
 // @Param data body types.GetUserExamplesByIDsRequest true "id array"
 // @Accept json
@@ -257,9 +257,9 @@ func (h *userExampleHandler) ListByIDs(c *gin.Context) {
 	})
 }
 
-// List Get multiple records by query parameters
-// @Summary get a list of userExamples
-// @Description paging and conditional fetching of userExamples lists using post requests
+// List of records by query parameters
+// @Summary list of userExamples by query parameters
+// @Description list of userExamples by paging and conditions
 // @Tags userExample
 // @accept json
 // @Produce json

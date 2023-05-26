@@ -129,7 +129,7 @@ info:
   contact: {}
   description: http server api docs
   title: serverNameExample api docs
-  version: v0.0.0
+  version: "2.0"
 paths:
   /api/v1/userExample:
     post:
@@ -177,7 +177,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: get userExample details by id
+      description: get userExample detail by id
       parameters:
       - description: id
         in: path
@@ -191,7 +191,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/types.Result'
-      summary: get userExample details
+      summary: get userExample detail
       tags:
       - userExample
     put:
@@ -217,14 +217,14 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/types.Result'
-      summary: update userExample information
+      summary: update userExample
       tags:
       - userExample
   /api/v1/userExample/delete/ids:
     post:
       consumes:
       - application/json
-      description: delete userExamples by multiple id using a post request
+      description: delete userExamples by batch id
       parameters:
       - description: id array
         in: body
@@ -239,15 +239,14 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/types.Result'
-      summary: delete userExamples by multiple id
+      summary: delete userExamples
       tags:
       - userExample
   /api/v1/userExample/list:
     post:
       consumes:
       - application/json
-      description: paging and conditional fetching of userExamples lists using post
-        requests
+      description: list of userExamples by paging and conditions
       parameters:
       - description: query parameters
         in: body
@@ -262,14 +261,14 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/types.Result'
-      summary: get a list of userExamples
+      summary: list of userExamples by query parameters
       tags:
       - userExample
   /api/v1/userExample/list/ids:
     post:
       consumes:
       - application/json
-      description: get userExamples by multiple id using a post request
+      description: list of userExamples by batch id
       parameters:
       - description: id array
         in: body
@@ -284,7 +283,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/types.Result'
-      summary: get userExamples by multiple id
+      summary: list of userExamples by batch id
       tags:
       - userExample
   /health:

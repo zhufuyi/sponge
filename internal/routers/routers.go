@@ -11,6 +11,7 @@ import (
 	"github.com/zhufuyi/sponge/pkg/gin/middleware/metrics"
 	"github.com/zhufuyi/sponge/pkg/gin/prof"
 	"github.com/zhufuyi/sponge/pkg/gin/validator"
+	"github.com/zhufuyi/sponge/pkg/jwt"
 	"github.com/zhufuyi/sponge/pkg/logger"
 
 	"github.com/gin-gonic/gin"
@@ -42,6 +43,13 @@ func NewRouter() *gin.Engine {
 		middleware.WithRequestIDFromContext(),
 		middleware.WithIgnoreRoutes("/metrics"), // ignore path
 	))
+
+	// init jwt middleware
+	jwt.Init(
+	//jwt.WithExpire(time.Hour*24),
+	//jwt.WithSigningKey("123456"),
+	//jwt.WithSigningMethod(jwt.SigningMethodHS384),
+	)
 
 	// metrics middleware
 	if config.Get().App.EnableMetrics {

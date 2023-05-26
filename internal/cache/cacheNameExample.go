@@ -38,7 +38,7 @@ type cacheNameExampleCache struct {
 	cache cache.Cache
 }
 
-// NewCacheNameExampleCache new cache
+// NewCacheNameExampleCache create a new cache
 func NewCacheNameExampleCache(cacheType *model.CacheType) CacheNameExampleCache {
 	newObject := func() interface{} {
 		return ""

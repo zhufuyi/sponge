@@ -52,7 +52,7 @@ const docTemplate = `{
         },
         "/api/v1/userExample/delete/ids": {
             "post": {
-                "description": "delete userExamples by multiple id using a post request",
+                "description": "delete userExamples by batch id",
                 "consumes": [
                     "application/json"
                 ],
@@ -62,7 +62,7 @@ const docTemplate = `{
                 "tags": [
                     "userExample"
                 ],
-                "summary": "delete userExamples by multiple id",
+                "summary": "delete userExamples",
                 "parameters": [
                     {
                         "description": "id array",
@@ -86,7 +86,7 @@ const docTemplate = `{
         },
         "/api/v1/userExample/list": {
             "post": {
-                "description": "paging and conditional fetching of userExamples lists using post requests",
+                "description": "list of userExamples by paging and conditions",
                 "consumes": [
                     "application/json"
                 ],
@@ -96,7 +96,7 @@ const docTemplate = `{
                 "tags": [
                     "userExample"
                 ],
-                "summary": "get a list of userExamples",
+                "summary": "list of userExamples by query parameters",
                 "parameters": [
                     {
                         "description": "query parameters",
@@ -120,7 +120,7 @@ const docTemplate = `{
         },
         "/api/v1/userExample/list/ids": {
             "post": {
-                "description": "get userExamples by multiple id using a post request",
+                "description": "list of userExamples by batch id",
                 "consumes": [
                     "application/json"
                 ],
@@ -130,7 +130,7 @@ const docTemplate = `{
                 "tags": [
                     "userExample"
                 ],
-                "summary": "get userExamples by multiple id",
+                "summary": "list of userExamples by batch id",
                 "parameters": [
                     {
                         "description": "id array",
@@ -154,7 +154,7 @@ const docTemplate = `{
         },
         "/api/v1/userExample/{id}": {
             "get": {
-                "description": "get userExample details by id",
+                "description": "get userExample detail by id",
                 "consumes": [
                     "application/json"
                 ],
@@ -164,7 +164,7 @@ const docTemplate = `{
                 "tags": [
                     "userExample"
                 ],
-                "summary": "get userExample details",
+                "summary": "get userExample detail",
                 "parameters": [
                     {
                         "type": "string",
@@ -194,7 +194,7 @@ const docTemplate = `{
                 "tags": [
                     "userExample"
                 ],
-                "summary": "update userExample information",
+                "summary": "update userExample",
                 "parameters": [
                     {
                         "type": "string",
@@ -479,7 +479,7 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "v0.0.0",
+	Version:          "2.0",
 	Host:             "localhost:8080",
 	BasePath:         "",
 	Schemes:          []string{"http", "https"},

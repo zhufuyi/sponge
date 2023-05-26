@@ -14,17 +14,29 @@ import "tagger/tagger.proto";
 option go_package = "github.com/zhufuyi/sponge/api/serverNameExample/v1;v1";
 
 // default settings for generating *.swagger.json documents
+// reference https://github.com/grpc-ecosystem/grpc-gateway/blob/db7fbefff7c04877cdb32e16d4a248a024428207/examples/internal/proto/examplepb/a_bit_of_everything.proto
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   host: "localhost:8080"
   base_path: ""
   info: {
     title: "serverNameExample api docs";
-    version: "v0.0.0";
-  };
+    version: "2.0";
+  }
   schemes: HTTP;
   schemes: HTTPS;
   consumes: "application/json";
   produces: "application/json";
+  security_definitions: {
+    security: {
+      key: "BearerAuth";
+      value: {
+        type: TYPE_API_KEY;
+        in: IN_HEADER;
+        name: "Authorization";
+        description: "Input a \"Bearer your-jwt-token\" to Value";
+      }
+    }
+  }
 };
 
 service userExampleService {
@@ -35,7 +47,7 @@ service userExampleService {
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "create userExample",
-      description: "submit information to create a userExample",
+      description: "submit information to create userExample",
       tags: "userExample",
     };
   }
@@ -48,6 +60,30 @@ service userExampleService {
       summary: "delete userExample",
       description: "delete userExample by id",
       tags: "userExample",
+      //security: {
+      //  security_requirement: {
+      //    key: "BearerAuth";
+      //    value: {}
+      //  }
+      //}
+    };
+  }
+
+  rpc DeleteByIDs(DeleteUserExampleByIDsRequest) returns (DeleteUserExampleByIDsReply) {
+    option (google.api.http) = {
+      post: "/api/v1/userExample/delete/ids"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "delete userExamples",
+      description: "delete userExamples by batch id",
+      tags: "userExample",
+      //security: {
+      //  security_requirement: {
+      //    key: "BearerAuth";
+      //    value: {}
+      //  }
+      //}
     };
   }
 
@@ -58,8 +94,14 @@ service userExampleService {
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "update userExample",
-      description: "update userExample information based on id",
+      description: "update userExample by id",
       tags: "userExample",
+      //security: {
+      //  security_requirement: {
+      //    key: "BearerAuth";
+      //    value: {}
+      //  }
+      //}
     };
   }
 
@@ -68,9 +110,15 @@ service userExampleService {
       get: "/api/v1/userExample/{id}"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "get userExample details",
-      description: "get userExample details by id",
+      summary: "get userExample detail",
+      description: "get userExample detail by id",
       tags: "userExample",
+      //security: {
+      //  security_requirement: {
+      //    key: "BearerAuth";
+      //    value: {}
+      //  }
+      //}
     };
   }
 
@@ -80,9 +128,15 @@ service userExampleService {
       body: "*"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "get a list of userExample based on multiple ids",
-      description: "get a list of userExample based on multiple ids using a post request",
+      summary: "list of userExamples by batch id",
+      description: "list of userExamples by by batch id",
       tags: "userExample",
+      //security: {
+      //  security_requirement: {
+      //    key: "BearerAuth";
+      //    value: {}
+      //  }
+      //}
     };
   }
 
@@ -92,9 +146,15 @@ service userExampleService {
       body: "*"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "get a list of userExamples",
-      description: "get a list of userExamples using a post request",
+      summary: "list of userExamples by query parameters",
+      description: "list of userExamples by paging and conditions",
       tags: "userExample",
+      //security: {
+      //  security_requirement: {
+      //    key: "BearerAuth";
+      //    value: {}
+      //  }
+      //}
     };
   }
 }
@@ -105,8 +165,7 @@ enum GenderType {
   FEMALE = 2;
 };
 
-// if using a grpc gateway, it is recommended to add target, which can be automatically verified on request.
-// example: string email = 2 [(tagger.tags) = "binding:\"email\"" ];
+// todo fill in the validate rules https://github.com/envoyproxy/protoc-gen-validate#constraint-rules
 
 message CreateUserExampleRequest {
   string name = 1 [(validate.rules).string.min_len  = 2];         // name
@@ -127,6 +186,14 @@ message DeleteUserExampleByIDRequest {
 }
 
 message DeleteUserExampleByIDReply {
+
+}
+
+message DeleteUserExampleByIDsRequest {
+  repeated uint64 ids = 1;
+}
+
+message DeleteUserExampleByIDsReply {
 
 }
 
