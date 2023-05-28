@@ -26,6 +26,8 @@ type {{$.LowerName}}Options struct {
 	isFromRPC bool
 	responser errcode.Responser
 	zapLog    *zap.Logger
+	httpErrors []*errcode.Error
+	rpcStatus  []*errcode.RPCStatus
 }
 
 func (o *{{$.LowerName}}Options) apply(opts ...{{$.Name}}Option) {
@@ -58,6 +60,18 @@ func With{{$.Name}}Logger(zapLog *zap.Logger) {{$.Name}}Option {
 	}
 }
 
+func With{{$.Name}}ErrorToHTTPCode(e ...*errcode.Error) {{$.Name}}Option {
+	return func(o *{{$.LowerName}}Options) {
+		o.httpErrors = e
+	}
+}
+
+func With{{$.Name}}RPCStatusToHTTPCode(s ...*errcode.RPCStatus) {{$.Name}}Option {
+	return func(o *{{$.LowerName}}Options) {
+		o.rpcStatus = s
+	}
+}
+
 func Register{{$.Name}}Router(
 	iRouter gin.IRouter,
 	groupPathMiddlewares map[string][]gin.HandlerFunc,
@@ -69,7 +83,7 @@ func Register{{$.Name}}Router(
 	o.apply(opts...)
 
 	if o.responser == nil {
-		o.responser = errcode.NewResponse(o.isFromRPC)
+		o.responser = errcode.NewResponser(o.isFromRPC, o.httpErrors, o.rpcStatus)
 	}
 	if o.zapLog == nil {
 		o.zapLog,_ = zap.NewProduction()
@@ -96,11 +110,11 @@ type {{$.LowerName}}Router struct {
 }
 
 func (r *{{$.LowerName}}Router) register() {
-{{range .Methods}}r.iRouter.Handle("{{.Method}}", "{{.Path}}", r.withMiddleware("{{.Path}}", r.{{ .HandlerName }})...)
+{{range .Methods}}r.iRouter.Handle("{{.Method}}", "{{.Path}}", r.withMiddleware("{{.Method}}", "{{.Path}}", r.{{ .HandlerName }})...)
 {{end}}
 }
 
-func (r *{{$.LowerName}}Router) withMiddleware(path string, fn gin.HandlerFunc) []gin.HandlerFunc {
+func (r *{{$.LowerName}}Router) withMiddleware(method string, path string, fn gin.HandlerFunc) []gin.HandlerFunc {
 	handlerFns := []gin.HandlerFunc{}
 
 	// determine if a route group is hit or miss, left prefix rule
@@ -119,7 +133,8 @@ func (r *{{$.LowerName}}Router) withMiddleware(path string, fn gin.HandlerFunc) 
 	}
 
 	// determine if a single route has been hit
-	if fns, ok := r.singlePathMiddlewares[path]; ok {
+	key := strings.ToUpper(method) + "->" + path
+	if fns, ok := r.singlePathMiddlewares[key]; ok {
 		handlerFns = append(handlerFns, fns...)
 	}
 
@@ -129,27 +144,28 @@ func (r *{{$.LowerName}}Router) withMiddleware(path string, fn gin.HandlerFunc) 
 {{range .Methods}}
 func (r *{{$.LowerName}}Router) {{ .HandlerName }} (c *gin.Context) {
 	req := &{{.Request}}{}
+	var err error
 {{if .HasPathParams }}
-	if err := c.ShouldBindUri(req); err != nil {
+	if err = c.ShouldBindUri(req); err != nil {
 		r.zapLog.Warn("ShouldBindUri error", zap.Error(err), middleware.GCtxRequestIDField(c))
 		r.iResponse.ParamError(c, err)
 		return
 	}
 {{end}}
 {{if eq .Method "GET" "DELETE" }}
-	if err := c.ShouldBindQuery(req); err != nil {
+	if err = c.ShouldBindQuery(req); err != nil {
 		r.zapLog.Warn("ShouldBindQuery error", zap.Error(err), middleware.GCtxRequestIDField(c))
 		r.iResponse.ParamError(c, err)
 		return
 	}
 {{else if eq .Method "POST" "PUT" }}
-	if err := c.ShouldBindJSON(req); err != nil {
+	if err = c.ShouldBindJSON(req); err != nil {
 		r.zapLog.Warn("ShouldBindJSON error", zap.Error(err), middleware.GCtxRequestIDField(c))
 		r.iResponse.ParamError(c, err)
 		return
 	}
 {{else}}
-	if err := c.ShouldBind(req); err != nil {
+	if err = c.ShouldBind(req); err != nil {
 		r.zapLog.Warn("ShouldBind error", zap.Error(err), middleware.GCtxRequestIDField(c))
 		r.iResponse.ParamError(c, err)
 		return
@@ -157,10 +173,7 @@ func (r *{{$.LowerName}}Router) {{ .HandlerName }} (c *gin.Context) {
 {{end}}
 	out, err := r.iLogic.{{.Name}}(c.Request.Context(), req)
 	if err != nil {
-		isIgnore := r.iResponse.Error(c, err)
-		if !isIgnore {
-			r.zapLog.Error("{{.Name}} error", zap.Error(err), middleware.GCtxRequestIDField(c))
-		}
+		r.iResponse.Error(c, err)
 		return
 	}
 

@@ -65,7 +65,7 @@ func (e *Error) ToHTTPCode() int {
 		return http.StatusInternalServerError
 	case InvalidParams.Code():
 		return http.StatusBadRequest
-	case Unauthorized.Code():
+	case Unauthorized.Code(), PermissionDenied.Code():
 		return http.StatusUnauthorized
 	case TooManyRequests.Code(), LimitExceed.Code():
 		return http.StatusTooManyRequests
@@ -81,9 +81,11 @@ func (e *Error) ToHTTPCode() int {
 		return http.StatusMethodNotAllowed
 	case ServiceUnavailable.Code():
 		return http.StatusServiceUnavailable
+	case Unimplemented.Code():
+		return http.StatusNotImplemented
 	}
 
-	return e.Code()
+	return http.StatusInternalServerError
 }
 
 // ParseError parsing out error codes from error messages

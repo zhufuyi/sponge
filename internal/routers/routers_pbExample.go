@@ -2,6 +2,7 @@ package routers
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/zhufuyi/sponge/docs"
 	"github.com/zhufuyi/sponge/internal/config"
@@ -21,8 +22,12 @@ import (
 
 type routeFns = []func(r *gin.Engine, groupPathMiddlewares map[string][]gin.HandlerFunc, singlePathMiddlewares map[string][]gin.HandlerFunc)
 
-// all route functions
-var allRouteFns = make(routeFns, 0)
+var (
+	// all route functions
+	allRouteFns = make(routeFns, 0)
+	// all middleware functions
+	allMiddlewareFns = []func(c *middlewareConfig){}
+)
 
 // NewRouter_pbExample create a new router
 func NewRouter_pbExample() *gin.Engine { //nolint
@@ -87,31 +92,17 @@ func NewRouter_pbExample() *gin.Engine { //nolint
 
 	c := newMiddlewareConfig()
 
-	// set up the middleware for the route group, route group is left prefix rules,
-	// it can be viewed in the register() function in the api/serverNameExample/v1/xxx_route.go file
-	// example:
-	//		c.setMiddlewaresForGroupPath("/api/v1", middleware.Auth())
-	//		c.setMiddlewaresForGroupPath("/api/v2", middleware.Auth(), middleware.RateLimit())
-
-	// set up single route middleware, route must be full path,
-	// it can be viewed in the register() function in the api/serverNameExample/v1/xxx_route.go file
-	// example:
-	//		c.setMiddlewaresForSinglePath("/api/v1/userExample", middleware.Auth())
-	//		c.setMiddlewaresForSinglePath("/api/v1/userExample/list", middleware.Auth(), middleware.RateLimit())
+	// set up all middlewares
+	for _, fn := range allMiddlewareFns {
+		fn(c)
+	}
 
 	// register all routes
-	registerAllRoutes(r, c, allRouteFns)
-
-	return r
-}
-
-func registerAllRoutes(r *gin.Engine, c *middlewareConfig, routeFns routeFns) {
-	if c == nil {
-		c = newMiddlewareConfig()
-	}
-	for _, fn := range routeFns {
+	for _, fn := range allRouteFns {
 		fn(r, c.groupPathMiddlewares, c.singlePathMiddlewares)
 	}
+
+	return r
 }
 
 type middlewareConfig struct {
@@ -126,7 +117,7 @@ func newMiddlewareConfig() *middlewareConfig {
 	}
 }
 
-func (c *middlewareConfig) setMiddlewaresForGroupPath(groupPath string, handlers ...gin.HandlerFunc) { // nolint
+func (c *middlewareConfig) setGroupPath(groupPath string, handlers ...gin.HandlerFunc) { //nolint
 	if groupPath == "" {
 		return
 	}
@@ -143,15 +134,21 @@ func (c *middlewareConfig) setMiddlewaresForGroupPath(groupPath string, handlers
 	c.groupPathMiddlewares[groupPath] = append(handlerFns, handlers...)
 }
 
-func (c *middlewareConfig) setMiddlewaresForSinglePath(singlePath string, handlers ...gin.HandlerFunc) { // nolint
-	if singlePath == "" {
-		return
-	}
-	handlerFns, ok := c.singlePathMiddlewares[singlePath]
-	if !ok {
-		c.singlePathMiddlewares[singlePath] = handlers
+func (c *middlewareConfig) setSinglePath(method string, singlePath string, handlers ...gin.HandlerFunc) { //nolint
+	if method == "" || singlePath == "" {
 		return
 	}
 
-	c.singlePathMiddlewares[singlePath] = append(handlerFns, handlers...)
+	key := getSinglePathKey(method, singlePath)
+	handlerFns, ok := c.singlePathMiddlewares[key]
+	if !ok {
+		c.singlePathMiddlewares[key] = handlers
+		return
+	}
+
+	c.singlePathMiddlewares[key] = append(handlerFns, handlers...)
+}
+
+func getSinglePathKey(method string, singlePath string) string { //nolint
+	return strings.ToUpper(method) + "->" + singlePath
 }

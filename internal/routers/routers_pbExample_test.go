@@ -39,15 +39,15 @@ func TestNewRouter_pbExample(t *testing.T) {
 func Test_middlewareConfig(t *testing.T) {
 	c := newMiddlewareConfig()
 
-	c.setMiddlewaresForGroupPath("/api/v1", middleware.Auth())
+	c.setGroupPath("/api/v1", middleware.Auth())
 	assert.Equal(t, 1, len(c.groupPathMiddlewares["/api/v1"]))
-	c.setMiddlewaresForGroupPath("/api/v1", middleware.RateLimit(), middleware.RequestID())
+	c.setGroupPath("/api/v1", middleware.RateLimit(), middleware.RequestID())
 	assert.Equal(t, 3, len(c.groupPathMiddlewares["/api/v1"]))
 
-	c.setMiddlewaresForSinglePath("/api/v1/userExample", middleware.Auth())
-	assert.Equal(t, 1, len(c.singlePathMiddlewares["/api/v1/userExample"]))
-	c.setMiddlewaresForSinglePath("/api/v1/userExample/list", middleware.RateLimit(), middleware.RequestID())
-	assert.Equal(t, 2, len(c.singlePathMiddlewares["/api/v1/userExample/list"]))
+	c.setSinglePath("DELETE", "/api/v1/userExample/:id", middleware.Auth())
+	assert.Equal(t, 1, len(c.singlePathMiddlewares[getSinglePathKey("DELETE", "/api/v1/userExample/:id")]))
+	c.setSinglePath("POST", "/api/v1/userExample/list", middleware.RateLimit(), middleware.RequestID())
+	assert.Equal(t, 2, len(c.singlePathMiddlewares[getSinglePathKey("POST", "/api/v1/userExample/list")]))
 }
 
 func Test_userExampleServiceRouter(t *testing.T) {
@@ -64,6 +64,10 @@ func (m mockGw) Create(ctx context.Context, req *serverNameExampleV1.CreateUserE
 }
 
 func (m mockGw) DeleteByID(ctx context.Context, req *serverNameExampleV1.DeleteUserExampleByIDRequest) (*serverNameExampleV1.DeleteUserExampleByIDReply, error) {
+	return nil, nil
+}
+
+func (m mockGw) DeleteByIDs(ctx context.Context, req *serverNameExampleV1.DeleteUserExampleByIDsRequest) (*serverNameExampleV1.DeleteUserExampleByIDsReply, error) {
 	return nil, nil
 }
 

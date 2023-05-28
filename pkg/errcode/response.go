@@ -16,13 +16,41 @@ type Responser interface {
 	Error(ctx *gin.Context, err error) bool
 }
 
-// NewResponse creates a new response, if isFromRPC=true, it means return from rpc, otherwise default return from http
+// Deprecated: NewResponse use NewResponser instead
 func NewResponse(isFromRPC bool) Responser {
-	return &defaultResponse{isFromRPC: isFromRPC}
+	return &defaultResponse{isFromRPC, make(map[int]*Error), make(map[int]*RPCStatus)}
+}
+
+// NewResponser creates a new responser, if isFromRPC=true, it means return from rpc, otherwise default return from http
+func NewResponser(isFromRPC bool, httpErrors []*Error, rpcStatus []*RPCStatus) Responser {
+	httpErrorsMap := make(map[int]*Error)
+	rpcStatusMap := make(map[int]*RPCStatus)
+
+	for _, httpError := range httpErrors {
+		if httpError == nil {
+			continue
+		}
+		httpErrorsMap[httpError.Code()] = httpError
+	}
+	for _, statusError := range rpcStatus {
+		if statusError == nil || statusError.status == nil {
+			continue
+		}
+		rpcStatusMap[int(statusError.ToRPCCode())] = statusError
+		rpcStatusMap[int(statusError.status.Code())] = statusError
+	}
+
+	return &defaultResponse{
+		isFromRPC:  isFromRPC,
+		httpErrors: httpErrorsMap,
+		rpcStatus:  rpcStatusMap,
+	}
 }
 
 type defaultResponse struct {
-	isFromRPC bool // error comes from grpc, if not, default is from http
+	isFromRPC  bool // error comes from grpc, if not, default is from http
+	httpErrors map[int]*Error
+	rpcStatus  map[int]*RPCStatus
 }
 
 func (resp *defaultResponse) response(c *gin.Context, status, code int, msg string, data interface{}) {
@@ -43,9 +71,9 @@ func (resp *defaultResponse) ParamError(c *gin.Context, err error) {
 	resp.response(c, http.StatusOK, InvalidParams.Code(), InvalidParams.Msg(), struct{}{})
 }
 
-// Error response error information, if return true, this error is not important and can be ignored
+// Error response error information, if return true, means that the error code is converted to a standard http code,
+// otherwise the return code is always 200
 func (resp *defaultResponse) Error(c *gin.Context, err error) bool {
-	isIgnore := false
 	_ = c.Error(err)
 
 	// error from rpc
@@ -56,30 +84,71 @@ func (resp *defaultResponse) Error(c *gin.Context, err error) bool {
 			return false
 		}
 
+		// default error code to http
 		switch st.Code() {
-		case codes.Internal:
+		case codes.Internal, StatusInternalServerError.status.Code():
 			resp.response(c, http.StatusInternalServerError, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), struct{}{})
-			return false
-		case codes.Unavailable:
+			return true
+		case codes.Unavailable, StatusServiceUnavailable.status.Code():
 			resp.response(c, http.StatusServiceUnavailable, http.StatusServiceUnavailable, http.StatusText(http.StatusServiceUnavailable), struct{}{})
-			return false
+			return true
+		}
+
+		// User defined error code to http
+		if resp.isUserDefinedRPCErrorCode(c, int(st.Code())) {
+			return true
 		}
 
 		e := ToHTTPErr(st)
-		if e.code == NotFound.code {
-			isIgnore = true
-		}
 		resp.response(c, http.StatusOK, e.code, e.msg, struct{}{})
-		return isIgnore
+		return false
 	}
 
 	// error from http
 	e := ParseError(err)
-	if e.code == NotFound.code {
-		isIgnore = true
+	// default error code to http
+	switch e.Code() {
+	case InternalServerError.Code(), http.StatusInternalServerError:
+		resp.response(c, http.StatusInternalServerError, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), struct{}{})
+		return true
+	case ServiceUnavailable.Code(), http.StatusServiceUnavailable:
+		resp.response(c, http.StatusServiceUnavailable, http.StatusServiceUnavailable, http.StatusText(http.StatusServiceUnavailable), struct{}{})
+		return true
 	}
+
+	// User defined error code to http
+	if resp.isUserDefinedHTTPErrorCode(c, e.Code()) {
+		return true
+	}
+
 	resp.response(c, http.StatusOK, e.code, e.msg, struct{}{})
-	return isIgnore
+	return false
+}
+
+func (resp *defaultResponse) isUserDefinedRPCErrorCode(c *gin.Context, errCode int) bool {
+	if v, ok := resp.rpcStatus[errCode]; ok {
+		httpCode := ToHTTPErr(v.status).ToHTTPCode()
+		msg := http.StatusText(httpCode)
+		if msg == "" {
+			msg = "unknown error"
+		}
+		resp.response(c, httpCode, httpCode, msg, struct{}{})
+		return true
+	}
+	return false
+}
+
+func (resp *defaultResponse) isUserDefinedHTTPErrorCode(c *gin.Context, errCode int) bool {
+	if v, ok := resp.httpErrors[errCode]; ok {
+		httpCode := v.ToHTTPCode()
+		msg := http.StatusText(httpCode)
+		if msg == "" {
+			msg = "unknown error"
+		}
+		resp.response(c, httpCode, httpCode, msg, struct{}{})
+		return true
+	}
+	return false
 }
 
 // ToHTTPErr converted to http error

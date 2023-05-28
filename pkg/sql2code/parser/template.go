@@ -98,6 +98,7 @@ import "tagger/tagger.proto";
 option go_package = "github.com/zhufuyi/sponge/api/serverNameExample/v1;v1";
 
 // Default settings for generating swagger documents
+// NOTE: because json does not support 64 bits, the int64 and uint64 types under *.swagger.json are automatically converted to string types
 // Reference https://github.com/grpc-ecosystem/grpc-gateway/blob/db7fbefff7c04877cdb32e16d4a248a024428207/examples/internal/proto/examplepb/a_bit_of_everything.proto  
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   host: "localhost:8080"
@@ -123,7 +124,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   }
 };
 
-service {{.TName}} {
+service {{.TName}}Service {
   rpc Create(Create{{.TableName}}Request) returns (Create{{.TableName}}Reply) {
     option (google.api.http) = {
       post: "/api/v1/{{.TName}}"

@@ -4,10 +4,12 @@ import (
 	"math/rand"
 	"strings"
 
+	"google.golang.org/genproto/googleapis/api/annotations"
 	"google.golang.org/protobuf/compiler/protogen"
+	"google.golang.org/protobuf/proto"
 )
 
-// ServiceMethod method fields
+// ServiceMethod RPCMethod fields
 type ServiceMethod struct {
 	MethodName string // Create
 	Request    string // CreateRequest
@@ -15,6 +17,11 @@ type ServiceMethod struct {
 
 	ServiceName      string // Greeter
 	LowerServiceName string // greeter first character to lower
+
+	// http_rule
+	Path   string // rule
+	Method string // HTTP Method
+	Body   string
 }
 
 // AddOne counter
@@ -37,6 +44,14 @@ func (s *PbService) RandNumber() int {
 func parsePbService(s *protogen.Service) *PbService {
 	var methods []*ServiceMethod
 	for _, m := range s.Methods {
+		rpcMethod := &RPCMethod{} //nolint
+		rule, ok := proto.GetExtension(m.Desc.Options(), annotations.E_Http).(*annotations.HttpRule)
+		if rule != nil && ok {
+			rpcMethod = buildHTTPRule(m, rule)
+		} else {
+			rpcMethod = defaultMethod(m)
+		}
+
 		methods = append(methods, &ServiceMethod{
 			MethodName: m.GoName,
 			Request:    m.Input.GoIdent.GoName,
@@ -44,6 +59,10 @@ func parsePbService(s *protogen.Service) *PbService {
 
 			ServiceName:      s.GoName,
 			LowerServiceName: strings.ToLower(s.GoName[:1]) + s.GoName[1:],
+
+			Path:   rpcMethod.Path,
+			Method: rpcMethod.Method,
+			Body:   rpcMethod.Body,
 		})
 	}
 

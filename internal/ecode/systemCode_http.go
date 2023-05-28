@@ -8,7 +8,8 @@ import (
 
 // http system level error code, error code range 10000~20000
 var (
-	Success             = errcode.Success
+	Success = errcode.Success
+
 	InvalidParams       = errcode.InvalidParams
 	Unauthorized        = errcode.Unauthorized
 	InternalServerError = errcode.InternalServerError
@@ -23,4 +24,14 @@ var (
 	AccessDenied       = errcode.AccessDenied
 	MethodNotAllowed   = errcode.MethodNotAllowed
 	ServiceUnavailable = errcode.ServiceUnavailable
+
+	Canceled           = errcode.Canceled
+	Unknown            = errcode.Unknown
+	PermissionDenied   = errcode.PermissionDenied
+	ResourceExhausted  = errcode.ResourceExhausted
+	FailedPrecondition = errcode.FailedPrecondition
+	Aborted            = errcode.Aborted
+	OutOfRange         = errcode.OutOfRange
+	Unimplemented      = errcode.Unimplemented
+	DataLoss           = errcode.DataLoss
 )

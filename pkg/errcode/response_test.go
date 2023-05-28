@@ -18,7 +18,10 @@ func runHTTPServer(isFromRPC bool) string {
 
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
-	resp := NewResponse(isFromRPC)
+
+	httpErrors := []*Error{Forbidden, TooManyRequests, MethodNotAllowed}
+	rpcStatus := []*RPCStatus{StatusDeadlineExceeded, StatusPermissionDenied, StatusAlreadyExists}
+	resp := NewResponser(isFromRPC, httpErrors, rpcStatus)
 
 	r.GET("/ping", func(c *gin.Context) {
 		resp.Success(c, "ping")
@@ -41,6 +44,14 @@ func runHTTPServer(isFromRPC bool) string {
 			isIgnore := resp.Error(c, StatusNotFound.Err())
 			fmt.Println("/err3", isIgnore)
 		})
+		r.GET("/rpc/userDefine/err1", func(c *gin.Context) {
+			isIgnore := resp.Error(c, StatusDeadlineExceeded.Err())
+			fmt.Println("/rpc/userDefine/err1", isIgnore)
+		})
+		r.GET("/rpc/userDefine/err2", func(c *gin.Context) {
+			isIgnore := resp.Error(c, StatusPermissionDenied.Err())
+			fmt.Println("/rpc/userDefine/err2", isIgnore)
+		})
 	} else {
 		r.GET("/err4", func(c *gin.Context) {
 			isIgnore := resp.Error(c, InternalServerError.Err())
@@ -49,6 +60,14 @@ func runHTTPServer(isFromRPC bool) string {
 		r.GET("/err5", func(c *gin.Context) {
 			isIgnore := resp.Error(c, NotFound.Err())
 			fmt.Println("/err5", isIgnore)
+		})
+		r.GET("/http/userDefine/err1", func(c *gin.Context) {
+			isIgnore := resp.Error(c, Forbidden.Err())
+			fmt.Println("/http/userDefine/err1", isIgnore)
+		})
+		r.GET("/http/userDefine/err2", func(c *gin.Context) {
+			isIgnore := resp.Error(c, TooManyRequests.Err())
+			fmt.Println("/http/userDefine/err2", isIgnore)
 		})
 	}
 
@@ -61,6 +80,11 @@ func runHTTPServer(isFromRPC bool) string {
 	time.Sleep(time.Millisecond * 200)
 
 	return requestAddr
+}
+
+func TestNewResponse(t *testing.T) {
+	resp := NewResponse(true)
+	assert.NotNil(t, resp)
 }
 
 func TestRPCResponse(t *testing.T) {
@@ -85,6 +109,14 @@ func TestRPCResponse(t *testing.T) {
 	result, err = http.Get(requestAddr + "/err3")
 	assert.NoError(t, err)
 	t.Log(result.StatusCode)
+
+	result, err = http.Get(requestAddr + "/rpc/userDefine/err1")
+	assert.NoError(t, err)
+	t.Log(result.StatusCode)
+
+	result, err = http.Get(requestAddr + "/rpc/userDefine/err2")
+	assert.NoError(t, err)
+	t.Log(result.StatusCode)
 }
 
 func TestHTTPResponse(t *testing.T) {
@@ -103,6 +135,14 @@ func TestHTTPResponse(t *testing.T) {
 	t.Log(result.StatusCode)
 
 	result, err = http.Get(requestAddr + "/err5")
+	assert.NoError(t, err)
+	t.Log(result.StatusCode)
+
+	result, err = http.Get(requestAddr + "/http/userDefine/err1")
+	assert.NoError(t, err)
+	t.Log(result.StatusCode)
+
+	result, err = http.Get(requestAddr + "/http/userDefine/err2")
 	assert.NoError(t, err)
 	t.Log(result.StatusCode)
 }

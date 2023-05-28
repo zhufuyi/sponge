@@ -8,9 +8,10 @@ import (
 	errcode "github.com/zhufuyi/sponge/pkg/errcode"
 	middleware "github.com/zhufuyi/sponge/pkg/gin/middleware"
 	zap "go.uber.org/zap"
+	strings "strings"
 )
 
-// import packages: context. errcode. middleware. zap. gin.
+// import packages: strings. context. errcode. middleware. zap. gin.
 
 type UserExampleServiceLogicer interface {
 	Create(ctx context.Context, req *CreateUserExampleRequest) (*CreateUserExampleReply, error)
@@ -25,9 +26,11 @@ type UserExampleServiceLogicer interface {
 type UserExampleServiceOption func(*userExampleServiceOptions)
 
 type userExampleServiceOptions struct {
-	isFromRPC bool
-	responser errcode.Responser
-	zapLog    *zap.Logger
+	isFromRPC  bool
+	responser  errcode.Responser
+	zapLog     *zap.Logger
+	httpErrors []*errcode.Error
+	rpcStatus  []*errcode.RPCStatus
 }
 
 func (o *userExampleServiceOptions) apply(opts ...UserExampleServiceOption) {
@@ -60,6 +63,18 @@ func WithUserExampleServiceLogger(zapLog *zap.Logger) UserExampleServiceOption {
 	}
 }
 
+func WithUserExampleServiceErrorToHTTPCode(e ...*errcode.Error) UserExampleServiceOption {
+	return func(o *userExampleServiceOptions) {
+		o.httpErrors = e
+	}
+}
+
+func WithUserExampleServiceRPCStatusToHTTPCode(s ...*errcode.RPCStatus) UserExampleServiceOption {
+	return func(o *userExampleServiceOptions) {
+		o.rpcStatus = s
+	}
+}
+
 func RegisterUserExampleServiceRouter(
 	iRouter gin.IRouter,
 	groupPathMiddlewares map[string][]gin.HandlerFunc,
@@ -71,7 +86,7 @@ func RegisterUserExampleServiceRouter(
 	o.apply(opts...)
 
 	if o.responser == nil {
-		o.responser = errcode.NewResponse(o.isFromRPC)
+		o.responser = errcode.NewResponser(o.isFromRPC, o.httpErrors, o.rpcStatus)
 	}
 	if o.zapLog == nil {
 		o.zapLog, _ = zap.NewProduction()
@@ -98,17 +113,17 @@ type userExampleServiceRouter struct {
 }
 
 func (r *userExampleServiceRouter) register() {
-	r.iRouter.Handle("POST", "/api/v1/userExample", r.withMiddleware("/api/v1/userExample", r.Create_0)...)
-	r.iRouter.Handle("DELETE", "/api/v1/userExample/:id", r.withMiddleware("/api/v1/userExample/:id", r.DeleteByID_0)...)
-	r.iRouter.Handle("POST", "/api/v1/userExample/delete/ids", r.withMiddleware("/api/v1/userExample/delete/ids", r.DeleteByIDs_0)...)
-	r.iRouter.Handle("PUT", "/api/v1/userExample/:id", r.withMiddleware("/api/v1/userExample/:id", r.UpdateByID_0)...)
-	r.iRouter.Handle("GET", "/api/v1/userExample/:id", r.withMiddleware("/api/v1/userExample/:id", r.GetByID_0)...)
-	r.iRouter.Handle("POST", "/api/v1/userExample/list/ids", r.withMiddleware("/api/v1/userExample/list/ids", r.ListByIDs_0)...)
-	r.iRouter.Handle("POST", "/api/v1/userExample/list", r.withMiddleware("/api/v1/userExample/list", r.List_0)...)
+	r.iRouter.Handle("POST", "/api/v1/userExample", r.withMiddleware("POST", "/api/v1/userExample", r.Create_0)...)
+	r.iRouter.Handle("DELETE", "/api/v1/userExample/:id", r.withMiddleware("DELETE", "/api/v1/userExample/:id", r.DeleteByID_0)...)
+	r.iRouter.Handle("POST", "/api/v1/userExample/delete/ids", r.withMiddleware("POST", "/api/v1/userExample/delete/ids", r.DeleteByIDs_0)...)
+	r.iRouter.Handle("PUT", "/api/v1/userExample/:id", r.withMiddleware("PUT", "/api/v1/userExample/:id", r.UpdateByID_0)...)
+	r.iRouter.Handle("GET", "/api/v1/userExample/:id", r.withMiddleware("GET", "/api/v1/userExample/:id", r.GetByID_0)...)
+	r.iRouter.Handle("POST", "/api/v1/userExample/list/ids", r.withMiddleware("POST", "/api/v1/userExample/list/ids", r.ListByIDs_0)...)
+	r.iRouter.Handle("POST", "/api/v1/userExample/list", r.withMiddleware("POST", "/api/v1/userExample/list", r.List_0)...)
 
 }
 
-func (r *userExampleServiceRouter) withMiddleware(path string, fn gin.HandlerFunc) []gin.HandlerFunc {
+func (r *userExampleServiceRouter) withMiddleware(method string, path string, fn gin.HandlerFunc) []gin.HandlerFunc {
 	handlerFns := []gin.HandlerFunc{}
 
 	// determine if a route group is hit or miss, left prefix rule
@@ -127,7 +142,8 @@ func (r *userExampleServiceRouter) withMiddleware(path string, fn gin.HandlerFun
 	}
 
 	// determine if a single route has been hit
-	if fns, ok := r.singlePathMiddlewares[path]; ok {
+	key := strings.ToUpper(method) + "->" + path
+	if fns, ok := r.singlePathMiddlewares[key]; ok {
 		handlerFns = append(handlerFns, fns...)
 	}
 

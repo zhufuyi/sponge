@@ -2,6 +2,7 @@ package discovery
 
 import (
 	"context"
+	"net/url"
 	"testing"
 	"time"
 
@@ -44,7 +45,10 @@ func Test_builder_Build(t *testing.T) {
 	b := NewBuilder(&discovery{})
 	assert.NotNil(t, b)
 
-	_, err := b.Build(resolver.Target{Endpoint: "ipv4.single.fake"}, nil, resolver.BuildOptions{})
+	u := url.URL{
+		Path: "ipv4.single.fake",
+	}
+	_, err := b.Build(resolver.Target{URL: u}, nil, resolver.BuildOptions{})
 	assert.NoError(t, err)
 }
 

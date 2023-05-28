@@ -10,20 +10,29 @@ import (
 var (
 	StatusSuccess = errcode.StatusSuccess
 
+	StatusCanceled            = errcode.StatusCanceled
+	StatusUnknown             = errcode.StatusUnknown
 	StatusInvalidParams       = errcode.StatusInvalidParams
-	StatusUnauthorized        = errcode.StatusUnauthorized
-	StatusInternalServerError = errcode.StatusInternalServerError
+	StatusDeadlineExceeded    = errcode.StatusDeadlineExceeded
 	StatusNotFound            = errcode.StatusNotFound
 	StatusAlreadyExists       = errcode.StatusAlreadyExists
-	StatusTimeout             = errcode.StatusTimeout
-	StatusTooManyRequests     = errcode.StatusTooManyRequests
-	StatusForbidden           = errcode.StatusForbidden
-	StatusLimitExceed         = errcode.StatusLimitExceed
+	StatusPermissionDenied    = errcode.StatusPermissionDenied
+	StatusResourceExhausted   = errcode.StatusResourceExhausted
+	StatusFailedPrecondition  = errcode.StatusFailedPrecondition
+	StatusAborted             = errcode.StatusAborted
+	StatusOutOfRange          = errcode.StatusOutOfRange
+	StatusUnimplemented       = errcode.StatusUnimplemented
+	StatusInternalServerError = errcode.StatusInternalServerError
+	StatusServiceUnavailable  = errcode.StatusServiceUnavailable
+	StatusDataLoss            = errcode.StatusDataLoss
+	StatusUnauthorized        = errcode.StatusUnauthorized
 
-	StatusDeadlineExceeded   = errcode.StatusDeadlineExceeded
-	StatusAccessDenied       = errcode.StatusAccessDenied
-	StatusMethodNotAllowed   = errcode.StatusMethodNotAllowed
-	StatusServiceUnavailable = errcode.StatusServiceUnavailable
+	StatusTimeout          = errcode.StatusTimeout
+	StatusTooManyRequests  = errcode.StatusTooManyRequests
+	StatusForbidden        = errcode.StatusForbidden
+	StatusLimitExceed      = errcode.StatusLimitExceed
+	StatusMethodNotAllowed = errcode.StatusMethodNotAllowed
+	StatusAccessDenied     = errcode.StatusAccessDenied
 )
 
 // Any kev-value
