@@ -9,12 +9,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const (
+	// HeaderAuthorizationKey http header authorization key
+	HeaderAuthorizationKey = "Authorization"
+)
+
 // Auth authorization
 func Auth() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		authorization := c.GetHeader("Authorization")
+		authorization := c.GetHeader(HeaderAuthorizationKey)
 		if len(authorization) < 20 {
-			logger.Warn("authorization is illegal", logger.String("authorization", authorization))
+			logger.Warn("authorization is illegal", logger.String(HeaderAuthorizationKey, authorization))
 			response.Error(c, errcode.Unauthorized)
 			c.Abort()
 			return
@@ -36,9 +41,9 @@ func Auth() gin.HandlerFunc {
 // AuthAdmin admin authentication
 func AuthAdmin() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		authorization := c.GetHeader("Authorization")
+		authorization := c.GetHeader(HeaderAuthorizationKey)
 		if len(authorization) < 20 {
-			logger.Warn("authorization is illegal", logger.String("authorization", authorization))
+			logger.Warn("authorization is illegal", logger.String(HeaderAuthorizationKey, authorization))
 			response.Error(c, errcode.Unauthorized)
 			c.Abort()
 			return
