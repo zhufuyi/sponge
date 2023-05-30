@@ -42,6 +42,7 @@ import (
 var _ serverNameExampleV1.{{.Name}}Logicer = (*{{.LowerName}}Client)(nil)
 
 type {{.LowerName}}Client struct {
+	// define the rpc server clients here
 	// example:
 	//	    {{.LowerName}}Cli serverNameExampleV1.{{.Name}}Client
 }
@@ -81,13 +82,16 @@ func (c *{{.LowerServiceName}}Client) {{.MethodName}}(ctx context.Context, req *
 package routers
 
 import (
+	"context"
+
 	serverNameExampleV1 "moduleNameExample/api/serverNameExample/v1"
 	"moduleNameExample/internal/service"
 
+	"github.com/zhufuyi/sponge/pkg/gin/middleware"
 	"github.com/zhufuyi/sponge/pkg/logger"
-	//"github.com/zhufuyi/sponge/pkg/middleware"
 
 	"github.com/gin-gonic/gin"
+	"google.golang.org/grpc/metadata"
 )
 
 func init() {
@@ -112,6 +116,15 @@ func {{.LowerName}}Router(
 	groupPathMiddlewares map[string][]gin.HandlerFunc,
 	singlePathMiddlewares map[string][]gin.HandlerFunc,
 	iService serverNameExampleV1.{{.Name}}Logicer) {
+	ctxFn := func(c *gin.Context) context.Context {
+		md := metadata.New(map[string]string{
+			// set metadata to be passed from http to rpc
+			middleware.ContextRequestIDKey: middleware.GCtxRequestID(c), // request_id
+			//middleware.HeaderAuthorizationKey: c.GetHeader(middleware.HeaderAuthorizationKey),  // authorization
+		})
+		return metadata.NewOutgoingContext(c, md)
+	}
+
 	serverNameExampleV1.Register{{.Name}}Router(
 		r,
 		groupPathMiddlewares,
@@ -120,8 +133,12 @@ func {{.LowerName}}Router(
 		serverNameExampleV1.With{{.Name}}RPCResponse(),
 		serverNameExampleV1.With{{.Name}}Logger(logger.Get()),
 		serverNameExampleV1.With{{.Name}}RPCStatusToHTTPCode(
-			// ecode.StatusUnimplemented, ecode.StatusAborted,
+		// Set some error codes to standard http return codes,
+		// by default there is already ecode.StatusInternalServerError and ecode.StatusServiceUnavailable
+		// example:
+		// 	ecode.StatusUnimplemented, ecode.StatusAborted,
 		),
+		serverNameExampleV1.With{{.Name}}WrapCtx(ctxFn),
 	)
 }
 
@@ -157,10 +174,10 @@ import (
 var (
 	_{{.LowerName}}NO       = {{.RandNumber}} // number range 1~100, if there is the same number, trigger panic.
 	_{{.LowerName}}Name     = "{{.LowerName}}"
-	_{{.LowerName}}BaseCode = errcode.HCode(_{{.LowerName}}NO)
+	_{{.LowerName}}BaseCode = errcode.RCode(_{{.LowerName}}NO)
 // --blank line--
 {{- range $i, $v := .Methods}}
-	Status{{.MethodName}}{{.ServiceName}}   = errcode.NewError(_{{.LowerServiceName}}BaseCode+{{$v.AddOne $i}}, "failed to {{.MethodName}} "+_{{.LowerServiceName}}Name)
+	Status{{.MethodName}}{{.ServiceName}}   = errcode.NewRPCStatus(_{{.LowerServiceName}}BaseCode+{{$v.AddOne $i}}, "failed to {{.MethodName}} "+_{{.LowerServiceName}}Name)
 {{- end}}
 	// add +1 to the previous error code
 )

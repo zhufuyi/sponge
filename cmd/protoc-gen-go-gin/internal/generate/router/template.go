@@ -28,6 +28,7 @@ type {{$.LowerName}}Options struct {
 	zapLog    *zap.Logger
 	httpErrors []*errcode.Error
 	rpcStatus  []*errcode.RPCStatus
+	wrapCtxFn  func(c *gin.Context) context.Context
 }
 
 func (o *{{$.LowerName}}Options) apply(opts ...{{$.Name}}Option) {
@@ -72,6 +73,12 @@ func With{{$.Name}}RPCStatusToHTTPCode(s ...*errcode.RPCStatus) {{$.Name}}Option
 	}
 }
 
+func With{{$.Name}}WrapCtx(wrapCtxFn func(c *gin.Context) context.Context) {{$.Name}}Option {
+	return func(o *{{$.LowerName}}Options) {
+		o.wrapCtxFn = wrapCtxFn
+	}
+}
+
 func Register{{$.Name}}Router(
 	iRouter gin.IRouter,
 	groupPathMiddlewares map[string][]gin.HandlerFunc,
@@ -90,23 +97,25 @@ func Register{{$.Name}}Router(
 	}
 
 	r := &{{$.LowerName}}Router {
-		iRouter:   iRouter,
+		iRouter:               iRouter,
 		groupPathMiddlewares:  groupPathMiddlewares,
 		singlePathMiddlewares: singlePathMiddlewares,
-		iLogic:    iLogic,
-		iResponse: o.responser,
-		zapLog:    o.zapLog,
+		iLogic:                iLogic,
+		iResponse:             o.responser,
+		zapLog:                o.zapLog,
+		wrapCtxFn:             o.wrapCtxFn,
 	}
 	r.register()
 }
 
 type {{$.LowerName}}Router struct {
-	iRouter   gin.IRouter
+	iRouter               gin.IRouter
 	groupPathMiddlewares  map[string][]gin.HandlerFunc
 	singlePathMiddlewares map[string][]gin.HandlerFunc
-	iLogic    {{$.Name}}Logicer
-	iResponse errcode.Responser
-	zapLog    *zap.Logger
+	iLogic                {{$.Name}}Logicer
+	iResponse             errcode.Responser
+	zapLog                *zap.Logger
+	wrapCtxFn             func(c *gin.Context) context.Context
 }
 
 func (r *{{$.LowerName}}Router) register() {
@@ -171,7 +180,14 @@ func (r *{{$.LowerName}}Router) {{ .HandlerName }} (c *gin.Context) {
 		return
 	}
 {{end}}
-	out, err := r.iLogic.{{.Name}}(c.Request.Context(), req)
+	var ctx context.Context
+	if r.wrapCtxFn != nil {
+		ctx = r.wrapCtxFn(c)
+	} else {
+		ctx = c
+	}
+
+	out, err := r.iLogic.{{.Name}}(ctx, req)
 	if err != nil {
 		r.iResponse.Error(c, err)
 		return

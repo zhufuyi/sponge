@@ -1,12 +1,16 @@
 package routers
 
 import (
+	"context"
+
 	serverNameExampleV1 "github.com/zhufuyi/sponge/api/serverNameExample/v1"
 	"github.com/zhufuyi/sponge/internal/service"
 
+	"github.com/zhufuyi/sponge/pkg/gin/middleware"
 	"github.com/zhufuyi/sponge/pkg/logger"
 
 	"github.com/gin-gonic/gin"
+	"google.golang.org/grpc/metadata"
 )
 
 func init() {
@@ -25,6 +29,15 @@ func userExampleServiceRouter(
 	groupPathMiddlewares map[string][]gin.HandlerFunc,
 	singlePathMiddlewares map[string][]gin.HandlerFunc,
 	iService serverNameExampleV1.UserExampleServiceLogicer) {
+	fn := func(c *gin.Context) context.Context {
+		md := metadata.New(map[string]string{
+			// set metadata to be passed from http to rpc
+			middleware.ContextRequestIDKey: middleware.GCtxRequestID(c), // request_id
+			//middleware.HeaderAuthorizationKey: c.GetHeader(middleware.HeaderAuthorizationKey),  // authorization
+		})
+		return metadata.NewOutgoingContext(c, md)
+	}
+
 	serverNameExampleV1.RegisterUserExampleServiceRouter(
 		r,
 		groupPathMiddlewares,
@@ -33,8 +46,12 @@ func userExampleServiceRouter(
 		serverNameExampleV1.WithUserExampleServiceRPCResponse(),
 		serverNameExampleV1.WithUserExampleServiceLogger(logger.Get()),
 		serverNameExampleV1.WithUserExampleServiceRPCStatusToHTTPCode(
-		//ecode.StatusUnimplemented, ecode.StatusAborted,
+		// Set some error codes to standard http return codes,
+		// by default there is already ecode.StatusInternalServerError and ecode.StatusServiceUnavailable
+		// example:
+		// 	ecode.StatusUnimplemented, ecode.StatusAborted,
 		),
+		serverNameExampleV1.WithUserExampleServiceWrapCtx(fn),
 	)
 }
 

@@ -76,6 +76,7 @@ func (h *{{.LowerServiceName}}Handler) {{.MethodName}}(ctx context.Context, req 
 	//			return nil, ecode.InternalServerError.Err()
 	//		}
 	// 	return reply, nil
+    // if necessary, 'ctx' can be converted to 'gin.Context', for example ginCtx, ok := ctx.(*gin.Context)
 
 	panic("implement me")
 }
@@ -130,7 +131,10 @@ func {{.LowerName}}Router(
 		serverNameExampleV1.With{{.Name}}HTTPResponse(),
 		serverNameExampleV1.With{{.Name}}Logger(logger.Get()),
 		serverNameExampleV1.With{{.Name}}ErrorToHTTPCode(
-			// ecode.AccessDenied, ecode.TooManyRequests,
+			// Set some error codes to standard http return codes,
+			// by default there is already ecode.StatusInternalServerError and ecode.StatusServiceUnavailable
+			// example:
+			// 	ecode.StatusUnimplemented, ecode.StatusAborted,
 		),
 	)
 }
