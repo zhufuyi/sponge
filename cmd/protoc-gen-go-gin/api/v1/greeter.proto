@@ -6,7 +6,7 @@ import "google/api/annotations.proto";
 
 option go_package = "./v1;v1";
 
-service Greeter {
+service GreeterService {
   rpc Create(CreateGreeterRequest) returns (CreateGreeterReply) {
     option (google.api.http) = {
       post: "/api/v1/greeter"

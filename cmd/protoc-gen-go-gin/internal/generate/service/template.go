@@ -30,28 +30,29 @@ var (
 
 package service
 
+{{- range .PbServices}}
+
 import (
 	"context"
 
 	serverNameExampleV1 "moduleNameExample/api/serverNameExample/v1"
+	//{{.LowerCutServiceName}}V1 "moduleNameExample/api/{{.LowerCutServiceName}}/v1"
 	//"moduleNameExample/internal/rpcclient"
 )
-
-{{- range .PbServices}}
 
 var _ serverNameExampleV1.{{.Name}}Logicer = (*{{.LowerName}}Client)(nil)
 
 type {{.LowerName}}Client struct {
 	// define the rpc server clients here
 	// example:
-	//	    {{.LowerName}}Cli serverNameExampleV1.{{.Name}}Client
+	//	    {{.LowerName}}Cli {{.LowerCutServiceName}}V1.{{.Name}}Client
 }
 
 // New{{.Name}}Client create a client
 func New{{.Name}}Client() serverNameExampleV1.{{.Name}}Logicer {
 	return &{{.LowerName}}Client{
 		// example:
-		//	    {{.LowerName}}Cli: serverNameExampleV1.New{{.Name}}Client(rpcclient.GetServerNameExampleRPCConn()),
+		//	    {{.LowerName}}Cli: {{.LowerCutServiceName}}V1.New{{.Name}}Client(rpcclient.Get{{.CutServiceName}}RPCConn()),
 	}
 }
 
@@ -133,10 +134,10 @@ func {{.LowerName}}Router(
 		serverNameExampleV1.With{{.Name}}RPCResponse(),
 		serverNameExampleV1.With{{.Name}}Logger(logger.Get()),
 		serverNameExampleV1.With{{.Name}}RPCStatusToHTTPCode(
-		// Set some error codes to standard http return codes,
-		// by default there is already ecode.StatusInternalServerError and ecode.StatusServiceUnavailable
-		// example:
-		// 	ecode.StatusUnimplemented, ecode.StatusAborted,
+			// Set some error codes to standard http return codes,
+			// by default there is already ecode.StatusInternalServerError and ecode.StatusServiceUnavailable
+			// example:
+			// 	ecode.StatusUnimplemented, ecode.StatusAborted,
 		),
 		serverNameExampleV1.With{{.Name}}WrapCtx(ctxFn),
 	)

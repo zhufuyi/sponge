@@ -34,6 +34,9 @@ type PbService struct {
 	Name      string           // Greeter
 	LowerName string           // greeter first character to lower
 	Methods   []*ServiceMethod // service methods
+
+	CutServiceName      string // GreeterService --> Greeter
+	LowerCutServiceName string // GreeterService --> greeter
 }
 
 // RandNumber rand number 1~100
@@ -66,10 +69,14 @@ func parsePbService(s *protogen.Service) *PbService {
 		})
 	}
 
+	cutServiceName := getCutServiceName(s.GoName)
+
 	return &PbService{
-		Name:      s.GoName,
-		LowerName: strings.ToLower(s.GoName[:1]) + s.GoName[1:],
-		Methods:   methods,
+		Name:                s.GoName,
+		LowerName:           strings.ToLower(s.GoName[:1]) + s.GoName[1:],
+		Methods:             methods,
+		CutServiceName:      cutServiceName,
+		LowerCutServiceName: strings.ToLower(cutServiceName[:1]) + cutServiceName[1:],
 	}
 }
 
@@ -80,4 +87,19 @@ func GetServices(file *protogen.File) []*PbService {
 		pss = append(pss, parsePbService(s))
 	}
 	return pss
+}
+
+func getCutServiceName(name string) string {
+	service := "Service"
+	if len(name) < len(service) {
+		return name
+	}
+	l := len(name) - len(service)
+	if name[l:] == service {
+		if name[:l] == "" {
+			return name
+		}
+		return name[:l]
+	}
+	return name
 }

@@ -132,9 +132,9 @@ func {{.LowerName}}Router(
 		serverNameExampleV1.With{{.Name}}Logger(logger.Get()),
 		serverNameExampleV1.With{{.Name}}ErrorToHTTPCode(
 			// Set some error codes to standard http return codes,
-			// by default there is already ecode.StatusInternalServerError and ecode.StatusServiceUnavailable
+			// by default there is already ecode.InternalServerError and ecode.ServiceUnavailable
 			// example:
-			// 	ecode.StatusUnimplemented, ecode.StatusAborted,
+			// 	ecode.Forbidden, ecode.LimitExceed,
 		),
 	)
 }
