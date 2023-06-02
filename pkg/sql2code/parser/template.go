@@ -52,7 +52,7 @@ import (
 // todo fill in the binding rules https://github.com/go-playground/validator
 type Create{{.TableName}}Request struct {
 {{- range .Fields}}
-	{{.Name}}  {{.GoType}} ` + "`" + `json:"{{.ColName}}" binding:""` + "`" + `{{if .Comment}} // {{.Comment}}{{end}}
+	{{.Name}}  {{.GoType}} ` + "`" + `json:"{{.JSONName}}" binding:""` + "`" + `{{if .Comment}} // {{.Comment}}{{end}}
 {{- end}}
 }
 `
@@ -62,7 +62,7 @@ type Create{{.TableName}}Request struct {
 // Update{{.TableName}}ByIDRequest update params
 type Update{{.TableName}}ByIDRequest struct {
 {{- range .Fields}}
-	{{.Name}}  {{.GoType}} ` + "`" + `json:"{{.ColName}}" binding:""` + "`" + `{{if .Comment}} // {{.Comment}}{{end}}
+	{{.Name}}  {{.GoType}} ` + "`" + `json:"{{.JSONName}}" binding:""` + "`" + `{{if .Comment}} // {{.Comment}}{{end}}
 {{- end}}
 }
 `
@@ -72,7 +72,7 @@ type Update{{.TableName}}ByIDRequest struct {
 // Get{{.TableName}}ByIDRespond respond detail
 type Get{{.TableName}}ByIDRespond struct {
 {{- range .Fields}}
-	{{.Name}}  {{.GoType}} ` + "`" + `json:"{{.ColName}}"` + "`" + `{{if .Comment}} // {{.Comment}}{{end}}
+	{{.Name}}  {{.GoType}} ` + "`" + `json:"{{.JSONName}}"` + "`" + `{{if .Comment}} // {{.Comment}}{{end}}
 {{- end}}
 }`
 
@@ -244,7 +244,15 @@ service {{.TName}}Service {
   }
 }
 
-// todo fill in the validate rules https://github.com/envoyproxy/protoc-gen-validate#constraint-rules
+// Some notes on defining fields under message:
+// (1) Fill in the validate rules https://github.com/envoyproxy/protoc-gen-validate#constraint-rules
+// (2) When using the protoc-gen-openapiv2 plugin, if the defined fields are snake case,
+//      you must add annotations for snake case names, such as string foo_bar = 1 [json_name = "foo_bar"],
+//      to ensure that the front end and back end JSON naming is consistent.
+// (3) If the declared route path includes a variable, such as /api/v1/userExample/{id},
+//      the request parameter of the rpc method contains the route variable field and this field
+//      must be annotated, such as int64 id = 1 [(tagger.tags) = "uri:\"id\"" ]
+
 
 // protoMessageCreateCode
 
@@ -305,21 +313,21 @@ message List{{.TableName}}Reply {
 	protoMessageCreateTmpl    *template.Template
 	protoMessageCreateTmplRaw = `message Create{{.TableName}}Request {
 {{- range $i, $v := .Fields}}
-	{{$v.GoType}} {{$v.ColName}} = {{$v.AddOne $i}}; {{if $v.Comment}} // {{$v.Comment}}{{end}}
+	{{$v.GoType}} {{$v.JSONName}} = {{$v.AddOne $i}}; {{if $v.Comment}} // {{$v.Comment}}{{end}}
 {{- end}}
 }`
 
 	protoMessageUpdateTmpl    *template.Template
 	protoMessageUpdateTmplRaw = `message Update{{.TableName}}ByIDRequest {
 {{- range $i, $v := .Fields}}
-	{{$v.GoType}} {{$v.ColName}} = {{$v.AddOneWithTag $i}}; {{if $v.Comment}} // {{$v.Comment}}{{end}}
+	{{$v.GoType}} {{$v.JSONName}} = {{$v.AddOneWithTag $i}}; {{if $v.Comment}} // {{$v.Comment}}{{end}}
 {{- end}}
 }`
 
 	protoMessageDetailTmpl    *template.Template
 	protoMessageDetailTmplRaw = `message {{.TableName}} {
 {{- range $i, $v := .Fields}}
-	{{$v.GoType}} {{$v.ColName}} = {{$v.AddOne $i}}; {{if $v.Comment}} // {{$v.Comment}}{{end}}
+	{{$v.GoType}} {{$v.JSONName}} = {{$v.AddOne $i}}; {{if $v.Comment}} // {{$v.Comment}}{{end}}
 {{- end}}
 }`
 

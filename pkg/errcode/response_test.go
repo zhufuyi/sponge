@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"regexp"
+	"strconv"
 	"testing"
 	"time"
 
@@ -11,6 +13,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 func runHTTPServer(isFromRPC bool) string {
@@ -145,4 +149,40 @@ func TestHTTPResponse(t *testing.T) {
 	result, err = http.Get(requestAddr + "/http/userDefine/err2")
 	assert.NoError(t, err)
 	t.Log(result.StatusCode)
+}
+
+func TestParseCodeAndMsgError(t *testing.T) {
+	errStr := "rpc error: code = Unknown desc = rpc error: code = Unknown desc = code = 204011, msg = wrong account or password"
+	err := errors.New(errStr)
+	st, _ := status.FromError(err)
+	if st.Code() == codes.Unknown {
+		code, msg := parseCodeAndMsg(st.String())
+		t.Log("regexp: ", code, msg)
+	}
+	code, msg := parseCodeAndMsg2(st.String())
+	t.Log("strings: ", code, msg)
+}
+
+var mcReg = regexp.MustCompile(`code\s*=\s*(\d+),\s*msg\s*=\s*(.+)`)
+
+func parseCodeAndMsg2(errStr string) (int, string) {
+	matches := mcReg.FindStringSubmatch(errStr)
+	if len(matches) == 3 {
+		code, _ := strconv.Atoi(matches[1])
+		msg := matches[2]
+		return code, msg
+	}
+	return 0, errStr
+}
+
+func BenchmarkName(b *testing.B) {
+	errStr := "rpc error: code = Unknown desc = rpc error: code = Unknown desc = code = 204011, msg = wrong account or password"
+	err := errors.New(errStr)
+	st, _ := status.FromError(err)
+	if st.Code() == codes.Unknown {
+		for i := 0; i < b.N; i++ {
+			parseCodeAndMsg(st.String())
+			//parseCodeAndMsg2(st.String())
+		}
+	}
 }

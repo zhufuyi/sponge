@@ -13,6 +13,14 @@ import (
 // Model embedded structs, add `gorm: "embedded"` when defining table structs
 type Model struct {
 	ID        uint64         `gorm:"column:id;AUTO_INCREMENT;primary_key" json:"id"`
+	CreatedAt time.Time      `gorm:"column:created_at" json:"createdAt"`
+	UpdatedAt time.Time      `gorm:"column:updated_at" json:"updatedAt"`
+	DeletedAt gorm.DeletedAt `gorm:"column:deleted_at;index" json:"-"`
+}
+
+// Model2 embedded structs, json tag named is snake case
+type Model2 struct {
+	ID        uint64         `gorm:"column:id;AUTO_INCREMENT;primary_key" json:"id"`
 	CreatedAt time.Time      `gorm:"column:created_at" json:"created_at"`
 	UpdatedAt time.Time      `gorm:"column:updated_at" json:"updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"column:deleted_at;index" json:"-"`

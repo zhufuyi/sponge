@@ -2,7 +2,6 @@ package routers
 
 import (
 	"context"
-
 	serverNameExampleV1 "github.com/zhufuyi/sponge/api/serverNameExample/v1"
 	"github.com/zhufuyi/sponge/internal/service"
 
@@ -64,7 +63,11 @@ func userExampleMiddlewares(c *middlewareConfig) {
 	// c.setGroupPath("/api/v1/userExample", middleware.Auth())
 
 	// set up single route middleware, just uncomment the code and fill in the middlewares, nothing else needs to be changed
-	//c.setSinglePath("GET", "/api/v1/userExample/:id", middleware.Auth())
+	//c.setSinglePath("POST", "/api/v1/userExample")
 	//c.setSinglePath("DELETE", "/api/v1/userExample/:id", middleware.Auth())
+	//c.setSinglePath("POST", "/api/v1/userExample/delete/ids", middleware.Auth())
 	//c.setSinglePath("PUT", "/api/v1/userExample/:id", middleware.Auth())
+	//c.setSinglePath("GET", "/api/v1/userExample/:id", middleware.Auth())
+	//c.setSinglePath("POST", "/api/v1/userExample/list/ids", middleware.Auth())
+	//c.setSinglePath("POST", "/api/v1/userExample/list", middleware.Auth())
 }

@@ -3,6 +3,7 @@ package errcode
 import (
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc/codes"
@@ -72,40 +73,59 @@ func (resp *defaultResponse) ParamError(c *gin.Context, err error) {
 }
 
 // Error response error information, if return true, means that the error code is converted to a standard http code,
-// otherwise the return code is always 200
+// otherwise the return http code is always 200
 func (resp *defaultResponse) Error(c *gin.Context, err error) bool {
-	_ = c.Error(err)
-
-	// error from rpc
 	if resp.isFromRPC {
-		st, ok := status.FromError(err)
-		if !ok {
+		// error from rpc and response the corresponding http code
+		return resp.handleRPCError(c, err)
+	}
+
+	// error from http and response http code
+	return resp.handleHTTPError(c, err)
+}
+
+func (resp *defaultResponse) handleRPCError(c *gin.Context, err error) bool {
+	st, _ := status.FromError(err)
+
+	// user defined err, response 200
+	if st.Code() == codes.Unknown {
+		code, msg := parseCodeAndMsg(st.String())
+		if code == -1 {
+			// non-conforming err
 			resp.response(c, http.StatusOK, -1, "unknown error", struct{}{})
-			return false
+		} else {
+			// err created using NewRPCStatus
+			resp.response(c, http.StatusOK, code, msg, struct{}{})
 		}
-
-		// default error code to http
-		switch st.Code() {
-		case codes.Internal, StatusInternalServerError.status.Code():
-			resp.response(c, http.StatusInternalServerError, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), struct{}{})
-			return true
-		case codes.Unavailable, StatusServiceUnavailable.status.Code():
-			resp.response(c, http.StatusServiceUnavailable, http.StatusServiceUnavailable, http.StatusText(http.StatusServiceUnavailable), struct{}{})
-			return true
-		}
-
-		// User defined error code to http
-		if resp.isUserDefinedRPCErrorCode(c, int(st.Code())) {
-			return true
-		}
-
-		e := ToHTTPErr(st)
-		resp.response(c, http.StatusOK, e.code, e.msg, struct{}{})
 		return false
 	}
 
-	// error from http
+	// default error code to http
+	switch st.Code() {
+	case codes.Internal, StatusInternalServerError.status.Code():
+		resp.response(c, http.StatusInternalServerError, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), struct{}{})
+		return true
+	case codes.Unavailable, StatusServiceUnavailable.status.Code():
+		resp.response(c, http.StatusServiceUnavailable, http.StatusServiceUnavailable, http.StatusText(http.StatusServiceUnavailable), struct{}{})
+		return true
+	}
+
+	// user defined error code to http
+	if resp.isUserDefinedRPCErrorCode(c, int(st.Code())) {
+		return true
+	}
+
+	// response 200
+	e := ToHTTPErr(st)
+	resp.response(c, http.StatusOK, e.code, e.msg, struct{}{})
+
+	return false
+}
+
+// error from http
+func (resp *defaultResponse) handleHTTPError(c *gin.Context, err error) bool {
 	e := ParseError(err)
+
 	// default error code to http
 	switch e.Code() {
 	case InternalServerError.Code(), http.StatusInternalServerError:
@@ -116,11 +136,12 @@ func (resp *defaultResponse) Error(c *gin.Context, err error) bool {
 		return true
 	}
 
-	// User defined error code to http
+	// user defined error code to http
 	if resp.isUserDefinedHTTPErrorCode(c, e.Code()) {
 		return true
 	}
 
+	// response 200
 	resp.response(c, http.StatusOK, e.code, e.msg, struct{}{})
 	return false
 }
@@ -198,21 +219,22 @@ func ToHTTPErr(st *status.Status) *Error {
 	}
 
 	return &Error{
-		code: getCodeInt(st),
+		code: int(st.Code()),
 		msg:  st.Message(),
 	}
 }
 
-func getCodeInt(st *status.Status) int {
-	code := st.Code().String()
-	if len(code) <= 6 {
-		return -1
+func parseCodeAndMsg(errStr string) (int, string) {
+	if errStr != "" {
+		ss := strings.Split(errStr, "desc = ")
+		cm := strings.Split(ss[len(ss)-1], "msg = ")
+		if len(cm) == 2 {
+			codeStr := strings.ReplaceAll(cm[0], "code = ", "")
+			codeStr = strings.ReplaceAll(codeStr, ", ", "")
+			code, _ := strconv.Atoi(codeStr)
+			msg := cm[1]
+			return code, msg
+		}
 	}
-
-	codeStr := code[5 : len(code)-1]
-	codeInt, err := strconv.Atoi(codeStr)
-	if err != nil {
-		return -1
-	}
-	return codeInt
+	return -1, errStr
 }

@@ -19,7 +19,7 @@ type UserExample struct {
 	Age      int    `gorm:"column:age;NOT NULL" json:"age"`           // age
 	Gender   int    `gorm:"column:gender;NOT NULL" json:"gender"`     // gender, 1:Male, 2:Female, other values:unknown
 	Status   int    `gorm:"column:status;NOT NULL" json:"status"`     // account status, 1:inactive, 2:activated, 3:blocked
-	LoginAt  int64  `gorm:"column:login_at;NOT NULL" json:"login_at"` // login timestamp
+	LoginAt  int64  `gorm:"column:login_at;NOT NULL" json:"loginAt"`  // login timestamp
 }
 
 // TableName get table name

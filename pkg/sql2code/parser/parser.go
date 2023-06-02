@@ -124,11 +124,12 @@ type tmplData struct {
 }
 
 type tmplField struct {
-	Name    string
-	ColName string
-	GoType  string
-	Tag     string
-	Comment string
+	Name     string
+	ColName  string
+	GoType   string
+	Tag      string
+	Comment  string
+	JSONName string
 }
 
 // ConditionZero type of condition 0
@@ -280,10 +281,14 @@ func makeCode(stmt *ast.CreateTableStmt, opt options) (*codeText, error) {
 		if columnPrefix != "" && strings.HasPrefix(goFieldName, columnPrefix) {
 			goFieldName = goFieldName[len(columnPrefix):]
 		}
-
+		jsonName := colName
+		if opt.JSONNamedType != 0 {
+			jsonName = xstrings.FirstRuneToLower(xstrings.ToCamelCase(colName)) // name type use camel case
+		}
 		field := tmplField{
-			Name:    toCamel(goFieldName),
-			ColName: colName,
+			Name:     toCamel(goFieldName),
+			ColName:  colName,
+			JSONName: jsonName,
 		}
 
 		tags := make([]string, 0, 4)
@@ -335,10 +340,7 @@ func makeCode(stmt *ast.CreateTableStmt, opt options) (*codeText, error) {
 		tags = append(tags, "gorm", gormTag.String())
 
 		if opt.JSONTag {
-			if opt.JSONNamedType != 0 {
-				colName = xstrings.FirstRuneToLower(xstrings.ToCamelCase(colName)) // use hump type json names
-			}
-			tags = append(tags, "json", colName)
+			tags = append(tags, "json", jsonName)
 		}
 
 		field.Tag = makeTagStr(tags)

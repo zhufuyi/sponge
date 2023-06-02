@@ -117,10 +117,12 @@ func NewServerNameExampleRPCConn() {
 		cliOptions = append(cliOptions, grpccli.WithEnableMetrics())
 	}
 
+	logger.Info("dialing rpc server", logger.String("name", serverName), logger.String("endpoint", endpoint))
+
 	var err error
 	serverNameExampleConn, err = grpccli.Dial(context.Background(), endpoint, cliOptions...)
 	if err != nil {
-		panic(fmt.Sprintf("dial rpc server failed: %v, endpoint: %s", err, endpoint))
+		panic(fmt.Sprintf("dial rpc server failed: %v, name: %s, endpoint: %s", err, serverName, endpoint))
 	}
 }
 

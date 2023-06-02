@@ -20,7 +20,7 @@ type Args struct {
 	Package        string // specify the package name (only valid for model types)
 	GormType       bool   // whether to display the gorm type name (only valid for model type codes)
 	JSONTag        bool   // does it include a json tag
-	JSONNamedType  int    // json naming type, 0: consistent with the column name, other values indicate a hump
+	JSONNamedType  int    // json field naming type, 0: snake case such as my_field_name, 1: camel sase, such as myFieldName
 	IsEmbed        bool   // is gorm.Model embedded
 	CodeType       string // specify the different types of code to be generated, namely model (default), json, dao, handler, proto
 	ForceTableName bool
