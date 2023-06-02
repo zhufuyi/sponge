@@ -59,6 +59,16 @@ func (g *RPCStatus) Err(details ...Detail) error {
 	return status.Errorf(g.status.Code(), "%s details = %s", g.status.Message(), dts)
 }
 
+// Code get code
+func (g *RPCStatus) Code() codes.Code {
+	return g.status.Code()
+}
+
+// Msg get message
+func (g *RPCStatus) Msg() string {
+	return g.status.Message()
+}
+
 // ToRPCErr converted to standard RPC error
 func (g *RPCStatus) ToRPCErr(desc ...string) error {
 	switch g.status.Code() {

@@ -12,6 +12,10 @@ func TestRPCStatus(t *testing.T) {
 	assert.Error(t, err)
 	err = st.Err(Any("foo", "bar"))
 	assert.Error(t, err)
+	code := st.Code()
+	assert.Equal(t, int(code), 41101)
+	msg := st.Msg()
+	assert.Equal(t, msg, "something is wrong")
 
 	defer func() {
 		recover()

@@ -7,17 +7,20 @@ import (
 	"github.com/zhufuyi/sponge/pkg/container/group"
 	"github.com/zhufuyi/sponge/pkg/errcode"
 	"github.com/zhufuyi/sponge/pkg/shield/circuitbreaker"
+	"google.golang.org/grpc/codes"
 
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc"
 )
 
 func TestUnaryClientCircuitBreaker(t *testing.T) {
-	interceptor := UnaryClientCircuitBreaker(WithGroup(
-		group.NewGroup(func() interface{} {
+	interceptor := UnaryClientCircuitBreaker(
+		WithGroup(group.NewGroup(func() interface{} {
 			return circuitbreaker.NewBreaker()
-		}),
-	))
+		})),
+		WithValidCode(codes.PermissionDenied),
+	)
+
 	assert.NotNil(t, interceptor)
 
 	ivoker := func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, opts ...grpc.CallOption) error {

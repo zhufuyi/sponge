@@ -1,6 +1,7 @@
 package routers
 
 import (
+	"github.com/zhufuyi/sponge/internal/ecode"
 	"net/http"
 	"strings"
 
@@ -68,7 +69,11 @@ func NewRouter_pbExample() *gin.Engine { //nolint
 
 	// circuit breaker middleware
 	if config.Get().App.EnableCircuitBreaker {
-		r.Use(middleware.CircuitBreaker())
+		r.Use(middleware.CircuitBreaker(
+			// set http code for circuit breaker, default already includes 500 and 503
+			middleware.WithValidCode(ecode.InternalServerError.Code()),
+			middleware.WithValidCode(ecode.ServiceUnavailable.Code()),
+		))
 	}
 
 	// trace middleware
@@ -106,7 +111,7 @@ func NewRouter_pbExample() *gin.Engine { //nolint
 }
 
 type middlewareConfig struct {
-	groupPathMiddlewares  map[string][]gin.HandlerFunc // middleware function corresponding to route group
+	groupPathMiddlewares  map[string][]gin.HandlerFunc // middleware functions corresponding to route group
 	singlePathMiddlewares map[string][]gin.HandlerFunc // middleware functions corresponding to a single route
 }
 

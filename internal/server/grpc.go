@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"github.com/zhufuyi/sponge/internal/ecode"
 	"net"
 	"net/http"
 	"time"
@@ -178,7 +179,11 @@ func (s *grpcServer) unaryServerOptions() grpc.ServerOption {
 
 	// circuit breaker interceptor
 	if config.Get().App.EnableCircuitBreaker {
-		unaryServerInterceptors = append(unaryServerInterceptors, interceptor.UnaryServerCircuitBreaker())
+		unaryServerInterceptors = append(unaryServerInterceptors, interceptor.UnaryServerCircuitBreaker(
+			// set rpc code for circuit breaker, default already includes codes.Internal and codes.Unavailable
+			interceptor.WithValidCode(ecode.StatusInternalServerError.Code()),
+			interceptor.WithValidCode(ecode.StatusServiceUnavailable.Code()),
+		))
 	}
 
 	// trace interceptor
@@ -214,7 +219,11 @@ func (s *grpcServer) streamServerOptions() grpc.ServerOption {
 
 	// circuit breaker interceptor
 	if config.Get().App.EnableCircuitBreaker {
-		streamServerInterceptors = append(streamServerInterceptors, interceptor.StreamServerCircuitBreaker())
+		streamServerInterceptors = append(streamServerInterceptors, interceptor.StreamServerCircuitBreaker(
+			// set rpc code for circuit breaker, default already includes codes.Internal and codes.Unavailable
+			interceptor.WithValidCode(ecode.StatusInternalServerError.Code()),
+			interceptor.WithValidCode(ecode.StatusServiceUnavailable.Code()),
+		))
 	}
 
 	// trace interceptor

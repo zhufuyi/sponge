@@ -18,6 +18,8 @@ type CircuitBreakerOption func(*circuitBreakerOptions)
 
 type circuitBreakerOptions struct {
 	group *group.Group
+	// http code for circuit breaker, default already includes 500 and 503
+	validCodes map[int]struct{}
 }
 
 func defaultCircuitBreakerOptions() *circuitBreakerOptions {
@@ -25,6 +27,10 @@ func defaultCircuitBreakerOptions() *circuitBreakerOptions {
 		group: group.NewGroup(func() interface{} {
 			return circuitbreaker.NewBreaker()
 		}),
+		validCodes: map[int]struct{}{
+			http.StatusInternalServerError: {},
+			http.StatusServiceUnavailable:  {},
+		},
 	}
 }
 
@@ -38,7 +44,18 @@ func (o *circuitBreakerOptions) apply(opts ...CircuitBreakerOption) {
 // NOTE: implements generics circuitbreaker.CircuitBreaker
 func WithGroup(g *group.Group) CircuitBreakerOption {
 	return func(o *circuitBreakerOptions) {
-		o.group = g
+		if g != nil {
+			o.group = g
+		}
+	}
+}
+
+// WithValidCode http code to mark failed
+func WithValidCode(code ...int) CircuitBreakerOption {
+	return func(o *circuitBreakerOptions) {
+		for _, c := range code {
+			o.validCodes[c] = struct{}{}
+		}
 	}
 }
 
@@ -51,7 +68,7 @@ func CircuitBreaker(opts ...CircuitBreakerOption) gin.HandlerFunc {
 		breaker := o.group.Get(c.FullPath()).(circuitbreaker.CircuitBreaker)
 		if err := breaker.Allow(); err != nil {
 			// NOTE: when client reject request locally,
-			// continue add counter let the drop ratio higher.
+			// continue to add counter let the drop ratio higher.
 			breaker.MarkFailed()
 			response.Output(c, http.StatusServiceUnavailable, err.Error())
 			c.Abort()
@@ -62,7 +79,8 @@ func CircuitBreaker(opts ...CircuitBreakerOption) gin.HandlerFunc {
 
 		code := c.Writer.Status()
 		// NOTE: need to check internal and service unavailable error
-		if code == http.StatusInternalServerError || code == http.StatusServiceUnavailable || code == http.StatusGatewayTimeout {
+		_, isHit := o.validCodes[code]
+		if isHit {
 			breaker.MarkFailed()
 		} else {
 			breaker.MarkSuccess()

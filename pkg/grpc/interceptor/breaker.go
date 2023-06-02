@@ -2,7 +2,6 @@ package interceptor
 
 import (
 	"context"
-
 	"github.com/zhufuyi/sponge/pkg/container/group"
 	"github.com/zhufuyi/sponge/pkg/errcode"
 	"github.com/zhufuyi/sponge/pkg/shield/circuitbreaker"
@@ -20,6 +19,8 @@ type CircuitBreakerOption func(*circuitBreakerOptions)
 
 type circuitBreakerOptions struct {
 	group *group.Group
+	// rpc code for circuit breaker, default already includes codes.Internal and codes.Unavailable
+	validCodes map[codes.Code]struct{}
 }
 
 func defaultCircuitBreakerOptions() *circuitBreakerOptions {
@@ -27,6 +28,10 @@ func defaultCircuitBreakerOptions() *circuitBreakerOptions {
 		group: group.NewGroup(func() interface{} {
 			return circuitbreaker.NewBreaker()
 		}),
+		validCodes: map[codes.Code]struct{}{
+			codes.Internal:    {},
+			codes.Unavailable: {},
+		},
 	}
 }
 
@@ -40,7 +45,18 @@ func (o *circuitBreakerOptions) apply(opts ...CircuitBreakerOption) {
 // NOTE: implements generics circuitbreaker.CircuitBreaker
 func WithGroup(g *group.Group) CircuitBreakerOption {
 	return func(o *circuitBreakerOptions) {
-		o.group = g
+		if g != nil {
+			o.group = g
+		}
+	}
+}
+
+// WithValidCode rpc code to mark failed
+func WithValidCode(code ...codes.Code) CircuitBreakerOption {
+	return func(o *circuitBreakerOptions) {
+		for _, c := range code {
+			o.validCodes[c] = struct{}{}
+		}
 	}
 }
 
@@ -62,7 +78,8 @@ func UnaryClientCircuitBreaker(opts ...CircuitBreakerOption) grpc.UnaryClientInt
 		if err != nil {
 			// NOTE: need to check internal and service unavailable error
 			s, ok := status.FromError(err)
-			if ok && (s.Code() == codes.Internal || s.Code() == codes.Unavailable) {
+			_, isHit := o.validCodes[s.Code()]
+			if ok && isHit {
 				breaker.MarkFailed()
 			} else {
 				breaker.MarkSuccess()
@@ -91,7 +108,8 @@ func StreamClientCircuitBreaker(opts ...CircuitBreakerOption) grpc.StreamClientI
 		if err != nil {
 			// NOTE: need to check internal and service unavailable error
 			s, ok := status.FromError(err)
-			if ok && (s.Code() == codes.Internal || s.Code() == codes.Unavailable) {
+			_, isHit := o.validCodes[s.Code()]
+			if ok && isHit {
 				breaker.MarkFailed()
 			} else {
 				breaker.MarkSuccess()
@@ -120,7 +138,8 @@ func UnaryServerCircuitBreaker(opts ...CircuitBreakerOption) grpc.UnaryServerInt
 		if err != nil {
 			// NOTE: need to check internal and service unavailable error
 			s, ok := status.FromError(err)
-			if ok && (s.Code() == codes.Internal || s.Code() == codes.Unavailable) {
+			_, isHit := o.validCodes[s.Code()]
+			if ok && isHit {
 				breaker.MarkFailed()
 			} else {
 				breaker.MarkSuccess()
@@ -149,7 +168,8 @@ func StreamServerCircuitBreaker(opts ...CircuitBreakerOption) grpc.StreamServerI
 		if err != nil {
 			// NOTE: need to check internal and service unavailable error
 			s, ok := status.FromError(err)
-			if ok && (s.Code() == codes.Internal || s.Code() == codes.Unavailable) {
+			_, isHit := o.validCodes[s.Code()]
+			if ok && isHit {
 				breaker.MarkFailed()
 			} else {
 				breaker.MarkSuccess()

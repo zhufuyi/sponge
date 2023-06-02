@@ -25,7 +25,9 @@ func runCircuitBreakerHTTPServer() string {
 	r := gin.New()
 	r.Use(CircuitBreaker(WithGroup(group.NewGroup(func() interface{} {
 		return circuitbreaker.NewBreaker()
-	}))))
+	})),
+		WithValidCode(http.StatusForbidden),
+	))
 
 	r.GET("/hello", func(c *gin.Context) {
 		if rand.Int()%2 == 0 {

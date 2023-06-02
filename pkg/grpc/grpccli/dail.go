@@ -3,6 +3,7 @@ package grpccli
 import (
 	"context"
 	"errors"
+
 	"github.com/zhufuyi/sponge/pkg/grpc/gtls"
 	"github.com/zhufuyi/sponge/pkg/grpc/interceptor"
 	"github.com/zhufuyi/sponge/pkg/logger"
@@ -119,9 +120,12 @@ func unaryClientOptions(o *options) grpc.DialOption {
 	}
 
 	// circuit breaker
-	if o.enableCircuitBreaker {
-		unaryClientInterceptors = append(unaryClientInterceptors, interceptor.UnaryClientCircuitBreaker())
-	}
+	//if o.enableCircuitBreaker {
+	//	unaryClientInterceptors = append(unaryClientInterceptors, interceptor.UnaryClientCircuitBreaker(
+	//	// set rpc code for circuit breaker, default already includes codes.Internal and codes.Unavailable
+	//	//interceptor.WithValidCode(codes.PermissionDenied),
+	//	))
+	//}
 
 	// retry
 	if o.enableRetry {
@@ -162,9 +166,12 @@ func streamClientOptions(o *options) grpc.DialOption {
 	}
 
 	// circuit breaker
-	if o.enableCircuitBreaker {
-		streamClientInterceptors = append(streamClientInterceptors, interceptor.StreamClientCircuitBreaker())
-	}
+	//if o.enableCircuitBreaker {
+	//	streamClientInterceptors = append(streamClientInterceptors, interceptor.StreamClientCircuitBreaker(
+	//	// set rpc code for circuit breaker, default already includes codes.Internal and codes.Unavailable
+	//	//interceptor.WithValidCode(codes.PermissionDenied),
+	//	))
+	//}
 
 	// retry
 	if o.enableRetry {
