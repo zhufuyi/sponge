@@ -86,7 +86,7 @@ func runGenRPCGwCommand(moduleName string, serverName string, projectName string
 		"types.pb.validate.go", "types.pb.go", // api/types
 		"swagger.json", "swagger.yaml", "apis.swagger.json", "apis.html", "docs.go", // sponge/docs
 		"userExample_rpc.go", "systemCode_http.go", "userExample_http.go", // internal/ecode
-		"routers.go", "routers_test.go", "userExample.go", "userExample_service.pb.go", // internal/routers
+		"routers_pbExample_test.go", "routers.go", "routers_test.go", "userExample.go", "userExample_service.pb.go", // internal/routers
 		"grpc.go", "grpc_option.go", "grpc_test.go", // internal/server
 	}
 

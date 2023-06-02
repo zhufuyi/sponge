@@ -158,6 +158,10 @@ func NewCenter(configFile string) (*Center, error) {
     $specifiedProtoFiles
 
   checkResult $?
+
+  convertTypeStringToInteger
+  checkResult $?
+
   echo ""
   echo "run server and see docs by http://localhost:8080/apis/swagger/index.html"
   echo ""
@@ -182,6 +186,10 @@ func NewCenter(configFile string) (*Center, error) {
     $specifiedProtoFiles
 
   checkResult $?
+
+  convertTypeStringToInteger
+  checkResult $?
+
   echo ""
   echo "run server and see docs by http://localhost:8080/apis/swagger/index.html"
   echo ""
