@@ -43,19 +43,19 @@ The microservice code framework created by sponge is shown in Figure 1-2, this i
 
 ### Supported code types for generation
 
-- Generate complete web service code based on MySQL tables.
-- Generate handler code based on MySQL tables, including CRUD code.
-- Generate dao code based on MySQL tables, including CRUD code.
-- Generate model code based on MySQL tables.
-- Generate complete rpc service code based on MySQL tables.
-- Generate service code based on MySQL tables, including CRUD code.
-- Generate protobuf code based on MySQL tables.
-- Generate web service code based on protobuf.
-- Generate rpc service code based on protobuf.
-- Generate rpc gateway service code based on protobuf.
-- Generate corresponding go structure code based on yaml.
-- Generate rpc connection code according to parameters.
-- Generate cache code according to parameters.
+- [Generate complete web service project code based on MySQL table](https://go-sponge.com/en/ui/web-http)
+- [Generate handler code based on MySQL tables, including CRUD code](https://go-sponge.com/en/ui/web-handler)
+- [Generate dao code based on MySQL tables, including CRUD code](https://go-sponge.com/en/ui/web-dao)
+- [Generate gorm model code based on MySQL tables](https://go-sponge.com/en/ui/web-model)
+- [Generate complete rpc service project code based on MySQL table](https://go-sponge.com/en/ui/micro-rpc)
+- [Generate service code based on MySQL tables, including CRUD code](https://go-sponge.com/en/ui/micro-service)
+- [Generate protobuf code based on MySQL tables](https://go-sponge.com/en/ui/micro-protobuf)
+- [Generate generic web service project code based on protobuf](https://go-sponge.com/en/ui/web-http-pb)
+- [Generate generic rpc service project code based on protobuf](https://go-sponge.com/en/ui/micro-rpc-pb)
+- [Generate rpc gateway service project code based on protobuf](https://go-sponge.com/en/ui/micro-rpc-gw-pb)
+- [Generate corresponding go structure code based on yaml](https://go-sponge.com/en/ui/yaml-config)
+- [Generate rpc connection code according to parameters](https://go-sponge.com/en/ui/micro-rpc-conn)
+- [Generate cache code according to parameters](https://go-sponge.com/en/ui/web-cache)
 
 The generated code can be combined into actual project web or microservice code, and the developer only needs to focus on writing the business logic code, online UI interface demo: [https://go-sponge.com/ui](https://go-sponge.com/ui)
 

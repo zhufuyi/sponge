@@ -93,24 +93,6 @@ function generateByAllProto(){
   checkResult $?
 }
 
-# the default 64-bit variable type is string, which needs to be converted to an integer type
-function convertTypeStringToInteger() {
-  JSONFile="docs/apis.swagger.json"
-  tmpJSONFile="docs/apis.swagger.tmp.json"
-
-  sed -i 's/"format": "uint64"/"format": "int64"/g' "$JSONFile"
-  sync
-  awk '{
-          if ($0 ~ /"type": "string",/ && getline next_line && next_line ~ /"format": "int64"/) {
-              print "    \"type\": \"integer\", \"format\": \"int64\""
-          } else {
-              print
-          }
-      }' "$JSONFile" > "$tmpJSONFile"
-
-  mv -f "$tmpJSONFile" "$JSONFile"
-}
-
 function generateBySpecifiedProto(){
   # get the proto file of the serverNameExample server
   allProtoFiles=""
@@ -127,7 +109,7 @@ function generateBySpecifiedProto(){
 
   checkResult $?
 
-  convertTypeStringToInteger
+  sponge web swagger --file=docs/apis.swagger.json
   checkResult $?
 
   echo ""

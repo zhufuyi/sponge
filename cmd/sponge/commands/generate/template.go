@@ -159,7 +159,7 @@ func NewCenter(configFile string) (*Center, error) {
 
   checkResult $?
 
-  convertTypeStringToInteger
+  sponge web swagger --file=docs/apis.swagger.json
   checkResult $?
 
   echo ""
@@ -187,7 +187,7 @@ func NewCenter(configFile string) (*Center, error) {
 
   checkResult $?
 
-  convertTypeStringToInteger
+  sponge micro swagger --file=docs/apis.swagger.json
   checkResult $?
 
   echo ""

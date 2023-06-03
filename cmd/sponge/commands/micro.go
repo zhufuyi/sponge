@@ -10,8 +10,8 @@ import (
 func MicroCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:           "micro",
-		Short:         "Generate proto, model, dao, service, rpc, rpc-gw, rpc-cli codes",
-		Long:          "generate proto, model, dao, service, rpc, rpc-gw, rpc-cli codes.",
+		Short:         "Generate proto, model, cache, dao, service, rpc, rpc-gw, rpc-cli codes",
+		Long:          "generate proto, model, cache, dao, service, rpc, rpc-gw, rpc-cli codes.",
 		SilenceErrors: true,
 		SilenceUsage:  true,
 	}
@@ -26,6 +26,7 @@ func MicroCommand() *cobra.Command {
 		generate.RPCGwPbCommand(),
 		generate.RPCPbCommand(),
 		generate.RPCConnectionCommand(),
+		generate.ConvertSwagJSONCommand("micro"),
 	)
 
 	return cmd

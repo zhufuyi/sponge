@@ -1,12 +1,12 @@
 package routers
 
 import (
-	"github.com/zhufuyi/sponge/internal/ecode"
 	"net/http"
 	"strings"
 
 	"github.com/zhufuyi/sponge/docs"
 	"github.com/zhufuyi/sponge/internal/config"
+	"github.com/zhufuyi/sponge/internal/ecode"
 
 	"github.com/zhufuyi/sponge/pkg/gin/handlerfunc"
 	"github.com/zhufuyi/sponge/pkg/gin/middleware"
