@@ -61,42 +61,20 @@ sponge run
 
 <br>
 
-生成web项目代码示例：
+### 使用示例
 
-<p align="center">
-<img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/web-http.gif">
-</p>
-
-下载web项目代码后，执行命令启动服务：
-
-```bash
-# 更新swagger文档
-make docs
-
-# 编译和运行服务
-make run
-```
-
-<br>
-
-💡 如果不想使用ui界面，可以使用sponge命令行生成代码，命令行帮助信息里面有丰富的示例，有一些生成代码命令比使用UI界面更便捷。
+- [1_web-gin-CRUD](https://www.bilibili.com/read/cv23018269)
+- [2_web-gin-protobuf](https://www.bilibili.com/read/cv23040234)
+- [3_micro-grpc-CRUD](https://www.bilibili.com/read/cv23064432)
+- [4_micro-grpc-protobuf](https://www.bilibili.com/read/cv23099236)
+- [5_micro-gin-rpc-gateway](https://www.bilibili.com/read/cv23189890)
+- [6_micro-cluster](https://www.bilibili.com/read/cv23255594)
 
 <br>
 
 ### 文档
 
 [sponge 使用文档](https://go-sponge.com/zh-cn/)
-
-<br>
-
-### 使用示例
-
-- [生成完整的web服务项目代码](https://www.bilibili.com/read/cv23018269)
-- [生成通用的web服务项目代码](https://www.bilibili.com/read/cv23040234)
-- [生成完整的微服务(gRPC)项目代码](https://www.bilibili.com/read/cv23064432)
-- [生成通用的微服务(gRPC)项目代码](https://www.bilibili.com/read/cv23099236)
-- [生成rpc网关服务项目代码](https://www.bilibili.com/read/cv23189890)
-- [生成微服务集群项目代码](https://www.bilibili.com/read/cv23255594)
 
 <br>
 

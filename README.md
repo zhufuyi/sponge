@@ -11,7 +11,6 @@
 [![Go Reference](https://pkg.go.dev/badge/github.com/zhufuyi/sponge.svg)](https://pkg.go.dev/github.com/zhufuyi/sponge)
 [![Go](https://github.com/zhufuyi/sponge/workflows/Go/badge.svg?branch=main)](https://github.com/zhufuyi/sponge/actions)
 [![License: MIT](https://img.shields.io/github/license/zhufuyi/sponge)](https://img.shields.io/github/license/zhufuyi/sponge)
-[![Join the chat at https://gitter.im/zhufuyi/sponge](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/zhufuyi/sponge?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 </div>
 
@@ -80,36 +79,14 @@ Visit `http://localhost:24631` in your browser, generate code by manipulating it
 
 <br>
 
-Example of sql based web project code generation.
-
-<p align="center">
-<img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/web-http-en.gif">
-</p>
-
-After downloading the web project code, execute the command to start the service.
-
-```bash
-# update swagger
-make docs
-
-# build and run
-make run
-```
-
-<br>
-
-💡 If you don't want to use the UI interface, you can use the sponge command line to generate code, there is a wealth of examples in the command line helper information, and some of the code generation commands are more convenient than using the UI interface.
-
-<br>
-
 ### Examples of use
 
-- [Generate the complete web service project code](https://github.com/zhufuyi/sponge/tree/main/examples/1_web-gin-CRUD)
-- [Generate generic web service project code](https://github.com/zhufuyi/sponge/tree/main/examples/2_web-gin-protobuf)
-- [Generate complete microservice(gRPC) project code](https://github.com/zhufuyi/sponge/tree/main/examples/3_micro-grpc-CRUD)
-- [Generates generic microservice(gRPC) project code](https://github.com/zhufuyi/sponge/tree/main/examples/4_micro-grpc-protobuf)
-- [Generate rpc gateway service project code](https://github.com/zhufuyi/sponge/tree/main/examples/5_micro-gin-rpc-gateway)
-- [Generate microservice cluster project code](https://github.com/zhufuyi/sponge/tree/main/examples/6_micro-cluster)
+- [1_web-gin-CRUD](https://github.com/zhufuyi/sponge_examples/tree/main/1_web-gin-CRUD)
+- [2_web-gin-protobuf](https://github.com/zhufuyi/sponge_examples/tree/main/2_web-gin-protobuf)
+- [3_micro-grpc-CRUD](https://github.com/zhufuyi/sponge_examples/tree/main/3_micro-grpc-CRUD)
+- [4_micro-grpc-protobuf](https://github.com/zhufuyi/sponge_examples/tree/main/4_micro-grpc-protobuf)
+- [5_micro-gin-rpc-gateway](https://github.com/zhufuyi/sponge_examples/tree/main/5_micro-gin-rpc-gateway)
+- [6_micro-cluster](https://github.com/zhufuyi/sponge_examples/tree/main/6_micro-cluster)
 
 <br>
 
