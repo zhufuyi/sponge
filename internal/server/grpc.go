@@ -166,6 +166,12 @@ func (s *grpcServer) unaryServerOptions() grpc.ServerOption {
 		unaryServerInterceptors = append(unaryServerInterceptors, interceptor.UnaryServerToken(checkToken))
 	}
 
+	// jwt token interceptor
+	//unaryServerInterceptors = append(unaryServerInterceptors, interceptor.UnaryServerJwtAuth(
+	//	// set ignore rpc methods(full path) for jwt token
+	//	interceptor.WithAuthIgnoreMethods("/api.user.v1.User/Register", "/api.user.v1.User/Login"),
+	//))
+
 	// metrics interceptor
 	if config.Get().App.EnableMetrics {
 		unaryServerInterceptors = append(unaryServerInterceptors, interceptor.UnaryServerMetrics())
@@ -205,6 +211,24 @@ func (s *grpcServer) streamServerOptions() grpc.ServerOption {
 	streamServerInterceptors = append(streamServerInterceptors, interceptor.StreamServerLog(
 		logger.Get(),
 	))
+
+	// token interceptor
+	if config.Get().Grpc.EnableToken {
+		checkToken := func(appID string, appKey string) error {
+			// todo the defaultTokenAppID and defaultTokenAppKey are usually retrieved from the cache or database
+			if appID != defaultTokenAppID || appKey != defaultTokenAppKey {
+				return status.Errorf(codes.Unauthenticated, "app id or app key checksum failure")
+			}
+			return nil
+		}
+		streamServerInterceptors = append(streamServerInterceptors, interceptor.StreamServerToken(checkToken))
+	}
+
+	// jwt token interceptor
+	//streamServerInterceptors = append(streamServerInterceptors, interceptor.StreamServerJwtAuth(
+	//	// set ignore rpc methods(full path) for jwt token
+	//	interceptor.WithAuthIgnoreMethods("/api.user.v1.User/Register", "/api.user.v1.User/Login"),
+	//))
 
 	// metrics interceptor
 	if config.Get().App.EnableMetrics {

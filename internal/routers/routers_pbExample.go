@@ -6,8 +6,8 @@ import (
 
 	"github.com/zhufuyi/sponge/docs"
 	"github.com/zhufuyi/sponge/internal/config"
-	"github.com/zhufuyi/sponge/internal/ecode"
 
+	"github.com/zhufuyi/sponge/pkg/errcode"
 	"github.com/zhufuyi/sponge/pkg/gin/handlerfunc"
 	"github.com/zhufuyi/sponge/pkg/gin/middleware"
 	"github.com/zhufuyi/sponge/pkg/gin/middleware/metrics"
@@ -71,8 +71,8 @@ func NewRouter_pbExample() *gin.Engine { //nolint
 	if config.Get().App.EnableCircuitBreaker {
 		r.Use(middleware.CircuitBreaker(
 			// set http code for circuit breaker, default already includes 500 and 503
-			middleware.WithValidCode(ecode.InternalServerError.Code()),
-			middleware.WithValidCode(ecode.ServiceUnavailable.Code()),
+			middleware.WithValidCode(errcode.InternalServerError.Code()),
+			middleware.WithValidCode(errcode.ServiceUnavailable.Code()),
 		))
 	}
 

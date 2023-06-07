@@ -9,12 +9,32 @@ import (
 	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
+
+// ---------------------------------- client ----------------------------------
+
+// SetJwtTokenToCtx set the token to the context in rpc client side
+// Example:
+//
+//	ctx := SetJwtTokenToCtx(ctx, "Bearer jwt-token")
+//	cli.GetByID(ctx, req)
+func SetJwtTokenToCtx(ctx context.Context, authorization string) context.Context {
+	md, ok := metadata.FromOutgoingContext(ctx)
+	if ok {
+		md.Set(headerAuthorize, authorization)
+	} else {
+		md = metadata.Pairs(headerAuthorize, authorization)
+	}
+	return metadata.NewOutgoingContext(ctx, md)
+}
 
 // ---------------------------------- server interceptor ----------------------------------
 
 var (
+	headerAuthorize = "authorization"
+
 	// auth Scheme
 	authScheme = "Bearer"
 

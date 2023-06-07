@@ -251,7 +251,8 @@ service {{.TName}}Service {
 //      to ensure that the front end and back end JSON naming is consistent.
 // (3) If the declared route path includes a variable, such as /api/v1/userExample/{id},
 //      the request parameter of the rpc method contains the route variable field and this field
-//      must be annotated, such as int64 id = 1 [(tagger.tags) = "uri:\"id\"" ]
+//      must be annotated, such as int64 id = 1 [(tagger.tags) = "uri:\"id\""]; If the get method is used, 
+//      the request parameters must be annotated with form, e.g. uint productID = 1 [(tagger.tags) = "form:\"productID\""].
 
 
 // protoMessageCreateCode

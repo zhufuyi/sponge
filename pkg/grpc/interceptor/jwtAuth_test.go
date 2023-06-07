@@ -95,3 +95,17 @@ func Test_defaultAuthOptions(t *testing.T) {
 	o := defaultAuthOptions()
 	assert.NotNil(t, o)
 }
+
+func TestSetJWTTokenToCtx(t *testing.T) {
+	ctx := context.Background()
+	expected := []string{"Bearer jwt-token-1"}
+
+	ctx = SetJwtTokenToCtx(ctx, expected[0])
+	md, _ := metadata.FromOutgoingContext(ctx)
+	assert.Equal(t, expected, md.Get(headerAuthorize))
+
+	expected[0] = "Bearer jwt-token-2"
+	ctx = SetJwtTokenToCtx(ctx, expected[0])
+	md, _ = metadata.FromOutgoingContext(ctx)
+	assert.Equal(t, expected, md.Get(headerAuthorize))
+}

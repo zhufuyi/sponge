@@ -20,6 +20,7 @@ func Test_service_userExample_methods(t *testing.T) {
 	conn := getRPCClientConnForTest()
 	cli := serverNameExampleV1.NewUserExampleServiceClient(conn)
 	ctx, _ := context.WithTimeout(context.Background(), time.Second*3)
+	//ctx = interceptor.SetJwtTokenToCtx(ctx, "Bearer jwt-token-value")
 
 	tests := []struct {
 		name    string
