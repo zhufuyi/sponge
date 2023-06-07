@@ -9,24 +9,26 @@ import (
 
 // ServiceMethod method fields
 type ServiceMethod struct {
-	MethodName    string         // e.g. Create
-	Request       string         // e.g. CreateRequest
-	RequestFields []RequestField // request fields
-	Reply         string         // e.g. CreateReply
+	MethodName    string   // e.g. Create
+	Request       string   // e.g. CreateRequest
+	RequestFields []*Field // request fields
+	Reply         string   // e.g. CreateReply
+	ReplyFields   []*Field
+	Comment       string // e.g. Create a record
 
 	ServiceName      string // Greeter
 	LowerServiceName string // greeter first character to lower
 }
 
-// RequestField request fields
-type RequestField struct {
-	FieldName string
+// Field request fields
+type Field struct {
+	Name      string
 	FieldType string
 	Comment   string
 }
 
 // GoTypeZero default zero value for type
-func (r RequestField) GoTypeZero() string {
+func (r Field) GoTypeZero() string {
 	switch r.FieldType {
 	case "bool":
 		return "false"
@@ -65,8 +67,10 @@ func parsePbService(s *protogen.Service) *PbService {
 		methods = append(methods, &ServiceMethod{
 			MethodName:    m.GoName,
 			Request:       m.Input.GoIdent.GoName,
-			RequestFields: getRequestFields(m.Input.Fields),
+			RequestFields: getFields(m.Input),
 			Reply:         m.Output.GoIdent.GoName,
+			ReplyFields:   getFields(m.Output),
+			Comment:       getMethodComment(m),
 
 			ServiceName:      s.GoName,
 			LowerServiceName: strings.ToLower(s.GoName[:1]) + s.GoName[1:],
@@ -80,21 +84,62 @@ func parsePbService(s *protogen.Service) *PbService {
 	}
 }
 
-func getRequestFields(fields []*protogen.Field) []RequestField {
-	var reqFields []RequestField
-	for _, field := range fields {
-		fieldType := field.Desc.Kind().String()
-		if field.Desc.Cardinality().String() == "repeated" {
+func getFields(m *protogen.Message) []*Field {
+	var fields []*Field
+	for _, f := range m.Fields {
+		fieldType := f.Desc.Kind().String()
+		if f.Desc.Cardinality().String() == "repeated" {
 			fieldType = "[]" + fieldType
 		}
-		reqFields = append(reqFields, RequestField{
-			FieldName: field.GoName,
-			//FieldType: field.Desc.Kind().String(),
+		fields = append(fields, &Field{
+			Name:      f.GoName,
 			FieldType: fieldType,
-			Comment:   strings.ReplaceAll(field.Comments.Trailing.String(), "\n", ""),
+			Comment:   getComment(f.Comments),
 		})
 	}
-	return reqFields
+	return fields
+}
+
+func getMethodComment(m *protogen.Method) string {
+	symbol := "// "
+	symbolLen := len(symbol)
+	commentPrefix := symbol + m.GoName + " "
+	comment := m.Comments.Leading.String()
+
+	if len(comment) >= symbolLen {
+		if comment[:symbolLen] == symbol {
+			if comment[len(comment)-1] == '\n' {
+				comment = comment[:len(comment)-1]
+			}
+			if len(comment) >= symbolLen {
+				if len(comment[symbolLen:]) > len(m.GoName) {
+					commentPrefixLower := strings.ToLower(comment[symbolLen : len(m.GoName)+symbolLen+1])
+					if commentPrefixLower == strings.ToLower(m.GoName+" ") {
+						return commentPrefix + comment[symbolLen+len(m.GoName)+1:]
+					}
+				}
+				return commentPrefix + comment[symbolLen:]
+			}
+		}
+	}
+
+	return commentPrefix + "......"
+}
+
+func getComment(commentSet protogen.CommentSet) string {
+	comment1 := getCommentStr(commentSet.Leading.String())
+	comment2 := getCommentStr(commentSet.Trailing.String())
+	if comment1 == "" {
+		return comment2
+	}
+	return comment1 + " " + comment2
+}
+
+func getCommentStr(comment string) string {
+	if len(comment) > 2 && comment[len(comment)-1] == '\n' {
+		return comment[:len(comment)-1]
+	}
+	return comment
 }
 
 // GetServices parse protobuf services

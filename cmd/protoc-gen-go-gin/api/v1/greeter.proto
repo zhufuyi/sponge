@@ -7,6 +7,7 @@ import "google/api/annotations.proto";
 option go_package = "./v1;v1";
 
 service GreeterService {
+  // create a record
   rpc Create(CreateGreeterRequest) returns (CreateGreeterReply) {
     option (google.api.http) = {
       post: "/api/v1/greeter"
@@ -14,12 +15,14 @@ service GreeterService {
     };
   }
 
+  // delete a record by id
   rpc DeleteByID(DeleteGreeterByIDRequest) returns (DeleteGreeterByIDReply) {
     option (google.api.http) = {
       delete: "/api/v1/greeter/{id}"
     };
   }
 
+  // update a record by id
   rpc UpdateByID(UpdateGreeterByIDRequest) returns (UpdateGreeterByIDReply) {
     option (google.api.http) = {
       put: "/api/v1/greeter/{id}"
@@ -27,12 +30,14 @@ service GreeterService {
     };
   }
 
+  // get a record by id
   rpc GetByID(GetGreeterByIDRequest) returns (GetGreeterByIDReply) {
     option (google.api.http) = {
       get: "/api/v1/greeter/{id}"
     };
   }
 
+  // list of records by parameters
   rpc List(ListGreeterRequest) returns (ListGreeterReply) {
     option (google.api.http) = {
       post: "/api/v1/greeter/list"

@@ -60,9 +60,11 @@ func New{{.Name}}Handler() serverNameExampleV1.{{.Name}}Logicer {
 
 {{- range .Methods}}
 
-// {{.MethodName}} ......
+{{.Comment}}
 func (h *{{.LowerServiceName}}Handler) {{.MethodName}}(ctx context.Context, req *serverNameExampleV1.{{.Request}}) (*serverNameExampleV1.{{.Reply}}, error) {
-	// fill in the business logic code here
+	panic("implement me")
+
+	// fill in the business logic code here, if necessary, 'ctx' can be converted to 'gin.Context', such as ginCtx, ok := ctx.(*gin.Context)
 	// example:
 	//	    err := req.Validate()
 	//	    if err != nil {
@@ -70,15 +72,21 @@ func (h *{{.LowerServiceName}}Handler) {{.MethodName}}(ctx context.Context, req 
 	//		    return nil, ecode.InvalidParams.Err()
 	//	    }
 	//
-	// 	reply, err := h.{{.LowerServiceName}}Dao.{{.MethodName}}(ctx, req)
+	// 	reply, err := h.{{.LowerServiceName}}Dao.{{.MethodName}}(ctx, &model.{{.ServiceName}}{
+{{- range .RequestFields}}
+	//     	{{.Name}}: req.{{.Name}},
+{{- end}}
+	//     })
 	// 	if err != nil {
 	//			logger.Warn("{{.MethodName}} error", logger.Err(err), middleware.CtxRequestIDField(ctx))
 	//			return nil, ecode.InternalServerError.Err()
 	//		}
-	// 	return reply, nil
-    // if necessary, 'ctx' can be converted to 'gin.Context', for example ginCtx, ok := ctx.(*gin.Context)
-
-	panic("implement me")
+	//
+	//     return &serverNameExampleV1.{{.Reply}}{
+{{- range .ReplyFields}}
+	//     	{{.Name}}: reply.{{.Name}},
+{{- end}}
+	//     }, nil
 }
 
 {{- end}}

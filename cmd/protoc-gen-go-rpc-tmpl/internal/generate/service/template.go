@@ -78,8 +78,10 @@ func New{{.Name}}Server() serverNameExampleV1.{{.Name}}Server {
 
 {{- range .Methods}}
 
-// {{.MethodName}} ......
+{{.Comment}}
 func (s *{{.LowerServiceName}}) {{.MethodName}}(ctx context.Context, req *serverNameExampleV1.{{.Request}}) (*serverNameExampleV1.{{.Reply}}, error) {
+	panic("implement me")
+
 	// fill in the business logic code here
 	// example:
 	//	    err := req.Validate()
@@ -88,14 +90,22 @@ func (s *{{.LowerServiceName}}) {{.MethodName}}(ctx context.Context, req *server
 	//		    return nil, ecode.StatusInvalidParams.Err()
 	//	    }
     //
-	// 	reply, err := s.xxxDao.XxxMethod(ctx, req)
+	// 	reply, err := s.iDao.{{.Request}}(ctx, &model.{{.ServiceName}}{
+{{- range .RequestFields}}
+	//     	{{.Name}}: req.{{.Name}},
+{{- end}}
+	//     })
+    //
 	// 	if err != nil {
 	//			logger.Warn("XxxMethod error", logger.Err(err), interceptor.ServerCtxRequestIDField(ctx))
 	//			return nil, ecode.InternalServerError.Err()
 	//		}
-	// 	return reply, nil
-
-	panic("implement me")
+	//
+	//     return &serverNameExampleV1.{{.Reply}}{
+{{- range .ReplyFields}}
+	//     	{{.Name}}: reply.{{.Name}},
+{{- end}}
+	//     }, nil
 }
 
 {{- end}}
@@ -142,7 +152,7 @@ func Test_service_{{.LowerName}}_methods(t *testing.T) {
 				// todo type in the parameters to test
 				req := &serverNameExampleV1.{{.Request}}{
 {{- range .RequestFields}}
-					{{.FieldName}}: {{.GoTypeZero}}, {{if .Comment}} {{.Comment}}{{end}}
+					{{.Name}}: {{.GoTypeZero}}, {{if .Comment}} {{.Comment}}{{end}}
 {{- end}}
 				}
 				return cli.{{.MethodName}}(ctx, req)
@@ -193,7 +203,7 @@ func Test_service_{{.LowerName}}_benchmark(t *testing.T) {
 				// todo type in the parameters to test
 				message := &serverNameExampleV1.{{.Request}}{
 {{- range .RequestFields}}
-					{{.FieldName}}: {{.GoTypeZero}}, {{if .Comment}} {{.Comment}}{{end}}
+					{{.Name}}: {{.GoTypeZero}}, {{if .Comment}} {{.Comment}}{{end}}
 {{- end}}
 				}
 				var total uint = 1000 // total number of requests

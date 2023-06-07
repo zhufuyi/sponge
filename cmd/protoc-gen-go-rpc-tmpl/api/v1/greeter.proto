@@ -2,49 +2,25 @@ syntax = "proto3";
 
 package v1;
 
-import "google/api/annotations.proto";
-
 option go_package = "./v1;v1";
 
 service Greeter {
-  rpc Create(CreateGreeterRequest) returns (CreateGreeterReply) {
-    option (google.api.http) = {
-      post: "/api/v1/greeter"
-      body: "*"
-    };
-  }
-
-  rpc DeleteByID(DeleteGreeterByIDRequest) returns (DeleteGreeterByIDReply) {
-    option (google.api.http) = {
-      delete: "/api/v1/greeter/{id}"
-    };
-  }
-
-  rpc UpdateByID(UpdateGreeterByIDRequest) returns (UpdateGreeterByIDReply) {
-    option (google.api.http) = {
-      put: "/api/v1/greeter/{id}"
-      body: "*"
-    };
-  }
-
-  rpc GetByID(GetGreeterByIDRequest) returns (GetGreeterByIDReply) {
-    option (google.api.http) = {
-      get: "/api/v1/greeter/{id}"
-    };
-  }
-
-  rpc List(ListGreeterRequest) returns (ListGreeterReply) {
-    option (google.api.http) = {
-      post: "/api/v1/greeter/list"
-      body: "*"
-    };
-  }
+  // create a record
+  rpc Create(CreateGreeterRequest) returns (CreateGreeterReply) {}
+  // delete a record by id
+  rpc DeleteByID(DeleteGreeterByIDRequest) returns (DeleteGreeterByIDReply) {}
+  // update a record by id
+  rpc UpdateByID(UpdateGreeterByIDRequest) returns (UpdateGreeterByIDReply) {}
+  // get a record by id
+  rpc GetByID(GetGreeterByIDRequest) returns (GetGreeterByIDReply) {}
+  // list of records by parameters
+  rpc List(ListGreeterRequest) returns (ListGreeterReply) {}
 }
 
 message CreateGreeterRequest {
-  string name = 1;
-  string email = 2;
-  string password = 3;
+  string name = 1; // name
+  string email = 2; // email address
+  string password = 3; // password
 }
 
 message CreateGreeterReply {
@@ -100,17 +76,8 @@ message Params {
 }
 
 service Foo {
-  rpc CreateFoo(CreateFooRequest) returns (CreateFooReply) {
-    option (google.api.http) = {
-      post: "/api/v1/foo"
-      body: "*"
-    };
-  }
-  rpc GetFoo(GetFooRequest) returns (GetFooReply) {
-    option (google.api.http) = {
-      get: "/api/v1/foo"
-    };
-  }
+  rpc CreateFoo(CreateFooRequest) returns (CreateFooReply) {}
+  rpc GetFoo(GetFooRequest) returns (GetFooReply) {}
 }
 
 message CreateFooRequest {

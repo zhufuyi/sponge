@@ -30,20 +30,19 @@ var (
 
 package service
 
-{{- range .PbServices}}
-
 import (
 	"context"
 
 	serverNameExampleV1 "moduleNameExample/api/serverNameExample/v1"
-	//{{.LowerCutServiceName}}V1 "moduleNameExample/api/{{.LowerCutServiceName}}/v1"
 	//"moduleNameExample/internal/rpcclient"
 )
+
+{{- range .PbServices}}
 
 var _ serverNameExampleV1.{{.Name}}Logicer = (*{{.LowerName}}Client)(nil)
 
 type {{.LowerName}}Client struct {
-	// define the rpc server clients here
+	// define rpc clients interface here
 	// example:
 	//	    {{.LowerName}}Cli {{.LowerCutServiceName}}V1.{{.Name}}Client
 }
@@ -58,8 +57,10 @@ func New{{.Name}}Client() serverNameExampleV1.{{.Name}}Logicer {
 
 {{- range .Methods}}
 
-// {{.MethodName}} ......
+{{.Comment}}
 func (c *{{.LowerServiceName}}Client) {{.MethodName}}(ctx context.Context, req *serverNameExampleV1.{{.Request}}) (*serverNameExampleV1.{{.Reply}}, error) {
+	panic("implement me")
+
 	// fill in the business logic code here
 	// example:
 	//	    err := req.Validate()
@@ -67,9 +68,21 @@ func (c *{{.LowerServiceName}}Client) {{.MethodName}}(ctx context.Context, req *
 	//		    logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req), interceptor.ServerCtxRequestIDField(ctx))
 	//		    return nil, ecode.StatusInvalidParams.Err()
 	//	    }
-	//     return c.{{.LowerServiceName}}Cli.{{.MethodName}}(ctx, req)
-
-	panic("implement me")
+	//
+	//     reply, err := c.{{.LowerServiceName}}Cli.{{.MethodName}}(ctx, &{{.LowerCutServiceName}}V1.{{.Request}}{
+{{- range .RequestFields}}
+	//     	{{.Name}}: req.{{.Name}},
+{{- end}}
+	//     })
+	//     if err != nil {
+	//     	return nil, err
+	//     }
+	//
+	//     return &serverNameExampleV1.{{.Reply}}{
+{{- range .ReplyFields}}
+	//     	{{.Name}}: reply.{{.Name}},
+{{- end}}
+	//     }, nil
 }
 
 {{- end}}
