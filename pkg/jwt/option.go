@@ -28,7 +28,7 @@ func Init(opts ...Option) {
 var (
 	defaultSigningKey    = []byte("zaq12wsxmko0") // default key
 	defaultSigningMethod = SigningMethodHS256     // default HS256
-	defaultExpire        = 2 * time.Hour          // default expiration
+	defaultExpire        = 24 * time.Hour         // default expiration
 	defaultIssuer        = ""
 )
 

@@ -94,7 +94,7 @@ func ParseError(err error) *Error {
 		return Success
 	}
 
-	unknownError := &Error{
+	outError := &Error{
 		code: -1,
 		msg:  "unknown error",
 	}
@@ -103,12 +103,17 @@ func ParseError(err error) *Error {
 	codeStr := strings.ReplaceAll(splits[0], "code = ", "")
 	code, er := strconv.Atoi(codeStr)
 	if er != nil {
-		return unknownError
+		return outError
 	}
 
 	if e, ok := errCodes[code]; ok {
+		if len(splits) > 1 {
+			outError.code = code
+			outError.msg = splits[1]
+			return outError
+		}
 		return e
 	}
 
-	return unknownError
+	return outError
 }

@@ -63,12 +63,19 @@ sponge run
 
 ### 使用示例
 
-- [1_web-gin-CRUD](https://www.bilibili.com/read/cv23018269)
-- [2_web-gin-protobuf](https://www.bilibili.com/read/cv23040234)
-- [3_micro-grpc-CRUD](https://www.bilibili.com/read/cv23064432)
-- [4_micro-grpc-protobuf](https://www.bilibili.com/read/cv23099236)
-- [5_micro-gin-rpc-gateway](https://www.bilibili.com/read/cv23189890)
-- [6_micro-cluster](https://www.bilibili.com/read/cv23255594)
+#### 基础服务示例
+
+- [1_web-gin-CRUD](https://github.com/zhufuyi/sponge_examples/tree/main/1_web-gin-CRUD)
+- [2_web-gin-protobuf](https://github.com/zhufuyi/sponge_examples/tree/main/2_web-gin-protobuf)
+- [3_micro-grpc-CRUD](https://github.com/zhufuyi/sponge_examples/tree/main/3_micro-grpc-CRUD)
+- [4_micro-grpc-protobuf](https://github.com/zhufuyi/sponge_examples/tree/main/4_micro-grpc-protobuf)
+- [5_micro-gin-rpc-gateway](https://github.com/zhufuyi/sponge_examples/tree/main/5_micro-gin-rpc-gateway)
+- [6_micro-cluster](https://github.com/zhufuyi/sponge_examples/tree/main/6_micro-cluster)
+
+#### 完整项目示例
+
+- [7_community-single](https://github.com/zhufuyi/sponge_examples/tree/main/7_community-single)
+- [8_community-cluster](https://github.com/zhufuyi/sponge_examples/tree/main/8_community-cluster)
 
 <br>
 
