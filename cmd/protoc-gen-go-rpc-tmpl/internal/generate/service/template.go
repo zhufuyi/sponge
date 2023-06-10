@@ -247,10 +247,10 @@ import (
 var (
 	_{{.LowerName}}NO       = {{.RandNumber}} // number range 1~100, if there is the same number, trigger panic.
 	_{{.LowerName}}Name     = "{{.LowerName}}"
-	_{{.LowerName}}BaseCode = errcode.HCode(_{{.LowerName}}NO)
+	_{{.LowerName}}BaseCode = errcode.RCode(_{{.LowerName}}NO)
 // --blank line--
 {{- range $i, $v := .Methods}}
-	Status{{.MethodName}}{{.ServiceName}}   = errcode.NewError(_{{.LowerServiceName}}BaseCode+{{$v.AddOne $i}}, "failed to {{.MethodName}} "+_{{.LowerServiceName}}Name)
+	Status{{.MethodName}}{{.ServiceName}}   = errcode.NewRPCStatus(_{{.LowerServiceName}}BaseCode+{{$v.AddOne $i}}, "failed to {{.MethodName}} "+_{{.LowerServiceName}}Name)
 {{- end}}
 	// add +1 to the previous error code
 )

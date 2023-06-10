@@ -32,6 +32,7 @@ func NewRootCMD() *cobra.Command {
 		MicroCommand(),
 		generate.ConfigCommand(),
 		NewRunCommand(),
+		generate.DeleteJSONOmitemptyCommand(),
 	)
 
 	return cmd
