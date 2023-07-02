@@ -24,21 +24,7 @@ sponge创建的微服务代码框架如下图所示，这是典型的微服务�
 
 ### 支持生成的代码类型
 
-- [基于mysql表生成完整的web服务项目代码](https://go-sponge.com/ui/web-http)
-- [基于mysql表生成handler代码，包括CRUD代码](https://go-sponge.com/ui/web-handler)
-- [基于mysql表生成dao代码，包括CRUD代码](https://go-sponge.com/ui/web-dao)
-- [基于mysql表生成model代码](https://go-sponge.com/ui/web-model)
-- [基于mysql表生成完整的rpc服务项目代码](https://go-sponge.com/ui/micro-rpc)
-- [基于mysql表生成service代码，包括CRUD代码](https://go-sponge.com/ui/micro-service)
-- [基于mysql表生成protobuf代码](https://go-sponge.com/ui/micro-protobuf)
-- [基于protobuf生成通用web服务项目代码](https://go-sponge.com/ui/web-http-pb)
-- [基于protobuf生成通用rpc服务项目代码](https://go-sponge.com/ui/micro-rpc-pb)
-- [基于protobuf生成rpc网关服务项目代码](https://go-sponge.com/ui/micro-rpc-gw-pb)
-- [基于yaml生成对应的go结构体代码](https://go-sponge.com/ui/yaml-config)
-- [根据参数生成rpc连接代码](https://go-sponge.com/ui/micro-rpc-conn)
-- [根据参数生成cache代码](https://go-sponge.com/ui/web-cache)
-
-生成的这些代码可以组合成实际项目的web或微服务代码，开发者只需专注写业务逻辑代码，在线UI界面demo： [https://go-sponge.com/ui](https://go-sponge.com/ui)
+目前支持生成13种功能代码(包括web服务、微服务、rpc网关服务、CRUD、模板、缓存等代码)，后续逐渐增加更多生成功能代码，sponge的在线UI界面demo： [https://go-sponge.com/ui](https://go-sponge.com/ui)
 
 <br>
 

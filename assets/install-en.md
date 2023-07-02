@@ -102,7 +102,9 @@ Download cmder at: [https://github.com/cmderdev/cmder/releases/download/v1.3.20/
 
 After downloading and extracting to the `D:\Program Files\cmder` directory, modify the system environment variable PATH and add `D:\Program Files\cmder`.
 
-Open the `Cmder.exe` terminal and check if common linux commands are supported.
+Open the `Cmder.exe` terminal and simply configure cmder. Click the settings icon in the lower right corner, select **Settings**, enter `Monospace` in the upper left corner of the settings interface to search, uncheck **Monospace**, and then save and close.
+
+Check if common linux commands are supported.
 
 ```bash
 ls --version
@@ -111,11 +113,12 @@ cp --version
 chmod --version
 rm --version
 ```
+
 <br>
 
 #### (4) Install sponge
 
-Open a `cmder`(not the cmd that comes with windows) terminal and execute the command to install sponge.
+Open a `Cmder.exe`(not the cmd that comes with windows) terminal and execute the command to install sponge.
 
 ```bash
 # Install sponge

@@ -42,21 +42,7 @@ The microservice code framework created by sponge is shown in Figure 1-2, this i
 
 ### Supported code types for generation
 
-- [Generate complete web service project code based on MySQL table](https://go-sponge.com/en/ui/web-http)
-- [Generate handler code based on MySQL tables, including CRUD code](https://go-sponge.com/en/ui/web-handler)
-- [Generate dao code based on MySQL tables, including CRUD code](https://go-sponge.com/en/ui/web-dao)
-- [Generate gorm model code based on MySQL tables](https://go-sponge.com/en/ui/web-model)
-- [Generate complete rpc service project code based on MySQL table](https://go-sponge.com/en/ui/micro-rpc)
-- [Generate service code based on MySQL tables, including CRUD code](https://go-sponge.com/en/ui/micro-service)
-- [Generate protobuf code based on MySQL tables](https://go-sponge.com/en/ui/micro-protobuf)
-- [Generate generic web service project code based on protobuf](https://go-sponge.com/en/ui/web-http-pb)
-- [Generate generic rpc service project code based on protobuf](https://go-sponge.com/en/ui/micro-rpc-pb)
-- [Generate rpc gateway service project code based on protobuf](https://go-sponge.com/en/ui/micro-rpc-gw-pb)
-- [Generate corresponding go structure code based on yaml](https://go-sponge.com/en/ui/yaml-config)
-- [Generate rpc connection code according to parameters](https://go-sponge.com/en/ui/micro-rpc-conn)
-- [Generate cache code according to parameters](https://go-sponge.com/en/ui/web-cache)
-
-The generated code can be combined into actual project web or microservice code, and the developer only needs to focus on writing the business logic code, online UI interface demo: [https://go-sponge.com/ui](https://go-sponge.com/ui)
+Currently, it supports generating 13 functional codes (including web services, microservices, rpc gateway services, CRUD, templates, cache, etc.), and more functional codes are gradually added later. Sponge's online UI demo: [https://go-sponge.com/ui](https://go-sponge.com/ui)
 
 <br>
 
@@ -81,7 +67,7 @@ Visit `http://localhost:24631` in your browser, generate code by manipulating it
 
 ### Examples of use
 
-#### Basic Services example
+#### Basic Services examples
 
 - [1_web-gin-CRUD](https://github.com/zhufuyi/sponge_examples/tree/main/1_web-gin-CRUD)
 - [2_web-gin-protobuf](https://github.com/zhufuyi/sponge_examples/tree/main/2_web-gin-protobuf)
@@ -90,7 +76,7 @@ Visit `http://localhost:24631` in your browser, generate code by manipulating it
 - [5_micro-gin-rpc-gateway](https://github.com/zhufuyi/sponge_examples/tree/main/5_micro-gin-rpc-gateway)
 - [6_micro-cluster](https://github.com/zhufuyi/sponge_examples/tree/main/6_micro-cluster)
 
-#### Full project example
+#### Full project examples
 
 - [7_community-single](https://github.com/zhufuyi/sponge_examples/tree/main/7_community-single)
 - [8_community-cluster](https://github.com/zhufuyi/sponge_examples/tree/main/8_community-cluster)

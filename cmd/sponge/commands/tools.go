@@ -41,7 +41,7 @@ var installToolCommands = map[string]string{
 	"protoc-gen-openapiv2":   "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@latest",
 	"protoc-gen-doc":         "github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc@latest",
 	"golangci-lint":          "github.com/golangci/golangci-lint/cmd/golangci-lint@latest",
-	"swag":                   "github.com/swaggo/swag/cmd/swag@latest",
+	"swag":                   "github.com/swaggo/swag/cmd/swag@v1.8.12",
 	"go-callvis":             "github.com/ofabry/go-callvis@latest",
 }
 

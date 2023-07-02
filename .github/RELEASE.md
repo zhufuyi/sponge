@@ -1,6 +1,4 @@
 ## New
 
-- Passing metadata from the web service to the RPC service.
-- Delete json tag omitempty.
-- Add a project example.
-- Add a microservice cluster project example.
+- Fixed the latest version of swag plugin incompatibility
+- Add settings cmder instructions in windows

@@ -108,7 +108,9 @@ make -v
 
 下载后解压到`D:\Program Files\cmder`目录下，修改系统环境变量PATH，新增`D:\Program Files\cmder`。
 
-打开`Cmder.exe`终端，检查是否支持常用的linux命令。
+打开`Cmder.exe`终端，简单的设置cmder，点击右下角设置图标 --> 【settings】，在设置界面左上角输入`Monospace`查找，去掉勾选**Monospace**，然后保存关闭。
+
+检查是否支持常用的linux命令。
 
 ```bash
 ls --version
@@ -123,7 +125,7 @@ go --version
 
 #### (4) 安装 sponge
 
-打开`cmder.exe`终端(不是windows自带的cmd)，执行命令安装sponge：
+打开`Cmder.exe`终端(不是windows自带的cmd)，执行命令安装sponge：
 
 ```bash
 # 安装sponge，安装完后，sponge二进制文件所在目录添加到系统path
