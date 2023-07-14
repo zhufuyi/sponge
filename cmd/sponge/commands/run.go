@@ -17,8 +17,8 @@ func NewRunCommand() *cobra.Command {
 	var isLog bool
 	cmd := &cobra.Command{
 		Use:   "run",
-		Short: "Start a web service for sponge",
-		Long: `start a web service for sponge.
+		Short: "Open the Sponge UI interface",
+		Long: `open the Sponge UI interface.
 
 Examples:
   # no log for running.

@@ -2,12 +2,28 @@
 
 <br>
 
-### 生成代码的命令框架
+### 生成代码框架
 
 生成代码基于**Yaml**、**SQL**和**Protobuf**三种方式，每种方式拥有生成不同功能代码，生成代码的框架图如下所示：
 
 <p align="center">
 <img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/sponge-framework.png">
+</p>
+
+<br>
+
+### 生成web服务、gRPC服务、rpc网关服务三种服务类型的代码组成结构
+
+<p align="center">
+<img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/web-http-pb-anatomy.png">
+</p>
+
+<p align="center">
+<img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/micro-rpc-pb-anatomy.png">
+</p>
+
+<p align="center">
+<img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/micro-rpc-gw-pb-anatomy.png">
 </p>
 
 <br>

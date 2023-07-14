@@ -29,6 +29,22 @@ The generated code is based on three approaches **Yaml**, **SQL** and **Protobuf
 
 <br>
 
+# Generate the code composition structure of three service types: web service, gRPC service, and rpc gateway service
+
+<p align="center">
+<img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/en_web-http-pb-anatomy.png">
+</p>
+
+<p align="center">
+<img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/en_micro-rpc-pb-anatomy.png">
+</p>
+
+<p align="center">
+<img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/en_micro-rpc-gw-pb-anatomy.png">
+</p>
+
+<br>
+
 ### Microservices framework
 
 The microservice code framework created by sponge is shown in Figure 1-2, this is a typical microservice hierarchy with high performance, high scalability, and includes common service governance features.
