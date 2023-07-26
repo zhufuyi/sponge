@@ -1,4 +1,4 @@
-[sponge](https://github.com/zhufuyi/sponge) 是一个强大的生成web和微服务代码工具，也是一个基于gin和grpc封装的微服务框架。sponge拥有丰富的生成代码命令，生成不同的功能代码可以组合成完整的服务(类似人为打散的海绵细胞可以自动重组成一个新的海绵)。微服务代码功能包括日志、服务注册与发现、注册中心、限流、熔断、链路跟踪、指标监控、pprof性能分析、统计、缓存、CICD等功能。代码解耦模块化设计，很容易构建出从开发到部署的完整工程代码，让使用go语言开发更便捷、轻松、高效。
+[sponge](https://github.com/zhufuyi/sponge) 是一个强大的生成web和微服务代码工具，也是一个基于gin和grpc封装的微服务框架。sponge拥有丰富的生成代码命令，生成不同的功能代码可以组合成完整的服务(类似人为打散的海绵细胞可以自动重组成一个新的海绵)。服务代码功能包括日志、服务注册与发现、注册中心、限流、熔断、链路跟踪、指标监控、pprof性能分析、统计、缓存、CICD等功能。生成代码统一在UI界面上操作，很容易构建出一个完整的项目工程代码，让开发人员聚焦在业务逻辑代码的实现，无需花费时间和精力在项目的配置和集成上。
 
 <br>
 
@@ -12,15 +12,35 @@
 
 <br>
 
-### 生成web服务、gRPC服务、rpc网关服务三种服务类型的代码组成结构
+生成代码的UI界面：
+
+<p align="center">
+<img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/sponge-ui.png">
+</p>
+
+<br>
+
+### 生成服务代码的组成结构
+
+sponge生成web服务代码过程中剥离了业务逻辑与非业务逻辑两大部分代码。例如把一个完整web服务代码看作一个鸡蛋，蛋壳表示web服务框架代码，蛋白和蛋黄都表示业务逻辑代码，蛋黄是业务逻辑的核心(需要人工编写的代码)，例如定义mysql表、定义api接口、编写具体逻辑代码都属于蛋黄部分。蛋白是业务逻辑核心代码与web框架代码连接的桥梁(自动生成，不需要人工编写)，例如根据proto文件生成的注册路由代码、handler方法函数代码、参数校验代码、错误码、swagger文档等都属于蛋白部分。
+
+web服务鸡蛋模型剖析图如下图所示：
 
 <p align="center">
 <img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/web-http-pb-anatomy.png">
 </p>
 
+<br>
+
+gRPC服务鸡蛋模型剖析图如下图所示：
+
 <p align="center">
 <img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/micro-rpc-pb-anatomy.png">
 </p>
+
+<br>
+
+rpc网关服务鸡蛋模型剖析图如下图所示：
 
 <p align="center">
 <img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/micro-rpc-gw-pb-anatomy.png">
@@ -28,9 +48,9 @@
 
 <br>
 
-### 微服务框架
+### 服务框架
 
-sponge创建的微服务代码框架如下图所示，这是典型的微服务分层结构，具有高性能，高扩展性，包含了常用的服务治理功能。
+sponge生成的微服务代码框架如下图所示，这是典型的微服务分层结构，具有高性能，高扩展性，包含了常用的服务治理功能。
 
 <p align="center">
 <img width="1000px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/microservices-framework.png">
@@ -38,9 +58,62 @@ sponge创建的微服务代码框架如下图所示，这是典型的微服务�
 
 <br>
 
-### 支持生成的代码类型
+### 服务主要功能
 
-目前支持生成13种功能代码(包括web服务、微服务、rpc网关服务、CRUD、模板、缓存等代码)，后续逐渐增加更多生成功能代码，sponge的在线UI界面demo： [https://go-sponge.com/ui](https://go-sponge.com/ui)
+生成的服务代码包含的功能(按需使用)：
+
+- Web 框架 [gin](https://github.com/gin-gonic/gin)
+- RPC 框架 [grpc](https://github.com/grpc/grpc-go)
+- 配置解析 [viper](https://github.com/spf13/viper)
+- 配置中心 [nacos](https://github.com/alibaba/nacos)
+- 日志 [zap](https://go.uber.org/zap)
+- 数据库组件 [gorm](https://gorm.io/gorm)
+- 缓存组件 [go-redis](https://github.com/go-redis/redis), [ristretto](https://github.com/dgraph-io/ristretto)
+- 文档 [swagger](https://github.com/swaggo/swag)
+- 鉴权 [jwt](https://github.com/golang-jwt/jwt)
+- 校验 [validator](https://github.com/go-playground/validator)
+- 限流 [ratelimit](https://github.com/zhufuyi/sponge/tree/main/pkg/shield/ratelimit)
+- 熔断 [circuitbreaker](https://github.com/zhufuyi/sponge/tree/main/pkg/shield/circuitbreaker)
+- 链路跟踪 [opentelemetry](https://go.opentelemetry.io/otel)
+- 监控 [prometheus](https://github.com/prometheus/client_golang/prometheus), [grafana](https://github.com/grafana/grafana)
+- 服务注册与发现 [etcd](https://github.com/etcd-io/etcd), [consul](https://github.com/hashicorp/consul), [nacos](https://github.com/alibaba/)
+- 性能分析 [go profile](https://go.dev/blog/pprof)
+- 资源统计 [gopsutil](https://github.com/shirou/gopsutil)
+- 代码规范检查 [golangci-lint](https://github.com/golangci/golangci-lint)
+- 持续集成部署 CICD [jenkins](https://github.com/jenkinsci/jenkins), [docker](https://www.docker.com/), [kubernetes](https://github.com/kubernetes/kubernetes)
+
+<br>
+
+### 目录结构
+
+生成的服务代码目录结构遵循 [project-layout](https://github.com/golang-standards/project-layout)，代码目录结构如下所示：
+
+```bash
+.
+├── api            # proto文件和生成的*pb.go目录
+├── assets         # 其他与资源库一起使用的资产(图片、logo等)目录
+├── build          # 打包和持续集成目录
+├── cmd            # 程序入口目录
+├── configs        # 配置文件的目录
+├── deployments    # IaaS、PaaS、系统和容器协调部署的配置和模板目录
+├── docs           # 设计文档和界面文档目录
+├── internal       # 私有应用程序和库的代码目录
+│    ├── cache        # 基于业务包装的缓存目录
+│    ├── config       # Go结构的配置文件目录
+│    ├── dao          # 数据访问目录
+│    ├── ecode        # 自定义业务错误代码目录
+│    ├── handler      # http的业务功能实现目录
+│    ├── model        # 数据库模型目录
+│    ├── routers      # http路由目录
+│    ├── rpcclient    # 连接rpc服务的客户端目录
+│    ├── server       # 服务入口，包括http、rpc等
+│    ├── service      # rpc的业务功能实现目录
+│    └── types        # http的请求和响应类型目录
+├── pkg            # 外部应用程序可以使用的库目录
+├── scripts        # 用于执行各种构建、安装、分析等操作的脚本目录
+├── test           # 额外的外部测试程序和测试数据
+└── third_party    # 外部帮助程序、分叉代码和其他第三方工具
+```
 
 <br>
 
@@ -108,6 +181,6 @@ sponge run
 
 如果对您有帮助给个star⭐，欢迎加入[go sponge微信群交流](https://pan.baidu.com/s/1NZgPb2v_8tAnBuwyeFyE_g?pwd=spon)。
 
-![wechat-group](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/wechat-group.png)
+![wechat-group](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/wechat-group.jpg)
 
 <br><br>

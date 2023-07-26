@@ -1,4 +1,4 @@
-## sponge [中文文档](assets/readme-cn.md)
+## sponge [中文](assets/readme-cn.md)
 
 <p align="center">
 <img width="500px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/logo.png">
@@ -14,7 +14,7 @@
 
 </div>
 
-[sponge](https://github.com/zhufuyi/sponge) is a powerful tool for generating web and microservice code, as well as a microservice framework based on gin and grpc encapsulation. Sponge has a wealth of code generation commands, and different functional codes can be combined to form a complete service (similar to artificially scattered sponge cells that can automatically recombine into a new sponge). Microservice code functions include logging, service registration and discovery, registration center, flow control, fuse, link tracking, metric monitoring, pprof performance analysis, statistics, cache, CICD and other functions. The code is decoupled and modularly designed, making it easy to build complete engineering code from development to deployment, making it more convenient, easy and efficient to develop with Go language.
+[sponge](https://github.com/zhufuyi/sponge) is a powerful tool for generating web and microservice code, a microservice framework based on gin and grpc encapsulation, and an open source framework for rapid application development. Sponge has a wealth of code generation commands, and different functional codes can be combined to form a complete service (similar to artificially scattered sponge cells that can automatically recombine into a new sponge). Microservice code functions include logging, service registration and discovery, registration center, flow control, fuse, link tracking, metric monitoring, pprof performance analysis, statistics, cache, CICD and other functions. Generate code unified in the UI interface operation, it is easy to build a complete project engineering code, allowing developers to focus on the implementation of the business logic code, without spending time and energy on the project configuration and integration.
 
 <br>
 
@@ -29,15 +29,35 @@ The generated code is based on three approaches **Yaml**, **SQL** and **Protobuf
 
 <br>
 
-# Generate the code composition structure of three service types: web service, gRPC service, and rpc gateway service
+UI interface for generating code:
+
+<p align="center">
+<img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/sponge-ui.png">
+</p>
+
+<br>
+
+### Components of the generated service code
+
+The sponge separates the two major parts of code during the process of generating web service code. It isolates the business logic from the non-business logic. For example, consider the entire web service code as an egg. The eggshell represents the web service framework code, while both the albumen and yolk represent the business logic code. The yolk is the core of the business logic (manually written code). It includes defining MySQL tables, defining API interfaces, and writing specific logic code.On the other hand, the albumen acts as a bridge connecting the core business logic code to the web framework code (automatically generated, no manual writing needed). This includes the registration of route codes generated from proto files, handler method function codes, parameter validation codes, error codes, Swagger documentation, and more.
+
+The web service egg model dissection diagram is shown in the following figure:
 
 <p align="center">
 <img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/en_web-http-pb-anatomy.png">
 </p>
 
+<br>
+
+The gRPC service egg model dissection is shown in the following figure:
+
 <p align="center">
 <img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/en_micro-rpc-pb-anatomy.png">
 </p>
+
+<br>
+
+The rpc gateway service egg model dissection is shown in the following figure:
 
 <p align="center">
 <img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/en_micro-rpc-gw-pb-anatomy.png">
@@ -45,7 +65,7 @@ The generated code is based on three approaches **Yaml**, **SQL** and **Protobuf
 
 <br>
 
-### Microservices framework
+### Services framework
 
 The microservice code framework created by sponge is shown in Figure 1-2, this is a typical microservice hierarchy with high performance, high scalability, and includes common service governance features.
 
@@ -53,12 +73,6 @@ The microservice code framework created by sponge is shown in Figure 1-2, this i
 <img width="1000px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/microservices-framework.png">
 </p>
 <p align="center">Figure 1-2 Microservices framework diagram</p>
-
-<br>
-
-### Supported code types for generation
-
-Currently, it supports generating 13 functional codes (including web services, microservices, rpc gateway services, CRUD, templates, cache, etc.), and more functional codes are gradually added later. Sponge's online UI demo: [https://go-sponge.com/ui](https://go-sponge.com/ui)
 
 <br>
 
@@ -92,7 +106,7 @@ Visit `http://localhost:24631` in your browser, generate code by manipulating it
 - [5_micro-gin-rpc-gateway](https://github.com/zhufuyi/sponge_examples/tree/main/5_micro-gin-rpc-gateway)
 - [6_micro-cluster](https://github.com/zhufuyi/sponge_examples/tree/main/6_micro-cluster)
 
-#### Full project examples
+#### Examples of a complete project
 
 - [7_community-single](https://github.com/zhufuyi/sponge_examples/tree/main/7_community-single)
 - [8_community-cluster](https://github.com/zhufuyi/sponge_examples/tree/main/8_community-cluster)
