@@ -46,7 +46,7 @@ func (f *handlerLogicFields) execute() []byte {
 	if err := handlerLogicTmpl.Execute(buf, f); err != nil {
 		panic(err)
 	}
-	return buf.Bytes()
+	return handleSplitLineMark(buf.Bytes())
 }
 
 type routerFields struct {
@@ -58,7 +58,7 @@ func (f *routerFields) execute() []byte {
 	if err := routerTmpl.Execute(buf, f); err != nil {
 		panic(err)
 	}
-	return buf.Bytes()
+	return handleSplitLineMark(buf.Bytes())
 }
 
 type errCodeFields struct {
@@ -70,5 +70,24 @@ func (f *errCodeFields) execute() []byte {
 	if err := httpErrCodeTmpl.Execute(buf, f); err != nil {
 		panic(err)
 	}
-	return bytes.ReplaceAll(buf.Bytes(), []byte("// --blank line--"), []byte{})
+	data := bytes.ReplaceAll(buf.Bytes(), []byte("// --blank line--"), []byte{})
+	return handleSplitLineMark(data)
+}
+
+var splitLineMark = []byte(`// ---------- Do not delete or move this split line, this is the merge code marker ----------`)
+
+func handleSplitLineMark(data []byte) []byte {
+	ss := bytes.Split(data, splitLineMark)
+	if len(ss) <= 2 {
+		return ss[0]
+	}
+
+	var out []byte
+	for i, s := range ss {
+		out = append(out, s...)
+		if i < len(ss)-2 {
+			out = append(out, splitLineMark...)
+		}
+	}
+	return out
 }

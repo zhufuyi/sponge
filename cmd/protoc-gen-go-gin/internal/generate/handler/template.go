@@ -91,6 +91,8 @@ func (h *{{.LowerServiceName}}Handler) {{.MethodName}}(ctx context.Context, req 
 
 {{- end}}
 
+// ---------- Do not delete or move this split line, this is the merge code marker ----------
+
 {{- end}}
 `
 
@@ -161,6 +163,8 @@ func {{.LowerName}}Middlewares(c *middlewareConfig) {
 {{- end}}
 }
 
+// ---------- Do not delete or move this split line, this is the merge code marker ----------
+
 {{- end}}
 `
 
@@ -186,6 +190,8 @@ var (
 {{- end}}
 	// add +1 to the previous error code
 )
+
+// ---------- Do not delete or move this split line, this is the merge code marker ----------
 
 {{- end}}
 `

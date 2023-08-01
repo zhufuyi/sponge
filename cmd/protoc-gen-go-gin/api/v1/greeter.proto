@@ -105,15 +105,15 @@ message Params {
 }
 
 service Foo {
-  rpc CreateFoo(CreateFooRequest) returns (CreateFooReply) {
+  rpc Create(CreateFooRequest) returns (CreateFooReply) {
     option (google.api.http) = {
       post: "/api/v1/foo"
       body: "*"
     };
   }
-  rpc GetFoo(GetFooRequest) returns (GetFooReply) {
+  rpc GetByID(GetFooRequest) returns (GetFooReply) {
     option (google.api.http) = {
-      get: "/api/v1/foo"
+      get: "/api/v1/foo/:id"
     };
   }
 }

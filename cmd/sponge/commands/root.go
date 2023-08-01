@@ -33,6 +33,7 @@ func NewRootCMD() *cobra.Command {
 		generate.ConfigCommand(),
 		NewRunCommand(),
 		generate.DeleteJSONOmitemptyCommand(),
+		MergeCommand(),
 	)
 
 	return cmd

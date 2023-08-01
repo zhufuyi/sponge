@@ -133,7 +133,7 @@ func saveHandlerAndRouterFiles(f *protogen.File, moduleName string, serverName s
 		return err
 	}
 
-	filePath = filenamePrefix + "_handler.pb.go"
+	filePath = filenamePrefix + "_router.go"
 	err = saveFile(moduleName, serverName, routerOut, filePath, routerContent, false, handlerPlugin)
 	if err != nil {
 		return err
@@ -159,7 +159,7 @@ func saveServiceAndRouterFiles(gen *protogen.Plugin, f *protogen.File, moduleNam
 		return err
 	}
 
-	filePath = filenamePrefix + "_service.pb.go"
+	filePath = filenamePrefix + "_router.go"
 	err = saveFile(moduleName, serverName, routerOut, filePath, routerContent, false, servicePlugin)
 	if err != nil {
 		return err

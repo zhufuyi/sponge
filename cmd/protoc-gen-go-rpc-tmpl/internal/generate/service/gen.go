@@ -49,7 +49,7 @@ func (f *serviceTmplFields) execute() []byte {
 	if err := serviceLogicTmpl.Execute(buf, f); err != nil {
 		panic(err)
 	}
-	return buf.Bytes()
+	return handleSplitLineMark(buf.Bytes())
 }
 
 type serviceTestTmplFields struct {
@@ -73,7 +73,8 @@ func (f *errCodeFields) execute() []byte {
 	if err := rpcErrCodeTmpl.Execute(buf, f); err != nil {
 		panic(err)
 	}
-	return bytes.ReplaceAll(buf.Bytes(), []byte("// --blank line--"), []byte{})
+	data := bytes.ReplaceAll(buf.Bytes(), []byte("// --blank line--"), []byte{})
+	return handleSplitLineMark(data)
 }
 
 func getProtoFilename(filenamePrefix string) string {
@@ -88,4 +89,22 @@ func getProtoFilename(filenamePrefix string) string {
 	}
 
 	return ss[len(ss)-1] + ".proto"
+}
+
+var splitLineMark = []byte(`// ---------- Do not delete or move this split line, this is the merge code marker ----------`)
+
+func handleSplitLineMark(data []byte) []byte {
+	ss := bytes.Split(data, splitLineMark)
+	if len(ss) <= 2 {
+		return ss[0]
+	}
+
+	var out []byte
+	for i, s := range ss {
+		out = append(out, s...)
+		if i < len(ss)-2 {
+			out = append(out, splitLineMark...)
+		}
+	}
+	return out
 }
