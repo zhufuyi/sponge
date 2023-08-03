@@ -158,7 +158,7 @@ func (m *RPCMethod) HasPathParams() bool {
 func (m *RPCMethod) InitPathParams() {
 	paths := strings.Split(m.Path, "/")
 	for i, p := range paths {
-		if len(p) > 0 && (p[0] == '{' && p[len(p)-1] == '}' || p[0] == ':') {
+		if len(p) > 0 && (p[0] == '{' && p[len(p)-1] == '}') {
 			paths[i] = ":" + p[1:len(p)-1]
 		}
 	}

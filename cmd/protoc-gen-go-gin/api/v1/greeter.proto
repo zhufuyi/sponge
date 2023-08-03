@@ -111,7 +111,7 @@ service Foo {
       body: "*"
     };
   }
-  rpc GetByID(GetFooRequest) returns (GetFooReply) {
+  rpc GetByID(GetFooByIDRequest) returns (GetFooByIDReply) {
     option (google.api.http) = {
       get: "/api/v1/foo/:id"
     };
@@ -126,10 +126,10 @@ message CreateFooReply {
    int64 id = 1;
 }
 
-message GetFooRequest {
+message GetFooByIDRequest {
   uint64   id = 1;
 }
 
-message GetFooReply {
+message GetFooByIDReply {
   string name = 1;
 }

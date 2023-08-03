@@ -16,10 +16,15 @@ import (
 )
 
 const (
-	exampleTip = `
+	helpInfo = `
 # generate *.go file
 protoc --proto_path=. --proto_path=./third_party --go-rpc-tmpl_out=. --go-rpc-tmpl_opt=paths=source_relative \
   --go-rpc-tmpl_opt=moduleName=yourModuleName --go-rpc-tmpl_opt=serverName=yourServerName *.proto
+
+Note:
+    If you want to merge the code, after generating the code, execute the command "sponge merge rpc-pb",
+    you don't worry about it affecting the logic code you have already written, in case of accidents,
+    you can find the pre-merge code in the directory /tmp/sponge_merge_backup_code.
 `
 
 	optErrFormat = `--go-rpc-tmpl_opt error, '%s' cannot be empty.
@@ -33,11 +38,11 @@ Usage example:
 )
 
 func main() {
-	var example bool
-	flag.BoolVar(&example, "example", false, "usage example")
+	var h bool
+	flag.BoolVar(&h, "h", false, "help information")
 	flag.Parse()
-	if example {
-		fmt.Printf("%s", exampleTip)
+	if h {
+		fmt.Printf("%s", helpInfo)
 		return
 	}
 
@@ -110,7 +115,7 @@ func saveFile(moduleName string, serverName string, out string, filePath string,
 	_, name := filepath.Split(filePath)
 	file := out + "/" + name
 	if !isNeedCovered && isExists(file) {
-		file += ".gen." + time.Now().Format("20060102T150405")
+		file += ".gen" + time.Now().Format("20060102T150405")
 	}
 
 	content = bytes.ReplaceAll(content, []byte("moduleNameExample"), []byte(moduleName))
@@ -128,7 +133,7 @@ func saveFileSimple(out string, filePath string, content []byte, isNeedCovered b
 	_, name := filepath.Split(filePath)
 	file := out + "/" + name
 	if !isNeedCovered && isExists(file) {
-		file += ".gen." + time.Now().Format("20060102T150405")
+		file += ".gen" + time.Now().Format("20060102T150405")
 	}
 
 	return os.WriteFile(file, content, 0666)

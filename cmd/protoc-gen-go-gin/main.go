@@ -21,17 +21,22 @@ const (
 	handlerPlugin = "handler"
 	servicePlugin = "service"
 
-	exampleTip = `
+	helpInfo = `
 # generate *_router.pb.go file
 protoc --proto_path=. --proto_path=./third_party --go-gin_out=. --go-gin_opt=paths=source_relative *.proto
 
-# generate *_router.pb.go, *_logic.go, *_handler.go, *_http.go files
+# generate *_router.pb.go, *_logic.go, *_router.go, *_http.go files
 protoc --proto_path=. --proto_path=./third_party --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=handler \
   --go-gin_opt=moduleName=yourModuleName --go-gin_opt=serverName=yourServerName *.proto
 
-# generate *_router.pb.go, *_logic.go, *_service.pb.go, *_rpc.go files
+# generate *_router.pb.go, *_logic.go, *_router.go, *_rpc.go files
 protoc --proto_path=. --proto_path=./third_party --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=service \
   --go-gin_opt=moduleName=yourModuleName --go-gin_opt=serverName=yourServerName *.proto
+
+Note:
+    If you want to merge the code, after generating the code, execute the command "sponge merge http-pb" or
+    "sponge merge rpc-gw-pb", you don't worry about it affecting the logic code you have already written,
+    in case of accidents, you can find the pre-merge code in the directory /tmp/sponge_merge_backup_code.
 `
 
 	optErrFormat = `--go-gin_opt error, '%s' cannot be empty.
@@ -45,11 +50,11 @@ Usage example:
 )
 
 func main() {
-	var example bool
-	flag.BoolVar(&example, "example", false, "usage example")
+	var h bool
+	flag.BoolVar(&h, "h", false, "help information")
 	flag.Parse()
-	if example {
-		fmt.Printf("%s", exampleTip)
+	if h {
+		fmt.Printf("%s", helpInfo)
 		return
 	}
 
@@ -190,7 +195,7 @@ func saveFile(moduleName string, serverName string, out string, filePath string,
 	_, name := filepath.Split(filePath)
 	file := out + "/" + name
 	if !isNeedCovered && isExists(file) {
-		file += ".gen." + time.Now().Format("20060102T150405")
+		file += ".gen" + time.Now().Format("20060102T150405")
 	}
 
 	content = bytes.ReplaceAll(content, []byte("moduleNameExample"), []byte(moduleName))
@@ -208,7 +213,7 @@ func saveFileSimple(out string, filePath string, content []byte, isNeedCovered b
 	_, name := filepath.Split(filePath)
 	file := out + "/" + name
 	if !isNeedCovered && isExists(file) {
-		file += ".gen." + time.Now().Format("20060102T150405")
+		file += ".gen" + time.Now().Format("20060102T150405")
 	}
 
 	return os.WriteFile(file, content, 0666)

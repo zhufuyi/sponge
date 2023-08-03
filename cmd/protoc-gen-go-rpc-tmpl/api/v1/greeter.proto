@@ -15,6 +15,7 @@ service Greeter {
   rpc GetByID(GetGreeterByIDRequest) returns (GetGreeterByIDReply) {}
   // list of records by parameters
   rpc List(ListGreeterRequest) returns (ListGreeterReply) {}
+  rpc ListByIDs(ListGreeterRequest) returns (ListGreeterReply) {}
 }
 
 message CreateGreeterRequest {
@@ -76,8 +77,9 @@ message Params {
 }
 
 service Foo {
-  rpc CreateFoo(CreateFooRequest) returns (CreateFooReply) {}
-  rpc GetFoo(GetFooRequest) returns (GetFooReply) {}
+  rpc Create(CreateFooRequest) returns (CreateFooReply) {}
+  rpc GetByID(GetFooByIDRequest) returns (GetFooByIDReply) {}
+  rpc DeleteByID(GetFooByIDRequest) returns (GetFooByIDReply) {}
 }
 
 message CreateFooRequest {
@@ -88,10 +90,10 @@ message CreateFooReply {
    int64 id = 1;
 }
 
-message GetFooRequest {
+message GetFooByIDRequest {
   repeated uint64   ids = 1;
 }
 
-message GetFooReply {
+message GetFooByIDReply {
   string name = 1;
 }
