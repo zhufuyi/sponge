@@ -168,15 +168,18 @@ func NewCenter(configFile string) (*Center, error) {
 
   moduleName=$(cat docs/gen.info | head -1 | cut -d , -f 1)
   serverName=$(cat docs/gen.info | head -1 | cut -d , -f 2)
-  # A total of four files are generated, namely the registration route file _*router.pb.go (saved in the same directory as the protobuf file), 
-  # the injection route file *_handler.pb.go (saved by default in the path internal/routers), the logical code template file*_logic.go (default path is in internal/handler), 
-  # return error code template file*_http.go (default path is in internal/ecode)
+  # A total of four files are generated, namely the registration route file _*router.pb.go (saved in the same directory as the protobuf file),
+  # the injection route file *_router.go (saved by default in the path internal/routers), the logical code template file*_logic.go (default path
+  # is in internal/handler), return error code template file*_http.go (default path is in internal/ecode)
   protoc --proto_path=. --proto_path=./third_party \
     --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=handler \
     --go-gin_opt=moduleName=${moduleName} --go-gin_opt=serverName=${serverName} \
     $specifiedProtoFiles
 
-  checkResult $?`
+  checkResult $?
+
+  sponge merge http-pb
+  echo ""`
 
 	// rpc-gw
 	protoShellServiceCode = `
@@ -196,15 +199,19 @@ func NewCenter(configFile string) (*Center, error) {
 
   moduleName=$(cat docs/gen.info | head -1 | cut -d , -f 1)
   serverName=$(cat docs/gen.info | head -1 | cut -d , -f 2)
-  # A total of 4 files are generated, namely the registration route file _*router.pb.go (saved in the same directory as the protobuf file), 
-  # the injection route file *_service.pb.go (default save path in internal/routers), the logical code template file*_logic.go (saved in internal/service by default), 
-  # return error code template file*_rpc.go (saved in internal/ecode by default)
+  # A total of 4 files are generated, namely the registration route file _*router.pb.go (saved in the same directory as the protobuf file),
+  # the injection route file *_router.go (default save path in internal/routers), the logical code template file*_logic.go (saved in
+  # internal/service by default), return error code template file*_rpc.go (saved in internal/ecode by default)
   protoc --proto_path=. --proto_path=./third_party \
     --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=service \
     --go-gin_opt=moduleName=${moduleName} --go-gin_opt=serverName=${serverName} \
     $specifiedProtoFiles
 
-  checkResult $?`
+
+  checkResult $?
+
+  sponge merge rpc-gw-pb
+  echo ""`
 
 	// rpc-pb
 	protoShellServiceTmplCode = `
@@ -216,7 +223,10 @@ func NewCenter(configFile string) (*Center, error) {
     --go-rpc-tmpl_opt=moduleName=${moduleName} --go-rpc-tmpl_opt=serverName=${serverName} \
     $specifiedProtoFiles
 
-  checkResult $?`
+  checkResult $?
+
+  sponge merge rpc-pb
+  echo ""`
 
 	httpServerConfigCode = `# http server settings
 http:

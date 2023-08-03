@@ -7,18 +7,19 @@ import (
 // GinServiceCode merge the gin service code
 func GinServiceCode() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "gin-service",
-		Short: "Merge the gin service code",
-		Long: `merge the gin service code.
+		Use:   "rpc-gw-pb",
+		Short: "Merge the generated rpc gateway related code into the template file",
+		Long: `merge the generated rpc gateway related code into the template file.
 
 Examples:
-  # merge gin service code
-  sponge merge gin-service
+  sponge merge rpc-gw-pb
 `,
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-
+			mergeGRPCECode()
+			mergeGinRouters()
+			mergeGRPCServiceClientTmpl()
 			return nil
 		},
 	}

@@ -7,18 +7,18 @@ import (
 // GRPCServiceCode merge the grpc service code
 func GRPCServiceCode() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "grpc-service",
-		Short: "Merge the grpc service code",
-		Long: `merge the grpc service code.
+		Use:   "rpc-pb",
+		Short: "Merge the generated grpc related code into the template file",
+		Long: `merge the generated grpc related code into the template file.
 
 Examples:
-  # merge grpc service code
-  sponge merge grpc-service
+  sponge merge rpc-pb
 `,
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-
+			mergeGRPCECode()
+			mergeGRPCServiceTmpl()
 			return nil
 		},
 	}
