@@ -117,14 +117,16 @@ function generateBySpecifiedProto(){
   echo "run server and see docs by http://localhost:8080/apis/swagger/index.html"
   echo ""
 
-  # A total of four files are generated: the registration route file **router.pb.go (saved in the same directory as the protobuf file),
-  # the injection route file *_service.pb.go (saved in internal/routers by default), the logic code template file *_logic.go (saved in internal/service by default),
+  # A total of four files are generated: the registration route file *_router.pb.go (saved in the same directory as the protobuf file),
+  # the injection route file *_router.go (saved in internal/routers by default), the logic code template file *_logic.go (saved in internal/service by default),
   # and the return error code template file *_http.go (saved in internal/ecode by default). internal/service),
   # return error code template file *_http.go (default path in internal/ecode)
   protoc --proto_path=. --proto_path=./third_party \
     --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=service \
     --go-gin_opt=moduleName=github.com/zhufuyi/sponge --go-gin_opt=serverName=serverNameExample \
     $specifiedProtoFiles
+
+  sponge merge rpc-gw-pb
 
   checkResult $?
   # delete the templates code end 2

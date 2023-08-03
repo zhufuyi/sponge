@@ -32,7 +32,7 @@ The generated code is based on three approaches **Yaml**, **SQL** and **Protobuf
 UI interface for generating code:
 
 <p align="center">
-<img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/sponge-ui.png">
+<img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/en_sponge-ui.png">
 </p>
 
 <br>
@@ -44,7 +44,7 @@ The sponge separates the two major parts of code during the process of generatin
 The web service egg model dissection diagram is shown in the following figure:
 
 <p align="center">
-<img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/en_web-http-pb-anatomy.png">
+<img width="1200px" src="https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/en_web-http-pb-anatomy.png">
 </p>
 
 <br>
@@ -52,7 +52,7 @@ The web service egg model dissection diagram is shown in the following figure:
 The gRPC service egg model dissection is shown in the following figure:
 
 <p align="center">
-<img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/en_micro-rpc-pb-anatomy.png">
+<img width="1200px" src="https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/en_micro-rpc-pb-anatomy.png">
 </p>
 
 <br>
@@ -60,7 +60,7 @@ The gRPC service egg model dissection is shown in the following figure:
 The rpc gateway service egg model dissection is shown in the following figure:
 
 <p align="center">
-<img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/en_micro-rpc-gw-pb-anatomy.png">
+<img width="1200px" src="https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/en_micro-rpc-gw-pb-anatomy.png">
 </p>
 
 <br>
@@ -115,7 +115,7 @@ Visit `http://localhost:24631` in your browser, generate code by manipulating it
 
 ### Documentation
 
-[sponge usage documentation](https://go-sponge.com/)
+[sponge documentation](https://go-sponge.com/)
 
 <br>
 
@@ -123,8 +123,20 @@ Visit `http://localhost:24631` in your browser, generate code by manipulating it
 
 <br>
 
-## License
+### License
 
 See the [LICENSE](LICENSE) file for licensing information.
 
 <br>
+
+### How to contribute
+
+You are more than welcome to join us, raise an Issue or Pull Request.
+
+Pull Request instructions.
+
+1. Fork the code
+2. Create your own branch: git checkout -b feat/xxxx
+3. Commit your changes: git commit -am 'feat: add xxxxx'
+4. Push your branch: git push origin feat/xxxx
+5. Commit your pull request

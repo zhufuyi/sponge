@@ -39,7 +39,7 @@ linters:
   # inverted configuration with `enable-all` and `disable` is not scalable during updates of golangci-lint
   disable-all: true
   enable:
-    - golint
+    - revive
     - goimports
     - gofmt
     - unused
@@ -126,9 +126,9 @@ linters-settings:
     # it's a comma-separated list of prefixes
     local-prefixes: github.com/zhufuyi/sponge
 
-  golint:
+#  golint:
     # minimal confidence for issues, default is 0.8
-    min-confidence: 0.8
+#    min-confidence: 0.8
 
   gomnd:
     settings:

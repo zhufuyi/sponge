@@ -1,10 +1,10 @@
-[sponge](https://github.com/zhufuyi/sponge) 是一个强大的生成web和微服务代码工具，也是一个基于gin和grpc封装的微服务框架。sponge拥有丰富的生成代码命令，生成不同的功能代码可以组合成完整的服务(类似人为打散的海绵细胞可以自动重组成一个新的海绵)。服务代码功能包括日志、服务注册与发现、注册中心、限流、熔断、链路跟踪、指标监控、pprof性能分析、统计、缓存、CICD等功能。生成代码统一在UI界面上操作，很容易构建出一个完整的项目工程代码，让开发人员聚焦在业务逻辑代码的实现，无需花费时间和精力在项目的配置和集成上。
+[sponge](https://github.com/zhufuyi/sponge) 是一个强大的自动生成web和微服务代码工具，也是一个基于gin和grpc封装的微服务框架。sponge拥有丰富的生成代码命令，生成不同的功能代码可以组合成完整的服务(类似人为打散的海绵细胞可以自动重组成一个新的海绵)。服务代码功能包括日志、服务注册与发现、注册中心、限流、熔断、链路跟踪、指标监控、pprof性能分析、统计、缓存、CICD等功能。生成代码统一在UI界面上操作，很容易构建出一个完整的项目工程代码，让开发人员聚焦在业务逻辑代码的实现，无需花费时间和精力在项目的配置和集成上。
 
 <br>
 
 ### 生成代码框架
 
-生成代码基于**Yaml**、**SQL**和**Protobuf**三种方式，每种方式拥有生成不同功能代码，生成代码的框架图如下所示：
+sponge主要基于**SQL**和**Protobuf**两种方式生成代码，每种方式拥有生成不同功能代码，生成代码的框架图如下所示：
 
 <p align="center">
 <img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/sponge-framework.png">
@@ -12,10 +12,10 @@
 
 <br>
 
-生成代码的UI界面：
+生成代码的UI界面(同时支持命令方式生成代码)：
 
 <p align="center">
-<img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/sponge-ui.png">
+<img width="1200px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/sponge-ui.png">
 </p>
 
 <br>
@@ -24,18 +24,18 @@
 
 sponge生成web服务代码过程中剥离了业务逻辑与非业务逻辑两大部分代码。例如把一个完整web服务代码看作一个鸡蛋，蛋壳表示web服务框架代码，蛋白和蛋黄都表示业务逻辑代码，蛋黄是业务逻辑的核心(需要人工编写的代码)，例如定义mysql表、定义api接口、编写具体逻辑代码都属于蛋黄部分。蛋白是业务逻辑核心代码与web框架代码连接的桥梁(自动生成，不需要人工编写)，例如根据proto文件生成的注册路由代码、handler方法函数代码、参数校验代码、错误码、swagger文档等都属于蛋白部分。
 
-web服务鸡蛋模型剖析图如下图所示：
+web服务代码的鸡蛋模型剖析图如下图所示：
 
 <p align="center">
-<img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/web-http-pb-anatomy.png">
+<img width="1200px" src="https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/web-http-pb-anatomy.png">
 </p>
 
 <br>
 
-gRPC服务鸡蛋模型剖析图如下图所示：
+gRPC服务代码的鸡蛋模型剖析图如下图所示：
 
 <p align="center">
-<img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/micro-rpc-pb-anatomy.png">
+<img width="1200px" src="https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/micro-rpc-pb-anatomy.png">
 </p>
 
 <br>
@@ -43,12 +43,12 @@ gRPC服务鸡蛋模型剖析图如下图所示：
 rpc网关服务鸡蛋模型剖析图如下图所示：
 
 <p align="center">
-<img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/micro-rpc-gw-pb-anatomy.png">
+<img width="1200px" src="https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/micro-rpc-gw-pb-anatomy.png">
 </p>
 
 <br>
 
-### 服务框架
+### 微服务框架
 
 sponge生成的微服务代码框架如下图所示，这是典型的微服务分层结构，具有高性能，高扩展性，包含了常用的服务治理功能。
 
@@ -132,7 +132,7 @@ sponge生成的微服务代码框架如下图所示，这是典型的微服务�
 sponge run
 ```
 
-在浏览器访问 `http://localhost:24631`，在页面上操作生成代码。
+在浏览器访问 `http://localhost:24631`，在UI页面上操作生成代码。
 
 <br>
 
@@ -179,8 +179,22 @@ sponge run
 
 <br>
 
-如果对您有帮助给个star⭐，欢迎加入[go sponge微信群交流](https://pan.baidu.com/s/1NZgPb2v_8tAnBuwyeFyE_g?pwd=spon)。
+如果对您有帮助给个star⭐，欢迎加入**go sponge微信群交流**，加微信进群。
 
-![wechat-group](https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/wechat-group.jpg)
+<img width="300px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/wechat-group.jpg">
+
+<br>
+
+### 如何贡献
+
+非常欢迎您的加入，提 Issue 或 Pull Request。
+
+Pull Request说明:
+
+1. Fork 代码
+2. 创建自己的分支: git checkout -b feat/xxxx
+3. 提交你的修改: git commit -am 'feat: add xxxxx'
+4. 推送您的分支: git push origin feat/xxxx
+5. 提交pull request
 
 <br><br>
