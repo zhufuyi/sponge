@@ -9,7 +9,6 @@ import (
 
 var basePath string
 
-// nolint
 func init() {
 	_, currentFile, _, _ := runtime.Caller(0)
 	basePath = filepath.Dir(currentFile)
