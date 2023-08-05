@@ -22,13 +22,13 @@ const (
 	// cache prefix key, must end with a colon
 	cacheNameExampleCachePrefixKey = "prefixKeyExample:"
 	// CacheNameExampleExpireTime expire time
-	CacheNameExampleExpireTime = 10 * time.Minute // nolint
+	CacheNameExampleExpireTime = 10 * time.Minute
 )
 
 var _ CacheNameExampleCache = (*cacheNameExampleCache)(nil)
 
 // CacheNameExampleCache cache interface
-type CacheNameExampleCache interface { // nolint
+type CacheNameExampleCache interface {
 	Set(ctx context.Context, keyNameExample keyTypeExample, valueNameExample valueTypeExample, duration time.Duration) error
 	Get(ctx context.Context, keyNameExample keyTypeExample) (valueTypeExample, error)
 	Del(ctx context.Context, keyNameExample keyTypeExample) error

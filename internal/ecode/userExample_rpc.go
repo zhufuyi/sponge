@@ -1,5 +1,3 @@
-// nolint
-
 package ecode
 
 import (

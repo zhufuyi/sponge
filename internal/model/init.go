@@ -1,3 +1,4 @@
+// Package model is the initial database driver and define the data structures corresponding to the tables.
 package model
 
 import (

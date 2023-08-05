@@ -49,9 +49,9 @@ func WithHTTPWriteTimeout(timeout time.Duration) HTTPOption {
 }
 
 // WithHTTPIsProd setting up production environment markers
-func WithHTTPIsProd(IsProd bool) HTTPOption {
+func WithHTTPIsProd(isProd bool) HTTPOption {
 	return func(o *httpOptions) {
-		o.isProd = IsProd
+		o.isProd = isProd
 	}
 }
 

@@ -59,6 +59,8 @@ func userExampleServiceRouter(
 // or you can mix them, pay attention to the duplication of middleware when mixing them,
 // it is recommended to set the middleware of a single route in preference
 func userExampleMiddlewares(c *middlewareConfig) {
+	_ = c
+
 	// set up group route middleware, group path is left prefix rules,
 	// if the left prefix is hit, the middleware will take effect, e.g. group route /api/v1, route /api/v1/userExample/:id  will take effect
 	// c.setGroupPath("/api/v1/userExample", middleware.Auth())

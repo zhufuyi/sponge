@@ -41,8 +41,12 @@ type userExampleDao struct {
 }
 
 // NewUserExampleDao creating the dao interface
-func NewUserExampleDao(db *gorm.DB, cache cache.UserExampleCache) UserExampleDao {
-	return &userExampleDao{db: db, cache: cache, sfg: new(singleflight.Group)}
+func NewUserExampleDao(db *gorm.DB, xCache cache.UserExampleCache) UserExampleDao {
+	return &userExampleDao{
+		db:    db,
+		cache: xCache,
+		sfg:   new(singleflight.Group),
+	}
 }
 
 // Create a record, insert the record and the id value is written back to the table
@@ -82,7 +86,7 @@ func (d *userExampleDao) DeleteByIDs(ctx context.Context, ids []uint64) error {
 
 // UpdateByID update a record by id
 func (d *userExampleDao) UpdateByID(ctx context.Context, table *model.UserExample) error {
-	err := d.updateByID(ctx, d.db, table)
+	err := d.updateDataByID(ctx, d.db, table)
 
 	// delete cache
 	_ = d.cache.Del(ctx, table.ID)
@@ -90,7 +94,7 @@ func (d *userExampleDao) UpdateByID(ctx context.Context, table *model.UserExampl
 	return err
 }
 
-func (d *userExampleDao) updateByID(ctx context.Context, db *gorm.DB, table *model.UserExample) error {
+func (d *userExampleDao) updateDataByID(ctx context.Context, db *gorm.DB, table *model.UserExample) error {
 	if table.ID < 1 {
 		return errors.New("id cannot be 0")
 	}
@@ -197,9 +201,8 @@ func (d *userExampleDao) GetByIDs(ctx context.Context, ids []uint64) (map[uint64
 			_, err = d.cache.Get(ctx, id)
 			if errors.Is(err, cacheBase.ErrPlaceholder) {
 				continue
-			} else {
-				realMissedIDs = append(realMissedIDs, id)
 			}
+			realMissedIDs = append(realMissedIDs, id)
 		}
 
 		if len(realMissedIDs) > 0 {
@@ -314,7 +317,7 @@ func (d *userExampleDao) DeleteByTx(ctx context.Context, tx *gorm.DB, id uint64)
 
 // UpdateByTx update a record by id in the database using the provided transaction
 func (d *userExampleDao) UpdateByTx(ctx context.Context, tx *gorm.DB, table *model.UserExample) error {
-	err := d.updateByID(ctx, tx, table)
+	err := d.updateDataByID(ctx, tx, table)
 
 	// delete cache
 	_ = d.cache.Del(ctx, table.ID)

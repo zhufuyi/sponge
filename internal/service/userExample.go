@@ -19,7 +19,6 @@ import (
 	"google.golang.org/grpc"
 )
 
-// nolint
 func init() {
 	registerFns = append(registerFns, func(server *grpc.Server) {
 		serverNameExampleV1.RegisterUserExampleServiceServer(server, NewUserExampleServiceServer()) // register service to the rpc service

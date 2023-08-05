@@ -1,28 +1,28 @@
-// Package sponge is a microservice framework, a tool for quickly creating microservice code.
-// sponge has a rich generating code commands, a total of 12 different functional code,
-// these functional code can be combined into a complete service (similar to artificially broken
-// sponge cells can be automatically reorganized into a new sponge ). Microservice code features
-// include logging, service registration and discovery, registry, rate limit, circuit breaker, trace,
-// metrics monitoring, pprof performance analysis, statistics, caching, CICD. The code uses a decoupled
-// layered structure and it's easy to add or replace functional code. As an efficiency-enhancing tool, commonly
-// repeated code is basically generated automatically and only business logic code needs to be populated
-// based on the generated template code examples.
+// Package sponge is a powerful tool for generating web and microservice code, a microservice framework
+// based on gin and grpc encapsulation, and an open source framework for rapid application development.
 //
-// https://github.com/zhufuyi/sponge/blob/main/README.md
+// Usage:
 //
-//	sponge -h
-//	sponge a microservice framework, a tool for quickly creating microservice code.
-//
-//	Usage:
 //	sponge [command]
 //
-//	Available Commands:
-//	completion  Generate the autocompletion script for the specified shell
-//	config         Generate go config codes from yaml file
-//	help           Help about any command
-//	init            Initialize sponge
-//	micro        Generate proto, model, dao, service, rpc, rpc-gw, rpc-cli codes
+// Available Commands:
+//
+//	completion    Generate the autocompletion script for the specified shell
+//	config        Generate go config codes from yaml file
+//	del-omitempty Delete json tag omitempty
+//	help          Help about any command
+//	init          Initialize sponge
+//	merge         Merge the generated code into the template file
+//	micro         Generate proto, model, cache, dao, service, rpc, rpc-gw, rpc-cli codes
+//	run           Open the Sponge UI interface
 //	tools         Managing sponge dependency tools
-//	update      Update sponge to the latest version
-//	web          Generate model, dao, handler, http codes
+//	upgrade       Upgrade sponge to the latest version
+//	web           Generate model, cache, dao, handler, http codes
+//
+// Flags:
+//
+//	-h, --help      help for sponge
+//	-v, --version   version for sponge
+//
+// Use "sponge [command] --help" for more information about a command.
 package sponge

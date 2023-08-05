@@ -1,3 +1,4 @@
+// Package types define the structure of request parameters and return results in this package
 package types
 
 import (

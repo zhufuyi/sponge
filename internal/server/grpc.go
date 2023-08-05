@@ -1,3 +1,4 @@
+// Package server is a package that holds the http or grpc service.
 package server
 
 import (
@@ -204,7 +205,7 @@ func (s *grpcServer) unaryServerOptions() grpc.ServerOption {
 func (s *grpcServer) streamServerOptions() grpc.ServerOption {
 	streamServerInterceptors := []grpc.StreamServerInterceptor{
 		interceptor.StreamServerRecovery(),
-		interceptor.StreamServerRequestID(),
+		//interceptor.StreamServerRequestID(),
 	}
 
 	// logger interceptor

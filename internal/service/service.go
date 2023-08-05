@@ -1,3 +1,4 @@
+// Package service A grpc server-side or client-side package that handles business logic.
 package service
 
 import (

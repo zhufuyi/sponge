@@ -1,5 +1,4 @@
-// nolint
-
+// Package ecode is the package that unifies the definition of http error codes or grpc error codes here.
 package ecode
 
 import (
