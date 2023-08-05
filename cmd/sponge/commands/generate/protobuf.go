@@ -77,16 +77,17 @@ Examples:
 				}
 			}
 
-			fmt.Printf("generate 'protocol buffers' codes successfully, out = %s\n", outPath)
-			fmt.Printf(`help for use:
-	The proto file can be used in the following scenarios.
-	  ● generate swagger documents.
-	  ● generate the required code as a custom plug-in for protoc.
-	  ● provided to sponge to create web projects.
-	  ● provided to sponge to create rpc gateway projects.
-	  ● provided for sponge to create rpc projects.
+			fmt.Printf(`
+using help:
+  the proto file can be used in the following scenarios.
+    ● generate swagger documents.
+    ● generate the required code as a custom plug-in for protoc.
+    ● provided to sponge to create web projects.
+    ● provided to sponge to create rpc gateway projects.
+    ● provided for sponge to create rpc projects.
 
 `)
+			fmt.Printf("generate 'protocol buffers' codes successfully, out = %s\n", outPath)
 
 			return nil
 		},

@@ -1,3 +1,4 @@
+// Package parse is parsed proto file to struct
 package parse
 
 import (

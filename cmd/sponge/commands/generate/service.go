@@ -83,14 +83,15 @@ Examples:
 				}
 			}
 
-			fmt.Printf("generate 'service' codes successfully, out = %s\n", outPath)
-			fmt.Printf(`help for use:
-	1. move the code to the rpc project folder.
-	2. open a terminal and execute the command to generate code in the rpc project folder: make proto
-	3. compiling and starting services: make run
-	4. open the file 'internal/service/xxx_client_test.go' using Goland or VS Code, test the rpc's CRUD method.
+			fmt.Printf(`
+using help:
+  1. move the code to the rpc project folder.
+  2. open a terminal and execute the command to generate code in the rpc project folder: make proto
+  3. compiling and starting services: make run
+  4. open the file 'internal/service/xxx_client_test.go' using Goland or VS Code, test the rpc's CRUD methods.
 
 `)
+			fmt.Printf("generate 'service' codes successfully, out = %s\n", outPath)
 			return nil
 		},
 	}
@@ -131,7 +132,7 @@ func runGenServiceCommand(moduleName string, serverName string, codes map[string
 		"systemCode_http.go", "systemCode_rpc.go", "userExample_http.go", // internal/ecode
 		"init.go", "init_test.go", // internal/model
 		"service.go", "service_test.go", "userExample_logic.go", "userExample_logic_test.go", // internal/service
-		"cacheNameExample.go", "cacheNameExample_test.go", // internal/cache
+		"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", // internal/cache
 	}
 
 	r.SetSubDirsAndFiles(subDirs)

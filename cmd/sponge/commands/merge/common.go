@@ -1,3 +1,6 @@
+// Package merge is merge the generated code into the template file, you don't worry about it affecting
+// the logic code you have already written, in case of accidents, you can find the
+// pre-merge code in the directory /tmp/sponge_merge_backup_code
 package merge
 
 import (
@@ -321,19 +324,19 @@ func parseFromTmplCode(data []byte, markStr string) []code {
 	return codes
 }
 
-func getTmplKey(str string) (string, string) {
+func getTmplKey(str string) (key string, methodName string) {
 	regStr2 := `func \((.*?)\) (.*?)\(`
 	reg2 := regexp.MustCompile(regStr2)
 	matches := reg2.FindAllStringSubmatch(str, -1)
 	if len(matches) == 0 {
 		return "", ""
 	}
-
 	if len(matches[0]) != 3 {
 		return "", ""
 	}
-
-	return matches[0][0], matches[0][2]
+	key = matches[0][0]
+	methodName = matches[0][2]
+	return key, methodName
 }
 
 func getComment(name string, str string) string {

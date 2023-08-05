@@ -1,3 +1,4 @@
+// Package main is the grpc server of the application.
 package main
 
 import (

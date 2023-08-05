@@ -83,11 +83,12 @@ Examples:
 				}
 			}
 
-			fmt.Printf("generate 'dao' codes successfully, out = %s\n", outPath)
-			fmt.Printf(`help for use:
-	Move the code to the web or rpc project folder.
+			fmt.Printf(`
+using help:
+  move the code to the web or rpc project folder.
 
 `)
+			fmt.Printf("generate 'dao' codes successfully, out = %s\n", outPath)
 			return nil
 		},
 	}
@@ -121,11 +122,11 @@ func runGenDaoCommand(moduleName string, isIncludeInitDB bool, codes map[string]
 	ignoreDirs := []string{} // specify the directory in the subdirectory where processing is ignored
 	ignoreFiles := []string{ // specify the files in the subdirectory to be ignored for processing
 		"init.go", "init_test.go", // internal/model
-		"cacheNameExample.go", "cacheNameExample_test.go", // internal/cache
+		"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", // internal/cache
 	}
 	if isIncludeInitDB {
 		ignoreFiles = []string{
-			"cacheNameExample.go", "cacheNameExample_test.go", // internal/cache
+			"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", // internal/cache
 		}
 	}
 

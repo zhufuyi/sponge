@@ -21,7 +21,6 @@ func RPCPbCommand() *cobra.Command {
 		protobufFile string // protobuf file, support * matching
 	)
 
-	//nolint
 	cmd := &cobra.Command{
 		Use:   "rpc-pb",
 		Short: "Generate rpc service codes based on protobuf file",
@@ -102,17 +101,18 @@ func runGenRPCPbCommand(moduleName string, serverName string, projectName string
 		return err
 	}
 
-	_ = saveProtobufFiles(moduleName, serverName, r.GetOutputDir(), protobufFiles)
+	_ = saveProtobufFiles(serverName, r.GetOutputDir(), protobufFiles)
 	_ = saveGenInfo(moduleName, serverName, r.GetOutputDir())
 
-	fmt.Printf("generate %s's rpc server codes successfully, out = %s\n", serverName, r.GetOutputDir())
-	fmt.Printf(`help for use:
-	1. open a terminal and execute the command to generate the *pb.go file and the service template code: make proto
-	2. open file 'internal/service/xxx.go', replace panic("implement me") according to template code example.
-	3. compiling and starting services: make run
-	4. open the file 'internal/service/xxx_client_test.go' using Goland or VS Code, testing the rpc method.
+	fmt.Printf(`
+using help:
+  1. open a terminal and execute the command to generate the *pb.go file and the service template code: make proto
+  2. open file 'internal/service/xxx.go', replace panic("implement me") according to template code example.
+  3. compiling and starting services: make run
+  4. open the file 'internal/service/xxx_client_test.go' using Goland or VS Code, testing the rpc methods.
 
 `)
+	fmt.Printf("generate %s's rpc server codes successfully, out = %s\n", serverName, r.GetOutputDir())
 	return nil
 }
 

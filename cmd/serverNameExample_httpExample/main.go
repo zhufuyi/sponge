@@ -1,3 +1,4 @@
+// Package main is the http server of the application.
 package main
 
 import (

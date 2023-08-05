@@ -1,3 +1,6 @@
+// Package initial is the package that starts the service to initialize the service, including
+// the initialization configuration, service configuration, connecting to the database, and
+// resource release needed when shutting down the service.
 package initial
 
 import (

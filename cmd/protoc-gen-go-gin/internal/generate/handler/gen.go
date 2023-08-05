@@ -1,3 +1,4 @@
+// Package handler is to generate template code, router code, and error code.
 package handler
 
 import (

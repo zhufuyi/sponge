@@ -1,3 +1,4 @@
+// Package service is to generate template code, router code, and error code.
 package service
 
 import (

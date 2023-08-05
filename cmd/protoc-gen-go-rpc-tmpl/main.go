@@ -1,3 +1,4 @@
+// Package main is to generate *_logic.go, *_logic_test.go, *_rpc.go files.
 package main
 
 import (
@@ -65,7 +66,7 @@ func main() {
 				continue
 			}
 
-			err := saveRPCTmplFiles(gen, f, moduleName, serverName, tmplDir, ecodeOut)
+			err := saveRPCTmplFiles(f, moduleName, serverName, tmplDir, ecodeOut)
 			if err != nil {
 				continue // skip error, process the next protobuf file
 			}
@@ -74,7 +75,7 @@ func main() {
 	})
 }
 
-func saveRPCTmplFiles(gen *protogen.Plugin, f *protogen.File, moduleName string, serverName string, tmplOut string, ecodeOut string) error {
+func saveRPCTmplFiles(f *protogen.File, moduleName string, serverName string, tmplOut string, ecodeOut string) error {
 	filenamePrefix := f.GeneratedFilenamePrefix
 	tmplFileContent, testTmplFileContent, ecodeFileContent := service.GenerateFiles(filenamePrefix, f)
 
@@ -139,8 +140,8 @@ func saveFileSimple(out string, filePath string, content []byte, isNeedCovered b
 	return os.WriteFile(file, content, 0666)
 }
 
-func isExists(path string) bool {
-	_, err := os.Stat(path)
+func isExists(f string) bool {
+	_, err := os.Stat(f)
 	if err != nil {
 		return !os.IsNotExist(err)
 	}

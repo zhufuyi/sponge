@@ -102,7 +102,7 @@ func runGenHTTPCommand(moduleName string, serverName string, projectName string,
 		"userExample_rpc.go", "systemCode_rpc.go", // internal/ecode
 		"routers_pbExample.go", "routers_pbExample_test.go", "userExample_service.pb.go", // internal/routers
 		"grpc.go", "grpc_option.go", "grpc_test.go", // internal/server
-		"cacheNameExample.go", "cacheNameExample_test.go", // internal/cache
+		"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", // internal/cache
 	}
 
 	r.SetSubDirsAndFiles(subDirs, subFiles...)
@@ -117,13 +117,14 @@ func runGenHTTPCommand(moduleName string, serverName string, projectName string,
 
 	_ = saveGenInfo(moduleName, serverName, r.GetOutputDir())
 
-	fmt.Printf("generate %s's http server codes successfully, out = %s\n", serverName, r.GetOutputDir())
-	fmt.Printf(`help for use:
-	1. open a terminal and execute the command to update the swagger documentation: make docs
-	2. compiling and starting services: make run
-	3. copy the 'http://localhost:8080/swagger/index.html' to your browser, and test the CRUD interface.
+	fmt.Printf(`
+using help:
+  1. open a terminal and execute the command to update the swagger documentation: make docs
+  2. compiling and starting services: make run
+  3. copy the url http://localhost:8080/swagger/index.html to your browser, and test the CRUD interface.
 
 `)
+	fmt.Printf("generate %s's http server codes successfully, out = %s\n", serverName, r.GetOutputDir())
 	return nil
 }
 

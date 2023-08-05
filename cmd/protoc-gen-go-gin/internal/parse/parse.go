@@ -1,3 +1,4 @@
+// Package parse is parsed proto file to struct
 package parse
 
 import (
@@ -134,38 +135,6 @@ func getCutServiceName(name string) string {
 	}
 	return name
 }
-
-//func getRequestFields(m *protogen.Method) []*Field {
-//	var fields []*Field
-//	for _, f := range m.Input.Fields {
-//		fieldType := f.Desc.Kind().String()
-//		if f.Desc.Cardinality().String() == "repeated" {
-//			fieldType = "[]" + fieldType
-//		}
-//		fields = append(fields, &Field{
-//			Name:      f.GoName,
-//			FieldType: fieldType,
-//			Comment:   getFieldComment(f.Comments),
-//		})
-//	}
-//	return fields
-//}
-//
-//func getReplyFields(m *protogen.Method) []*Field {
-//	var fields []*Field
-//	for _, f := range m.Output.Fields {
-//		fieldType := f.Desc.Kind().String()
-//		if f.Desc.Cardinality().String() == "repeated" {
-//			fieldType = "[]" + fieldType
-//		}
-//		fields = append(fields, &Field{
-//			Name:      f.GoName,
-//			FieldType: fieldType,
-//			Comment:   getFieldComment(f.Comments),
-//		})
-//	}
-//	return fields
-//}
 
 func getFields(m *protogen.Message) []*Field {
 	var fields []*Field

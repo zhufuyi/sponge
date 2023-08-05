@@ -67,11 +67,12 @@ Examples:
 				}
 			}
 
-			fmt.Printf("generate 'model' codes successfully, out = %s\n", outPath)
-			fmt.Printf(`help for use:
-	Generate structures corresponding to gorm based on mysql tables.
+			fmt.Printf(`
+using help:
+  generate structures corresponding to gorm based on mysql tables.
 
 `)
+			fmt.Printf("generate 'model' codes successfully, out = %s\n", outPath)
 			return nil
 		},
 	}

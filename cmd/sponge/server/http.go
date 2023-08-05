@@ -1,3 +1,4 @@
+// Package server is a sponge UI service that contains the front-end pages.
 package server
 
 import (

@@ -1,3 +1,4 @@
+// Package router is to generate gin router code.
 package router
 
 import (

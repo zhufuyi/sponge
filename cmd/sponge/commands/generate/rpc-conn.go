@@ -58,11 +58,12 @@ Examples:
 				}
 			}
 
-			fmt.Printf("generate 'rpc-conn' codes successfully, out = %s\n", outPath)
-			fmt.Printf(`help for use:
-	Move the rpc connection code to the web or microservice project.
+			fmt.Printf(`
+using help:
+  move the rpc connection code to the web or microservice project.
 
 `)
+			fmt.Printf("generate 'rpc-conn' codes successfully, out = %s\n", outPath)
 			return nil
 		},
 	}
@@ -89,7 +90,7 @@ func runGenRPCConnectionCommand(moduleName string, rpcName string, outPath strin
 	}
 	ignoreDirs := []string{} // specify the directory in the subdirectory where processing is ignored
 	ignoreFiles := []string{ // specify the files in the subdirectory to be ignored for processing
-		"serverNameExample_test.go",
+		"doc.go", "serverNameExample_test.go",
 	}
 
 	r.SetSubDirsAndFiles(subDirs)

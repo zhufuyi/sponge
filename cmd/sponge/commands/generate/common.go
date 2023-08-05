@@ -1,3 +1,4 @@
+// Package generate is to generate code, including model, cache, dao, handler, http, service, rpc, rpc-gw, rpc-cli code.
 package generate
 
 import (
@@ -160,7 +161,7 @@ func replaceFileContentMark(r replacer.Replacer, filename string, newContent str
 }
 
 // resolving mirror repository host and name
-func parseImageRepoAddr(addr string) (string, string) {
+func parseImageRepoAddr(addr string) (host string, name string) {
 	splits := strings.Split(addr, "/")
 
 	// default docker hub official repo address
@@ -216,7 +217,7 @@ func saveGenInfo(moduleName string, serverName string, outputDir string) error {
 }
 
 // get moduleName and serverName from directory
-func getNamesFromOutDir(dir string) (string, string) {
+func getNamesFromOutDir(dir string) (moduleName string, serverName string) {
 	if dir == "" {
 		return "", ""
 	}
@@ -233,7 +234,7 @@ func getNamesFromOutDir(dir string) (string, string) {
 	return ms[0], ms[1]
 }
 
-func saveProtobufFiles(moduleName string, serverName string, outputDir string, protobufFiles []string) error {
+func saveProtobufFiles(serverName string, outputDir string, protobufFiles []string) error {
 	for _, pbFile := range protobufFiles {
 		pbContent, err := os.ReadFile(pbFile)
 		if err != nil {

@@ -1,3 +1,4 @@
+// Package main is to generate *_router.pb.go file, *_logic.go, *_router.go, *_http.go files.
 package main
 
 import (
@@ -117,7 +118,7 @@ func main() {
 					continue // skip error, process the next protobuf file
 				}
 			} else if serviceFlag {
-				err := saveServiceAndRouterFiles(gen, f, moduleName, serverName, logicOut, routerOut, ecodeOut)
+				err := saveServiceAndRouterFiles(f, moduleName, serverName, logicOut, routerOut, ecodeOut)
 				if err != nil {
 					continue // skip error, process the next protobuf file
 				}
@@ -153,7 +154,7 @@ func saveHandlerAndRouterFiles(f *protogen.File, moduleName string, serverName s
 	return nil
 }
 
-func saveServiceAndRouterFiles(gen *protogen.Plugin, f *protogen.File, moduleName string, serverName string,
+func saveServiceAndRouterFiles(f *protogen.File, moduleName string, serverName string,
 	logicOut string, routerOut string, ecodeOut string) error {
 	filenamePrefix := f.GeneratedFilenamePrefix
 	serviceLogicContent, routerContent, errCodeFileContent := service.GenerateFiles(f)
@@ -219,8 +220,8 @@ func saveFileSimple(out string, filePath string, content []byte, isNeedCovered b
 	return os.WriteFile(file, content, 0666)
 }
 
-func isExists(path string) bool {
-	_, err := os.Stat(path)
+func isExists(f string) bool {
+	_, err := os.Stat(f)
 	if err != nil {
 		return !os.IsNotExist(err)
 	}

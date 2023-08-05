@@ -21,7 +21,6 @@ func HTTPPbCommand() *cobra.Command {
 		protobufFile string // protobuf file, support * matching
 	)
 
-	//nolint
 	cmd := &cobra.Command{
 		Use:   "http-pb",
 		Short: "Generate http service codes based on protobuf file",
@@ -104,17 +103,18 @@ func runGenHTTPPbCommand(moduleName string, serverName string, projectName strin
 		return err
 	}
 
-	_ = saveProtobufFiles(moduleName, serverName, r.GetOutputDir(), protobufFiles)
+	_ = saveProtobufFiles(serverName, r.GetOutputDir(), protobufFiles)
 	_ = saveGenInfo(moduleName, serverName, r.GetOutputDir())
 
-	fmt.Printf("generate %s's http server codes successfully, out = %s\n", serverName, r.GetOutputDir())
-	fmt.Printf(`help for use:
-	1. open a terminal and execute the commands to generate the *pb.go file, generate the handler template code and update the swagger documentation: make docs
-	3. open file 'internal/handler/xxx_logic.go', replace panic("implement me") according to template code example.
-	3. compiling and starting services: make run
-	4. copy the 'http://localhost:8080/apis/swagger/index.html' to your browser, and test the api interface.
+	fmt.Printf(`
+using help:
+  1. open a terminal and execute the commands to generate the *pb.go file, generate the handler template code and update the swagger documentation: make docs
+  2. open file 'internal/handler/xxx_logic.go', replace panic("implement me") according to template code example.
+  3. compiling and starting services: make run
+  4. copy the url http://localhost:8080/apis/swagger/index.html to your browser, and test the api interface.
 
 `)
+	fmt.Printf("generate %s's http server codes successfully, out = %s\n", serverName, r.GetOutputDir())
 	return nil
 }
 

@@ -50,7 +50,8 @@ Examples:
 func runUpgradeCommand() error {
 	ctx, _ := context.WithTimeout(context.Background(), time.Minute*3) //nolint
 	result := gobash.Run(ctx, "go", "install", "github.com/zhufuyi/sponge/cmd/sponge@latest")
-	for range result.StdOut {
+	for v := range result.StdOut {
+		_ = v
 	}
 	if result.Err != nil {
 		return fmt.Errorf("execute command failed, %v", result.Err)
@@ -114,7 +115,8 @@ func copyToTempDir() (string, error) {
 func executeCommand(name string, args ...string) error {
 	ctx, _ := context.WithTimeout(context.Background(), time.Second*30) //nolint
 	result := gobash.Run(ctx, name, args...)
-	for range result.StdOut {
+	for v := range result.StdOut {
+		_ = v
 	}
 	if result.Err != nil {
 		return fmt.Errorf("execute command failed, %v", result.Err)
@@ -160,7 +162,8 @@ func getLatestVersion(s string) string {
 func updateSpongeInternalPlugin(latestVersionNum string) {
 	ctx, _ := context.WithTimeout(context.Background(), time.Minute) //nolint
 	result := gobash.Run(ctx, "go", "install", "github.com/zhufuyi/sponge/cmd/protoc-gen-go-gin@"+latestVersionNum)
-	for range result.StdOut {
+	for v := range result.StdOut {
+		_ = v
 	}
 	if result.Err != nil {
 		fmt.Printf("upgrade plugin 'protoc-gen-go-gin' failed, target version=%s, error=%v, "+
@@ -169,7 +172,8 @@ func updateSpongeInternalPlugin(latestVersionNum string) {
 
 	ctx, _ = context.WithTimeout(context.Background(), time.Minute) //nolint
 	result = gobash.Run(ctx, "go", "install", "github.com/zhufuyi/sponge/cmd/protoc-gen-go-rpc-tmpl@"+latestVersionNum)
-	for range result.StdOut {
+	for v := range result.StdOut {
+		_ = v
 	}
 	if result.Err != nil {
 		fmt.Printf("upgrade plugin 'protoc-gen-go-rpc-tmpl' failed, target version=%s, error=%v, "+

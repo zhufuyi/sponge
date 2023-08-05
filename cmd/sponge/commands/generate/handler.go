@@ -76,14 +76,15 @@ Examples:
 				}
 			}
 
-			fmt.Printf("generate 'handler' codes successfully, out = %s\n", outPath)
-			fmt.Printf(`help for use:
-	1. move the code to the web project folder.
-	2. open a terminal and execute the command to update the swagger documentation in the web project folder: make docs
-	3. compiling and starting services: make run
-	4. copy the 'http://localhost:8080/swagger/index.html' to your browser, and test the CRUD interface.
+			fmt.Printf(`
+using help:
+  1. move the code to the web project folder.
+  2. open a terminal and execute the command to update the swagger documentation in the web project folder: make docs
+  3. compiling and starting services: make run
+  4. copy the 'http://localhost:8080/swagger/index.html' to your browser, and test the CRUD interface.
 
 `)
+			fmt.Printf("generate 'handler' codes successfully, out = %s\n", outPath)
 			return nil
 		},
 	}
@@ -117,8 +118,8 @@ func runGenHandlerCommand(moduleName string, codes map[string]string, outPath st
 		"systemCode_http.go", "systemCode_rpc.go", "userExample_rpc.go", // internal/ecode
 		"init.go", "init_test.go", // internal/model
 		"routers.go", "routers_test.go", "routers_pbExample.go", "routers_pbExample_test.go", "userExample_service.pb.go", // internal/routers
-		"swagger_types.go",                                // internal/types
-		"cacheNameExample.go", "cacheNameExample_test.go", // internal/cache
+		"swagger_types.go",                                          // internal/types
+		"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", // internal/cache
 	}
 
 	r.SetSubDirsAndFiles(subDirs)

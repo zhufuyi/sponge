@@ -88,16 +88,16 @@ func GenerateCode(c *gin.Context) {
 		return
 	}
 
-	generateCode(c, form.Path, form.Arg)
+	handleGenerateCode(c, form.Path, form.Arg)
 }
 
-func generateCode(c *gin.Context, path string, arg string) {
+func handleGenerateCode(c *gin.Context, outPath string, arg string) {
 	out := "-" + time.Now().Format("150405")
-	if len(path) > 1 {
-		if path[0] == '/' {
-			out = path[1:] + out
+	if len(outPath) > 1 {
+		if outPath[0] == '/' {
+			out = outPath[1:] + out
 		} else {
-			out = path + out
+			out = outPath + out
 		}
 	}
 
@@ -110,7 +110,8 @@ func generateCode(c *gin.Context, path string, arg string) {
 
 	ctx, _ := context.WithTimeout(context.Background(), time.Second*10) // nolint
 	result := gobash.Run(ctx, "sponge", args...)
-	for range result.StdOut {
+	for v := range result.StdOut {
+		_ = v
 	}
 	if result.Err != nil {
 		responseErr(c, result.Err, ecode.InternalServerError)
@@ -133,7 +134,7 @@ func generateCode(c *gin.Context, path string, arg string) {
 	c.Writer.Header().Set("content-disposition", zipFile)
 	c.File(zipFile)
 
-	recordObj().set(c.ClientIP(), path, params)
+	recordObj().set(c.ClientIP(), outPath, params)
 
 	_ = os.RemoveAll(out)
 	_ = os.RemoveAll(zipFile)
@@ -260,7 +261,7 @@ func getSavePath() string {
 }
 
 // CompressPathToZip compressed directory to zip file
-func CompressPathToZip(path, targetFile string) error {
+func CompressPathToZip(outPath, targetFile string) error {
 	d, err := os.Create(targetFile)
 	if err != nil {
 		return err
@@ -273,7 +274,7 @@ func CompressPathToZip(path, targetFile string) error {
 		_ = w.Close()
 	}()
 
-	f, err := os.Open(path)
+	f, err := os.Open(outPath)
 	if err != nil {
 		return err
 	}

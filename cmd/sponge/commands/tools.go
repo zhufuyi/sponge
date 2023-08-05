@@ -153,7 +153,8 @@ func installTools(lackNames []string) {
 			}
 			pkgAddr = adaptInternalCommand(name, pkgAddr)
 			result := gobash.Run(ctx, "go", "install", pkgAddr)
-			for range result.StdOut {
+			for v := range result.StdOut {
+				_ = v
 			}
 			if result.Err != nil {
 				fmt.Printf("%s %s, %v\n", lackSymbol, name, result.Err)

@@ -1,3 +1,4 @@
+// Package commands are subcommands of the sponge command.
 package commands
 
 import (
@@ -17,8 +18,9 @@ var (
 // NewRootCMD command entry
 func NewRootCMD() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:           "sponge",
-		Long:          "sponge a microservice framework, a tool for quickly creating microservice code.",
+		Use: "sponge",
+		Long: `sponge is a powerful tool for generating web and microservice code, a microservice framework
+based on gin and grpc encapsulation, and an open source framework for rapid application development.`,
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		Version:       getVersion(),
