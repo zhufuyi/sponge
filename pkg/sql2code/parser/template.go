@@ -1,9 +1,10 @@
 package parser
 
 import (
-	"github.com/pkg/errors"
 	"sync"
 	"text/template"
+
+	"github.com/pkg/errors"
 )
 
 var (

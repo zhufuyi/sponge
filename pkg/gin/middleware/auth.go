@@ -1,3 +1,4 @@
+// Package middleware is gin middleware plugin.
 package middleware
 
 import (

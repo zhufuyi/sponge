@@ -1,3 +1,4 @@
+// Package goredis is a library wrapped on top of github.com/go-redis/redis.
 package goredis
 
 import (

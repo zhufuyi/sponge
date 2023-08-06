@@ -1,3 +1,4 @@
+// Package resolve is setting grpc client-side load balancing policy.
 package resolve
 
 import (
@@ -37,7 +38,7 @@ type ResolverBuilder struct {
 }
 
 // Build resolver
-func (r *ResolverBuilder) Build(target resolver.Target, cc resolver.ClientConn, opts resolver.BuildOptions) (resolver.Resolver, error) {
+func (r *ResolverBuilder) Build(target resolver.Target, cc resolver.ClientConn, _ resolver.BuildOptions) (resolver.Resolver, error) {
 	blr := &blResolver{
 		target: target,
 		cc:     cc,
@@ -70,7 +71,7 @@ func (b *blResolver) start() {
 }
 
 // ResolveNow Resolve now
-func (*blResolver) ResolveNow(o resolver.ResolveNowOptions) {}
+func (*blResolver) ResolveNow(_ resolver.ResolveNowOptions) {}
 
 // Close resolver
 func (*blResolver) Close() {}

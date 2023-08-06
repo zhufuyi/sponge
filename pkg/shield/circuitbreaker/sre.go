@@ -117,7 +117,7 @@ func (b *Breaker) summary() (success int64, total int64) {
 		}
 		return 0
 	})
-	return
+	return //nolint
 }
 
 // Allow request if error returns nil.
@@ -147,8 +147,7 @@ func (b *Breaker) MarkSuccess() {
 
 // MarkFailed mark request is failed.
 func (b *Breaker) MarkFailed() {
-	// NOTE: when client reject requets locally, continue add counter let the
-	// drop ratio higher.
+	// NOTE: when client reject request locally, keep adding counter let the drop ratio higher.
 	b.stat.Add(0)
 }
 
@@ -156,5 +155,5 @@ func (b *Breaker) trueOnProba(proba float64) (truth bool) {
 	b.randLock.Lock()
 	truth = b.r.Float64() < proba
 	b.randLock.Unlock()
-	return
+	return truth
 }

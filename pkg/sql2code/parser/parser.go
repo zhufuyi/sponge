@@ -1,3 +1,5 @@
+// Package parser is a library that parses to go structures based on sql
+// and generates the code needed based on the template.
 package parser
 
 import (
@@ -68,9 +70,9 @@ func ParseSQL(sql string, options ...Option) (map[string]string, error) {
 	tableNames := make([]string, 0, len(stmts))
 	for _, stmt := range stmts {
 		if ct, ok := stmt.(*ast.CreateTableStmt); ok {
-			code, err := makeCode(ct, opt) //nolint
-			if err != nil {
-				return nil, err
+			code, err2 := makeCode(ct, opt)
+			if err2 != nil {
+				return nil, err2
 			}
 			modelStructCodes = append(modelStructCodes, code.modelStruct)
 			updateFieldsCodes = append(updateFieldsCodes, code.updateFields)
@@ -150,12 +152,12 @@ func (t tmplField) ConditionZero() string {
 // GoZero type of 0
 func (t tmplField) GoZero() string {
 	switch t.GoType {
-	case "int8", "int16", "int32", "int64", "int", "uint8", "uint16", "uint32", "uint64", "uint", "float64", "float32", //nolint
-		"sql.NullInt32", "sql.NullInt64", "sql.NullFloat64": //nolint
+	case "int8", "int16", "int32", "int64", "int", "uint8", "uint16", "uint32", "uint64", "uint", "float64", "float32",
+		"sql.NullInt32", "sql.NullInt64", "sql.NullFloat64":
 		return `= 0`
-	case "string", "sql.NullString": //nolint
+	case "string", "sql.NullString":
 		return `= "string"`
-	case "time.Time", "*time.Time", "sql.NullTime": //nolint
+	case "time.Time", "*time.Time", "sql.NullTime":
 		return `= "0000-01-00T00:00:00.000+08:00"`
 	}
 
@@ -165,12 +167,12 @@ func (t tmplField) GoZero() string {
 // GoTypeZero type of 0
 func (t tmplField) GoTypeZero() string {
 	switch t.GoType {
-	case "int8", "int16", "int32", "int64", "int", "uint8", "uint16", "uint32", "uint64", "uint", "float64", "float32", //nolint
-		"sql.NullInt32", "sql.NullInt64", "sql.NullFloat64": //nolint
+	case "int8", "int16", "int32", "int64", "int", "uint8", "uint16", "uint32", "uint64", "uint", "float64", "float32",
+		"sql.NullInt32", "sql.NullInt64", "sql.NullFloat64":
 		return `0`
-	case "string", "sql.NullString": //nolint
+	case "string", "sql.NullString":
 		return `""`
-	case "time.Time", "*time.Time", "sql.NullTime": //nolint
+	case "time.Time", "*time.Time", "sql.NullTime":
 		return `0 /*time.Now().Second()*/`
 	}
 
@@ -209,7 +211,6 @@ const (
 	columnMysqlModel = __mysqlModel__
 )
 
-// nolint
 var ignoreColumns = map[string]struct{}{
 	columnID:         {},
 	columnCreatedAt:  {},
@@ -481,6 +482,8 @@ func getModelCode(data modelCodes) (string, error) {
 }
 
 func getUpdateFieldsCode(data tmplData, isEmbed bool) (string, error) {
+	_ = isEmbed
+
 	// filter fields
 	var newFields = []tmplField{}
 	for _, field := range data.Fields {
@@ -525,7 +528,7 @@ func getHandlerStructCodes(data tmplData) (string, error) {
 	return postStructCode + putStructCode + getStructCode, nil
 }
 
-// customised filter fields
+// customized filter fields
 func tmplExecuteWithFilter(data tmplData, tmpl *template.Template, reservedColumns ...string) (string, error) {
 	var newFields = []tmplField{}
 	for _, field := range data.Fields {
@@ -668,13 +671,13 @@ func mysqlToGoType(colTp *types.FieldType, style NullStyle) (name string, path s
 			name = "sql.NullFloat64"
 		case mysql.TypeString, mysql.TypeVarchar, mysql.TypeVarString,
 			mysql.TypeBlob, mysql.TypeTinyBlob, mysql.TypeMediumBlob, mysql.TypeLongBlob:
-			name = "sql.NullString" //nolint
+			name = "sql.NullString"
 		case mysql.TypeTimestamp, mysql.TypeDatetime, mysql.TypeDate:
 			name = "sql.NullTime"
 		case mysql.TypeDecimal, mysql.TypeNewDecimal:
-			name = "sql.NullString" //nolint
+			name = "sql.NullString"
 		case mysql.TypeJSON:
-			name = "sql.NullString" //nolint
+			name = "sql.NullString"
 		default:
 			return "UnSupport", ""
 		}
@@ -690,7 +693,7 @@ func mysqlToGoType(colTp *types.FieldType, style NullStyle) (name string, path s
 			if mysql.HasUnsignedFlag(colTp.Flag) {
 				name = "uint64"
 			} else {
-				name = "int64" //nolint
+				name = "int64"
 			}
 		case mysql.TypeFloat, mysql.TypeDouble:
 			name = "float64"
@@ -711,7 +714,7 @@ func mysqlToGoType(colTp *types.FieldType, style NullStyle) (name string, path s
 			name = "*" + name
 		}
 	}
-	return
+	return name, path
 }
 
 func goTypeToProto(fields []tmplField) []tmplField {
@@ -758,7 +761,7 @@ func getDefaultValue(expr ast.ExprNode) (value string) {
 			}
 		}
 	}
-	return
+	return value
 }
 
 var acronym = map[string]struct{}{

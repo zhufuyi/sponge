@@ -1,3 +1,4 @@
+// Package consul is registered as a service using consul.
 package consul
 
 import (
@@ -78,7 +79,7 @@ func (r *Registry) Deregister(ctx context.Context, svc *registry.ServiceInstance
 }
 
 // GetService return service by name
-func (r *Registry) GetService(ctx context.Context, name string) (services []*registry.ServiceInstance, err error) {
+func (r *Registry) GetService(_ context.Context, name string) (services []*registry.ServiceInstance, err error) {
 	r.lock.RLock()
 	defer r.lock.RUnlock()
 	set := r.registry[name]
@@ -90,7 +91,7 @@ func (r *Registry) GetService(ctx context.Context, name string) (services []*reg
 		return nil, fmt.Errorf("service %s not found in registry", name)
 	}
 	services = append(services, ss...)
-	return
+	return //nolint
 }
 
 // ListServices return service list.
@@ -107,11 +108,11 @@ func (r *Registry) ListServices() (allServices map[string][]*registry.ServiceIns
 		services = append(services, ss...)
 		allServices[name] = services
 	}
-	return
+	return //nolint
 }
 
 // Watch resolve service by name
-func (r *Registry) Watch(ctx context.Context, name string) (registry.Watcher, error) {
+func (r *Registry) Watch(_ context.Context, name string) (registry.Watcher, error) {
 	r.lock.Lock()
 	defer r.lock.Unlock()
 	set, ok := r.registry[name]

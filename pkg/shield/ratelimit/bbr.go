@@ -1,3 +1,4 @@
+// Package ratelimit is an adaptive rate limit library, support for use in gin middleware and grpc interceptors.
 package ratelimit
 
 import (
@@ -252,9 +253,8 @@ func (l *BBR) shouldDrop() bool {
 			// accept current request
 			return false
 		}
-		if time.Duration(now-prevDropTime) <= time.Second {
-			// just start drop one second ago,
-			// check current inflight count
+		if now-prevDropTime <= time.Second {
+			// just start drop one second ago, check current inflight count
 			inFlight := atomic.LoadInt64(&l.inFlight)
 			return inFlight > 1 && inFlight > l.maxInFlight()
 		}
@@ -297,8 +297,7 @@ func (l *BBR) Allow() (DoneFunc, error) {
 	start := time.Now().UnixNano()
 	ms := float64(time.Millisecond)
 	return func(DoneInfo) {
-		//nolint
-		rt := int64(math.Ceil(float64(time.Now().UnixNano()-start)) / ms)
+		rt := int64(math.Ceil(float64(time.Now().UnixNano()-start)) / ms) //nolint
 		l.rtStat.Add(rt)
 		atomic.AddInt64(&l.inFlight, -1)
 		l.passStat.Add(1)

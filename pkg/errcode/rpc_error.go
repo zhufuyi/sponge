@@ -129,20 +129,31 @@ func toRPCErr(code codes.Code, descs ...string) error {
 // ToRPCCode converted to standard RPC error code
 func (g *RPCStatus) ToRPCCode() codes.Code {
 	switch g.status.Code() {
+	case StatusInvalidParams.status.Code():
+		return codes.InvalidArgument
+	case StatusInternalServerError.status.Code():
+		return codes.Internal
+	case StatusUnimplemented.status.Code():
+		return codes.Unimplemented
+	case StatusPermissionDenied.status.Code():
+		return codes.PermissionDenied
+	}
+
+	switch g.status.Code() {
 	case StatusCanceled.status.Code():
 		return codes.Canceled
 	case StatusUnknown.status.Code():
 		return codes.Unknown
-	case StatusInvalidParams.status.Code():
-		return codes.InvalidArgument
+	//case StatusInvalidParams.status.Code():
+	//	return codes.InvalidArgument
 	case StatusDeadlineExceeded.status.Code():
 		return codes.DeadlineExceeded
 	case StatusNotFound.status.Code():
 		return codes.NotFound
 	case StatusAlreadyExists.status.Code():
 		return codes.AlreadyExists
-	case StatusPermissionDenied.status.Code():
-		return codes.PermissionDenied
+	//case StatusPermissionDenied.status.Code():
+	//	return codes.PermissionDenied
 	case StatusResourceExhausted.status.Code():
 		return codes.ResourceExhausted
 	case StatusFailedPrecondition.status.Code():
@@ -151,10 +162,10 @@ func (g *RPCStatus) ToRPCCode() codes.Code {
 		return codes.Aborted
 	case StatusOutOfRange.status.Code():
 		return codes.OutOfRange
-	case StatusUnimplemented.status.Code():
-		return codes.Unimplemented
-	case StatusInternalServerError.status.Code():
-		return codes.Internal
+	//case StatusUnimplemented.status.Code():
+	//	return codes.Unimplemented
+	//case StatusInternalServerError.status.Code():
+	//	return codes.Internal
 	case StatusServiceUnavailable.status.Code():
 		return codes.Unavailable
 	case StatusDataLoss.status.Code():

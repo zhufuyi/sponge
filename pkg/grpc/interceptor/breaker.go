@@ -1,7 +1,9 @@
+// Package interceptor provides commonly used grpc client-side and server-side interceptors.
 package interceptor
 
 import (
 	"context"
+
 	"github.com/zhufuyi/sponge/pkg/container/group"
 	"github.com/zhufuyi/sponge/pkg/errcode"
 	"github.com/zhufuyi/sponge/pkg/shield/circuitbreaker"
@@ -68,8 +70,7 @@ func UnaryClientCircuitBreaker(opts ...CircuitBreakerOption) grpc.UnaryClientInt
 	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
 		breaker := o.group.Get(method).(circuitbreaker.CircuitBreaker)
 		if err := breaker.Allow(); err != nil {
-			// NOTE: when client reject request locally,
-			// continue to add counter let the drop ratio higher.
+			// NOTE: when client reject request locally, keep adding counter let the drop ratio higher.
 			breaker.MarkFailed()
 			return errcode.StatusServiceUnavailable.ToRPCErr(err.Error())
 		}
@@ -98,8 +99,7 @@ func StreamClientCircuitBreaker(opts ...CircuitBreakerOption) grpc.StreamClientI
 	return func(ctx context.Context, desc *grpc.StreamDesc, cc *grpc.ClientConn, method string, streamer grpc.Streamer, opts ...grpc.CallOption) (grpc.ClientStream, error) {
 		breaker := o.group.Get(method).(circuitbreaker.CircuitBreaker)
 		if err := breaker.Allow(); err != nil {
-			// NOTE: when client reject request locally,
-			// continue to add counter let the drop ratio higher.
+			// NOTE: when client reject request locally, keep adding counter let the drop ratio higher.
 			breaker.MarkFailed()
 			return nil, errcode.StatusServiceUnavailable.ToRPCErr(err.Error())
 		}
@@ -128,8 +128,7 @@ func UnaryServerCircuitBreaker(opts ...CircuitBreakerOption) grpc.UnaryServerInt
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		breaker := o.group.Get(info.FullMethod).(circuitbreaker.CircuitBreaker)
 		if err := breaker.Allow(); err != nil {
-			// NOTE: when client reject request locally,
-			// continue to add counter let the drop ratio higher.
+			// NOTE: when client reject request locally, keep adding let the drop ratio higher.
 			breaker.MarkFailed()
 			return nil, errcode.StatusServiceUnavailable.ToRPCErr(err.Error())
 		}
@@ -158,8 +157,7 @@ func StreamServerCircuitBreaker(opts ...CircuitBreakerOption) grpc.StreamServerI
 	return func(srv interface{}, ss grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
 		breaker := o.group.Get(info.FullMethod).(circuitbreaker.CircuitBreaker)
 		if err := breaker.Allow(); err != nil {
-			// NOTE: when client reject request locally,
-			// continue to add counter let the drop ratio higher.
+			// NOTE: when client reject request locally, keep adding counter let the drop ratio higher.
 			breaker.MarkFailed()
 			return errcode.StatusServiceUnavailable.ToRPCErr(err.Error())
 		}

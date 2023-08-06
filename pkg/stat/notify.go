@@ -3,14 +3,21 @@
 
 package stat
 
-import "syscall"
+import (
+	"fmt"
+	"syscall"
+)
 
+// nolint
 func init() {
 	go func() {
 		for {
 			select {
 			case <-notifyCh:
-				syscall.Kill(syscall.Getpid(), syscall.SIGTRAP)
+				err := syscall.Kill(syscall.Getpid(), syscall.SIGTRAP)
+				if err != nil {
+					fmt.Println(err)
+				}
 			}
 		}
 	}()

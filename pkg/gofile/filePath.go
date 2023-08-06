@@ -9,8 +9,8 @@ import (
 )
 
 // IsExists determine if a file or folder exists
-func IsExists(path string) bool {
-	_, err := os.Stat(path)
+func IsExists(f string) bool {
+	_, err := os.Stat(f)
 	if err != nil {
 		return !os.IsNotExist(err)
 	}
@@ -56,13 +56,13 @@ func GetFilenameWithoutSuffix(filePath string) string {
 
 // Join joins any number of path elements into a single path
 func Join(elem ...string) string {
-	path := strings.Join(elem, "/")
+	dir := strings.Join(elem, "/")
 
 	if IsWindows() {
-		return strings.ReplaceAll(path, "/", "\\")
+		return strings.ReplaceAll(dir, "/", "\\")
 	}
 
-	return path
+	return dir
 }
 
 // IsWindows determining whether a window environment

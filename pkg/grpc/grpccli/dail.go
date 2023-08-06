@@ -1,3 +1,4 @@
+// Package grpccli is grpc client with support for service discovery, logging, load balancing, trace, metrics, retries, circuit breaker.
 package grpccli
 
 import (

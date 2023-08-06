@@ -1,3 +1,4 @@
+// Package cpu is a library that calculates cpu and memory usage.
 package cpu
 
 import (
@@ -10,36 +11,36 @@ type psutilCPU struct {
 	interval time.Duration
 }
 
-func newPsutilCPU(interval time.Duration) (cpu *psutilCPU, err error) {
-	cpu = &psutilCPU{interval: interval}
-	_, err = cpu.Usage()
+func newPsutilCPU(interval time.Duration) (*psutilCPU, error) {
+	psCPU := &psutilCPU{interval: interval}
+	_, err := psCPU.Usage()
 	if err != nil {
-		return
+		return nil, err
 	}
-	return
+	return psCPU, nil
 }
 
-func (ps *psutilCPU) Usage() (u uint64, err error) {
-	var percents []float64
-	percents, err = cpu.Percent(ps.interval, false)
+func (ps *psutilCPU) Usage() (uint64, error) {
+	var u uint64
+	percents, err := cpu.Percent(ps.interval, false)
 	if err == nil {
 		u = uint64(percents[0] * 10)
 	}
-	return
+	return u, err
 }
 
-func (ps *psutilCPU) Info() (info Info) {
+func (ps *psutilCPU) Info() Info {
 	stats, err := cpu.Info()
 	if err != nil {
-		return
+		return Info{}
 	}
 	cores, err := cpu.Counts(true)
 	if err != nil {
-		return
+		return Info{}
 	}
-	info = Info{
+
+	return Info{
 		Frequency: uint64(stats[0].Mhz),
 		Quota:     float64(cores),
 	}
-	return
 }

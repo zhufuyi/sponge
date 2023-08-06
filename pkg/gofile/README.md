@@ -1,6 +1,6 @@
 ## gofile
 
-For file and directory management libraries.
+File and directory management libraries.
 
 <br>
 

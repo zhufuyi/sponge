@@ -1,3 +1,5 @@
+// Package replacer is a library of replacement file content, supports replacement of
+// files in local directories and embedded directory files via embed.
 package replacer
 
 import (
@@ -117,9 +119,8 @@ func (r *replacerInfo) SetSubDirsAndFiles(subDirs []string, subFiles ...string) 
 			if isSubPath(file, dir) {
 				if _, ok := isExistFile[file]; ok {
 					continue
-				} else {
-					isExistFile[file] = struct{}{}
 				}
+				isExistFile[file] = struct{}{}
 				files = append(files, file)
 			}
 		}
@@ -127,9 +128,8 @@ func (r *replacerInfo) SetSubDirsAndFiles(subDirs []string, subFiles ...string) 
 			if isMatchFile(file, sf) {
 				if _, ok := isExistFile[file]; ok {
 					continue
-				} else {
-					isExistFile[file] = struct{}{}
 				}
+				isExistFile[file] = struct{}{}
 				files = append(files, file)
 			}
 		}
@@ -314,12 +314,13 @@ func isForbiddenFile(file string, path string) bool {
 }
 
 func (r *replacerInfo) getNewFilePath(file string) string {
-	var newFilePath string
-	if r.isActual {
-		newFilePath = r.outPath + strings.Replace(file, r.path, "", 1)
-	} else {
-		newFilePath = r.outPath + strings.Replace(file, r.path, "", 1)
-	}
+	//var newFilePath string
+	//if r.isActual {
+	//	newFilePath = r.outPath + strings.Replace(file, r.path, "", 1)
+	//} else {
+	//	newFilePath = r.outPath + strings.Replace(file, r.path, "", 1)
+	//}
+	newFilePath := r.outPath + strings.Replace(file, r.path, "", 1)
 
 	if gofile.IsWindows() {
 		newFilePath = strings.ReplaceAll(newFilePath, "/", "\\")
@@ -372,7 +373,7 @@ func listFiles(path string, fs embed.FS) ([]string, error) {
 	return files, err
 }
 
-// iterating through the embedded catalogue
+// iterating through the embedded catalog
 func walkDir(dirPath string, allFiles *[]string, fs embed.FS) error {
 	files, err := fs.ReadDir(dirPath)
 	if err != nil {

@@ -1,3 +1,4 @@
+// Package swagger is gin swagger library.
 package swagger
 
 import (

@@ -1,6 +1,6 @@
 ## metrics
 
-The grpc's server and client-side metrics can continue to be captured using prometheus.
+The grpc's server-side and client-side metrics can continue to be captured using prometheus.
 
 ### Example of use
 

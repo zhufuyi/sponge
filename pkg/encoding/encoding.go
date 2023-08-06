@@ -1,3 +1,4 @@
+// Package encoding Provides encoding and decoding of json, protobuf and gob.
 package encoding
 
 import (
@@ -74,19 +75,18 @@ func Marshal(e Encoding, v interface{}) (data []byte, err error) {
 	}
 	bm, ok := v.(encoding.BinaryMarshaler)
 	if ok && e == nil {
-		data, err = bm.MarshalBinary()
-		return
+		return bm.MarshalBinary()
 	}
 
 	data, err = e.Marshal(v)
 	if err == nil {
-		return
+		return data, err
 	}
 	if ok {
 		data, err = bm.MarshalBinary()
 	}
 
-	return
+	return data, err
 }
 
 // Unmarshal decode data
@@ -101,12 +101,12 @@ func Unmarshal(e Encoding, data []byte, v interface{}) (err error) {
 	}
 	err = e.Unmarshal(data, v)
 	if err == nil {
-		return
+		return err
 	}
 	if ok {
 		return bm.UnmarshalBinary(data)
 	}
-	return
+	return err
 }
 
 func isPointer(data interface{}) bool {

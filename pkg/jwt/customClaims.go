@@ -1,3 +1,4 @@
+// Package jwt is token generation and validation.
 package jwt
 
 import (

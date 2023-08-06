@@ -19,7 +19,7 @@ var (
 	// create a Registry
 	cliReg = prometheus.NewRegistry()
 
-	// initialise the client's default metrics
+	// initialize the client's default metrics
 	grpcClientMetrics = grpc_prometheus.NewClientMetrics()
 
 	cliOnce sync.Once

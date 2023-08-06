@@ -1,3 +1,4 @@
+// Package utils is a library of commonly used utility functions.
 package utils
 
 import (
@@ -16,14 +17,14 @@ func GetHostname() string {
 }
 
 // GetLocalHTTPAddrPairs get available http server and request address
-func GetLocalHTTPAddrPairs() (string, string) {
+func GetLocalHTTPAddrPairs() (serverAddr string, requestAddr string) {
 	port, err := GetAvailablePort()
 	if err != nil {
 		fmt.Printf("GetAvailablePort error: %v\n", err)
 		return "", ""
 	}
-	serverAddr := fmt.Sprintf(":%d", port)
-	requestAddr := fmt.Sprintf("http://127.0.0.1:%d", port)
+	serverAddr = fmt.Sprintf(":%d", port)
+	requestAddr = fmt.Sprintf("http://127.0.0.1:%d", port)
 	return serverAddr, requestAddr
 }
 

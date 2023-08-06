@@ -1,3 +1,4 @@
+// Package keepalive is setting grpc keepalive parameters.
 package keepalive
 
 import (

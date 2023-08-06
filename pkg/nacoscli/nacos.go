@@ -1,3 +1,4 @@
+// Package nacoscli provides for getting the configuration from the nacos configuration center and parse it into a structure.
 package nacoscli
 
 import (

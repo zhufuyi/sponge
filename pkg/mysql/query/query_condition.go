@@ -1,3 +1,4 @@
+// Package query is a library for mysql query, support for complex conditional paging queries.
 package query
 
 import (
@@ -18,7 +19,7 @@ const (
 	Lt = "lt"
 	// Lte less than or equal
 	Lte = "lte"
-	// Like like
+	// Like fuzzy lookup
 	Like = "like"
 
 	// AND logic and
@@ -86,7 +87,7 @@ func (c *Column) convert() error {
 	if c.Exp == "" {
 		c.Exp = Eq
 	}
-	if v, ok := expMap[strings.ToLower(c.Exp)]; ok {
+	if v, ok := expMap[strings.ToLower(c.Exp)]; ok { //nolint
 		c.Exp = v
 		if c.Exp == " LIKE " {
 			c.Value = fmt.Sprintf("%%%v%%", c.Value)
@@ -98,7 +99,7 @@ func (c *Column) convert() error {
 	if c.Logic == "" {
 		c.Logic = AND
 	}
-	if v, ok := logicMap[strings.ToLower(c.Logic)]; ok {
+	if v, ok := logicMap[strings.ToLower(c.Logic)]; ok { //nolint
 		c.Logic = v
 	} else {
 		return fmt.Errorf("unknown logic type '%s'", c.Logic)
@@ -108,12 +109,12 @@ func (c *Column) convert() error {
 }
 
 // ConvertToPage converted to conform to gorm rules based on the page size sort parameter
-func (p *Params) ConvertToPage() (order string, limit int, offset int) {
+func (p *Params) ConvertToPage() (order string, limit int, offset int) { //nolint
 	page := NewPage(p.Page, p.Size, p.Sort)
 	order = page.sort
 	limit = page.size
 	offset = page.page * page.size
-	return
+	return //nolint
 }
 
 // ConvertToGormConditions conversion to gorm-compliant parameters based on the Columns parameter
@@ -205,9 +206,8 @@ func getExpsAndLogics(keyLen int, paramSrc string) ([]string, []string) { //noli
 
 			group = map[string]string{}
 			continue
-		} else {
-			group[split[0]] = split[1]
 		}
+		group[split[0]] = split[1]
 	}
 
 	// handling the last group

@@ -1,3 +1,4 @@
+// Package certfile is used to locate the certificate file.
 package certfile
 
 import (

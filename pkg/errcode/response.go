@@ -54,8 +54,8 @@ type defaultResponse struct {
 	rpcStatus  map[int]*RPCStatus
 }
 
-func (resp *defaultResponse) response(c *gin.Context, status, code int, msg string, data interface{}) {
-	c.JSON(status, map[string]interface{}{
+func (resp *defaultResponse) response(c *gin.Context, respStatus, code int, msg string, data interface{}) {
+	c.JSON(respStatus, map[string]interface{}{
 		"code": code,
 		"msg":  msg,
 		"data": data,
@@ -67,8 +67,8 @@ func (resp *defaultResponse) Success(c *gin.Context, data interface{}) {
 	resp.response(c, http.StatusOK, 0, "ok", data)
 }
 
-// ParamError response parameter error information
-func (resp *defaultResponse) ParamError(c *gin.Context, err error) {
+// ParamError response parameter error information, does not return an error message
+func (resp *defaultResponse) ParamError(c *gin.Context, _ error) {
 	resp.response(c, http.StatusOK, InvalidParams.Code(), InvalidParams.Msg(), struct{}{})
 }
 
@@ -173,24 +173,37 @@ func (resp *defaultResponse) isUserDefinedHTTPErrorCode(c *gin.Context, errCode 
 }
 
 // ToHTTPErr converted to http error
-func ToHTTPErr(st *status.Status) *Error {
+func ToHTTPErr(st *status.Status) *Error { //nolint
 	switch st.Code() {
 	case StatusSuccess.status.Code(), codes.OK:
 		return Success
+	case StatusInvalidParams.status.Code(), codes.InvalidArgument:
+		return InvalidParams
+	case StatusInternalServerError.status.Code(), codes.Internal:
+		return InternalServerError
+	case StatusUnimplemented.status.Code(), codes.Unimplemented:
+		return Unimplemented
+	case StatusPermissionDenied.status.Code(), codes.PermissionDenied:
+		return PermissionDenied
+	}
+
+	switch st.Code() {
+	//case StatusSuccess.status.Code(), codes.OK:
+	//	return Success
 	case StatusCanceled.status.Code(), codes.Canceled:
 		return Canceled
 	case StatusUnknown.status.Code(), codes.Unknown:
 		return Unknown
-	case StatusInvalidParams.status.Code(), codes.InvalidArgument:
-		return InvalidParams
+	//case StatusInvalidParams.status.Code(), codes.InvalidArgument:
+	//	return InvalidParams
 	case StatusDeadlineExceeded.status.Code(), codes.DeadlineExceeded:
 		return DeadlineExceeded
 	case StatusNotFound.status.Code(), codes.NotFound:
 		return NotFound
 	case StatusAlreadyExists.status.Code(), codes.AlreadyExists:
 		return AlreadyExists
-	case StatusPermissionDenied.status.Code(), codes.PermissionDenied:
-		return PermissionDenied
+	//case StatusPermissionDenied.status.Code(), codes.PermissionDenied:
+	//	return PermissionDenied
 	case StatusResourceExhausted.status.Code(), codes.ResourceExhausted:
 		return ResourceExhausted
 	case StatusFailedPrecondition.status.Code(), codes.FailedPrecondition:
@@ -199,10 +212,10 @@ func ToHTTPErr(st *status.Status) *Error {
 		return Aborted
 	case StatusOutOfRange.status.Code(), codes.OutOfRange:
 		return OutOfRange
-	case StatusUnimplemented.status.Code(), codes.Unimplemented:
-		return Unimplemented
-	case StatusInternalServerError.status.Code(), codes.Internal:
-		return InternalServerError
+	//case StatusUnimplemented.status.Code(), codes.Unimplemented:
+	//	return Unimplemented
+	//case StatusInternalServerError.status.Code(), codes.Internal:
+	//	return InternalServerError
 	case StatusServiceUnavailable.status.Code(), codes.Unavailable:
 		return ServiceUnavailable
 	case StatusDataLoss.status.Code(), codes.DataLoss:

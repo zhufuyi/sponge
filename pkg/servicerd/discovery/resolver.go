@@ -1,3 +1,4 @@
+// Package discovery is service discovery library, supports etcd, consul and nacos.
 package discovery
 
 import (
@@ -94,7 +95,7 @@ func (r *discoveryResolver) Close() {
 	}
 }
 
-func (r *discoveryResolver) ResolveNow(options resolver.ResolveNowOptions) {}
+func (r *discoveryResolver) ResolveNow(_ resolver.ResolveNowOptions) {}
 
 func parseAttributes(md map[string]string) *attributes.Attributes {
 	var a *attributes.Attributes

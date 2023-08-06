@@ -1,3 +1,4 @@
+// Package gtls provides grpc secure connectivity, supporting both server-only authentication and client-server authentication.
 package gtls
 
 import (

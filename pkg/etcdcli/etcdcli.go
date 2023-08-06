@@ -1,3 +1,4 @@
+// Package etcdcli is use for connecting to the etcd service
 package etcdcli
 
 import (

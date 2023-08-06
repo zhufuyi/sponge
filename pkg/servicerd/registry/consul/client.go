@@ -68,7 +68,7 @@ func (d *Client) Service(ctx context.Context, service string, index uint64, pass
 }
 
 // Register register service instance to consul
-func (d *Client) Register(ctx context.Context, svc *registry.ServiceInstance, enableHealthCheck bool) error {
+func (d *Client) Register(_ context.Context, svc *registry.ServiceInstance, enableHealthCheck bool) error {
 	addresses := make(map[string]api.ServiceAddress)
 	var addr string
 	var port uint64
@@ -120,7 +120,7 @@ func (d *Client) Register(ctx context.Context, svc *registry.ServiceInstance, en
 }
 
 // Deregister deregister service by service ID
-func (d *Client) Deregister(ctx context.Context, serviceID string) error {
+func (d *Client) Deregister(_ context.Context, serviceID string) error {
 	d.cancel()
 	return d.client.Agent().ServiceDeregister(serviceID)
 }

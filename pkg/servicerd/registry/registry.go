@@ -1,3 +1,4 @@
+// Package registry is service registry library, supports etcd, consul and nacos.
 package registry
 
 import "context"

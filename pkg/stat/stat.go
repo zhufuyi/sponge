@@ -1,3 +1,4 @@
+// Package stat provides for counting system and process cpu and memory information, alarm notification support.
 package stat
 
 import (
@@ -68,6 +69,7 @@ func Init(opts ...Option) {
 	o := &options{}
 	o.apply(opts...)
 
+	//nolint
 	go func() {
 		printTick := time.NewTicker(printInfoInterval)
 		defer printTick.Stop()
@@ -87,16 +89,16 @@ func Init(opts ...Option) {
 	}()
 }
 
+// nolint
 func sendSystemSignForLinux() {
 	select {
 	case notifyCh <- struct{}{}:
 	default:
-
 	}
 }
 
 func printUsageInfo() *statData {
-	defer func() { recover() }()
+	defer func() { _ = recover() }()
 
 	mSys := mem.GetSystemMemory()
 	mProc := mem.GetProcessMemory()

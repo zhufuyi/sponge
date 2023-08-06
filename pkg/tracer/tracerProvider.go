@@ -1,3 +1,4 @@
+// Package tracer is a library wrapped in go.opentelemetry.io/otel.
 package tracer
 
 import (

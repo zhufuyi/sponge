@@ -1,3 +1,4 @@
+// Package errcode is used for http and grpc error codes, include system-level error codes and service-level error codes
 package errcode
 
 import (

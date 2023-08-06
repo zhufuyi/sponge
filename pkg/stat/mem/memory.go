@@ -1,3 +1,4 @@
+// Package mem is a library that counts system and process memory usage.
 package mem
 
 import (

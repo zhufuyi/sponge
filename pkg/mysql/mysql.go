@@ -1,3 +1,4 @@
+// Package mysql is a library wrapped on top of gorm.io/gorm, with added features such as link tracing, paging queries, etc.
 package mysql
 
 import (

@@ -1,3 +1,4 @@
+// Package conf is parsing yaml, json, toml configuration files to go struct.
 package conf
 
 import (

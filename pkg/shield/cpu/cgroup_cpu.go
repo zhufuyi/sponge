@@ -32,14 +32,14 @@ func newCgroupCPU() (cpu *cgroupCPU, err error) {
 
 	sets, err := cpuSets()
 	if err != nil {
-		return
+		return nil, err
 	}
 	quota := float64(len(sets))
 	cq, err := cpuQuota()
 	if err == nil && cq != -1 {
 		var period uint64
 		if period, err = cpuPeriod(); err != nil {
-			return
+			return nil, err
 		}
 		limit := float64(cq) / float64(period)
 		if limit < quota {
@@ -50,11 +50,11 @@ func newCgroupCPU() (cpu *cgroupCPU, err error) {
 
 	preSystem, err := systemCPUUsage()
 	if err != nil {
-		return
+		return nil, err
 	}
 	preTotal, err := totalCPUUsage()
 	if err != nil {
-		return
+		return nil, err
 	}
 	cpu = &cgroupCPU{
 		frequency: maxFreq,
@@ -63,7 +63,7 @@ func newCgroupCPU() (cpu *cgroupCPU, err error) {
 		preSystem: preSystem,
 		preTotal:  preTotal,
 	}
-	return
+	return cpu, nil
 }
 
 func (cpu *cgroupCPU) Usage() (u uint64, err error) {
@@ -73,18 +73,18 @@ func (cpu *cgroupCPU) Usage() (u uint64, err error) {
 	)
 	total, err = totalCPUUsage()
 	if err != nil {
-		return
+		return 0, err
 	}
 	system, err = systemCPUUsage()
 	if err != nil {
-		return
+		return 0, err
 	}
 	if system != cpu.preSystem {
 		u = uint64(float64((total-cpu.preTotal)*cpu.cores*1e3) / (float64(system-cpu.preSystem) * cpu.quota))
 	}
 	cpu.preSystem = system
 	cpu.preTotal = total
-	return
+	return u, err
 }
 
 func (cpu *cgroupCPU) Info() Info {
@@ -115,45 +115,44 @@ func systemCPUUsage() (usage uint64, err error) {
 		f    *os.File
 	)
 	if f, err = os.Open("/proc/stat"); err != nil {
-		return
+		return usage, err
 	}
 	bufReader := bufio.NewReaderSize(nil, 128)
 	defer func() {
 		bufReader.Reset(nil)
-		f.Close()
+		_ = f.Close()
 	}()
 	bufReader.Reset(f)
 	for err == nil {
 		if line, err = bufReader.ReadString('\n'); err != nil {
-			return
+			return usage, err
 		}
 		parts := strings.Fields(line)
-		switch parts[0] {
-		case "cpu":
+		if parts[0] == "cpu" {
 			if len(parts) < 8 {
 				err = errors.New("bad format of cpu stats")
-				return
+				return usage, err
 			}
 			var totalClockTicks uint64
 			for _, i := range parts[1:8] {
 				var v uint64
 				if v, err = strconv.ParseUint(i, 10, 64); err != nil {
-					return
+					return usage, err
 				}
 				totalClockTicks += v
 			}
 			usage = (totalClockTicks * nanoSecondsPerSecond) / clockTicksPerSecond
-			return
+			return usage, nil
 		}
 	}
 	err = errors.New("bad stats format")
-	return
+	return usage, err
 }
 
 func totalCPUUsage() (usage uint64, err error) {
 	var cg *cgroup
 	if cg, err = currentcGroup(); err != nil {
-		return
+		return 0, err
 	}
 	return cg.CPUAcctUsage()
 }
@@ -161,7 +160,7 @@ func totalCPUUsage() (usage uint64, err error) {
 func perCPUUsage() (usage []uint64, err error) {
 	var cg *cgroup
 	if cg, err = currentcGroup(); err != nil {
-		return
+		return nil, err
 	}
 	return cg.CPUAcctUsagePerCPU()
 }
@@ -169,7 +168,7 @@ func perCPUUsage() (usage []uint64, err error) {
 func cpuSets() (sets []uint64, err error) {
 	var cg *cgroup
 	if cg, err = currentcGroup(); err != nil {
-		return
+		return nil, err
 	}
 	return cg.CPUSetCPUs()
 }
@@ -177,7 +176,7 @@ func cpuSets() (sets []uint64, err error) {
 func cpuQuota() (quota int64, err error) {
 	var cg *cgroup
 	if cg, err = currentcGroup(); err != nil {
-		return
+		return 0, err
 	}
 	return cg.CPUCFSQuotaUs()
 }
@@ -185,7 +184,7 @@ func cpuQuota() (quota int64, err error) {
 func cpuPeriod() (peroid uint64, err error) {
 	var cg *cgroup
 	if cg, err = currentcGroup(); err != nil {
-		return
+		return 0, err
 	}
 	return cg.CPUCFSPeriodUs()
 }

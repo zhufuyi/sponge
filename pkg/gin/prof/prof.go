@@ -1,3 +1,4 @@
+// Package prof is used for gin profiling.
 package prof
 
 import (

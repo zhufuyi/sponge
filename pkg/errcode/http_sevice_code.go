@@ -10,9 +10,9 @@ package errcode
 // ErrUserUpdate = NewError(HCode(1)+3, "failed to update user")		// 200103
 // ErrUserGet    = NewError(HCode(1)+4, "failed to get user details")	// 200104
 // )
-func HCode(NO int) int {
-	if NO > 99 || NO < 1 {
-		panic("NO range must be between 0 to 100")
+func HCode(num int) int {
+	if num > 99 || num < 1 {
+		panic("num range must be between 0 to 100")
 	}
-	return 200000 + NO*100
+	return 200000 + num*100
 }

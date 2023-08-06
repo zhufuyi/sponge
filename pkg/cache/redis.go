@@ -26,11 +26,11 @@ type redisCache struct {
 }
 
 // NewRedisCache new a cache, client parameter can be passed in for unit testing
-func NewRedisCache(client *redis.Client, keyPrefix string, encoding encoding.Encoding, newObject func() interface{}) Cache {
+func NewRedisCache(client *redis.Client, keyPrefix string, encode encoding.Encoding, newObject func() interface{}) Cache {
 	return &redisCache{
 		client:    client,
 		KeyPrefix: keyPrefix,
-		encoding:  encoding,
+		encoding:  encode,
 		newObject: newObject,
 	}
 }

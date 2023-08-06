@@ -1,3 +1,4 @@
+// Package gohttp is http request client, which only supports returning json format.
 package gohttp
 
 import (
@@ -166,7 +167,7 @@ func (req *Request) Do(method string, data interface{}) (*Response, error) {
 	switch method {
 	case http.MethodGet, http.MethodDelete:
 		if data != nil {
-			if params, ok := data.(map[string]interface{}); ok {
+			if params, ok := data.(map[string]interface{}); ok { //nolint
 				req.SetParams(params)
 			} else {
 				req.err = errors.New("params is not a map[string]interface{}")
@@ -321,36 +322,36 @@ func (resp *Response) BindJSON(v interface{}) error {
 // Simple crud function, no support for setting header, timeout, etc.
 
 // Get request, return custom json format
-func Get(result interface{}, url string, params ...KV) error {
+func Get(result interface{}, urlStr string, params ...KV) error {
 	var pms KV
 	if len(params) > 0 {
 		pms = params[0]
 	}
-	return gDo("GET", result, url, pms)
+	return gDo("GET", result, urlStr, pms)
 }
 
 // Delete request, return custom json format
-func Delete(result interface{}, url string, params ...KV) error {
+func Delete(result interface{}, urlStr string, params ...KV) error {
 	var pms KV
 	if len(params) > 0 {
 		pms = params[0]
 	}
-	return gDo("DELETE", result, url, pms)
+	return gDo("DELETE", result, urlStr, pms)
 }
 
 // Post request, return custom json format
-func Post(result interface{}, url string, body interface{}) error {
-	return do("POST", result, url, body)
+func Post(result interface{}, urlStr string, body interface{}) error {
+	return do("POST", result, urlStr, body)
 }
 
 // Put request, return custom json format
-func Put(result interface{}, url string, body interface{}) error {
-	return do("PUT", result, url, body)
+func Put(result interface{}, urlStr string, body interface{}) error {
+	return do("PUT", result, urlStr, body)
 }
 
 // Patch request, return custom json format
-func Patch(result interface{}, url string, body interface{}) error {
-	return do("PATCH", result, url, body)
+func Patch(result interface{}, urlStr string, body interface{}) error {
+	return do("PATCH", result, urlStr, body)
 }
 
 var requestErr = func(err error) error { return fmt.Errorf("request error, err=%v", err) }
@@ -366,13 +367,13 @@ var notOKErr = func(resp *Response) error {
 	return fmt.Errorf("statusCode=%d, body=%s", resp.StatusCode, body)
 }
 
-func do(method string, result interface{}, url string, body interface{}, params ...KV) error {
+func do(method string, result interface{}, urlStr string, body interface{}, params ...KV) error {
 	if result == nil {
 		return fmt.Errorf("params 'result' is nil")
 	}
 
 	req := &Request{}
-	req.SetURL(url)
+	req.SetURL(urlStr)
 	req.SetContentType("application/json")
 	if len(params) > 0 {
 		req.SetParams(params[0])
@@ -406,9 +407,9 @@ func do(method string, result interface{}, url string, body interface{}, params 
 	return nil
 }
 
-func gDo(method string, result interface{}, url string, params KV) error {
+func gDo(method string, result interface{}, urlStr string, params KV) error {
 	req := &Request{}
-	req.SetURL(url)
+	req.SetURL(urlStr)
 	req.SetParams(params)
 
 	var resp *Response

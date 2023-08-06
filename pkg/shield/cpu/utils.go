@@ -3,14 +3,13 @@ package cpu
 import (
 	"bufio"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strconv"
 	"strings"
 )
 
 func readFile(path string) (string, error) {
-	contents, err := ioutil.ReadFile(path)
+	contents, err := os.ReadFile(path)
 	if err != nil {
 		return "", err
 	}
@@ -101,7 +100,7 @@ func readLinesOffsetN(filename string, offset uint, n int) ([]string, error) {
 	if err != nil {
 		return []string{""}, err
 	}
-	defer f.Close()
+	defer f.Close() //nolint
 
 	var ret []string
 

@@ -1,3 +1,4 @@
+// Package handlerfunc is used for public http request handler.
 package handlerfunc
 
 import (

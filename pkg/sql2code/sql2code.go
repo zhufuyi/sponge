@@ -1,3 +1,6 @@
+// Package sql2code provides for generating code for different purposes according to sql,
+// support generating json, gorm model, update parameter, request parameter code,
+// sql can be obtained from parameter, file, db three ways, priority from high to low.
 package sql2code
 
 import (

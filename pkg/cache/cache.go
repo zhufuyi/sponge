@@ -1,3 +1,4 @@
+// Package cache is memory and redis cache libraries.
 package cache
 
 import (

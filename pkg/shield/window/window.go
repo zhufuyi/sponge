@@ -1,3 +1,4 @@
+// Package window is a library that calculates windows cpu and memory usage.
 package window
 
 // Bucket contains multiple float64 points.

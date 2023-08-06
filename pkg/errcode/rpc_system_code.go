@@ -1,6 +1,5 @@
 package errcode
 
-// nolint
 // rpc system level error code with status prefix, error code range 30000~40000
 var (
 	StatusSuccess = NewRPCStatus(0, "ok")

@@ -2,6 +2,7 @@ package interceptor
 
 import (
 	"context"
+
 	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
 	"google.golang.org/grpc"
 )
@@ -15,7 +16,7 @@ type authToken struct {
 }
 
 // GetRequestMetadata get metadata
-func (t *authToken) GetRequestMetadata(ctx context.Context, uri ...string) (map[string]string, error) {
+func (t *authToken) GetRequestMetadata(ctx context.Context, uri ...string) (map[string]string, error) { //nolint
 	return map[string]string{
 		"app_id":  t.AppID,
 		"app_key": t.AppKey,

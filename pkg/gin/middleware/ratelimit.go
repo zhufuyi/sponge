@@ -4,9 +4,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/zhufuyi/sponge/pkg/gin/response"
 	rl "github.com/zhufuyi/sponge/pkg/shield/ratelimit"
+
+	"github.com/gin-gonic/gin"
 )
 
 // ErrLimitExceed is returned when the rate limiter is

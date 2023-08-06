@@ -1,3 +1,5 @@
+// Package metrics is gin metrics library, collect five metrics, "uptime", "http_request_count_total",
+// "http_request_duration_seconds", "http_request_size_bytes", "http_response_size_bytes".
 package metrics
 
 import (

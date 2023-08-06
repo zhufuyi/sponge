@@ -1,4 +1,5 @@
 ## New
 
-- Add automatic code merge function to solve the problem that you need to copy code manually after executing the command `make proto`.
-- Improve documentation
+- Add automated code merge functionality in the command `make proto`, no more copying code manually.
+- Add code quality inspection.
+- Improve documentation.

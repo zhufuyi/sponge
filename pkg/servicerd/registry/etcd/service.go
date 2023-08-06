@@ -1,3 +1,4 @@
+// Package etcd is registered as a service using etcd.
 package etcd
 
 import (
@@ -14,6 +15,7 @@ func marshal(si *registry.ServiceInstance) (string, error) {
 	return string(data), nil
 }
 
+// nolint
 func unmarshal(data []byte) (si *registry.ServiceInstance, err error) {
 	err = json.Unmarshal(data, &si)
 	return

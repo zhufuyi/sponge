@@ -138,6 +138,8 @@ sponge run
 
 ### 使用示例
 
+下面的示例代码，除了核心业务逻辑代码，其他代码都是由工具sponge生成。
+
 #### 基础服务示例
 
 - [1_web-gin-CRUD](https://github.com/zhufuyi/sponge_examples/tree/main/1_web-gin-CRUD)

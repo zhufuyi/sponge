@@ -1,3 +1,4 @@
+// Package benchmark is compression testing of rpc methods and generation of reported results.
 package benchmark
 
 import (

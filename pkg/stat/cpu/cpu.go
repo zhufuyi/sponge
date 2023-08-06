@@ -1,3 +1,4 @@
+// Package cpu is a library that counts system and process cpu usage.
 package cpu
 
 import (

@@ -1,3 +1,4 @@
+// Package metrics is grpc's server-side and client-side metrics can continue to be captured using prometheus.
 package metrics
 
 import (
@@ -135,7 +136,7 @@ func ServerHTTPService(addr string, grpcServer *grpc.Server) *http.Server {
 		}
 	}()
 
-	// initialising gRPC methods Metrics
+	// initialize gRPC methods Metrics
 	grpcServerMetrics.InitializeMetrics(grpcServer)
 
 	return httpServer

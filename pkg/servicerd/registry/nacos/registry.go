@@ -1,3 +1,4 @@
+// Package nacos is registered as a service using nacos.
 package nacos
 
 import (

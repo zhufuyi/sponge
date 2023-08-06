@@ -19,7 +19,7 @@ type options struct {
 	serverNameOverride string // etcd domain
 	certFile           string // path to certificate file
 
-	autoSyncInterval time.Duration // automatic synchronisation of member list intervals
+	autoSyncInterval time.Duration // automatic synchronization of member list intervals
 	logger           *zap.Logger
 }
 

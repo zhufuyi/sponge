@@ -21,7 +21,7 @@ type memoryCache struct {
 }
 
 // NewMemoryCache create a memory cache
-func NewMemoryCache(keyPrefix string, encoding encoding.Encoding, newObject func() interface{}) Cache {
+func NewMemoryCache(keyPrefix string, encode encoding.Encoding, newObject func() interface{}) Cache {
 	// see: https://dgraph.io/blog/post/introducing-ristretto-high-perf-go-cache/
 	//		https://www.start.io/blog/we-chose-ristretto-cache-for-go-heres-why/
 	config := &ristretto.Config{
@@ -33,13 +33,13 @@ func NewMemoryCache(keyPrefix string, encoding encoding.Encoding, newObject func
 	return &memoryCache{
 		client:    store,
 		KeyPrefix: keyPrefix,
-		encoding:  encoding,
+		encoding:  encode,
 		newObject: newObject,
 	}
 }
 
 // Set data
-func (m *memoryCache) Set(ctx context.Context, key string, val interface{}, expiration time.Duration) error {
+func (m *memoryCache) Set(_ context.Context, key string, val interface{}, expiration time.Duration) error {
 	buf, err := encoding.Marshal(m.encoding, val)
 	if err != nil {
 		return fmt.Errorf("encoding.Marshal error: %v, key=%s, val=%+v ", err, key, val)
@@ -57,7 +57,7 @@ func (m *memoryCache) Set(ctx context.Context, key string, val interface{}, expi
 }
 
 // Get data
-func (m *memoryCache) Get(ctx context.Context, key string, val interface{}) error {
+func (m *memoryCache) Get(_ context.Context, key string, val interface{}) error {
 	cacheKey, err := BuildCacheKey(m.KeyPrefix, key)
 	if err != nil {
 		return fmt.Errorf("BuildCacheKey error: %v, key=%s", err, key)
@@ -81,7 +81,7 @@ func (m *memoryCache) Get(ctx context.Context, key string, val interface{}) erro
 }
 
 // Del delete data
-func (m *memoryCache) Del(ctx context.Context, keys ...string) error {
+func (m *memoryCache) Del(_ context.Context, keys ...string) error {
 	if len(keys) == 0 {
 		return nil
 	}
@@ -124,7 +124,7 @@ func (m *memoryCache) MultiGet(ctx context.Context, keys []string, value interfa
 }
 
 // SetCacheWithNotFound set not found
-func (m *memoryCache) SetCacheWithNotFound(ctx context.Context, key string) error {
+func (m *memoryCache) SetCacheWithNotFound(_ context.Context, key string) error {
 	cacheKey, err := BuildCacheKey(m.KeyPrefix, key)
 	if err != nil {
 		return fmt.Errorf("BuildCacheKey error: %v, key=%s", err, key)

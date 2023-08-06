@@ -101,7 +101,9 @@ func buildHTTPRule(m *protogen.Method, rule *annotations.HttpRule) *RPCMethod {
 }
 
 func buildMethodDesc(m *protogen.Method, httpMethod, path string) *RPCMethod {
-	defer func() { methodSets[m.GoName]++ }()
+	defer func() {
+		methodSets[m.GoName]++
+	}()
 	md := &RPCMethod{
 		Name:    m.GoName,
 		Num:     methodSets[m.GoName],

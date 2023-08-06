@@ -1,3 +1,4 @@
+// Package consulcli is connecting to the consul service client.
 package consulcli
 
 import (

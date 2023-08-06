@@ -22,6 +22,7 @@ func SetTraceName(name string) {
 func NewSpan(ctx context.Context, spanName string, tags map[string]interface{}) (context.Context, trace.Span) {
 	var opts []trace.SpanStartOption
 
+	//nolint
 	for k, v := range tags {
 		var tag attribute.KeyValue
 		switch v.(type) {

@@ -1,6 +1,6 @@
 ## interceptor
 
-Commonly used grpc client and server-side interceptors.
+Commonly used grpc client-side and server-side interceptors.
 
 <br>
 
@@ -60,10 +60,9 @@ var logger *zap.Logger
 
 func getServerOptions() []grpc.ServerOption {
 	var options []grpc.ServerOption
-
-	// log setting, which prints client disconnection information by default, example https://pkg.go.dev/github.com/grpc-ecosystem/go-grpc-middleware/logging/zap
+	
 	options = append(options, grpc_middleware.WithUnaryServerChain(
-		interceptor.UnaryServerZapLogging(
+		interceptor.UnaryClientLog(
 			logger.Get(), // zap
 			// middleware.WithLogFields(map[string]interface{}{"serverName": "userExample"}), // additional print fields
 			middleware.WithLogIgnoreMethods("/proto.userExampleService/GetByID"), // ignore the specified method print, you can specify more than one

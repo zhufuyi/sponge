@@ -27,7 +27,7 @@ func (w *watcher) Next() (services []*registry.ServiceInstance, err error) {
 	if ok {
 		services = append(services, ss...)
 	}
-	return
+	return //nolint
 }
 
 func (w *watcher) Stop() error {

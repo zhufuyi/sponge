@@ -1,3 +1,4 @@
+// Package jy2struct is a library for generating go struct code, supporting json and yaml.
 package jy2struct
 
 import (
@@ -16,7 +17,7 @@ type Args struct {
 	SubStruct bool   // are sub-structures separated
 	Tags      string // add additional tags, multiple tags separated by commas
 
-	tags          []string
+	tags          []string //nolint
 	convertFloats bool
 	parser        Parser
 }

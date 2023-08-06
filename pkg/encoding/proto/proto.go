@@ -1,3 +1,4 @@
+// Package proto is a protobuf encoding and decoding.
 package proto
 
 import (

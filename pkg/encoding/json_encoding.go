@@ -106,7 +106,7 @@ func GzipDecode(in []byte) ([]byte, error) {
 // JSONSnappyEncoding json format and snappy compression
 type JSONSnappyEncoding struct{}
 
-// Marshal serialisation
+// Marshal serialization
 func (s JSONSnappyEncoding) Marshal(v interface{}) (data []byte, err error) {
 	b, err := json.Marshal(v)
 	if err != nil {

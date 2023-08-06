@@ -1,3 +1,4 @@
+// Package circuitbreaker is an adaptive circuit breaker library, support for use in gin middleware and grpc interceptors.
 package circuitbreaker
 
 import (

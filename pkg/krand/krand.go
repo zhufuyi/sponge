@@ -1,3 +1,4 @@
+// Package krand is a library for generating random strings, integers, floating point numbers.
 package krand
 
 import (

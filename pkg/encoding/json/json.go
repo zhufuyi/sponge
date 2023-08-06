@@ -1,3 +1,4 @@
+// Package json is a JSON encoding and decoding.
 package json
 
 import (

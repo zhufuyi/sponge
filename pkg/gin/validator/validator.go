@@ -1,3 +1,4 @@
+// Package validator is gin request parameter check library.
 package validator
 
 import (
@@ -9,9 +10,9 @@ import (
 
 // Init request body file valid
 func Init() *CustomValidator {
-	valid := NewCustomValidator()
-	valid.Engine()
-	return valid
+	validator := NewCustomValidator()
+	validator.Engine()
+	return validator
 }
 
 // CustomValidator Custom valid objects

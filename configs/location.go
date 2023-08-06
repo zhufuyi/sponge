@@ -1,3 +1,4 @@
+// Package configs used to locate config file.
 package configs
 
 import (
@@ -5,12 +6,10 @@ import (
 	"runtime"
 )
 
-// used to locate a directory
-
 var basePath string
 
 func init() {
-	_, currentFile, _, _ := runtime.Caller(0)
+	_, currentFile, _, _ := runtime.Caller(0) //nolint
 	basePath = filepath.Dir(currentFile)
 }
 

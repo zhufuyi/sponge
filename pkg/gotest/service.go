@@ -1,3 +1,4 @@
+// Package gotest is a library that simulates the testing of cache, dao and handler.
 package gotest
 
 import (

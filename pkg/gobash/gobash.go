@@ -1,3 +1,4 @@
+// Package gobash provides the ability to execute commands, scripts, executables in the go environment with live log output.
 package gobash
 
 import (

@@ -5,13 +5,12 @@ import (
 	"os"
 
 	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
-	stdout "go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	sdkTrace "go.opentelemetry.io/otel/sdk/trace"
 )
 
 // NewConsoleExporter output to console
 func NewConsoleExporter() (sdkTrace.SpanExporter, error) {
-	return stdout.New(stdout.WithPrettyPrint())
+	return stdouttrace.New(stdouttrace.WithPrettyPrint())
 }
 
 // NewFileExporter output to file, note: close the file before ending
@@ -37,9 +36,9 @@ func NewFileExporter(filename string) (sdkTrace.SpanExporter, *os.File, error) {
 func newExporter(w io.Writer) (sdkTrace.SpanExporter, error) {
 	return stdouttrace.New(
 		stdouttrace.WithWriter(w),
-		// Use human readable output.
+		// output to console.
 		stdouttrace.WithPrettyPrint(),
-		// Do not print timestamps for the demo.
+		// do not print timestamps for the demo.
 		stdouttrace.WithoutTimestamps(),
 	)
 }

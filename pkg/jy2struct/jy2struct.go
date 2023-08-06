@@ -107,7 +107,8 @@ func readFile(input io.Reader) ([]byte, error) {
 
 // json or yaml parse
 func jyParse(input io.Reader, parser Parser, structName, pkgName string, tags []string, subStruct bool, convertFloats bool) ([]byte, error) {
-	var subStructMap map[string]string = nil
+	_ = pkgName
+	var subStructMap map[string]string
 	if subStruct {
 		subStructMap = make(map[string]string)
 	}
@@ -125,7 +126,6 @@ func jyParse(input io.Reader, parser Parser, structName, pkgName string, tags []
 	case map[string]interface{}:
 		result = iresult
 	case []interface{}:
-		//src := fmt.Sprintf("package %s\n\ntype %s %s\n", pkgName, structName, typeForValue(iresult, structName, tags, subStructMap, convertFloats))
 		src := fmt.Sprintf("\ntype %s %s\n", structName, typeForValue(iresult, structName, tags, subStructMap, convertFloats))
 		// supplementary sub-structures
 		for k, v := range subStructMap {
@@ -141,7 +141,6 @@ func jyParse(input io.Reader, parser Parser, structName, pkgName string, tags []
 		return nil, fmt.Errorf("unexpected type: %T", iresult)
 	}
 
-	//src := fmt.Sprintf("package %s\ntype %s %s}", pkgName, structName, generateTypes(result, structName, tags, 0, subStructMap, convertFloats))
 	src := fmt.Sprintf("\ntype %s %s}", structName, generateTypes(result, structName, tags, 0, subStructMap, convertFloats))
 
 	keys := make([]string, 0, len(subStructMap))

@@ -1,3 +1,4 @@
+// Package prof is wrap the official `net/http/pprof` route and add the profile io wait time route.
 package prof
 
 import (
@@ -24,8 +25,8 @@ var (
 	timeFormat = "20060102T150405"
 
 	status      uint32
-	statusStart uint32 = 1
-	statusStop  uint32 = 0
+	statusStart uint32 = 1 // status=1
+	statusStop  uint32     // status=0
 )
 
 // WaitSign wait system notification signals
@@ -52,7 +53,7 @@ type profile struct {
 	files    []string
 	closeFns []func()
 
-	ctx    context.Context
+	//ctx    context.Context
 	stopCh chan struct{}
 }
 
@@ -113,7 +114,7 @@ func (p *profile) startProfile() {
 	}
 
 	if isSamplingTrace {
-		err = p.trace()
+		err = p.tracing()
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -144,7 +145,8 @@ func (p *profile) stopProfile() {
 	default:
 	}
 
-	p = NewProfile() // reset profile
+	// reset profile
+	p = NewProfile() //nolint
 }
 
 func (p *profile) checkTimeout() {
@@ -283,7 +285,7 @@ func (p *profile) threadCreate() error {
 	return nil
 }
 
-func (p *profile) trace() error {
+func (p *profile) tracing() error {
 	profileName := "trace"
 	file := getFilePath(profileName)
 	f, err := os.Create(file)
@@ -338,9 +340,9 @@ func getServerName() string {
 }
 
 func joinPath(elem ...string) string {
-	path := strings.Join(elem, "/")
+	dir := strings.Join(elem, "/")
 	if runtime.GOOS == "windows" {
-		return strings.ReplaceAll(path, "/", "\\")
+		return strings.ReplaceAll(dir, "/", "\\")
 	}
-	return path
+	return dir
 }

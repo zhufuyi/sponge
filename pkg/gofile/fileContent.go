@@ -1,3 +1,4 @@
+// Package gofile is file and directory management libraries.
 package gofile
 
 import (

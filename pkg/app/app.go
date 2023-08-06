@@ -1,3 +1,4 @@
+// Package app is starting and stopping services gracefully, using golang.org/x/sync/errgroup to ensure that multiple services are started properly at the same time.
 package app
 
 import (
@@ -46,10 +47,7 @@ func (a *App) Run() {
 		s := server
 		eg.Go(func() error {
 			fmt.Println(s.String())
-			if err := s.Start(); err != nil {
-				return err
-			}
-			return nil
+			return s.Start()
 		})
 	}
 

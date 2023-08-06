@@ -1,3 +1,4 @@
+// Package response provides wrapper gin returns json data in the same format.
 package response
 
 import (
@@ -52,11 +53,11 @@ func writeJSON(c *gin.Context, code int, res interface{}) {
 }
 
 func respJSONWithStatusCode(c *gin.Context, code int, msg string, data ...interface{}) {
-	var FirstData interface{}
+	var firstData interface{}
 	if len(data) > 0 {
-		FirstData = data[0]
+		firstData = data[0]
 	}
-	resp := newResp(code, msg, FirstData)
+	resp := newResp(code, msg, firstData)
 
 	writeJSON(c, code, resp)
 }
@@ -122,11 +123,11 @@ func Out(c *gin.Context, err *errcode.Error, data ...interface{}) {
 
 // status code flat 200, custom error codes in data.code
 func respJSONWith200(c *gin.Context, code int, msg string, data ...interface{}) {
-	var FirstData interface{}
+	var firstData interface{}
 	if len(data) > 0 {
-		FirstData = data[0]
+		firstData = data[0]
 	}
-	resp := newResp(code, msg, FirstData)
+	resp := newResp(code, msg, firstData)
 
 	writeJSON(c, http.StatusOK, resp)
 }

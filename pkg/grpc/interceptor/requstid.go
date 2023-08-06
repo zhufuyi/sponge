@@ -81,14 +81,14 @@ func UnaryServerRequestID() grpc.UnaryServerInterceptor {
 
 // StreamServerRequestID server-side request id stream interceptor
 func StreamServerRequestID() grpc.StreamServerInterceptor {
+	// todo
 	return func(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
-		ctx := stream.Context()
-		requestID := ServerCtxRequestID(ctx)
-		if requestID == "" {
-			requestID = krand.String(krand.R_All, 10)
-			ctx = metautils.ExtractIncoming(ctx).Add(ContextRequestIDKey, requestID).ToIncoming(ctx)
-		}
-
+		//ctx := stream.Context()
+		//requestID := ServerCtxRequestID(ctx)
+		//if requestID == "" {
+		//	requestID = krand.String(krand.R_All, 10)
+		//	ctx = metautils.ExtractIncoming(ctx).Add(ContextRequestIDKey, requestID).ToIncoming(ctx)
+		//}
 		return handler(srv, stream)
 	}
 }
