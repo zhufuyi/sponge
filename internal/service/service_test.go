@@ -11,6 +11,7 @@ import (
 	"github.com/zhufuyi/sponge/pkg/consulcli"
 	"github.com/zhufuyi/sponge/pkg/etcdcli"
 	"github.com/zhufuyi/sponge/pkg/grpc/grpccli"
+	"github.com/zhufuyi/sponge/pkg/logger"
 	"github.com/zhufuyi/sponge/pkg/nacoscli"
 	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
 	"github.com/zhufuyi/sponge/pkg/servicerd/registry/consul"
@@ -46,6 +47,11 @@ func getRPCClientConnForTest() *grpc.ClientConn {
 	endpoint := rpcClientCfg.Host + ":" + utils.IntToStr(rpcClientCfg.Port)
 	var cliOptions []grpccli.Option
 
+	// load balance
+	if rpcClientCfg.EnableLoadBalance {
+		cliOptions = append(cliOptions, grpccli.WithEnableLoadBalance())
+	}
+
 	// secure
 	cliOptions = append(cliOptions, grpccli.WithSecure(
 		rpcClientCfg.ClientSecure.Type,
@@ -67,6 +73,7 @@ func getRPCClientConnForTest() *grpc.ClientConn {
 		grpccli.WithEnableLog(zap.NewNop()),
 	)
 
+	isUseDiscover := false
 	if config.Get().App.RegistryDiscoveryType != "" {
 		var iDiscovery registry.Discovery
 		endpoint = "discovery:///" + config.Get().App.Name // Connecting to grpc services by service name
@@ -79,6 +86,7 @@ func getRPCClientConnForTest() *grpc.ClientConn {
 				panic(err)
 			}
 			iDiscovery = consul.New(cli)
+			isUseDiscover = true
 		}
 
 		// Use etcd service discovery, use the command etcdctl get / --prefix to see if the service is registered before testing,
@@ -89,6 +97,7 @@ func getRPCClientConnForTest() *grpc.ClientConn {
 				panic(err)
 			}
 			iDiscovery = etcd.New(cli)
+			isUseDiscover = true
 		}
 
 		// Use nacos service discovery
@@ -103,6 +112,7 @@ func getRPCClientConnForTest() *grpc.ClientConn {
 				panic(err)
 			}
 			iDiscovery = nacos.New(cli)
+			isUseDiscover = true
 		}
 
 		cliOptions = append(cliOptions, grpccli.WithDiscovery(iDiscovery))
@@ -117,6 +127,12 @@ func getRPCClientConnForTest() *grpc.ClientConn {
 	if config.Get().App.EnableMetrics {
 		cliOptions = append(cliOptions, grpccli.WithEnableMetrics())
 	}
+
+	msg := "dialing rpc server"
+	if isUseDiscover {
+		msg += " with discovery from " + config.Get().App.RegistryDiscoveryType
+	}
+	logger.Info(msg, logger.String("name", config.Get().App.Name), logger.String("endpoint", endpoint))
 
 	conn, err := grpccli.Dial(context.Background(), endpoint, cliOptions...)
 	if err != nil {

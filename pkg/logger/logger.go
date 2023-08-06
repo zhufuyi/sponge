@@ -1,3 +1,9 @@
+// Package logger is log library encapsulated in https://github.com/uber-go/zap
+//
+// Support for terminal printing and log saving.
+// Support for automatic log file cutting.
+// Support for json format and console log format output.
+// Supports Debug, Info, Warn, Error, Panic, Fatal, also supports fmt.Printf-like log printing, Debugf, Infof, Warnf, Errorf, Panicf, Fatalf.
 package logger
 
 import (

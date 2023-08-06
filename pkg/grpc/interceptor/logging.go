@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"time"
 
-	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
+	zapLog "github.com/zhufuyi/sponge/pkg/logger"
+
 	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/status"
 )
@@ -15,10 +15,16 @@ import (
 // ---------------------------------- client interceptor ----------------------------------
 
 // UnaryClientLog client log unary interceptor
-func UnaryClientLog(logger *zap.Logger) grpc.UnaryClientInterceptor {
+func UnaryClientLog(logger *zap.Logger, opts ...LogOption) grpc.UnaryClientInterceptor {
+	o := defaultLogOptions()
+	o.apply(opts...)
 	if logger == nil {
 		logger, _ = zap.NewProduction()
 	}
+	if o.isReplaceGRPCLogger {
+		zapLog.ReplaceGRPCLoggerV2(logger)
+	}
+
 	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
 		startTime := time.Now()
 
@@ -45,19 +51,17 @@ func UnaryClientLog(logger *zap.Logger) grpc.UnaryClientInterceptor {
 	}
 }
 
-// UnaryClientLog2 client log unary interceptor
-func UnaryClientLog2(logger *zap.Logger, opts ...grpc_zap.Option) grpc.UnaryClientInterceptor {
-	if logger == nil {
-		logger, _ = zap.NewProduction()
-	}
-	return grpc_zap.UnaryClientInterceptor(logger, opts...)
-}
-
 // StreamClientLog client log stream interceptor
-func StreamClientLog(logger *zap.Logger) grpc.StreamClientInterceptor {
+func StreamClientLog(logger *zap.Logger, opts ...LogOption) grpc.StreamClientInterceptor {
+	o := defaultLogOptions()
+	o.apply(opts...)
 	if logger == nil {
 		logger, _ = zap.NewProduction()
 	}
+	if o.isReplaceGRPCLogger {
+		zapLog.ReplaceGRPCLoggerV2(logger)
+	}
+
 	return func(ctx context.Context, desc *grpc.StreamDesc, cc *grpc.ClientConn, method string,
 		streamer grpc.Streamer, opts ...grpc.CallOption) (grpc.ClientStream, error) {
 		startTime := time.Now()
@@ -85,14 +89,6 @@ func StreamClientLog(logger *zap.Logger) grpc.StreamClientInterceptor {
 	}
 }
 
-// StreamClientLog2 client log stream interceptor
-func StreamClientLog2(logger *zap.Logger, opts ...grpc_zap.Option) grpc.StreamClientInterceptor {
-	if logger == nil {
-		logger, _ = zap.NewProduction()
-	}
-	return grpc_zap.StreamClientInterceptor(logger, opts...)
-}
-
 // ---------------------------------- server interceptor ----------------------------------
 
 var ignoreLogMethods = map[string]struct{}{} // ignore printing methods
@@ -101,8 +97,9 @@ var ignoreLogMethods = map[string]struct{}{} // ignore printing methods
 type LogOption func(*logOptions)
 
 type logOptions struct {
-	fields        map[string]interface{}
-	ignoreMethods map[string]struct{}
+	fields              map[string]interface{}
+	ignoreMethods       map[string]struct{}
+	isReplaceGRPCLogger bool
 }
 
 func defaultLogOptions() *logOptions {
@@ -115,6 +112,13 @@ func defaultLogOptions() *logOptions {
 func (o *logOptions) apply(opts ...LogOption) {
 	for _, opt := range opts {
 		opt(o)
+	}
+}
+
+// WithReplaceGRPCLogger replace grpc logger v2
+func WithReplaceGRPCLogger() LogOption {
+	return func(o *logOptions) {
+		o.isReplaceGRPCLogger = true
 	}
 }
 
@@ -148,7 +152,9 @@ func UnaryServerLog(logger *zap.Logger, opts ...LogOption) grpc.UnaryServerInter
 	if logger == nil {
 		logger, _ = zap.NewProduction()
 	}
-	grpc_zap.ReplaceGrpcLoggerV2(logger)
+	if o.isReplaceGRPCLogger {
+		zapLog.ReplaceGRPCLoggerV2(logger)
+	}
 
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		// ignore printing of the specified method
@@ -193,51 +199,6 @@ func UnaryServerLog(logger *zap.Logger, opts ...LogOption) grpc.UnaryServerInter
 	}
 }
 
-// UnaryServerLog2 server-side log unary interceptor
-func UnaryServerLog2(logger *zap.Logger, opts ...LogOption) grpc.UnaryServerInterceptor {
-	o := defaultLogOptions()
-	o.apply(opts...)
-	ignoreLogMethods = o.ignoreMethods
-
-	if logger == nil {
-		logger, _ = zap.NewProduction()
-	}
-	grpc_zap.ReplaceGrpcLoggerV2(logger)
-
-	// log settings, default printing of client disconnection information, example https://pkg.go.dev/github.com/grpc-ecosystem/go-grpc-middleware/logging/zap
-	zapOptions := []grpc_zap.Option{
-		grpc_zap.WithDurationField(func(duration time.Duration) zapcore.Field {
-			return zap.Int64("grpc.time_us", duration.Microseconds())
-		}),
-	}
-
-	// custom log fields
-	for key, val := range o.fields {
-		zapOptions = append(zapOptions, grpc_zap.WithDurationField(func(duration time.Duration) zapcore.Field {
-			return zap.Any(key, val)
-		}))
-	}
-
-	// custom call method for skipping log
-	if len(ignoreLogMethods) > 0 {
-		zapOptions = append(zapOptions, grpc_zap.WithDecider(func(fullMethodName string, err error) bool {
-			if err == nil {
-				if _, ok := ignoreLogMethods[fullMethodName]; ok {
-					return false
-				}
-			}
-			return true
-		}))
-	}
-
-	return grpc_zap.UnaryServerInterceptor(logger, zapOptions...)
-}
-
-// UnaryServerCtxTags extractor field unary interceptor
-//func UnaryServerCtxTags() grpc.UnaryServerInterceptor {
-//	return grpc_ctxtags.UnaryServerInterceptor(grpc_ctxtags.WithFieldExtractor(grpc_ctxtags.CodeGenRequestFieldExtractor))
-//}
-
 // StreamServerLog Server-side log stream interceptor
 func StreamServerLog(logger *zap.Logger, opts ...LogOption) grpc.StreamServerInterceptor {
 	o := defaultLogOptions()
@@ -247,7 +208,9 @@ func StreamServerLog(logger *zap.Logger, opts ...LogOption) grpc.StreamServerInt
 	if logger == nil {
 		logger, _ = zap.NewProduction()
 	}
-	grpc_zap.ReplaceGrpcLoggerV2(logger)
+	if o.isReplaceGRPCLogger {
+		zapLog.ReplaceGRPCLoggerV2(logger)
+	}
 
 	return func(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
 		// ignore printing of the specified method
@@ -283,48 +246,3 @@ func StreamServerLog(logger *zap.Logger, opts ...LogOption) grpc.StreamServerInt
 		return err
 	}
 }
-
-// StreamServerLog2 Server-side log stream interceptor
-func StreamServerLog2(logger *zap.Logger, opts ...LogOption) grpc.StreamServerInterceptor {
-	o := defaultLogOptions()
-	o.apply(opts...)
-	ignoreLogMethods = o.ignoreMethods
-
-	if logger == nil {
-		logger, _ = zap.NewProduction()
-	}
-	grpc_zap.ReplaceGrpcLoggerV2(logger)
-
-	// log settings, default printing of client disconnection information, example https://pkg.go.dev/github.com/grpc-ecosystem/go-grpc-middleware/logging/zap
-	zapOptions := []grpc_zap.Option{
-		grpc_zap.WithDurationField(func(duration time.Duration) zapcore.Field {
-			return zap.Int64("grpc.time_us", duration.Microseconds())
-		}),
-	}
-
-	// custom log fields
-	for key, val := range o.fields {
-		zapOptions = append(zapOptions, grpc_zap.WithDurationField(func(duration time.Duration) zapcore.Field {
-			return zap.Any(key, val)
-		}))
-	}
-
-	// custom call method for skipping log
-	if len(ignoreLogMethods) > 0 {
-		zapOptions = append(zapOptions, grpc_zap.WithDecider(func(fullMethodName string, err error) bool {
-			if err == nil {
-				if _, ok := ignoreLogMethods[fullMethodName]; ok {
-					return false
-				}
-			}
-			return true
-		}))
-	}
-
-	return grpc_zap.StreamServerInterceptor(logger, zapOptions...)
-}
-
-// StreamServerCtxTags extractor field stream interceptor
-//func StreamServerCtxTags() grpc.StreamServerInterceptor {
-//	return grpc_ctxtags.StreamServerInterceptor(grpc_ctxtags.WithFieldExtractor(grpc_ctxtags.CodeGenRequestFieldExtractor))
-//}

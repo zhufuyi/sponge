@@ -72,6 +72,7 @@ func Test_service_userExample_methods(t *testing.T) {
 			},
 			wantErr: false,
 		},
+
 		{
 			name: "DeleteByIDs",
 			fn: func() (interface{}, error) {
@@ -83,6 +84,7 @@ func Test_service_userExample_methods(t *testing.T) {
 			},
 			wantErr: false,
 		},
+
 		{
 			name: "GetByID",
 			fn: func() (interface{}, error) {
@@ -131,6 +133,7 @@ func Test_service_userExample_methods(t *testing.T) {
 			wantErr: false,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := tt.fn()
