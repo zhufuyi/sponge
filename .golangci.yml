@@ -85,7 +85,7 @@ linters-settings:
       - name: duplicated-imports
       - name: early-return
       - name: empty-block
-      - name: empty-lines
+      #- name: empty-lines
       - name: error-naming
       - name: error-return
       - name: error-strings
