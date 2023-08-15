@@ -18,10 +18,10 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// UserExampleServiceClient is the client API for UserExampleService service.
+// UserExampleClient is the client API for UserExample service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type UserExampleServiceClient interface {
+type UserExampleClient interface {
 	Create(ctx context.Context, in *CreateUserExampleRequest, opts ...grpc.CallOption) (*CreateUserExampleReply, error)
 	DeleteByID(ctx context.Context, in *DeleteUserExampleByIDRequest, opts ...grpc.CallOption) (*DeleteUserExampleByIDReply, error)
 	DeleteByIDs(ctx context.Context, in *DeleteUserExampleByIDsRequest, opts ...grpc.CallOption) (*DeleteUserExampleByIDsReply, error)
@@ -31,81 +31,81 @@ type UserExampleServiceClient interface {
 	List(ctx context.Context, in *ListUserExampleRequest, opts ...grpc.CallOption) (*ListUserExampleReply, error)
 }
 
-type userExampleServiceClient struct {
+type userExampleClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewUserExampleServiceClient(cc grpc.ClientConnInterface) UserExampleServiceClient {
-	return &userExampleServiceClient{cc}
+func NewUserExampleClient(cc grpc.ClientConnInterface) UserExampleClient {
+	return &userExampleClient{cc}
 }
 
-func (c *userExampleServiceClient) Create(ctx context.Context, in *CreateUserExampleRequest, opts ...grpc.CallOption) (*CreateUserExampleReply, error) {
+func (c *userExampleClient) Create(ctx context.Context, in *CreateUserExampleRequest, opts ...grpc.CallOption) (*CreateUserExampleReply, error) {
 	out := new(CreateUserExampleReply)
-	err := c.cc.Invoke(ctx, "/api.serverNameExample.v1.userExampleService/Create", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.serverNameExample.v1.userExample/Create", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userExampleServiceClient) DeleteByID(ctx context.Context, in *DeleteUserExampleByIDRequest, opts ...grpc.CallOption) (*DeleteUserExampleByIDReply, error) {
+func (c *userExampleClient) DeleteByID(ctx context.Context, in *DeleteUserExampleByIDRequest, opts ...grpc.CallOption) (*DeleteUserExampleByIDReply, error) {
 	out := new(DeleteUserExampleByIDReply)
-	err := c.cc.Invoke(ctx, "/api.serverNameExample.v1.userExampleService/DeleteByID", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.serverNameExample.v1.userExample/DeleteByID", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userExampleServiceClient) DeleteByIDs(ctx context.Context, in *DeleteUserExampleByIDsRequest, opts ...grpc.CallOption) (*DeleteUserExampleByIDsReply, error) {
+func (c *userExampleClient) DeleteByIDs(ctx context.Context, in *DeleteUserExampleByIDsRequest, opts ...grpc.CallOption) (*DeleteUserExampleByIDsReply, error) {
 	out := new(DeleteUserExampleByIDsReply)
-	err := c.cc.Invoke(ctx, "/api.serverNameExample.v1.userExampleService/DeleteByIDs", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.serverNameExample.v1.userExample/DeleteByIDs", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userExampleServiceClient) UpdateByID(ctx context.Context, in *UpdateUserExampleByIDRequest, opts ...grpc.CallOption) (*UpdateUserExampleByIDReply, error) {
+func (c *userExampleClient) UpdateByID(ctx context.Context, in *UpdateUserExampleByIDRequest, opts ...grpc.CallOption) (*UpdateUserExampleByIDReply, error) {
 	out := new(UpdateUserExampleByIDReply)
-	err := c.cc.Invoke(ctx, "/api.serverNameExample.v1.userExampleService/UpdateByID", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.serverNameExample.v1.userExample/UpdateByID", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userExampleServiceClient) GetByID(ctx context.Context, in *GetUserExampleByIDRequest, opts ...grpc.CallOption) (*GetUserExampleByIDReply, error) {
+func (c *userExampleClient) GetByID(ctx context.Context, in *GetUserExampleByIDRequest, opts ...grpc.CallOption) (*GetUserExampleByIDReply, error) {
 	out := new(GetUserExampleByIDReply)
-	err := c.cc.Invoke(ctx, "/api.serverNameExample.v1.userExampleService/GetByID", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.serverNameExample.v1.userExample/GetByID", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userExampleServiceClient) ListByIDs(ctx context.Context, in *ListUserExampleByIDsRequest, opts ...grpc.CallOption) (*ListUserExampleByIDsReply, error) {
+func (c *userExampleClient) ListByIDs(ctx context.Context, in *ListUserExampleByIDsRequest, opts ...grpc.CallOption) (*ListUserExampleByIDsReply, error) {
 	out := new(ListUserExampleByIDsReply)
-	err := c.cc.Invoke(ctx, "/api.serverNameExample.v1.userExampleService/ListByIDs", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.serverNameExample.v1.userExample/ListByIDs", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userExampleServiceClient) List(ctx context.Context, in *ListUserExampleRequest, opts ...grpc.CallOption) (*ListUserExampleReply, error) {
+func (c *userExampleClient) List(ctx context.Context, in *ListUserExampleRequest, opts ...grpc.CallOption) (*ListUserExampleReply, error) {
 	out := new(ListUserExampleReply)
-	err := c.cc.Invoke(ctx, "/api.serverNameExample.v1.userExampleService/List", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.serverNameExample.v1.userExample/List", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// UserExampleServiceServer is the server API for UserExampleService service.
-// All implementations must embed UnimplementedUserExampleServiceServer
+// UserExampleServer is the server API for UserExample service.
+// All implementations must embed UnimplementedUserExampleServer
 // for forward compatibility
-type UserExampleServiceServer interface {
+type UserExampleServer interface {
 	Create(context.Context, *CreateUserExampleRequest) (*CreateUserExampleReply, error)
 	DeleteByID(context.Context, *DeleteUserExampleByIDRequest) (*DeleteUserExampleByIDReply, error)
 	DeleteByIDs(context.Context, *DeleteUserExampleByIDsRequest) (*DeleteUserExampleByIDsReply, error)
@@ -113,207 +113,207 @@ type UserExampleServiceServer interface {
 	GetByID(context.Context, *GetUserExampleByIDRequest) (*GetUserExampleByIDReply, error)
 	ListByIDs(context.Context, *ListUserExampleByIDsRequest) (*ListUserExampleByIDsReply, error)
 	List(context.Context, *ListUserExampleRequest) (*ListUserExampleReply, error)
-	mustEmbedUnimplementedUserExampleServiceServer()
+	mustEmbedUnimplementedUserExampleServer()
 }
 
-// UnimplementedUserExampleServiceServer must be embedded to have forward compatible implementations.
-type UnimplementedUserExampleServiceServer struct {
+// UnimplementedUserExampleServer must be embedded to have forward compatible implementations.
+type UnimplementedUserExampleServer struct {
 }
 
-func (UnimplementedUserExampleServiceServer) Create(context.Context, *CreateUserExampleRequest) (*CreateUserExampleReply, error) {
+func (UnimplementedUserExampleServer) Create(context.Context, *CreateUserExampleRequest) (*CreateUserExampleReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
 }
-func (UnimplementedUserExampleServiceServer) DeleteByID(context.Context, *DeleteUserExampleByIDRequest) (*DeleteUserExampleByIDReply, error) {
+func (UnimplementedUserExampleServer) DeleteByID(context.Context, *DeleteUserExampleByIDRequest) (*DeleteUserExampleByIDReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteByID not implemented")
 }
-func (UnimplementedUserExampleServiceServer) DeleteByIDs(context.Context, *DeleteUserExampleByIDsRequest) (*DeleteUserExampleByIDsReply, error) {
+func (UnimplementedUserExampleServer) DeleteByIDs(context.Context, *DeleteUserExampleByIDsRequest) (*DeleteUserExampleByIDsReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteByIDs not implemented")
 }
-func (UnimplementedUserExampleServiceServer) UpdateByID(context.Context, *UpdateUserExampleByIDRequest) (*UpdateUserExampleByIDReply, error) {
+func (UnimplementedUserExampleServer) UpdateByID(context.Context, *UpdateUserExampleByIDRequest) (*UpdateUserExampleByIDReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateByID not implemented")
 }
-func (UnimplementedUserExampleServiceServer) GetByID(context.Context, *GetUserExampleByIDRequest) (*GetUserExampleByIDReply, error) {
+func (UnimplementedUserExampleServer) GetByID(context.Context, *GetUserExampleByIDRequest) (*GetUserExampleByIDReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetByID not implemented")
 }
-func (UnimplementedUserExampleServiceServer) ListByIDs(context.Context, *ListUserExampleByIDsRequest) (*ListUserExampleByIDsReply, error) {
+func (UnimplementedUserExampleServer) ListByIDs(context.Context, *ListUserExampleByIDsRequest) (*ListUserExampleByIDsReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListByIDs not implemented")
 }
-func (UnimplementedUserExampleServiceServer) List(context.Context, *ListUserExampleRequest) (*ListUserExampleReply, error) {
+func (UnimplementedUserExampleServer) List(context.Context, *ListUserExampleRequest) (*ListUserExampleReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
 }
-func (UnimplementedUserExampleServiceServer) mustEmbedUnimplementedUserExampleServiceServer() {}
+func (UnimplementedUserExampleServer) mustEmbedUnimplementedUserExampleServer() {}
 
-// UnsafeUserExampleServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to UserExampleServiceServer will
+// UnsafeUserExampleServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to UserExampleServer will
 // result in compilation errors.
-type UnsafeUserExampleServiceServer interface {
-	mustEmbedUnimplementedUserExampleServiceServer()
+type UnsafeUserExampleServer interface {
+	mustEmbedUnimplementedUserExampleServer()
 }
 
-func RegisterUserExampleServiceServer(s grpc.ServiceRegistrar, srv UserExampleServiceServer) {
-	s.RegisterService(&UserExampleService_ServiceDesc, srv)
+func RegisterUserExampleServer(s grpc.ServiceRegistrar, srv UserExampleServer) {
+	s.RegisterService(&UserExample_ServiceDesc, srv)
 }
 
-func _UserExampleService_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserExample_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateUserExampleRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserExampleServiceServer).Create(ctx, in)
+		return srv.(UserExampleServer).Create(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.serverNameExample.v1.userExampleService/Create",
+		FullMethod: "/api.serverNameExample.v1.userExample/Create",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserExampleServiceServer).Create(ctx, req.(*CreateUserExampleRequest))
+		return srv.(UserExampleServer).Create(ctx, req.(*CreateUserExampleRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserExampleService_DeleteByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserExample_DeleteByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteUserExampleByIDRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserExampleServiceServer).DeleteByID(ctx, in)
+		return srv.(UserExampleServer).DeleteByID(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.serverNameExample.v1.userExampleService/DeleteByID",
+		FullMethod: "/api.serverNameExample.v1.userExample/DeleteByID",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserExampleServiceServer).DeleteByID(ctx, req.(*DeleteUserExampleByIDRequest))
+		return srv.(UserExampleServer).DeleteByID(ctx, req.(*DeleteUserExampleByIDRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserExampleService_DeleteByIDs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserExample_DeleteByIDs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteUserExampleByIDsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserExampleServiceServer).DeleteByIDs(ctx, in)
+		return srv.(UserExampleServer).DeleteByIDs(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.serverNameExample.v1.userExampleService/DeleteByIDs",
+		FullMethod: "/api.serverNameExample.v1.userExample/DeleteByIDs",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserExampleServiceServer).DeleteByIDs(ctx, req.(*DeleteUserExampleByIDsRequest))
+		return srv.(UserExampleServer).DeleteByIDs(ctx, req.(*DeleteUserExampleByIDsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserExampleService_UpdateByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserExample_UpdateByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateUserExampleByIDRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserExampleServiceServer).UpdateByID(ctx, in)
+		return srv.(UserExampleServer).UpdateByID(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.serverNameExample.v1.userExampleService/UpdateByID",
+		FullMethod: "/api.serverNameExample.v1.userExample/UpdateByID",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserExampleServiceServer).UpdateByID(ctx, req.(*UpdateUserExampleByIDRequest))
+		return srv.(UserExampleServer).UpdateByID(ctx, req.(*UpdateUserExampleByIDRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserExampleService_GetByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserExample_GetByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetUserExampleByIDRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserExampleServiceServer).GetByID(ctx, in)
+		return srv.(UserExampleServer).GetByID(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.serverNameExample.v1.userExampleService/GetByID",
+		FullMethod: "/api.serverNameExample.v1.userExample/GetByID",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserExampleServiceServer).GetByID(ctx, req.(*GetUserExampleByIDRequest))
+		return srv.(UserExampleServer).GetByID(ctx, req.(*GetUserExampleByIDRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserExampleService_ListByIDs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserExample_ListByIDs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListUserExampleByIDsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserExampleServiceServer).ListByIDs(ctx, in)
+		return srv.(UserExampleServer).ListByIDs(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.serverNameExample.v1.userExampleService/ListByIDs",
+		FullMethod: "/api.serverNameExample.v1.userExample/ListByIDs",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserExampleServiceServer).ListByIDs(ctx, req.(*ListUserExampleByIDsRequest))
+		return srv.(UserExampleServer).ListByIDs(ctx, req.(*ListUserExampleByIDsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserExampleService_List_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserExample_List_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListUserExampleRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserExampleServiceServer).List(ctx, in)
+		return srv.(UserExampleServer).List(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.serverNameExample.v1.userExampleService/List",
+		FullMethod: "/api.serverNameExample.v1.userExample/List",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserExampleServiceServer).List(ctx, req.(*ListUserExampleRequest))
+		return srv.(UserExampleServer).List(ctx, req.(*ListUserExampleRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// UserExampleService_ServiceDesc is the grpc.ServiceDesc for UserExampleService service.
+// UserExample_ServiceDesc is the grpc.ServiceDesc for UserExample service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var UserExampleService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "api.serverNameExample.v1.userExampleService",
-	HandlerType: (*UserExampleServiceServer)(nil),
+var UserExample_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "api.serverNameExample.v1.userExample",
+	HandlerType: (*UserExampleServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "Create",
-			Handler:    _UserExampleService_Create_Handler,
+			Handler:    _UserExample_Create_Handler,
 		},
 		{
 			MethodName: "DeleteByID",
-			Handler:    _UserExampleService_DeleteByID_Handler,
+			Handler:    _UserExample_DeleteByID_Handler,
 		},
 		{
 			MethodName: "DeleteByIDs",
-			Handler:    _UserExampleService_DeleteByIDs_Handler,
+			Handler:    _UserExample_DeleteByIDs_Handler,
 		},
 		{
 			MethodName: "UpdateByID",
-			Handler:    _UserExampleService_UpdateByID_Handler,
+			Handler:    _UserExample_UpdateByID_Handler,
 		},
 		{
 			MethodName: "GetByID",
-			Handler:    _UserExampleService_GetByID_Handler,
+			Handler:    _UserExample_GetByID_Handler,
 		},
 		{
 			MethodName: "ListByIDs",
-			Handler:    _UserExampleService_ListByIDs_Handler,
+			Handler:    _UserExample_ListByIDs_Handler,
 		},
 		{
 			MethodName: "List",
-			Handler:    _UserExampleService_List_Handler,
+			Handler:    _UserExample_List_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

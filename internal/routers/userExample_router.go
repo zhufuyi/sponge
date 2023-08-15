@@ -20,7 +20,7 @@ func init() {
 
 	allRouteFns = append(allRouteFns,
 		func(r *gin.Engine, groupPathMiddlewares map[string][]gin.HandlerFunc, singlePathMiddlewares map[string][]gin.HandlerFunc) {
-			userExampleServiceRouter(r, groupPathMiddlewares, singlePathMiddlewares, service.NewUserExampleServiceClient())
+			userExampleServiceRouter(r, groupPathMiddlewares, singlePathMiddlewares, service.NewUserExampleClient())
 		})
 }
 
@@ -28,7 +28,7 @@ func userExampleServiceRouter(
 	r *gin.Engine,
 	groupPathMiddlewares map[string][]gin.HandlerFunc,
 	singlePathMiddlewares map[string][]gin.HandlerFunc,
-	iService serverNameExampleV1.UserExampleServiceLogicer) {
+	iService serverNameExampleV1.UserExampleLogicer) {
 	fn := func(c *gin.Context) context.Context {
 		md := metadata.New(map[string]string{
 			// set metadata to be passed from http to rpc
@@ -38,20 +38,20 @@ func userExampleServiceRouter(
 		return metadata.NewOutgoingContext(c, md)
 	}
 
-	serverNameExampleV1.RegisterUserExampleServiceRouter(
+	serverNameExampleV1.RegisterUserExampleRouter(
 		r,
 		groupPathMiddlewares,
 		singlePathMiddlewares,
 		iService,
-		serverNameExampleV1.WithUserExampleServiceRPCResponse(),
-		serverNameExampleV1.WithUserExampleServiceLogger(logger.Get()),
-		serverNameExampleV1.WithUserExampleServiceRPCStatusToHTTPCode(
+		serverNameExampleV1.WithUserExampleRPCResponse(),
+		serverNameExampleV1.WithUserExampleLogger(logger.Get()),
+		serverNameExampleV1.WithUserExampleRPCStatusToHTTPCode(
 		// Set some error codes to standard http return codes,
 		// by default there is already ecode.StatusInternalServerError and ecode.StatusServiceUnavailable
 		// example:
 		// 	ecode.StatusUnimplemented, ecode.StatusAborted,
 		),
-		serverNameExampleV1.WithUserExampleServiceWrapCtx(fn),
+		serverNameExampleV1.WithUserExampleWrapCtx(fn),
 	)
 }
 

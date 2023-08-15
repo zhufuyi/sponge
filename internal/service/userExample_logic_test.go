@@ -24,7 +24,7 @@ func TestNewUserExampleServiceClient(t *testing.T) {
 	}()
 
 	time.Sleep(time.Millisecond * 200)
-	cli := NewUserExampleServiceClient()
+	cli := NewUserExampleClient()
 	ctx := context.Background()
 
 	utils.SafeRunWithTimeout(time.Second, func(cancel context.CancelFunc) {

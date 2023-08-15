@@ -13,7 +13,7 @@ import (
 
 // import packages: strings. context. errcode. middleware. zap. gin.
 
-type UserExampleServiceLogicer interface {
+type UserExampleLogicer interface {
 	Create(ctx context.Context, req *CreateUserExampleRequest) (*CreateUserExampleReply, error)
 	DeleteByID(ctx context.Context, req *DeleteUserExampleByIDRequest) (*DeleteUserExampleByIDReply, error)
 	DeleteByIDs(ctx context.Context, req *DeleteUserExampleByIDsRequest) (*DeleteUserExampleByIDsReply, error)
@@ -23,9 +23,9 @@ type UserExampleServiceLogicer interface {
 	UpdateByID(ctx context.Context, req *UpdateUserExampleByIDRequest) (*UpdateUserExampleByIDReply, error)
 }
 
-type UserExampleServiceOption func(*userExampleServiceOptions)
+type UserExampleOption func(*userExampleOptions)
 
-type userExampleServiceOptions struct {
+type userExampleOptions struct {
 	isFromRPC  bool
 	responser  errcode.Responser
 	zapLog     *zap.Logger
@@ -34,62 +34,62 @@ type userExampleServiceOptions struct {
 	wrapCtxFn  func(c *gin.Context) context.Context
 }
 
-func (o *userExampleServiceOptions) apply(opts ...UserExampleServiceOption) {
+func (o *userExampleOptions) apply(opts ...UserExampleOption) {
 	for _, opt := range opts {
 		opt(o)
 	}
 }
 
-func WithUserExampleServiceHTTPResponse() UserExampleServiceOption {
-	return func(o *userExampleServiceOptions) {
+func WithUserExampleHTTPResponse() UserExampleOption {
+	return func(o *userExampleOptions) {
 		o.isFromRPC = false
 	}
 }
 
-func WithUserExampleServiceRPCResponse() UserExampleServiceOption {
-	return func(o *userExampleServiceOptions) {
+func WithUserExampleRPCResponse() UserExampleOption {
+	return func(o *userExampleOptions) {
 		o.isFromRPC = true
 	}
 }
 
-func WithUserExampleServiceResponser(responser errcode.Responser) UserExampleServiceOption {
-	return func(o *userExampleServiceOptions) {
+func WithUserExampleResponser(responser errcode.Responser) UserExampleOption {
+	return func(o *userExampleOptions) {
 		o.responser = responser
 	}
 }
 
-func WithUserExampleServiceLogger(zapLog *zap.Logger) UserExampleServiceOption {
-	return func(o *userExampleServiceOptions) {
+func WithUserExampleLogger(zapLog *zap.Logger) UserExampleOption {
+	return func(o *userExampleOptions) {
 		o.zapLog = zapLog
 	}
 }
 
-func WithUserExampleServiceErrorToHTTPCode(e ...*errcode.Error) UserExampleServiceOption {
-	return func(o *userExampleServiceOptions) {
+func WithUserExampleErrorToHTTPCode(e ...*errcode.Error) UserExampleOption {
+	return func(o *userExampleOptions) {
 		o.httpErrors = e
 	}
 }
 
-func WithUserExampleServiceRPCStatusToHTTPCode(s ...*errcode.RPCStatus) UserExampleServiceOption {
-	return func(o *userExampleServiceOptions) {
+func WithUserExampleRPCStatusToHTTPCode(s ...*errcode.RPCStatus) UserExampleOption {
+	return func(o *userExampleOptions) {
 		o.rpcStatus = s
 	}
 }
 
-func WithUserExampleServiceWrapCtx(wrapCtxFn func(c *gin.Context) context.Context) UserExampleServiceOption {
-	return func(o *userExampleServiceOptions) {
+func WithUserExampleWrapCtx(wrapCtxFn func(c *gin.Context) context.Context) UserExampleOption {
+	return func(o *userExampleOptions) {
 		o.wrapCtxFn = wrapCtxFn
 	}
 }
 
-func RegisterUserExampleServiceRouter(
+func RegisterUserExampleRouter(
 	iRouter gin.IRouter,
 	groupPathMiddlewares map[string][]gin.HandlerFunc,
 	singlePathMiddlewares map[string][]gin.HandlerFunc,
-	iLogic UserExampleServiceLogicer,
-	opts ...UserExampleServiceOption) {
+	iLogic UserExampleLogicer,
+	opts ...UserExampleOption) {
 
-	o := &userExampleServiceOptions{}
+	o := &userExampleOptions{}
 	o.apply(opts...)
 
 	if o.responser == nil {
@@ -99,7 +99,7 @@ func RegisterUserExampleServiceRouter(
 		o.zapLog, _ = zap.NewProduction()
 	}
 
-	r := &userExampleServiceRouter{
+	r := &userExampleRouter{
 		iRouter:               iRouter,
 		groupPathMiddlewares:  groupPathMiddlewares,
 		singlePathMiddlewares: singlePathMiddlewares,
@@ -111,17 +111,17 @@ func RegisterUserExampleServiceRouter(
 	r.register()
 }
 
-type userExampleServiceRouter struct {
+type userExampleRouter struct {
 	iRouter               gin.IRouter
 	groupPathMiddlewares  map[string][]gin.HandlerFunc
 	singlePathMiddlewares map[string][]gin.HandlerFunc
-	iLogic                UserExampleServiceLogicer
+	iLogic                UserExampleLogicer
 	iResponse             errcode.Responser
 	zapLog                *zap.Logger
 	wrapCtxFn             func(c *gin.Context) context.Context
 }
 
-func (r *userExampleServiceRouter) register() {
+func (r *userExampleRouter) register() {
 	r.iRouter.Handle("POST", "/api/v1/userExample", r.withMiddleware("POST", "/api/v1/userExample", r.Create_0)...)
 	r.iRouter.Handle("DELETE", "/api/v1/userExample/:id", r.withMiddleware("DELETE", "/api/v1/userExample/:id", r.DeleteByID_0)...)
 	r.iRouter.Handle("POST", "/api/v1/userExample/delete/ids", r.withMiddleware("POST", "/api/v1/userExample/delete/ids", r.DeleteByIDs_0)...)
@@ -132,7 +132,7 @@ func (r *userExampleServiceRouter) register() {
 
 }
 
-func (r *userExampleServiceRouter) withMiddleware(method string, path string, fn gin.HandlerFunc) []gin.HandlerFunc {
+func (r *userExampleRouter) withMiddleware(method string, path string, fn gin.HandlerFunc) []gin.HandlerFunc {
 	handlerFns := []gin.HandlerFunc{}
 
 	// determine if a route group is hit or miss, left prefix rule
@@ -159,7 +159,7 @@ func (r *userExampleServiceRouter) withMiddleware(method string, path string, fn
 	return append(handlerFns, fn)
 }
 
-func (r *userExampleServiceRouter) Create_0(c *gin.Context) {
+func (r *userExampleRouter) Create_0(c *gin.Context) {
 	req := &CreateUserExampleRequest{}
 	var err error
 
@@ -185,7 +185,7 @@ func (r *userExampleServiceRouter) Create_0(c *gin.Context) {
 	r.iResponse.Success(c, out)
 }
 
-func (r *userExampleServiceRouter) DeleteByID_0(c *gin.Context) {
+func (r *userExampleRouter) DeleteByID_0(c *gin.Context) {
 	req := &DeleteUserExampleByIDRequest{}
 	var err error
 
@@ -217,7 +217,7 @@ func (r *userExampleServiceRouter) DeleteByID_0(c *gin.Context) {
 	r.iResponse.Success(c, out)
 }
 
-func (r *userExampleServiceRouter) DeleteByIDs_0(c *gin.Context) {
+func (r *userExampleRouter) DeleteByIDs_0(c *gin.Context) {
 	req := &DeleteUserExampleByIDsRequest{}
 	var err error
 
@@ -243,7 +243,7 @@ func (r *userExampleServiceRouter) DeleteByIDs_0(c *gin.Context) {
 	r.iResponse.Success(c, out)
 }
 
-func (r *userExampleServiceRouter) UpdateByID_0(c *gin.Context) {
+func (r *userExampleRouter) UpdateByID_0(c *gin.Context) {
 	req := &UpdateUserExampleByIDRequest{}
 	var err error
 
@@ -275,7 +275,7 @@ func (r *userExampleServiceRouter) UpdateByID_0(c *gin.Context) {
 	r.iResponse.Success(c, out)
 }
 
-func (r *userExampleServiceRouter) GetByID_0(c *gin.Context) {
+func (r *userExampleRouter) GetByID_0(c *gin.Context) {
 	req := &GetUserExampleByIDRequest{}
 	var err error
 
@@ -307,7 +307,7 @@ func (r *userExampleServiceRouter) GetByID_0(c *gin.Context) {
 	r.iResponse.Success(c, out)
 }
 
-func (r *userExampleServiceRouter) ListByIDs_0(c *gin.Context) {
+func (r *userExampleRouter) ListByIDs_0(c *gin.Context) {
 	req := &ListUserExampleByIDsRequest{}
 	var err error
 
@@ -333,7 +333,7 @@ func (r *userExampleServiceRouter) ListByIDs_0(c *gin.Context) {
 	r.iResponse.Success(c, out)
 }
 
-func (r *userExampleServiceRouter) List_0(c *gin.Context) {
+func (r *userExampleRouter) List_0(c *gin.Context) {
 	req := &ListUserExampleRequest{}
 	var err error
 

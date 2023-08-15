@@ -197,7 +197,7 @@ var (
 {{- range $i, $v := .Methods}}
 	Status{{.MethodName}}{{.ServiceName}}   = errcode.NewRPCStatus(_{{.LowerServiceName}}BaseCode+{{$v.AddOne $i}}, "failed to {{.MethodName}} "+_{{.LowerServiceName}}Name)
 {{- end}}
-	// add +1 to the previous error code
+	// error codes are globally unique, adding 1 to the previous error code
 )
 
 // ---------- Do not delete or move this split line, this is the merge code marker ----------

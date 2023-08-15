@@ -38,9 +38,9 @@ func newUserExampleService() *gotest.Service {
 
 	// init mock service
 	s := gotest.NewService(d, testData)
-	serverNameExampleV1.RegisterUserExampleServiceServer(s.Server, &userExampleService{
-		UnimplementedUserExampleServiceServer: serverNameExampleV1.UnimplementedUserExampleServiceServer{},
-		iDao:                                  d.IDao.(dao.UserExampleDao),
+	serverNameExampleV1.RegisterUserExampleServer(s.Server, &userExample{
+		UnimplementedUserExampleServer: serverNameExampleV1.UnimplementedUserExampleServer{},
+		iDao:                           d.IDao.(dao.UserExampleDao),
 	})
 
 	// start up rpc server
@@ -48,7 +48,7 @@ func newUserExampleService() *gotest.Service {
 	time.Sleep(time.Millisecond * 100)
 
 	// grpc client
-	s.IServiceClient = serverNameExampleV1.NewUserExampleServiceClient(s.GetClientConn())
+	s.IServiceClient = serverNameExampleV1.NewUserExampleClient(s.GetClientConn())
 
 	return s
 }
@@ -66,7 +66,7 @@ func Test_userExampleService_Create(t *testing.T) {
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	s.MockDao.SQLMock.ExpectCommit()
 
-	reply, err := s.IServiceClient.(serverNameExampleV1.UserExampleServiceClient).Create(s.Ctx, testData)
+	reply, err := s.IServiceClient.(serverNameExampleV1.UserExampleClient).Create(s.Ctx, testData)
 	t.Log(err, reply.String())
 
 	// delete the templates code start
@@ -79,12 +79,12 @@ func Test_userExampleService_Create(t *testing.T) {
 		Age:      10,
 		Gender:   1,
 	}
-	reply, err = s.IServiceClient.(serverNameExampleV1.UserExampleServiceClient).Create(s.Ctx, testData)
+	reply, err = s.IServiceClient.(serverNameExampleV1.UserExampleClient).Create(s.Ctx, testData)
 	t.Log(err, reply.String())
 
 	s.MockDao.SQLMock.ExpectBegin()
 	s.MockDao.SQLMock.ExpectCommit()
-	reply, err = s.IServiceClient.(serverNameExampleV1.UserExampleServiceClient).Create(s.Ctx, testData)
+	reply, err = s.IServiceClient.(serverNameExampleV1.UserExampleClient).Create(s.Ctx, testData)
 	assert.Error(t, err)
 	// delete the templates code end
 }
@@ -102,18 +102,18 @@ func Test_userExampleService_DeleteByID(t *testing.T) {
 		WillReturnResult(sqlmock.NewResult(int64(testData.Id), 1))
 	s.MockDao.SQLMock.ExpectCommit()
 
-	reply, err := s.IServiceClient.(serverNameExampleV1.UserExampleServiceClient).DeleteByID(s.Ctx, testData)
+	reply, err := s.IServiceClient.(serverNameExampleV1.UserExampleClient).DeleteByID(s.Ctx, testData)
 	assert.NoError(t, err)
 	t.Log(reply.String())
 
 	// zero id error test
 	testData.Id = 0
-	reply, err = s.IServiceClient.(serverNameExampleV1.UserExampleServiceClient).DeleteByID(s.Ctx, testData)
+	reply, err = s.IServiceClient.(serverNameExampleV1.UserExampleClient).DeleteByID(s.Ctx, testData)
 	assert.Error(t, err)
 
 	// delete error test
 	testData.Id = 111
-	reply, err = s.IServiceClient.(serverNameExampleV1.UserExampleServiceClient).DeleteByID(s.Ctx, testData)
+	reply, err = s.IServiceClient.(serverNameExampleV1.UserExampleClient).DeleteByID(s.Ctx, testData)
 	assert.Error(t, err)
 }
 
@@ -131,18 +131,18 @@ func Test_userExampleService_DeleteByIDs(t *testing.T) {
 		WillReturnResult(sqlmock.NewResult(int64(data.ID), 1))
 	s.MockDao.SQLMock.ExpectCommit()
 
-	reply, err := s.IServiceClient.(serverNameExampleV1.UserExampleServiceClient).DeleteByIDs(s.Ctx, testData)
+	reply, err := s.IServiceClient.(serverNameExampleV1.UserExampleClient).DeleteByIDs(s.Ctx, testData)
 	assert.NoError(t, err)
 	t.Log(reply.String())
 
 	// zero id error test
 	testData.Ids = []uint64{}
-	reply, err = s.IServiceClient.(serverNameExampleV1.UserExampleServiceClient).DeleteByIDs(s.Ctx, testData)
+	reply, err = s.IServiceClient.(serverNameExampleV1.UserExampleClient).DeleteByIDs(s.Ctx, testData)
 	assert.Error(t, err)
 
 	// delete error test
 	testData.Ids = []uint64{111}
-	reply, err = s.IServiceClient.(serverNameExampleV1.UserExampleServiceClient).DeleteByIDs(s.Ctx, testData)
+	reply, err = s.IServiceClient.(serverNameExampleV1.UserExampleClient).DeleteByIDs(s.Ctx, testData)
 	assert.Error(t, err)
 }
 
@@ -160,18 +160,18 @@ func Test_userExampleService_UpdateByID(t *testing.T) {
 		WillReturnResult(sqlmock.NewResult(int64(testData.Id), 1))
 	s.MockDao.SQLMock.ExpectCommit()
 
-	reply, err := s.IServiceClient.(serverNameExampleV1.UserExampleServiceClient).UpdateByID(s.Ctx, testData)
+	reply, err := s.IServiceClient.(serverNameExampleV1.UserExampleClient).UpdateByID(s.Ctx, testData)
 	assert.NoError(t, err)
 	t.Log(reply.String())
 
 	// zero id error test
 	testData.Id = 0
-	reply, err = s.IServiceClient.(serverNameExampleV1.UserExampleServiceClient).UpdateByID(s.Ctx, testData)
+	reply, err = s.IServiceClient.(serverNameExampleV1.UserExampleClient).UpdateByID(s.Ctx, testData)
 	assert.Error(t, err)
 
 	// upate error test
 	testData.Id = 111
-	reply, err = s.IServiceClient.(serverNameExampleV1.UserExampleServiceClient).UpdateByID(s.Ctx, testData)
+	reply, err = s.IServiceClient.(serverNameExampleV1.UserExampleClient).UpdateByID(s.Ctx, testData)
 	assert.Error(t, err)
 }
 
@@ -190,18 +190,18 @@ func Test_userExampleService_GetByID(t *testing.T) {
 		WithArgs(testData.Id).
 		WillReturnRows(rows)
 
-	reply, err := s.IServiceClient.(serverNameExampleV1.UserExampleServiceClient).GetByID(s.Ctx, testData)
+	reply, err := s.IServiceClient.(serverNameExampleV1.UserExampleClient).GetByID(s.Ctx, testData)
 	assert.NoError(t, err)
 	t.Log(reply.String())
 
 	// zero id error test
 	testData.Id = 0
-	reply, err = s.IServiceClient.(serverNameExampleV1.UserExampleServiceClient).GetByID(s.Ctx, testData)
+	reply, err = s.IServiceClient.(serverNameExampleV1.UserExampleClient).GetByID(s.Ctx, testData)
 	assert.Error(t, err)
 
 	// get error test
 	testData.Id = 111
-	reply, err = s.IServiceClient.(serverNameExampleV1.UserExampleServiceClient).GetByID(s.Ctx, testData)
+	reply, err = s.IServiceClient.(serverNameExampleV1.UserExampleClient).GetByID(s.Ctx, testData)
 	assert.Error(t, err)
 }
 
@@ -220,13 +220,13 @@ func Test_userExampleService_ListByIDs(t *testing.T) {
 		WithArgs(data.ID).
 		WillReturnRows(rows)
 
-	reply, err := s.IServiceClient.(serverNameExampleV1.UserExampleServiceClient).ListByIDs(s.Ctx, testData)
+	reply, err := s.IServiceClient.(serverNameExampleV1.UserExampleClient).ListByIDs(s.Ctx, testData)
 	assert.NoError(t, err)
 	t.Log(reply.String())
 
 	// get error test
 	testData.Ids = []uint64{111}
-	reply, err = s.IServiceClient.(serverNameExampleV1.UserExampleServiceClient).ListByIDs(s.Ctx, testData)
+	reply, err = s.IServiceClient.(serverNameExampleV1.UserExampleClient).ListByIDs(s.Ctx, testData)
 	assert.Error(t, err)
 }
 
@@ -240,7 +240,7 @@ func Test_userExampleService_List(t *testing.T) {
 
 	s.MockDao.SQLMock.ExpectQuery("SELECT .*").WillReturnRows(rows)
 
-	reply, err := s.IServiceClient.(serverNameExampleV1.UserExampleServiceClient).List(s.Ctx, &serverNameExampleV1.ListUserExampleRequest{
+	reply, err := s.IServiceClient.(serverNameExampleV1.UserExampleClient).List(s.Ctx, &serverNameExampleV1.ListUserExampleRequest{
 		Params: &types.Params{
 			Page:  0,
 			Limit: 10,
@@ -251,7 +251,7 @@ func Test_userExampleService_List(t *testing.T) {
 	t.Log(reply.String())
 
 	// get error test
-	reply, err = s.IServiceClient.(serverNameExampleV1.UserExampleServiceClient).List(s.Ctx, &serverNameExampleV1.ListUserExampleRequest{
+	reply, err = s.IServiceClient.(serverNameExampleV1.UserExampleClient).List(s.Ctx, &serverNameExampleV1.ListUserExampleRequest{
 		Params: &types.Params{
 			Page:  0,
 			Limit: 10,

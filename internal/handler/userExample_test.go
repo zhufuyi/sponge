@@ -41,49 +41,50 @@ func newUserExampleHandler() *gotest.Handler {
 	// init mock handler
 	h := gotest.NewHandler(d, testData)
 	h.IHandler = &userExampleHandler{iDao: d.IDao.(dao.UserExampleDao)}
+	iHandler := h.IHandler.(UserExampleHandler)
 
 	testFns := []gotest.RouterInfo{
 		{
 			FuncName:    "Create",
 			Method:      http.MethodPost,
 			Path:        "/userExample",
-			HandlerFunc: h.IHandler.(UserExampleHandler).Create,
+			HandlerFunc: iHandler.Create,
 		},
 		{
 			FuncName:    "DeleteByID",
 			Method:      http.MethodDelete,
 			Path:        "/userExample/:id",
-			HandlerFunc: h.IHandler.(UserExampleHandler).DeleteByID,
+			HandlerFunc: iHandler.DeleteByID,
 		},
 		{
 			FuncName:    "DeleteByIDs",
 			Method:      http.MethodPost,
 			Path:        "/userExample/delete/ids",
-			HandlerFunc: h.IHandler.(UserExampleHandler).DeleteByIDs,
+			HandlerFunc: iHandler.DeleteByIDs,
 		},
 		{
 			FuncName:    "UpdateByID",
 			Method:      http.MethodPut,
 			Path:        "/userExample/:id",
-			HandlerFunc: h.IHandler.(UserExampleHandler).UpdateByID,
+			HandlerFunc: iHandler.UpdateByID,
 		},
 		{
 			FuncName:    "GetByID",
 			Method:      http.MethodGet,
 			Path:        "/userExample/:id",
-			HandlerFunc: h.IHandler.(UserExampleHandler).GetByID,
+			HandlerFunc: iHandler.GetByID,
 		},
 		{
 			FuncName:    "ListByIDs",
 			Method:      http.MethodPost,
 			Path:        "/userExample/list/ids",
-			HandlerFunc: h.IHandler.(UserExampleHandler).ListByIDs,
+			HandlerFunc: iHandler.ListByIDs,
 		},
 		{
 			FuncName:    "List",
 			Method:      http.MethodPost,
 			Path:        "/userExample/list",
-			HandlerFunc: h.IHandler.(UserExampleHandler).List,
+			HandlerFunc: iHandler.List,
 		},
 	}
 

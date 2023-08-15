@@ -188,7 +188,7 @@ var (
 {{- range $i, $v := .Methods}}
 	Err{{.MethodName}}{{.ServiceName}}   = errcode.NewError({{.LowerServiceName}}BaseCode+{{$v.AddOne $i}}, "failed to {{.MethodName}} "+{{.LowerServiceName}}Name)
 {{- end}}
-	// add +1 to the previous error code
+	// error codes are globally unique, adding 1 to the previous error code
 )
 
 // ---------- Do not delete or move this split line, this is the merge code marker ----------

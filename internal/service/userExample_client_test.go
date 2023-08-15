@@ -18,7 +18,7 @@ import (
 // Test each method of userExample via the rpc client
 func Test_service_userExample_methods(t *testing.T) {
 	conn := getRPCClientConnForTest()
-	cli := serverNameExampleV1.NewUserExampleServiceClient(conn)
+	cli := serverNameExampleV1.NewUserExampleClient(conn)
 	ctx, _ := context.WithTimeout(context.Background(), time.Second*3)
 	//ctx = interceptor.SetJwtTokenToCtx(ctx, "Bearer jwt-token-value")
 

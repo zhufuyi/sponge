@@ -18,5 +18,5 @@ var (
 	ErrGetUserExample         = errcode.NewError(userExampleBaseCode+5, "failed to get "+userExampleName+" details")
 	ErrListByIDsUserExample   = errcode.NewError(userExampleBaseCode+6, "failed to list by batch ids "+userExampleName)
 	ErrListUserExample        = errcode.NewError(userExampleBaseCode+7, "failed to list of "+userExampleName)
-	// for each error code added, add +1 to the previous error code
+	// error codes are globally unique, adding 1 to the previous error code
 )

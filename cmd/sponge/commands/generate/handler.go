@@ -117,7 +117,7 @@ func runGenHandlerCommand(moduleName string, codes map[string]string, outPath st
 	ignoreFiles := []string{ // specify the files in the subdirectory to be ignored for processing
 		"systemCode_http.go", "systemCode_rpc.go", "userExample_rpc.go", // internal/ecode
 		"init.go", "init_test.go", // internal/model
-		"routers.go", "routers_test.go", "routers_pbExample.go", "routers_pbExample_test.go", "userExample_service.pb.go", // internal/routers
+		"routers.go", "routers_test.go", "routers_pbExample.go", "routers_pbExample_test.go", "userExample_router.go", // internal/routers
 		"swagger_types.go",                                          // internal/types
 		"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", // internal/cache
 	}

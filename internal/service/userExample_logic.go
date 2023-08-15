@@ -7,59 +7,59 @@ import (
 	"github.com/zhufuyi/sponge/internal/rpcclient"
 )
 
-var _ serverNameExampleV1.UserExampleServiceLogicer = (*userExampleServiceClient)(nil)
+var _ serverNameExampleV1.UserExampleLogicer = (*userExampleClient)(nil)
 
-type userExampleServiceClient struct {
-	userExampleServiceCli serverNameExampleV1.UserExampleServiceClient
+type userExampleClient struct {
+	userExampleCli serverNameExampleV1.UserExampleClient
 	// If required, fill in the definition of the other service client code here.
 }
 
-// NewUserExampleServiceClient creating rpc clients
-func NewUserExampleServiceClient() serverNameExampleV1.UserExampleServiceLogicer {
-	return &userExampleServiceClient{
-		userExampleServiceCli: serverNameExampleV1.NewUserExampleServiceClient(rpcclient.GetServerNameExampleRPCConn()),
+// NewUserExampleClient creating rpc clients
+func NewUserExampleClient() serverNameExampleV1.UserExampleLogicer {
+	return &userExampleClient{
+		userExampleCli: serverNameExampleV1.NewUserExampleClient(rpcclient.GetServerNameExampleRPCConn()),
 		// If required, fill in the code to implement other service clients here.
 	}
 }
 
-func (c *userExampleServiceClient) Create(ctx context.Context, req *serverNameExampleV1.CreateUserExampleRequest) (*serverNameExampleV1.CreateUserExampleReply, error) {
+func (c *userExampleClient) Create(ctx context.Context, req *serverNameExampleV1.CreateUserExampleRequest) (*serverNameExampleV1.CreateUserExampleReply, error) {
 	// implement me
 	// If required, fill in the code to fetch data from other rpc servers here.
-	return c.userExampleServiceCli.Create(ctx, req)
+	return c.userExampleCli.Create(ctx, req)
 }
 
-func (c *userExampleServiceClient) DeleteByID(ctx context.Context, req *serverNameExampleV1.DeleteUserExampleByIDRequest) (*serverNameExampleV1.DeleteUserExampleByIDReply, error) {
+func (c *userExampleClient) DeleteByID(ctx context.Context, req *serverNameExampleV1.DeleteUserExampleByIDRequest) (*serverNameExampleV1.DeleteUserExampleByIDReply, error) {
 	// implement me
 	// If required, fill in the code to fetch data from other rpc servers here.
-	return c.userExampleServiceCli.DeleteByID(ctx, req)
+	return c.userExampleCli.DeleteByID(ctx, req)
 }
 
-func (c *userExampleServiceClient) DeleteByIDs(ctx context.Context, req *serverNameExampleV1.DeleteUserExampleByIDsRequest) (*serverNameExampleV1.DeleteUserExampleByIDsReply, error) {
+func (c *userExampleClient) DeleteByIDs(ctx context.Context, req *serverNameExampleV1.DeleteUserExampleByIDsRequest) (*serverNameExampleV1.DeleteUserExampleByIDsReply, error) {
 	// implement me
 	// If required, fill in the code to fetch data from other rpc servers here.
-	return c.userExampleServiceCli.DeleteByIDs(ctx, req)
+	return c.userExampleCli.DeleteByIDs(ctx, req)
 }
 
-func (c *userExampleServiceClient) UpdateByID(ctx context.Context, req *serverNameExampleV1.UpdateUserExampleByIDRequest) (*serverNameExampleV1.UpdateUserExampleByIDReply, error) {
+func (c *userExampleClient) UpdateByID(ctx context.Context, req *serverNameExampleV1.UpdateUserExampleByIDRequest) (*serverNameExampleV1.UpdateUserExampleByIDReply, error) {
 	// implement me
 	// If required, fill in the code to fetch data from other rpc servers here.
-	return c.userExampleServiceCli.UpdateByID(ctx, req)
+	return c.userExampleCli.UpdateByID(ctx, req)
 }
 
-func (c *userExampleServiceClient) GetByID(ctx context.Context, req *serverNameExampleV1.GetUserExampleByIDRequest) (*serverNameExampleV1.GetUserExampleByIDReply, error) {
+func (c *userExampleClient) GetByID(ctx context.Context, req *serverNameExampleV1.GetUserExampleByIDRequest) (*serverNameExampleV1.GetUserExampleByIDReply, error) {
 	// implement me
 	// If required, fill in the code to fetch data from other rpc servers here.
-	return c.userExampleServiceCli.GetByID(ctx, req)
+	return c.userExampleCli.GetByID(ctx, req)
 }
 
-func (c *userExampleServiceClient) ListByIDs(ctx context.Context, req *serverNameExampleV1.ListUserExampleByIDsRequest) (*serverNameExampleV1.ListUserExampleByIDsReply, error) {
+func (c *userExampleClient) ListByIDs(ctx context.Context, req *serverNameExampleV1.ListUserExampleByIDsRequest) (*serverNameExampleV1.ListUserExampleByIDsReply, error) {
 	// implement me
 	// If required, fill in the code to fetch data from other rpc servers here.
-	return c.userExampleServiceCli.ListByIDs(ctx, req)
+	return c.userExampleCli.ListByIDs(ctx, req)
 }
 
-func (c *userExampleServiceClient) List(ctx context.Context, req *serverNameExampleV1.ListUserExampleRequest) (*serverNameExampleV1.ListUserExampleReply, error) {
+func (c *userExampleClient) List(ctx context.Context, req *serverNameExampleV1.ListUserExampleRequest) (*serverNameExampleV1.ListUserExampleReply, error) {
 	// implement me
 	// If required, fill in the code to fetch data from other rpc servers here.
-	return c.userExampleServiceCli.List(ctx, req)
+	return c.userExampleCli.List(ctx, req)
 }

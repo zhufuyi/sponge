@@ -18,5 +18,5 @@ var (
 	StatusGetUserExample         = errcode.NewRPCStatus(_userExampleBaseCode+5, "failed to get "+_userExampleName+" details")
 	StatusListByIDsUserExample   = errcode.NewRPCStatus(_userExampleBaseCode+6, "failed to list by batch ids "+_userExampleName)
 	StatusListUserExample        = errcode.NewRPCStatus(_userExampleBaseCode+7, "failed to list of "+_userExampleName)
-	// add +1 to the previous error code
+	// error codes are globally unique, adding 1 to the previous error code
 )

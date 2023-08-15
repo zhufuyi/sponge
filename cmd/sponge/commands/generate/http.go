@@ -100,7 +100,7 @@ func runGenHTTPCommand(moduleName string, serverName string, projectName string,
 	ignoreFiles := []string{ // specify the files in the subdirectory to be ignored for processing
 		"swagger.json", "swagger.yaml", "apis.swagger.json", "apis.html", "apis.go", // sponge/docs
 		"userExample_rpc.go", "systemCode_rpc.go", // internal/ecode
-		"routers_pbExample.go", "routers_pbExample_test.go", "userExample_service.pb.go", // internal/routers
+		"routers_pbExample.go", "routers_pbExample_test.go", "userExample_router.go", // internal/routers
 		"grpc.go", "grpc_option.go", "grpc_test.go", // internal/server
 		"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", // internal/cache
 	}
