@@ -169,6 +169,12 @@ deploy-binary: binary-package
 	@expect scripts/deploy-binary.sh $(USER) $(PWD) $(IP)
 
 
+.PHONY: patch
+# patch some dependent code, such as types.proto, mysql initialization code. e.g. make patch TYPE=types-pb , make patch TYPE=mysql-redis-init
+patch:
+	@bash scripts/patch.sh $(TYPE)
+
+
 .PHONY: clean
 # clean binary file, cover.out, template file
 clean:
