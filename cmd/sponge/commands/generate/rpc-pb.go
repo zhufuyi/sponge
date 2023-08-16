@@ -106,9 +106,9 @@ func runGenRPCPbCommand(moduleName string, serverName string, projectName string
 
 	fmt.Printf(`
 using help:
-  1. open a terminal and execute the command to generate the *pb.go file and the service template code: make proto
+  1. open a terminal and execute the command to generate codes: make proto
   2. open file 'internal/service/xxx.go', replace panic("implement me") according to template code example.
-  3. compiling and starting services: make run
+  3. compile and run service: make run
   4. open the file 'internal/service/xxx_client_test.go' using Goland or VS Code, testing the rpc methods.
 
 `)

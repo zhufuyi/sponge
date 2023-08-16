@@ -74,21 +74,18 @@ Examples:
 					return err
 				}
 
-				dir, err := runGenServiceCommand(moduleName, serverName, codes, outPath)
+				outPath, err = runGenServiceCommand(moduleName, serverName, codes, outPath)
 				if err != nil {
 					return err
-				}
-				if outPath == "" {
-					outPath = dir
 				}
 			}
 
 			fmt.Printf(`
 using help:
-  1. move the code to the rpc project folder.
-  2. open a terminal and execute the command to generate code in the rpc project folder: make proto
-  3. compiling and starting services: make run
-  4. open the file 'internal/service/xxx_client_test.go' using Goland or VS Code, test the rpc's CRUD methods.
+  1. move the folders "api" and "internal" to your project code folder.
+  2. open a terminal and execute the command to generate codes: make proto
+  3. compile and run service: make run
+  4. open the file internal/service/xxx_client_test.go using Goland or VS Code, and test the CRUD api interface.
 
 `)
 			fmt.Printf("generate 'service' codes successfully, out = %s\n", outPath)

@@ -18,7 +18,7 @@ var statusCodes = map[codes.Code]string{}
 // NewRPCStatus create a new rpc status
 func NewRPCStatus(code codes.Code, msg string) *RPCStatus {
 	if v, ok := statusCodes[code]; ok {
-		panic(fmt.Sprintf("grpc status code = %d already exists, please replace with a new error code, old msg = %s", code, v))
+		panic(fmt.Sprintf("grpc status code = %d already exists, please define a new error code, old msg = %s", code, v))
 	} else {
 		statusCodes[code] = msg
 	}

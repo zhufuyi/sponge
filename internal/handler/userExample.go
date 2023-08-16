@@ -162,7 +162,7 @@ func (h *userExampleHandler) UpdateByID(c *gin.Context) {
 	userExample := &model.UserExample{}
 	err = copier.Copy(userExample, form)
 	if err != nil {
-		response.Error(c, ecode.ErrUpdateUserExample)
+		response.Error(c, ecode.ErrUpdateByIDUserExample)
 		return
 	}
 
@@ -206,7 +206,7 @@ func (h *userExampleHandler) GetByID(c *gin.Context) {
 	data := &types.GetUserExampleByIDRespond{}
 	err = copier.Copy(data, userExample)
 	if err != nil {
-		response.Error(c, ecode.ErrGetUserExample)
+		response.Error(c, ecode.ErrGetByIDUserExample)
 		return
 	}
 	data.ID = idStr

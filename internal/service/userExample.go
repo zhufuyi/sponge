@@ -111,7 +111,7 @@ func (s *userExample) UpdateByID(ctx context.Context, req *serverNameExampleV1.U
 	userExample := &model.UserExample{}
 	err = copier.Copy(userExample, req)
 	if err != nil {
-		return nil, ecode.StatusUpdateUserExample.Err()
+		return nil, ecode.StatusUpdateByIDUserExample.Err()
 	}
 	userExample.ID = req.Id
 
@@ -145,7 +145,7 @@ func (s *userExample) GetByID(ctx context.Context, req *serverNameExampleV1.GetU
 	data, err := convertUserExample(record)
 	if err != nil {
 		logger.Warn("convertUserExample error", logger.Err(err), logger.Any("userExample", record), interceptor.ServerCtxRequestIDField(ctx))
-		return nil, ecode.StatusGetUserExample.Err()
+		return nil, ecode.StatusGetByIDUserExample.Err()
 	}
 
 	return &serverNameExampleV1.GetUserExampleByIDReply{UserExample: data}, nil

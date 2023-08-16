@@ -20,7 +20,7 @@ type Error struct {
 // NewError create a new error message
 func NewError(code int, msg string) *Error {
 	if v, ok := errCodes[code]; ok {
-		panic(fmt.Sprintf("http error code = %d already exists, please replace with a new error code, old msg = %s", code, v.Msg()))
+		panic(fmt.Sprintf("http error code = %d already exists, please define a new error code, old msg = %s", code, v.Msg()))
 	}
 	e := &Error{code: code, msg: msg}
 	errCodes[code] = e

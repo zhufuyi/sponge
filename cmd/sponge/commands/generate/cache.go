@@ -44,17 +44,15 @@ Examples:
 				return errors.New(`required flag(s) "module-name" not set, use "sponge micro cache -h" for help`)
 			}
 
-			dir, err := runCacheCommand(moduleName, cacheName, prefixKey, keyName, keyType, valueName, valueType, outPath)
+			var err error
+			outPath, err = runCacheCommand(moduleName, cacheName, prefixKey, keyName, keyType, valueName, valueType, outPath)
 			if err != nil {
 				return err
-			}
-			if outPath == "" {
-				outPath = dir
 			}
 
 			fmt.Printf(`
 using help:
-  move the code to the web or rpc project folder.
+  move the folder "internal" to your project code folder.
 
 `)
 			fmt.Printf("generate 'cache' codes successfully, out = %s\n", outPath)

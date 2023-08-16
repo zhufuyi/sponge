@@ -49,18 +49,16 @@ Examples:
 					continue
 				}
 
-				dir, err := runGenRPCConnectionCommand(moduleName, rpcName, outPath)
+				var err error
+				outPath, err = runGenRPCConnectionCommand(moduleName, rpcName, outPath)
 				if err != nil {
 					return err
-				}
-				if outPath == "" {
-					outPath = dir
 				}
 			}
 
 			fmt.Printf(`
 using help:
-  move the rpc connection code to the web or microservice project.
+  move the folder "internal" to your project code folder.
 
 `)
 			fmt.Printf("generate 'rpc-conn' codes successfully, out = %s\n", outPath)

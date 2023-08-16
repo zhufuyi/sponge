@@ -35,7 +35,7 @@ type replacerInfo struct {
 	fs                embed.FS // Template directory corresponding to binary objects
 	isActual          bool     // true: use os to manipulate files, false: use fs to manipulate files
 	files             []string // list of template files
-	ignoreFiles       []string // ignore the list of replaced files
+	ignoreFiles       []string // ignore the list of replaced files, e.g. ignore.txt or myDir/ignore.txt
 	ignoreDirs        []string // ignore processed subdirectories
 	replacementFields []Field  // characters to be replaced when converting from a template file to a new file
 	outPath           string   // the directory where the file is saved after replacement
@@ -415,6 +415,14 @@ func isMatchFile(filePath string, sf string) bool {
 	dir2, file2 := filepath.Split(sf)
 	if file1 != file2 {
 		return false
+	}
+
+	if gofile.IsWindows() {
+		dir1 = strings.ReplaceAll(dir1, "/", "\\")
+		dir2 = strings.ReplaceAll(dir2, "/", "\\")
+	} else {
+		dir1 = strings.ReplaceAll(dir1, "\\", "/")
+		dir2 = strings.ReplaceAll(dir2, "\\", "/")
 	}
 
 	l1, l2 := len(dir1), len(dir2)

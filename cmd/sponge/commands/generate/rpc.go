@@ -123,9 +123,9 @@ func runGenRPCCommand(moduleName string, serverName string, projectName string, 
 
 	fmt.Printf(`
 using help:
-  1. open a terminal and execute the command to generate code:  make proto
-  2. compiling and starting services:   make run
-  3. open the file 'internal/service/xxx_client_test.go' using Goland or VS Code, test rpc's CRUD methods.
+  1. open a terminal and execute the command to generate codes:  make proto
+  2. compile and run service:   make run
+  3. open the file internal/service/xxx_client_test.go using Goland or VS Code, and test CRUD api interface.
 
 `)
 	fmt.Printf("generate %s's rpc server codes successfully, out = %s\n", serverName, r.GetOutputDir())

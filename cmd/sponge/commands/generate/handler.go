@@ -67,21 +67,18 @@ Examples:
 					return err
 				}
 
-				outDir, err := runGenHandlerCommand(moduleName, codes, outPath)
+				outPath, err = runGenHandlerCommand(moduleName, codes, outPath)
 				if err != nil {
 					return err
-				}
-				if outPath == "" {
-					outPath = outDir
 				}
 			}
 
 			fmt.Printf(`
 using help:
-  1. move the code to the web project folder.
-  2. open a terminal and execute the command to update the swagger documentation in the web project folder: make docs
-  3. compiling and starting services: make run
-  4. copy the 'http://localhost:8080/swagger/index.html' to your browser, and test the CRUD interface.
+  1. move the folder "internal" to your project code folder.
+  2. open a terminal and execute the command: make docs
+  3. compile and run service: make run
+  4. visit http://localhost:8080/swagger/index.html to your browser, and test the CRUD api interface.
 
 `)
 			fmt.Printf("generate 'handler' codes successfully, out = %s\n", outPath)

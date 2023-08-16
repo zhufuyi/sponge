@@ -74,18 +74,15 @@ Examples:
 					isIncludeInitDB = false
 				}
 
-				dir, err := runGenDaoCommand(moduleName, isIncludeInitDB, codes, outPath)
+				outPath, err = runGenDaoCommand(moduleName, isIncludeInitDB, codes, outPath)
 				if err != nil {
 					return err
-				}
-				if outPath == "" {
-					outPath = dir
 				}
 			}
 
 			fmt.Printf(`
 using help:
-  move the code to the web or rpc project folder.
+  move the folder "internal" to your project code folder.
 
 `)
 			fmt.Printf("generate 'dao' codes successfully, out = %s\n", outPath)

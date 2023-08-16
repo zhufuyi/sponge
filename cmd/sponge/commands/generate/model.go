@@ -58,18 +58,15 @@ Examples:
 					return err
 				}
 
-				dir, err := runGenModelCommand(codes, outPath)
+				outPath, err = runGenModelCommand(codes, outPath)
 				if err != nil {
 					return err
-				}
-				if outPath == "" {
-					outPath = dir
 				}
 			}
 
 			fmt.Printf(`
 using help:
-  generate structures corresponding to gorm based on mysql tables.
+  move the folder "internal" to your project code folder.
 
 `)
 			fmt.Printf("generate 'model' codes successfully, out = %s\n", outPath)

@@ -119,9 +119,9 @@ func runGenHTTPCommand(moduleName string, serverName string, projectName string,
 
 	fmt.Printf(`
 using help:
-  1. open a terminal and execute the command to update the swagger documentation: make docs
-  2. compiling and starting services: make run
-  3. copy the url http://localhost:8080/swagger/index.html to your browser, and test the CRUD interface.
+  1. open a terminal and execute the command to generate the swagger documentation: make docs
+  2. compile and run service: make run
+  3. visit http://localhost:8080/swagger/index.html in your browser, and test the CRUD api interface.
 
 `)
 	fmt.Printf("generate %s's http server codes successfully, out = %s\n", serverName, r.GetOutputDir())

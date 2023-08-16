@@ -68,23 +68,15 @@ Examples:
 					return err
 				}
 
-				dir, err := runGenProtoCommand(moduleName, serverName, codes, outPath)
+				outPath, err = runGenProtoCommand(moduleName, serverName, codes, outPath)
 				if err != nil {
 					return err
-				}
-				if outPath == "" {
-					outPath = dir
 				}
 			}
 
 			fmt.Printf(`
 using help:
-  the proto file can be used in the following scenarios.
-    ● generate swagger documents.
-    ● generate the required code as a custom plug-in for protoc.
-    ● provided to sponge to create web projects.
-    ● provided to sponge to create rpc gateway projects.
-    ● provided for sponge to create rpc projects.
+  move the folder "internal" to your project code folder.
 
 `)
 			fmt.Printf("generate 'protocol buffers' codes successfully, out = %s\n", outPath)
