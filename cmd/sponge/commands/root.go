@@ -36,6 +36,7 @@ based on gin and grpc encapsulation, and an open source framework for rapid appl
 		NewRunCommand(),
 		generate.DeleteJSONOmitemptyCommand(),
 		MergeCommand(),
+		GenCommand(),
 	)
 
 	return cmd
