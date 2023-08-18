@@ -91,6 +91,98 @@ type Get{{.TableName}}ByIDRespond struct {
 package api.serverNameExample.v1;
 
 import "api/types/types.proto";
+//import "validate/validate.proto";
+
+option go_package = "github.com/zhufuyi/sponge/api/serverNameExample/v1;v1";
+
+service {{.TName}} {
+  // create {{.TName}}
+  rpc Create(Create{{.TableName}}Request) returns (Create{{.TableName}}Reply) {}
+
+  // delete {{.TName}} by id
+  rpc DeleteByID(Delete{{.TableName}}ByIDRequest) returns (Delete{{.TableName}}ByIDReply) {}
+
+  // delete {{.TName}} by batch id
+  rpc DeleteByIDs(Delete{{.TableName}}ByIDsRequest) returns (Delete{{.TableName}}ByIDsReply) {}
+
+  // update {{.TName}} by id
+  rpc UpdateByID(Update{{.TableName}}ByIDRequest) returns (Update{{.TableName}}ByIDReply) {}
+
+  // get {{.TName}} by id
+  rpc GetByID(Get{{.TableName}}ByIDRequest) returns (Get{{.TableName}}ByIDReply) {}
+
+  // list of {{.TName}} by batch id
+  rpc ListByIDs(List{{.TableName}}ByIDsRequest) returns (List{{.TableName}}ByIDsReply) {}
+
+  // list of {{.TName}} by query parameters
+  rpc List(List{{.TableName}}Request) returns (List{{.TableName}}Reply) {}
+}
+
+// Some notes on defining fields under message:
+// Fill in the validate rules https://github.com/envoyproxy/protoc-gen-validate#constraint-rules
+
+// protoMessageCreateCode
+
+message Create{{.TableName}}Reply {
+  uint64   id =1;
+}
+
+message Delete{{.TableName}}ByIDRequest {
+  uint64   id =1;
+}
+
+message Delete{{.TableName}}ByIDReply {
+
+}
+
+message Delete{{.TableName}}ByIDsRequest {
+  repeated uint64 ids = 1;
+}
+
+message Delete{{.TableName}}ByIDsReply {
+
+}
+
+// protoMessageUpdateCode
+
+message Update{{.TableName}}ByIDReply {
+
+}
+
+// protoMessageDetailCode
+
+message Get{{.TableName}}ByIDRequest {
+  uint64   id =1;
+}
+
+message Get{{.TableName}}ByIDReply {
+  {{.TableName}} {{.TName}} = 1;
+}
+
+message List{{.TableName}}ByIDsRequest {
+  repeated uint64 ids = 1;
+}
+
+message List{{.TableName}}ByIDsReply {
+  repeated {{.TableName}} {{.TName}}s = 1;
+}
+
+message List{{.TableName}}Request {
+  types.Params params = 1;
+}
+
+message List{{.TableName}}Reply {
+  int64 total =1;
+  repeated {{.TableName}} {{.TName}}s = 2;
+}
+`
+
+	protoFileForWebTmpl    *template.Template
+	protoFileForWebTmplRaw = `syntax = "proto3";
+
+package api.serverNameExample.v1;
+
+import "api/types/types.proto";
 import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "tagger/tagger.proto";
@@ -126,6 +218,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 };
 
 service {{.TName}} {
+  // create {{.TName}}
   rpc Create(Create{{.TableName}}Request) returns (Create{{.TableName}}Reply) {
     option (google.api.http) = {
       post: "/api/v1/{{.TName}}"
@@ -134,10 +227,10 @@ service {{.TName}} {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "create {{.TName}}",
       description: "submit information to create {{.TName}}",
-      tags: "{{.TName}}",
     };
   }
 
+  // delete {{.TName}} by id
   rpc DeleteByID(Delete{{.TableName}}ByIDRequest) returns (Delete{{.TableName}}ByIDReply) {
     option (google.api.http) = {
       delete: "/api/v1/{{.TName}}/{id}"
@@ -145,7 +238,6 @@ service {{.TName}} {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "delete {{.TName}}",
       description: "delete {{.TName}} by id",
-      tags: "{{.TName}}",
       //security: {
       //  security_requirement: {
       //    key: "BearerAuth";
@@ -155,6 +247,7 @@ service {{.TName}} {
     };
   }
 
+  // delete {{.TName}} by batch id
   rpc DeleteByIDs(Delete{{.TableName}}ByIDsRequest) returns (Delete{{.TableName}}ByIDsReply) {
     option (google.api.http) = {
       post: "/api/v1/{{.TName}}/delete/ids"
@@ -163,7 +256,6 @@ service {{.TName}} {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "delete {{.TName}}s by batch id",
       description: "delete {{.TName}}s by batch id",
-      tags: "{{.TName}}",
       //security: {
       //  security_requirement: {
       //    key: "BearerAuth";
@@ -173,6 +265,7 @@ service {{.TName}} {
     };
   }
 
+  // update {{.TName}} by id
   rpc UpdateByID(Update{{.TableName}}ByIDRequest) returns (Update{{.TableName}}ByIDReply) {
     option (google.api.http) = {
       put: "/api/v1/{{.TName}}/{id}"
@@ -181,7 +274,6 @@ service {{.TName}} {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "update {{.TName}}",
       description: "update {{.TName}} by id",
-      tags: "{{.TName}}",
       //security: {
       //  security_requirement: {
       //    key: "BearerAuth";
@@ -191,6 +283,7 @@ service {{.TName}} {
     };
   }
 
+  // get {{.TName}} by id
   rpc GetByID(Get{{.TableName}}ByIDRequest) returns (Get{{.TableName}}ByIDReply) {
     option (google.api.http) = {
       get: "/api/v1/{{.TName}}/{id}"
@@ -198,7 +291,6 @@ service {{.TName}} {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "get {{.TName}} detail",
       description: "get {{.TName}} detail by id",
-      tags: "{{.TName}}",
       //security: {
       //  security_requirement: {
       //    key: "BearerAuth";
@@ -208,6 +300,7 @@ service {{.TName}} {
     };
   }
 
+  // list of {{.TName}} by batch id
   rpc ListByIDs(List{{.TableName}}ByIDsRequest) returns (List{{.TableName}}ByIDsReply) {
     option (google.api.http) = {
       post: "/api/v1/{{.TName}}/list/ids"
@@ -216,7 +309,6 @@ service {{.TName}} {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "list of {{.TName}}s by batch id",
       description: "list of {{.TName}}s by batch id",
-      tags: "{{.TName}}",
       //security: {
       //  security_requirement: {
       //    key: "BearerAuth";
@@ -226,6 +318,7 @@ service {{.TName}} {
     };
   }
 
+  // list of {{.TName}} by query parameters
   rpc List(List{{.TableName}}Request) returns (List{{.TableName}}Reply) {
     option (google.api.http) = {
       post: "/api/v1/{{.TName}}/list"
@@ -234,7 +327,6 @@ service {{.TName}} {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "list of {{.TName}}s by parameters",
       description: "list of {{.TName}}s by paging and conditions",
-      tags: "{{.TName}}",
       //security: {
       //  security_requirement: {
       //    key: "BearerAuth";
@@ -408,6 +500,10 @@ func initTemplate() {
 		protoFileTmpl, err = template.New("protoFile").Parse(protoFileTmplRaw)
 		if err != nil {
 			errSum = errors.Wrap(errSum, "protoFileTmplRaw:"+err.Error())
+		}
+		protoFileForWebTmpl, err = template.New("protoFileForWeb").Parse(protoFileForWebTmplRaw)
+		if err != nil {
+			errSum = errors.Wrap(errSum, "protoFileForWebTmplRaw:"+err.Error())
 		}
 		protoMessageCreateTmpl, err = template.New("protoMessageCreate").Parse(protoMessageCreateTmplRaw)
 		if err != nil {

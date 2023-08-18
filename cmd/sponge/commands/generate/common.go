@@ -216,6 +216,17 @@ func saveGenInfo(moduleName string, serverName string, outputDir string) error {
 	return nil
 }
 
+func saveEmptySwaggerJSON(outputDir string) error {
+	dir := outputDir + "/docs"
+	_ = os.MkdirAll(dir, 0766)
+	file := dir + "/apis.swagger.json"
+	err := os.WriteFile(file, []byte(`{"swagger":"2.0","info":{"version":"version not set"}}`), 0666)
+	if err != nil {
+		return fmt.Errorf("save file %s error, %v", file, err)
+	}
+	return nil
+}
+
 // get moduleName and serverName from directory
 func getNamesFromOutDir(dir string) (moduleName string, serverName string) {
 	if dir == "" {

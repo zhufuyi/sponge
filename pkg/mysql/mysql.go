@@ -29,7 +29,7 @@ func Init(dns string, opts ...Option) (*gorm.DB, error) {
 
 	db, err := gorm.Open(mysqlDriver.New(mysqlDriver.Config{Conn: sqlDB}), gormConfig(o))
 	if err != nil {
-		return nil, fmt.Errorf("gorm.Open error, err: %v", err)
+		return nil, err
 	}
 	db.Set("gorm:table_options", "CHARSET=utf8mb4") // automatic appending of table suffixes when creating tables
 

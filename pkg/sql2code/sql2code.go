@@ -25,6 +25,7 @@ type Args struct {
 	JSONTag        bool   // does it include a json tag
 	JSONNamedType  int    // json field naming type, 0: snake case such as my_field_name, 1: camel sase, such as myFieldName
 	IsEmbed        bool   // is gorm.Model embedded
+	IsWebProto     bool   // proto file type, true: include router path and swagger info, false: normal proto file without router and swagger
 	CodeType       string // specify the different types of code to be generated, namely model (default), json, dao, handler, proto
 	ForceTableName bool
 	Charset        string
@@ -91,6 +92,9 @@ func getOptions(args *Args) []parser.Option {
 	}
 	if args.IsEmbed {
 		opts = append(opts, parser.WithEmbed())
+	}
+	if args.IsWebProto {
+		opts = append(opts, parser.WithWebProto())
 	}
 
 	if args.NullStyle != "" {

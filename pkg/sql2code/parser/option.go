@@ -26,6 +26,7 @@ type options struct {
 	GormType       bool
 	ForceTableName bool
 	IsEmbed        bool // is gorm.Model embedded
+	IsWebProto     bool // true: proto file include router path and swagger info, false: normal proto file without router and swagger
 }
 
 var defaultOptions = options{
@@ -108,6 +109,13 @@ func WithForceTableName() Option {
 func WithEmbed() Option {
 	return func(o *options) {
 		o.IsEmbed = true
+	}
+}
+
+// WithWebProto set proto file type
+func WithWebProto() Option {
+	return func(o *options) {
+		o.IsWebProto = true
 	}
 }
 

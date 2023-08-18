@@ -163,6 +163,7 @@ func Test_initTemplate(t *testing.T) {
 	handlerDetailStructTmplRaw = "{{if .foo}}"
 	modelJSONTmplRaw = "{{if .foo}}"
 	protoFileTmplRaw = "{{if .foo}}"
+	protoFileForWebTmplRaw = "{{if .foo}}"
 	protoMessageCreateTmplRaw = "{{if .foo}}"
 	protoMessageUpdateTmplRaw = "{{if .foo}}"
 	protoMessageDetailTmplRaw = "{{if .foo}}"

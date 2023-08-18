@@ -380,7 +380,7 @@ func makeCode(stmt *ast.CreateTableStmt, opt options) (*codeText, error) {
 		return nil, err
 	}
 
-	protoFileCode, err := getProtoFileCode(data)
+	protoFileCode, err := getProtoFileCode(data, opt.IsWebProto)
 	if err != nil {
 		return nil, err
 	}
@@ -565,13 +565,20 @@ func getModelJSONCode(data tmplData) (string, error) {
 	return modelJSONCode, nil
 }
 
-func getProtoFileCode(data tmplData) (string, error) {
+func getProtoFileCode(data tmplData, isWebProto bool) (string, error) {
 	data.Fields = goTypeToProto(data.Fields)
 
 	builder := strings.Builder{}
-	err := protoFileTmpl.Execute(&builder, data)
-	if err != nil {
-		return "", err
+	if isWebProto {
+		err := protoFileForWebTmpl.Execute(&builder, data)
+		if err != nil {
+			return "", err
+		}
+	} else {
+		err := protoFileTmpl.Execute(&builder, data)
+		if err != nil {
+			return "", err
+		}
 	}
 	code := builder.String()
 
@@ -583,6 +590,9 @@ func getProtoFileCode(data tmplData) (string, error) {
 	protoMessageUpdateCode, err := tmplExecuteWithFilter(data, protoMessageUpdateTmpl, columnID)
 	if err != nil {
 		return "", fmt.Errorf("handlerCreateStructTmpl error: %v", err)
+	}
+	if !isWebProto {
+		protoMessageUpdateCode = strings.ReplaceAll(protoMessageUpdateCode, ` [(tagger.tags) = "uri:\"id\"" ]`, "")
 	}
 
 	protoMessageDetailCode, err := tmplExecuteWithFilter(data, protoMessageDetailTmpl, columnID, columnCreatedAt, columnUpdatedAt)
