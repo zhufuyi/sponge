@@ -103,6 +103,7 @@ func runGenHTTPCommand(moduleName string, serverName string, projectName string,
 		"routers_pbExample.go", "routers_pbExample_test.go", "userExample_router.go", // internal/routers
 		"grpc.go", "grpc_option.go", "grpc_test.go", // internal/server
 		"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", // internal/cache
+		"handler/userExample_logic.go", // internal/handler
 	}
 
 	r.SetSubDirsAndFiles(subDirs, subFiles...)

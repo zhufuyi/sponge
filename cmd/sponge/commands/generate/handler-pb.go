@@ -23,9 +23,10 @@ func HandlerPbCommand() *cobra.Command {
 		dbTables   string // table names
 
 		sqlArgs = sql2code.Args{
-			Package:  "model",
-			JSONTag:  true,
-			GormType: true,
+			Package:    "model",
+			JSONTag:    true,
+			GormType:   true,
+			IsWebProto: true,
 		}
 	)
 

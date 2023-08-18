@@ -106,6 +106,8 @@ func handleGenerateCode(c *gin.Context, outPath string, arg string) {
 	if params.ModuleName != "" {
 		out = params.ModuleName + "-" + out
 	}
+	out = os.TempDir() + gofile.GetPathDelimiter() + out
+	//fmt.Println("outTmp =", out)
 	args = append(args, fmt.Sprintf("--out=%s", out))
 
 	ctx, _ := context.WithTimeout(context.Background(), time.Second*10) // nolint
@@ -131,7 +133,7 @@ func handleGenerateCode(c *gin.Context, outPath string, arg string) {
 		return
 	}
 
-	c.Writer.Header().Set("content-disposition", zipFile)
+	c.Writer.Header().Set("content-disposition", gofile.GetFilename(zipFile))
 	c.File(zipFile)
 
 	recordObj().set(c.ClientIP(), outPath, params)

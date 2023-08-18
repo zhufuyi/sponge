@@ -193,8 +193,8 @@ func addServiceFields(moduleName string, serverName string, r replacer.Replacer,
 			New: fmt.Sprintf("api.%s.v1", strings.ReplaceAll(serverName, "-", "_")), // protobuf package no "-" signs allowed
 		},
 		{
-			Old: "userExampleNO       = 1",
-			New: fmt.Sprintf("userExampleNO = %d", rand.Intn(100)),
+			Old: "_userExampleNO       = 2",
+			New: fmt.Sprintf("_userExampleNO       = %d", rand.Intn(100)),
 		},
 		{
 			Old: moduleName + "/pkg",

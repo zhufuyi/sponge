@@ -98,6 +98,7 @@ func runCacheCommand(moduleName string, cacheName string, prefixKey string, keyN
 	}
 	ignoreDirs := []string{} // specify the directory in the subdirectory where processing is ignored
 	ignoreFiles := []string{ // specify the files in the subdirectory to be ignored for processing
+		"doc.go",
 		"userExample.go",
 		"userExample_test.go",
 	}

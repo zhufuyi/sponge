@@ -105,6 +105,7 @@ func runGenRPCGwCommand(moduleName string, serverName string, projectName string
 
 	_ = saveProtobufFiles(serverName, r.GetOutputDir(), protobufFiles)
 	_ = saveGenInfo(moduleName, serverName, r.GetOutputDir())
+	_ = saveEmptySwaggerJSON(r.GetOutputDir())
 
 	fmt.Printf(`
 using help:

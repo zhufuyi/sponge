@@ -235,8 +235,8 @@ func addRPCFields(moduleName string, serverName string, projectName string, repo
 			New: serverName + " api docs",
 		},
 		{
-			Old: "userExampleNO       = 1",
-			New: fmt.Sprintf("userExampleNO = %d", rand.Intn(100)),
+			Old: "_userExampleNO       = 2",
+			New: fmt.Sprintf("_userExampleNO       = %d", rand.Intn(100)),
 		},
 		{
 			Old: "serverNameExample",
