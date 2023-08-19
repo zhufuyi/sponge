@@ -1,116 +1,87 @@
-### 在linux或macOS上安装sponge
+### 安装依赖
 
-#### (1) 安装go，要求1.16版本以上
+> 安装sponge之前需要先安装`go`和`protoc`两个依赖。
+
+**✅ 安装 go**
 
 下载go地址： [https://studygolang.com/dl](https://studygolang.com/dl)
 
-安装完后查看go版本
+> 要求1.16以上版本，把`go install`命令编译生成的二进制文件所在目录(通常是$GOPATH/bin)添加到系统环境变量path。
 
-```bash
-go version
-```
-
-注：把go install命令编译生成的二进制文件所在目录(通常是$GOPATH/bin)添加到系统目录下。
+查看go版本 `go version`
 
 <br>
 
-#### (2) 安装 protoc，要求v3.20以上版本
+**✅ 安装 protoc**
 
 下载protoc地址： [https://github.com/protocolbuffers/protobuf/releases/tag/v3.20.3](https://github.com/protocolbuffers/protobuf/releases/tag/v3.20.3)
 
-把 protoc 二进制文件添加到系统path下。
+> 要求v3.20以上版本，把 protoc 二进制文件所在目录(建议是$GOPATH/bin)添加到系统环境变量path。
 
-安装完后查看protoc版本
-
-```bash
-protoc --version
-```
+查看protoc版本: `protoc --version`
 
 <br>
 
-#### (3) 安装 sponge
+安装完go和protoc之后，接下来安装sponge，支持在windows、mac、linux环境安装。
+
+> 如果不能科学上网，安装sponge时，获取github的库会遇到超时失败问题，建议设置为国内代理，执行命令 **go env -w GOPROXY=https://goproxy.cn,direct**
+
+<br>
+<br>
+
+### 在linux或macOS上安装sponge
 
 ```bash
 # 安装sponge
 go install github.com/zhufuyi/sponge/cmd/sponge@latest
 
-# 初始化sponge
+# 初始化sponge，自动安装sponge依赖插件
 sponge init
 
-# 查看插件是否都安装成功，如果有安装不成功，执行命令重试 sponge tools --install
+# 查看插件是否都安装成功，如果发现有插件没有安装成功，执行命令重试 sponge tools --install
 sponge tools
 
-# 安装完后查看sponge版本
+# 查看sponge版本
 sponge -v
 ```
 
-💡  如果想更新到最新版本，执行命令 `sponge upgrade`。
-
-<br>
 <br>
 <br>
 
-### 在windows上安装sponge
+### **Windows环境**
 
-#### (1) 安装go，要求1.16版本以上
+> 在windows环境中需要安装mingw64、make、cmder来支持linux命令环境才可以使用sponge。
 
-下载go地址： [https://studygolang.com/dl](https://studygolang.com/dl)
+**✅ 安装 mingw64**
 
-安装完后查看go版本
+下载mingw64地址： [x86_64-8.1.0-release-posix-seh-rt_v6-rev0.7z](https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/8.1.0/threads-posix/seh/x86_64-8.1.0-release-posix-seh-rt_v6-rev0.7z)
 
-```bash
-go version
-```
-
-注：把go install命令编译生成的二进制文件所在目录(通常是$GOPATH/bin)添加到系统目录下。
+下载后解压到`D:\Program Files\mingw64`目录，把linux常用命令所在的目录`D:\Program Files\mingw64\bin`添加系统环境变量PATH。
 
 <br>
 
-#### (2) 安装 protoc，v3.20以上版本
-
-下载protoc地址： [https://github.com/protocolbuffers/protobuf/releases/tag/v3.20.3](https://github.com/protocolbuffers/protobuf/releases/tag/v3.20.3)
-
-把 protoc 二进制文件添加到系统path下。
-
-安装完后查看protoc版本
-
-```bash
-protoc --version
-```
-
-<br>
-
-#### (3) 在windows上安装支持linux命令环境
-
-**安装 mingw64**
-
-下载mingw64地址： [https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/8.1.0/threads-posix/seh/x86_64-8.1.0-release-posix-seh-rt_v6-rev0.7z](https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/8.1.0/threads-posix/seh/x86_64-8.1.0-release-posix-seh-rt_v6-rev0.7z)
-
-下载后解压到`D:\Program Files\mingw64`目录下，修改系统环境变量PATH，新增`D:\Program Files\mingw64\bin`。
-
-<br>
-
-**安装 make 命令**
+**✅ 安装 make 命令**
 
 切换到`D:\Program Files\mingw64\bin`目录，找到`mingw32-make.exe`可执行文件，复制并改名为`make.exe`。
 
-安装完后查看版本
-
-```bash
-make -v
-```
+查看make版本：`make -v`
 
 <br>
 
-**安装 cmder**
+**✅ 安装 cmder**
 
-下载cmder地址： [https://github.com/cmderdev/cmder/releases/download/v1.3.20/cmder.zip](https://github.com/cmderdev/cmder/releases/download/v1.3.20/cmder.zip)
+下载cmder地址： [cmder-v1.3.20.zip](https://github.com/cmderdev/cmder/releases/download/v1.3.20/cmder.zip)
 
-下载后解压到`D:\Program Files\cmder`目录下，修改系统环境变量PATH，新增`D:\Program Files\cmder`。
+下载后解压到`D:\Program Files\cmder`目录下，并把目录`D:\Program Files\cmder`添加到系统环境变量path。
 
-打开`Cmder.exe`终端，简单的设置cmder，点击右下角设置图标 --> 【settings】，在设置界面左上角输入`Monospace`查找，去掉勾选**Monospace**，然后保存关闭。
+对cmder进行简单的配置：
 
-检查是否支持常用的linux命令。
+- **配置右键启动cmder**，按下组合键`win+x`，再按字母`a`进入有管理权限的终端，执行命令`Cmder.exe /REGISTER ALL`。 随便在一个文件夹里按下鼠标右键，选择`Cmder Here`即可打开cmder界面。
+- **解决输入命令时的空格问题**，打开cmder界面，按下组合键win+alt+p进入设置界面，在左上角搜索`Monospace`，取消勾选，保存退出。
+
+> ⚠ 在windows环境使用sponge开发项目，为了避免找不到linux命令错误，请使用cmder，不要用系统自带的cmd终端、Goland和VS Code下的终端。
+
+打开`cmder.exe`终端，检查是否支持常用的linux命令。
 
 ```bash
 ls --version
@@ -118,27 +89,24 @@ make --version
 cp --version
 chmod --version
 rm --version
-go --version
 ```
 
 <br>
 
-#### (4) 安装 sponge
+**✅ 安装 sponge**
 
-打开`Cmder.exe`终端(不是windows自带的cmd)，执行命令安装sponge：
+打开`cmder.exe`终端(不是windows自带的cmd)，执行命令安装sponge：
 
 ```bash
-# 安装sponge，安装完后，sponge二进制文件所在目录添加到系统path
+# 安装sponge
 go install github.com/zhufuyi/sponge/cmd/sponge@latest
 
-# 初始化sponge
+# 初始化sponge，自动安装sponge依赖插件
 sponge init
 
-# 查看插件是否都安装成功，如果有安装不成功，执行命令重试 sponge tools --install
+# 查看插件是否都安装成功，如果发现有插件没有安装成功，执行命令重试 sponge tools --install
 sponge tools
 
-# 安装完后查看sponge版本
+# 查看sponge版本
 sponge -v
 ```
-
-💡  如果想更新到最新版本，执行命令 `sponge upgrade`。
