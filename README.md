@@ -27,7 +27,6 @@ sponge is mainly based on **SQL** and **Protobuf** two ways to generate code, ea
 <p align="center">
 <img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/sponge-framework.png">
 </p>
-<p align="center">Figure 1-1 sponge generation code framework diagram</p>
 
 <br>
 
@@ -46,7 +45,6 @@ sponge generated microservice code framework is shown in the figure below, which
 <p align="center">
 <img width="1000px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/microservices-framework.png">
 </p>
-<p align="center">Figure 1-2 Microservices framework diagram</p>
 
 <br>
 

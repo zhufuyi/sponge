@@ -24,12 +24,10 @@ Check protoc version: `protoc --version`
 
 After installing go and protoc, proceed to install Sponge. Sponge can be installed on Windows, macOS, and Linux environments.
 
-> If you cannot access the internet directly, when installing Sponge, you might encounter timeouts while fetching libraries from GitHub. It's recommended to set up a domestic proxy by executing the command **go env -w GOPROXY=https://goproxy.cn,direct**
-
 <br>
 <br>
 
-### Installing Sponge on Linux or macOS
+### Linux or macOS Environment
 
 ```bash
 # Install Sponge
@@ -48,7 +46,7 @@ sponge -v
 <br>
 <br>
 
-### **Windows Environment**
+### Windows Environment
 
 > In the Windows environment, you need to install mingw64, make, and cmder to support the Linux command environment required by Sponge.
 

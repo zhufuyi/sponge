@@ -57,7 +57,7 @@ sponge包含丰富的组件(按需使用)：
 - 日志 [zap](https://go.uber.org/zap)
 - 数据库组件 [gorm](https://gorm.io/gorm)
 - 缓存组件 [go-redis](https://github.com/go-redis/redis), [ristretto](https://github.com/dgraph-io/ristretto)
-- 接口文档 [swagger](https://github.com/swaggo/swag)
+- 自动化api接口文档 [swagger](https://github.com/swaggo/swag), [protoc-gen-openapiv2](https://github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2)
 - 鉴权 [jwt](https://github.com/golang-jwt/jwt)
 - 校验 [validator](https://github.com/go-playground/validator)
 - 自适应限流 [ratelimit](https://github.com/zhufuyi/sponge/tree/main/pkg/shield/ratelimit)
@@ -67,7 +67,7 @@ sponge包含丰富的组件(按需使用)：
 - 服务注册与发现 [etcd](https://github.com/etcd-io/etcd), [consul](https://github.com/hashicorp/consul), [nacos](https://github.com/alibaba/)
 - 自适应采集 [profile](https://go.dev/blog/pprof)
 - 资源统计 [gopsutil](https://github.com/shirou/gopsutil)
-- 代码规范检查 [golangci-lint](https://github.com/golangci/golangci-lint)
+- 代码质量检查 [golangci-lint](https://github.com/golangci/golangci-lint)
 - 持续集成部署 CICD [jenkins](https://github.com/jenkinsci/jenkins), [docker](https://www.docker.com/), [kubernetes](https://github.com/kubernetes/kubernetes)
 
 <br>

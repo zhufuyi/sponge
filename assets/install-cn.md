@@ -29,7 +29,7 @@
 <br>
 <br>
 
-### 在linux或macOS上安装sponge
+### linux或macOS环境
 
 ```bash
 # 安装sponge
@@ -48,7 +48,7 @@ sponge -v
 <br>
 <br>
 
-### **Windows环境**
+### Windows环境
 
 > 在windows环境中需要安装mingw64、make、cmder来支持linux命令环境才可以使用sponge。
 
