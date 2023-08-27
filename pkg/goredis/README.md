@@ -1,6 +1,6 @@
 ## goredis
 
-A library wrapped on top of [go-redis](github.com/go-redis/redis).
+`goredis` library wrapped in [go-redis](github.com/go-redis/redis).
 
 <br>
 

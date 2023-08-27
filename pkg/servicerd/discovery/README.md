@@ -5,6 +5,8 @@ Service discovery, corresponding to the service [registry](../registry), support
 ### Example of use
 
 ```go
+    import "github.com/zhufuyi/sponge/pkg/servicerd/discovery"
+
     var cliOptions = []grpccli.Option{}
     var endpoint string
 

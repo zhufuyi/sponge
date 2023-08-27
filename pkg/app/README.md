@@ -7,6 +7,8 @@ Start and stop services gracefully, using [errgroup](golang.org/x/sync/errgroup)
 ### Example of use
 
 ```go
+import "github.com/zhufuyi/sponge/pkg/app"
+
 func main() {
     initApp()
     servers := registerServers()

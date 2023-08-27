@@ -1,17 +1,19 @@
 ## logger
 
-Log library encapsulated in [zap](https://github.com/uber-go/zap).
+Logger library wrapped in [zap](https://github.com/uber-go/zap).
 
 - Support for terminal printing and log saving.
 - Support for automatic log file cutting.
 - Support for json format and console log format output.
-- Supports Debug, Info, Warn, Error, Panic, Fatal, also supports fmt.Printf-like log printing, Debugf, Infof, Warnf, Errorf, Panicf, Fatalf.
+- Support Debug, Info, Warn, Error, Panic, Fatal, also supports fmt.Printf-like log printing, Debugf, Infof, Warnf, Errorf, Panicf, Fatalf.
 
 <br>
 
 ## Example of use
 
 ```go
+    import "github.com/zhufuyi/sponge/pkg/logger"
+
     // (1) used directly, it will be initialised by default
     logger.Info("this is info")
     logger.Warn("this is warn", logger.String("foo","bar"), logger.Int("size",10), logger.Any("obj",obj))
@@ -29,4 +31,7 @@ Log library encapsulated in [zap](https://github.com/uber-go/zap).
        //     logger.WithFileIsCompression(true), // whether to compress and archive old files, default false
         )
     )
+    logger.Info("this is info")
+    logger.Warn("this is warn", logger.String("foo","bar"), logger.Int("size",10), logger.Any("obj",obj))
+    logger.Error("this is error", logger.Err(err), logger.String("foo","bar"))
 ```

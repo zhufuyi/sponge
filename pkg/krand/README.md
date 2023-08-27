@@ -9,6 +9,8 @@ Generate random strings, integers, floating point numbers.
 ### Generate a random string
 
 ```go
+    import "github.com/zhufuyi/sponge/pkg/krand"
+
     /*
 	R_NUM = 1      // only number
 	R_UPPER = 2   // only capital letters
@@ -28,6 +30,8 @@ Generate random strings, integers, floating point numbers.
 ### Generate random integers
 
 ```go
+    import "github.com/zhufuyi/sponge/pkg/krand"
+
     krand.Int(200)            // random number range 0 ~ 200
     krand.Int(1000, 2000)  // random number range 1000 ~ 2000
 ```
@@ -37,6 +41,8 @@ Generate random strings, integers, floating point numbers.
 ### Generate random floating point numbers
 
 ```go
+    import "github.com/zhufuyi/sponge/pkg/krand"
+
     krand.Float64(1, 200)            // floating point number with 1 decimal point, range 0~200
     krand.Float64(2, 100,1000)            // floating point number with 2 decimal places, range 100~1000
 ```

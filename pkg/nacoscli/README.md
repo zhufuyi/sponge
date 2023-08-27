@@ -5,6 +5,8 @@ Get the configuration from the nacos configuration center and parse it into a st
 ### Example of use
 
 ```go
+    import "github.com/zhufuyi/sponge/pkg/nacoscli"
+
 	// Way 1: Setting parameters
 	a := &config{}
 	params := &Params{
@@ -15,7 +17,7 @@ Get the configuration from the nacos configuration center and parse it into a st
 		DataId:      "user-srv.yml",
 		Format:      "yaml",
 	}
-	err := Init(a, params)
+	err := nacoscli.Init(a, params)
 
 	// Way 2: Setting up ClientConfig and ServerConfig
 	a = &config{}
@@ -37,7 +39,7 @@ Get the configuration from the nacos configuration center and parse it into a st
 			Port:   8848,
 		},
 	}
-	err = Init(a, params,
+	err = nacoscli.Init(a, params,
 		WithClientConfig(clientConfig),
 		WithServerConfigs(serverConfigs),
 	)

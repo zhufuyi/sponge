@@ -5,6 +5,8 @@ Service registry, corresponding to service [discovery](../discovery) corresponds
 ### Example of use
 
 ```go
+import "github.com/zhufuyi/sponge/pkg/servicerd/registry"
+
 func registryService(scheme string, host string, port int) (registry.Registry, *registry.ServiceInstance) {
 	var (
 		instanceEndpoint = fmt.Sprintf("%s://%s:%d", scheme, host, port)

@@ -5,6 +5,8 @@ grpc client with support for service discovery, logging, load balancing, trace, 
 ### Example of use
 
 ```go
+    import "github.com/zhufuyi/sponge/pkg/grpc/grpccli"
+
 func grpcClientExample() serverNameV1.UserExampleServiceClient {
 	err := config.Init(third_party.Path("../config/conf.yml"))
 	if err != nil {

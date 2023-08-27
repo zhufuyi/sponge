@@ -1,4 +1,4 @@
-[sponge](https://github.com/zhufuyi/sponge) 是一个集成了`自动生成代码`、`微服务框架`、`通用基础开发框架`的golang生产力工具。sponge拥有丰富的生成代码命令，生成不同的功能代码可以组合成完整的服务(类似人为打散的海绵细胞可以自动重组成一个新的海绵)。代码解耦模块化设计，很容易构建出从开发到部署的完整工程项目，让你开发web或微服务项目轻而易举、事半功倍，golang也可以"低代码开发"。
+[sponge](https://github.com/zhufuyi/sponge) 是一个集成了`自动生成代码`、`web和微服务框架`、`通用基础开发框架`的golang生产力工具。sponge拥有丰富的生成代码命令，生成不同的功能代码可以组合成完整的服务(类似人为打散的海绵细胞可以自动重组成一个新的海绵)。代码解耦模块化设计，很容易构建出从开发到部署的完整工程项目，让你开发web或微服务项目轻而易举、事半功倍，golang也可以"低代码开发"。
 
 <br>
 
@@ -54,17 +54,17 @@ sponge包含丰富的组件(按需使用)：
 - RPC 框架 [grpc](https://github.com/grpc/grpc-go)
 - 配置解析 [viper](https://github.com/spf13/viper)
 - 配置中心 [nacos](https://github.com/alibaba/nacos)
-- 日志 [zap](https://go.uber.org/zap)
-- 数据库组件 [gorm](https://gorm.io/gorm)
+- 日志 [zap](https://github.com/uber-go/zap)
+- 数据库组件 [gorm](https://github.com/go-gorm/gorm)
 - 缓存组件 [go-redis](https://github.com/go-redis/redis), [ristretto](https://github.com/dgraph-io/ristretto)
 - 自动化api接口文档 [swagger](https://github.com/swaggo/swag), [protoc-gen-openapiv2](https://github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2)
 - 鉴权 [jwt](https://github.com/golang-jwt/jwt)
 - 校验 [validator](https://github.com/go-playground/validator)
 - 自适应限流 [ratelimit](https://github.com/zhufuyi/sponge/tree/main/pkg/shield/ratelimit)
 - 自适应熔断 [circuitbreaker](https://github.com/zhufuyi/sponge/tree/main/pkg/shield/circuitbreaker)
-- 链路跟踪 [opentelemetry](https://go.opentelemetry.io/otel)
+- 链路跟踪 [opentelemetry](https://github.com/open-telemetry/opentelemetry-go)
 - 监控 [prometheus](https://github.com/prometheus/client_golang/prometheus), [grafana](https://github.com/grafana/grafana)
-- 服务注册与发现 [etcd](https://github.com/etcd-io/etcd), [consul](https://github.com/hashicorp/consul), [nacos](https://github.com/alibaba/)
+- 服务注册与发现 [etcd](https://github.com/etcd-io/etcd), [consul](https://github.com/hashicorp/consul), [nacos](https://github.com/alibaba/nacos)
 - 自适应采集 [profile](https://go.dev/blog/pprof)
 - 资源统计 [gopsutil](https://github.com/shirou/gopsutil)
 - 代码质量检查 [golangci-lint](https://github.com/golangci/golangci-lint)
@@ -123,13 +123,15 @@ sponge run
 
 ### 使用文档
 
-[使用sponge开发项目的详细文档](https://go-sponge.com/zh-cn/)
+[使用sponge开发项目文档](https://go-sponge.com/zh-cn/)。
 
 <br>
 
 ### 使用示例
 
-#### 简单示例(不包括业务逻辑代码)
+#### 简单示例
+
+不包括业务逻辑代码。
 
 - [1_web-gin-CRUD](https://github.com/zhufuyi/sponge_examples/tree/main/1_web-gin-CRUD)
 - [2_web-gin-protobuf](https://github.com/zhufuyi/sponge_examples/tree/main/2_web-gin-protobuf)
@@ -138,7 +140,9 @@ sponge run
 - [5_micro-gin-rpc-gateway](https://github.com/zhufuyi/sponge_examples/tree/main/5_micro-gin-rpc-gateway)
 - [6_micro-cluster](https://github.com/zhufuyi/sponge_examples/tree/main/6_micro-cluster)
 
-#### 完整项目示例(包括业务逻辑代码)
+#### 完整项目示例
+
+包括业务逻辑代码。
 
 - [7_community-single](https://github.com/zhufuyi/sponge_examples/tree/main/7_community-single)
 - [8_community-cluster](https://github.com/zhufuyi/sponge_examples/tree/main/8_community-cluster)
@@ -147,7 +151,7 @@ sponge run
 
 ### 视频介绍
 
-> sponge v1.5.0版本以后的UI界面的左边菜单栏有一些修改，视频演示使用sponge之前版本，左边菜单栏看起来会有些不同。
+> sponge v1.5.0版本以后的UI界面的左边菜单栏有一些修改，下面视频演示使用v1.5.0之前版本，左边菜单栏看起来会有些不同。
 
 - [01 sponge的形成过程](https://www.bilibili.com/video/BV1s14y1F7Fz/)
 - [02 sponge的框架介绍](https://www.bilibili.com/video/BV13u4y1F7EU/)
@@ -155,14 +159,14 @@ sponge run
 - [04 批量生成CRUD接口代码到web服务](https://www.bilibili.com/video/BV1AY411C7J7/)
 - [05 一键生成通用的web服务项目代码](https://www.bilibili.com/video/BV1CX4y1D7xj/)
 - [06 批量生成任意API接口代码到web服务](https://www.bilibili.com/video/BV1P54y1g7J9/)
-- [07 一键生成rpc服务完整项目代码](https://www.bilibili.com/video/BV1Tg4y1b79U/)
-- [08 批量生成CRUD代码到rpc服务](https://www.bilibili.com/video/BV1TY411z7rY/)
-- [09 一键生成通用的rpc服务完整项目代码](https://www.bilibili.com/video/BV1WY4y1X7zH/)
-- [10 批量生成rpc方法代码到rpc服务](https://www.bilibili.com/video/BV1Yo4y1q76o/)
+- [07 一键生成微服务(gRPC)完整项目代码](https://www.bilibili.com/video/BV1Tg4y1b79U/)
+- [08 批量生成CRUD代码到微服务项目代码](https://www.bilibili.com/video/BV1TY411z7rY/)
+- [09 一键生成通用的微服务(gRPC)项目代码](https://www.bilibili.com/video/BV1WY4y1X7zH/)
+- [10 批量生成rpc方法代码到微服务](https://www.bilibili.com/video/BV1Yo4y1q76o/)
 - [11 rpc测试神器，简单便捷](https://www.bilibili.com/video/BV1VT411z7oj/)
-- [12 一键生成rpc网关服务完整项目代码](https://www.bilibili.com/video/BV1mV4y1D7k9/)
+- [12 一键生成rpc网关服务项目代码](https://www.bilibili.com/video/BV1mV4y1D7k9/)
 - [13 十分钟搭建一个微服务集群示例](https://www.bilibili.com/video/BV1YM4y127YK/)
-- [14 sponge实战：用chatGPT打造你的专属面试题库](https://www.bilibili.com/video/BV1V24y1w7wG/)
+- [14 用chatGPT打造你的专属面试题库](https://www.bilibili.com/video/BV1V24y1w7wG/)
 
 <br>
 

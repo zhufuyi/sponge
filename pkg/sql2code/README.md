@@ -31,6 +31,8 @@ type Args struct {
 Generated code example.
 
 ```go
+    import "github.com/zhufuyi/sponge/pkg/sql2code"
+
     // generate gorm model code
     code, err := sql2code.GenerateOne(&sql2code.Args{
         SQL: sqlData,  // source from sql text

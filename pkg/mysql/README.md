@@ -1,14 +1,16 @@
-## mysql
+### mysql
 
-A library wrapped on top of [gorm](gorm.io/gorm), with added features such as link tracing, paging queries, etc.
+`mysql` library wrapped in [gorm](gorm.io/gorm), with added features such as tracer, paging queries, etc.
 
 <br>
 
-## Example of use
+### Example of use
 
-### Initializing the connection
+#### Initializing the connection
 
 ```go
+    import "github.com/zhufuyi/sponge/pkg/mysql"
+
     var dsn = "root:123456@(192.168.1.6:3306)/test?charset=utf8mb4&parseTime=True&loc=Local"
 
     // (1) connect to the database using the default settings
@@ -28,14 +30,12 @@ A library wrapped on top of [gorm](gorm.io/gorm), with added features such as li
 
 <br>
 
-### Model
+#### Model
 
 ```go
 package model
 
-import (
-	"github.com/zhufuyi/sponge/pkg/mysql"
-)
+import "github.com/zhufuyi/sponge/pkg/mysql"
 
 // UserExample object fields mapping table
 type UserExample struct {
@@ -54,9 +54,11 @@ func (table *UserExample) TableName() string {
 
 <br>
 
-### Transaction
+#### Transaction
 
 ```go
+import "github.com/zhufuyi/sponge/pkg/mysql"
+
 func createUser() error {
 	// note that you should use tx as the database handle when you are in a transaction
 	tx := db.Begin()
@@ -89,7 +91,6 @@ func createUser() error {
 ```
 <br>
 
-## gorm User Guide
+### gorm User Guide
 
 - https://gorm.io/zh_CN/docs/index.html
-- https://learnku.com/docs/gorm/v2

@@ -1,6 +1,6 @@
 ## tracer
 
-Tracer library wrapped in [go.opentelemetry.io/otel](go.opentelemetry.io/otel).
+Tracer library wrapped in [go.opentelemetry.io/otel](https://github.com/open-telemetry/opentelemetry-go).
 
 <br>
 
@@ -9,6 +9,8 @@ Tracer library wrapped in [go.opentelemetry.io/otel](go.opentelemetry.io/otel).
 Initialize the trace, specifying exporter and resource.
 
 ```go
+import "github.com/zhufuyi/sponge/pkg/tracer"
+
 func initTrace() {
     // exporter := tracer.NewConsoleExporter() // output to terminal
 

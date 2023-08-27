@@ -1,16 +1,18 @@
-## gohttp
+### gohttp
 
 The http request client, which only supports returning json format.
 
 <br>
 
-## Example of use
+### Example of use
 
-### Standard CURD
+#### Standard CURD
 
 Get, Delete request example.
 
 ```go
+    import "github.com/zhufuyi/sponge/pkg/gohttp"
+
 	req := gohttp.Request{}
 	req.SetURL("http://localhost:8080/user")
 	req.SetHeaders(map[string]string{
@@ -32,6 +34,8 @@ Get, Delete request example.
 Post, Put, Patch request example.
 
 ```go
+    import "github.com/zhufuyi/sponge/pkg/gohttp"
+
 	req := gohttp.Request{}
 	req.SetURL("http://localhost:8080/user")
 	req.SetHeaders(map[string]string{
@@ -58,11 +62,13 @@ Post, Put, Patch request example.
 
 <br>
 
-### simplified version of CRUD
+#### simplified version of CRUD
 
 No support for setting header, timeout, etc.
 
 ```go
+    import "github.com/zhufuyi/sponge/pkg/gohttp"
+
     url := "http://localhost:8080/user"
     params := gohttp.KV{"id":123}
     result := &gohttp.StdResult{} // other structures can be defined to receive data
@@ -88,4 +94,3 @@ No support for setting header, timeout, etc.
     // Patch
     err := gohttp.Patch(result, url, body)
 ```
-

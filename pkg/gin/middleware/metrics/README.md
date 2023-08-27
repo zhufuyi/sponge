@@ -7,6 +7,8 @@ gin metrics library, collect five metrics, `uptime`, `http_request_count_total`,
 ### Usage
 
 ```go
+	import "github.com/zhufuyi/sponge/pkg/gin/middleware/metrics"
+
 	r := gin.Default()
 
 	r.Use(metrics.Metrics(r,

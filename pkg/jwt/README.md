@@ -7,6 +7,8 @@ token generation and validation.
 ## Example of use
 
 ```go
+    import "github.com/zhufuyi/sponge/pkg/gwt"
+
 	jwt.Init(
 		jwt.WithSigningKey("123456"),   // key
 		jwt.WithExpire(time.Hour), // expiry time

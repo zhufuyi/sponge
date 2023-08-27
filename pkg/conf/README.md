@@ -7,16 +7,18 @@ Parsing yaml, json, toml configuration files to go struct.
 ### Example of use
 
 ```go
+    import "github.com/zhufuyi/sponge/pkg/conf"
+
     // Way 1: No listening profile
-	conf := &App{}
-	err := Parse("test.yml", conf)
+	config := &App{}
+	err := conf.Parse("test.yml", config)
 
     // Way 2: Enable listening profile
-	conf := &App{}
+config := &App{}
 	fs := []func(){
 		func() {
 			fmt.Println("Listening for updates to the configuration file")
 		},
 	}
-	err := Parse("test.yml", conf, fs...)
+	err := conf.Parse("test.yml", config, fs...)
 ```

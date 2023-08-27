@@ -7,10 +7,12 @@ Statistics on system and process cpu and memory information, alarm notification 
 ### Example of use
 
 ```go
+    import "github.com/zhufuyi/sponge/pkg/stat"
+
 	l, _ := zap.NewDevelopment()
     stat.Init(
-        WithLog(l),
-        WithPrintInterval(time.Minute),
-        WithEnableAlarm(WithCPUThreshold(0.9), WithMemoryThreshold(0.85)), // invalid if it is windows
+        stat.WithLog(l),
+        stat.WithPrintInterval(time.Minute),
+        stat.WithEnableAlarm(stat.WithCPUThreshold(0.9), stat.WithMemoryThreshold(0.85)), // invalid if it is windows
     )
 ```

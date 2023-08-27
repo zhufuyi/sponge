@@ -18,6 +18,8 @@ Error codes usually include system-level error codes and service-level error cod
 ### Example of http error code usage
 
 ```go
+    import "github.com/zhufuyi/sponge/pkg/errcode"
+
     // defining error codes
     var ErrLogin = errcode.NewError(20101, "incorrect username or password")
 
@@ -30,8 +32,10 @@ Error codes usually include system-level error codes and service-level error cod
 ### Example of grpc error code usage
 
 ```go
+    import "github.com/zhufuyi/sponge/pkg/errcode"
+
     // defining error codes
-    var ErrLogin = NewRPCStatus(40101, "incorrect username or password")
+    var ErrLogin = errcode.NewRPCStatus(40101, "incorrect username or password")
 
     // return error
     errcode.ErrLogin.Err()

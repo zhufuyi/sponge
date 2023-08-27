@@ -6,54 +6,13 @@ Commonly used grpc client-side and server-side interceptors.
 
 ### Example of use
 
-#### jwt
-
 ```go
-// grpc server
-
-func getServerOptions() []grpc.ServerOption {
-	var options []grpc.ServerOption
-
-	// token authorization
-	options = append(options, grpc.UnaryInterceptor(
-	    interceptor.UnaryServerJwtAuth(
-	        // middleware.WithAuthClaimsName("tokenInfo"), // set the name of the forensic information attached to the ctx, the default is tokenInfo
-	        middleware.WithAuthIgnoreMethods( // add a way to ignore token validation
-	            "/proto.Account/Register",
-	        ),
-	    ),
-	))
-
-	return options
-}
-
-// generate forensic information authorization
-func (a *Account) Register(ctx context.Context, req *serverNameV1.RegisterRequest) (*serverNameV1.RegisterReply, error) {
-    // ......
-	token, err := jwt.GenerateToken(uid)
-	// handle err
-	authorization = middleware.GetAuthorization(token)
-    // ......
-}
-
-// the client must pass in the authentication information via the context when calling the method, and the key name must be authorization
-func getUser(client serverNameV1.AccountClient, req *serverNameV1.RegisterReply) error {
-	md := metadata.Pairs("authorization", req.Authorization)
-	ctx := metadata.NewOutgoingContext(context.Background(), md)
-
-	resp, err := client.GetUser(ctx, &serverNameV1.GetUserRequest{Id: req.Id})
-	if err != nil {
-		return err
-	}
-
-	fmt.Println("get user success", resp)
-	return nil
-}
+import "github.com/zhufuyi/sponge/pkg/grpc/interceptor"
 ```
 
-<br>
-
 #### logging
+
+**grpc server-side**
 
 ```go
 var logger *zap.Logger
@@ -73,9 +32,28 @@ func getServerOptions() []grpc.ServerOption {
 }
 ```
 
+**grpc client-side**
+
+```go
+func getDialOptions() []grpc.DialOption {
+	var options []grpc.DialOption
+
+	option := grpc.WithUnaryInterceptor(
+		grpc_middleware.ChainUnaryClient(
+			interceptor.UnaryClientLog(logger.Get()),
+		),
+	)
+	options = append(options, option)
+
+	return options
+}
+```
+
 <br>
 
 #### recovery
+
+**grpc server-side**
 
 ```go
 func getServerOptions() []grpc.ServerOption {
@@ -90,9 +68,28 @@ func getServerOptions() []grpc.ServerOption {
 }
 ```
 
+**grpc client-side**
+
+```go
+func getDialOptions() []grpc.DialOption {
+	var options []grpc.DialOption
+
+	option := grpc.WithUnaryInterceptor(
+		grpc_middleware.ChainUnaryClient(
+			interceptor.UnaryClientRecovery(),
+		),
+	)
+	options = append(options, option)
+
+	return options
+}
+```
+
 <br>
 
 #### retry
+
+**grpc client-side**
 
 ```go
 func getDialOptions() []grpc.DialOption {
@@ -121,6 +118,8 @@ func getDialOptions() []grpc.DialOption {
 
 #### rate limiter
 
+**grpc server-side**
+
 ```go
 func getDialOptions() []grpc.DialOption {
 	var options []grpc.DialOption
@@ -142,8 +141,9 @@ func getDialOptions() []grpc.DialOption {
 
 <br>
 
-
 #### Circuit Breaker
+
+**grpc server-side**
 
 ```go
 func getDialOptions() []grpc.DialOption {
@@ -168,6 +168,8 @@ func getDialOptions() []grpc.DialOption {
 
 #### timeout
 
+**grpc client-side**
+
 ```go
 func getDialOptions() []grpc.DialOption {
 	var options []grpc.DialOption
@@ -190,6 +192,8 @@ func getDialOptions() []grpc.DialOption {
 <br>
 
 #### tracing
+
+**grpc server-side**
 
 ```go
 // initialize tracing
@@ -257,7 +261,7 @@ example [metrics](../metrics/README.md).
 
 #### Request id
 
-(1) server side
+**grpc server-side**
 
 ```go
 func getServerOptions() []grpc.ServerOption {
@@ -274,7 +278,7 @@ func getServerOptions() []grpc.ServerOption {
 
 <br>
 
-(2) client side
+**grpc client-side**
 
 ```go
 func getDialOptions() []grpc.DialOption {
@@ -293,3 +297,52 @@ func getDialOptions() []grpc.DialOption {
 	return options
 }
 ```
+
+<br>
+
+#### jwt
+
+**grpc server-side**
+
+```go
+func getServerOptions() []grpc.ServerOption {
+	var options []grpc.ServerOption
+
+	// token authorization
+	options = append(options, grpc.UnaryInterceptor(
+	    interceptor.UnaryServerJwtAuth(
+	        // middleware.WithAuthClaimsName("tokenInfo"), // set the name of the forensic information attached to the ctx, the default is tokenInfo
+	        middleware.WithAuthIgnoreMethods( // add a way to ignore token validation
+	            "/proto.Account/Register",
+	        ),
+	    ),
+	))
+
+	return options
+}
+
+// generate forensic information authorization
+func (a *Account) Register(ctx context.Context, req *serverNameV1.RegisterRequest) (*serverNameV1.RegisterReply, error) {
+    // ......
+	token, err := jwt.GenerateToken(uid)
+	// handle err
+	authorization = middleware.GetAuthorization(token)
+    // ......
+}
+
+// the client must pass in the authentication information via the context when calling the method, and the key name must be authorization
+func getUser(client serverNameV1.AccountClient, req *serverNameV1.RegisterReply) error {
+	md := metadata.Pairs("authorization", req.Authorization)
+	ctx := metadata.NewOutgoingContext(context.Background(), md)
+
+	resp, err := client.GetUser(ctx, &serverNameV1.GetUserRequest{Id: req.Id})
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("get user success", resp)
+	return nil
+}
+```
+
+<br>

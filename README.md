@@ -14,7 +14,7 @@
 
 </div>
 
-[sponge](https://github.com/zhufuyi/sponge) is a powerful golang productivity tool that integrates `automatic code generation`, `microservices framework`, `general basic development framework`. sponge has a wealth of code generation commands to generate different functionality of the code can be combined into a complete service (similar to artificially scattered sponge cells that can automatically recombine into a new sponge). Code decoupling modular design , it is easy to build a complete project from development to deployment, so that you develop web or microservices project easily, golang can also be "low-code development".
+[sponge](https://github.com/zhufuyi/sponge) is a powerful golang productivity tool that integrates `automatic code generation`, `web and microservices frameworks`, `general basic development framework`. sponge has a wealth of code generation commands to generate different functionality of the code can be combined into a complete service (similar to artificially scattered sponge cells that can automatically recombine into a new sponge). Code decoupling modular design , it is easy to build a complete project from development to deployment, so that you develop web or microservices project easily, golang can also be "low-code development".
 
 <br>
 

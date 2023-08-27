@@ -9,6 +9,8 @@ Circuit Breaker for web middleware and rpc interceptor.
 **gin circuit breaker middleware**
 
 ```go
+import "github.com/zhufuyi/sponge/pkg/shield/circuitbreaker"
+
 // CircuitBreaker a circuit breaker middleware
 func CircuitBreaker(opts ...CircuitBreakerOption) gin.HandlerFunc {
 	o := defaultCircuitBreakerOptions()
@@ -43,6 +45,8 @@ func CircuitBreaker(opts ...CircuitBreakerOption) gin.HandlerFunc {
 **rpc server circuit breaker interceptor** 
 
 ```go
+import "github.com/zhufuyi/sponge/pkg/shield/circuitbreaker"
+
 // UnaryServerCircuitBreaker server-side unary circuit breaker interceptor
 func UnaryServerCircuitBreaker(opts ...CircuitBreakerOption) grpc.UnaryServerInterceptor {
 	o := defaultCircuitBreakerOptions()

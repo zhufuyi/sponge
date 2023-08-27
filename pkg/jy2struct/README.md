@@ -24,6 +24,8 @@ type Args struct {
 Example of conversion.
 
 ```go
+    import "github.com/zhufuyi/sponge/pkg/jy2struct"
+
     // json convert to struct
     code, err := jy2struct.Convert(&jy2struct.Args{
         Format: "json",
