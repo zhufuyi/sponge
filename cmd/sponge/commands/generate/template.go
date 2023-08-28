@@ -160,8 +160,12 @@ func NewCenter(configFile string) (*Center, error) {
   sponge web swagger --file=docs/apis.swagger.json
   checkResult $?
 
+  colorStart='\e[1;36m'
+  underLine='\e[4m'
+  markEnd='\e[0m'
+
   echo ""
-  echo "run server and see docs by http://localhost:8080/apis/swagger/index.html"
+  echo -e "execute the command ${colorStart}make run${markEnd} and then visit ${underLine}http://localhost:8080/apis/swagger/index.html${markEnd} in your browser. "
   echo ""
 
   moduleName=$(cat docs/gen.info | head -1 | cut -d , -f 1)
@@ -191,8 +195,12 @@ func NewCenter(configFile string) (*Center, error) {
   sponge micro swagger --file=docs/apis.swagger.json
   checkResult $?
 
+  colorStart='\e[1;36m'
+  underLine='\e[4m'
+  markEnd='\e[0m'
+
   echo ""
-  echo "run server and see docs by http://localhost:8080/apis/swagger/index.html"
+  echo -e "execute the command ${colorStart}make run${markEnd} and then visit ${underLine}http://localhost:8080/apis/swagger/index.html${markEnd} in your browser."
   echo ""
 
   moduleName=$(cat docs/gen.info | head -1 | cut -d , -f 1)
@@ -253,7 +261,7 @@ grpc:
 
 # grpc client settings, support for setting up multiple rpc clients
 grpcClient:
-  - name: "serverNameExample"   # rpc service name, used for service discovery
+  - name: "your-rpc-server-name"   # rpc server name, used for service discovery
     host: "127.0.0.1"                    # rpc service address, used for direct connection
     port: 8282                              # rpc service port
     registryDiscoveryType: ""         # registration and discovery types: consul, etcd, nacos, if empty, connecting to server using host and port
@@ -282,7 +290,7 @@ http:
 
 # grpc client settings, support for setting up multiple rpc clients
 grpcClient:
-  - name: "serverNameExample"   # rpc service name, used for service discovery
+  - name: "your-rpc-server-name"   # rpc server name, used for service discovery
     host: "127.0.0.1"                    # rpc service address, used for direct connection
     port: 8282                              # rpc service port
     registryDiscoveryType: ""         # registration and discovery types: consul, etcd, nacos, if empty, connecting to server using host and port

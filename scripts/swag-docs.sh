@@ -12,6 +12,10 @@ fi
 
 swag init -g cmd/serverNameExample_mixExample/main.go
 
+colorStart='\e[1;36m'
+underLine='\e[4m'
+markEnd='\e[0m'
+
 echo ""
-echo "run server and see docs by http://${HOST_ADDR}:8080/swagger/index.html"
+echo -e "execute the command ${colorStart}make run${markEnd} and then visit ${underLine}http://${HOST_ADDR}:8080/swagger/index.html${markEnd} in your browser."
 echo ""

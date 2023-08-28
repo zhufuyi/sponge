@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// HTTPPbCommand generate http service codes based on protobuf file
+// HTTPPbCommand generate web server codes based on protobuf file
 func HTTPPbCommand() *cobra.Command {
 	var (
 		moduleName   string // module name for go.mod
@@ -23,17 +23,17 @@ func HTTPPbCommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "http-pb",
-		Short: "Generate http service codes based on protobuf file",
-		Long: `generate http service codes based on protobuf file.
+		Short: "Generate web server codes based on protobuf file",
+		Long: `generate web server codes based on protobuf file.
 
 Examples:
-  # generate http service codes.
+  # generate web server codes.
   sponge web http-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --protobuf-file=./test.proto
 
-  # generate http service codes and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
+  # generate web server codes and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge web http-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --protobuf-file=./test.proto --out=./yourServerDir
 
-  # generate http service codes and specify the docker image repository address.
+  # generate web server codes and specify the docker image repository address.
   sponge web http-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --protobuf-file=./test.proto
 `,
 		SilenceErrors: true,
@@ -115,7 +115,7 @@ using help:
   4. visit http://localhost:8080/apis/swagger/index.html in your browser, and test api interface.
 
 `)
-	fmt.Printf("generate %s's http server codes successfully, out = %s\n", serverName, r.GetOutputDir())
+	fmt.Printf("generate %s's web server codes successfully, out = %s\n", serverName, r.GetOutputDir())
 	return nil
 }
 

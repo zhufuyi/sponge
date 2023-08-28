@@ -613,7 +613,7 @@
         },
         "datasource": "Prometheus",
         "definition": "label_values(grpc_server_started_total, grpc_service)",
-        "description": "gRPC Service Name",
+        "description": "gRPC Server Name",
         "error": null,
         "hide": 0,
         "includeAll": true,

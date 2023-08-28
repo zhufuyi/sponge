@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// RPCGwPbCommand generate rpc gateway service codes base on protobuf file
+// RPCGwPbCommand generate rpc gateway server codes base on protobuf file
 func RPCGwPbCommand() *cobra.Command {
 	var (
 		moduleName   string // module name for go.mod
@@ -23,17 +23,17 @@ func RPCGwPbCommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "rpc-gw-pb",
-		Short: "Generate rpc gateway service codes based on protobuf file",
-		Long: `generate rpc gateway service codes based on protobuf file.
+		Short: "Generate rpc gateway server codes based on protobuf file",
+		Long: `generate rpc gateway server codes based on protobuf file.
 
 Examples:
-  # generate rpc gateway service codes.
+  # generate rpc gateway server codes.
   sponge micro rpc-gw-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --protobuf-file=./demo.proto
 
-  # generate rpc gateway service codes and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
+  # generate rpc gateway server codes and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge micro rpc-gw-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --protobuf-file=./demo.proto --out=./yourServerDir
 
-  # generate rpc gateway service codes and specify the docker image repository address.
+  # generate rpc gateway server codes and specify the docker image repository address.
   sponge micro rpc-gw-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --protobuf-file=./demo.proto
 `,
 		SilenceErrors: true,
@@ -115,7 +115,7 @@ using help:
   4. visit http://localhost:8080/apis/swagger/index.html in your browser, and test api interface.
 
 `)
-	fmt.Printf("generate %s's rpc gateway service codes successfully, out = %s\n", serverName, r.GetOutputDir())
+	fmt.Printf("generate %s's rpc gateway server codes successfully, out = %s\n", serverName, r.GetOutputDir())
 
 	return nil
 }

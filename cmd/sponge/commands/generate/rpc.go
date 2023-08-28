@@ -15,7 +15,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// RPCCommand generate rpc service codes
+// RPCCommand generate rpc server codes
 func RPCCommand() *cobra.Command {
 	var (
 		moduleName  string // module name for go.mod
@@ -23,6 +23,7 @@ func RPCCommand() *cobra.Command {
 		projectName string // project name for deployment name
 		repoAddr    string // image repo address
 		outPath     string // output directory
+		dbTables    string // table names
 		sqlArgs     = sql2code.Args{
 			Package:  "model",
 			JSONTag:  true,
@@ -33,31 +34,74 @@ func RPCCommand() *cobra.Command {
 	//nolint
 	cmd := &cobra.Command{
 		Use:   "rpc",
-		Short: "Generate rpc service codes based on mysql table",
-		Long: `generate rpc service codes based on mysql table.
+		Short: "Generate rpc server codes based on mysql table",
+		Long: `generate rpc server codes based on mysql table.
 
 Examples:
-  # generate rpc service codes and embed 'gorm.model' struct.
+  # generate rpc server codes and embed 'gorm.model' struct.
   sponge micro rpc --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
-  # generate rpc service codes, structure fields correspond to the column names of the table.
+  # generate rpc server codes, structure fields correspond to the column names of the table.
   sponge micro rpc --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --embed=false
 
-  # generate rpc service codes and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
+  # generate rpc server codes with multiple table names.
+  sponge micro rpc --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=t1,t2
+
+  # generate rpc server codes and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge micro rpc --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
 
-  # generate rpc service codes and specify the docker image repository address.
+  # generate rpc server codes and specify the docker image repository address.
   sponge micro rpc --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 `,
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			var firstTable string
+			var servicesTableNames []string
+			tableNames := strings.Split(dbTables, ",")
+			if len(tableNames) == 1 {
+				firstTable = tableNames[0]
+			} else if len(tableNames) > 1 {
+				firstTable = tableNames[0]
+				servicesTableNames = tableNames[1:]
+			}
+
+			sqlArgs.DBTable = firstTable
 			codes, err := sql2code.Generate(&sqlArgs)
 			if err != nil {
 				return err
 			}
+			outPath, err = runGenRPCCommand(moduleName, serverName, projectName, repoAddr, sqlArgs.DBDsn, codes, outPath)
+			if err != nil {
+				return err
+			}
 
-			return runGenRPCCommand(moduleName, serverName, projectName, repoAddr, sqlArgs.DBDsn, codes, outPath)
+			for _, serviceTableName := range servicesTableNames {
+				if serviceTableName == "" {
+					continue
+				}
+
+				sqlArgs.DBTable = serviceTableName
+				codes, err := sql2code.Generate(&sqlArgs)
+				if err != nil {
+					return err
+				}
+
+				outPath, err = runGenServiceCommand(moduleName, serverName, codes, outPath)
+				if err != nil {
+					return err
+				}
+			}
+
+			fmt.Printf(`
+using help:
+  1. open a terminal and execute the command to generate codes:  make proto
+  2. compile and run service:   make run
+  3. open the file internal/service/xxx_client_test.go using Goland or VS Code, and test CRUD api interface.
+
+`)
+			fmt.Printf("generate %s's rpc server codes successfully, out = %s\n", serverName, outPath)
+			return nil
 		},
 	}
 
@@ -69,7 +113,7 @@ Examples:
 	_ = cmd.MarkFlagRequired("project-name")
 	cmd.Flags().StringVarP(&sqlArgs.DBDsn, "db-dsn", "d", "", "db content addr, e.g. user:password@(host:port)/database")
 	_ = cmd.MarkFlagRequired("db-dsn")
-	cmd.Flags().StringVarP(&sqlArgs.DBTable, "db-table", "t", "", "table name")
+	cmd.Flags().StringVarP(&dbTables, "db-table", "t", "", "table name, multiple names separated by commas")
 	_ = cmd.MarkFlagRequired("db-table")
 	cmd.Flags().BoolVarP(&sqlArgs.IsEmbed, "embed", "e", true, "whether to embed 'gorm.Model' struct")
 	cmd.Flags().IntVarP(&sqlArgs.JSONNamedType, "json-name-type", "j", 1, "json tags name type, 0:snake case, 1:camel case")
@@ -80,11 +124,11 @@ Examples:
 }
 
 func runGenRPCCommand(moduleName string, serverName string, projectName string, repoAddr string,
-	dbDSN string, codes map[string]string, outPath string) error {
+	dbDSN string, codes map[string]string, outPath string) (string, error) {
 	subTplName := "rpc"
 	r := Replacers[TplNameSponge]
 	if r == nil {
-		return errors.New("replacer is nil")
+		return "", errors.New("replacer is nil")
 	}
 
 	// setting up template information
@@ -116,20 +160,11 @@ func runGenRPCCommand(moduleName string, serverName string, projectName string, 
 	r.SetReplacementFields(fields)
 	_ = r.SetOutputDir(outPath, serverName+"_"+subTplName)
 	if err := r.SaveFiles(); err != nil {
-		return err
+		return "", err
 	}
-
 	_ = saveGenInfo(moduleName, serverName, r.GetOutputDir())
 
-	fmt.Printf(`
-using help:
-  1. open a terminal and execute the command to generate codes:  make proto
-  2. compile and run service:   make run
-  3. open the file internal/service/xxx_client_test.go using Goland or VS Code, and test CRUD api interface.
-
-`)
-	fmt.Printf("generate %s's rpc server codes successfully, out = %s\n", serverName, r.GetOutputDir())
-	return nil
+	return r.GetOutputDir(), nil
 }
 
 func addRPCFields(moduleName string, serverName string, projectName string, repoAddr string,

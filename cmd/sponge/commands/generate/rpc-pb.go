@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// RPCPbCommand generate rpc service codes bash on protobuf file
+// RPCPbCommand generate rpc server codes bash on protobuf file
 func RPCPbCommand() *cobra.Command {
 	var (
 		moduleName   string // module name for go.mod
@@ -23,17 +23,17 @@ func RPCPbCommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "rpc-pb",
-		Short: "Generate rpc service codes based on protobuf file",
-		Long: `generate rpc service codes based on protobuf file.
+		Short: "Generate rpc server codes based on protobuf file",
+		Long: `generate rpc server codes based on protobuf file.
 
 Examples:
-  # generate rpc service codes.
+  # generate rpc server codes.
   sponge micro rpc-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --protobuf-file=./demo.proto
 
-  # generate rpc service codes and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
+  # generate rpc server codes and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge micro rpc-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --protobuf-file=./demo.proto --out=./yourServerDir
 
-  # generate rpc service codes and specify the docker image repository address.
+  # generate rpc server codes and specify the docker image repository address.
   sponge micro rpc-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --protobuf-file=./demo.proto
 `,
 		SilenceErrors: true,

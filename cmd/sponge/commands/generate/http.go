@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
+	"strings"
 
 	"github.com/zhufuyi/sponge/pkg/replacer"
 	"github.com/zhufuyi/sponge/pkg/sql2code"
@@ -13,7 +14,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// HTTPCommand generate http service codes
+// HTTPCommand generate web server codes
 func HTTPCommand() *cobra.Command {
 	var (
 		moduleName  string // module name for go.mod
@@ -21,6 +22,7 @@ func HTTPCommand() *cobra.Command {
 		projectName string // project name for deployment name
 		repoAddr    string // image repo address
 		outPath     string // output directory
+		dbTables    string // table names
 		sqlArgs     = sql2code.Args{
 			Package:  "model",
 			JSONTag:  true,
@@ -31,31 +33,74 @@ func HTTPCommand() *cobra.Command {
 	//nolint
 	cmd := &cobra.Command{
 		Use:   "http",
-		Short: "Generate http service codes based on mysql table",
-		Long: `generate http service codes based on mysql table.
+		Short: "Generate web server codes based on mysql table",
+		Long: `generate web server codes based on mysql table.
 
 Examples:
-  # generate http service codes and embed 'gorm.model' struct.
+  # generate web server codes and embed 'gorm.model' struct.
   sponge web http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
-  # generate http service codes, structure fields correspond to the column names of the table.
+  # generate web server codes, structure fields correspond to the column names of the table.
   sponge web http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --embed=false
 
-  # generate http service codes and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
+  # generate web server codes with multiple table names.
+  sponge web http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=t1,t2
+
+  # generate web server codes and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge web http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
 
-  # generate http service codes and specify the docker image repository address.
+  # generate web server codes and specify the docker image repository address.
   sponge web http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 `,
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			var firstTable string
+			var handlerTableNames []string
+			tableNames := strings.Split(dbTables, ",")
+			if len(tableNames) == 1 {
+				firstTable = tableNames[0]
+			} else if len(tableNames) > 1 {
+				firstTable = tableNames[0]
+				handlerTableNames = tableNames[1:]
+			}
+
+			sqlArgs.DBTable = firstTable
 			codes, err := sql2code.Generate(&sqlArgs)
 			if err != nil {
 				return err
 			}
+			outPath, err = runGenHTTPCommand(moduleName, serverName, projectName, repoAddr, sqlArgs.DBDsn, codes, outPath)
+			if err != nil {
+				return err
+			}
 
-			return runGenHTTPCommand(moduleName, serverName, projectName, repoAddr, sqlArgs.DBDsn, codes, outPath)
+			for _, handlerTableName := range handlerTableNames {
+				if handlerTableName == "" {
+					continue
+				}
+
+				sqlArgs.DBTable = handlerTableName
+				codes, err := sql2code.Generate(&sqlArgs)
+				if err != nil {
+					return err
+				}
+
+				outPath, err = runGenHandlerCommand(moduleName, codes, outPath)
+				if err != nil {
+					return err
+				}
+			}
+
+			fmt.Printf(`
+using help:
+  1. open a terminal and execute the command to generate the swagger documentation: make docs
+  2. compile and run service: make run
+  3. visit http://localhost:8080/swagger/index.html in your browser, and test the CRUD api interface.
+
+`)
+			fmt.Printf("generate %s's web server codes successfully, out = %s\n", serverName, outPath)
+			return nil
 		},
 	}
 
@@ -67,7 +112,7 @@ Examples:
 	_ = cmd.MarkFlagRequired("project-name")
 	cmd.Flags().StringVarP(&sqlArgs.DBDsn, "db-dsn", "d", "", "db content addr, e.g. user:password@(host:port)/database")
 	_ = cmd.MarkFlagRequired("db-dsn")
-	cmd.Flags().StringVarP(&sqlArgs.DBTable, "db-table", "t", "", "table name")
+	cmd.Flags().StringVarP(&dbTables, "db-table", "t", "", "table name, multiple names separated by commas")
 	_ = cmd.MarkFlagRequired("db-table")
 	cmd.Flags().BoolVarP(&sqlArgs.IsEmbed, "embed", "e", true, "whether to embed 'gorm.Model' struct")
 	cmd.Flags().IntVarP(&sqlArgs.JSONNamedType, "json-name-type", "j", 1, "json tags name type, 0:snake case, 1:camel case")
@@ -78,11 +123,11 @@ Examples:
 }
 
 func runGenHTTPCommand(moduleName string, serverName string, projectName string, repoAddr string,
-	dbDSN string, codes map[string]string, outPath string) error {
+	dbDSN string, codes map[string]string, outPath string) (string, error) {
 	subTplName := "http"
 	r := Replacers[TplNameSponge]
 	if r == nil {
-		return errors.New("replacer is nil")
+		return "", errors.New("replacer is nil")
 	}
 
 	// setting up template information
@@ -113,20 +158,11 @@ func runGenHTTPCommand(moduleName string, serverName string, projectName string,
 	r.SetReplacementFields(fields)
 	_ = r.SetOutputDir(outPath, serverName+"_"+subTplName)
 	if err := r.SaveFiles(); err != nil {
-		return err
+		return "", err
 	}
-
 	_ = saveGenInfo(moduleName, serverName, r.GetOutputDir())
 
-	fmt.Printf(`
-using help:
-  1. open a terminal and execute the command to generate the swagger documentation: make docs
-  2. compile and run service: make run
-  3. visit http://localhost:8080/swagger/index.html in your browser, and test the CRUD api interface.
-
-`)
-	fmt.Printf("generate %s's http server codes successfully, out = %s\n", serverName, r.GetOutputDir())
-	return nil
+	return r.GetOutputDir(), nil
 }
 
 func addHTTPFields(moduleName string, serverName string, projectName string, repoAddr string,

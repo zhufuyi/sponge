@@ -47,7 +47,7 @@ grpc:
 
 # grpc client settings, support for setting up multiple rpc clients
 grpcClient:
-  - name: "serverNameExample"   # rpc service name, used for service discovery
+  - name: "serverNameExample"   # rpc server name, used for service discovery
     host: "127.0.0.1"                    # rpc service address, used for direct connection
     port: 8282                              # rpc service port
     registryDiscoveryType: ""         # registration and discovery types: consul, etcd, nacos, if empty, connecting to server using host and port
