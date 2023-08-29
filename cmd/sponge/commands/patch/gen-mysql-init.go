@@ -1,18 +1,20 @@
-package generate
+package patch
 
 import (
 	"errors"
 	"fmt"
+	"os"
 	"strings"
 
+	"github.com/zhufuyi/sponge/cmd/sponge/commands/generate"
 	"github.com/zhufuyi/sponge/pkg/gofile"
 	"github.com/zhufuyi/sponge/pkg/replacer"
 
 	"github.com/spf13/cobra"
 )
 
-// MysqlAndRedisCommand generate mysql and redis initialization code
-func MysqlAndRedisCommand() *cobra.Command {
+// GenMysqlInitCommand generate mysql initialization code
+func GenMysqlInitCommand() *cobra.Command {
 	var (
 		moduleName string // go.mod module name
 		outPath    string // output directory
@@ -20,16 +22,16 @@ func MysqlAndRedisCommand() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "mysql-redis-init",
-		Short: "Generate mysql and redis initialization code",
-		Long: `generate mysql and redis initialization code
+		Use:   "gen-mysql-init",
+		Short: "Generate mysql initialization code",
+		Long: `generate mysql initialization code
 
 Examples:
-  # generate mysql and redis initialization code.
-  sponge gen mysql-redis-init --module-name=yourModuleName
+  # generate mysql initialization code.
+  sponge patch gen-mysql-init --module-name=yourModuleName
 
-  # generate mysql and redis initialization code, and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
-  sponge gen mysql-redis-init --out=./yourServerDir
+  # generate mysql initialization code, and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
+  sponge patch gen-mysql-init --out=./yourServerDir
 `,
 		SilenceErrors: true,
 		SilenceUsage:  true,
@@ -38,7 +40,7 @@ Examples:
 			if mdName != "" {
 				moduleName = mdName
 			} else if moduleName == "" {
-				return fmt.Errorf(`required flag(s) "module-name" not set, use "sponge gen mysql-redis-init -h" for help`)
+				return fmt.Errorf(`required flag(s) "module-name" not set, use "sponge patch gen-mysql-init -h" for help`)
 			}
 
 			var isEmpty bool
@@ -83,8 +85,8 @@ using help:
 }
 
 func runMysqlCliCommand(moduleName string, outPath string) (string, error) {
-	subTplName := "mysql-redis-init"
-	r := Replacers[TplNameSponge]
+	subTplName := "mysql-init"
+	r := generate.Replacers[generate.TplNameSponge]
 	if r == nil {
 		return "", errors.New("replacer is nil")
 	}
@@ -93,7 +95,7 @@ func runMysqlCliCommand(moduleName string, outPath string) (string, error) {
 	subDirs := []string{"internal/model"} // only the specified subdirectory is processed, if empty or no subdirectory is specified, it means all files
 	ignoreDirs := []string{}              // specify the directory in the subdirectory where processing is ignored
 	ignoreFiles := []string{              // specify the files in the subdirectory to be ignored for processing
-		"userExample.go",
+		"userExample.go", "init_test.go",
 	}
 
 	r.SetSubDirsAndFiles(subDirs)
@@ -126,4 +128,22 @@ func addMysqlAndRedisInitFields(moduleName string) []replacer.Field {
 	}...)
 
 	return fields
+}
+
+// get moduleName and serverName from directory
+func getNamesFromOutDir(dir string) (moduleName string, serverName string) {
+	if dir == "" {
+		return "", ""
+	}
+	data, err := os.ReadFile(dir + "/docs/gen.info")
+	if err != nil {
+		return "", ""
+	}
+
+	ms := strings.Split(string(data), ",")
+	if len(ms) != 2 {
+		return "", ""
+	}
+
+	return ms[0], ms[1]
 }

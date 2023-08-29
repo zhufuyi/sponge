@@ -6,12 +6,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// NewWebCommand web commands
-func NewWebCommand() *cobra.Command {
+// GenWebCommand generate web server code
+func GenWebCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:           "web",
-		Short:         "Generate model, cache, dao, handler, http codes",
-		Long:          "generate model, cache, dao, handler, http codes.",
+		Short:         "Generate model, cache, dao, handler, web codes",
+		Long:          "generate model, cache, dao, handler, web codes.",
 		SilenceErrors: true,
 		SilenceUsage:  true,
 	}

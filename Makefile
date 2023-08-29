@@ -170,9 +170,15 @@ deploy-binary: binary-package
 
 
 .PHONY: patch
-# patch some dependent code, such as types.proto, mysql initialization code. e.g. make patch TYPE=types-pb , make patch TYPE=mysql-redis-init
+# patch some dependent code, such as types.proto, mysql initialization code. e.g. make patch TYPE=types-pb , make patch TYPE=mysql-init
 patch:
 	@bash scripts/patch.sh $(TYPE)
+
+
+.PHONY: copy-proto
+# copy proto file from the rpc server directory, multiple directories separated by commas. e.g. make copy-proto SERVER=yourServerDir
+copy-proto:
+	@bash scripts/copy-proto.sh $(SERVER)
 
 
 .PHONY: clean

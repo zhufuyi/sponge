@@ -12,13 +12,13 @@ import (
 
 var servicePort = 24631
 
-// NewRunCommand sponge run commands
-func NewRunCommand() *cobra.Command {
+// OpenUICommand open the sponge UI interface
+func OpenUICommand() *cobra.Command {
 	var isLog bool
 	cmd := &cobra.Command{
 		Use:   "run",
-		Short: "Open the Sponge UI interface",
-		Long: `open the Sponge UI interface.
+		Short: "Open the sponge UI interface",
+		Long: `open the sponge UI interface.
 
 Examples:
   # no log for running.

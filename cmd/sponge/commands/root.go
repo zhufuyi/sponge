@@ -19,8 +19,8 @@ var (
 func NewRootCMD() *cobra.Command {
 	cmd := &cobra.Command{
 		Use: "sponge",
-		Long: `sponge is a powerful tool for generating web and microservice code, a microservice framework
-based on gin and grpc encapsulation, and an open source framework for rapid application development.`,
+		Long: `sponge is a powerful golang productivity tool that integrates automatic code generation, 
+web and microservice framework, general basic development framework.`,
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		Version:       getVersion(),
@@ -30,13 +30,12 @@ based on gin and grpc encapsulation, and an open source framework for rapid appl
 		InitCommand(),
 		UpgradeCommand(),
 		ToolsCommand(),
-		NewWebCommand(),
-		MicroCommand(),
+		GenWebCommand(),
+		GenMicroCommand(),
 		generate.ConfigCommand(),
-		NewRunCommand(),
-		generate.DeleteJSONOmitemptyCommand(),
+		OpenUICommand(),
 		MergeCommand(),
-		GenCommand(),
+		PatchCommand(),
 	)
 
 	return cmd

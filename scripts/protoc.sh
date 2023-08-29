@@ -145,7 +145,7 @@ generateBySpecifiedProto
 handlePbGoFiles $protoBasePath
 
 # delete json tag omitempty
-sponge del-omitempty --dir=$protoBasePath --suffix-name=pb.go > /dev/null
+sponge patch del-omitempty --dir=$protoBasePath --suffix-name=pb.go > /dev/null
 checkResult $?
 
 go mod tidy

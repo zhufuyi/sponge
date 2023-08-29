@@ -1,18 +1,19 @@
-package generate
+package patch
 
 import (
 	"errors"
 	"fmt"
 	"strings"
 
+	"github.com/zhufuyi/sponge/cmd/sponge/commands/generate"
 	"github.com/zhufuyi/sponge/pkg/gofile"
 	"github.com/zhufuyi/sponge/pkg/replacer"
 
 	"github.com/spf13/cobra"
 )
 
-// TypesPbCommand generate types.proto file
-func TypesPbCommand() *cobra.Command {
+// GenTypesPbCommand generate types.proto code
+func GenTypesPbCommand() *cobra.Command {
 	var (
 		moduleName string // go.mod module name
 		outPath    string // output directory
@@ -20,16 +21,16 @@ func TypesPbCommand() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "types-pb",
-		Short: "Generate types.proto file",
-		Long: `generate types.proto file
+		Use:   "gen-types-pb",
+		Short: "Generate types.proto code",
+		Long: `generate types.proto code
 
 Examples:
-  # generate types.proto file.
-  sponge gen types-pb --module-name=yourModuleName
+  # generate types.proto code.
+  sponge patch gen-types-pb --module-name=yourModuleName
 
-  # generate types.proto file and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
-  sponge gen types-pb --out=./yourServerDir
+  # generate types.proto code and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
+  sponge patch gen-types-pb --out=./yourServerDir
 `,
 		SilenceErrors: true,
 		SilenceUsage:  true,
@@ -38,7 +39,7 @@ Examples:
 			if mdName != "" {
 				moduleName = mdName
 			} else if moduleName == "" {
-				return fmt.Errorf(`required flag(s) "module-name" not set, use "sponge gen types-pb -h" for help`)
+				return fmt.Errorf(`required flag(s) "module-name" not set, use "sponge patch gen-types-pb -h" for help`)
 			}
 
 			var isEmpty bool
@@ -84,7 +85,7 @@ using help:
 
 func runTypesPbCommand(moduleName string, outPath string) (string, error) {
 	subTplName := "types-pb"
-	r := Replacers[TplNameSponge]
+	r := generate.Replacers[generate.TplNameSponge]
 	if r == nil {
 		return "", errors.New("replacer is nil")
 	}

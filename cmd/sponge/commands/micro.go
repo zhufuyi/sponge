@@ -6,8 +6,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// MicroCommand micro commands
-func MicroCommand() *cobra.Command {
+// GenMicroCommand generate micro service code
+func GenMicroCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:           "micro",
 		Short:         "Generate proto, model, cache, dao, service, rpc, rpc-gw, rpc-cli codes",

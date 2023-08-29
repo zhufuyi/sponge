@@ -34,12 +34,12 @@ type mergeParam struct {
 	splitLineMark []byte                                   // file Contents Partition Line Marker
 	mark          string                                   // code mark strings or regular expressions
 	isLineCode    bool                                     // true:handles line code, false:handles code blocks
-	parseCode     func(date []byte, markStr string) []code // parsing code method
+	parseCode     func(data []byte, markStr string) []code // parsing code method
 	dt            string                                   // character form of date and time
 	backupDir     string                                   // backup Code Catalog
 }
 
-func newMergeParam(dir string, mark string, isLineCode bool, parseCode func(date []byte, markStr string) []code) *mergeParam {
+func newMergeParam(dir string, mark string, isLineCode bool, parseCode func(data []byte, markStr string) []code) *mergeParam {
 	return &mergeParam{
 		dir:           dir,
 		fuzzyFilename: defaultFuzzyFilename,
@@ -77,7 +77,7 @@ func (m *mergeParam) runMerge() {
 			continue
 		}
 		if successFile != "" {
-			fmt.Printf("merge code to '%s' successfully.\n", successFile)
+			fmt.Printf("merge code to \"%s\" successfully.\n", successFile)
 		}
 	}
 }
@@ -233,9 +233,9 @@ func mergeCode(oldCode []byte, addCode []byte, position []byte) []byte {
 
 // ------------- parsing the core of data in the internal/ecode directory -------------
 
-func parseFromECode(date []byte, markStr string) []code {
+func parseFromECode(data []byte, markStr string) []code {
 	var codes []code
-	buf := bufio.NewReader(bytes.NewReader(date))
+	buf := bufio.NewReader(bytes.NewReader(data))
 	for {
 		line, err := buf.ReadString('\n')
 		if err != nil {
@@ -264,9 +264,9 @@ func getECodeMarkName(str string, markStr string) string {
 
 // ------------- parsing the core of data in the internal/routers directory -------------
 
-func parseFromRouters(date []byte, markStr string) []code {
+func parseFromRouters(data []byte, markStr string) []code {
 	var codes []code
-	buf := bufio.NewReader(bytes.NewReader(date))
+	buf := bufio.NewReader(bytes.NewReader(data))
 	for {
 		line, err := buf.ReadString('\n')
 		if err != nil {

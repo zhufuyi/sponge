@@ -2,7 +2,7 @@
 
 patchType=$1
 typesPb="types-pb"
-mysqlInit="mysql-redis-init"
+mysqlInit="mysql-init"
 
 function checkResult() {
     result=$1
@@ -12,22 +12,22 @@ function checkResult() {
 }
 
 function patchTypesPb() {
-    sponge gen types-pb --out=./
+    sponge patch gen-types-pb --out=./
     checkResult $?
 }
 
-function patchMysqlAndRedisInit() {
-    sponge gen mysql-redis-init --out=./
+function patchMysqlInit() {
+    sponge patch gen-mysql-init --out=./
     checkResult $?
 }
 
 if [ "X$patchType" = "X" ];then
     patchTypesPb
-    patchMysqlAndRedisInit
+    patchMysqlInit
 elif [  "$patchType" = "$typesPb"  ]; then
     patchTypesPb
 elif [ "$patchType" = "$mysqlInit" ]; then
-    patchMysqlAndRedisInit
+    patchMysqlInit
 else
     echo "TYPE should be "", $typesPb or $mysqlInit."
     exit 1
