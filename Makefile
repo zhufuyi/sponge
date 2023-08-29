@@ -76,7 +76,7 @@ graph:
 
 
 .PHONY: proto
-# generate *.pb.go codes from *.proto files
+# generate *.go code from *.proto files
 proto: mod fmt
 	@bash scripts/protoc.sh
 

@@ -12,10 +12,11 @@ fi
 
 swag init -g cmd/serverNameExample_mixExample/main.go
 
-colorStart='\e[1;36m'
-underLine='\e[4m'
+colorCyan='\e[1;36m'
+highBright='\e[1m'
 markEnd='\e[0m'
 
 echo ""
-echo -e "execute the command ${colorStart}make run${markEnd} and then visit ${underLine}http://${HOST_ADDR}:8080/swagger/index.html${markEnd} in your browser."
+echo -e "${highBright}Tip:${markEnd} execute the command ${colorCyan}make run${markEnd} and then visit ${colorCyan}http://${HOST_ADDR}:8080/swagger/index.html${markEnd} in your browser."
 echo ""
+echo "generated api docs successfully."

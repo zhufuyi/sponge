@@ -196,6 +196,10 @@ func addHandlerPbFields(moduleName string, serverName string, r replacer.Replace
 			New: "github.com/zhufuyi/sponge/pkg",
 		},
 		{
+			Old: "userExample_logic.go",
+			New: "userExample.go",
+		},
+		{
 			Old:             "UserExamplePb",
 			New:             "UserExample",
 			IsCaseSensitive: true,

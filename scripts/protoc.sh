@@ -113,16 +113,8 @@ function generateBySpecifiedProto(){
   sponge web swagger --file=docs/apis.swagger.json > /dev/null
   checkResult $?
 
-  colorStart='\e[1;36m'
-  underLine='\e[4m'
-  markEnd='\e[0m'
-
-  echo ""
-  echo -e "execute the command ${colorStart}make run${markEnd} and then visit ${underLine}http://localhost:8080/apis/swagger/index.html${markEnd} in your browser."
-  echo ""
-
   # A total of four files are generated: the registration route file *_router.pb.go (saved in the same directory as the protobuf file),
-  # the injection route file *_router.go (saved in internal/routers by default), the logic code template file *_logic.go (saved in internal/service by default),
+  # the injection route file *_router.go (saved in internal/routers by default), the logic code template file *.go (saved in internal/service by default),
   # and the return error code template file *_http.go (saved in internal/ecode by default). internal/service),
   # return error code template file *_http.go (default path in internal/ecode)
   protoc --proto_path=. --proto_path=./third_party \
@@ -131,8 +123,15 @@ function generateBySpecifiedProto(){
     $specifiedProtoFiles
 
   sponge merge rpc-gw-pb
-
   checkResult $?
+
+  colorCyan='\e[1;36m'
+  highBright='\e[1m'
+  markEnd='\e[0m'
+
+  echo ""
+  echo -e "${highBright}Tip:${markEnd} execute the command ${colorCyan}make run${markEnd} and then visit ${colorCyan}http://localhost:8080/apis/swagger/index.html${markEnd} in your browser."
+  echo ""
   # delete the templates code end 2
 }
 
@@ -152,4 +151,4 @@ checkResult $?
 go mod tidy
 checkResult $?
 
-echo "execute protoc command successfully."
+echo "generated code successfully."

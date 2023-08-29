@@ -75,6 +75,7 @@ func (c *{{.LowerServiceName}}Client) {{.MethodName}}(ctx context.Context, req *
 {{- end}}
 	//     })
 	//     if err != nil {
+	//     	logger.Warn("{{.MethodName}} error", logger.Err(err), interceptor.ServerCtxRequestIDField(ctx))
 	//     	return nil, err
 	//     }
 	//

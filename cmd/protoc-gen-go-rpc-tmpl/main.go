@@ -1,4 +1,4 @@
-// Package main is to generate *_logic.go, *_logic_test.go, *_rpc.go files.
+// Package main is to generate *.go(tmpl), *_client_test.go, *_rpc.go files.
 package main
 
 import (

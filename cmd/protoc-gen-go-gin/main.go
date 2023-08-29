@@ -1,4 +1,4 @@
-// Package main is to generate *_router.pb.go file, *_logic.go, *_router.go, *_http.go files.
+// Package main is to generate *.go(tmpl), *_router.go, *_http.go, *_router.pb.go,files.
 package main
 
 import (
@@ -26,11 +26,11 @@ const (
 # generate *_router.pb.go file
 protoc --proto_path=. --proto_path=./third_party --go-gin_out=. --go-gin_opt=paths=source_relative *.proto
 
-# generate *_router.pb.go, *_logic.go, *_router.go, *_http.go files
+# generate *_router.pb.go, *.go(tmpl), *_router.go, *_http.go files
 protoc --proto_path=. --proto_path=./third_party --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=handler \
   --go-gin_opt=moduleName=yourModuleName --go-gin_opt=serverName=yourServerName *.proto
 
-# generate *_router.pb.go, *_logic.go, *_router.go, *_rpc.go files
+# generate *_router.pb.go, *.go(tmpl), *_router.go, *_rpc.go files
 protoc --proto_path=. --proto_path=./third_party --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=service \
   --go-gin_opt=moduleName=yourModuleName --go-gin_opt=serverName=yourServerName *.proto
 
@@ -133,7 +133,7 @@ func saveHandlerAndRouterFiles(f *protogen.File, moduleName string, serverName s
 	filenamePrefix := f.GeneratedFilenamePrefix
 	handlerLogicContent, routerContent, errCodeFileContent := handler.GenerateFiles(f)
 
-	filePath := filenamePrefix + "_logic.go"
+	filePath := filenamePrefix + ".go"
 	err := saveFile(moduleName, serverName, logicOut, filePath, handlerLogicContent, false, handlerPlugin)
 	if err != nil {
 		return err
@@ -159,7 +159,7 @@ func saveServiceAndRouterFiles(f *protogen.File, moduleName string, serverName s
 	filenamePrefix := f.GeneratedFilenamePrefix
 	serviceLogicContent, routerContent, errCodeFileContent := service.GenerateFiles(f)
 
-	filePath := filenamePrefix + "_logic.go"
+	filePath := filenamePrefix + ".go"
 	err := saveFile(moduleName, serverName, logicOut, filePath, serviceLogicContent, false, servicePlugin)
 	if err != nil {
 		return err

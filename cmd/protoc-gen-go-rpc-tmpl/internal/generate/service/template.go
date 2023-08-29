@@ -90,14 +90,13 @@ func (s *{{.LowerServiceName}}) {{.MethodName}}(ctx context.Context, req *server
 	//		    return nil, ecode.StatusInvalidParams.Err()
 	//	    }
     //
-	// 	reply, err := s.iDao.{{.Request}}(ctx, &model.{{.ServiceName}}{
+	// 	reply, err := s.iDao.{{.MethodName}}(ctx, &model.{{.ServiceName}}{
 {{- range .RequestFields}}
 	//     	{{.Name}}: req.{{.Name}},
 {{- end}}
 	//     })
-    //
 	// 	if err != nil {
-	//			logger.Warn("XxxMethod error", logger.Err(err), interceptor.ServerCtxRequestIDField(ctx))
+	//			logger.Warn("{{.MethodName}} error", logger.Err(err), interceptor.ServerCtxRequestIDField(ctx))
 	//			return nil, ecode.InternalServerError.Err()
 	//		}
 	//

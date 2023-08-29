@@ -110,7 +110,7 @@ func runGenRPCGwCommand(moduleName string, serverName string, projectName string
 	fmt.Printf(`
 using help:
   1. open a terminal and execute the command to generate codes: make proto
-  2. open internal/service/xxx_logic.go file, replace panic("implement me") according to template code example.
+  2. open internal/service/xxx.go file, replace panic("implement me") according to template code example.
   3. compile and run service: make run
   4. visit http://localhost:8080/apis/swagger/index.html in your browser, and test api interface.
 

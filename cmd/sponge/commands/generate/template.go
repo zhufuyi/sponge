@@ -148,78 +148,7 @@ func NewCenter(configFile string) (*Center, error) {
 
   checkResult $?`
 
-	// http-pb
-	protoShellHandlerCode = `
-  # generate the swagger document and merge all files into docs/apis.swagger.json
-  protoc --proto_path=. --proto_path=./third_party \
-    --openapiv2_out=. --openapiv2_opt=logtostderr=true --openapiv2_opt=allow_merge=true --openapiv2_opt=merge_file_name=docs/apis.json \
-    $specifiedProtoFiles
-
-  checkResult $?
-
-  sponge web swagger --file=docs/apis.swagger.json
-  checkResult $?
-
-  colorStart='\e[1;36m'
-  underLine='\e[4m'
-  markEnd='\e[0m'
-
-  echo ""
-  echo -e "execute the command ${colorStart}make run${markEnd} and then visit ${underLine}http://localhost:8080/apis/swagger/index.html${markEnd} in your browser. "
-  echo ""
-
-  moduleName=$(cat docs/gen.info | head -1 | cut -d , -f 1)
-  serverName=$(cat docs/gen.info | head -1 | cut -d , -f 2)
-  # A total of four files are generated, namely the registration route file _*router.pb.go (saved in the same directory as the protobuf file),
-  # the injection route file *_router.go (saved by default in the path internal/routers), the logical code template file*_logic.go (default path
-  # is in internal/handler), return error code template file*_http.go (default path is in internal/ecode)
-  protoc --proto_path=. --proto_path=./third_party \
-    --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=handler \
-    --go-gin_opt=moduleName=${moduleName} --go-gin_opt=serverName=${serverName} \
-    $specifiedProtoFiles
-
-  checkResult $?
-
-  sponge merge http-pb
-  echo ""`
-
-	// rpc-gw
-	protoShellServiceCode = `
-  # Generate the swagger document and merge all files into docs/apis.swagger.json
-  protoc --proto_path=. --proto_path=./third_party \
-    --openapiv2_out=. --openapiv2_opt=logtostderr=true --openapiv2_opt=allow_merge=true --openapiv2_opt=merge_file_name=docs/apis.json \
-    $specifiedProtoFiles
-
-  checkResult $?
-
-  sponge micro swagger --file=docs/apis.swagger.json
-  checkResult $?
-
-  colorStart='\e[1;36m'
-  underLine='\e[4m'
-  markEnd='\e[0m'
-
-  echo ""
-  echo -e "execute the command ${colorStart}make run${markEnd} and then visit ${underLine}http://localhost:8080/apis/swagger/index.html${markEnd} in your browser."
-  echo ""
-
-  moduleName=$(cat docs/gen.info | head -1 | cut -d , -f 1)
-  serverName=$(cat docs/gen.info | head -1 | cut -d , -f 2)
-  # A total of 4 files are generated, namely the registration route file _*router.pb.go (saved in the same directory as the protobuf file),
-  # the injection route file *_router.go (default save path in internal/routers), the logical code template file*_logic.go (saved in
-  # internal/service by default), return error code template file*_rpc.go (saved in internal/ecode by default)
-  protoc --proto_path=. --proto_path=./third_party \
-    --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=service \
-    --go-gin_opt=moduleName=${moduleName} --go-gin_opt=serverName=${serverName} \
-    $specifiedProtoFiles
-
-
-  checkResult $?
-
-  sponge merge rpc-gw-pb
-  echo ""`
-
-	// rpc-pb
+	// for rpc and rpc-pb
 	protoShellServiceTmplCode = `
   moduleName=$(cat docs/gen.info | head -1 | cut -d , -f 1)
   serverName=$(cat docs/gen.info | head -1 | cut -d , -f 2)
@@ -232,6 +161,84 @@ func NewCenter(configFile string) (*Center, error) {
   checkResult $?
 
   sponge merge rpc-pb
+  checkResult $?
+
+  colorCyan='\e[1;36m'
+  highBright='\e[1m'
+  markEnd='\e[0m'
+
+  echo ""
+  echo -e "${highBright}Tip:${markEnd} execute the command ${colorCyan}make run${markEnd} and then test rpc method is in the file ${colorCyan}internal/service/xxx_client_test.go${markEnd}."
+  echo ""`
+
+	// for http-pb
+	protoShellHandlerCode = `
+  # generate the swagger document and merge all files into docs/apis.swagger.json
+  protoc --proto_path=. --proto_path=./third_party \
+    --openapiv2_out=. --openapiv2_opt=logtostderr=true --openapiv2_opt=allow_merge=true --openapiv2_opt=merge_file_name=docs/apis.json \
+    $specifiedProtoFiles
+
+  checkResult $?
+
+  sponge web swagger --file=docs/apis.swagger.json
+  checkResult $?
+
+  moduleName=$(cat docs/gen.info | head -1 | cut -d , -f 1)
+  serverName=$(cat docs/gen.info | head -1 | cut -d , -f 2)
+  # A total of four files are generated, namely the registration route file _*router.pb.go (saved in the same directory as the protobuf file),
+  # the injection route file *_router.go (saved by default in the path internal/routers), the logical code template file *.go (default path
+  # is in internal/handler), return error code template file*_http.go (default path is in internal/ecode)
+  protoc --proto_path=. --proto_path=./third_party \
+    --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=handler \
+    --go-gin_opt=moduleName=${moduleName} --go-gin_opt=serverName=${serverName} \
+    $specifiedProtoFiles
+
+  checkResult $?
+
+  sponge merge http-pb
+  checkResult $?
+
+  colorCyan='\e[1;36m'
+  highBright='\e[1m'
+  markEnd='\e[0m'
+
+  echo ""
+  echo -e "${highBright}Tip:${markEnd} execute the command ${colorCyan}make run${markEnd} and then visit ${colorCyan}http://localhost:8080/apis/swagger/index.html${markEnd} in your browser. "
+  echo ""`
+
+	// for rpc-gw
+	protoShellServiceCode = `
+  # Generate the swagger document and merge all files into docs/apis.swagger.json
+  protoc --proto_path=. --proto_path=./third_party \
+    --openapiv2_out=. --openapiv2_opt=logtostderr=true --openapiv2_opt=allow_merge=true --openapiv2_opt=merge_file_name=docs/apis.json \
+    $specifiedProtoFiles
+
+  checkResult $?
+
+  sponge micro swagger --file=docs/apis.swagger.json
+  checkResult $?
+
+  moduleName=$(cat docs/gen.info | head -1 | cut -d , -f 1)
+  serverName=$(cat docs/gen.info | head -1 | cut -d , -f 2)
+  # A total of 4 files are generated, namely the registration route file _*router.pb.go (saved in the same directory as the protobuf file),
+  # the injection route file *_router.go (default save path in internal/routers), the logical code template file *.go (saved in
+  # internal/service by default), return error code template file*_rpc.go (saved in internal/ecode by default)
+  protoc --proto_path=. --proto_path=./third_party \
+    --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=service \
+    --go-gin_opt=moduleName=${moduleName} --go-gin_opt=serverName=${serverName} \
+    $specifiedProtoFiles
+
+  checkResult $?
+
+  sponge merge rpc-gw-pb
+  checkResult $?
+
+  colorCyan='\e[1;36m'
+  highBright='\e[1m'
+  markEnd='\e[0m'
+
+  echo ""
+  echo -e "${highBright}Tip:${markEnd} execute the command ${colorCyan}make run${markEnd} and then visit ${colorCyan}http://localhost:8080/apis/swagger/index.html${markEnd} in your browser."
   echo ""`
 
 	httpServerConfigCode = `# http server settings
