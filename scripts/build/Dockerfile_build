@@ -1,6 +1,7 @@
 # Need to package the code first `tar zcf serverNameExample.tar.gz $(ls)` and move it to the same directory as Dokerfile
-# Compile the go code
-FROM golang:1.18-alpine as build
+
+# Compile the go code, you can specify the golang version
+FROM golang:1.21-alpine as build
 COPY . /go/src/serverNameExample
 WORKDIR /go/src/serverNameExample
 RUN tar zxf serverNameExample.tar.gz
@@ -8,7 +9,10 @@ RUN go env -w GOPROXY=https://goproxy.cn,direct
 RUN go mod download
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /serverNameExample cmd/serverNameExample/main.go
 
-# build grpc_health_probe
+# todo generate dockerfile_build code for http or grpc here
+# delete the templates code start
+
+# install grpc-health-probe, for health check of grpc service
 RUN go install github.com/grpc-ecosystem/grpc-health-probe@v0.4.12
 RUN cd $GOPATH/pkg/mod/github.com/grpc-ecosystem/grpc-health-probe@v0.4.12 \
     && go mod download \
@@ -30,14 +34,10 @@ RUN apk add tzdata  \
     && echo "Asia/Shanghai" > /etc/timezone \
     && apk del tzdata
 
-# todo generate dockerfile_build code for http or grpc here
-# delete the templates code start
-
 # add curl, used in the http service check, if deployed in k8s, can be installed without
 RUN apk add curl
 # add grpc_health_probe for health check of grpc service
 COPY --from=build /grpc_health_probe /bin/grpc_health_probe
-
 COPY --from=build /serverNameExample /app/serverNameExample
 COPY --from=build /go/src/serverNameExample/configs/serverNameExample.yml /app/configs/serverNameExample.yml
 
