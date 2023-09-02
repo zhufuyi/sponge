@@ -17,9 +17,27 @@ RUN chmod +x /bin/grpc_health_probe
 
 COPY configs/ /app/configs/
 COPY serverNameExample /app/serverNameExample
-RUN chmod +x /app/serverNameExample`
+RUN chmod +x /app/serverNameExample
 
-	dockerFileBuildHTTPCode = `# add curl, used for http service checking, can be installed without it if deployed in k8s
+# grpc and http port
+EXPOSE 8282 8283`
+
+	dockerFileBuildHTTPCode = `# compressing binary files
+#cd /
+#upx -9 serverNameExample
+
+
+# building images with binary
+FROM alpine:latest
+MAINTAINER zhufuyi "g.zhufuyi@gmail.com"
+
+# set the time zone to Shanghai
+RUN apk add tzdata  \
+    && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+    && echo "Asia/Shanghai" > /etc/timezone \
+    && apk del tzdata
+
+# add curl, used for http service checking, can be installed without it if deployed in k8s
 RUN apk add curl
 
 COPY --from=build /serverNameExample /app/serverNameExample
@@ -28,10 +46,95 @@ COPY --from=build /go/src/serverNameExample/configs/serverNameExample.yml /app/c
 # http port
 EXPOSE 8080`
 
-	dockerFileBuildGrpcCode = `# add grpc_health_probe for health check of grpc services
+	dockerFileBuildGrpcCode = `# install grpc-health-probe, for health check of grpc service
+RUN go install github.com/grpc-ecosystem/grpc-health-probe@v0.4.12
+RUN cd $GOPATH/pkg/mod/github.com/grpc-ecosystem/grpc-health-probe@v0.4.12 \
+    && go mod download \
+    && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "all=-s -w" -o /grpc_health_probe
+
+# compressing binary files
+#cd /
+#upx -9 serverNameExample
+#upx -9 grpc_health_probe
+
+
+# building images with binary
+FROM alpine:latest
+MAINTAINER zhufuyi "g.zhufuyi@gmail.com"
+
+# set the time zone to Shanghai
+RUN apk add tzdata  \
+    && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+    && echo "Asia/Shanghai" > /etc/timezone \
+    && apk del tzdata
+
+# add grpc_health_probe for health check of grpc services
 COPY --from=build /grpc_health_probe /bin/grpc_health_probe
 COPY --from=build /serverNameExample /app/serverNameExample
-COPY --from=build /go/src/serverNameExample/configs/serverNameExample.yml /app/configs/serverNameExample.yml`
+COPY --from=build /go/src/serverNameExample/configs/serverNameExample.yml /app/configs/serverNameExample.yml
+
+# grpc and http port
+EXPOSE 8282 8283`
+
+	imageBuildFileHTTPCode = `# compressing binary file
+#cd ${DOCKERFILE_PATH}
+#upx -9 ${serverName}
+#cd -
+
+echo "docker build -f ${DOCKERFILE} -t ${IMAGE_NAME_TAG} ${DOCKERFILE_PATH}"
+docker build -f ${DOCKERFILE} -t ${IMAGE_NAME_TAG} ${DOCKERFILE_PATH}`
+
+	imageBuildFileGrpcCode = `# install grpc-health-probe, for health check of grpc service
+rootDockerFilePath=$(pwd)/${DOCKERFILE_PATH}
+go install github.com/grpc-ecosystem/grpc-health-probe@v0.4.12
+cd $GOPATH/pkg/mod/github.com/grpc-ecosystem/grpc-health-probe@v0.4.12 \
+    && go mod download \
+    && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "all=-s -w" -o "${rootDockerFilePath}/grpc_health_probe"
+cd -
+
+# compressing binary file
+#cd ${DOCKERFILE_PATH}
+#upx -9 ${serverName}
+#upx -9 grpc_health_probe
+#cd -
+
+echo "docker build -f ${DOCKERFILE} -t ${IMAGE_NAME_TAG} ${DOCKERFILE_PATH}"
+docker build -f ${DOCKERFILE} -t ${IMAGE_NAME_TAG} ${DOCKERFILE_PATH}
+
+if [ -f "${DOCKERFILE_PATH}/grpc_health_probe" ]; then
+    rm -f ${DOCKERFILE_PATH}/grpc_health_probe
+fi`
+
+	imageBuildLocalFileHTTPCode = `# compressing binary file
+#cd ${DOCKERFILE_PATH}
+#upx -9 ${serverName}
+#cd -
+
+mkdir -p ${DOCKERFILE_PATH}/configs && cp -f configs/${serverName}.yml ${DOCKERFILE_PATH}/configs/
+echo "docker build -f ${DOCKERFILE} -t ${IMAGE_NAME}:latest ${DOCKERFILE_PATH}"
+docker build -f ${DOCKERFILE} -t ${IMAGE_NAME}:latest ${DOCKERFILE_PATH}`
+
+	imageBuildLocalFileGrpcCode = `# install grpc-health-probe, for health check of grpc service
+rootDockerFilePath=$(pwd)/${DOCKERFILE_PATH}
+go install github.com/grpc-ecosystem/grpc-health-probe@v0.4.12
+cd $GOPATH/pkg/mod/github.com/grpc-ecosystem/grpc-health-probe@v0.4.12 \
+    && go mod download \
+    && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "all=-s -w" -o "${rootDockerFilePath}/grpc_health_probe"
+cd -
+
+# compressing binary file
+#cd ${DOCKERFILE_PATH}
+#upx -9 ${serverName}
+#upx -9 grpc_health_probe
+#cd -
+
+mkdir -p ${DOCKERFILE_PATH}/configs && cp -f configs/${serverName}.yml ${DOCKERFILE_PATH}/configs/
+echo "docker build -f ${DOCKERFILE} -t ${IMAGE_NAME}:latest ${DOCKERFILE_PATH}"
+docker build -f ${DOCKERFILE} -t ${IMAGE_NAME}:latest ${DOCKERFILE_PATH}
+
+if [ -f "${DOCKERFILE_PATH}/grpc_health_probe" ]; then
+    rm -f ${DOCKERFILE_PATH}/grpc_health_probe
+fi`
 
 	dockerComposeFileHTTPCode = `    ports:
       - "8080:8080"   # http port
@@ -247,7 +350,7 @@ http:
   readTimeout: 3     # read timeout, unit(second)
   writeTimeout: 60  # write timeout, unit(second), if enableHTTPProfile is true, it needs to be greater than 60s, the default value for pprof to do profiling is 60s`
 
-	rpcServerConfigCode = `# grpc server settings
+	rpcServerConfigCode = `# grpc service settings
 grpc:
   port: 8282             # listen port
   httpPort: 8283       # profile and metrics ports
@@ -256,7 +359,7 @@ grpc:
   enableToken: false  # whether to enable server-side token authentication, default appID=grpc, appKey=123456
   # serverSecure parameter setting
   # if type="", it means no secure connection, no need to fill in any parameters
-  # if type="one-way", it means server-side certification, only the fields 'certFile' and 'keyFile' should be filled in
+  # if type="one-way", it means server-side certification, only the fields "certFile" and "keyFile" should be filled in
   # if type="two-way", it means both client and server side certification, fill in all fields
   serverSecure:
     type: ""               # secures type, "", "one-way", "two-way"
@@ -268,14 +371,14 @@ grpc:
 
 # grpc client settings, support for setting up multiple rpc clients
 grpcClient:
-  - name: "your-rpc-server-name"   # rpc server name, used for service discovery
+  - name: "your-rpc-server-name"   # rpc service name, used for service discovery
     host: "127.0.0.1"                    # rpc service address, used for direct connection
     port: 8282                              # rpc service port
     registryDiscoveryType: ""         # registration and discovery types: consul, etcd, nacos, if empty, connecting to server using host and port
     enableLoadBalance: false         # whether to turn on the load balancer
     # clientSecure parameter setting
     # if type="", it means no secure connection, no need to fill in any parameters
-    # if type="one-way", it means server-side certification, only the fields 'serverName' and 'certFile' should be filled in
+    # if type="one-way", it means server-side certification, only the fields "serverName" and "certFile" should be filled in
     # if type="two-way", it means both client and server side certification, fill in all fields
     clientSecure:
       type: ""              # secures type, "", "one-way", "two-way"
@@ -297,14 +400,14 @@ http:
 
 # grpc client settings, support for setting up multiple rpc clients
 grpcClient:
-  - name: "your-rpc-server-name"   # rpc server name, used for service discovery
+  - name: "your-rpc-server-name"   # rpc service name, used for service discovery
     host: "127.0.0.1"                    # rpc service address, used for direct connection
     port: 8282                              # rpc service port
     registryDiscoveryType: ""         # registration and discovery types: consul, etcd, nacos, if empty, connecting to server using host and port
     enableLoadBalance: false         # whether to turn on the load balancer
     # clientSecure parameter setting
     # if type="", it means no secure connection, no need to fill in any parameters
-    # if type="one-way", it means server-side certification, only the fields 'serverName' and 'certFile' should be filled in
+    # if type="one-way", it means server-side certification, only the fields "serverName" and "certFile" should be filled in
     # if type="two-way", it means both client and server side certification, fill in all fields
     clientSecure:
       type: ""              # secures type, "", "one-way", "two-way"

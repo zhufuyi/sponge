@@ -14,7 +14,7 @@ function checkResult() {
 # add the import of useless packages from the generated *.pb.go code here
 function deleteUnusedPkg() {
   file=$1
-  osType = $(uname -s)
+  osType=$(uname -s)
   if [ "${osType}"x = "Darwin"x ];then
     sed -i '' 's#_ \"github.com/envoyproxy/protoc-gen-validate/validate\"##g' ${file}
     sed -i '' 's#_ \"github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2/options\"##g' ${file}

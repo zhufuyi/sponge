@@ -12,6 +12,8 @@ import (
 
 	"github.com/zhufuyi/sponge/pkg/gofile"
 	"github.com/zhufuyi/sponge/pkg/replacer"
+
+	"github.com/huandu/xstrings"
 )
 
 const (
@@ -21,7 +23,7 @@ const (
 
 var (
 	modelFile     = "model/userExample.go"
-	modelFileMark = "// todo generate model codes to here"
+	modelFileMark = "// todo generate model code to here"
 
 	cacheFile = "cache/cacheNameExample.go"
 
@@ -42,11 +44,17 @@ var (
 	serviceClientFile = "service/userExample_client_test.go"
 	serviceFileMark   = "// todo generate the service struct code here"
 
-	dockerFile     = "build/Dockerfile"
+	dockerFile     = "scripts/build/Dockerfile"
 	dockerFileMark = "# todo generate dockerfile code for http or grpc here"
 
-	dockerFileBuild     = "build/Dockerfile_build"
+	dockerFileBuild     = "scripts/build/Dockerfile_build"
 	dockerFileBuildMark = "# todo generate dockerfile_build code for http or grpc here"
+
+	imageBuildFile     = "scripts/image-build.sh"
+	imageBuildFileMark = "# todo generate image-build code for http or grpc here"
+
+	imageBuildLocalFile     = "scripts/image-build-local.sh"
+	imageBuildLocalFileMark = "# todo generate image-build-local code for http or grpc here"
 
 	dockerComposeFile     = "deployments/docker-compose/docker-compose.yml"
 	dockerComposeFileMark = "# todo generate docker-compose.yml code for http or grpc here"
@@ -59,28 +67,21 @@ var (
 
 	protoShellFile         = "scripts/protoc.sh"
 	protoShellFileGRPCMark = "# todo generate grpc files here"
-	protoShellFileMark     = "# todo generate router code for gin here"
+	protoShellFileMark     = "# todo generate api template code command here"
 
 	appConfigFile     = "configs/serverNameExample.yml"
 	appConfigFileMark = "# todo generate http or rpc server configuration here"
 
-	imageBuildFile = "scripts/image-build.sh"
-	readmeFile     = "sponge/README.md"
-	makeFile       = "sponge/Makefile"
-	gitIgnoreFile  = "sponge/.gitignore"
+	readmeFile    = "sponge/README.md"
+	makeFile      = "sponge/Makefile"
+	gitIgnoreFile = "sponge/.gitignore"
 
-	startMarkStr          = "// delete the templates code start"
-	endMarkStr            = "// delete the templates code end"
-	startMark             = []byte(startMarkStr)
-	endMark               = []byte(endMarkStr)
-	wellStartMark         = symbolConvert(startMarkStr)
-	wellEndMark           = symbolConvert(endMarkStr)
-	wellStartMark2        = symbolConvert(startMarkStr, " 2")
-	wellEndMark2          = symbolConvert(endMarkStr, " 2")
-	onlyGrpcStartMarkStr  = "// only grpc use start"
-	onlyGrpcEndMarkStr    = "// only grpc use end\n"
-	wellOnlyGrpcStartMark = symbolConvert(onlyGrpcStartMarkStr)
-	wellOnlyGrpcEndMark   = symbolConvert(onlyGrpcEndMarkStr)
+	startMarkStr  = "// delete the templates code start"
+	endMarkStr    = "// delete the templates code end"
+	startMark     = []byte(startMarkStr)
+	endMark       = []byte(endMarkStr)
+	wellStartMark = symbolConvert(startMarkStr)
+	wellEndMark   = symbolConvert(endMarkStr)
 
 	// embed FS template file when using
 	selfPackageName = "github.com/zhufuyi/sponge"
@@ -93,6 +94,16 @@ func symbolConvert(str string, additionalChar ...string) []byte {
 	}
 
 	return []byte(strings.Replace(str, "//", "#", 1) + char)
+}
+
+func convertServerName(serverName string) string {
+	return strings.ReplaceAll(serverName, "-", "_")
+}
+
+func convertProjectAndServerName(projectName, serverName string) (pn string, sn string) {
+	pn = xstrings.ToKebabCase(projectName)
+	sn = strings.ReplaceAll(serverName, "-", "_")
+	return pn, sn
 }
 
 func adjustmentOfIDType(handlerCodes string) string {
@@ -128,10 +139,31 @@ func deleteFieldsMark(r replacer.Replacer, filename string, startMark []byte, en
 
 	data, err := r.ReadFile(filename)
 	if err != nil {
-		fmt.Printf("readFile error: %v, please execute the 'sponge update' command to resolve\n ", err)
+		fmt.Printf("readFile error: %v, please execute the \"sponge update\" command to resolve\n ", err)
 		return fields
 	}
 	if subBytes := gofile.FindSubBytes(data, startMark, endMark); len(subBytes) > 0 {
+		fields = append(fields,
+			replacer.Field{ // clear marked template code
+				Old: string(subBytes),
+				New: "",
+			},
+		)
+	}
+
+	return fields
+}
+
+func deleteAllFieldsMark(r replacer.Replacer, filename string, startMark []byte, endMark []byte) []replacer.Field {
+	var fields []replacer.Field
+
+	data, err := r.ReadFile(filename)
+	if err != nil {
+		fmt.Printf("readFile error: %v, please execute the \"sponge update\" command to resolve\n ", err)
+		return fields
+	}
+	allSubBytes := gofile.FindAllSubBytes(data, startMark, endMark)
+	for _, subBytes := range allSubBytes {
 		fields = append(fields,
 			replacer.Field{ // clear marked template code
 				Old: string(subBytes),
@@ -148,7 +180,7 @@ func replaceFileContentMark(r replacer.Replacer, filename string, newContent str
 
 	data, err := r.ReadFile(filename)
 	if err != nil {
-		fmt.Printf("read the file '%s' error: %v\n", filename, err)
+		fmt.Printf("read the file \"%s\" error: %v\n", filename, err)
 		return fields
 	}
 
@@ -245,13 +277,15 @@ func getNamesFromOutDir(dir string) (moduleName string, serverName string) {
 	return ms[0], ms[1]
 }
 
-func saveProtobufFiles(serverName string, outputDir string, protobufFiles []string) error {
+func saveProtobufFiles(moduleName string, serverName string, outputDir string, protobufFiles []string) error {
 	for _, pbFile := range protobufFiles {
 		pbContent, err := os.ReadFile(pbFile)
 		if err != nil {
 			fmt.Printf("read file %s error, %v\n", pbFile, err)
 			continue
 		}
+		pbContent = replacePackage(pbContent, moduleName, serverName)
+
 		dir := outputDir + "/api/" + serverName + "/v1"
 		_ = os.MkdirAll(dir, 0766)
 
@@ -275,4 +309,30 @@ func isExistServiceName(data []byte) bool {
 
 func isDependImport(protoData []byte, pkgName string) bool {
 	return bytes.Contains(protoData, []byte(pkgName))
+}
+
+func replacePackage(data []byte, moduleName string, serverName string) []byte {
+	if bytes.Contains(data, []byte("\r\n")) {
+		data = bytes.ReplaceAll(data, []byte("\r\n"), []byte("\n"))
+	}
+
+	regStr := `\npackage [\w\W]*?;`
+	reg := regexp.MustCompile(regStr)
+	packageName := reg.Find(data)
+
+	regStr2 := `go_package [\w\W]*?;\n`
+	reg2 := regexp.MustCompile(regStr2)
+	goPackageName := reg2.Find(data)
+
+	if len(packageName) > 0 {
+		newPackage := fmt.Sprintf("\npackage api.%s.v1;", serverName)
+		data = bytes.Replace(data, packageName, []byte(newPackage), 1)
+	}
+
+	if len(goPackageName) > 0 {
+		newGoPackage := fmt.Sprintf("go_package = \"%s/api/%s/v1;v1\";\n", moduleName, serverName)
+		data = bytes.Replace(data, goPackageName, []byte(newGoPackage), 1)
+	}
+
+	return data
 }

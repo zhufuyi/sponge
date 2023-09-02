@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// RPCPbCommand generate rpc server codes bash on protobuf file
+// RPCPbCommand generate rpc service code bash on protobuf file
 func RPCPbCommand() *cobra.Command {
 	var (
 		moduleName   string // module name for go.mod
@@ -23,27 +23,28 @@ func RPCPbCommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "rpc-pb",
-		Short: "Generate rpc server codes based on protobuf file",
-		Long: `generate rpc server codes based on protobuf file.
+		Short: "Generate rpc service code based on protobuf file",
+		Long: `generate rpc service code based on protobuf file.
 
 Examples:
-  # generate rpc server codes.
+  # generate rpc service code.
   sponge micro rpc-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --protobuf-file=./demo.proto
 
-  # generate rpc server codes and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
+  # generate rpc service code and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge micro rpc-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --protobuf-file=./demo.proto --out=./yourServerDir
 
-  # generate rpc server codes and specify the docker image repository address.
+  # generate rpc service code and specify the docker image repository address.
   sponge micro rpc-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --protobuf-file=./demo.proto
 `,
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			projectName, serverName = convertProjectAndServerName(projectName, serverName)
 			return runGenRPCPbCommand(moduleName, serverName, projectName, protobufFile, repoAddr, outPath)
 		},
 	}
 
-	cmd.Flags().StringVarP(&moduleName, "module-name", "m", "", "module-name is the name of the module in the 'go.mod' file")
+	cmd.Flags().StringVarP(&moduleName, "module-name", "m", "", "module-name is the name of the module in the go.mod file")
 	_ = cmd.MarkFlagRequired("module-name")
 	cmd.Flags().StringVarP(&serverName, "server-name", "s", "", "server name")
 	_ = cmd.MarkFlagRequired("server-name")
@@ -72,7 +73,7 @@ func runGenRPCPbCommand(moduleName string, serverName string, projectName string
 	// setting up template information
 	subDirs := []string{ // processing-only subdirectories
 		"api/types", "cmd/serverNameExample_grpcPbExample",
-		"sponge/build", "sponge/configs", "sponge/deployments", "sponge/scripts", "sponge/third_party",
+		"sponge/configs", "sponge/deployments", "sponge/scripts", "sponge/third_party",
 		"internal/config", "internal/ecode", "internal/server", "internal/service",
 	}
 	subFiles := []string{ // processing of sub-documents only
@@ -101,18 +102,18 @@ func runGenRPCPbCommand(moduleName string, serverName string, projectName string
 		return err
 	}
 
-	_ = saveProtobufFiles(serverName, r.GetOutputDir(), protobufFiles)
+	_ = saveProtobufFiles(moduleName, serverName, r.GetOutputDir(), protobufFiles)
 	_ = saveGenInfo(moduleName, serverName, r.GetOutputDir())
 
 	fmt.Printf(`
 using help:
-  1. open a terminal and execute the command to generate codes: make proto
-  2. open file 'internal/service/xxx.go', replace panic("implement me") according to template code example.
+  1. open a terminal and execute the command to generate code: make proto
+  2. open file "internal/service/xxx.go", replace panic("implement me") according to template code example.
   3. compile and run service: make run
-  4. open the file 'internal/service/xxx_client_test.go' using Goland or VS Code, testing the rpc methods.
+  4. open the file "internal/service/xxx_client_test.go" using Goland or VS Code, testing the rpc methods.
 
 `)
-	fmt.Printf("generate %s's rpc server codes successfully, out = %s\n", serverName, r.GetOutputDir())
+	fmt.Printf("generate %s's rpc service code successfully, out = %s\n", serverName, r.GetOutputDir())
 	return nil
 }
 
@@ -126,33 +127,41 @@ func addRPCPbFields(moduleName string, serverName string, projectName string, re
 	fields = append(fields, deleteFieldsMark(r, dockerComposeFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, k8sDeploymentFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, k8sServiceFile, wellStartMark, wellEndMark)...)
-	fields = append(fields, deleteFieldsMark(r, imageBuildFile, wellOnlyGrpcStartMark, wellOnlyGrpcEndMark)...)
-	fields = append(fields, deleteFieldsMark(r, makeFile, wellStartMark, wellEndMark)...)
+	fields = append(fields, deleteFieldsMark(r, imageBuildFile, wellStartMark, wellEndMark)...)
+	fields = append(fields, deleteFieldsMark(r, imageBuildLocalFile, wellStartMark, wellEndMark)...)
+	fields = append(fields, deleteAllFieldsMark(r, makeFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, gitIgnoreFile, wellStartMark, wellEndMark)...)
-	fields = append(fields, deleteFieldsMark(r, protoShellFile, wellStartMark2, wellEndMark2)...)
-	fields = append(fields, deleteFieldsMark(r, protoShellFile, wellStartMark, wellEndMark)...)
+	fields = append(fields, deleteAllFieldsMark(r, protoShellFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, appConfigFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, replaceFileContentMark(r, readmeFile, "## "+serverName)...)
 	fields = append(fields, []replacer.Field{
 		{ // replace the contents of the Dockerfile file
 			Old: dockerFileMark,
-			New: dockerFileHTTPCode,
+			New: dockerFileGrpcCode,
 		},
 		{ // replace the contents of the Dockerfile_build file
 			Old: dockerFileBuildMark,
-			New: dockerFileBuildHTTPCode,
+			New: dockerFileBuildGrpcCode,
+		},
+		{ // replace the contents of the image-build.sh file
+			Old: imageBuildFileMark,
+			New: imageBuildFileGrpcCode,
+		},
+		{ // replace the contents of the image-build-local.sh file
+			Old: imageBuildLocalFileMark,
+			New: imageBuildLocalFileGrpcCode,
 		},
 		{ // replace the contents of the docker-compose.yml file
 			Old: dockerComposeFileMark,
-			New: dockerComposeFileHTTPCode,
+			New: dockerComposeFileGrpcCode,
 		},
 		{ // replace the contents of the *-deployment.yml file
 			Old: k8sDeploymentFileMark,
-			New: k8sDeploymentFileHTTPCode,
+			New: k8sDeploymentFileGrpcCode,
 		},
 		{ // replace the contents of the *-svc.yml file
 			Old: k8sServiceFileMark,
-			New: k8sServiceFileHTTPCode,
+			New: k8sServiceFileGrpcCode,
 		},
 		{ // replace the configuration of the *.yml file
 			Old: appConfigFileMark,
@@ -185,16 +194,12 @@ func addRPCPbFields(moduleName string, serverName string, projectName string, re
 		// docker image and k8s deployment script replacement
 		{
 			Old: "server-name-example",
-			New: xstrings.ToKebabCase(serverName),
-		},
-		{
-			Old: "projectNameExample",
-			New: projectName,
+			New: xstrings.ToKebabCase(serverName), // snake_case to kebab_case
 		},
 		// docker image and k8s deployment script replacement
 		{
 			Old: "project-name-example",
-			New: xstrings.ToKebabCase(projectName),
+			New: projectName,
 		},
 		{
 			Old: "repo-addr-example",

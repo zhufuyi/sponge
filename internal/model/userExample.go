@@ -1,4 +1,4 @@
-// todo generate model codes to here
+// todo generate model code to here
 // delete the templates code start
 
 package model

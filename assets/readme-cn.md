@@ -80,7 +80,6 @@ sponge包含丰富的组件(按需使用)：
 .
 ├── api            # proto文件和生成的*pb.go目录
 ├── assets         # 其他与资源库一起使用的资产(图片、logo等)目录
-├── build          # 打包和持续集成目录
 ├── cmd            # 程序入口目录
 ├── configs        # 配置文件的目录
 ├── deployments    # IaaS、PaaS、系统和容器协调部署的配置和模板目录

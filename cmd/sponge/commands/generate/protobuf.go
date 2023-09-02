@@ -13,7 +13,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// ProtoBufCommand generate protobuf codes
+// ProtoBufCommand generate protobuf code
 func ProtoBufCommand() *cobra.Command {
 	var (
 		moduleName string // module name for go.mod
@@ -28,20 +28,20 @@ func ProtoBufCommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "protobuf",
-		Short: "Generate protobuf codes based on mysql table",
-		Long: `generate protobuf codes based on mysql table.
+		Short: "Generate protobuf code based on mysql table",
+		Long: `generate protobuf code based on mysql table.
 
 Examples:
-  # generate protobuf codes.
+  # generate protobuf code.
   sponge micro protobuf --module-name=yourModuleName --server-name=yourServerName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
-  # generate protobuf codes with multiple table names.
+  # generate protobuf code with multiple table names.
   sponge micro protobuf --module-name=yourModuleName --server-name=yourServerName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=t1,t2
 
-  # generate protobuf codes that include router path and swagger info.
+  # generate protobuf code that include router path and swagger info.
   sponge micro protobuf --module-name=yourModuleName --server-name=yourServerName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --web-type=true
 
-  # generate protobuf codes and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
+  # generate protobuf code and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge micro protobuf --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
 `,
 		SilenceErrors: true,
@@ -58,6 +58,8 @@ Examples:
 			} else if serverName == "" {
 				return errors.New(`required flag(s) "server-name" not set, use "sponge micro protobuf -h" for help`)
 			}
+
+			serverName = convertServerName(serverName)
 
 			tableNames := strings.Split(dbTables, ",")
 			for _, tableName := range tableNames {
@@ -82,13 +84,13 @@ using help:
   move the folder "internal" to your project code folder.
 
 `)
-			fmt.Printf("generate 'protocol buffers' codes successfully, out = %s\n", outPath)
+			fmt.Printf("generate \"protobuf\" code successfully, out = %s\n", outPath)
 
 			return nil
 		},
 	}
 
-	cmd.Flags().StringVarP(&moduleName, "module-name", "m", "", "module-name is the name of the module in the 'go.mod' file")
+	cmd.Flags().StringVarP(&moduleName, "module-name", "m", "", "module-name is the name of the module in the go.mod file")
 	//_ = cmd.MarkFlagRequired("module-name")
 	cmd.Flags().StringVarP(&serverName, "server-name", "s", "", "server name")
 	//_ = cmd.MarkFlagRequired("server-name")
@@ -159,9 +161,10 @@ func addProtoFields(moduleName string, serverName string, r replacer.Replacer, c
 			Old: "api/serverNameExample/v1",
 			New: fmt.Sprintf("api/%s/v1", serverName),
 		},
+		// Note: protobuf package no "-" signs allowed
 		{
 			Old: "api.serverNameExample.v1",
-			New: fmt.Sprintf("api.%s.v1", strings.ReplaceAll(serverName, "-", "_")), // protobuf package no "-" signs allowed
+			New: fmt.Sprintf("api.%s.v1", serverName),
 		},
 		{
 			Old: "serverNameExample",

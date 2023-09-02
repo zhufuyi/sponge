@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// RPCGwPbCommand generate rpc gateway server codes base on protobuf file
+// RPCGwPbCommand generate rpc gateway service code base on protobuf file
 func RPCGwPbCommand() *cobra.Command {
 	var (
 		moduleName   string // module name for go.mod
@@ -23,27 +23,28 @@ func RPCGwPbCommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "rpc-gw-pb",
-		Short: "Generate rpc gateway server codes based on protobuf file",
-		Long: `generate rpc gateway server codes based on protobuf file.
+		Short: "Generate rpc gateway service code based on protobuf file",
+		Long: `generate rpc gateway service code based on protobuf file.
 
 Examples:
-  # generate rpc gateway server codes.
+  # generate rpc gateway service code.
   sponge micro rpc-gw-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --protobuf-file=./demo.proto
 
-  # generate rpc gateway server codes and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
+  # generate rpc gateway service code and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge micro rpc-gw-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --protobuf-file=./demo.proto --out=./yourServerDir
 
-  # generate rpc gateway server codes and specify the docker image repository address.
+  # generate rpc gateway service code and specify the docker image repository address.
   sponge micro rpc-gw-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --protobuf-file=./demo.proto
 `,
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			projectName, serverName = convertProjectAndServerName(projectName, serverName)
 			return runGenRPCGwCommand(moduleName, serverName, projectName, protobufFile, repoAddr, outPath)
 		},
 	}
 
-	cmd.Flags().StringVarP(&moduleName, "module-name", "m", "", "module-name is the name of the module in the 'go.mod' file")
+	cmd.Flags().StringVarP(&moduleName, "module-name", "m", "", "module-name is the name of the module in the go.mod file")
 	_ = cmd.MarkFlagRequired("module-name")
 	cmd.Flags().StringVarP(&serverName, "server-name", "s", "", "server name")
 	_ = cmd.MarkFlagRequired("server-name")
@@ -73,7 +74,7 @@ func runGenRPCGwCommand(moduleName string, serverName string, projectName string
 	// setting up template information
 	subDirs := []string{ // processing-only subdirectories
 		"api/types", "cmd/serverNameExample_grpcGwPbExample",
-		"sponge/build", "sponge/configs", "sponge/deployments", "sponge/docs", "sponge/scripts", "sponge/third_party",
+		"sponge/configs", "sponge/deployments", "sponge/docs", "sponge/scripts", "sponge/third_party",
 		"internal/config", "internal/ecode", "internal/routers", "internal/server",
 	}
 	subFiles := []string{ // processing of sub-documents only
@@ -103,19 +104,19 @@ func runGenRPCGwCommand(moduleName string, serverName string, projectName string
 		return err
 	}
 
-	_ = saveProtobufFiles(serverName, r.GetOutputDir(), protobufFiles)
+	_ = saveProtobufFiles(moduleName, serverName, r.GetOutputDir(), protobufFiles)
 	_ = saveGenInfo(moduleName, serverName, r.GetOutputDir())
 	_ = saveEmptySwaggerJSON(r.GetOutputDir())
 
 	fmt.Printf(`
 using help:
-  1. open a terminal and execute the command to generate codes: make proto
+  1. open a terminal and execute the command to generate code: make proto
   2. open internal/service/xxx.go file, replace panic("implement me") according to template code example.
   3. compile and run service: make run
   4. visit http://localhost:8080/apis/swagger/index.html in your browser, and test api interface.
 
 `)
-	fmt.Printf("generate %s's rpc gateway server codes successfully, out = %s\n", serverName, r.GetOutputDir())
+	fmt.Printf("generate %s's rpc gateway service code successfully, out = %s\n", serverName, r.GetOutputDir())
 
 	return nil
 }
@@ -132,11 +133,11 @@ func addRPCGwFields(moduleName string, serverName string, projectName string, re
 	fields = append(fields, deleteFieldsMark(r, dockerComposeFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, k8sDeploymentFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, k8sServiceFile, wellStartMark, wellEndMark)...)
-	fields = append(fields, deleteFieldsMark(r, imageBuildFile, wellOnlyGrpcStartMark, wellOnlyGrpcEndMark)...)
-	fields = append(fields, deleteFieldsMark(r, makeFile, wellStartMark, wellEndMark)...)
+	fields = append(fields, deleteFieldsMark(r, imageBuildFile, wellStartMark, wellEndMark)...)
+	fields = append(fields, deleteFieldsMark(r, imageBuildLocalFile, wellStartMark, wellEndMark)...)
+	fields = append(fields, deleteAllFieldsMark(r, makeFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, gitIgnoreFile, wellStartMark, wellEndMark)...)
-	fields = append(fields, deleteFieldsMark(r, protoShellFile, wellStartMark2, wellEndMark2)...)
-	fields = append(fields, deleteFieldsMark(r, protoShellFile, wellStartMark, wellEndMark)...)
+	fields = append(fields, deleteAllFieldsMark(r, protoShellFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, appConfigFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, replaceFileContentMark(r, readmeFile, "## "+serverName)...)
 	fields = append(fields, []replacer.Field{
@@ -147,6 +148,14 @@ func addRPCGwFields(moduleName string, serverName string, projectName string, re
 		{ // replace the contents of the Dockerfile_build file
 			Old: dockerFileBuildMark,
 			New: dockerFileBuildHTTPCode,
+		},
+		{ // replace the contents of the image-build.sh file
+			Old: imageBuildFileMark,
+			New: imageBuildFileHTTPCode,
+		},
+		{ // replace the contents of the image-build-local.sh file
+			Old: imageBuildLocalFileMark,
+			New: imageBuildLocalFileHTTPCode,
 		},
 		{ // replace the contents of the docker-compose.yml file
 			Old: dockerComposeFileMark,
@@ -192,16 +201,12 @@ func addRPCGwFields(moduleName string, serverName string, projectName string, re
 		// docker image and k8s deployment script replacement
 		{
 			Old: "server-name-example",
-			New: xstrings.ToKebabCase(serverName),
-		},
-		{
-			Old: "projectNameExample",
-			New: projectName,
+			New: xstrings.ToKebabCase(serverName), // snake_case to kebab_case
 		},
 		// docker image and k8s deployment script replacement
 		{
 			Old: "project-name-example",
-			New: xstrings.ToKebabCase(projectName),
+			New: projectName,
 		},
 		{
 			Old: "repo-addr-example",

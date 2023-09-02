@@ -35,12 +35,12 @@ func Init(name string, filepath string) error {
 		if isShowCommand() {
 			return nil
 		}
-		return fmt.Errorf("%s not yet initialized, run the command 'sponge init'", warnSymbol)
+		return fmt.Errorf("%s not yet initialized, run the command \"sponge init\"", warnSymbol)
 	}
 
 	var err error
 	if _, ok := Replacers[name]; ok {
-		panic(fmt.Sprintf("template name '%s' already exists", name))
+		panic(fmt.Sprintf("template name \"%s\" already exists", name))
 	}
 	Replacers[name], err = replacer.New(filepath)
 	if err != nil {
@@ -54,7 +54,7 @@ func Init(name string, filepath string) error {
 func InitFS(name string, filepath string, fs embed.FS) {
 	var err error
 	if _, ok := Replacers[name]; ok {
-		panic(fmt.Sprintf("template name '%s' already exists", name))
+		panic(fmt.Sprintf("template name \"%s\" already exists", name))
 	}
 	Replacers[name], err = replacer.NewFS(filepath, fs)
 	if err != nil {

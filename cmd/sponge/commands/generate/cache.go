@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// CacheCommand generate cache codes
+// CacheCommand generate cache code
 func CacheCommand(parentName string) *cobra.Command {
 	var (
 		moduleName string // module name for go.mod
@@ -24,14 +24,14 @@ func CacheCommand(parentName string) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "cache",
-		Short: "Generate cache codes",
-		Long: fmt.Sprintf(`generate cache codes.
+		Short: "Generate cache code",
+		Long: fmt.Sprintf(`generate cache code.
 
 Examples:
-  # generate kv cache codes
+  # generate kv cache code
   sponge %s cache --module-name=yourModuleName --cache-name=userToken --prefix-key=user:token: --key-name=id --key-type=uint64 --value-name=token --value-type=string
 
-  # generate kv cache codes and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
+  # generate kv cache code and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge %s cache --module-name=yourModuleName --cache-name=token --prefix-key=user:token: --key-name=id --key-type=uint64 --value-name=token --value-type=string --out=./yourServerDir
 `, parentName, parentName),
 		SilenceErrors: true,
@@ -55,12 +55,12 @@ using help:
   move the folder "internal" to your project code folder.
 
 `)
-			fmt.Printf("generate 'cache' codes successfully, out = %s\n", outPath)
+			fmt.Printf("generate \"cache\" code successfully, out = %s\n", outPath)
 			return nil
 		},
 	}
 
-	cmd.Flags().StringVarP(&moduleName, "module-name", "m", "", "module-name is the name of the module in the 'go.mod' file")
+	cmd.Flags().StringVarP(&moduleName, "module-name", "m", "", "module-name is the name of the module in the go.mod file")
 	cmd.Flags().StringVarP(&cacheName, "cache-name", "c", "", "cache name, e.g. userToken")
 	_ = cmd.MarkFlagRequired("cache-name")
 	cmd.Flags().StringVarP(&prefixKey, "prefix-key", "p", "", "cache prefix key, must end with a colon, e.g. user:token:")

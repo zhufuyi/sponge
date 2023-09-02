@@ -14,7 +14,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// HTTPCommand generate web server codes
+// HTTPCommand generate web service code
 func HTTPCommand() *cobra.Command {
 	var (
 		moduleName  string // module name for go.mod
@@ -33,23 +33,23 @@ func HTTPCommand() *cobra.Command {
 	//nolint
 	cmd := &cobra.Command{
 		Use:   "http",
-		Short: "Generate web server codes based on mysql table",
-		Long: `generate web server codes based on mysql table.
+		Short: "Generate web service code based on mysql table",
+		Long: `generate web service code based on mysql table.
 
 Examples:
-  # generate web server codes and embed 'gorm.model' struct.
+  # generate web service code and embed gorm.model struct.
   sponge web http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
-  # generate web server codes, structure fields correspond to the column names of the table.
+  # generate web service code, structure fields correspond to the column names of the table.
   sponge web http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --embed=false
 
-  # generate web server codes with multiple table names.
+  # generate web service code with multiple table names.
   sponge web http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=t1,t2
 
-  # generate web server codes and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
+  # generate web service code and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge web http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
 
-  # generate web server codes and specify the docker image repository address.
+  # generate web service code and specify the docker image repository address.
   sponge web http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 `,
 		SilenceErrors: true,
@@ -64,6 +64,8 @@ Examples:
 				firstTable = tableNames[0]
 				handlerTableNames = tableNames[1:]
 			}
+
+			projectName, serverName = convertProjectAndServerName(projectName, serverName)
 
 			sqlArgs.DBTable = firstTable
 			codes, err := sql2code.Generate(&sqlArgs)
@@ -99,12 +101,12 @@ using help:
   3. visit http://localhost:8080/swagger/index.html in your browser, and test the CRUD api interface.
 
 `)
-			fmt.Printf("generate %s's web server codes successfully, out = %s\n", serverName, outPath)
+			fmt.Printf("generate %s's web service code successfully, out = %s\n", serverName, outPath)
 			return nil
 		},
 	}
 
-	cmd.Flags().StringVarP(&moduleName, "module-name", "m", "", "module-name is the name of the module in the 'go.mod' file")
+	cmd.Flags().StringVarP(&moduleName, "module-name", "m", "", "module-name is the name of the module in the go.mod file")
 	_ = cmd.MarkFlagRequired("module-name")
 	cmd.Flags().StringVarP(&serverName, "server-name", "s", "", "server name")
 	_ = cmd.MarkFlagRequired("server-name")
@@ -114,7 +116,7 @@ using help:
 	_ = cmd.MarkFlagRequired("db-dsn")
 	cmd.Flags().StringVarP(&dbTables, "db-table", "t", "", "table name, multiple names separated by commas")
 	_ = cmd.MarkFlagRequired("db-table")
-	cmd.Flags().BoolVarP(&sqlArgs.IsEmbed, "embed", "e", true, "whether to embed 'gorm.Model' struct")
+	cmd.Flags().BoolVarP(&sqlArgs.IsEmbed, "embed", "e", true, "whether to embed gorm.model struct")
 	cmd.Flags().IntVarP(&sqlArgs.JSONNamedType, "json-name-type", "j", 1, "json tags name type, 0:snake case, 1:camel case")
 	cmd.Flags().StringVarP(&repoAddr, "repo-addr", "r", "", "docker image repository address, excluding http and repository names")
 	cmd.Flags().StringVarP(&outPath, "out", "o", "", "output directory, default is ./serverName_http_<time>")
@@ -132,7 +134,7 @@ func runGenHTTPCommand(moduleName string, serverName string, projectName string,
 
 	// setting up template information
 	subDirs := []string{ // specify the subdirectory for processing
-		"cmd/serverNameExample_httpExample", "sponge/build", "sponge/configs", "sponge/deployments",
+		"cmd/serverNameExample_httpExample", "sponge/configs", "sponge/deployments",
 		"sponge/docs", "sponge/scripts", "sponge/internal",
 	}
 	subFiles := []string{ // specify the sub-documents to be processed
@@ -182,9 +184,11 @@ func addHTTPFields(moduleName string, serverName string, projectName string, rep
 	fields = append(fields, deleteFieldsMark(r, dockerComposeFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, k8sDeploymentFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, k8sServiceFile, wellStartMark, wellEndMark)...)
-	fields = append(fields, deleteFieldsMark(r, imageBuildFile, wellOnlyGrpcStartMark, wellOnlyGrpcEndMark)...)
-	fields = append(fields, deleteFieldsMark(r, makeFile, wellStartMark, wellEndMark)...)
+	fields = append(fields, deleteFieldsMark(r, imageBuildFile, wellStartMark, wellEndMark)...)
+	fields = append(fields, deleteFieldsMark(r, imageBuildLocalFile, wellStartMark, wellEndMark)...)
+	fields = append(fields, deleteAllFieldsMark(r, makeFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, gitIgnoreFile, wellStartMark, wellEndMark)...)
+	fields = append(fields, deleteAllFieldsMark(r, protoShellFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, appConfigFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, replaceFileContentMark(r, readmeFile, "## "+serverName)...)
 	fields = append(fields, []replacer.Field{
@@ -208,6 +212,14 @@ func addHTTPFields(moduleName string, serverName string, projectName string, rep
 			Old: dockerFileBuildMark,
 			New: dockerFileBuildHTTPCode,
 		},
+		{ // replace the contents of the image-build.sh file
+			Old: imageBuildFileMark,
+			New: imageBuildFileHTTPCode,
+		},
+		{ // replace the contents of the image-build-local.sh file
+			Old: imageBuildLocalFileMark,
+			New: imageBuildLocalFileHTTPCode,
+		},
 		{ // replace the contents of the docker-compose.yml file
 			Old: dockerComposeFileMark,
 			New: dockerComposeFileHTTPCode,
@@ -228,6 +240,14 @@ func addHTTPFields(moduleName string, serverName string, projectName string, rep
 		{
 			Old: selfPackageName + "/" + r.GetSourcePath(),
 			New: moduleName,
+		},
+		{
+			Old: protoShellFileGRPCMark,
+			New: "",
+		},
+		{
+			Old: protoShellFileMark,
+			New: "",
 		},
 		{
 			Old: "github.com/zhufuyi/sponge",
@@ -252,16 +272,12 @@ func addHTTPFields(moduleName string, serverName string, projectName string, rep
 		// docker image and k8s deployment script replacement
 		{
 			Old: "server-name-example",
-			New: xstrings.ToKebabCase(serverName),
-		},
-		{
-			Old: "projectNameExample",
-			New: projectName,
+			New: xstrings.ToKebabCase(serverName), // snake_case to kebab_case
 		},
 		// docker image and k8s deployment script replacement
 		{
 			Old: "project-name-example",
-			New: xstrings.ToKebabCase(projectName),
+			New: projectName,
 		},
 		{
 			Old: "repo-addr-example",

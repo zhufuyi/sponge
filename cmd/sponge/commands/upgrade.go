@@ -80,7 +80,7 @@ func copyToTempDir() (string, error) {
 
 	latestSpongeDirName := getLatestVersion(string(result))
 	if latestSpongeDirName == "" {
-		return "", fmt.Errorf("not found 'sponge' directory in '$GOPATH/pkg/mod/github.com/zhufuyi'")
+		return "", fmt.Errorf("not found sponge directory in '$GOPATH/pkg/mod/github.com/zhufuyi'")
 	}
 
 	srcDir := adaptPathDelimiter(fmt.Sprintf("%s/pkg/mod/github.com/zhufuyi/%s", gopath, latestSpongeDirName))
@@ -101,7 +101,7 @@ func copyToTempDir() (string, error) {
 	}
 	err = os.Rename(destDir+latestSpongeDirName, targetDir)
 	if err != nil {
-		return "", fmt.Errorf("rename '%s' error, %v", destDir, err)
+		return "", fmt.Errorf("rename \"%s\" error, %v", destDir, err)
 	}
 
 	versionNum := strings.Replace(latestSpongeDirName, "sponge@", "", 1)
@@ -166,8 +166,8 @@ func updateSpongeInternalPlugin(latestVersionNum string) {
 		_ = v
 	}
 	if result.Err != nil {
-		fmt.Printf("upgrade plugin 'protoc-gen-go-gin' failed, target version=%s, error=%v, "+
-			"please use the command 'sponge tools --install' to retry.\n", latestVersionNum, result.Err)
+		fmt.Printf("upgrade plugin \"protoc-gen-go-gin\" failed, target version=%s, error=%v, "+
+			"please use the command \"sponge tools --install\" to retry.\n", latestVersionNum, result.Err)
 	}
 
 	ctx, _ = context.WithTimeout(context.Background(), time.Minute) //nolint
@@ -176,7 +176,7 @@ func updateSpongeInternalPlugin(latestVersionNum string) {
 		_ = v
 	}
 	if result.Err != nil {
-		fmt.Printf("upgrade plugin 'protoc-gen-go-rpc-tmpl' failed, target version=%s, error=%v, "+
-			"please use the command 'sponge tools --install' to retry.\n", latestVersionNum, result.Err)
+		fmt.Printf("upgrade plugin \"protoc-gen-go-rpc-tmpl\" failed, target version=%s, error=%v, "+
+			"please use the command \"sponge tools --install\" to retry.\n", latestVersionNum, result.Err)
 	}
 }

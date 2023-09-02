@@ -10,8 +10,8 @@ import (
 func GenMicroCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:           "micro",
-		Short:         "Generate proto, model, cache, dao, service, rpc, rpc-gw, rpc-cli codes",
-		Long:          "generate proto, model, cache, dao, service, rpc, rpc-gw, rpc-cli codes.",
+		Short:         "Generate proto, model, cache, dao, service, rpc, rpc-gw, rpc-cli code",
+		Long:          "generate proto, model, cache, dao, service, rpc, rpc-gw, rpc-cli code.",
 		SilenceErrors: true,
 		SilenceUsage:  true,
 	}

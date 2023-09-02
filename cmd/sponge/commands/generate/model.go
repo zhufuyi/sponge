@@ -12,7 +12,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// ModelCommand generate model codes
+// ModelCommand generate model code
 func ModelCommand(parentName string) *cobra.Command {
 	var (
 		outPath  string // output directory
@@ -27,20 +27,20 @@ func ModelCommand(parentName string) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "model",
-		Short: "Generate model codes based on mysql table",
-		Long: fmt.Sprintf(`generate model codes based on mysql table.
+		Short: "Generate model code based on mysql table",
+		Long: fmt.Sprintf(`generate model code based on mysql table.
 
 Examples:
-  # generate model codes and embed 'gorm.Model' struct.
+  # generate model code and embed gorm.model struct.
   sponge %s model --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
-  # generate model codes with multiple table names.
+  # generate model code with multiple table names.
   sponge %s model --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=t1,t2
 
-  # generate model codes, structure fields correspond to the column names of the table.
+  # generate model code, structure fields correspond to the column names of the table.
   sponge %s model --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --embed=false
 
-  # generate model codes and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
+  # generate model code and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge %s model --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
 `, parentName, parentName, parentName, parentName),
 		SilenceErrors: true,
@@ -69,7 +69,7 @@ using help:
   move the folder "internal" to your project code folder.
 
 `)
-			fmt.Printf("generate 'model' codes successfully, out = %s\n", outPath)
+			fmt.Printf("generate \"model\" code successfully, out = %s\n", outPath)
 			return nil
 		},
 	}
@@ -78,7 +78,7 @@ using help:
 	_ = cmd.MarkFlagRequired("db-dsn")
 	cmd.Flags().StringVarP(&dbTables, "db-table", "t", "", "table name, multiple names separated by commas")
 	_ = cmd.MarkFlagRequired("db-table")
-	cmd.Flags().BoolVarP(&sqlArgs.IsEmbed, "embed", "e", true, "whether to embed 'gorm.Model' struct")
+	cmd.Flags().BoolVarP(&sqlArgs.IsEmbed, "embed", "e", true, "whether to embed gorm.model struct")
 	cmd.Flags().IntVarP(&sqlArgs.JSONNamedType, "json-name-type", "j", 1, "json tags name type, 0:snake case, 1:camel case")
 	cmd.Flags().StringVarP(&outPath, "out", "o", "", "output directory, default is ./model_<time>")
 

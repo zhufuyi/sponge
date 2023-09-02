@@ -28,14 +28,14 @@ func ConfigCommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "config",
-		Short: "Generate go config codes from yaml file",
-		Long: `generate go config codes from yaml file.
+		Short: "Generate go config code from yaml file",
+		Long: `generate go config code from yaml file.
 
 Examples:
-  # generate config codes in server directory, the yaml configuration file must be in <yourServerDir>/configs directory.
+  # generate config code in server directory, the yaml configuration file must be in <yourServerDir>/configs directory.
   sponge config --server-dir=/yourServerDir
 
-  # generate config codes from yaml file.
+  # generate config code from yaml file.
   sponge config --yaml-file=yourConfig.yml
 `,
 		SilenceErrors: true,
@@ -46,7 +46,7 @@ Examples:
 			}
 
 			if serverDir == "" {
-				return errors.New("set at least one of the parameters 'server-dir' and 'yaml-file'")
+				return errors.New("set at least one of the parameters \"service-dir\" and \"yaml-file\"")
 			}
 
 			files, err := getYAMLFile(serverDir)
@@ -123,7 +123,7 @@ func getYAMLFile(serverDir string) (map[string]configType, error) {
 	}
 
 	if len(ymlFiles) != 0 && len(yamlFiles) != 0 {
-		return nil, fmt.Errorf("please use 'yml' or 'yaml' suffixes for configuration files, do not mix them")
+		return nil, fmt.Errorf("please use \"yml\" or \"yaml\" suffixes for configuration files, do not mix them")
 	}
 
 	if len(ymlFiles) > 0 {

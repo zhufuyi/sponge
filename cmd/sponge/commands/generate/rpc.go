@@ -15,7 +15,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// RPCCommand generate rpc server codes
+// RPCCommand generate rpc service code
 func RPCCommand() *cobra.Command {
 	var (
 		moduleName  string // module name for go.mod
@@ -34,23 +34,23 @@ func RPCCommand() *cobra.Command {
 	//nolint
 	cmd := &cobra.Command{
 		Use:   "rpc",
-		Short: "Generate rpc server codes based on mysql table",
-		Long: `generate rpc server codes based on mysql table.
+		Short: "Generate rpc service code based on mysql table",
+		Long: `generate rpc service code based on mysql table.
 
 Examples:
-  # generate rpc server codes and embed 'gorm.model' struct.
+  # generate rpc service code and embed gorm.model struct.
   sponge micro rpc --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
-  # generate rpc server codes, structure fields correspond to the column names of the table.
+  # generate rpc service code, structure fields correspond to the column names of the table.
   sponge micro rpc --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --embed=false
 
-  # generate rpc server codes with multiple table names.
+  # generate rpc service code with multiple table names.
   sponge micro rpc --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=t1,t2
 
-  # generate rpc server codes and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
+  # generate rpc service code and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge micro rpc --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
 
-  # generate rpc server codes and specify the docker image repository address.
+  # generate rpc service code and specify the docker image repository address.
   sponge micro rpc --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 `,
 		SilenceErrors: true,
@@ -65,6 +65,8 @@ Examples:
 				firstTable = tableNames[0]
 				servicesTableNames = tableNames[1:]
 			}
+
+			projectName, serverName = convertProjectAndServerName(projectName, serverName)
 
 			sqlArgs.DBTable = firstTable
 			codes, err := sql2code.Generate(&sqlArgs)
@@ -95,17 +97,17 @@ Examples:
 
 			fmt.Printf(`
 using help:
-  1. open a terminal and execute the command to generate codes:  make proto
+  1. open a terminal and execute the command to generate code:  make proto
   2. compile and run service:   make run
   3. open the file internal/service/xxx_client_test.go using Goland or VS Code, and test CRUD api interface.
 
 `)
-			fmt.Printf("generate %s's rpc server codes successfully, out = %s\n", serverName, outPath)
+			fmt.Printf("generate %s's rpc service code successfully, out = %s\n", serverName, outPath)
 			return nil
 		},
 	}
 
-	cmd.Flags().StringVarP(&moduleName, "module-name", "m", "", "module-name is the name of the module in the 'go.mod' file")
+	cmd.Flags().StringVarP(&moduleName, "module-name", "m", "", "module-name is the name of the module in the go.mod file")
 	_ = cmd.MarkFlagRequired("module-name")
 	cmd.Flags().StringVarP(&serverName, "server-name", "s", "", "server name")
 	_ = cmd.MarkFlagRequired("server-name")
@@ -115,7 +117,7 @@ using help:
 	_ = cmd.MarkFlagRequired("db-dsn")
 	cmd.Flags().StringVarP(&dbTables, "db-table", "t", "", "table name, multiple names separated by commas")
 	_ = cmd.MarkFlagRequired("db-table")
-	cmd.Flags().BoolVarP(&sqlArgs.IsEmbed, "embed", "e", true, "whether to embed 'gorm.Model' struct")
+	cmd.Flags().BoolVarP(&sqlArgs.IsEmbed, "embed", "e", true, "whether to embed gorm.model struct")
 	cmd.Flags().IntVarP(&sqlArgs.JSONNamedType, "json-name-type", "j", 1, "json tags name type, 0:snake case, 1:camel case")
 	cmd.Flags().StringVarP(&repoAddr, "repo-addr", "r", "", "docker image repository address, excluding http and repository names")
 	cmd.Flags().StringVarP(&outPath, "out", "o", "", "output directory, default is ./serverName_rpc_<time>")
@@ -133,7 +135,7 @@ func runGenRPCCommand(moduleName string, serverName string, projectName string, 
 
 	// setting up template information
 	subDirs := []string{ // specify the subdirectory for processing
-		"sponge/api", "sponge/build", "cmd/serverNameExample_grpcExample", "sponge/configs", "sponge/deployments",
+		"sponge/api", "cmd/serverNameExample_grpcExample", "sponge/configs", "sponge/deployments",
 		"sponge/scripts", "sponge/internal", "sponge/third_party",
 	}
 	subFiles := []string{ // specify the sub-documents to be processed
@@ -184,10 +186,11 @@ func addRPCFields(moduleName string, serverName string, projectName string, repo
 	fields = append(fields, deleteFieldsMark(r, dockerComposeFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, k8sDeploymentFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, k8sServiceFile, wellStartMark, wellEndMark)...)
-	fields = append(fields, deleteFieldsMark(r, makeFile, wellStartMark, wellEndMark)...)
+	fields = append(fields, deleteFieldsMark(r, imageBuildFile, wellStartMark, wellEndMark)...)
+	fields = append(fields, deleteFieldsMark(r, imageBuildLocalFile, wellStartMark, wellEndMark)...)
+	fields = append(fields, deleteAllFieldsMark(r, makeFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, gitIgnoreFile, wellStartMark, wellEndMark)...)
-	fields = append(fields, deleteFieldsMark(r, protoShellFile, wellStartMark2, wellEndMark2)...)
-	fields = append(fields, deleteFieldsMark(r, protoShellFile, wellStartMark, wellEndMark)...)
+	fields = append(fields, deleteAllFieldsMark(r, protoShellFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, appConfigFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, replaceFileContentMark(r, readmeFile, "## "+serverName)...)
 	fields = append(fields, []replacer.Field{
@@ -222,6 +225,14 @@ func addRPCFields(moduleName string, serverName string, projectName string, repo
 		{ // replace the contents of the Dockerfile_build file
 			Old: dockerFileBuildMark,
 			New: dockerFileBuildGrpcCode,
+		},
+		{ // replace the contents of the image-build.sh file
+			Old: imageBuildFileMark,
+			New: imageBuildFileGrpcCode,
+		},
+		{ // replace the contents of the image-build-local.sh file
+			Old: imageBuildLocalFileMark,
+			New: imageBuildLocalFileGrpcCode,
 		},
 		{ // replace the contents of the docker-compose.yml file
 			Old: dockerComposeFileMark,
@@ -263,7 +274,7 @@ func addRPCFields(moduleName string, serverName string, projectName string, repo
 		},
 		{
 			Old: "api.userExample.v1",
-			New: fmt.Sprintf("api.%s.v1", strings.ReplaceAll(serverName, "-", "_")), // protobuf package no "-" signs allowed
+			New: fmt.Sprintf("api.%s.v1", serverName), // protobuf package no "-" signs allowed
 		},
 		{
 			Old: "sponge api docs",
@@ -280,16 +291,12 @@ func addRPCFields(moduleName string, serverName string, projectName string, repo
 		// docker image and k8s deployment script replacement
 		{
 			Old: "server-name-example",
-			New: xstrings.ToKebabCase(serverName),
-		},
-		{
-			Old: "projectNameExample",
-			New: projectName,
+			New: xstrings.ToKebabCase(serverName), // snake_case to kebab_case
 		},
 		// docker image and k8s deployment script replacement
 		{
 			Old: "project-name-example",
-			New: xstrings.ToKebabCase(projectName),
+			New: projectName,
 		},
 		{
 			Old: "repo-addr-example",
@@ -305,14 +312,6 @@ func addRPCFields(moduleName string, serverName string, projectName string, repo
 		},
 		{
 			Old: "_mixExample",
-			New: "",
-		},
-		{
-			Old: string(wellOnlyGrpcStartMark),
-			New: "",
-		},
-		{
-			Old: string(wellOnlyGrpcEndMark),
 			New: "",
 		},
 		{

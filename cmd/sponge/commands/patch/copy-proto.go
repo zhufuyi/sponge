@@ -1,3 +1,4 @@
+// Package patch is command set for patching server code.
 package patch
 
 import (
@@ -60,7 +61,6 @@ Examples:
 
 			if copyCount == 0 {
 				fmt.Printf("\nno proto files to copy, server-dir = %v\n", serverDirs)
-				return nil
 			} else {
 				fmt.Printf("\ncopy proto files successfully, out = %s\n", outPath)
 			}
@@ -77,7 +77,7 @@ Examples:
 
 func getServerName(dir string) (string, error) {
 	if dir == "" {
-		return "", errors.New("param 'server-dir' is empty")
+		return "", errors.New("param \"server-dir\" is empty")
 	}
 	data, err := os.ReadFile(dir + "/docs/gen.info")
 	if err != nil {
