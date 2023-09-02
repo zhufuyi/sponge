@@ -63,13 +63,7 @@ func (m *mergeParam) SetSplitLineMark(lineMark string) {
 }
 
 func (m *mergeParam) runMerge() {
-	result, err := gobash.Exec("ls", m.dir+"/"+m.fuzzyFilename)
-	if err != nil {
-		//fmt.Println("Warring:", err)
-		return
-	}
-
-	files := strings.Split(string(result), "\n")
+	files := gofile.FuzzyMatchFiles(m.dir + "/" + m.fuzzyFilename)
 	for _, file := range files {
 		successFile, err := m.runMergeCode(file)
 		if err != nil {
@@ -77,6 +71,17 @@ func (m *mergeParam) runMerge() {
 			continue
 		}
 		if successFile != "" {
+			if gofile.IsWindows() {
+				ss := strings.Split(successFile, "\\internal\\")
+				if len(ss) == 2 {
+					successFile = "internal\\" + ss[len(ss)-1]
+				}
+			} else {
+				ss := strings.Split(successFile, "/internal/")
+				if len(ss) == 2 {
+					successFile = "internal/" + ss[len(ss)-1]
+				}
+			}
 			fmt.Printf("merge code to \"%s\" successfully.\n", successFile)
 		}
 	}
