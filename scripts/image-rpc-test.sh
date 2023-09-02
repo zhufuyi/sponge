@@ -3,10 +3,10 @@
 # build rpc service test image
 
 serverName="serverNameExample_mixExample"
-# image name of the service, no capital letters
-SERVER_NAME="project-name-example.server-name-example.rpc-test"
+# image name of the service, prohibit uppercase letters in names.
+IMAGE_NAME="project-name-example/server-name-example.rpc-test"
 # Dockerfile file directory
-DOCKERFILE_PATH="build"
+DOCKERFILE_PATH="scripts/build"
 DOCKERFILE="${DOCKERFILE_PATH}/Dockerfile_test"
 
 # image repo address, REPO_HOST="ip or domain", passed in via the first parameter
@@ -21,7 +21,7 @@ if [ "X${TAG}" = "X" ];then
         TAG="latest"
 fi
 # image name and tag
-IMAGE_NAME_TAG="${REPO_HOST}/${SERVER_NAME}:${TAG}"
+IMAGE_NAME_TAG="${REPO_HOST}/${IMAGE_NAME}:${TAG}"
 
 PROJECT_FILES=$(ls)
 tar zcf ${serverName}.tar.gz ${PROJECT_FILES}

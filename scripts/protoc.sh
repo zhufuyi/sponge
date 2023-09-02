@@ -14,10 +14,19 @@ function checkResult() {
 # add the import of useless packages from the generated *.pb.go code here
 function deleteUnusedPkg() {
   file=$1
-  sed -i "s#_ \"github.com/envoyproxy/protoc-gen-validate/validate\"##g" ${file}
-  sed -i "s#_ \"github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2/options\"##g" ${file}
-  sed -i "s#_ \"github.com/srikrsna/protoc-gen-gotag/tagger\"##g" ${file}
-  sed -i "s#_ \"google.golang.org/genproto/googleapis/api/annotations\"##g" ${file}
+  osType = $(uname -s)
+  if [ "${osType}"x = "Darwin"x ];then
+    sed -i '' 's#_ \"github.com/envoyproxy/protoc-gen-validate/validate\"##g' ${file}
+    sed -i '' 's#_ \"github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2/options\"##g' ${file}
+    sed -i '' 's#_ \"github.com/srikrsna/protoc-gen-gotag/tagger\"##g' ${file}
+    sed -i '' 's#_ \"google.golang.org/genproto/googleapis/api/annotations\"##g' ${file}
+  else
+    sed -i "s#_ \"github.com/envoyproxy/protoc-gen-validate/validate\"##g" ${file}
+    sed -i "s#_ \"github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2/options\"##g" ${file}
+    sed -i "s#_ \"github.com/srikrsna/protoc-gen-gotag/tagger\"##g" ${file}
+    sed -i "s#_ \"google.golang.org/genproto/googleapis/api/annotations\"##g" ${file}
+  fi
+  checkResult $?
 }
 
 function listProtoFiles(){
@@ -99,8 +108,8 @@ function generateBySpecifiedProto(){
   listProtoFiles ${protoBasePath}/serverNameExample
   cd ..
   specifiedProtoFiles=$allProtoFiles
-  # todo generate router code for gin here
-  # delete the templates code start 2
+  # todo generate api template code command here
+  # delete the templates code start
 
   # generate the swagger document and merge all files into docs/apis.swagger.json
   protoc --proto_path=. --proto_path=./third_party \
@@ -132,7 +141,7 @@ function generateBySpecifiedProto(){
   echo ""
   echo -e "${highBright}Tip:${markEnd} execute the command ${colorCyan}make run${markEnd} and then visit ${colorCyan}http://localhost:8080/apis/swagger/index.html${markEnd} in your browser."
   echo ""
-  # delete the templates code end 2
+  # delete the templates code end
 }
 
 # generate pb.go by all proto files
@@ -152,3 +161,4 @@ go mod tidy
 checkResult $?
 
 echo "generated code successfully."
+echo ""

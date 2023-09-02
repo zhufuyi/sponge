@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# image name, no capital letters
-SERVER_NAME="project-name-example.server-name-example"
+# image name, prohibit uppercase letters in names.
+IMAGE_NAME="project-name-example/server-name-example"
 
 # image repo address, passed in via the first parameter
 REPO_HOST=$1
@@ -16,7 +16,7 @@ if [ "X${TAG}" = "X" ];then
     TAG="latest"
 fi
 # image name and tag
-IMAGE_NAME_TAG="${REPO_HOST}/${SERVER_NAME}:${TAG}"
+IMAGE_NAME_TAG="${REPO_HOST}/${IMAGE_NAME}:${TAG}"
 
 function checkResult() {
     result=$1

@@ -3,10 +3,10 @@
 # two-stage build docker image
 
 serverName="serverNameExample_mixExample"
-# image name of the service, no capital letters
-SERVER_NAME="project-name-example.server-name-example"
+# image name of the service, prohibit uppercase letters in names.
+IMAGE_NAME="project-name-example/server-name-example"
 # Dockerfile file directory
-DOCKERFILE_PATH="build"
+DOCKERFILE_PATH="scripts/build"
 DOCKERFILE="${DOCKERFILE_PATH}/Dockerfile_build"
 
 # image repo address, REPO_HOST="ip or domain", passed in via the first parameter
@@ -21,7 +21,7 @@ if [ "X${TAG}" = "X" ];then
         TAG="latest"
 fi
 # image name and tag
-IMAGE_NAME_TAG="${REPO_HOST}/${SERVER_NAME}:${TAG}"
+IMAGE_NAME_TAG="${REPO_HOST}/${IMAGE_NAME}:${TAG}"
 
 PROJECT_FILES=$(ls)
 tar zcf ${serverName}.tar.gz ${PROJECT_FILES}
@@ -29,3 +29,10 @@ mv -f ${serverName}.tar.gz ${DOCKERFILE_PATH}
 echo "docker build --force-rm -f ${DOCKERFILE} -t ${IMAGE_NAME_TAG} ${DOCKERFILE_PATH}"
 docker build --force-rm -f ${DOCKERFILE} -t ${IMAGE_NAME_TAG} ${DOCKERFILE_PATH}
 rm -rf ${DOCKERFILE_PATH}/${serverName}.tar.gz
+# delete none image
+noneImages=$(docker images | grep "<none>" | awk '{print $3}')
+if [ "X${noneImages}" != "X" ]; then
+  docker rmi ${noneImages} > /dev/null
+fi
+exit 0
+

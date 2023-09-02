@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: server-name-example
-          image: repo-addr-example/project-name-example.server-name-example:latest
+          image: repo-addr-example/project-name-example/server-name-example:latest
           # If using a local image, use Never, default is Always
           #imagePullPolicy: Never
           command: ["./serverNameExample", "-c", "/app/configs/serverNameExample.yml"]

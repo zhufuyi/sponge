@@ -172,7 +172,7 @@ Deployment, pod's resource configuration `imagePullSecrets` to specify the key
     spec:
       containers:
         - name: server-name-example
-          image: project-name-example.server-name-example:latest
+          image: project-name-example/server-name-example:latest
 # ......
       imagePullSecrets:
         - name: docker-auth-secret
