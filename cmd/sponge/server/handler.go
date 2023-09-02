@@ -103,9 +103,14 @@ func handleGenerateCode(c *gin.Context, outPath string, arg string) {
 
 	args := strings.Split(arg, " ")
 	params := parseCommandArgs(args)
-	if params.ModuleName != "" {
-		out = params.ModuleName + "-" + out
+	if params.ServerName != "" {
+		out = params.ServerName + "-" + out
+	} else {
+		if params.ModuleName != "" {
+			out = params.ModuleName + "-" + out
+		}
 	}
+
 	out = os.TempDir() + gofile.GetPathDelimiter() + out
 	//fmt.Println("outTmp =", out)
 	args = append(args, fmt.Sprintf("--out=%s", out))

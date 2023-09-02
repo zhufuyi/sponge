@@ -133,6 +133,9 @@ func parseCommandArgs(args []string) *parameters {
 			case "--project-name":
 				params.ProjectName = val
 			case "--server-name":
+				if val != "" {
+					val = strings.ReplaceAll(val, "-", "_")
+				}
 				params.ServerName = val
 			case "--repo-addr":
 				params.RepoAddr = val
