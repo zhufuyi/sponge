@@ -286,6 +286,28 @@ paths:
       summary: list of userExamples by batch id
       tags:
       - userExample
+  /codes:
+    get:
+      consumes:
+      - application/json
+      description: list error codes info
+      produces:
+      - application/json
+      responses: {}
+      summary: list error codes info
+      tags:
+      - system
+  /config:
+    get:
+      consumes:
+      - application/json
+      description: show config info
+      produces:
+      - application/json
+      responses: {}
+      summary: show config info
+      tags:
+      - system
   /health:
     get:
       consumes:

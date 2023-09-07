@@ -253,6 +253,38 @@ const docTemplate = `{
                 }
             }
         },
+        "/codes": {
+            "get": {
+                "description": "list error codes info",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "list error codes info",
+                "responses": {}
+            }
+        },
+        "/config": {
+            "get": {
+                "description": "show config info",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "show config info",
+                "responses": {}
+            }
+        },
         "/health": {
             "get": {
                 "description": "check health",

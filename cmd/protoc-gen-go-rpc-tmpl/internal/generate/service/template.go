@@ -244,9 +244,10 @@ import (
 
 {{- range .PbServices}}
 
-// {{.LowerName}} rpc service level error code
+// {{.LowerName}} business-level rpc error codes.
+// the _{{.LowerName}}NO value range is 1~100, if the same number appears, it will cause a failure to start the service.
 var (
-	_{{.LowerName}}NO       = {{.RandNumber}} // number range 1~100, if there is the same number, trigger panic.
+	_{{.LowerName}}NO       = {{.RandNumber}}
 	_{{.LowerName}}Name     = "{{.LowerName}}"
 	_{{.LowerName}}BaseCode = errcode.RCode(_{{.LowerName}}NO)
 // --blank line--

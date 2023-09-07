@@ -177,7 +177,13 @@ patch:
 .PHONY: copy-proto
 # copy proto file from the rpc server directory, multiple directories separated by commas. e.g. make copy-proto SERVER=yourServerDir
 copy-proto:
-	@bash scripts/copy-proto.sh $(SERVER)
+	@sponge patch copy-proto --server-dir=$(SERVER)
+
+
+.PHONY: update-config
+# update internal/config code base on yaml file
+update-config:
+	@sponge config --server-dir=.
 
 
 .PHONY: clean

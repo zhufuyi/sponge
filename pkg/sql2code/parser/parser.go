@@ -442,6 +442,11 @@ func getModelStructCode(data tmplData, importPaths []string, isEmbed bool) (stri
 		for i, field := range data.Fields {
 			if strings.Contains(field.GoType, "time.Time") {
 				data.Fields[i].GoType = "*time.Time"
+				continue
+			}
+			// force conversion of ID field to uint64 type
+			if field.Name == "ID" {
+				data.Fields[i].GoType = "uint64"
 			}
 		}
 		newImportPaths = importPaths

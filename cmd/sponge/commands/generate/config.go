@@ -155,7 +155,7 @@ func saveFile(inputFile string, outputFile string, code string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("%s ----> %s\n", inputFile, outputFile)
+	fmt.Printf("update \"%s\"  -->  \"%s\"\n", inputFile, outputFile)
 	return nil
 }
 

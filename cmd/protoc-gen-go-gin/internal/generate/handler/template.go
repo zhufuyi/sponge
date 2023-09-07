@@ -179,9 +179,10 @@ import (
 
 {{- range .PbServices}}
 
-// {{.LowerName}} http service level error code
+// {{.LowerName}} business-level http error codes.
+// the {{.LowerName}}NO value range is 1~100, if the same number appears, it will cause a failure to start the service.
 var (
-	{{.LowerName}}NO       = {{.RandNumber}} // number range 1~100, if there is the same number, trigger panic.
+	{{.LowerName}}NO       = {{.RandNumber}}
 	{{.LowerName}}Name     = "{{.LowerName}}"
 	{{.LowerName}}BaseCode = errcode.HCode({{.LowerName}}NO)
 // --blank line--

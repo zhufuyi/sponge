@@ -2,6 +2,13 @@
 
 HOST_ADDR=$1
 
+function checkResult() {
+    result=$1
+    if [ ${result} -ne 0 ]; then
+        exit ${result}
+    fi
+}
+
 # change host addr
 if [ "X${HOST_ADDR}" = "X" ];then
   HOST_ADDR=$(cat cmd/serverNameExample_mixExample/main.go | grep "@host" | awk '{print $3}')
@@ -11,6 +18,7 @@ else
 fi
 
 swag init -g cmd/serverNameExample_mixExample/main.go
+checkResult $?
 
 colorCyan='\e[1;36m'
 highBright='\e[1m'
