@@ -7,7 +7,7 @@ var (
 	StatusCanceled            = NewRPCStatus(30001, "Canceled")
 	StatusUnknown             = NewRPCStatus(30002, "Unknown")
 	StatusInvalidParams       = NewRPCStatus(30003, "Invalid Parameter")
-	StatusDeadlineExceeded    = NewRPCStatus(3004, "Deadline Exceeded")
+	StatusDeadlineExceeded    = NewRPCStatus(30004, "Deadline Exceeded")
 	StatusNotFound            = NewRPCStatus(30005, "Not Found")
 	StatusAlreadyExists       = NewRPCStatus(30006, "Already Exists")
 	StatusPermissionDenied    = NewRPCStatus(30007, "Permission Denied")
@@ -18,7 +18,7 @@ var (
 	StatusUnimplemented       = NewRPCStatus(30012, "Unimplemented")
 	StatusInternalServerError = NewRPCStatus(30013, "Internal Server Error")
 	StatusServiceUnavailable  = NewRPCStatus(30014, "Service Unavailable")
-	StatusDataLoss            = NewRPCStatus(300115, "Data Loss")
+	StatusDataLoss            = NewRPCStatus(30015, "Data Loss")
 	StatusUnauthorized        = NewRPCStatus(30016, "Unauthorized")
 
 	StatusTimeout          = NewRPCStatus(30017, "Request Timeout")

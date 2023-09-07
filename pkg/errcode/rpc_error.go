@@ -1,12 +1,17 @@
 package errcode
 
 import (
+	"encoding/json"
 	"fmt"
+	"net/http"
+	"sort"
 	"strings"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
+
+var grpcErrCodes = map[int]string{}
 
 // RPCStatus rpc status
 type RPCStatus struct {
@@ -18,11 +23,14 @@ var statusCodes = map[codes.Code]string{}
 // NewRPCStatus create a new rpc status
 func NewRPCStatus(code codes.Code, msg string) *RPCStatus {
 	if v, ok := statusCodes[code]; ok {
-		panic(fmt.Sprintf("grpc status code = %d already exists, please define a new error code, old msg = %s", code, v))
-	} else {
-		statusCodes[code] = msg
+		panic(fmt.Sprintf(`grpc status code = %d already exists, please define a new error code,
+old msg = %s
+new msg = %s
+`, code, v, msg))
 	}
 
+	grpcErrCodes[int(code)] = msg
+	statusCodes[code] = msg
 	return &RPCStatus{
 		status: status.New(code, msg),
 	}
@@ -182,4 +190,66 @@ func (g *RPCStatus) ToRPCCode() codes.Code {
 	}
 
 	return g.status.Code()
+}
+
+// ErrInfo error info
+type ErrInfo struct {
+	Code int    `json:"code"`
+	Msg  string `json:"msg"`
+}
+
+func getErrorInfo(codeInfo map[int]string) []ErrInfo {
+	var keys []int
+	for key := range codeInfo {
+		keys = append(keys, key)
+	}
+
+	sort.Ints(keys)
+	eis := []ErrInfo{}
+	for _, key := range keys {
+		eis = append(eis, ErrInfo{
+			Code: key,
+			Msg:  codeInfo[key],
+		})
+	}
+
+	return eis
+}
+
+// ListGRPCErrCodes list grpc error codes, http handle func
+func ListGRPCErrCodes(w http.ResponseWriter, r *http.Request) {
+	eis := getErrorInfo(grpcErrCodes)
+
+	jsonData, err := json.Marshal(&eis)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	_, err = w.Write(jsonData)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+// ShowConfig show config info
+// @Summary show config info
+// @Description show config info
+// @Tags system
+// @Accept  json
+// @Produce  json
+// @Router /config [get]
+func ShowConfig(jsonData []byte) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		//w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, err := w.Write(jsonData)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
 }

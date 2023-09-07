@@ -4,8 +4,8 @@ import (
 	"github.com/zhufuyi/sponge/pkg/errcode"
 )
 
-// userExample rpc service level error code
-// each resource name corresponds to a unique number (rpc type), the number range is 1~100, if there is the same number, trigger panic
+// userExample business-level rpc error codes.
+// the _userExampleNO value range is 1~100, if the same number appears, it will cause a failure to start the service.
 var (
 	_userExampleNO       = 2
 	_userExampleName     = "userExample"

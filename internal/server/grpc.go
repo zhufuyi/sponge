@@ -13,6 +13,7 @@ import (
 	"github.com/zhufuyi/sponge/internal/service"
 
 	"github.com/zhufuyi/sponge/pkg/app"
+	"github.com/zhufuyi/sponge/pkg/errcode"
 	"github.com/zhufuyi/sponge/pkg/grpc/gtls"
 	"github.com/zhufuyi/sponge/pkg/grpc/interceptor"
 	"github.com/zhufuyi/sponge/pkg/grpc/metrics"
@@ -292,6 +293,16 @@ func (s *grpcServer) registerProfMux() {
 	prof.Register(s.mux, prof.WithIOWaitTime())
 }
 
+func (s *grpcServer) addHTTPRouter() {
+	if s.mux == nil {
+		s.mux = http.NewServeMux()
+	}
+	s.mux.HandleFunc("/codes", errcode.ListGRPCErrCodes) // error codes router
+
+	cfgStr := config.Show()
+	s.mux.HandleFunc("/config", errcode.ShowConfig([]byte(cfgStr))) // config router
+}
+
 // NewGRPCServer creates a new grpc server
 func NewGRPCServer(addr string, opts ...GrpcOption) app.IServer {
 	var err error
@@ -302,6 +313,7 @@ func NewGRPCServer(addr string, opts ...GrpcOption) app.IServer {
 		iRegistry: o.iRegistry,
 		instance:  o.instance,
 	}
+	s.addHTTPRouter()
 	if config.Get().App.EnableHTTPProfile {
 		s.registerProfMux()
 	}

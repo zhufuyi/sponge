@@ -18,7 +18,9 @@ func TestRPCStatus(t *testing.T) {
 	assert.Equal(t, msg, "something is wrong")
 
 	defer func() {
-		recover()
+		if e := recover(); e != nil {
+			t.Log(e)
+		}
 	}()
 	NewRPCStatus(41101, "something is wrong")
 }

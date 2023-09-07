@@ -34,12 +34,12 @@ func Test_replaceDSN(t *testing.T) {
 	t.Log(replaceDSN(dsn))
 }
 
-func Test_replacePWD(t *testing.T) {
+func Test_hideSensitiveFields(t *testing.T) {
 	var keywords []string
 	keywords = append(keywords, `"dsn"`, `"password"`, `"name"`)
 	str := Show(c, keywords...)
 
-	fmt.Printf(replacePWD(str))
+	fmt.Printf(hideSensitiveFields(str))
 }
 
 // test listening for profile updates

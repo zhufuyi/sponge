@@ -2,6 +2,7 @@ package errcode
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 	"testing"
 
@@ -66,7 +67,9 @@ func TestNewError(t *testing.T) {
 	_ = e.Details()
 
 	defer func() {
-		recover()
+		if err := recover(); err != nil {
+			t.Log(err)
+		}
 	}()
 	_ = NewError(code, msg)
 }
@@ -79,4 +82,11 @@ func TestHCode(t *testing.T) {
 		recover()
 	}()
 	code = HCode(101)
+}
+
+func TestListHTTPErrCodes(t *testing.T) {
+	errInfos := ListHTTPErrCodes()
+	for _, v := range errInfos {
+		fmt.Println(v.Code, v.Msg)
+	}
 }

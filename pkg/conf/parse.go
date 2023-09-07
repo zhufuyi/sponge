@@ -60,8 +60,8 @@ func watchConfig(obj interface{}, fs ...func()) {
 	})
 }
 
-// Show print configuration information (remove sensitive information)
-func Show(obj interface{}, keywords ...string) string {
+// Show print configuration information (hide sensitive fields)
+func Show(obj interface{}, fields ...string) string {
 	var out string
 
 	data, err := json.MarshalIndent(obj, "", "    ")
@@ -76,34 +76,33 @@ func Show(obj interface{}, keywords ...string) string {
 		if err != nil {
 			break
 		}
-		keywords = append(keywords, `"dsn"`, `"password"`)
+		fields = append(fields, `"dsn"`, `"password"`, `"pwd"`)
 
-		out += replacePWD(line, keywords...)
+		out += hideSensitiveFields(line, fields...)
 	}
 
 	return out
 }
 
-// replace password
-func replacePWD(line string, keywords ...string) string {
-	for _, keyword := range keywords {
-		if strings.Contains(line, keyword) {
-			index := strings.Index(line, keyword)
+func hideSensitiveFields(line string, fields ...string) string {
+	for _, field := range fields {
+		if strings.Contains(line, field) {
+			index := strings.Index(line, field)
 			if strings.Contains(line, "@") && strings.Contains(line, ":") {
 				return replaceDSN(line)
 			}
-			return fmt.Sprintf("%s: \"******\",\n", line[:index+len(keyword)])
+			return fmt.Sprintf("%s: \"******\",\n", line[:index+len(field)])
 		}
 	}
 
 	return line
 }
 
-// replace dsn's password
+// replace dsn password
 func replaceDSN(str string) string {
-	mysqlPWD := []byte(str)
+	data := []byte(str)
 	start, end := 0, 0
-	for k, v := range mysqlPWD {
+	for k, v := range data {
 		if v == ':' {
 			start = k
 		}
@@ -117,5 +116,5 @@ func replaceDSN(str string) string {
 		return str
 	}
 
-	return fmt.Sprintf("%s******%s", mysqlPWD[:start+1], mysqlPWD[end:])
+	return fmt.Sprintf("%s******%s", data[:start+1], data[end:])
 }

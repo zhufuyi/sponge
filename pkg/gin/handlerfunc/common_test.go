@@ -2,11 +2,12 @@ package handlerfunc
 
 import (
 	"embed"
-	"github.com/zhufuyi/sponge/pkg/gohttp"
 	"net/http"
 	"testing"
 	"time"
 
+	"github.com/zhufuyi/sponge/pkg/errcode"
+	"github.com/zhufuyi/sponge/pkg/gohttp"
 	"github.com/zhufuyi/sponge/pkg/utils"
 
 	"github.com/gin-gonic/gin"
@@ -20,6 +21,9 @@ func TestCheckHealth(t *testing.T) {
 	r := gin.New()
 	r.GET("/health", CheckHealth)
 	r.GET("/ping", Ping)
+	r.GET("/codes", ListCodes)
+	r.GET("/codes2", gin.WrapF(errcode.ListGRPCErrCodes))
+	r.GET("/config", gin.WrapF(errcode.ShowConfig([]byte(`{"foo": "bar"}`))))
 
 	go func() {
 		_ = r.Run(serverAddr)
@@ -30,6 +34,15 @@ func TestCheckHealth(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
 	resp, err = http.Get(requestAddr + "/ping")
+	assert.NoError(t, err)
+	assert.NotNil(t, resp)
+	resp, err = http.Get(requestAddr + "/codes")
+	assert.NoError(t, err)
+	assert.NotNil(t, resp)
+	resp, err = http.Get(requestAddr + "/codes2")
+	assert.NoError(t, err)
+	assert.NotNil(t, resp)
+	resp, err = http.Get(requestAddr + "/config")
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
 }

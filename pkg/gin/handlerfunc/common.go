@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/zhufuyi/sponge/pkg/errcode"
 	"github.com/zhufuyi/sponge/pkg/utils"
 
 	"github.com/gin-gonic/gin"
@@ -39,6 +40,17 @@ func CheckHealth(c *gin.Context) {
 // @Router /ping [get]
 func Ping(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{})
+}
+
+// ListCodes list error codes info
+// @Summary list error codes info
+// @Description list error codes info
+// @Tags system
+// @Accept  json
+// @Produce  json
+// @Router /codes [get]
+func ListCodes(c *gin.Context) {
+	c.JSON(http.StatusOK, errcode.ListHTTPErrCodes())
 }
 
 // BrowserRefresh solve vue using history route 404 problem, for system file

@@ -13,8 +13,8 @@ func Init(configFile string, fs ...func()) error {
 	return conf.Parse(configFile, config, fs...)
 }
 
-func Show() string {
-	return conf.Show(config)
+func Show(hiddenFields ...string) string {
+	return conf.Show(config, hiddenFields...)
 }
 
 func Get() *Config {

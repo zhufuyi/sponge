@@ -81,7 +81,7 @@ func NewRouter_pbExample() *gin.Engine { //nolint
 		r.Use(middleware.Tracing(config.Get().App.Name))
 	}
 
-	// pprof performance analysis
+	// profile performance analysis
 	if config.Get().App.EnableHTTPProfile {
 		prof.Register(r, prof.WithIOWaitTime())
 	}
@@ -91,6 +91,8 @@ func NewRouter_pbExample() *gin.Engine { //nolint
 
 	r.GET("/health", handlerfunc.CheckHealth)
 	r.GET("/ping", handlerfunc.Ping)
+	r.GET("/codes", handlerfunc.ListCodes)
+	r.GET("/config", gin.WrapF(errcode.ShowConfig([]byte(config.Show()))))
 
 	// access path /apis/swagger/index.html
 	swagger.CustomRouter(r, "apis", docs.ApiDocs)

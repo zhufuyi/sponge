@@ -1,4 +1,4 @@
-// Package errcode is used for http and grpc error codes, include system-level error codes and service-level error codes
+// Package errcode is used for http and grpc error codes, include system-level error codes and business-level error codes
 package errcode
 
 import (
@@ -9,6 +9,7 @@ import (
 )
 
 var errCodes = map[int]*Error{}
+var httpErrCodes = map[int]string{}
 
 // Error error
 type Error struct {
@@ -20,8 +21,13 @@ type Error struct {
 // NewError create a new error message
 func NewError(code int, msg string) *Error {
 	if v, ok := errCodes[code]; ok {
-		panic(fmt.Sprintf("http error code = %d already exists, please define a new error code, old msg = %s", code, v.Msg()))
+		panic(fmt.Sprintf(`http error code = %d already exists, please define a new error code,
+old msg = %s
+new msg = %s
+`, code, v.Msg(), msg))
 	}
+
+	httpErrCodes[code] = msg
 	e := &Error{code: code, msg: msg}
 	errCodes[code] = e
 	return e
@@ -117,4 +123,9 @@ func ParseError(err error) *Error {
 	}
 
 	return outError
+}
+
+// ListHTTPErrCodes list http error codes
+func ListHTTPErrCodes() []ErrInfo {
+	return getErrorInfo(httpErrCodes)
 }

@@ -4,8 +4,8 @@ import (
 	"github.com/zhufuyi/sponge/pkg/errcode"
 )
 
-// userExample http service level error code
-// each resource name corresponds to a unique number (http type), the number range is 1~100, if there is the same number, trigger panic
+// userExample business-level http error codes.
+// the userExampleNO value range is 1~100, if the same number appears, it will cause a failure to start the service.
 var (
 	userExampleNO       = 1
 	userExampleName     = "userExample"
