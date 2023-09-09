@@ -21,6 +21,8 @@ func PatchCommand() *cobra.Command {
 		patch.GenMysqlInitCommand(),
 		patch.GenTypesPbCommand(),
 		patch.CopyProtoCommand(),
+		patch.ModifyDuplicateNumCommand(),
+		patch.ModifyDuplicateErrCodeCommand(),
 	)
 
 	return cmd

@@ -155,7 +155,10 @@ handlePbGoFiles $protoBasePath
 
 # delete json tag omitempty
 sponge patch del-omitempty --dir=$protoBasePath --suffix-name=pb.go > /dev/null
-checkResult $?
+
+# modify duplicate numbers and error codes
+sponge patch modify-dup-num --dir=internal/ecode
+sponge patch modify-dup-err-code --dir=internal/ecode
 
 go mod tidy
 checkResult $?

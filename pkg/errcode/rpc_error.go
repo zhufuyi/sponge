@@ -24,8 +24,8 @@ var statusCodes = map[codes.Code]string{}
 func NewRPCStatus(code codes.Code, msg string) *RPCStatus {
 	if v, ok := statusCodes[code]; ok {
 		panic(fmt.Sprintf(`grpc status code = %d already exists, please define a new error code,
-old msg = %s
-new msg = %s
+msg1 = %s
+msg2 = %s
 `, code, v, msg))
 	}
 
@@ -217,7 +217,7 @@ func getErrorInfo(codeInfo map[int]string) []ErrInfo {
 }
 
 // ListGRPCErrCodes list grpc error codes, http handle func
-func ListGRPCErrCodes(w http.ResponseWriter, r *http.Request) {
+func ListGRPCErrCodes(w http.ResponseWriter, _ *http.Request) {
 	eis := getErrorInfo(grpcErrCodes)
 
 	jsonData, err := json.Marshal(&eis)

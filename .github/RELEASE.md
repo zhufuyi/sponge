@@ -1,7 +1,7 @@
 ## New
 
-- Support for selecting multiple mysql tables when creating web and microservice projects based on sql.
-- Add the copy proto file from rpc service command.
-- Unify the name of the template code of web and RPC gateway services, and remove the file suffix _logic.
-- Support merging template code for microservices  created based on sql.
-- Move `build` directory to `scripts` directory.
+- Add modify duplicate error codes command, avoid manual modification of duplicate error codes.
+- Change `ID` field go type to `uint64` in sql based generated model code to avoid ID type inconsistency.
+- Add `make update-config` command.
+- Add view error codes list api interface `/codes`.
+- Add view service configuration list api interface `/config`.

@@ -22,8 +22,8 @@ type Error struct {
 func NewError(code int, msg string) *Error {
 	if v, ok := errCodes[code]; ok {
 		panic(fmt.Sprintf(`http error code = %d already exists, please define a new error code,
-old msg = %s
-new msg = %s
+msg1 = %s
+msg2 = %s
 `, code, v.Msg(), msg))
 	}
 
