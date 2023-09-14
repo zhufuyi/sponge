@@ -25,6 +25,8 @@ func Test_gormConfig(t *testing.T) {
 	o := defaultOptions()
 	o.apply(
 		WithLog(),
+		WithLogging(nil),
+		WithLogging(nil, 4),
 		WithSlowThreshold(time.Millisecond*100),
 		WithEnableTrace(),
 		WithMaxIdleConns(5),

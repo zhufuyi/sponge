@@ -8,6 +8,7 @@ import (
 	"github.com/zhufuyi/sponge/internal/config"
 
 	"github.com/zhufuyi/sponge/pkg/goredis"
+	"github.com/zhufuyi/sponge/pkg/logger"
 	"github.com/zhufuyi/sponge/pkg/mysql"
 
 	"github.com/go-redis/redis/v8"
@@ -42,7 +43,10 @@ func InitMysql() {
 		mysql.WithConnMaxLifetime(time.Duration(config.Get().Mysql.ConnMaxLifetime) * time.Minute),
 	}
 	if config.Get().Mysql.EnableLog {
-		opts = append(opts, mysql.WithLog())
+		opts = append(opts,
+			mysql.WithLogging(logger.Get()),
+			mysql.WithLogRequestIDKey("request_id"),
+		)
 	}
 
 	if config.Get().App.EnableTrace {

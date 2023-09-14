@@ -1,7 +1,10 @@
 package mysql
 
 import (
+	"gorm.io/gorm/logger"
 	"time"
+
+	"go.uber.org/zap"
 )
 
 // Option set the mysql options.
@@ -17,6 +20,10 @@ type options struct {
 
 	disableForeignKey bool
 	enableTrace       bool
+
+	requestIDKey string
+	gLog         *zap.Logger
+	logLevel     logger.LogLevel
 }
 
 func (o *options) apply(opts ...Option) {
@@ -37,13 +44,30 @@ func defaultOptions() *options {
 
 		disableForeignKey: true,  // disables the use of foreign keys, true is recommended for production environments, enabled by default
 		enableTrace:       false, // whether to enable link tracing, default is off
+
+		requestIDKey: "",          // request id key
+		gLog:         nil,         // custom logger
+		logLevel:     logger.Info, // default logLevel
 	}
 }
 
 // WithLog set log sql
+// Deprecated: will be replaced by WithLogging
 func WithLog() Option {
 	return func(o *options) {
 		o.isLog = true
+	}
+}
+
+// WithLogging set log sql, If l=nil, the gorm log library will be used
+func WithLogging(l *zap.Logger, level ...logger.LogLevel) Option {
+	return func(o *options) {
+		o.isLog = true
+		o.gLog = l
+		if len(level) > 0 {
+			o.logLevel = level[0]
+		}
+		o.logLevel = logger.Info
 	}
 }
 
@@ -86,5 +110,15 @@ func WithEnableForeignKey() Option {
 func WithEnableTrace() Option {
 	return func(o *options) {
 		o.enableTrace = true
+	}
+}
+
+// WithLogRequestIDKey log request id
+func WithLogRequestIDKey(key string) Option {
+	return func(o *options) {
+		if key == "" {
+			key = "request_id"
+		}
+		o.requestIDKey = key
 	}
 }

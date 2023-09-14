@@ -45,6 +45,7 @@ func TestNewError(t *testing.T) {
 		OutOfRange,
 		Unimplemented,
 		DataLoss.WithDetails("foo", "bar"),
+		DataLoss.WithOutMsg("foobar"),
 		NewError(1010, "unknown"),
 	}
 

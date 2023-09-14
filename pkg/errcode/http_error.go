@@ -63,6 +63,11 @@ func (e *Error) WithDetails(details ...string) *Error {
 	return newError
 }
 
+// WithOutMsg out error message
+func (e *Error) WithOutMsg(msg string) *Error {
+	return &Error{code: e.code, msg: msg}
+}
+
 // ToHTTPCode convert to http error code
 func (e *Error) ToHTTPCode() int {
 	switch e.Code() {

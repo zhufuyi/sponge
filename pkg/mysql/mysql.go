@@ -52,9 +52,13 @@ func gormConfig(o *options) *gorm.Config {
 		NamingStrategy: schema.NamingStrategy{SingularTable: true},
 	}
 
-	// print all SQL
+	// print SQL
 	if o.isLog {
-		config.Logger = logger.Default.LogMode(logger.Info)
+		if o.gLog == nil {
+			config.Logger = logger.Default.LogMode(o.logLevel)
+		} else {
+			config.Logger = NewCustomGormLogger(o)
+		}
 	} else {
 		config.Logger = logger.Default.LogMode(logger.Silent)
 	}

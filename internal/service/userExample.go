@@ -57,6 +57,7 @@ func (s *userExample) Create(ctx context.Context, req *serverNameExampleV1.Creat
 		return nil, ecode.StatusCreateUserExample.Err()
 	}
 
+	ctx = context.WithValue(ctx, interceptor.ContextRequestIDKey, interceptor.ServerCtxRequestID(ctx))
 	err = s.iDao.Create(ctx, userExample)
 	if err != nil {
 		logger.Error("Create error", logger.Err(err), logger.Any("userExample", userExample), interceptor.ServerCtxRequestIDField(ctx))
@@ -74,6 +75,7 @@ func (s *userExample) DeleteByID(ctx context.Context, req *serverNameExampleV1.D
 		return nil, ecode.StatusInvalidParams.Err()
 	}
 
+	ctx = context.WithValue(ctx, interceptor.ContextRequestIDKey, interceptor.ServerCtxRequestID(ctx))
 	err = s.iDao.DeleteByID(ctx, req.Id)
 	if err != nil {
 		logger.Error("DeleteByID error", logger.Err(err), logger.Any("id", req.Id), interceptor.ServerCtxRequestIDField(ctx))
@@ -91,6 +93,7 @@ func (s *userExample) DeleteByIDs(ctx context.Context, req *serverNameExampleV1.
 		return nil, ecode.StatusInvalidParams.Err()
 	}
 
+	ctx = context.WithValue(ctx, interceptor.ContextRequestIDKey, interceptor.ServerCtxRequestID(ctx))
 	err = s.iDao.DeleteByIDs(ctx, req.Ids)
 	if err != nil {
 		logger.Error("DeleteByID error", logger.Err(err), logger.Any("ids", req.Ids), interceptor.ServerCtxRequestIDField(ctx))
@@ -115,6 +118,7 @@ func (s *userExample) UpdateByID(ctx context.Context, req *serverNameExampleV1.U
 	}
 	userExample.ID = req.Id
 
+	ctx = context.WithValue(ctx, interceptor.ContextRequestIDKey, interceptor.ServerCtxRequestID(ctx))
 	err = s.iDao.UpdateByID(ctx, userExample)
 	if err != nil {
 		logger.Error("UpdateByID error", logger.Err(err), logger.Any("userExample", userExample), interceptor.ServerCtxRequestIDField(ctx))
@@ -132,6 +136,7 @@ func (s *userExample) GetByID(ctx context.Context, req *serverNameExampleV1.GetU
 		return nil, ecode.StatusInvalidParams.Err()
 	}
 
+	ctx = context.WithValue(ctx, interceptor.ContextRequestIDKey, interceptor.ServerCtxRequestID(ctx))
 	record, err := s.iDao.GetByID(ctx, req.Id)
 	if err != nil {
 		if errors.Is(err, query.ErrNotFound) {
@@ -159,6 +164,7 @@ func (s *userExample) ListByIDs(ctx context.Context, req *serverNameExampleV1.Li
 		return nil, ecode.StatusInvalidParams.Err()
 	}
 
+	ctx = context.WithValue(ctx, interceptor.ContextRequestIDKey, interceptor.ServerCtxRequestID(ctx))
 	userExampleMap, err := s.iDao.GetByIDs(ctx, req.Ids)
 	if err != nil {
 		logger.Error("GetByIDs error", logger.Err(err), logger.Any("ids", req.Ids), interceptor.ServerCtxRequestIDField(ctx))
@@ -195,6 +201,7 @@ func (s *userExample) List(ctx context.Context, req *serverNameExampleV1.ListUse
 	}
 	params.Size = int(req.Params.Limit)
 
+	ctx = context.WithValue(ctx, interceptor.ContextRequestIDKey, interceptor.ServerCtxRequestID(ctx))
 	records, total, err := s.iDao.GetByColumns(ctx, params)
 	if err != nil {
 		if strings.Contains(err.Error(), "query params error:") {

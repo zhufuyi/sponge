@@ -93,8 +93,12 @@ func log2Terminal(levelName string, encoding string) (*zap.Logger, error) {
 	}
 
 	config.EncoderConfig = zap.NewProductionEncoderConfig()
-	config.EncoderConfig.EncodeTime = timeFormatter                // default time format
-	config.EncoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder // logging levels in the log file using upper case letters
+	if encoding == formatConsole {
+		config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder // logging color
+	} else {
+		config.EncoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder // logging levels in the log file using upper case letters
+	}
+	config.EncoderConfig.EncodeTime = timeFormatter // default time format
 	return config.Build()
 }
 
