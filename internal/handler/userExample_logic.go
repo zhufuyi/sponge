@@ -144,6 +144,47 @@ func (h *userExamplePbHandler) GetByID(ctx context.Context, req *serverNameExamp
 	}, nil
 }
 
+// GetByCondition get a record by condition
+func (h *userExamplePbHandler) GetByCondition(ctx context.Context, req *serverNameExampleV1.GetUserExampleByConditionRequest) (*serverNameExampleV1.GetUserExampleByConditionReply, error) {
+	err := req.Validate()
+	if err != nil {
+		logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req), middleware.CtxRequestIDField(ctx))
+		return nil, ecode.InvalidParams.Err()
+	}
+
+	conditions := &query.Conditions{}
+	for _, v := range req.Conditions.GetColumns() {
+		column := query.Column{}
+		_ = copier.Copy(&column, v)
+		conditions.Columns = append(conditions.Columns, column)
+	}
+	err = conditions.CheckValid()
+	if err != nil {
+		logger.Warn("Parameters error", logger.Err(err), logger.Any("conditions", conditions), middleware.CtxRequestIDField(ctx))
+		return nil, ecode.InvalidParams.Err()
+	}
+
+	record, err := h.userExampleDao.GetByCondition(ctx, conditions)
+	if err != nil {
+		if errors.Is(err, query.ErrNotFound) {
+			logger.Warn("GetByID error", logger.Err(err), logger.Any("req", req), middleware.CtxRequestIDField(ctx))
+			return nil, ecode.NotFound.Err()
+		}
+		logger.Error("GetByID error", logger.Err(err), logger.Any("req", req), middleware.CtxRequestIDField(ctx))
+		return nil, ecode.InternalServerError.Err()
+	}
+
+	data, err := convertUserExamplePb(record)
+	if err != nil {
+		logger.Warn("convertUserExample error", logger.Err(err), logger.Any("userExample", record), middleware.CtxRequestIDField(ctx))
+		return nil, ecode.ErrGetByIDUserExample.Err()
+	}
+
+	return &serverNameExampleV1.GetUserExampleByConditionReply{
+		UserExample: data,
+	}, nil
+}
+
 // ListByIDs list of records by batch id
 func (h *userExamplePbHandler) ListByIDs(ctx context.Context, req *serverNameExampleV1.ListUserExampleByIDsRequest) (*serverNameExampleV1.ListUserExampleByIDsReply, error) {
 	err := req.Validate()

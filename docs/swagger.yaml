@@ -3,7 +3,7 @@ definitions:
     properties:
       exp:
         description: expressions, which default to = when the value is null, have
-          =, ! =, >, >=, <, <=, like
+          =, !=, >, >=, <, <=, like
         type: string
       logic:
         description: logical type, defaults to and when value is null, only &(and),
@@ -24,7 +24,6 @@ definitions:
         type: array
       page:
         description: page number, starting from page 0
-        minimum: 0
         type: integer
       size:
         description: lines per page
@@ -39,6 +38,14 @@ definitions:
         type: string
       status:
         type: string
+    type: object
+  types.Conditions:
+    properties:
+      columns:
+        description: columns info
+        items:
+          $ref: '#/definitions/github_com_zhufuyi_sponge_internal_types.Column'
+        type: array
     type: object
   types.CreateUserExampleRequest:
     properties:
@@ -65,7 +72,34 @@ definitions:
         description: password
         type: string
       phone:
-        description: phone number, e164 means <+ country code> <cell phone number>.
+        description: phone number, e164 rules, e.g. +8612345678901
+        type: string
+    type: object
+  types.CreateUserExampleRespond:
+    properties:
+      code:
+        description: return code
+        type: integer
+      data:
+        description: return data
+        properties:
+          id:
+            description: id
+            type: integer
+        type: object
+      msg:
+        description: return information description
+        type: string
+    type: object
+  types.DeleteUserExampleByIDRespond:
+    properties:
+      code:
+        description: return code
+        type: integer
+      data:
+        description: return data
+      msg:
+        description: return information description
         type: string
     type: object
   types.DeleteUserExamplesByIDsRequest:
@@ -77,7 +111,48 @@ definitions:
         minItems: 1
         type: array
     type: object
-  types.GetUserExamplesByIDsRequest:
+  types.DeleteUserExamplesByIDsRespond:
+    properties:
+      code:
+        description: return code
+        type: integer
+      data:
+        description: return data
+      msg:
+        description: return information description
+        type: string
+    type: object
+  types.GetUserExampleByConditionRespond:
+    properties:
+      code:
+        description: return code
+        type: integer
+      data:
+        description: return data
+        properties:
+          userExample:
+            $ref: '#/definitions/types.UserExampleObjDetail'
+        type: object
+      msg:
+        description: return information description
+        type: string
+    type: object
+  types.GetUserExampleByIDRespond:
+    properties:
+      code:
+        description: return code
+        type: integer
+      data:
+        description: return data
+        properties:
+          userExample:
+            $ref: '#/definitions/types.UserExampleObjDetail'
+        type: object
+      msg:
+        description: return information description
+        type: string
+    type: object
+  types.ListUserExamplesByIDsRequest:
     properties:
       ids:
         description: id list
@@ -86,13 +161,36 @@ definitions:
         minItems: 1
         type: array
     type: object
-  types.Result:
+  types.ListUserExamplesByIDsRespond:
     properties:
       code:
         description: return code
         type: integer
       data:
         description: return data
+        properties:
+          userExamples:
+            items:
+              $ref: '#/definitions/types.UserExampleObjDetail'
+            type: array
+        type: object
+      msg:
+        description: return information description
+        type: string
+    type: object
+  types.ListUserExamplesRespond:
+    properties:
+      code:
+        description: return code
+        type: integer
+      data:
+        description: return data
+        properties:
+          userExamples:
+            items:
+              $ref: '#/definitions/types.UserExampleObjDetail'
+            type: array
+        type: object
       msg:
         description: return information description
         type: string
@@ -124,6 +222,53 @@ definitions:
         description: phone number
         type: string
     type: object
+  types.UpdateUserExampleByIDRespond:
+    properties:
+      code:
+        description: return code
+        type: integer
+      data:
+        description: return data
+      msg:
+        description: return information description
+        type: string
+    type: object
+  types.UserExampleObjDetail:
+    properties:
+      age:
+        description: age
+        type: integer
+      avatar:
+        description: avatar
+        type: string
+      createdAt:
+        description: create time
+        type: string
+      email:
+        description: email
+        type: string
+      gender:
+        description: gender, 1:Male, 2:Female, other values:unknown
+        type: integer
+      id:
+        description: id
+        type: string
+      loginAt:
+        description: login timestamp
+        type: integer
+      name:
+        description: username
+        type: string
+      phone:
+        description: phone number
+        type: string
+      status:
+        description: account status, 1:inactive, 2:activated, 3:blocked
+        type: integer
+      updatedAt:
+        description: update time
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -149,7 +294,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/types.Result'
+            $ref: '#/definitions/types.CreateUserExampleRespond'
       summary: create userExample
       tags:
       - userExample
@@ -170,7 +315,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/types.Result'
+            $ref: '#/definitions/types.DeleteUserExampleByIDRespond'
       summary: delete userExample
       tags:
       - userExample
@@ -190,7 +335,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/types.Result'
+            $ref: '#/definitions/types.GetUserExampleByIDRespond'
       summary: get userExample detail
       tags:
       - userExample
@@ -216,8 +361,30 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/types.Result'
+            $ref: '#/definitions/types.UpdateUserExampleByIDRespond'
       summary: update userExample
+      tags:
+      - userExample
+  /api/v1/userExample/condition:
+    post:
+      consumes:
+      - application/json
+      description: get userExample by condition
+      parameters:
+      - description: query condition
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/types.Conditions'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.GetUserExampleByConditionRespond'
+      summary: get userExample by condition
       tags:
       - userExample
   /api/v1/userExample/delete/ids:
@@ -238,7 +405,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/types.Result'
+            $ref: '#/definitions/types.DeleteUserExamplesByIDsRespond'
       summary: delete userExamples
       tags:
       - userExample
@@ -260,7 +427,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/types.Result'
+            $ref: '#/definitions/types.ListUserExamplesRespond'
       summary: list of userExamples by query parameters
       tags:
       - userExample
@@ -275,14 +442,14 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/types.GetUserExamplesByIDsRequest'
+          $ref: '#/definitions/types.ListUserExamplesByIDsRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/types.Result'
+            $ref: '#/definitions/types.ListUserExamplesByIDsRespond'
       summary: list of userExamples by batch id
       tags:
       - userExample

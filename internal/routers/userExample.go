@@ -18,6 +18,7 @@ func userExampleRouter(group *gin.RouterGroup, h handler.UserExampleHandler) {
 	group.POST("/userExample/delete/ids", h.DeleteByIDs)
 	group.PUT("/userExample/:id", h.UpdateByID)
 	group.GET("/userExample/:id", h.GetByID)
+	group.POST("/userExample/condition", h.GetByCondition)
 	group.POST("/userExample/list/ids", h.ListByIDs)
 	group.POST("/userExample/list", h.List)
 }

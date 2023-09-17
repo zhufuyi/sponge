@@ -49,27 +49,29 @@ var logicMap = map[string]string{
 	AND: " AND ",
 	OR:  " OR ",
 
-	"&":  " AND ",
-	"&&": " AND ",
-	"|":  " OR ",
-	"||": " OR ",
+	"&":   " AND ",
+	"&&":  " AND ",
+	"|":   " OR ",
+	"||":  " OR ",
+	"AND": " AND ",
+	"OR":  " OR ",
 }
 
 // Params query parameters
 type Params struct {
-	Page int    `form:"page" binding:"gte=0" json:"page"`
-	Size int    `form:"size" binding:"gt=0" json:"size"`
-	Sort string `form:"sort" binding:"" json:"sort,omitempty"`
+	Page int    `json:"page" form:"page" binding:"gte=0"`
+	Size int    `json:"size" form:"size" binding:"gt=0"`
+	Sort string `json:"sort,omitempty" form:"sort" binding:""`
 
-	Columns []Column `json:"columns,omitempty"` // not required
+	Columns []Column `json:"columns,omitempty" form:"columns"` // not required
 }
 
-// Column search information
+// Column query info
 type Column struct {
-	Name  string      `json:"name"`  // column name
-	Exp   string      `json:"exp"`   // expressions, which default to = when the value is null, have =, ! =, >, >=, <, <=, like
-	Value interface{} `json:"value"` // column value
-	Logic string      `json:"logic"` // logical type, defaults to and when the value is null, with &(and), ||(or)
+	Name  string      `json:"name" form:"columns"`  // column name
+	Exp   string      `json:"exp" form:"columns"`   // expressions, which default to = when the value is null, have =, !=, >, >=, <, <=, like
+	Value interface{} `json:"value" form:"columns"` // column value
+	Logic string      `json:"logic" form:"columns"` // logical type, defaults to and when the value is null, with &(and), ||(or)
 }
 
 func (c *Column) checkValid() error {
@@ -215,4 +217,42 @@ func getExpsAndLogics(keyLen int, paramSrc string) ([]string, []string) { //noli
 	logics = append(logics, group["logic"])
 
 	return exps, logics
+}
+
+// Conditions query conditions
+type Conditions struct {
+	Columns []Column `json:"columns" form:"columns" binding:"min=1"` // columns info
+}
+
+// CheckValid check valid
+func (c *Conditions) CheckValid() error {
+	if len(c.Columns) == 0 {
+		return fmt.Errorf("field 'columns' cannot be empty")
+	}
+
+	for _, column := range c.Columns {
+		err := column.checkValid()
+		if err != nil {
+			return err
+		}
+		if column.Exp != "" {
+			if _, ok := expMap[column.Exp]; !ok {
+				return fmt.Errorf("unknown exp type '%s'", column.Exp)
+			}
+		}
+		if column.Logic != "" {
+			if _, ok := logicMap[column.Logic]; !ok {
+				return fmt.Errorf("unknown logic type '%s'", column.Logic)
+			}
+		}
+	}
+
+	return nil
+}
+
+// ConvertToGorm conversion to gorm-compliant parameters based on the Columns parameter
+// ignore the logical type of the last column, whether it is a one-column or multi-column query
+func (c *Conditions) ConvertToGorm() (string, []interface{}, error) {
+	p := &Params{Columns: c.Columns}
+	return p.ConvertToGormConditions()
 }

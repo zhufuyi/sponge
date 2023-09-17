@@ -17,6 +17,12 @@ const (
 	HeaderXRequestIDKey = "X-Request-ID"
 )
 
+// CtxKeyString for context.WithValue key type
+type CtxKeyString string
+
+// RequestIDKey "request_id"
+var RequestIDKey = CtxKeyString(ContextRequestIDKey)
+
 // RequestID is an interceptor that injects a 'X-Request-ID' into the context and request/response header of each request.
 func RequestID() gin.HandlerFunc {
 	return func(c *gin.Context) {

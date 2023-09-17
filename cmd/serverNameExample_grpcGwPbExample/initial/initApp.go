@@ -33,11 +33,14 @@ func Config() {
 	cfg := config.Get()
 
 	// initializing log
-	_, _ = logger.Init(
+	_, err := logger.Init(
 		logger.WithLevel(cfg.Logger.Level),
 		logger.WithFormat(cfg.Logger.Format),
 		logger.WithSave(cfg.Logger.IsSave),
 	)
+	if err != nil {
+		panic(err)
+	}
 
 	// initializing tracing
 	if cfg.App.EnableTrace {

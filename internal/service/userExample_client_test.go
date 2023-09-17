@@ -98,6 +98,25 @@ func Test_service_userExample_methods(t *testing.T) {
 		},
 
 		{
+			name: "GetByCondition",
+			fn: func() (interface{}, error) {
+				// todo type in the parameters to test
+				req := &serverNameExampleV1.GetUserExampleByConditionRequest{
+					Conditions: &types.Conditions{
+						Columns: []*types.Column{
+							{
+								Name:  "email",
+								Value: "foo@bar.com",
+							},
+						},
+					},
+				}
+				return cli.GetByCondition(ctx, req)
+			},
+			wantErr: false,
+		},
+
+		{
 			name: "ListByIDs",
 			fn: func() (interface{}, error) {
 				// todo type in the parameters to test

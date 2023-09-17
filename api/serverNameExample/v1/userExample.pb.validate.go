@@ -1402,6 +1402,283 @@ var _ interface {
 	ErrorName() string
 } = GetUserExampleByIDReplyValidationError{}
 
+// Validate checks the field values on GetUserExampleByConditionRequest with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the first error encountered is returned, or nil if there are
+// no violations.
+func (m *GetUserExampleByConditionRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetUserExampleByConditionRequest with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// GetUserExampleByConditionRequestMultiError, or nil if none found.
+func (m *GetUserExampleByConditionRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetUserExampleByConditionRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetConditions() == nil {
+		err := GetUserExampleByConditionRequestValidationError{
+			field:  "Conditions",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetConditions()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetUserExampleByConditionRequestValidationError{
+					field:  "Conditions",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetUserExampleByConditionRequestValidationError{
+					field:  "Conditions",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetConditions()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetUserExampleByConditionRequestValidationError{
+				field:  "Conditions",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return GetUserExampleByConditionRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetUserExampleByConditionRequestMultiError is an error wrapping multiple
+// validation errors returned by
+// GetUserExampleByConditionRequest.ValidateAll() if the designated
+// constraints aren't met.
+type GetUserExampleByConditionRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetUserExampleByConditionRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetUserExampleByConditionRequestMultiError) AllErrors() []error { return m }
+
+// GetUserExampleByConditionRequestValidationError is the validation error
+// returned by GetUserExampleByConditionRequest.Validate if the designated
+// constraints aren't met.
+type GetUserExampleByConditionRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetUserExampleByConditionRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetUserExampleByConditionRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetUserExampleByConditionRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetUserExampleByConditionRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetUserExampleByConditionRequestValidationError) ErrorName() string {
+	return "GetUserExampleByConditionRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetUserExampleByConditionRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetUserExampleByConditionRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetUserExampleByConditionRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetUserExampleByConditionRequestValidationError{}
+
+// Validate checks the field values on GetUserExampleByConditionReply with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetUserExampleByConditionReply) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetUserExampleByConditionReply with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// GetUserExampleByConditionReplyMultiError, or nil if none found.
+func (m *GetUserExampleByConditionReply) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetUserExampleByConditionReply) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetUserExample()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetUserExampleByConditionReplyValidationError{
+					field:  "UserExample",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetUserExampleByConditionReplyValidationError{
+					field:  "UserExample",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetUserExample()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetUserExampleByConditionReplyValidationError{
+				field:  "UserExample",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return GetUserExampleByConditionReplyMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetUserExampleByConditionReplyMultiError is an error wrapping multiple
+// validation errors returned by GetUserExampleByConditionReply.ValidateAll()
+// if the designated constraints aren't met.
+type GetUserExampleByConditionReplyMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetUserExampleByConditionReplyMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetUserExampleByConditionReplyMultiError) AllErrors() []error { return m }
+
+// GetUserExampleByConditionReplyValidationError is the validation error
+// returned by GetUserExampleByConditionReply.Validate if the designated
+// constraints aren't met.
+type GetUserExampleByConditionReplyValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetUserExampleByConditionReplyValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetUserExampleByConditionReplyValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetUserExampleByConditionReplyValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetUserExampleByConditionReplyValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetUserExampleByConditionReplyValidationError) ErrorName() string {
+	return "GetUserExampleByConditionReplyValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetUserExampleByConditionReplyValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetUserExampleByConditionReply.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetUserExampleByConditionReplyValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetUserExampleByConditionReplyValidationError{}
+
 // Validate checks the field values on ListUserExampleByIDsRequest with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.

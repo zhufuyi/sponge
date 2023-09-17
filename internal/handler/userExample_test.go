@@ -75,6 +75,12 @@ func newUserExampleHandler() *gotest.Handler {
 			HandlerFunc: iHandler.GetByID,
 		},
 		{
+			FuncName:    "GetByCondition",
+			Method:      http.MethodPost,
+			Path:        "/userExample/condition",
+			HandlerFunc: iHandler.GetByCondition,
+		},
+		{
 			FuncName:    "ListByIDs",
 			Method:      http.MethodPost,
 			Path:        "/userExample/list/ids",
@@ -257,6 +263,52 @@ func Test_userExampleHandler_GetByID(t *testing.T) {
 	assert.Error(t, err)
 }
 
+func Test_userExampleHandler_GetByCondition(t *testing.T) {
+	h := newUserExampleHandler()
+	defer h.Close()
+	testData := h.TestData.(*model.UserExample)
+
+	rows := sqlmock.NewRows([]string{"id", "created_at", "updated_at"}).
+		AddRow(testData.ID, testData.CreatedAt, testData.UpdatedAt)
+
+	h.MockDao.SQLMock.ExpectQuery("SELECT .*").WillReturnRows(rows)
+
+	result := &gohttp.StdResult{}
+	err := gohttp.Post(result, h.GetRequestURL("GetByCondition"), &types.GetUserExampleByConditionRequest{
+		query.Conditions{
+			Columns: []query.Column{
+				{
+					Name:  "id",
+					Value: testData.ID,
+				},
+			},
+		},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result.Code != 0 {
+		t.Fatalf("%+v", result)
+	}
+
+	// zero error test
+	err = gohttp.Post(result, h.GetRequestURL("GetByCondition"), nil)
+	assert.NoError(t, err)
+
+	// get error test
+	err = gohttp.Post(result, h.GetRequestURL("GetByCondition"), &types.GetUserExampleByConditionRequest{
+		query.Conditions{
+			Columns: []query.Column{
+				{
+					Name:  "id",
+					Value: 2,
+				},
+			},
+		},
+	})
+	assert.Error(t, err)
+}
+
 func Test_userExampleHandler_ListByIDs(t *testing.T) {
 	h := newUserExampleHandler()
 	defer h.Close()
@@ -268,7 +320,7 @@ func Test_userExampleHandler_ListByIDs(t *testing.T) {
 	h.MockDao.SQLMock.ExpectQuery("SELECT .*").WillReturnRows(rows)
 
 	result := &gohttp.StdResult{}
-	err := gohttp.Post(result, h.GetRequestURL("ListByIDs"), &types.GetUserExamplesByIDsRequest{IDs: []uint64{testData.ID}})
+	err := gohttp.Post(result, h.GetRequestURL("ListByIDs"), &types.ListUserExamplesByIDsRequest{IDs: []uint64{testData.ID}})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -281,7 +333,7 @@ func Test_userExampleHandler_ListByIDs(t *testing.T) {
 	assert.NoError(t, err)
 
 	// get error test
-	err = gohttp.Post(result, h.GetRequestURL("ListByIDs"), &types.GetUserExamplesByIDsRequest{IDs: []uint64{111}})
+	err = gohttp.Post(result, h.GetRequestURL("ListByIDs"), &types.ListUserExamplesByIDsRequest{IDs: []uint64{111}})
 	assert.Error(t, err)
 }
 
@@ -296,7 +348,7 @@ func Test_userExampleHandler_List(t *testing.T) {
 	h.MockDao.SQLMock.ExpectQuery("SELECT .*").WillReturnRows(rows)
 
 	result := &gohttp.StdResult{}
-	err := gohttp.Post(result, h.GetRequestURL("List"), &types.GetUserExamplesRequest{query.Params{
+	err := gohttp.Post(result, h.GetRequestURL("List"), &types.ListUserExamplesRequest{query.Params{
 		Page: 0,
 		Size: 10,
 		Sort: "ignore count", // ignore test count
@@ -312,7 +364,7 @@ func Test_userExampleHandler_List(t *testing.T) {
 	err = gohttp.Post(result, h.GetRequestURL("List"), nil)
 
 	// get error test
-	err = gohttp.Post(result, h.GetRequestURL("List"), &types.GetUserExamplesRequest{query.Params{
+	err = gohttp.Post(result, h.GetRequestURL("List"), &types.ListUserExamplesRequest{query.Params{
 		Page: 0,
 		Size: 10,
 	}})

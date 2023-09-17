@@ -121,7 +121,7 @@ func requestIDField(ctx context.Context, requestIDKey string) zap.Field {
 		if v, ok := ctx.Value(requestIDKey).(string); ok {
 			field = zap.String(requestIDKey, v)
 		} else {
-			return zap.Skip()
+			field = zap.Skip()
 		}
 	}
 	return field

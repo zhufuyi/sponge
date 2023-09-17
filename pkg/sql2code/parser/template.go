@@ -49,8 +49,7 @@ import (
 
 	handlerCreateStructTmpl    *template.Template
 	handlerCreateStructTmplRaw = `
-// Create{{.TableName}}Request create params
-// todo fill in the binding rules https://github.com/go-playground/validator
+// Create{{.TableName}}Request request params
 type Create{{.TableName}}Request struct {
 {{- range .Fields}}
 	{{.Name}}  {{.GoType}} ` + "`" + `json:"{{.JSONName}}" binding:""` + "`" + `{{if .Comment}} // {{.Comment}}{{end}}
@@ -60,7 +59,7 @@ type Create{{.TableName}}Request struct {
 
 	handlerUpdateStructTmpl    *template.Template
 	handlerUpdateStructTmplRaw = `
-// Update{{.TableName}}ByIDRequest update params
+// Update{{.TableName}}ByIDRequest request params
 type Update{{.TableName}}ByIDRequest struct {
 {{- range .Fields}}
 	{{.Name}}  {{.GoType}} ` + "`" + `json:"{{.JSONName}}" binding:""` + "`" + `{{if .Comment}} // {{.Comment}}{{end}}
@@ -70,8 +69,8 @@ type Update{{.TableName}}ByIDRequest struct {
 
 	handlerDetailStructTmpl    *template.Template
 	handlerDetailStructTmplRaw = `
-// Get{{.TableName}}ByIDRespond respond detail
-type Get{{.TableName}}ByIDRespond struct {
+// {{.TableName}}ObjDetail detail
+type {{.TableName}}ObjDetail struct {
 {{- range .Fields}}
 	{{.Name}}  {{.GoType}} ` + "`" + `json:"{{.JSONName}}"` + "`" + `{{if .Comment}} // {{.Comment}}{{end}}
 {{- end}}
@@ -110,6 +109,9 @@ service {{.TName}} {
 
   // get {{.TName}} by id
   rpc GetByID(Get{{.TableName}}ByIDRequest) returns (Get{{.TableName}}ByIDReply) {}
+
+  // get {{.TName}} by condition
+  rpc GetByCondition(Get{{.TableName}}ByConditionRequest) returns (Get{{.TableName}}ByConditionReply) {}
 
   // list of {{.TName}} by batch id
   rpc ListByIDs(List{{.TableName}}ByIDsRequest) returns (List{{.TableName}}ByIDsReply) {}
@@ -156,6 +158,14 @@ message Get{{.TableName}}ByIDRequest {
 }
 
 message Get{{.TableName}}ByIDReply {
+  {{.TableName}} {{.TName}} = 1;
+}
+
+message Get{{.TableName}}ByConditionRequest {
+  types.Conditions conditions = 1;
+}
+
+message Get{{.TableName}}ByConditionReply {
   {{.TableName}} {{.TName}} = 1;
 }
 
@@ -300,6 +310,24 @@ service {{.TName}} {
     };
   }
 
+  // get {{.TName}} by condition
+  rpc GetByCondition(Get{{.TableName}}ByConditionRequest) returns (Get{{.TableName}}ByConditionReply) {
+    option (google.api.http) = {
+      post: "/api/v1/{{.TName}}/condition"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "get {{.TName}} detail by condition",
+      description: "get {{.TName}} detail by condition",
+      //security: {
+      //  security_requirement: {
+      //    key: "BearerAuth";
+      //    value: {}
+      //  }
+      //}
+    };
+  }
+
   // list of {{.TName}} by batch id
   rpc ListByIDs(List{{.TableName}}ByIDsRequest) returns (List{{.TableName}}ByIDsReply) {
     option (google.api.http) = {
@@ -383,6 +411,14 @@ message Get{{.TableName}}ByIDRequest {
 }
 
 message Get{{.TableName}}ByIDReply {
+  {{.TableName}} {{.TName}} = 1;
+}
+
+message Get{{.TableName}}ByConditionRequest {
+  types.Conditions conditions = 1;
+}
+
+message Get{{.TableName}}ByConditionReply {
   {{.TableName}} {{.TName}} = 1;
 }
 

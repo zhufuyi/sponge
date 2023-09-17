@@ -205,6 +205,34 @@ func Test_userExampleService_GetByID(t *testing.T) {
 	assert.Error(t, err)
 }
 
+func Test_userExampleService_GetByCondition(t *testing.T) {
+	s := newUserExampleService()
+	defer s.Close()
+	testData := s.TestData.(*model.UserExample)
+
+	rows := sqlmock.NewRows([]string{"id", "created_at", "updated_at"}).
+		AddRow(testData.ID, testData.CreatedAt, testData.UpdatedAt)
+
+	s.MockDao.SQLMock.ExpectQuery("SELECT .*").WillReturnRows(rows)
+
+	reply, err := s.IServiceClient.(serverNameExampleV1.UserExampleClient).GetByCondition(s.Ctx, &serverNameExampleV1.GetUserExampleByConditionRequest{
+		Conditions: &types.Conditions{
+			Columns: []*types.Column{{
+				Name:  "id",
+				Value: "1",
+			}},
+		},
+	})
+	assert.NoError(t, err)
+	t.Log(reply.String())
+
+	// get error test
+	reply, err = s.IServiceClient.(serverNameExampleV1.UserExampleClient).GetByCondition(s.Ctx, &serverNameExampleV1.GetUserExampleByConditionRequest{
+		Conditions: &types.Conditions{},
+	})
+	assert.Error(t, err)
+}
+
 func Test_userExampleService_ListByIDs(t *testing.T) {
 	s := newUserExampleService()
 	defer s.Close()

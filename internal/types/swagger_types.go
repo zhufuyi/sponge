@@ -1,7 +1,8 @@
 package types
 
-// swagger public structures, it is recommended to write comments to all of them,
-// if you use yapi, import swagger.json into yapi and fill in the notes automatically to avoid repeating the comments.
+// This file is public struct, only used to generate swagger documents, it is recommended
+// to write comments to all of them, if you use postman or yapi, import swagger.json
+// into postman or yapi and fill in the notes automatically to avoid repeating the comments.
 
 // Result output data format
 type Result struct {
@@ -12,17 +13,22 @@ type Result struct {
 
 // Params query parameters
 type Params struct {
-	Page int    `form:"page" binding:"gte=0" json:"page"`      // page number, starting from page 0
-	Size int    `form:"size" binding:"gt=0" json:"size"`       // lines per page
-	Sort string `form:"sort" binding:"" json:"sort,omitempty"` // sorted fields, multi-column sorting separated by commas
+	Page int    `json:"page"`           // page number, starting from page 0
+	Size int    `json:"size"`           // lines per page
+	Sort string `json:"sort,omitempty"` // sorted fields, multi-column sorting separated by commas
 
 	Columns []Column `json:"columns,omitempty"` // query conditions
 }
 
-// Column search information
+// Column information
 type Column struct {
 	Name  string      `json:"name"`  // column name
-	Exp   string      `json:"exp"`   // expressions, which default to = when the value is null, have =, ! =, >, >=, <, <=, like
+	Exp   string      `json:"exp"`   // expressions, which default to = when the value is null, have =, !=, >, >=, <, <=, like
 	Value interface{} `json:"value"` // column value
 	Logic string      `json:"logic"` // logical type, defaults to and when value is null, only &(and), ||(or)
+}
+
+// Conditions query conditions
+type Conditions struct {
+	Columns []Column `json:"columns"` // columns info
 }

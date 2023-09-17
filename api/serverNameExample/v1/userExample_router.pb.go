@@ -17,6 +17,7 @@ type UserExampleLogicer interface {
 	Create(ctx context.Context, req *CreateUserExampleRequest) (*CreateUserExampleReply, error)
 	DeleteByID(ctx context.Context, req *DeleteUserExampleByIDRequest) (*DeleteUserExampleByIDReply, error)
 	DeleteByIDs(ctx context.Context, req *DeleteUserExampleByIDsRequest) (*DeleteUserExampleByIDsReply, error)
+	GetByCondition(ctx context.Context, req *GetUserExampleByConditionRequest) (*GetUserExampleByConditionReply, error)
 	GetByID(ctx context.Context, req *GetUserExampleByIDRequest) (*GetUserExampleByIDReply, error)
 	List(ctx context.Context, req *ListUserExampleRequest) (*ListUserExampleReply, error)
 	ListByIDs(ctx context.Context, req *ListUserExampleByIDsRequest) (*ListUserExampleByIDsReply, error)
@@ -127,6 +128,7 @@ func (r *userExampleRouter) register() {
 	r.iRouter.Handle("POST", "/api/v1/userExample/delete/ids", r.withMiddleware("POST", "/api/v1/userExample/delete/ids", r.DeleteByIDs_0)...)
 	r.iRouter.Handle("PUT", "/api/v1/userExample/:id", r.withMiddleware("PUT", "/api/v1/userExample/:id", r.UpdateByID_0)...)
 	r.iRouter.Handle("GET", "/api/v1/userExample/:id", r.withMiddleware("GET", "/api/v1/userExample/:id", r.GetByID_0)...)
+	r.iRouter.Handle("POST", "/api/v1/userExample/condition", r.withMiddleware("POST", "/api/v1/userExample/condition", r.GetByCondition_0)...)
 	r.iRouter.Handle("POST", "/api/v1/userExample/list/ids", r.withMiddleware("POST", "/api/v1/userExample/list/ids", r.ListByIDs_0)...)
 	r.iRouter.Handle("POST", "/api/v1/userExample/list", r.withMiddleware("POST", "/api/v1/userExample/list", r.List_0)...)
 
@@ -299,6 +301,32 @@ func (r *userExampleRouter) GetByID_0(c *gin.Context) {
 	}
 
 	out, err := r.iLogic.GetByID(ctx, req)
+	if err != nil {
+		r.iResponse.Error(c, err)
+		return
+	}
+
+	r.iResponse.Success(c, out)
+}
+
+func (r *userExampleRouter) GetByCondition_0(c *gin.Context) {
+	req := &GetUserExampleByConditionRequest{}
+	var err error
+
+	if err = c.ShouldBindJSON(req); err != nil {
+		r.zapLog.Warn("ShouldBindJSON error", zap.Error(err), middleware.GCtxRequestIDField(c))
+		r.iResponse.ParamError(c, err)
+		return
+	}
+
+	var ctx context.Context
+	if r.wrapCtxFn != nil {
+		ctx = r.wrapCtxFn(c)
+	} else {
+		ctx = c
+	}
+
+	out, err := r.iLogic.GetByCondition(ctx, req)
 	if err != nil {
 		r.iResponse.Error(c, err)
 		return

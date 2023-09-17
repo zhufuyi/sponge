@@ -41,6 +41,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 };
 
 service userExample {
+  // create userExample
   rpc Create(CreateUserExampleRequest) returns (CreateUserExampleReply) {
     option (google.api.http) = {
       post: "/api/v1/userExample"
@@ -52,6 +53,7 @@ service userExample {
     };
   }
 
+  // delete userExample by id
   rpc DeleteByID(DeleteUserExampleByIDRequest) returns (DeleteUserExampleByIDReply) {
     option (google.api.http) = {
       delete: "/api/v1/userExample/{id}"
@@ -68,6 +70,7 @@ service userExample {
     };
   }
 
+  // delete userExample by batch id
   rpc DeleteByIDs(DeleteUserExampleByIDsRequest) returns (DeleteUserExampleByIDsReply) {
     option (google.api.http) = {
       post: "/api/v1/userExample/delete/ids"
@@ -85,6 +88,7 @@ service userExample {
     };
   }
 
+  // update userExample by id
   rpc UpdateByID(UpdateUserExampleByIDRequest) returns (UpdateUserExampleByIDReply) {
     option (google.api.http) = {
       put: "/api/v1/userExample/{id}"
@@ -102,6 +106,7 @@ service userExample {
     };
   }
 
+  // get userExample by id
   rpc GetByID(GetUserExampleByIDRequest) returns (GetUserExampleByIDReply) {
     option (google.api.http) = {
       get: "/api/v1/userExample/{id}"
@@ -118,6 +123,25 @@ service userExample {
     };
   }
 
+  // get userExample by condition
+  rpc GetByCondition(GetUserExampleByConditionRequest) returns (GetUserExampleByConditionReply) {
+    option (google.api.http) = {
+      post: "/api/v1/userExample/condition"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "get userExample by condition",
+      description: "get userExample by condition",
+      //security: {
+      //  security_requirement: {
+      //    key: "BearerAuth";
+      //    value: {}
+      //  }
+      //}
+    };
+  }
+
+  // list of userExample by batch id
   rpc ListByIDs(ListUserExampleByIDsRequest) returns (ListUserExampleByIDsReply) {
     option (google.api.http) = {
       post: "/api/v1/userExample/list/ids"
@@ -135,6 +159,7 @@ service userExample {
     };
   }
 
+  // list of userExample by query parameters
   rpc List(ListUserExampleRequest) returns (ListUserExampleReply) {
     option (google.api.http) = {
       post: "/api/v1/userExample/list"
@@ -236,6 +261,14 @@ message GetUserExampleByIDRequest {
 }
 
 message GetUserExampleByIDReply {
+  UserExample userExample = 1;
+}
+
+message GetUserExampleByConditionRequest {
+  types.Conditions conditions = 1 [(validate.rules).message.required = true];
+}
+
+message GetUserExampleByConditionReply {
   UserExample userExample = 1;
 }
 

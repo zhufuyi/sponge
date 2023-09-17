@@ -16,6 +16,12 @@ const (
 	ContextRequestIDKey = "request_id"
 )
 
+// CtxKeyString for context.WithValue key type
+type CtxKeyString string
+
+// RequestIDKey "request_id"
+var RequestIDKey = CtxKeyString(ContextRequestIDKey)
+
 // ---------------------------------- client interceptor ----------------------------------
 
 // ClientCtxRequestID get request id from rpc client context.Context

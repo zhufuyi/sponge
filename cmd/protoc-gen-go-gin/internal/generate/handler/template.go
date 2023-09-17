@@ -72,6 +72,7 @@ func (h *{{.LowerServiceName}}Handler) {{.MethodName}}(ctx context.Context, req 
 	//		    return nil, ecode.InvalidParams.Err()
 	//	    }
 	//
+	// 	ctx = context.WithValue(c.Request.Context(), middleware.ContextRequestIDKey, middleware.GCtxRequestID(c))
 	// 	reply, err := h.{{.LowerServiceName}}Dao.{{.MethodName}}(ctx, &model.{{.ServiceName}}{
 {{- range .RequestFields}}
 	//     	{{.Name}}: req.{{.Name}},

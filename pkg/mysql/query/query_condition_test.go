@@ -1,6 +1,7 @@
 package query
 
 import (
+	"github.com/stretchr/testify/assert"
 	"reflect"
 	"strings"
 	"testing"
@@ -519,4 +520,84 @@ func Test_getExpsAndLogics(t *testing.T) {
 			t.Logf("%+v  %+v", got, got1)
 		})
 	}
+}
+
+func TestConditions_ConvertToGorm(t *testing.T) {
+	c := Conditions{
+		Columns: []Column{
+			{
+				Name:  "name",
+				Value: "ZhangSan",
+			},
+			{
+				Name:  "gender",
+				Value: "male",
+			},
+		}}
+	str, values, err := c.ConvertToGorm()
+	if err != nil {
+		t.Error(err)
+	}
+	assert.Equal(t, "name = ? AND gender = ?", str)
+	assert.Equal(t, len(values), 2)
+}
+
+func TestConditions_checkValid(t *testing.T) {
+	// empty error
+	c := Conditions{}
+	err := c.CheckValid()
+	assert.Error(t, err)
+
+	// value is empty error
+	c = Conditions{
+		Columns: []Column{
+			{
+				Name:  "foo",
+				Value: nil,
+			},
+		},
+	}
+	err = c.CheckValid()
+	assert.Error(t, err)
+
+	// exp error
+	c = Conditions{
+		Columns: []Column{
+			{
+				Name:  "foo",
+				Value: "bar",
+				Exp:   "unknown-exp",
+			},
+		},
+	}
+	err = c.CheckValid()
+	assert.Error(t, err)
+
+	// logic error
+	c = Conditions{
+		Columns: []Column{
+			{
+				Name:  "foo",
+				Value: "bar",
+				Logic: "unknown-logic",
+			},
+		},
+	}
+	err = c.CheckValid()
+	assert.Error(t, err)
+
+	// success
+	c = Conditions{
+		Columns: []Column{
+			{
+				Name:  "name",
+				Value: "ZhangSan",
+			},
+			{
+				Name:  "gender",
+				Value: "male",
+			},
+		}}
+	err = c.CheckValid()
+	assert.NoError(t, err)
 }

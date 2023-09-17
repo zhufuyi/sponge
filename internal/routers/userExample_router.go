@@ -73,4 +73,6 @@ func userExampleMiddlewares(c *middlewareConfig) {
 	//c.setSinglePath("GET", "/api/v1/userExample/:id", middleware.Auth())
 	//c.setSinglePath("POST", "/api/v1/userExample/list/ids", middleware.Auth())
 	//c.setSinglePath("POST", "/api/v1/userExample/list", middleware.Auth())
+	//c.setSinglePath("POST", "/api/v1/userExample", middleware.Auth())
+	//c.setSinglePath("POST", "/api/v1/userExample/condition", middleware.Auth())
 }

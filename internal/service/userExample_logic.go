@@ -52,6 +52,12 @@ func (c *userExampleClient) GetByID(ctx context.Context, req *serverNameExampleV
 	return c.userExampleCli.GetByID(ctx, req)
 }
 
+func (c *userExampleClient) GetByCondition(ctx context.Context, req *serverNameExampleV1.GetUserExampleByConditionRequest) (*serverNameExampleV1.GetUserExampleByConditionReply, error) {
+	// implement me
+	// If required, fill in the code to fetch data from other rpc servers here.
+	return c.userExampleCli.GetByCondition(ctx, req)
+}
+
 func (c *userExampleClient) ListByIDs(ctx context.Context, req *serverNameExampleV1.ListUserExampleByIDsRequest) (*serverNameExampleV1.ListUserExampleByIDsReply, error) {
 	// implement me
 	// If required, fill in the code to fetch data from other rpc servers here.

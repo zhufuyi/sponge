@@ -1,10 +1,10 @@
 package mysql
 
 import (
-	"gorm.io/gorm/logger"
 	"time"
 
 	"go.uber.org/zap"
+	"gorm.io/gorm/logger"
 )
 
 // Option set the mysql options.

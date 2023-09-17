@@ -22,12 +22,21 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserExampleClient interface {
+	// create userExample
 	Create(ctx context.Context, in *CreateUserExampleRequest, opts ...grpc.CallOption) (*CreateUserExampleReply, error)
+	// delete userExample by id
 	DeleteByID(ctx context.Context, in *DeleteUserExampleByIDRequest, opts ...grpc.CallOption) (*DeleteUserExampleByIDReply, error)
+	// delete userExample by batch id
 	DeleteByIDs(ctx context.Context, in *DeleteUserExampleByIDsRequest, opts ...grpc.CallOption) (*DeleteUserExampleByIDsReply, error)
+	// update userExample by id
 	UpdateByID(ctx context.Context, in *UpdateUserExampleByIDRequest, opts ...grpc.CallOption) (*UpdateUserExampleByIDReply, error)
+	// get userExample by id
 	GetByID(ctx context.Context, in *GetUserExampleByIDRequest, opts ...grpc.CallOption) (*GetUserExampleByIDReply, error)
+	// get userExample by condition
+	GetByCondition(ctx context.Context, in *GetUserExampleByConditionRequest, opts ...grpc.CallOption) (*GetUserExampleByConditionReply, error)
+	// list of userExample by batch id
 	ListByIDs(ctx context.Context, in *ListUserExampleByIDsRequest, opts ...grpc.CallOption) (*ListUserExampleByIDsReply, error)
+	// list of userExample by query parameters
 	List(ctx context.Context, in *ListUserExampleRequest, opts ...grpc.CallOption) (*ListUserExampleReply, error)
 }
 
@@ -84,6 +93,15 @@ func (c *userExampleClient) GetByID(ctx context.Context, in *GetUserExampleByIDR
 	return out, nil
 }
 
+func (c *userExampleClient) GetByCondition(ctx context.Context, in *GetUserExampleByConditionRequest, opts ...grpc.CallOption) (*GetUserExampleByConditionReply, error) {
+	out := new(GetUserExampleByConditionReply)
+	err := c.cc.Invoke(ctx, "/api.serverNameExample.v1.userExample/GetByCondition", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *userExampleClient) ListByIDs(ctx context.Context, in *ListUserExampleByIDsRequest, opts ...grpc.CallOption) (*ListUserExampleByIDsReply, error) {
 	out := new(ListUserExampleByIDsReply)
 	err := c.cc.Invoke(ctx, "/api.serverNameExample.v1.userExample/ListByIDs", in, out, opts...)
@@ -106,12 +124,21 @@ func (c *userExampleClient) List(ctx context.Context, in *ListUserExampleRequest
 // All implementations must embed UnimplementedUserExampleServer
 // for forward compatibility
 type UserExampleServer interface {
+	// create userExample
 	Create(context.Context, *CreateUserExampleRequest) (*CreateUserExampleReply, error)
+	// delete userExample by id
 	DeleteByID(context.Context, *DeleteUserExampleByIDRequest) (*DeleteUserExampleByIDReply, error)
+	// delete userExample by batch id
 	DeleteByIDs(context.Context, *DeleteUserExampleByIDsRequest) (*DeleteUserExampleByIDsReply, error)
+	// update userExample by id
 	UpdateByID(context.Context, *UpdateUserExampleByIDRequest) (*UpdateUserExampleByIDReply, error)
+	// get userExample by id
 	GetByID(context.Context, *GetUserExampleByIDRequest) (*GetUserExampleByIDReply, error)
+	// get userExample by condition
+	GetByCondition(context.Context, *GetUserExampleByConditionRequest) (*GetUserExampleByConditionReply, error)
+	// list of userExample by batch id
 	ListByIDs(context.Context, *ListUserExampleByIDsRequest) (*ListUserExampleByIDsReply, error)
+	// list of userExample by query parameters
 	List(context.Context, *ListUserExampleRequest) (*ListUserExampleReply, error)
 	mustEmbedUnimplementedUserExampleServer()
 }
@@ -134,6 +161,9 @@ func (UnimplementedUserExampleServer) UpdateByID(context.Context, *UpdateUserExa
 }
 func (UnimplementedUserExampleServer) GetByID(context.Context, *GetUserExampleByIDRequest) (*GetUserExampleByIDReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetByID not implemented")
+}
+func (UnimplementedUserExampleServer) GetByCondition(context.Context, *GetUserExampleByConditionRequest) (*GetUserExampleByConditionReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetByCondition not implemented")
 }
 func (UnimplementedUserExampleServer) ListByIDs(context.Context, *ListUserExampleByIDsRequest) (*ListUserExampleByIDsReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListByIDs not implemented")
@@ -244,6 +274,24 @@ func _UserExample_GetByID_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserExample_GetByCondition_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserExampleByConditionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserExampleServer).GetByCondition(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.serverNameExample.v1.userExample/GetByCondition",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserExampleServer).GetByCondition(ctx, req.(*GetUserExampleByConditionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _UserExample_ListByIDs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListUserExampleByIDsRequest)
 	if err := dec(in); err != nil {
@@ -306,6 +354,10 @@ var UserExample_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetByID",
 			Handler:    _UserExample_GetByID_Handler,
+		},
+		{
+			MethodName: "GetByCondition",
+			Handler:    _UserExample_GetByCondition_Handler,
 		},
 		{
 			MethodName: "ListByIDs",

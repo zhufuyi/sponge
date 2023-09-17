@@ -90,6 +90,7 @@ func (s *{{.LowerServiceName}}) {{.MethodName}}(ctx context.Context, req *server
 	//		    return nil, ecode.StatusInvalidParams.Err()
 	//	    }
     //
+    // 	ctx = context.WithValue(ctx, interceptor.ContextRequestIDKey, interceptor.ServerCtxRequestID(ctx))
 	// 	reply, err := s.iDao.{{.MethodName}}(ctx, &model.{{.ServiceName}}{
 {{- range .RequestFields}}
 	//     	{{.Name}}: req.{{.Name}},

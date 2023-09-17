@@ -75,6 +75,10 @@ func (m mockGw) GetByID(ctx context.Context, req *serverNameExampleV1.GetUserExa
 	return nil, nil
 }
 
+func (m mockGw) GetByCondition(ctx context.Context, req *serverNameExampleV1.GetUserExampleByConditionRequest) (*serverNameExampleV1.GetUserExampleByConditionReply, error) {
+	return nil, nil
+}
+
 func (m mockGw) List(ctx context.Context, req *serverNameExampleV1.ListUserExampleRequest) (*serverNameExampleV1.ListUserExampleReply, error) {
 	return nil, nil
 }

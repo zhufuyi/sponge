@@ -44,7 +44,41 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/types.Result"
+                            "$ref": "#/definitions/types.CreateUserExampleRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/userExample/condition": {
+            "post": {
+                "description": "get userExample by condition",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "userExample"
+                ],
+                "summary": "get userExample by condition",
+                "parameters": [
+                    {
+                        "description": "query condition",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.Conditions"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.GetUserExampleByConditionRespond"
                         }
                     }
                 }
@@ -78,7 +112,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/types.Result"
+                            "$ref": "#/definitions/types.DeleteUserExamplesByIDsRespond"
                         }
                     }
                 }
@@ -112,7 +146,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/types.Result"
+                            "$ref": "#/definitions/types.ListUserExamplesRespond"
                         }
                     }
                 }
@@ -138,7 +172,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/types.GetUserExamplesByIDsRequest"
+                            "$ref": "#/definitions/types.ListUserExamplesByIDsRequest"
                         }
                     }
                 ],
@@ -146,7 +180,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/types.Result"
+                            "$ref": "#/definitions/types.ListUserExamplesByIDsRespond"
                         }
                     }
                 }
@@ -178,7 +212,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/types.Result"
+                            "$ref": "#/definitions/types.GetUserExampleByIDRespond"
                         }
                     }
                 }
@@ -217,7 +251,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/types.Result"
+                            "$ref": "#/definitions/types.UpdateUserExampleByIDRespond"
                         }
                     }
                 }
@@ -247,7 +281,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/types.Result"
+                            "$ref": "#/definitions/types.DeleteUserExampleByIDRespond"
                         }
                     }
                 }
@@ -330,7 +364,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "exp": {
-                    "description": "expressions, which default to = when the value is null, have =, ! =, \u003e, \u003e=, \u003c, \u003c=, like",
+                    "description": "expressions, which default to = when the value is null, have =, !=, \u003e, \u003e=, \u003c, \u003c=, like",
                     "type": "string"
                 },
                 "logic": {
@@ -358,8 +392,7 @@ const docTemplate = `{
                 },
                 "page": {
                     "description": "page number, starting from page 0",
-                    "type": "integer",
-                    "minimum": 0
+                    "type": "integer"
                 },
                 "size": {
                     "description": "lines per page",
@@ -379,6 +412,18 @@ const docTemplate = `{
                 },
                 "status": {
                     "type": "string"
+                }
+            }
+        },
+        "types.Conditions": {
+            "type": "object",
+            "properties": {
+                "columns": {
+                    "description": "columns info",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_zhufuyi_sponge_internal_types.Column"
+                    }
                 }
             }
         },
@@ -414,7 +459,46 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "phone": {
-                    "description": "phone number, e164 means \u003c+ country code\u003e \u003ccell phone number\u003e.",
+                    "description": "phone number, e164 rules, e.g. +8612345678901",
+                    "type": "string"
+                }
+            }
+        },
+        "types.CreateUserExampleRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "description": "id",
+                            "type": "integer"
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.DeleteUserExampleByIDRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data"
+                },
+                "msg": {
+                    "description": "return information description",
                     "type": "string"
                 }
             }
@@ -432,7 +516,67 @@ const docTemplate = `{
                 }
             }
         },
-        "types.GetUserExamplesByIDsRequest": {
+        "types.DeleteUserExamplesByIDsRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data"
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.GetUserExampleByConditionRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "userExample": {
+                            "$ref": "#/definitions/types.UserExampleObjDetail"
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.GetUserExampleByIDRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "userExample": {
+                            "$ref": "#/definitions/types.UserExampleObjDetail"
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.ListUserExamplesByIDsRequest": {
             "type": "object",
             "properties": {
                 "ids": {
@@ -445,7 +589,7 @@ const docTemplate = `{
                 }
             }
         },
-        "types.Result": {
+        "types.ListUserExamplesByIDsRespond": {
             "type": "object",
             "properties": {
                 "code": {
@@ -453,7 +597,41 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "data": {
-                    "description": "return data"
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "userExamples": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.UserExampleObjDetail"
+                            }
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.ListUserExamplesRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "userExamples": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.UserExampleObjDetail"
+                            }
+                        }
+                    }
                 },
                 "msg": {
                     "description": "return information description",
@@ -494,6 +672,71 @@ const docTemplate = `{
                 },
                 "phone": {
                     "description": "phone number",
+                    "type": "string"
+                }
+            }
+        },
+        "types.UpdateUserExampleByIDRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data"
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.UserExampleObjDetail": {
+            "type": "object",
+            "properties": {
+                "age": {
+                    "description": "age",
+                    "type": "integer"
+                },
+                "avatar": {
+                    "description": "avatar",
+                    "type": "string"
+                },
+                "createdAt": {
+                    "description": "create time",
+                    "type": "string"
+                },
+                "email": {
+                    "description": "email",
+                    "type": "string"
+                },
+                "gender": {
+                    "description": "gender, 1:Male, 2:Female, other values:unknown",
+                    "type": "integer"
+                },
+                "id": {
+                    "description": "id",
+                    "type": "string"
+                },
+                "loginAt": {
+                    "description": "login timestamp",
+                    "type": "integer"
+                },
+                "name": {
+                    "description": "username",
+                    "type": "string"
+                },
+                "phone": {
+                    "description": "phone number",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "account status, 1:inactive, 2:activated, 3:blocked",
+                    "type": "integer"
+                },
+                "updatedAt": {
+                    "description": "update time",
                     "type": "string"
                 }
             }

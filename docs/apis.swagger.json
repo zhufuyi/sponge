@@ -55,6 +55,40 @@
         ]
       }
     },
+    "/api/v1/userExample/condition": {
+      "post": {
+        "summary": "get userExample by condition",
+        "description": "get userExample by condition",
+        "operationId": "userExample_GetByCondition",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetUserExampleByConditionReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1GetUserExampleByConditionRequest"
+            }
+          }
+        ],
+        "tags": [
+          "userExample"
+        ]
+      }
+    },
     "/api/v1/userExample/delete/ids": {
       "post": {
         "summary": "delete userExamples",
@@ -338,6 +372,17 @@
         }
       }
     },
+    "typesConditions": {
+      "type": "object",
+      "properties": {
+        "columns": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/typesColumn"
+          }
+        }
+      }
+    },
     "typesParams": {
       "type": "object",
       "properties": {
@@ -422,6 +467,22 @@
         "FEMALE"
       ],
       "default": "UNKNOWN"
+    },
+    "v1GetUserExampleByConditionReply": {
+      "type": "object",
+      "properties": {
+        "userExample": {
+          "$ref": "#/definitions/v1UserExample"
+        }
+      }
+    },
+    "v1GetUserExampleByConditionRequest": {
+      "type": "object",
+      "properties": {
+        "conditions": {
+          "$ref": "#/definitions/typesConditions"
+        }
+      }
     },
     "v1GetUserExampleByIDReply": {
       "type": "object",

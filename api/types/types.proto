@@ -13,7 +13,11 @@ message Params {
 
 message Column {
   string  name = 1;  // column name
-  string  exp = 2;   // expressions, which default to = when the value is null, have =, ! =, >, >=, <, <=, like
+  string  exp = 2;   // expressions, which default to = when the value is null, have =, !=, >, >=, <, <=, like
   string value = 3; // column value
   string  logic = 4; // logical type, defaults to and when value is null, only &(and), ||(or)
+}
+
+message Conditions {
+  repeated Column columns = 1; // query conditions
 }
