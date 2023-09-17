@@ -130,7 +130,7 @@ func runGenServiceCommand(moduleName string, serverName string, codes map[string
 		"userExample.pb.go", "userExample.pb.validate.go", "userExample_grpc.pb.go", "userExample_router.pb.go", // api/serverNameExample
 		"systemCode_http.go", "systemCode_rpc.go", "userExample_http.go", // internal/ecode
 		"init.go", "init_test.go", // internal/model
-		"service.go", "service_test.go", "userExample_logic.go", "userExample_logic_test.go", // internal/service
+		"service.go", "service_test.go", "userExample_logic.go", "userExample_logic_test.go", "service/userExample_test.go", // internal/service
 		"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", // internal/cache
 	}
 

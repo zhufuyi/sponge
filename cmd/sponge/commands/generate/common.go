@@ -123,7 +123,7 @@ func idTypeFixToUint64(handlerCodes string) string {
 }
 
 func idTypeToStr(handlerCodes string) string {
-	subStart := "ByIDRespond struct {"
+	subStart := "ObjDetail struct {"
 	subEnd := "`" + `json:"id"` + "`"
 	if subBytes := gofile.FindSubBytesNotIn([]byte(handlerCodes), []byte(subStart), []byte(subEnd)); len(subBytes) > 0 {
 		old := subStart + string(subBytes) + subEnd

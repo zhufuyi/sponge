@@ -150,7 +150,7 @@ func runGenRPCCommand(moduleName string, serverName string, projectName string, 
 		"userExample.pb.go", "userExample.pb.validate.go", "userExample_grpc.pb.go", "userExample_router.pb.go", // api/serverNameExample/v1
 		"userExample_http.go", "systemCode_http.go", // internal/ecode
 		"http.go", "http_option.go", "http_test.go", // internal/server
-		"userExample_logic.go", "userExample_logic_test.go", "userExample_test.go", // internal/service
+		"userExample_logic.go", "userExample_logic_test.go", "service/userExample_test.go", // internal/service
 		"scripts/swag-docs.sh",                                      // sponge/scripts
 		"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", // internal/cache
 	}
