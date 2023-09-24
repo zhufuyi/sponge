@@ -75,9 +75,9 @@ docs: mod fmt
 
 
 .PHONY: proto
-# generate *.go code from *.proto files, only for ⓶ Microservices created based on sql, ⓷ Web services created based on protobuf, ⓸ Microservices created based on protobuf, ⓹ RPC gateway service created based on protobuf
+# generate *.go and template code by proto files, if you do not refer to the proto file, the default is all the proto files in the api directory. you can specify the proto file, multiple files are separated by commas, e.g. make proto FILES=api/user/v1/user.proto. only for ⓶ Microservices created based on sql, ⓷ Web services created based on protobuf, ⓸ Microservices created based on protobuf, ⓹ RPC gateway service created based on protobuf
 proto: mod fmt
-	@bash scripts/protoc.sh
+	@bash scripts/protoc.sh $(FILES)
 
 
 .PHONY: proto-doc
