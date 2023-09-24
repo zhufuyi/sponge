@@ -61,6 +61,11 @@ func Errorf(format string, a ...interface{}) {
 //	getLogger().Fatal(fmt.Sprintf(format, a...))
 //}
 
+// Sync flushing any buffered log entries, applications should take care to call Sync before exiting.
+func Sync() error {
+	return getLogger().Sync()
+}
+
 // WithFields carrying field information
 func WithFields(fields ...Field) *zap.Logger {
 	return getLogger().With(fields...)

@@ -21,6 +21,7 @@ func printInfo() {
 	Error("this is error")
 	Errorf("this is error %d", 2)
 	WithFields(Int("key", 2)).Info("this is info")
+	_ = Sync()
 
 	type people struct {
 		Name string `json:"name"`
@@ -29,7 +30,7 @@ func printInfo() {
 	p := &people{"Mr Zhang", 11}
 	ps := []people{{"Mr Zhang", 11}, {"Mr Li", 12}}
 	pMap := map[string]*people{"123": p, "456": p}
-	Info("this is debug object", Any("object1", p), Any("object2", ps), Any("object3", pMap)) // this sentence cannot be printed using debug
+	Info("this is info object", Any("object1", p), Any("object2", ps), Any("object3", pMap)) // this sentence cannot be printed using debug
 
 	Panic("this is panic")
 }

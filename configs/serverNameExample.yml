@@ -88,7 +88,7 @@ mysql:
 
 # redis settings
 redis:
-  # dsn format, [user]:<pass>@]127.0.0.1:6379/[db], the default user is default
+  # dsn format, [user]:<pass>@127.0.0.1:6379/[db], the default user is default, redis version 6.0 and above only supports user.
   dsn: "default:123456@192.168.3.37:6379/0"
   dialTimeout: 10        # connection timeout, unit(second)
   readTimeout: 2        # read timeout, unit(second)
