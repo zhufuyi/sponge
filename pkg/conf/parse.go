@@ -95,6 +95,11 @@ func hideSensitiveFields(line string, fields ...string) string {
 		}
 	}
 
+	// replace dsn
+	if strings.Contains(line, "@") && strings.Contains(line, ":") {
+		return replaceDSN(line)
+	}
+
 	return line
 }
 

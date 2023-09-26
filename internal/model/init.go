@@ -53,6 +53,15 @@ func InitMysql() {
 		opts = append(opts, mysql.WithEnableTrace())
 	}
 
+	// setting mysql slave and master dsn addresses
+	//opts = append(opts, mysql.WithRWSeparation(
+	//	config.Get().Mysql.SlavesDsn,
+	//	config.Get().Mysql.MastersDsn...,
+	//))
+
+	// add custom gorm plugin
+	//opts = append(opts, mysql.WithGormPlugin(yourPlugin))
+
 	var err error
 	db, err = mysql.Init(config.Get().Mysql.Dsn, opts...)
 	if err != nil {

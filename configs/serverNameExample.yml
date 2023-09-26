@@ -84,6 +84,11 @@ mysql:
   maxIdleConns: 3                  # set the maximum number of connections in the idle connection pool
   maxOpenConns: 100            # set the maximum number of open database connections
   connMaxLifetime: 30            # sets the maximum time for which the connection can be reused, in minutes
+  #slavesDsn:                          # sets slaves mysql dsn, array type
+  #  - "your slave dsn 1"
+  #  - "your slave dsn 2"
+  #mastersDsn:                        # sets masters mysql dsn, array type, non-required field, if there is only one master, there is no need to set the mastersDsn field, the default dsn field is mysql master.
+  #  - "your master dsn"
 
 
 # redis settings

@@ -63,7 +63,8 @@ func Errorf(format string, a ...interface{}) {
 
 // Sync flushing any buffered log entries, applications should take care to call Sync before exiting.
 func Sync() error {
-	return getLogger().Sync()
+	//return getLogger().Sync()
+	return nil
 }
 
 // WithFields carrying field information

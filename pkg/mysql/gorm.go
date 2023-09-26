@@ -12,6 +12,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
+	"gorm.io/plugin/dbresolver"
 )
 
 // Init mysql
@@ -33,10 +34,27 @@ func Init(dns string, opts ...Option) (*gorm.DB, error) {
 	}
 	db.Set("gorm:table_options", "CHARSET=utf8mb4") // automatic appending of table suffixes when creating tables
 
+	// register trace plugin
 	if o.enableTrace {
 		err = db.Use(otelgorm.NewPlugin())
 		if err != nil {
 			return nil, fmt.Errorf("using gorm opentelemetry, err: %v", err)
+		}
+	}
+
+	// register read-write separation plugin
+	if len(o.slavesDsn) > 0 {
+		err = db.Use(rwSeparationPlugin(o))
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	// register plugins
+	for _, plugin := range o.plugins {
+		err = db.Use(plugin)
+		if err != nil {
+			return nil, err
 		}
 	}
 
@@ -76,4 +94,26 @@ func gormConfig(o *options) *gorm.Config {
 	}
 
 	return config
+}
+
+func rwSeparationPlugin(o *options) gorm.Plugin {
+	slaves := []gorm.Dialector{}
+	for _, dsn := range o.slavesDsn {
+		slaves = append(slaves, mysqlDriver.New(mysqlDriver.Config{
+			DSN: dsn,
+		}))
+	}
+
+	masters := []gorm.Dialector{}
+	for _, dsn := range o.mastersDsn {
+		masters = append(masters, mysqlDriver.New(mysqlDriver.Config{
+			DSN: dsn,
+		}))
+	}
+
+	return dbresolver.Register(dbresolver.Config{
+		Sources:  masters,
+		Replicas: slaves,
+		Policy:   dbresolver.RandomPolicy{},
+	})
 }

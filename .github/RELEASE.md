@@ -1,5 +1,5 @@
 ## Change log
 
-- Add request_id to gorm print sql log.
-- Add a new arbitrary condition query api interface in web and microservices.
-- Update documentation.
+- The make proto command supports code generation for a given proto file.
+- Gorm supports master-slave configuration and custom plugins.
+- Logger library add sync function.

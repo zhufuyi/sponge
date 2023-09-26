@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
 
@@ -24,6 +25,11 @@ type options struct {
 	requestIDKey string
 	gLog         *zap.Logger
 	logLevel     logger.LogLevel
+
+	slavesDsn  []string
+	mastersDsn []string
+
+	plugins []gorm.Plugin
 }
 
 func (o *options) apply(opts ...Option) {
@@ -120,5 +126,20 @@ func WithLogRequestIDKey(key string) Option {
 			key = "request_id"
 		}
 		o.requestIDKey = key
+	}
+}
+
+// WithRWSeparation setting read-write separation
+func WithRWSeparation(slavesDsn []string, mastersDsn ...string) Option {
+	return func(o *options) {
+		o.slavesDsn = slavesDsn
+		o.mastersDsn = mastersDsn
+	}
+}
+
+// WithGormPlugin setting gorm plugin
+func WithGormPlugin(plugins ...gorm.Plugin) Option {
+	return func(o *options) {
+		o.plugins = plugins
 	}
 }

@@ -40,6 +40,9 @@ func Test_hideSensitiveFields(t *testing.T) {
 	str := Show(c, keywords...)
 
 	fmt.Printf(hideSensitiveFields(str))
+
+	str = "\ndefault:123456@192.168.3.37:6379/0\n"
+	fmt.Printf(hideSensitiveFields(str))
 }
 
 // test listening for profile updates

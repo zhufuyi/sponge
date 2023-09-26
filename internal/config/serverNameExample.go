@@ -103,12 +103,14 @@ type GrpcClient struct {
 }
 
 type Mysql struct {
-	ConnMaxLifetime int    `yaml:"connMaxLifetime" json:"connMaxLifetime"`
-	Dsn             string `yaml:"dsn" json:"dsn"`
-	EnableLog       bool   `yaml:"enableLog" json:"enableLog"`
-	MaxIdleConns    int    `yaml:"maxIdleConns" json:"maxIdleConns"`
-	MaxOpenConns    int    `yaml:"maxOpenConns" json:"maxOpenConns"`
-	SlowThreshold   int    `yaml:"slowThreshold" json:"slowThreshold"`
+	ConnMaxLifetime int      `yaml:"connMaxLifetime" json:"connMaxLifetime"`
+	Dsn             string   `yaml:"dsn" json:"dsn"`
+	EnableLog       bool     `yaml:"enableLog" json:"enableLog"`
+	MastersDsn      []string `yaml:"mastersDsn" json:"mastersDsn"`
+	MaxIdleConns    int      `yaml:"maxIdleConns" json:"maxIdleConns"`
+	MaxOpenConns    int      `yaml:"maxOpenConns" json:"maxOpenConns"`
+	SlavesDsn       []string `yaml:"slavesDsn" json:"slavesDsn"`
+	SlowThreshold   int      `yaml:"slowThreshold" json:"slowThreshold"`
 }
 
 type Redis struct {
