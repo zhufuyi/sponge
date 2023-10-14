@@ -16,7 +16,7 @@ require (
 	github.com/go-redis/redis/extra/redisotel v0.3.0
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/go-sql-driver/mysql v1.7.0
-	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/golang-jwt/jwt/v5 v5.0.0
 	github.com/golang/snappy v0.0.3
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
@@ -28,6 +28,7 @@ require (
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.13.0
+	github.com/rabbitmq/amqp091-go v1.9.0
 	github.com/shirou/gopsutil/v3 v3.23.8
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/viper v1.12.0
@@ -53,6 +54,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/driver/mysql v1.5.1
 	gorm.io/gorm v1.25.4
+	gorm.io/plugin/dbresolver v1.4.7
 )
 
 require (
@@ -172,5 +174,4 @@ require (
 	gopkg.in/ini.v1 v1.66.4 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	gorm.io/plugin/dbresolver v1.4.7 // indirect
 )

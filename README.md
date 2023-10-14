@@ -1,4 +1,4 @@
-## sponge [中文](assets/readme-cn.md)
+## English | [简体中文](assets/readme-cn.md)
 
 <p align="center">
 <img width="500px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/logo.png">
@@ -58,7 +58,7 @@ Egg model profiling diagram for `⓷Web services created based on protobuf`:
 <img width="1200px" src="https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/en_web-http-pb-anatomy.png">
 </p>
 
-This is the egg model for web service code, and there are egg models for microservice (gRPC) code, and rpc gateway service code described in [sponge documentation](https://go-sponge.com/).
+This is the egg model for web service code, and there are egg models for microservice (gRPC) code, and rpc gateway service code described in [sponge documentation](https://go-sponge.com/learn-about-sponge?id=%f0%9f%8f%b7project-code-egg-model).
 
 <br>
 

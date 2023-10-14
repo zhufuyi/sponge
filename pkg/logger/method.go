@@ -2,6 +2,7 @@ package logger
 
 import (
 	"fmt"
+	"strings"
 
 	"go.uber.org/zap"
 )
@@ -63,7 +64,10 @@ func Errorf(format string, a ...interface{}) {
 
 // Sync flushing any buffered log entries, applications should take care to call Sync before exiting.
 func Sync() error {
-	//return getLogger().Sync()
+	err := getLogger().Sync()
+	if err != nil && !strings.Contains(err.Error(), "/dev/stdout") {
+		return err
+	}
 	return nil
 }
 

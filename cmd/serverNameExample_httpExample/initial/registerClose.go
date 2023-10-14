@@ -8,7 +8,6 @@ import (
 	"github.com/zhufuyi/sponge/internal/model"
 
 	"github.com/zhufuyi/sponge/pkg/app"
-	"github.com/zhufuyi/sponge/pkg/logger"
 	"github.com/zhufuyi/sponge/pkg/tracer"
 )
 
@@ -40,11 +39,6 @@ func RegisterClose(servers []app.IServer) []app.Close {
 			return tracer.Close(ctx)
 		})
 	}
-
-	// logger flushing
-	closes = append(closes, func() error {
-		return logger.Sync()
-	})
 
 	return closes
 }
