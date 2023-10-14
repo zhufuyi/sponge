@@ -149,6 +149,21 @@ func TestParams_ConvertToGormConditions(t *testing.T) {
 			want1:   []interface{}{"%Li%"},
 			wantErr: false,
 		},
+		{
+			name: "1 column IN",
+			args: args{
+				columns: []Column{
+					{
+						Name:  "name",
+						Value: "ab,cd,ef",
+						Exp:   In,
+					},
+				},
+			},
+			want:    "name IN (?)",
+			want1:   []interface{}{[]interface{}{"ab", "cd", "ef"}},
+			wantErr: false,
+		},
 
 		// --------------------------- query 2 columns  ------------------------------
 		{
@@ -333,6 +348,26 @@ func TestParams_ConvertToGormConditions(t *testing.T) {
 			},
 			want:    "name = ? OR gender <> ?",
 			want1:   []interface{}{"LiSi", "male"},
+			wantErr: false,
+		},
+		{
+			name: "2 columns eq and in",
+			args: args{
+				columns: []Column{
+					{
+						Name:  "gender",
+						Value: "male",
+						//Logic: "&",
+					},
+					{
+						Name:  "name",
+						Value: "LiSi,ZhangSan,WangWu",
+						Exp:   In,
+					},
+				},
+			},
+			want:    "gender = ? AND name IN (?)",
+			want1:   []interface{}{"male", []interface{}{"LiSi", "ZhangSan", "WangWu"}},
 			wantErr: false,
 		},
 

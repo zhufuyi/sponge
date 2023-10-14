@@ -34,6 +34,7 @@ func (l *gormLogger) LogMode(level logger.LogLevel) logger.Interface {
 // Info print info
 func (l *gormLogger) Info(ctx context.Context, msg string, data ...interface{}) {
 	if l.logLevel >= logger.Info {
+		msg = strings.ReplaceAll(msg, "%v", "")
 		l.gLog.Info(msg, zap.Any("data", data), zap.String("line", utils.FileWithLineNum()), requestIDField(ctx, l.requestIDKey))
 	}
 }
@@ -41,6 +42,7 @@ func (l *gormLogger) Info(ctx context.Context, msg string, data ...interface{}) 
 // Warn print warn messages
 func (l *gormLogger) Warn(ctx context.Context, msg string, data ...interface{}) {
 	if l.logLevel >= logger.Warn {
+		msg = strings.ReplaceAll(msg, "%v", "")
 		l.gLog.Warn(msg, zap.Any("data", data), zap.String("line", utils.FileWithLineNum()), requestIDField(ctx, l.requestIDKey))
 	}
 }
@@ -48,6 +50,7 @@ func (l *gormLogger) Warn(ctx context.Context, msg string, data ...interface{}) 
 // Error print error messages
 func (l *gormLogger) Error(ctx context.Context, msg string, data ...interface{}) {
 	if l.logLevel >= logger.Error {
+		msg = strings.ReplaceAll(msg, "%v", "")
 		l.gLog.Warn(msg, zap.Any("data", data), zap.String("line", utils.FileWithLineNum()), requestIDField(ctx, l.requestIDKey))
 	}
 }

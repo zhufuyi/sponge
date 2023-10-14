@@ -17,14 +17,17 @@
     db, err := mysql.Init(dsn)
 
     // (2) customised settings to connect to the database
-	db, err := Init(
+	db, err := mysql.Init(
 		dsn,
-		//WithLog(), // print all logs
-		WithSlowThreshold(time.Millisecond*100), // only print logs that take longer than 100 milliseconds to execute
-		WithEnableTrace(),                       // enable tracing
-		WithMaxIdleConns(5),
-		WithMaxOpenConns(50),
-		WithConnMaxLifetime(time.Minute*3),
+		mysql.WithLogging(logger.Get()),  // print log
+		mysql.WithLogRequestIDKey("request_id"),  // print request_id
+        mysql.WithMaxIdleConns(5),
+        mysql.WithMaxOpenConns(50),
+        mysql.WithConnMaxLifetime(time.Minute*3),
+        // mysql.WithSlowThreshold(time.Millisecond*100),  // only print logs that take longer than 100 milliseconds to execute
+        // mysql.WithEnableTrace(),  // enable tracing
+        // mysql.WithRWSeparation(SlavesDsn, MastersDsn...)  // read-write separation
+        // mysql.WithGormPlugin(yourPlugin)  // custom gorm plugin
 	)
 ```
 

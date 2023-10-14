@@ -21,6 +21,8 @@ const (
 	Lte = "lte"
 	// Like fuzzy lookup
 	Like = "like"
+	// In include
+	In = "in"
 
 	// AND logic and
 	AND string = "and"
@@ -36,6 +38,7 @@ var expMap = map[string]string{
 	Lt:   " < ",
 	Lte:  " <= ",
 	Like: " LIKE ",
+	In:   " IN ",
 
 	"=":  " = ",
 	"!=": " <> ",
@@ -94,6 +97,18 @@ func (c *Column) convert() error {
 		if c.Exp == " LIKE " {
 			c.Value = fmt.Sprintf("%%%v%%", c.Value)
 		}
+		if c.Exp == " IN " {
+			val, ok := c.Value.(string)
+			if !ok {
+				return fmt.Errorf("invalid value type '%s'", c.Value)
+			}
+			iVal := []interface{}{}
+			ss := strings.Split(val, ",")
+			for _, s := range ss {
+				iVal = append(iVal, s)
+			}
+			c.Value = iVal
+		}
 	} else {
 		return fmt.Errorf("unknown c expression type '%s'", c.Exp)
 	}
@@ -145,13 +160,18 @@ func (p *Params) ConvertToGormConditions() (string, []interface{}, error) {
 			return "", nil, err
 		}
 
+		symbol := "?"
+		if column.Exp == " IN " {
+			symbol = "(?)"
+		}
 		if i == l-1 { // ignore the logical type of the last column
-			str += column.Name + column.Exp + "?"
+			str += column.Name + column.Exp + symbol
 		} else {
-			str += column.Name + column.Exp + "?" + column.Logic
+			str += column.Name + column.Exp + symbol + column.Logic
 		}
 		args = append(args, column.Value)
 
+		// when multiple columns are the same, determine whether the use of IN
 		if isUseIN {
 			if field != column.Name {
 				isUseIN = false

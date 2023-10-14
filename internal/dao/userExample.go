@@ -182,8 +182,8 @@ func (d *userExampleDao) GetByID(ctx context.Context, id uint64) (*model.UserExa
 // query conditions:
 //
 //	name: column name
-//	exp: expressions, which default is "=",  support =, !=, >, >=, <, <=, like
-//	value: column name
+//	exp: expressions, which default is "=",  support =, !=, >, >=, <, <=, like, in
+//	value: column value, if exp=in, multiple values are separated by commas
 //	logic: logical type, defaults to and when value is null, only &(and), ||(or)
 //
 // example: find a male aged 20
@@ -269,9 +269,7 @@ func (d *userExampleDao) GetByIDs(ctx context.Context, ids []uint64) (map[uint64
 }
 
 // GetByColumns get records by paging and column information,
-// Note: suitable for scenarios where the number of rows in the table is not very large,
-//
-//	performance is lower if the data table is large because of the use of offset.
+// Note: query performance degrades when table rows are very large because of the use of offset.
 //
 // params includes paging parameters and query parameters
 // paging parameters (required):
@@ -283,8 +281,8 @@ func (d *userExampleDao) GetByIDs(ctx context.Context, ids []uint64) (map[uint64
 // query parameters (not required):
 //
 //	name: column name
-//	exp: expressions, which default is "=",  support =, !=, >, >=, <, <=, like
-//	value: column name
+//	exp: expressions, which default is "=",  support =, !=, >, >=, <, <=, like, in
+//	value: column value, if exp=in, multiple values are separated by commas
 //	logic: logical type, defaults to and when value is null, only &(and), ||(or)
 //
 // example: search for a male over 20 years of age

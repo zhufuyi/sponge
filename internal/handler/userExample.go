@@ -283,7 +283,8 @@ func (h *userExampleHandler) ListByIDs(c *gin.Context) {
 	err := c.ShouldBindJSON(form)
 	if err != nil {
 		logger.Warn("ShouldBindJSON error: ", logger.Err(err), middleware.GCtxRequestIDField(c))
-		response.Error(c, ecode.InvalidParams)
+		response.Error(c, ecode.InvalidParams.WithOutMsg("参数错误"), "详细错误信息")
+		response.Output(c, ecode.Unauthorized.WithOutMsg("错误简单描述").ToHTTPCode(), "详细错误信息")
 		return
 	}
 
@@ -334,7 +335,9 @@ func (h *userExampleHandler) List(c *gin.Context) {
 	userExamples, total, err := h.iDao.GetByColumns(ctx, &form.Params)
 	if err != nil {
 		logger.Error("GetByColumns error", logger.Err(err), logger.Any("form", form), middleware.GCtxRequestIDField(c))
-		response.Output(c, ecode.InternalServerError.ToHTTPCode())
+		//response.Output(c, ecode.InternalServerError.ToHTTPCode())
+		response.Output(c, ecode.Unauthorized.ToHTTPCode(), "详细错误信息")
+		response.Error(c, ecode.Unauthorized.WithOutMsg("错误简单描述"), "详细错误信息")
 		return
 	}
 
