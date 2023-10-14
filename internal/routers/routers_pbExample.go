@@ -51,7 +51,7 @@ func NewRouter_pbExample() *gin.Engine { //nolint
 	jwt.Init(
 	//jwt.WithExpire(time.Hour*24),
 	//jwt.WithSigningKey("123456"),
-	//jwt.WithSigningMethod(jwt.SigningMethodHS384),
+	//jwt.WithSigningMethod(jwt.HS384),
 	)
 
 	// metrics middleware

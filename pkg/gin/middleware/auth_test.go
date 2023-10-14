@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -16,9 +17,35 @@ import (
 )
 
 var (
-	uid  = "123"
-	role = "admin"
+	uid    = "123"
+	role   = "admin"
+	fields = jwt.KV{"id": 1, "foo": "bar"}
 )
+
+func verify(claims *jwt.Claims) error {
+	if claims.UID != uid || claims.Role != role {
+		return errors.New("verify failed")
+	}
+	return nil
+}
+
+func verifyCustom(claims *jwt.CustomClaims) error {
+	err := errors.New("verify failed")
+
+	id, exist := claims.Get("id")
+	if !exist {
+		return err
+	}
+	foo, exist := claims.Get("foo")
+	if !exist {
+		return err
+	}
+	if int(id.(float64)) != fields["id"].(int) || foo.(string) != fields["foo"].(string) {
+		return err
+	}
+
+	return nil
+}
 
 func runAuthHTTPServer() string {
 	serverAddr, requestAddr := utils.GetLocalHTTPAddrPairs()
@@ -34,6 +61,11 @@ func runAuthHTTPServer() string {
 		fmt.Println("token =", token)
 		response.Success(c, token)
 	}
+	customTokenFun := func(c *gin.Context) {
+		token, _ := jwt.GenerateCustomToken(fields)
+		fmt.Println("token custom =", token)
+		response.Success(c, token)
+	}
 
 	userFun := func(c *gin.Context) {
 		response.Success(c, "hello "+uid)
@@ -41,7 +73,10 @@ func runAuthHTTPServer() string {
 
 	r.GET("/token", tokenFun)
 	r.GET("/user/:id", Auth(), userFun)
-	r.GET("/admin/:id", AuthAdmin(), userFun)
+	r.GET("/user2/:id", Auth(WithVerify(verify), WithSwitchHTTPCode()), userFun)
+
+	r.GET("/token/custom", customTokenFun)
+	r.GET("/user/custom", AuthCustom(verifyCustom), userFun)
 
 	go func() {
 		err := r.Run(serverAddr)
@@ -55,7 +90,6 @@ func runAuthHTTPServer() string {
 }
 
 func TestAuth(t *testing.T) {
-	role = ""
 	requestAddr := runAuthHTTPServer()
 
 	// get token
@@ -68,80 +102,96 @@ func TestAuth(t *testing.T) {
 
 	// the right request
 	authorization := fmt.Sprintf("Bearer %s", token)
-	val, err := getUser(requestAddr, authorization)
+	val, err := getUser(requestAddr+"/user/"+uid, authorization)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(val)
+
+	val, err = getUser(requestAddr+"/user2/"+uid, authorization)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(val)
+
+	// verify error
+	role = "foobar"
+	val, err = getUser(requestAddr+"/user2/"+uid, authorization)
 	if err != nil {
 		t.Fatal(err)
 	}
 	t.Log(val)
 
 	// wrong authorization
-	val, err = getUser(requestAddr, "Bearer ")
+	val, err = getUser(requestAddr+"/user/"+uid, "Bearer ")
 	if err != nil {
 		t.Fatal(err)
 	}
 	t.Log(val)
 
 	// wrong authorization
-	val, err = getUser(requestAddr, token)
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Log(val)
-
-	// administrator access required
-	val, err = getAdmin(requestAddr, authorization)
+	val, err = getUser(requestAddr+"/user/"+uid, token)
 	if err != nil {
 		t.Fatal(err)
 	}
 	t.Log(val)
 }
 
-func TestAdminAuth(t *testing.T) {
+func TestAuthCustom(t *testing.T) {
 	requestAddr := runAuthHTTPServer()
 
 	// get token
 	result := &gohttp.StdResult{}
-	err := gohttp.Get(result, requestAddr+"/token")
+	err := gohttp.Get(result, requestAddr+"/token/custom")
 	if err != nil {
 		t.Fatal(err)
 	}
 	token := result.Data.(string)
 
+	url := requestAddr + "/user/custom"
+
 	// the right request
 	authorization := fmt.Sprintf("Bearer %s", token)
-	val, err := getAdmin(requestAddr, authorization)
+	val, err := getUserCustom(url, authorization)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(val)
+
+	// verify error
+	fields["foo"] = "bar2"
+	val, err = getUser(url, authorization)
 	if err != nil {
 		t.Fatal(err)
 	}
 	t.Log(val)
 
 	// wrong authorization
-	val, err = getAdmin(requestAddr, "Bearer ")
+	val, err = getUserCustom(url, "Bearer ")
 	if err != nil {
 		t.Fatal(err)
 	}
 	t.Log(val)
 
 	// wrong authorization
-	val, err = getAdmin(requestAddr, token)
+	val, err = getUserCustom(url, token)
 	if err != nil {
 		t.Fatal(err)
 	}
 	t.Log(val)
 }
 
-func getUser(requestAddr string, authorization string) (string, error) {
+func getUser(url string, authorization string) (string, error) {
 	client := &http.Client{}
-	url := requestAddr + "/user/" + uid
-	reqest, err := http.NewRequest("GET", url, nil)
-	reqest.Header.Add("Authorization", authorization)
+	request, err := http.NewRequest("GET", url, nil)
+	request.Header.Add("Authorization", authorization)
 	if err != nil {
 		return "", err
 	}
-	response, _ := client.Do(reqest)
-	defer response.Body.Close()
+	resp, _ := client.Do(request)
+	defer resp.Body.Close()
 
-	data, err := io.ReadAll(response.Body)
+	data, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
 	}
@@ -149,18 +199,17 @@ func getUser(requestAddr string, authorization string) (string, error) {
 	return string(data), nil
 }
 
-func getAdmin(requestAddr string, authorization string) (string, error) {
+func getUserCustom(url string, authorization string) (string, error) {
 	client := &http.Client{}
-	url := requestAddr + "/admin/" + uid
-	reqest, err := http.NewRequest("GET", url, nil)
-	reqest.Header.Add("Authorization", authorization)
+	request, err := http.NewRequest("GET", url, nil)
+	request.Header.Add("Authorization", authorization)
 	if err != nil {
 		return "", err
 	}
-	response, _ := client.Do(reqest)
-	defer response.Body.Close()
+	resp, _ := client.Do(request)
+	defer resp.Body.Close()
 
-	data, err := io.ReadAll(response.Body)
+	data, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
 	}

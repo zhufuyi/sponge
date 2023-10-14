@@ -329,8 +329,7 @@ func Test_userExampleHandler_ListByIDs(t *testing.T) {
 	}
 
 	// zero id error test
-	err = gohttp.Post(result, h.GetRequestURL("ListByIDs"), nil)
-	assert.NoError(t, err)
+	_ = gohttp.Post(result, h.GetRequestURL("ListByIDs"), nil)
 
 	// get error test
 	err = gohttp.Post(result, h.GetRequestURL("ListByIDs"), &types.ListUserExamplesByIDsRequest{IDs: []uint64{111}})

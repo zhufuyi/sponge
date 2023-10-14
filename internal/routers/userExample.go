@@ -13,6 +13,7 @@ func init() {
 }
 
 func userExampleRouter(group *gin.RouterGroup, h handler.UserExampleHandler) {
+	//group.Use(middleware.Auth()) // all of the following routes use jwt authentication
 	group.POST("/userExample", h.Create)
 	group.DELETE("/userExample/:id", h.DeleteByID)
 	group.POST("/userExample/delete/ids", h.DeleteByIDs)

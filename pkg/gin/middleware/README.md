@@ -70,9 +70,78 @@ Adaptive flow limitation based on hardware resources.
 
 ### jwt authorization middleware
 
+#### common authorization
+
 ```go
+import "github.com/zhufuyi/sponge/pkg/jwt"
+
+func main() {
     r := gin.Default()
-    r.GET("/user/:id", middleware.JWT(), userFun)
+
+    r.POST("/user/login", Login)
+    r.GET("/user/:id", middleware.Auth(), h.GetByID)
+	// r.GET("/user/:id", middleware.Auth(middleware.WithVerify(verify)), userFun) // with verify
+
+    r.Run(serverAddr)
+}
+
+func verify(claims *jwt.Claims) error {
+    if claims.UID != "123" || claims.Role != "admin" {
+        return errors.New("verify failed")
+    }
+    return nil
+}
+
+func Login(c *gin.Context) {
+	// login success
+
+	// generate token
+	token, err := jwt.GenerateToken("123", "admin")
+    // handle err
+}
+```
+<br>
+
+#### custom authorization
+
+```go
+import "github.com/zhufuyi/sponge/pkg/jwt"
+
+func main() {
+    r := gin.Default()
+
+	r.POST("/user/login", Login)
+	r.GET("/user/:id", middleware.AuthCustom(verifyCustom), userFun)
+
+    r.Run(serverAddr)
+}
+
+func verifyCustom(claims *jwt.CustomClaims) error {
+	err := errors.New("verify failed")
+
+	id, exist := claims.Get("id")
+	if !exist {
+		return err
+	}
+	foo, exist := claims.Get("foo")
+	if !exist {
+		return err
+	}
+	if int(id.(float64)) != fields["id"].(int) || foo.(string) != fields["foo"].(string) {
+		return err
+	}
+
+	return nil
+}
+
+func Login(c *gin.Context) {
+    // login success
+
+	// generate token
+	fields := jwt.KV{"id": 123, "foo": "bar"}
+	token, err := jwt.GenerateCustomToken(fields)
+    // handle err
+}
 ```
 <br>
 

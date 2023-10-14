@@ -4,16 +4,16 @@ import (
 	"errors"
 	"time"
 
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 var (
-	// SigningMethodHS256 Method
-	SigningMethodHS256 = jwt.SigningMethodHS256
-	// SigningMethodHS384 Method
-	SigningMethodHS384 = jwt.SigningMethodHS384
-	// SigningMethodHS512 Method
-	SigningMethodHS512 = jwt.SigningMethodHS512
+	// HS256 Method
+	HS256 = jwt.SigningMethodHS256
+	// HS384 Method
+	HS384 = jwt.SigningMethodHS384
+	// HS512 Method
+	HS512 = jwt.SigningMethodHS512
 )
 
 var opt *options
@@ -27,7 +27,7 @@ func Init(opts ...Option) {
 
 var (
 	defaultSigningKey    = []byte("zaq12wsxmko0") // default key
-	defaultSigningMethod = SigningMethodHS256     // default HS256
+	defaultSigningMethod = HS256                  // default HS256
 	defaultExpire        = 24 * time.Hour         // default expiration
 	defaultIssuer        = ""
 )
@@ -86,18 +86,6 @@ func WithIssuer(issuer string) Option {
 }
 
 var (
-	// HS256 Method
-	HS256 = jwt.SigningMethodHS256
-	// HS384 Method
-	HS384 = jwt.SigningMethodHS384
-	// HS512 Method
-	HS512 = jwt.SigningMethodHS512
-)
-
-var (
-	errFormat       = errors.New("invalid token format")
-	errExpired      = errors.New("token has expired")
-	errUnverifiable = errors.New("the token could not be verified due to a signing problem")
-	errSignature    = errors.New("signature failure")
-	errInit         = errors.New("not yet initialized jwt, usage 'jwt.Init()'")
+	errSignature = errors.New("signature failure")
+	errInit      = errors.New("not yet initialized jwt, usage 'jwt.Init()'")
 )

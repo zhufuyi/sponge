@@ -15,57 +15,125 @@ const (
 	HeaderAuthorizationKey = "Authorization"
 )
 
+type jwtOptions struct {
+	isSwitchHTTPCode bool
+	verify           VerifyFn // verify function, only use in Auth
+}
+
+// JwtOption set the jwt options.
+type JwtOption func(*jwtOptions)
+
+func (o *jwtOptions) apply(opts ...JwtOption) {
+	for _, opt := range opts {
+		opt(o)
+	}
+}
+
+func defaultJwtOptions() *jwtOptions {
+	return &jwtOptions{
+		isSwitchHTTPCode: false,
+		verify:           nil,
+	}
+}
+
+// WithSwitchHTTPCode switch to http code
+func WithSwitchHTTPCode() JwtOption {
+	return func(o *jwtOptions) {
+		o.isSwitchHTTPCode = true
+	}
+}
+
+// WithVerify set verify function
+func WithVerify(verify VerifyFn) JwtOption {
+	return func(o *jwtOptions) {
+		o.verify = verify
+	}
+}
+
+func responseUnauthorized(c *gin.Context, isSwitchHTTPCode bool) {
+	if isSwitchHTTPCode {
+		response.Out(c, errcode.Unauthorized)
+	} else {
+		response.Error(c, errcode.Unauthorized)
+	}
+}
+
+// -------------------------------------------------------------------------------------------
+
+// VerifyFn verify function
+type VerifyFn func(claims *jwt.Claims) error
+
 // Auth authorization
-func Auth() gin.HandlerFunc {
+func Auth(opts ...JwtOption) gin.HandlerFunc {
+	o := defaultJwtOptions()
+	o.apply(opts...)
+
 	return func(c *gin.Context) {
 		authorization := c.GetHeader(HeaderAuthorizationKey)
-		if len(authorization) < 20 {
-			logger.Warn("authorization is illegal", logger.String(HeaderAuthorizationKey, authorization))
-			response.Error(c, errcode.Unauthorized)
+		if len(authorization) < 150 {
+			logger.Warn("authorization is illegal")
+			responseUnauthorized(c, o.isSwitchHTTPCode)
 			c.Abort()
 			return
 		}
-		token := authorization[7:] // remove Bearer prefix
-		claims, err := jwt.VerifyToken(token)
+
+		claims, err := jwt.ParseToken(authorization[7:]) // token=authorization[7:], remove Bearer prefix
 		if err != nil {
-			logger.Warn("VerifyToken error", logger.Err(err))
-			response.Error(c, errcode.Unauthorized)
+			logger.Warn("ParseToken error", logger.Err(err))
+			responseUnauthorized(c, o.isSwitchHTTPCode)
 			c.Abort()
 			return
 		}
-		c.Set("uid", claims.UID)
+
+		if o.verify != nil {
+			if err = o.verify(claims); err != nil {
+				logger.Warn("verify error", logger.Err(err), logger.String("uid", claims.UID), logger.String("role", claims.Role))
+				responseUnauthorized(c, o.isSwitchHTTPCode)
+				c.Abort()
+				return
+			}
+		} else {
+			c.Set("uid", claims.UID)
+			c.Set("role", claims.Role)
+		}
 
 		c.Next()
 	}
 }
 
-// AuthAdmin admin authentication
-func AuthAdmin() gin.HandlerFunc {
+// -------------------------------------------------------------------------------------------
+
+// VerifyCustomFn verify custom function
+type VerifyCustomFn func(claims *jwt.CustomClaims) error
+
+// AuthCustom custom authentication
+func AuthCustom(verify VerifyCustomFn, opts ...JwtOption) gin.HandlerFunc {
+	o := defaultJwtOptions()
+	o.apply(opts...)
+
 	return func(c *gin.Context) {
 		authorization := c.GetHeader(HeaderAuthorizationKey)
-		if len(authorization) < 20 {
-			logger.Warn("authorization is illegal", logger.String(HeaderAuthorizationKey, authorization))
-			response.Error(c, errcode.Unauthorized)
-			c.Abort()
-			return
-		}
-		token := authorization[7:] // remove Bearer prefix
-		claims, err := jwt.VerifyToken(token)
-		if err != nil {
-			logger.Warn("VerifyToken error", logger.Err(err))
-			response.Error(c, errcode.Unauthorized)
+		if len(authorization) < 150 {
+			logger.Warn("authorization is illegal")
+			responseUnauthorized(c, o.isSwitchHTTPCode)
 			c.Abort()
 			return
 		}
 
-		// determine if it is an administrator
-		if claims.Role != "admin" {
-			logger.Warn("prohibition of access", logger.String("uid", claims.UID), logger.String("role", claims.Role))
-			response.Error(c, errcode.Forbidden)
+		claims, err := jwt.ParseCustomToken(authorization[7:]) // token=authorization[7:], remove Bearer prefix
+		if err != nil {
+			logger.Warn("ParseToken error", logger.Err(err))
+			responseUnauthorized(c, o.isSwitchHTTPCode)
 			c.Abort()
 			return
 		}
-		c.Set("uid", claims.UID)
+
+		if err = verify(claims); err != nil {
+			logger.Warn("verify error", logger.Err(err), logger.Any("fields", claims.Fields))
+			responseUnauthorized(c, o.isSwitchHTTPCode)
+			c.Abort()
+			return
+		}
 
 		c.Next()
 	}

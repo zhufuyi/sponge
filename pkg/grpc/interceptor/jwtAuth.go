@@ -111,13 +111,13 @@ func JwtVerify(ctx context.Context) (context.Context, error) {
 		return nil, err
 	}
 
-	cc, err := jwt.VerifyToken(token)
+	cc, err := jwt.ParseToken(token)
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "%v", err)
 	}
 
 	newCtx := context.WithValue(ctx, authCtxClaimsName, cc) //nolint
-	// get value by ctx.Value(interceptor.GetAuthCtxKey()).(*jwt.CustomClaims)
+	// get value by ctx.Value(interceptor.GetAuthCtxKey()).(*jwt.Claims)
 
 	return newCtx, nil
 }
