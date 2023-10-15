@@ -36,8 +36,10 @@ func TestConnectionOptions(t *testing.T) {
 
 func TestNewConnection1(t *testing.T) {
 	utils.SafeRunWithTimeout(time.Second*2, func(cancel context.CancelFunc) {
+		c, err := NewConnection("")
+		assert.Error(t, err)
 
-		c, err := NewConnection(url)
+		c, err = NewConnection(url)
 		if err != nil {
 			t.Log(err)
 			return
@@ -76,6 +78,7 @@ func TestConnection_monitor(t *testing.T) {
 		IsConnected:   true,
 	}
 
+	c.CheckConnected()
 	go func() {
 		defer func() { recover() }()
 		c.monitor()

@@ -25,13 +25,6 @@ type Queue struct {
 	zapLog        *zap.Logger
 }
 
-// Close queue
-func (q *Queue) Close() {
-	if q.ch != nil {
-		_ = q.ch.Close()
-	}
-}
-
 // Handler message
 type Handler func(ctx context.Context, data []byte, tagID ...string) error
 
@@ -160,4 +153,11 @@ func (q *Queue) Consume(handler Handler) {
 			}
 		}
 	}()
+}
+
+// Close queue
+func (q *Queue) Close() {
+	if q.ch != nil {
+		_ = q.ch.Close()
+	}
 }

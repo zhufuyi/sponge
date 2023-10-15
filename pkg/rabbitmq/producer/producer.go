@@ -163,13 +163,6 @@ func NewQueue(queueName string, conn *amqp.Connection, exchange *Exchange, opts 
 	}, nil
 }
 
-// Close the queue
-func (q *Queue) Close() {
-	if q.ch != nil {
-		_ = q.ch.Close()
-	}
-}
-
 // Publish send direct or fanout type message
 func (q *Queue) Publish(ctx context.Context, body []byte) error {
 	if q.exchange.eType != exchangeTypeDirect && q.exchange.eType != exchangeTypeFanout {
@@ -223,4 +216,11 @@ func (q *Queue) PublishHeaders(ctx context.Context, headersKey map[string]interf
 			Body:        body,
 		},
 	)
+}
+
+// Close the queue
+func (q *Queue) Close() {
+	if q.ch != nil {
+		_ = q.ch.Close()
+	}
 }

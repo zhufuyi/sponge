@@ -38,6 +38,11 @@ func TestNewUserExampleServiceClient(t *testing.T) {
 		cancel()
 	})
 	utils.SafeRunWithTimeout(time.Second, func(cancel context.CancelFunc) {
+		reply, err := cli.DeleteByIDs(ctx, nil)
+		t.Log(reply, err)
+		cancel()
+	})
+	utils.SafeRunWithTimeout(time.Second, func(cancel context.CancelFunc) {
 		reply, err := cli.UpdateByID(ctx, nil)
 		t.Log(reply, err)
 		cancel()

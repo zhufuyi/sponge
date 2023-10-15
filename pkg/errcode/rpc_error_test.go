@@ -1,7 +1,11 @@
 package errcode
 
 import (
+	"github.com/gin-gonic/gin"
+	"github.com/zhufuyi/sponge/pkg/utils"
+	"net/http"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -83,4 +87,26 @@ func TestRCode(t *testing.T) {
 		recover()
 	}()
 	code = RCode(101)
+}
+
+func TestHandlers(t *testing.T) {
+	serverAddr, requestAddr := utils.GetLocalHTTPAddrPairs()
+
+	gin.SetMode(gin.ReleaseMode)
+	r := gin.New()
+	r.GET("/codes", gin.WrapF(ListGRPCErrCodes))
+	r.GET("/config", gin.WrapF(ShowConfig([]byte(`{"foo": "bar"}`))))
+
+	go func() {
+		_ = r.Run(serverAddr)
+	}()
+
+	time.Sleep(time.Millisecond * 200)
+	resp, err := http.Get(requestAddr + "/codes")
+	assert.NoError(t, err)
+	assert.NotNil(t, resp)
+	resp, err = http.Get(requestAddr + "/config")
+	assert.NoError(t, err)
+	assert.NotNil(t, resp)
+	time.Sleep(time.Second)
 }

@@ -2,10 +2,10 @@ package parser
 
 import (
 	"fmt"
-	"github.com/blastrain/vitess-sqlparser/tidbparser/dependency/mysql"
-	"github.com/blastrain/vitess-sqlparser/tidbparser/dependency/types"
 	"testing"
 
+	"github.com/blastrain/vitess-sqlparser/tidbparser/dependency/mysql"
+	"github.com/blastrain/vitess-sqlparser/tidbparser/dependency/types"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -154,6 +154,8 @@ func TestGetTableInfo(t *testing.T) {
 }
 
 func Test_initTemplate(t *testing.T) {
+	initTemplate()
+
 	defer func() { recover() }()
 	modelStructTmplRaw = "{{if .foo}}"
 	modelTmplRaw = "{{if .foo}}"

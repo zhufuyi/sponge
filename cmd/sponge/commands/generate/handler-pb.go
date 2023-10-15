@@ -131,7 +131,7 @@ func runGenHandlerPbCommand(moduleName string, serverName string, codes map[stri
 		"userExample.pb.go", "userExample.pb.validate.go", "userExample_grpc.pb.go", "userExample_router.pb.go", // api/serverNameExample
 		"systemCode_http.go", "systemCode_rpc.go", "userExample_rpc.go", // internal/ecode
 		"init.go", "init_test.go", // internal/model
-		"handler/userExample.go", "handler/userExample_test.go", // internal/handler
+		"handler/userExample.go", "handler/userExample_test.go", "handler/userExample_logic_test.go", // internal/handler
 		"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", // internal/cache
 	}
 

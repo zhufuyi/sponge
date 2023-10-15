@@ -139,6 +139,7 @@ func Test_userExampleHandler_Create(t *testing.T) {
 
 	h.MockDao.SQLMock.ExpectBegin()
 	h.MockDao.SQLMock.ExpectCommit()
+	// create error test
 	result = &gohttp.StdResult{}
 	err = gohttp.Post(result, h.GetRequestURL("Create"), testData)
 	assert.Error(t, err)

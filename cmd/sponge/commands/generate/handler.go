@@ -117,7 +117,7 @@ func runGenHandlerCommand(moduleName string, codes map[string]string, outPath st
 		"routers.go", "routers_test.go", "routers_pbExample.go", "routers_pbExample_test.go", "userExample_router.go", // internal/routers
 		"swagger_types.go",                                          // internal/types
 		"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", // internal/cache
-		"handler/userExample_logic.go", // internal/handler
+		"handler/userExample_logic.go", "handler/userExample_logic_test.go", // internal/handler
 	}
 
 	r.SetSubDirsAndFiles(subDirs)

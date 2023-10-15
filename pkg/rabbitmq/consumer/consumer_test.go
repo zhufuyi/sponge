@@ -10,6 +10,9 @@ import (
 	"github.com/zhufuyi/sponge/pkg/rabbitmq"
 	"github.com/zhufuyi/sponge/pkg/rabbitmq/producer"
 	"github.com/zhufuyi/sponge/pkg/utils"
+
+	amqp "github.com/rabbitmq/amqp091-go"
+	"go.uber.org/zap"
 )
 
 var url = "amqp://guest:guest@192.168.3.37:5672/"
@@ -241,4 +244,41 @@ func producerHeaders(queueName string) error {
 
 	})
 	return producerErr
+}
+
+func TestNewQueue(t *testing.T) {
+	c := &rabbitmq.Connection{
+		Exit:        make(chan struct{}),
+		ZapLog:      zap.NewNop(),
+		Conn:        &amqp.Connection{},
+		IsConnected: true,
+	}
+
+	q, err := NewQueue(context.Background(), "test", c, WithConsumeQos(WithQosPrefetchCount(1)))
+	if err != nil {
+		t.Log(err)
+		return
+	}
+	q.ch = &amqp.Channel{}
+	amqp.NewConnectionProperties()
+
+	utils.SafeRunWithTimeout(time.Second, func(cancel context.CancelFunc) {
+		err = q.newChannel()
+		if err != nil {
+			t.Log(err)
+			return
+		}
+	})
+	utils.SafeRunWithTimeout(time.Second, func(cancel context.CancelFunc) {
+		_, err := q.consumeWithContext()
+		if err != nil {
+			t.Log(err)
+			return
+		}
+	})
+	utils.SafeRunWithTimeout(time.Second*3, func(cancel context.CancelFunc) {
+		q.Consume(handler)
+	})
+	time.Sleep(time.Millisecond * 2500)
+	close(q.c.Exit)
 }

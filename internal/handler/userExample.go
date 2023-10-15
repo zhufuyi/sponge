@@ -96,6 +96,7 @@ func (h *userExampleHandler) Create(c *gin.Context) {
 func (h *userExampleHandler) DeleteByID(c *gin.Context) {
 	_, id, isAbort := getUserExampleIDFromPath(c)
 	if isAbort {
+		response.Error(c, ecode.InvalidParams)
 		return
 	}
 
@@ -152,6 +153,7 @@ func (h *userExampleHandler) DeleteByIDs(c *gin.Context) {
 func (h *userExampleHandler) UpdateByID(c *gin.Context) {
 	_, id, isAbort := getUserExampleIDFromPath(c)
 	if isAbort {
+		response.Error(c, ecode.InvalidParams)
 		return
 	}
 
@@ -194,6 +196,7 @@ func (h *userExampleHandler) UpdateByID(c *gin.Context) {
 func (h *userExampleHandler) GetByID(c *gin.Context) {
 	idStr, id, isAbort := getUserExampleIDFromPath(c)
 	if isAbort {
+		response.Error(c, ecode.InvalidParams)
 		return
 	}
 
@@ -358,7 +361,6 @@ func getUserExampleIDFromPath(c *gin.Context) (string, uint64, bool) {
 	id, err := utils.StrToUint64E(idStr)
 	if err != nil || id == 0 {
 		logger.Warn("StrToUint64E error: ", logger.String("idStr", idStr), middleware.GCtxRequestIDField(c))
-		response.Error(c, ecode.InvalidParams)
 		return "", 0, true
 	}
 

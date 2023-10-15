@@ -29,30 +29,6 @@ type Connection struct {
 	IsConnected bool
 }
 
-func connect(url string, tlsConfig *tls.Config) (*amqp.Connection, error) {
-	var (
-		conn *amqp.Connection
-		err  error
-	)
-
-	if strings.HasPrefix(url, "amqps://") {
-		if tlsConfig == nil {
-			return nil, errors.New("tls not set, e.g. NewConnection(url, WithTLSConfig(tlsConfig))")
-		}
-		conn, err = amqp.DialTLS(url, tlsConfig)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		conn, err = amqp.Dial(url)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return conn, nil
-}
-
 // NewConnection rabbitmq connection
 func NewConnection(url string, opts ...ConnectionOption) (*Connection, error) {
 	if url == "" {
@@ -85,13 +61,28 @@ func NewConnection(url string, opts ...ConnectionOption) (*Connection, error) {
 	return c, nil
 }
 
-// Close rabbitmq connection
-func (c *Connection) Close() {
-	c.Mutex.Lock()
-	c.IsConnected = false
-	c.Mutex.Unlock()
+func connect(url string, tlsConfig *tls.Config) (*amqp.Connection, error) {
+	var (
+		conn *amqp.Connection
+		err  error
+	)
 
-	close(c.Exit)
+	if strings.HasPrefix(url, "amqps://") {
+		if tlsConfig == nil {
+			return nil, errors.New("tls not set, e.g. NewConnection(url, WithTLSConfig(tlsConfig))")
+		}
+		conn, err = amqp.DialTLS(url, tlsConfig)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		conn, err = amqp.Dial(url)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return conn, nil
 }
 
 // CheckConnected rabbitmq connection
@@ -99,17 +90,6 @@ func (c *Connection) CheckConnected() bool {
 	c.Mutex.Lock()
 	defer c.Mutex.Unlock()
 	return c.IsConnected
-}
-
-func (c *Connection) closeConn() error {
-	c.Mutex.Lock()
-	defer c.Mutex.Unlock()
-
-	if c.Conn != nil {
-		return c.Conn.Close()
-	}
-
-	return nil
 }
 
 func (c *Connection) monitor() {
@@ -153,4 +133,24 @@ func (c *Connection) monitor() {
 			c.Mutex.Unlock()
 		}
 	}
+}
+
+// Close rabbitmq connection
+func (c *Connection) Close() {
+	c.Mutex.Lock()
+	c.IsConnected = false
+	c.Mutex.Unlock()
+
+	close(c.Exit)
+}
+
+func (c *Connection) closeConn() error {
+	c.Mutex.Lock()
+	defer c.Mutex.Unlock()
+
+	if c.Conn != nil {
+		return c.Conn.Close()
+	}
+
+	return nil
 }

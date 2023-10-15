@@ -6,7 +6,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zhufuyi/sponge/pkg/errcode"
 	"github.com/zhufuyi/sponge/pkg/gohttp"
 	"github.com/zhufuyi/sponge/pkg/utils"
 
@@ -14,7 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCheckHealth(t *testing.T) {
+func TestCommonHandlers(t *testing.T) {
 	serverAddr, requestAddr := utils.GetLocalHTTPAddrPairs()
 
 	gin.SetMode(gin.ReleaseMode)
@@ -22,8 +21,6 @@ func TestCheckHealth(t *testing.T) {
 	r.GET("/health", CheckHealth)
 	r.GET("/ping", Ping)
 	r.GET("/codes", ListCodes)
-	r.GET("/codes2", gin.WrapF(errcode.ListGRPCErrCodes))
-	r.GET("/config", gin.WrapF(errcode.ShowConfig([]byte(`{"foo": "bar"}`))))
 
 	go func() {
 		_ = r.Run(serverAddr)
@@ -39,12 +36,7 @@ func TestCheckHealth(t *testing.T) {
 	resp, err = http.Get(requestAddr + "/codes")
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
-	resp, err = http.Get(requestAddr + "/codes2")
-	assert.NoError(t, err)
-	assert.NotNil(t, resp)
-	resp, err = http.Get(requestAddr + "/config")
-	assert.NoError(t, err)
-	assert.NotNil(t, resp)
+	time.Sleep(time.Second)
 }
 
 func TestBrowserRefresh(t *testing.T) {
