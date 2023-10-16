@@ -72,7 +72,7 @@ type Params struct {
 // Column query info
 type Column struct {
 	Name  string      `json:"name" form:"columns"`  // column name
-	Exp   string      `json:"exp" form:"columns"`   // expressions, which default to = when the value is null, have =, !=, >, >=, <, <=, like
+	Exp   string      `json:"exp" form:"columns"`   // expressions, which default to = when the value is null, have =, !=, >, >=, <, <=, like, in
 	Value interface{} `json:"value" form:"columns"` // column value
 	Logic string      `json:"logic" form:"columns"` // logical type, defaults to and when the value is null, with &(and), ||(or)
 }
@@ -110,7 +110,7 @@ func (c *Column) convert() error {
 			c.Value = iVal
 		}
 	} else {
-		return fmt.Errorf("unknown c expression type '%s'", c.Exp)
+		return fmt.Errorf("unknown exp type '%s'", c.Exp)
 	}
 
 	if c.Logic == "" {

@@ -24,9 +24,9 @@ Example 1: common fields jwt
 	token, err := jwt.GenerateToken(uid)
 	// handle err
 
-    // parse token
+	// parse token
 	claims, err := jwt.ParseToken(token)
-    // handle err
+	// handle err
 	
 	// verify
 	if claims.Uid != "123" ||claims.Role != "admin" {
@@ -52,17 +52,17 @@ Example 2: custom fields jwt
 
 	// generate token
 	token, err := jwt.GenerateCustomToken(uid)
-    // handle err
+	// handle err
 
-    // parse token
+	// parse token
 	claims, err := jwt.ParseCustomToken(token)
-    // handle err
+	// handle err
 
 	// verify
-    id, isExist1 := claims.Get("id")
-    foo, isExist2 := claims.Get("foo")
+	id, isExist1 := claims.Get("id")
+	foo, isExist2 := claims.Get("foo")
 	if !isExist1 || !isExist2 || int(id.(float64)) != fields["id"].(int) || foo.(string) != fields["foo"].(string) {
-		print("verify failed")
+	    print("verify failed")
 	    return
 	}
 ```

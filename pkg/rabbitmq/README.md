@@ -229,7 +229,7 @@ func main() {
 If the error is caused by the network, you can check if the reconnection is successful and resend it again.
 
 ```go
-	err := q.Publish(context.Background(), []byte(routeKey+" say hello"))
+    err := q.Publish(context.Background(), []byte(routeKey+" say hello"))
     if err != nil {
         if errors.Is(err, producer.ErrClosed) && c.CheckConnected() { // check connection
             q, err = producer.NewQueue(queueName, c.Conn, exchange)
@@ -239,6 +239,6 @@ If the error is caused by the network, you can check if the reconnection is succ
                 logger.Info("queue reconnect success")
             }
         }
-	}
+    }
 ```
 

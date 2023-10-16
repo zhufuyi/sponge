@@ -102,9 +102,9 @@ func getDialOptions() []grpc.DialOption {
 	option := grpc.WithUnaryInterceptor(
 		grpc_middleware.ChainUnaryClient(
 			interceptor.UnaryClientRetry(
-                //middleware.WithRetryTimes(5), // modify the default number of retries to 3 by default
-                //middleware.WithRetryInterval(100*time.Millisecond), // modify the default retry interval, default 50 milliseconds
-                //middleware.WithRetryErrCodes(), // add trigger retry error code, default is codes.Internal, codes.DeadlineExceeded, codes.Unavailable
+				//middleware.WithRetryTimes(5), // modify the default number of retries to 3 by default
+				//middleware.WithRetryInterval(100*time.Millisecond), // modify the default retry interval, default 50 milliseconds
+				//middleware.WithRetryErrCodes(), // add trigger retry error code, default is codes.Internal, codes.DeadlineExceeded, codes.Unavailable
 			),
 		),
 	)
@@ -323,11 +323,11 @@ func getServerOptions() []grpc.ServerOption {
 
 // generate forensic information authorization
 func (a *Account) Register(ctx context.Context, req *serverNameV1.RegisterRequest) (*serverNameV1.RegisterReply, error) {
-    // ......
+	// ......
 	token, err := jwt.GenerateToken(uid)
 	// handle err
 	authorization = middleware.GetAuthorization(token)
-    // ......
+	// ......
 }
 
 // the client must pass in the authentication information via the context when calling the method, and the key name must be authorization

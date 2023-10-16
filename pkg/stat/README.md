@@ -9,7 +9,7 @@ Statistics on system and process cpu and memory information, alarm notification 
 ```go
     import "github.com/zhufuyi/sponge/pkg/stat"
 
-	l, _ := zap.NewDevelopment()
+    l, _ := zap.NewDevelopment()
     stat.Init(
         stat.WithLog(l),
         stat.WithPrintInterval(time.Minute),

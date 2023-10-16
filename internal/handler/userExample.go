@@ -338,9 +338,7 @@ func (h *userExampleHandler) List(c *gin.Context) {
 	userExamples, total, err := h.iDao.GetByColumns(ctx, &form.Params)
 	if err != nil {
 		logger.Error("GetByColumns error", logger.Err(err), logger.Any("form", form), middleware.GCtxRequestIDField(c))
-		//response.Output(c, ecode.InternalServerError.ToHTTPCode())
-		response.Output(c, ecode.Unauthorized.ToHTTPCode(), "详细错误信息")
-		response.Error(c, ecode.Unauthorized.WithOutMsg("错误简单描述"), "详细错误信息")
+		response.Output(c, ecode.InternalServerError.ToHTTPCode())
 		return
 	}
 

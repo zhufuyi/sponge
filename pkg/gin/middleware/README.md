@@ -17,8 +17,8 @@ You can set the maximum length for printing, add a request id field, ignore prin
 
     r.Use(middleware.Logging(
         middleware.WithMaxLen(400),
-		//WithRequestIDFromHeader(),
-		WithRequestIDFromContext(),
+        //WithRequestIDFromHeader(),
+        WithRequestIDFromContext(),
         //middleware.WithIgnoreRoutes("/hello"),
     ))
 
@@ -44,7 +44,7 @@ You can set the maximum length for printing, add a request id field, ignore prin
 Adaptive flow limitation based on hardware resources.
 
 ```go
-	r := gin.Default()
+    r := gin.Default()
 
     // e.g. (1) use default
     // r.Use(RateLimit())
@@ -79,24 +79,24 @@ func main() {
     r := gin.Default()
 
     r.POST("/user/login", Login)
-    r.GET("/user/:id", middleware.Auth(), h.GetByID)
-	// r.GET("/user/:id", middleware.Auth(middleware.WithVerify(verify)), userFun) // with verify
+    r.GET("/user/:id", middleware.Auth(), h.GetByID) // no verify field
+    // r.GET("/user/:id", middleware.Auth(middleware.WithVerify(adminVerify)), userFun) // with verify field
 
     r.Run(serverAddr)
 }
 
-func verify(claims *jwt.Claims) error {
-    if claims.UID != "123" || claims.Role != "admin" {
+func adminVerify(claims *jwt.Claims) error {
+    if claims.Role != "admin" {
         return errors.New("verify failed")
     }
     return nil
 }
 
 func Login(c *gin.Context) {
-	// login success
+    // login success
 
-	// generate token
-	token, err := jwt.GenerateToken("123", "admin")
+    // generate token
+    token, err := jwt.GenerateToken("123", "admin")
     // handle err
 }
 ```
@@ -110,39 +110,40 @@ import "github.com/zhufuyi/sponge/pkg/jwt"
 func main() {
     r := gin.Default()
 
-	r.POST("/user/login", Login)
-	r.GET("/user/:id", middleware.AuthCustom(verifyCustom), userFun)
+    r.POST("/user/login", Login)
+    r.GET("/user/:id", middleware.AuthCustom(verify), userFun)
 
     r.Run(serverAddr)
 }
 
-func verifyCustom(claims *jwt.CustomClaims) error {
-	err := errors.New("verify failed")
+func verify(claims *jwt.CustomClaims) error {
+    err := errors.New("verify failed")
 
-	id, exist := claims.Get("id")
-	if !exist {
-		return err
-	}
-	foo, exist := claims.Get("foo")
-	if !exist {
-		return err
-	}
-	if int(id.(float64)) != fields["id"].(int) || foo.(string) != fields["foo"].(string) {
-		return err
-	}
+    id, exist := claims.Get("id")
+    if !exist {
+        return err
+    }
+    foo, exist := claims.Get("foo")
+    if !exist {
+        return err
+    }
+    if int(id.(float64)) != fields["id"].(int) || foo.(string) != fields["foo"].(string) {
+        return err
+    }
 
-	return nil
+    return nil
 }
 
 func Login(c *gin.Context) {
     // login success
 
-	// generate token
-	fields := jwt.KV{"id": 123, "foo": "bar"}
-	token, err := jwt.GenerateCustomToken(fields)
+    // generate token
+    fields := jwt.KV{"id": 123, "foo": "bar"}
+    token, err := jwt.GenerateCustomToken(fields)
     // handle err
 }
 ```
+
 <br>
 
 ### tracing middleware
@@ -164,10 +165,10 @@ func InitTrace(serviceName string) {
 }
 
 func NewRouter(
-    r := gin.Default()
-    r.Use(middleware.Tracing("your-service-name"))
+	r := gin.Default()
+	r.Use(middleware.Tracing("your-service-name"))
 
-    // ......
+	// ......
 )
 
 // if necessary, you can create a span in the program
@@ -200,6 +201,6 @@ func SpanDemo(serviceName string, spanName string, ctx context.Context) {
 ### Request id
 
 ```go
-	r := gin.Default()
+    r := gin.Default()
     r.Use(RequestID())
 ```

@@ -51,7 +51,7 @@ func main() {
 	}
 
 	server := grpc.NewServer(getServerOptions()...)
-    serverNameV1.RegisterGreeterServer(server, &GreeterServer{})
+	serverNameV1.RegisterGreeterServer(server, &GreeterServer{})
 
 	// start metrics server, collect grpc metrics by default, turn on, go metrics
 	metrics.ServerHTTPService(":8283", server)

@@ -58,7 +58,7 @@ func NewPage(page int, size int, columnNames string) *Page {
 	if page < 0 {
 		page = 0
 	}
-	if size > defaultMaxSize {
+	if size > defaultMaxSize || size < 1 {
 		size = defaultMaxSize
 	}
 

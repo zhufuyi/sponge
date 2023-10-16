@@ -4,14 +4,15 @@ gin metrics library, collect five metrics, `uptime`, `http_request_count_total`,
 
 <br>
 
-### Usage
+### Example of use
 
 ```go
 	import "github.com/zhufuyi/sponge/pkg/gin/middleware/metrics"
 
 	r := gin.Default()
 
-	r.Use(metrics.Metrics(r,
+	r.Use(metrics.Metrics(
+		r,
 		//metrics.WithMetricsPath("/demo/metrics"), // default is /metrics
 		metrics.WithIgnoreStatusCodes(http.StatusNotFound), // ignore status codes
 		//metrics.WithIgnoreRequestMethods(http.MethodHead),  // ignore request methods

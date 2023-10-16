@@ -5,7 +5,7 @@ Get the configuration from the nacos configuration center and parse it into a st
 ### Example of use
 
 ```go
-    import "github.com/zhufuyi/sponge/pkg/nacoscli"
+	import "github.com/zhufuyi/sponge/pkg/nacoscli"
 
 	// Way 1: Setting parameters
 	a := &config{}

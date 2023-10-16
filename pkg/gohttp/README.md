@@ -13,20 +13,20 @@ Get, Delete request example.
 ```go
     import "github.com/zhufuyi/sponge/pkg/gohttp"
 
-	req := gohttp.Request{}
-	req.SetURL("http://localhost:8080/user")
-	req.SetHeaders(map[string]string{
-		"Authorization": "Bearer token",
-	})
-	req.SetParams(gohttp.KV{
-		"id": 123,
-	})
+    req := gohttp.Request{}
+    req.SetURL("http://localhost:8080/user")
+    req.SetHeaders(map[string]string{
+        "Authorization": "Bearer token",
+    })
+    req.SetParams(gohttp.KV{
+        "id": 123,
+    })
 
-	resp, err := req.GET()
-	// resp, err := req.Delete()
+    resp, err := req.GET()
+    // resp, err := req.Delete()
 
-	result := &gohttp.StdResult{} // other structures can be defined to receive data
-	err = resp.BindJSON(result)
+    result := &gohttp.StdResult{} // other structures can be defined to receive data
+    err = resp.BindJSON(result)
 ```
 
 <br>
@@ -36,11 +36,11 @@ Post, Put, Patch request example.
 ```go
     import "github.com/zhufuyi/sponge/pkg/gohttp"
 
-	req := gohttp.Request{}
-	req.SetURL("http://localhost:8080/user")
-	req.SetHeaders(map[string]string{
-		"Authorization": "Bearer token",
-	})
+    req := gohttp.Request{}
+    req.SetURL("http://localhost:8080/user")
+    req.SetHeaders(map[string]string{
+        "Authorization": "Bearer token",
+    })
 
 	// body is a structure
     type User struct{
@@ -52,12 +52,12 @@ Post, Put, Patch request example.
     // or body as json
     // req.SetBody(`{"name":"foo", "email":"foo@bar.com"}`)
 
-	resp, err := req.Post()
-	// resp, err := req.Put()
-	// resp, err := req.Patch()
+    resp, err := req.Post()
+    // resp, err := req.Put()
+    // resp, err := req.Patch()
 
-	result := &gohttp.StdResult{} // other structures can be defined to receive data
-	err = resp.BindJSON(result)
+    result := &gohttp.StdResult{} // other structures can be defined to receive data
+    err = resp.BindJSON(result)
 ```
 
 <br>

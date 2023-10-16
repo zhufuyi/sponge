@@ -12,9 +12,9 @@ Initialize the trace, specifying exporter and resource.
 import "github.com/zhufuyi/sponge/pkg/tracer"
 
 func initTrace() {
-    // exporter := tracer.NewConsoleExporter() // output to terminal
+	// exporter := tracer.NewConsoleExporter() // output to terminal
 
-    // exporter, f, err := tracer.NewFileExporter("trace.json") // output to file
+	// exporter, f, err := tracer.NewFileExporter("trace.json") // output to file
 
 	// exporter, err := tracer.NewJaegerExporter("http://localhost:14268/api/traces") // output to jaeger, using collector http
 	exporter, err := tracer.NewJaegerAgentExporter("192.168.3.37", "6831") // output to jaeger, using agent udp
