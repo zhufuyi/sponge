@@ -14,8 +14,9 @@ import (
 )
 
 var (
-	url    = "amqp://guest:guest@192.168.3.37:5672/"
-	urlTLS = "amqps://guest:guest@127.0.0.1:5672/"
+	url            = "amqp://guest:guest@192.168.3.37:5672/"
+	urlTLS         = "amqps://guest:guest@127.0.0.1:5672/"
+	datetimeLayout = "2006-01-02 15:04:05.000"
 )
 
 func TestConnectionOptions(t *testing.T) {
@@ -36,6 +37,7 @@ func TestConnectionOptions(t *testing.T) {
 
 func TestNewConnection1(t *testing.T) {
 	utils.SafeRunWithTimeout(time.Second*2, func(cancel context.CancelFunc) {
+		defer cancel()
 		c, err := NewConnection("")
 		assert.Error(t, err)
 
@@ -47,13 +49,12 @@ func TestNewConnection1(t *testing.T) {
 		assert.True(t, c.CheckConnected())
 		time.Sleep(time.Second)
 		c.Close()
-
 	})
 }
 
 func TestNewConnection2(t *testing.T) {
 	utils.SafeRunWithTimeout(time.Second*2, func(cancel context.CancelFunc) {
-
+		defer cancel()
 		// error
 		_, err := NewConnection(urlTLS)
 		assert.Error(t, err)
@@ -62,7 +63,6 @@ func TestNewConnection2(t *testing.T) {
 			InsecureSkipVerify: true,
 		}))
 		assert.Error(t, err)
-
 	})
 }
 
@@ -70,12 +70,12 @@ func TestConnection_monitor(t *testing.T) {
 	c := &Connection{
 		url:           urlTLS,
 		reconnectTime: time.Second,
-		Exit:          make(chan struct{}),
-		ZapLog:        defaultLogger,
-		Conn:          &amqp.Connection{},
+		exit:          make(chan struct{}),
+		zapLog:        defaultLogger,
+		conn:          &amqp.Connection{},
 		blockChan:     make(chan amqp.Blocking, 1),
 		closeChan:     make(chan *amqp.Error, 1),
-		IsConnected:   true,
+		isConnected:   true,
 	}
 
 	c.CheckConnected()
@@ -85,15 +85,15 @@ func TestConnection_monitor(t *testing.T) {
 	}()
 
 	time.Sleep(time.Millisecond * 500)
-	c.Mutex.Lock()
+	c.mutex.Lock()
 	c.blockChan <- amqp.Blocking{Active: false}
 	c.blockChan <- amqp.Blocking{Active: true, Reason: "the disk is full."}
-	c.Mutex.Unlock()
+	c.mutex.Unlock()
 
 	time.Sleep(time.Millisecond * 500)
-	c.Mutex.Lock()
+	c.mutex.Lock()
 	c.closeChan <- &amqp.Error{Code: 504, Reason: "connect failed"}
-	c.Mutex.Unlock()
+	c.mutex.Unlock()
 
 	time.Sleep(time.Millisecond * 500)
 	c.Close()
