@@ -37,7 +37,6 @@ var (
 // InitMysql connect mysql
 func InitMysql() {
 	opts := []mysql.Option{
-		mysql.WithSlowThreshold(time.Duration(config.Get().Mysql.SlowThreshold) * time.Millisecond),
 		mysql.WithMaxIdleConns(config.Get().Mysql.MaxIdleConns),
 		mysql.WithMaxOpenConns(config.Get().Mysql.MaxOpenConns),
 		mysql.WithConnMaxLifetime(time.Duration(config.Get().Mysql.ConnMaxLifetime) * time.Minute),
@@ -53,11 +52,12 @@ func InitMysql() {
 		opts = append(opts, mysql.WithEnableTrace())
 	}
 
-	// setting mysql slave and master dsn addresses
-	//opts = append(opts, mysql.WithRWSeparation(
-	//	config.Get().Mysql.SlavesDsn,
-	//	config.Get().Mysql.MastersDsn...,
-	//))
+	// setting mysql slave and master dsn addresses,
+	// if there is no read/write separation, you can comment out the following piece of code
+	opts = append(opts, mysql.WithRWSeparation(
+		config.Get().Mysql.SlavesDsn,
+		config.Get().Mysql.MastersDsn...,
+	))
 
 	// add custom gorm plugin
 	//opts = append(opts, mysql.WithGormPlugin(yourPlugin))

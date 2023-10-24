@@ -54,7 +54,7 @@ func Test_requestIDField(t *testing.T) {
 	ctx := context.WithValue(context.Background(), "request_id", "123")
 	field := requestIDField(ctx, "")
 	assert.Equal(t, zap.Skip(), field)
-	field = requestIDField(ctx, "X-Request-ID")
+	field = requestIDField(ctx, "your request id key")
 	assert.Equal(t, zap.Skip(), field)
 	field = requestIDField(ctx, "request_id")
 	assert.Equal(t, zap.String("request_id", "123"), field)

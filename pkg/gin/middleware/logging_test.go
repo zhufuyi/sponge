@@ -160,8 +160,8 @@ func runLogHTTPServer2() string {
 	r.Use(Logging(
 		WithLog(logger.Get()),
 		WithMaxLen(200),
-		WithRequestIDFromContext("request-id"),
-		WithRequestIDFromHeader("request-id"),
+		WithRequestIDFromContext(),
+		WithRequestIDFromHeader(),
 	))
 
 	pingFun := func(c *gin.Context) {

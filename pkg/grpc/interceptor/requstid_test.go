@@ -560,3 +560,10 @@ func TestCtxRequestIDField(t *testing.T) {
 	field = ServerCtxRequestIDField(context.Background())
 	assert.NotNil(t, field)
 }
+
+func TestSetContextRequestIDKey(t *testing.T) {
+	SetContextRequestIDKey("my_request_id")
+	SetContextRequestIDKey("foo_bar") // invalid key, sync.Once
+	t.Log(ContextRequestIDKey)
+	SetContextRequestIDKey("xx") // invalid key
+}

@@ -2,6 +2,7 @@ package interceptor
 
 import (
 	"context"
+	"sync"
 
 	"github.com/zhufuyi/sponge/pkg/krand"
 
@@ -11,15 +12,26 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-const (
-	// ContextRequestIDKey context request id for context
+var (
+	// ContextRequestIDKey request id key for context
 	ContextRequestIDKey = "request_id"
+	once                sync.Once
 )
+
+// SetContextRequestIDKey set context request id key
+func SetContextRequestIDKey(key string) {
+	if len(key) < 4 {
+		return
+	}
+	once.Do(func() {
+		ContextRequestIDKey = key
+	})
+}
 
 // CtxKeyString for context.WithValue key type
 type CtxKeyString string
 
-// RequestIDKey "request_id"
+// RequestIDKey request_id
 var RequestIDKey = CtxKeyString(ContextRequestIDKey)
 
 // ---------------------------------- client interceptor ----------------------------------

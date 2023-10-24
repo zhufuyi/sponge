@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"context"
 	"errors"
 
 	"github.com/zhufuyi/sponge/internal/cache"
@@ -73,7 +72,7 @@ func (h *userExampleHandler) Create(c *gin.Context) {
 		return
 	}
 
-	ctx := context.WithValue(c.Request.Context(), middleware.ContextRequestIDKey, middleware.GCtxRequestID(c)) //nolint
+	ctx := middleware.WrapCtx(c)
 	err = h.iDao.Create(ctx, userExample)
 	if err != nil {
 		logger.Error("Create error", logger.Err(err), logger.Any("form", form), middleware.GCtxRequestIDField(c))
@@ -100,7 +99,7 @@ func (h *userExampleHandler) DeleteByID(c *gin.Context) {
 		return
 	}
 
-	ctx := context.WithValue(c.Request.Context(), middleware.ContextRequestIDKey, middleware.GCtxRequestID(c)) //nolint
+	ctx := middleware.WrapCtx(c)
 	err := h.iDao.DeleteByID(ctx, id)
 	if err != nil {
 		logger.Error("DeleteByID error", logger.Err(err), logger.Any("id", id), middleware.GCtxRequestIDField(c))
@@ -129,7 +128,7 @@ func (h *userExampleHandler) DeleteByIDs(c *gin.Context) {
 		return
 	}
 
-	ctx := context.WithValue(c.Request.Context(), middleware.ContextRequestIDKey, middleware.GCtxRequestID(c)) //nolint
+	ctx := middleware.WrapCtx(c)
 	err = h.iDao.DeleteByIDs(ctx, form.IDs)
 	if err != nil {
 		logger.Error("GetByIDs error", logger.Err(err), logger.Any("form", form), middleware.GCtxRequestIDField(c))
@@ -173,7 +172,7 @@ func (h *userExampleHandler) UpdateByID(c *gin.Context) {
 		return
 	}
 
-	ctx := context.WithValue(c.Request.Context(), middleware.ContextRequestIDKey, middleware.GCtxRequestID(c)) //nolint
+	ctx := middleware.WrapCtx(c)
 	err = h.iDao.UpdateByID(ctx, userExample)
 	if err != nil {
 		logger.Error("UpdateByID error", logger.Err(err), logger.Any("form", form), middleware.GCtxRequestIDField(c))
@@ -200,7 +199,7 @@ func (h *userExampleHandler) GetByID(c *gin.Context) {
 		return
 	}
 
-	ctx := context.WithValue(c.Request.Context(), middleware.ContextRequestIDKey, middleware.GCtxRequestID(c)) //nolint
+	ctx := middleware.WrapCtx(c)
 	userExample, err := h.iDao.GetByID(ctx, id)
 	if err != nil {
 		if errors.Is(err, query.ErrNotFound) {
@@ -248,7 +247,7 @@ func (h *userExampleHandler) GetByCondition(c *gin.Context) {
 		return
 	}
 
-	ctx := context.WithValue(c.Request.Context(), middleware.ContextRequestIDKey, middleware.GCtxRequestID(c)) //nolint
+	ctx := middleware.WrapCtx(c)
 	userExample, err := h.iDao.GetByCondition(ctx, &form.Conditions)
 	if err != nil {
 		if errors.Is(err, query.ErrNotFound) {
@@ -291,7 +290,7 @@ func (h *userExampleHandler) ListByIDs(c *gin.Context) {
 		return
 	}
 
-	ctx := context.WithValue(c.Request.Context(), middleware.ContextRequestIDKey, middleware.GCtxRequestID(c)) //nolint
+	ctx := middleware.WrapCtx(c)
 	userExampleMap, err := h.iDao.GetByIDs(ctx, form.IDs)
 	if err != nil {
 		logger.Error("GetByIDs error", logger.Err(err), logger.Any("form", form), middleware.GCtxRequestIDField(c))
@@ -334,7 +333,7 @@ func (h *userExampleHandler) List(c *gin.Context) {
 		return
 	}
 
-	ctx := context.WithValue(c.Request.Context(), middleware.ContextRequestIDKey, middleware.GCtxRequestID(c)) //nolint
+	ctx := middleware.WrapCtx(c)
 	userExamples, total, err := h.iDao.GetByColumns(ctx, &form.Params)
 	if err != nil {
 		logger.Error("GetByColumns error", logger.Err(err), logger.Any("form", form), middleware.GCtxRequestIDField(c))

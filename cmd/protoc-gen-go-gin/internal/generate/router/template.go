@@ -184,7 +184,7 @@ func (r *{{$.LowerName}}Router) {{ .HandlerName }} (c *gin.Context) {
 	if r.wrapCtxFn != nil {
 		ctx = r.wrapCtxFn(c)
 	} else {
-		ctx = c
+		ctx = middleware.WrapCtx(c)
 	}
 
 	out, err := r.iLogic.{{.Name}}(ctx, req)

@@ -64,15 +64,14 @@ func New{{.Name}}Handler() serverNameExampleV1.{{.Name}}Logicer {
 func (h *{{.LowerServiceName}}Handler) {{.MethodName}}(ctx context.Context, req *serverNameExampleV1.{{.Request}}) (*serverNameExampleV1.{{.Reply}}, error) {
 	panic("implement me")
 
-	// fill in the business logic code here, if necessary, 'ctx' can be converted to 'gin.Context', such as ginCtx, ok := ctx.(*gin.Context)
+	// fill in the business logic code here
 	// example:
 	//	    err := req.Validate()
 	//	    if err != nil {
-	//		    logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req), interceptor.ServerCtxRequestIDField(ctx))
+	//		    logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req), middleware.CtxRequestIDField(ctx))
 	//		    return nil, ecode.InvalidParams.Err()
 	//	    }
 	//
-	// 	ctx = context.WithValue(c.Request.Context(), middleware.ContextRequestIDKey, middleware.GCtxRequestID(c))
 	// 	reply, err := h.{{.LowerServiceName}}Dao.{{.MethodName}}(ctx, &model.{{.ServiceName}}{
 {{- range .RequestFields}}
 	//     	{{.Name}}: req.{{.Name}},

@@ -34,7 +34,6 @@ func defaultOptions() *options {
 		maxLength:     defaultMaxLength,
 		log:           defaultLogger,
 		ignoreRoutes:  defaultIgnoreRoutes,
-		requestIDName: "",
 		requestIDFrom: 0,
 	}
 }
@@ -43,8 +42,7 @@ type options struct {
 	maxLength     int
 	log           *zap.Logger
 	ignoreRoutes  map[string]struct{}
-	requestIDName string
-	requestIDFrom int // 0: ignore, 1: from header, 2: from context
+	requestIDFrom int // 0: ignore, 1: from context, 2: from header
 }
 
 func (o *options) apply(opts ...Option) {
@@ -78,31 +76,17 @@ func WithIgnoreRoutes(routes ...string) Option {
 	}
 }
 
-// WithRequestIDFromHeader name is field in header, default value is X-Request-Id
-func WithRequestIDFromHeader(name ...string) Option {
-	var requestIDName string
-	if len(name) > 0 && name[0] != "" {
-		requestIDName = name[0]
-	} else {
-		requestIDName = HeaderXRequestIDKey
-	}
+// WithRequestIDFromContext name is field in context, default value is request_id
+func WithRequestIDFromContext() Option {
 	return func(o *options) {
 		o.requestIDFrom = 1
-		o.requestIDName = requestIDName
 	}
 }
 
-// WithRequestIDFromContext name is field in context, default value is request_id
-func WithRequestIDFromContext(name ...string) Option {
-	var requestIDName string
-	if len(name) > 0 && name[0] != "" {
-		requestIDName = name[0]
-	} else {
-		requestIDName = ContextRequestIDKey
-	}
+// WithRequestIDFromHeader name is field in header, default value is X-Request-Id
+func WithRequestIDFromHeader() Option {
 	return func(o *options) {
 		o.requestIDFrom = 2
-		o.requestIDName = requestIDName
 	}
 }
 
@@ -159,17 +143,18 @@ func Logging(opts ...Option) gin.HandlerFunc {
 				zap.String("body", getBodyData(&buf, o.maxLength)),
 			)
 		}
+
 		reqID := ""
 		if o.requestIDFrom == 1 {
-			reqID = c.Request.Header.Get(o.requestIDName)
-			fields = append(fields, zap.String(o.requestIDName, reqID))
-		} else if o.requestIDFrom == 2 {
-			if v, isExist := c.Get(o.requestIDName); isExist {
+			if v, isExist := c.Get(ContextRequestIDKey); isExist {
 				if requestID, ok := v.(string); ok {
 					reqID = requestID
-					fields = append(fields, zap.String(o.requestIDName, reqID))
+					fields = append(fields, zap.String(ContextRequestIDKey, reqID))
 				}
 			}
+		} else if o.requestIDFrom == 2 {
+			reqID = c.Request.Header.Get(HeaderXRequestIDKey)
+			fields = append(fields, zap.String(ContextRequestIDKey, reqID))
 		}
 		o.log.Info("<<<<", fields...)
 
@@ -191,8 +176,8 @@ func Logging(opts ...Option) gin.HandlerFunc {
 			zap.Int("size", newWriter.body.Len()),
 			zap.String("response", strings.TrimRight(getBodyData(newWriter.body, o.maxLength), "\n")),
 		}
-		if o.requestIDName != "" {
-			fields = append(fields, zap.String(o.requestIDName, reqID))
+		if reqID != "" {
+			fields = append(fields, zap.String(ContextRequestIDKey, reqID))
 		}
 		o.log.Info(">>>>", fields...)
 	}

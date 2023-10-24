@@ -203,4 +203,16 @@ func SpanDemo(serviceName string, spanName string, ctx context.Context) {
 ```go
     r := gin.Default()
     r.Use(RequestID())
+
+    // Customized request id key
+    //r.User(RequestID(
+    //    middleware.WithContextRequestIDKey("your ctx request id key"), // default is request_id
+    //    middleware.WithHeaderRequestIDKey("your header request id key"), // default is X-Request-Id
+    //))
+    // If you change the ContextRequestIDKey, you have to set the same key name if you want to print the request id in the mysql logs as well.
+    // example: 
+    // db, err := mysql.Init(dsn,
+        // mysql.WithLogRequestIDKey("your ctx request id key"),  // print request_id
+        // ...
+    // )
 ```
