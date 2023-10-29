@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-	"time"
 
 	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/process"
@@ -13,7 +12,7 @@ import (
 
 // System cpu information
 type System struct {
-	UsagePercent float64   `json:"usage_percent"` // cpu usage, unit(%)
+	UsagePercent float64   `json:"usage_percent"` // cpu usage, unit(%), current logical CPU usage, total usage is cores*UsagePercent
 	CPUInfo      []CPUInfo `json:"cpu_info"`
 }
 
@@ -26,7 +25,7 @@ type CPUInfo struct {
 
 // Process information
 type Process struct {
-	UsagePercent float64 `json:"usage_percent"` // cpu usage, unit(%)
+	UsagePercent float64 `json:"usage_percent"` // cpu usage, unit(%), current process occupies current logical CPU, total usage is cores*UsagePercent
 
 	RSS uint64 `json:"rss"` // use of physical memory, unit(M)
 	VMS uint64 `json:"vms"` // use of virtual memory, unit(M)
@@ -35,12 +34,12 @@ type Process struct {
 // GetSystemCPU get system cpu info
 func GetSystemCPU() *System {
 	sysUsagePercent := 0.0
-	vs, err := cpu.Percent(time.Millisecond*10, false)
+	vs, err := cpu.Percent(0, false) // total cpu Percent
 	if err != nil {
 		fmt.Printf("cpu.Percent error, %v\n", err)
 	}
 	if len(vs) == 1 {
-		sysUsagePercent = vs[0]
+		sysUsagePercent = vs[0] * 10
 	}
 
 	var cpuInfos []CPUInfo

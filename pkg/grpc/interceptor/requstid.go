@@ -34,6 +34,11 @@ type CtxKeyString string
 // RequestIDKey request_id
 var RequestIDKey = CtxKeyString(ContextRequestIDKey)
 
+// CtxRequestIDField get request id field from context.Context
+func CtxRequestIDField(ctx context.Context) zap.Field {
+	return zap.String(ContextRequestIDKey, metautils.ExtractOutgoing(ctx).Get(ContextRequestIDKey))
+}
+
 // ---------------------------------- client interceptor ----------------------------------
 
 // ClientCtxRequestID get request id from rpc client context.Context

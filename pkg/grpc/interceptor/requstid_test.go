@@ -559,6 +559,8 @@ func TestCtxRequestIDField(t *testing.T) {
 	assert.NotNil(t, field)
 	field = ServerCtxRequestIDField(context.Background())
 	assert.NotNil(t, field)
+	field = CtxRequestIDField(context.Background())
+	assert.NotNil(t, field)
 }
 
 func TestSetContextRequestIDKey(t *testing.T) {

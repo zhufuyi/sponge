@@ -204,12 +204,15 @@ func (c *protoCopier) copyProtoFile(srcProtoFile string, targetProtoFile string,
 	// replace go_package
 	pbContent, err := os.ReadFile(srcProtoFile)
 	if err != nil {
-		return fmt.Errorf("read file %s error, %v\n", srcProtoFile, err)
+		return fmt.Errorf("read file %s error, %v", srcProtoFile, err)
 	}
 	pbContent = c.replacePackage(pbContent, isDependency)
 
 	tmpFile := os.TempDir() + gofile.GetPathDelimiter() + gofile.GetFilename(srcProtoFile)
-	err = os.WriteFile(tmpFile, pbContent, 0644)
+	err = os.WriteFile(tmpFile, pbContent, 0666)
+	if err != nil {
+		return err
+	}
 
 	fmt.Printf("copy  \"%s\"  -->  \"%s\"\n", srcProtoFile, targetProtoFile)
 	_, err = gobash.Exec("mv", "-f", tmpFile, targetProtoFile)

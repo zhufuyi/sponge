@@ -130,11 +130,13 @@ func HeaderRequestIDField(c *gin.Context) zap.Field {
 
 // -------------------------------------------------------------------------------------------
 
-type metaData struct{}
+// RequestHeaderKey request header key
+var RequestHeaderKey = "request_header_key"
 
 // WrapCtx wrap context, put the Keys and Header of gin.Context into context
 func WrapCtx(c *gin.Context) context.Context {
-	return context.WithValue(c, metaData{}, c.Request.Header)
+	ctx := context.WithValue(c.Request.Context(), ContextRequestIDKey, c.GetString(ContextRequestIDKey)) //nolint
+	return context.WithValue(ctx, RequestHeaderKey, c.Request.Header)                                    //nolint
 }
 
 // GetFromCtx get value from context
@@ -158,7 +160,7 @@ func CtxRequestIDField(ctx context.Context) zap.Field {
 
 // GetFromHeader get value from header
 func GetFromHeader(ctx context.Context, key string) string {
-	header, ok := ctx.Value(metaData{}).(http.Header)
+	header, ok := ctx.Value(RequestHeaderKey).(http.Header)
 	if !ok {
 		return ""
 	}
@@ -167,7 +169,7 @@ func GetFromHeader(ctx context.Context, key string) string {
 
 // GetFromHeaders get values from header
 func GetFromHeaders(ctx context.Context, key string) []string {
-	header, ok := ctx.Value(metaData{}).(http.Header)
+	header, ok := ctx.Value(RequestHeaderKey).(http.Header)
 	if !ok {
 		return []string{}
 	}

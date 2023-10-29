@@ -370,10 +370,12 @@ service {{.TName}} {
 // (2) When using the protoc-gen-openapiv2 plugin, if the defined fields are snake case,
 //      you must add annotations for snake case names, such as string foo_bar = 1 [json_name = "foo_bar"],
 //      to ensure that the front end and back end JSON naming is consistent.
-// (3) If the declared route path includes a variable, such as /api/v1/userExample/{id},
-//      the request parameter of the rpc method contains the route variable field and this field
-//      must be annotated, such as int64 id = 1 [(tagger.tags) = "uri:\"id\""]; If the get method is used, 
-//      the request parameters must be annotated with form, e.g. uint productID = 1 [(tagger.tags) = "form:\"productID\""].
+// (3) If the route contains the path parameter, such as /api/v1/userExample/{id}, the defined
+//      message  must contain the name of the path parameter and the name should be
+//      added with a new tag, such as int64 id = 1 [(tagger.tags) = "uri:\"id\""];
+// (4) If the request url is followed by a query parameter, such as /api/v1/getUserExample?name=Tom,
+//      a form tag must be added when defining the query parameter in the message,
+//      such as string name = 1 [(tagger.tags) = "form:\"name\""];
 
 
 // protoMessageCreateCode

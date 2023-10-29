@@ -157,13 +157,13 @@ func (p *profile) checkTimeout() {
 	ctx, _ := context.WithTimeout(context.Background(), time.Second*time.Duration(durationSecond)) //nolint
 	select {
 	case <-p.stopCh:
-		fmt.Println("[profile] reason for stopping: manual")
+		fmt.Println("[profile] stop collecting profiles: manual")
 		return
 	case <-ctx.Done():
 		if isStop() {
 			p.stopProfile()
 		}
-		fmt.Println("[profile] reason for stopping: timeout")
+		fmt.Println("[profile] stop collecting profiles: time is up")
 	}
 }
 

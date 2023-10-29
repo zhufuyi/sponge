@@ -139,7 +139,7 @@ func {{.LowerName}}Router(
 			middleware.ContextRequestIDKey: middleware.GCtxRequestID(c), // request_id
 			//middleware.HeaderAuthorizationKey: c.GetHeader(middleware.HeaderAuthorizationKey),  // authorization
 		})
-		return metadata.NewOutgoingContext(c, md)
+		return metadata.NewOutgoingContext(c.Request.Context(), md)
 	}
 
 	serverNameExampleV1.Register{{.Name}}Router(
