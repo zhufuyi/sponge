@@ -1,8 +1,11 @@
 package goredis
 
 import (
+	"crypto/tls"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestInit(t *testing.T) {
@@ -47,6 +50,7 @@ func TestInit(t *testing.T) {
 				WithDialTimeout(time.Second),
 				WithReadTimeout(time.Second),
 				WithWriteTimeout(time.Second),
+				WithTLSConfig(&tls.Config{}),
 			)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Init() error = %v, wantErr %v", err, tt.wantErr)
@@ -57,9 +61,36 @@ func TestInit(t *testing.T) {
 }
 
 func TestInit2(t *testing.T) {
-	Init2("127.0.0.1:6379", "123456", 0,
+	rdb := Init2("127.0.0.1:6379", "123456", 0,
 		WithEnableTrace(),
 		WithDialTimeout(time.Second),
 		WithReadTimeout(time.Second),
-		WithWriteTimeout(time.Second))
+		WithWriteTimeout(time.Second),
+		WithTLSConfig(&tls.Config{}),
+	)
+	assert.NotNil(t, rdb)
+}
+
+func TestInitSentinel(t *testing.T) {
+	addrs := []string{"127.0.0.1:6380", "127.0.0.1:6381", "127.0.0.1:6382"}
+	rdb := InitSentinel("master", addrs, "default", "123456",
+		WithEnableTrace(),
+		WithDialTimeout(time.Second),
+		WithReadTimeout(time.Second),
+		WithWriteTimeout(time.Second),
+		WithTLSConfig(&tls.Config{}),
+	)
+	assert.NotNil(t, rdb)
+}
+
+func TestInitCluster(t *testing.T) {
+	addrs := []string{"127.0.0.1:6380", "127.0.0.1:6381", "127.0.0.1:6382"}
+	clusterRdb := InitCluster(addrs, "default", "123456",
+		WithEnableTrace(),
+		WithDialTimeout(time.Second),
+		WithReadTimeout(time.Second),
+		WithWriteTimeout(time.Second),
+		WithTLSConfig(&tls.Config{}),
+	)
+	assert.NotNil(t, clusterRdb)
 }

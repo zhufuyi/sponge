@@ -1,6 +1,9 @@
 package goredis
 
-import "time"
+import (
+	"crypto/tls"
+	"time"
+)
 
 // Option set the redis options.
 type Option func(*options)
@@ -10,6 +13,8 @@ type options struct {
 	dialTimeout  time.Duration
 	readTimeout  time.Duration
 	writeTimeout time.Duration
+
+	tlsConfig *tls.Config
 }
 
 func (o *options) apply(opts ...Option) {
@@ -50,5 +55,12 @@ func WithReadTimeout(t time.Duration) Option {
 func WithWriteTimeout(t time.Duration) Option {
 	return func(o *options) {
 		o.writeTimeout = t
+	}
+}
+
+// WithTLSConfig set TLS config
+func WithTLSConfig(c *tls.Config) Option {
+	return func(o *options) {
+		o.tlsConfig = c
 	}
 }
