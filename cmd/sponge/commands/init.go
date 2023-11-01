@@ -22,16 +22,12 @@ Examples:
 		RunE: func(cmd *cobra.Command, args []string) error {
 			fmt.Println("initialize sponge ......")
 
+			targetVersion := "latest"
 			// download sponge template code
-			err := runUpgradeCommand()
+			_, err := runUpgrade(targetVersion)
 			if err != nil {
 				return err
 			}
-			ver, err := copyToTempDir()
-			if err != nil {
-				return err
-			}
-			updateSpongeInternalPlugin(ver)
 
 			// installing dependent plug-ins
 			_, lackNames := checkInstallTools()
