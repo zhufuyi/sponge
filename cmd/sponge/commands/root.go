@@ -19,8 +19,10 @@ var (
 func NewRootCMD() *cobra.Command {
 	cmd := &cobra.Command{
 		Use: "sponge",
-		Long: `sponge is a powerful golang productivity tool that integrates automatic code generation, 
-web and microservice framework, basic development framework.`,
+		Long: `Sponge is a powerful golang productivity tool that integrates automatic code generation, 
+web and microservice framework, basic development framework.
+repo: https://github.com/zhufuyi/sponge
+docs: https://go-sponge.com`,
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		Version:       getVersion(),

@@ -45,11 +45,11 @@ grpc:
 
 
 
-# grpc client settings, support for setting up multiple rpc clients
+# grpc client settings, support for setting up multiple grpc clients
 grpcClient:
-  - name: "serverNameExample"   # rpc server name, used for service discovery
-    host: "127.0.0.1"                    # rpc service address, used for direct connection
-    port: 8282                              # rpc service port
+  - name: "serverNameExample"   # grpc server name, used for service discovery
+    host: "127.0.0.1"                    # grpc service address, used for direct connection
+    port: 8282                              # grpc service port
     registryDiscoveryType: ""         # registration and discovery types: consul, etcd, nacos, if empty, connecting to server using host and port
     enableLoadBalance: true         # whether to turn on the load balancer
     # clientSecure parameter setting

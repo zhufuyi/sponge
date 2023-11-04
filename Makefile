@@ -75,7 +75,7 @@ docs: mod fmt
 
 
 .PHONY: proto
-# generate *.go and template code by proto files, if you do not refer to the proto file, the default is all the proto files in the api directory. you can specify the proto file, multiple files are separated by commas, e.g. make proto FILES=api/user/v1/user.proto. only for ⓶ Microservices created based on sql, ⓷ Web services created based on protobuf, ⓸ Microservices created based on protobuf, ⓹ RPC gateway service created based on protobuf
+# generate *.go and template code by proto files, if you do not refer to the proto file, the default is all the proto files in the api directory. you can specify the proto file, multiple files are separated by commas, e.g. make proto FILES=api/user/v1/user.proto. only for ⓶ Microservices created based on sql, ⓷ Web services created based on protobuf, ⓸ Microservices created based on protobuf, ⓹ grpc gateway service created based on protobuf
 proto: mod fmt
 	@bash scripts/protoc.sh $(FILES)
 
@@ -163,7 +163,7 @@ deploy-k8s:
 
 
 .PHONY: image-build-rpc-test
-# build rpc test image for remote repositories, e.g. make image-build-rpc-test REPO_HOST=addr TAG=latest
+# build grpc test image for remote repositories, e.g. make image-build-rpc-test REPO_HOST=addr TAG=latest
 image-build-rpc-test:
 	@bash scripts/image-rpc-test.sh $(REPO_HOST) $(TAG)
 
@@ -175,7 +175,7 @@ patch:
 
 
 .PHONY: copy-proto
-# copy proto file from the rpc server directory, multiple directories separated by commas. e.g. make copy-proto SERVER=yourServerDir
+# copy proto file from the grpc server directory, multiple directories separated by commas. e.g. make copy-proto SERVER=yourServerDir
 copy-proto:
 	@sponge patch copy-proto --server-dir=$(SERVER)
 

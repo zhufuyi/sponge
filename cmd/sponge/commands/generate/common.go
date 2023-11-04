@@ -1,4 +1,4 @@
-// Package generate is to generate code, including model, cache, dao, handler, http, service, rpc, rpc-gw, rpc-cli code.
+// Package generate is to generate code, including model, cache, dao, handler, http, service, grpc, grpc-gw, grpc-cli code.
 package generate
 
 import (

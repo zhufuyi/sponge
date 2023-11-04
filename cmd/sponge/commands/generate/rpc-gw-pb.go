@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// RPCGwPbCommand generate rpc gateway service code base on protobuf file
+// RPCGwPbCommand generate grpc gateway service code base on protobuf file
 func RPCGwPbCommand() *cobra.Command {
 	var (
 		moduleName   string // module name for go.mod
@@ -23,17 +23,17 @@ func RPCGwPbCommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "rpc-gw-pb",
-		Short: "Generate rpc gateway service code based on protobuf file",
-		Long: `generate rpc gateway service code based on protobuf file.
+		Short: "Generate grpc gateway service code based on protobuf file",
+		Long: `generate grpc gateway service code based on protobuf file.
 
 Examples:
-  # generate rpc gateway service code.
+  # generate grpc gateway service code.
   sponge micro rpc-gw-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --protobuf-file=./demo.proto
 
-  # generate rpc gateway service code and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
+  # generate grpc gateway service code and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge micro rpc-gw-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --protobuf-file=./demo.proto --out=./yourServerDir
 
-  # generate rpc gateway service code and specify the docker image repository address.
+  # generate grpc gateway service code and specify the docker image repository address.
   sponge micro rpc-gw-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --protobuf-file=./demo.proto
 `,
 		SilenceErrors: true,
@@ -116,7 +116,7 @@ using help:
   4. visit http://localhost:8080/apis/swagger/index.html in your browser, and test api interface.
 
 `)
-	fmt.Printf("generate %s's rpc gateway service code successfully, out = %s\n", serverName, r.GetOutputDir())
+	fmt.Printf("generate %s's grpc gateway service code successfully, out = %s\n", serverName, r.GetOutputDir())
 
 	return nil
 }

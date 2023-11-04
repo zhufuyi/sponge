@@ -271,7 +271,7 @@ func NewCenter(configFile string) (*Center, error) {
   markEnd='\e[0m'
 
   echo ""
-  echo -e "${highBright}Tip:${markEnd} execute the command ${colorCyan}make run${markEnd} and then test rpc method is in the file ${colorCyan}internal/service/xxx_client_test.go${markEnd}."
+  echo -e "${highBright}Tip:${markEnd} execute the command ${colorCyan}make run${markEnd} and then test grpc method is in the file ${colorCyan}internal/service/xxx_client_test.go${markEnd}."
   echo ""`
 
 	// for http-pb
@@ -369,11 +369,11 @@ grpc:
 
 
 
-# grpc client settings, support for setting up multiple rpc clients
+# grpc client settings, support for setting up multiple grpc clients
 grpcClient:
-  - name: "your-rpc-server-name"   # rpc service name, used for service discovery
-    host: "127.0.0.1"                    # rpc service address, used for direct connection
-    port: 8282                              # rpc service port
+  - name: "your-rpc-server-name"   # grpc service name, used for service discovery
+    host: "127.0.0.1"                    # grpc service address, used for direct connection
+    port: 8282                              # grpc service port
     registryDiscoveryType: ""         # registration and discovery types: consul, etcd, nacos, if empty, connecting to server using host and port
     enableLoadBalance: false         # whether to turn on the load balancer
     # clientSecure parameter setting
@@ -398,11 +398,11 @@ http:
   writeTimeout: 60  # write timeout, unit(second), if enableHTTPProfile is true, it needs to be greater than 60s, the default value for pprof to do profiling is 60s
 
 
-# grpc client settings, support for setting up multiple rpc clients
+# grpc client settings, support for setting up multiple grpc clients
 grpcClient:
-  - name: "your-rpc-server-name"   # rpc service name, used for service discovery
-    host: "127.0.0.1"                    # rpc service address, used for direct connection
-    port: 8282                              # rpc service port
+  - name: "your-rpc-server-name"   # grpc service name, used for service discovery
+    host: "127.0.0.1"                    # grpc service address, used for direct connection
+    port: 8282                              # grpc service port
     registryDiscoveryType: ""         # registration and discovery types: consul, etcd, nacos, if empty, connecting to server using host and port
     enableLoadBalance: false         # whether to turn on the load balancer
     # clientSecure parameter setting

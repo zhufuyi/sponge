@@ -31,8 +31,8 @@ func ServiceCommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "service",
-		Short: "Generate rpc service code based on mysql table",
-		Long: `generate rpc service code based on mysql table.
+		Short: "Generate grpc service code based on mysql table",
+		Long: `generate grpc service code based on mysql table.
 
 Examples:
   # generate service code and embed gorm.model struct.

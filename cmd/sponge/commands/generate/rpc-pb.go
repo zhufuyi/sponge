@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// RPCPbCommand generate rpc service code bash on protobuf file
+// RPCPbCommand generate grpc service code bash on protobuf file
 func RPCPbCommand() *cobra.Command {
 	var (
 		moduleName   string // module name for go.mod
@@ -23,17 +23,17 @@ func RPCPbCommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "rpc-pb",
-		Short: "Generate rpc service code based on protobuf file",
-		Long: `generate rpc service code based on protobuf file.
+		Short: "Generate grpc service code based on protobuf file",
+		Long: `generate grpc service code based on protobuf file.
 
 Examples:
-  # generate rpc service code.
+  # generate grpc service code.
   sponge micro rpc-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --protobuf-file=./demo.proto
 
-  # generate rpc service code and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
+  # generate grpc service code and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge micro rpc-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --protobuf-file=./demo.proto --out=./yourServerDir
 
-  # generate rpc service code and specify the docker image repository address.
+  # generate grpc service code and specify the docker image repository address.
   sponge micro rpc-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --protobuf-file=./demo.proto
 `,
 		SilenceErrors: true,
@@ -110,10 +110,10 @@ using help:
   1. open a terminal and execute the command to generate code: make proto
   2. open file "internal/service/xxx.go", replace panic("implement me") according to template code example.
   3. compile and run service: make run
-  4. open the file "internal/service/xxx_client_test.go" using Goland or VS Code, testing the rpc methods.
+  4. open the file "internal/service/xxx_client_test.go" using Goland or VS Code, testing the grpc methods.
 
 `)
-	fmt.Printf("generate %s's rpc service code successfully, out = %s\n", serverName, r.GetOutputDir())
+	fmt.Printf("generate %s's grpc service code successfully, out = %s\n", serverName, r.GetOutputDir())
 	return nil
 }
 

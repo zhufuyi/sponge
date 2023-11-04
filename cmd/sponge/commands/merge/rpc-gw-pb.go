@@ -8,8 +8,8 @@ import (
 func GinServiceCode() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "rpc-gw-pb",
-		Short: "Merge the generated rpc gateway related code into the template file",
-		Long: `merge the generated rpc gateway related code into the template file.
+		Short: "Merge the generated grpc gateway related code into the template file",
+		Long: `merge the generated grpc gateway related code into the template file.
 
 Examples:
   sponge merge rpc-gw-pb

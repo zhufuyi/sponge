@@ -10,27 +10,27 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// RPCConnectionCommand generate rpc connection code
+// RPCConnectionCommand generate grpc connection code
 func RPCConnectionCommand() *cobra.Command {
 	var (
 		moduleName     string // module name for go.mod
 		outPath        string // output directory
-		rpcServerNames string // rpc service names
+		rpcServerNames string // grpc service names
 	)
 
 	cmd := &cobra.Command{
 		Use:   "rpc-conn",
-		Short: "Generate rpc connection code",
-		Long: `generate rpc connection code.
+		Short: "Generate grpc connection code",
+		Long: `generate grpc connection code.
 
 Examples:
-  # generate rpc connection code
+  # generate grpc connection code
   sponge micro rpc-conn --module-name=yourModuleName --rpc-server-name=user
 
-  # generate rpc connection code with multiple names.
+  # generate grpc connection code with multiple names.
   sponge micro rpc-conn --module-name=yourModuleName --rpc-server-name=name1,name2
 
-  # generate rpc connection code and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
+  # generate grpc connection code and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge micro rpc-conn --rpc-server-name=user --out=./yourServerDir
 `,
 		SilenceErrors: true,
