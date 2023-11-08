@@ -1,0 +1,20 @@
+version: '3'
+ 
+services:
+  rabbitmq:
+    image: rabbitmq:3.12-management
+    container_name: rabbitmq
+    hostname: rabbitmq-service
+    restart: always
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - $PWD/data:/var/lib/rabbitmq
+      - $PWD/plugins/enabled_plugins:/etc/rabbitmq/enabled_plugins
+      - $PWD/plugins/rabbitmq_delayed_message_exchange-3.12.0.ez:/plugins/rabbitmq_delayed_message_exchange-3.12.0.ez
+    environment:
+      TZ: Asia/Shanghai
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+      RABBITMQ_DEFAULT_VHOST: /

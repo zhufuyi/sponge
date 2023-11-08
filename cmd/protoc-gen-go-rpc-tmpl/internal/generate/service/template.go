@@ -89,8 +89,8 @@ func (s *{{.LowerServiceName}}) {{.MethodName}}(ctx context.Context, req *server
 	//		    logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req), interceptor.ServerCtxRequestIDField(ctx))
 	//		    return nil, ecode.StatusInvalidParams.Err()
 	//	    }
+    // 	ctx = interceptor.WrapServerCtx(ctx)
     //
-    // 	ctx = context.WithValue(ctx, interceptor.ContextRequestIDKey, interceptor.ServerCtxRequestID(ctx))
 	// 	reply, err := s.iDao.{{.MethodName}}(ctx, &model.{{.ServiceName}}{
 {{- range .RequestFields}}
 	//     	{{.Name}}: req.{{.Name}},

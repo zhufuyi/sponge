@@ -35,7 +35,7 @@ Examples:
 		RunE: func(cmd *cobra.Command, args []string) error {
 			fmt.Println("upgrade sponge ......")
 			if targetVersion == "" {
-				targetVersion = "latest"
+				targetVersion = latestVersion
 			}
 			ver, err := runUpgrade(targetVersion)
 			if err != nil {
@@ -46,7 +46,7 @@ Examples:
 		},
 	}
 
-	cmd.Flags().StringVarP(&targetVersion, "version", "v", "latest", "upgrade sponge version")
+	cmd.Flags().StringVarP(&targetVersion, "version", "v", latestVersion, "upgrade sponge version")
 	return cmd
 }
 
@@ -96,7 +96,7 @@ func copyToTempDir(targetVersion string) (string, error) {
 	}
 
 	spongeDirName := ""
-	if targetVersion == "latest" {
+	if targetVersion == latestVersion {
 		// find the new version of the sponge code directory
 		arg := fmt.Sprintf("%s/pkg/mod/github.com/zhufuyi", gopath)
 		result, err = gobash.Exec("ls", adaptPathDelimiter(arg))

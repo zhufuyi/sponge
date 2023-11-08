@@ -65,7 +65,7 @@ func (c *{{.LowerServiceName}}Client) {{.MethodName}}(ctx context.Context, req *
 	// example:
 	//	    err := req.Validate()
 	//	    if err != nil {
-	//		    logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req), interceptor.ClientCtxRequestIDField(ctx))
+	//		    logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req), interceptor.CtxRequestIDField(ctx))
 	//		    return nil, ecode.StatusInvalidParams.Err()
 	//	    }
 	//
@@ -75,7 +75,7 @@ func (c *{{.LowerServiceName}}Client) {{.MethodName}}(ctx context.Context, req *
 {{- end}}
 	//     })
 	//     if err != nil {
-	//     	logger.Warn("{{.MethodName}} error", logger.Err(err), interceptor.ClientCtxRequestIDField(ctx))
+	//     	logger.Warn("{{.MethodName}} error", logger.Err(err), interceptor.CtxRequestIDField(ctx))
 	//     	return nil, err
 	//     }
 	//

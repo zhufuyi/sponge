@@ -6,6 +6,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const latestVersion = "latest"
+
 // InitCommand initial sponge
 func InitCommand() *cobra.Command {
 	cmd := &cobra.Command{
@@ -22,7 +24,7 @@ Examples:
 		RunE: func(cmd *cobra.Command, args []string) error {
 			fmt.Println("initialize sponge ......")
 
-			targetVersion := "latest"
+			targetVersion := latestVersion
 			// download sponge template code
 			_, err := runUpgrade(targetVersion)
 			if err != nil {

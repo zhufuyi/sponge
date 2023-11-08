@@ -48,7 +48,7 @@ sponge生成代码过程中剥离了业务逻辑与非业务逻辑两大部分�
 <img width="1200px" src="https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/web-http-pb-anatomy.png">
 </p>
 
-这是web服务代码鸡蛋模型，还有微服务(gRPC)代码、rpc网关服务代码的鸡蛋模型在[sponge文档](https://go-sponge.com/zh-cn/learn-about-sponge?id=%f0%9f%8f%b7%e9%a1%b9%e7%9b%ae%e4%bb%a3%e7%a0%81%e9%b8%a1%e8%9b%8b%e6%a8%a1%e5%9e%8b)中有介绍。
+这是web服务代码鸡蛋模型，还有微服务(grpc)代码、grpc网关服务代码的鸡蛋模型在[sponge文档](https://go-sponge.com/zh-cn/learn-about-sponge?id=%f0%9f%8f%b7%e9%a1%b9%e7%9b%ae%e4%bb%a3%e7%a0%81%e9%b8%a1%e8%9b%8b%e6%a8%a1%e5%9e%8b)中有介绍。
 
 <br>
 
@@ -99,9 +99,9 @@ sponge包含丰富的组件(按需使用)：
 │    ├── handler      # http的业务功能实现目录
 │    ├── model        # 数据库模型目录
 │    ├── routers      # http路由目录
-│    ├── rpcclient    # 连接rpc服务的客户端目录
-│    ├── server       # 服务入口，包括http、rpc等
-│    ├── service      # rpc的业务功能实现目录
+│    ├── rpcclient    # 连接grpc服务的客户端目录
+│    ├── server       # 服务入口，包括http、grpc等
+│    ├── service      # grpc的业务功能实现目录
 │    └── types        # http的请求和响应类型目录
 ├── pkg            # 外部应用程序可以使用的库目录
 ├── scripts        # 用于执行各种构建、安装、分析等操作的脚本目录
@@ -137,18 +137,18 @@ sponge run
 
 #### 简单示例
 
-不包括业务逻辑代码。
+不包含具体业务逻辑代码。
 
 - [1_web-gin-CRUD](https://github.com/zhufuyi/sponge_examples/tree/main/1_web-gin-CRUD)
-- [2_web-gin-protobuf](https://github.com/zhufuyi/sponge_examples/tree/main/2_web-gin-protobuf)
-- [3_micro-grpc-CRUD](https://github.com/zhufuyi/sponge_examples/tree/main/3_micro-grpc-CRUD)
+- [2_micro-grpc-CRUD](https://github.com/zhufuyi/sponge_examples/tree/main/2_micro-grpc-CRUD)
+- [3_web-gin-protobuf](https://github.com/zhufuyi/sponge_examples/tree/main/3_web-gin-protobuf)
 - [4_micro-grpc-protobuf](https://github.com/zhufuyi/sponge_examples/tree/main/4_micro-grpc-protobuf)
 - [5_micro-gin-rpc-gateway](https://github.com/zhufuyi/sponge_examples/tree/main/5_micro-gin-rpc-gateway)
 - [6_micro-cluster](https://github.com/zhufuyi/sponge_examples/tree/main/6_micro-cluster)
 
 #### 完整项目示例
 
-包括业务逻辑代码。
+包括具体业务逻辑代码。
 
 - [7_community-single](https://github.com/zhufuyi/sponge_examples/tree/main/7_community-single)
 - [8_community-cluster](https://github.com/zhufuyi/sponge_examples/tree/main/8_community-cluster)
@@ -165,14 +165,13 @@ sponge run
 - [04 批量生成CRUD接口代码到web服务](https://www.bilibili.com/video/BV1AY411C7J7/)
 - [05 一键生成通用的web服务项目代码](https://www.bilibili.com/video/BV1CX4y1D7xj/)
 - [06 批量生成任意API接口代码到web服务](https://www.bilibili.com/video/BV1P54y1g7J9/)
-- [07 一键生成微服务(gRPC)完整项目代码](https://www.bilibili.com/video/BV1Tg4y1b79U/)
+- [07 一键生成微服务(grpc)完整项目代码](https://www.bilibili.com/video/BV1Tg4y1b79U/)
 - [08 批量生成CRUD代码到微服务项目代码](https://www.bilibili.com/video/BV1TY411z7rY/)
-- [09 一键生成通用的微服务(gRPC)项目代码](https://www.bilibili.com/video/BV1WY4y1X7zH/)
-- [10 批量生成rpc方法代码到微服务](https://www.bilibili.com/video/BV1Yo4y1q76o/)
-- [11 rpc测试神器，简单便捷](https://www.bilibili.com/video/BV1VT411z7oj/)
-- [12 一键生成rpc网关服务项目代码](https://www.bilibili.com/video/BV1mV4y1D7k9/)
+- [09 一键生成通用的微服务(grpc)项目代码](https://www.bilibili.com/video/BV1WY4y1X7zH/)
+- [10 批量生成grpc方法代码到微服务](https://www.bilibili.com/video/BV1Yo4y1q76o/)
+- [11 grpc测试神器，简单便捷](https://www.bilibili.com/video/BV1VT411z7oj/)
+- [12 一键生成grpc网关服务项目代码](https://www.bilibili.com/video/BV1mV4y1D7k9/)
 - [13 十分钟搭建一个微服务集群示例](https://www.bilibili.com/video/BV1YM4y127YK/)
-- [14 用chatGPT打造你的专属面试题库](https://www.bilibili.com/video/BV1V24y1w7wG/)
 
 <br>
 
