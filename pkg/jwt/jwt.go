@@ -7,6 +7,18 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+// ErrTokenExpired expired
+var ErrTokenExpired = jwt.ErrTokenExpired
+
+var opt *options
+
+// Init initialize jwt
+func Init(opts ...Option) {
+	o := defaultOptions()
+	o.apply(opts...)
+	opt = o
+}
+
 // Claims my custom claims
 type Claims struct {
 	UID  string `json:"uid"`

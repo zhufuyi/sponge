@@ -34,12 +34,12 @@ type CtxKeyString string
 // RequestIDKey request_id
 var RequestIDKey = CtxKeyString(ContextRequestIDKey)
 
+// ---------------------------------- client interceptor ----------------------------------
+
 // CtxRequestIDField get request id field from context.Context
 func CtxRequestIDField(ctx context.Context) zap.Field {
 	return zap.String(ContextRequestIDKey, metautils.ExtractOutgoing(ctx).Get(ContextRequestIDKey))
 }
-
-// ---------------------------------- client interceptor ----------------------------------
 
 // ClientCtxRequestID get request id from rpc client context.Context
 func ClientCtxRequestID(ctx context.Context) string {
@@ -48,7 +48,7 @@ func ClientCtxRequestID(ctx context.Context) string {
 
 // ClientCtxRequestIDField get request id field from rpc client context.Context
 func ClientCtxRequestIDField(ctx context.Context) zap.Field {
-	return zap.String(ContextRequestIDKey, ClientCtxRequestID(ctx))
+	return zap.String(ContextRequestIDKey, metautils.ExtractOutgoing(ctx).Get(ContextRequestIDKey))
 }
 
 // UnaryClientRequestID client-side request_id unary interceptor
@@ -79,6 +79,21 @@ func StreamClientRequestID() grpc.StreamClientInterceptor {
 
 // ---------------------------------- server interceptor ----------------------------------
 
+// KV key value
+type KV struct {
+	Key string
+	Val interface{}
+}
+
+// WrapServerCtx wrap context, used in grpc server-side
+func WrapServerCtx(ctx context.Context, kvs ...KV) context.Context {
+	ctx = context.WithValue(ctx, ContextRequestIDKey, metautils.ExtractIncoming(ctx).Get(ContextRequestIDKey)) //nolint
+	for _, kv := range kvs {
+		ctx = context.WithValue(ctx, kv.Key, kv.Val) //nolint
+	}
+	return ctx
+}
+
 // ServerCtxRequestID get request id from rpc server context.Context
 func ServerCtxRequestID(ctx context.Context) string {
 	return metautils.ExtractIncoming(ctx).Get(ContextRequestIDKey)
@@ -86,7 +101,7 @@ func ServerCtxRequestID(ctx context.Context) string {
 
 // ServerCtxRequestIDField get request id field from rpc server context.Context
 func ServerCtxRequestIDField(ctx context.Context) zap.Field {
-	return zap.String(ContextRequestIDKey, ServerCtxRequestID(ctx))
+	return zap.String(ContextRequestIDKey, metautils.ExtractIncoming(ctx).Get(ContextRequestIDKey))
 }
 
 // UnaryServerRequestID server-side request_id unary interceptor

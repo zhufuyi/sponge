@@ -554,12 +554,19 @@ func TestStreamServerRequestID(t *testing.T) {
 	time.Sleep(time.Millisecond)
 }
 
-func TestCtxRequestIDField(t *testing.T) {
-	field := ClientCtxRequestIDField(context.Background())
+func TestCtxRequestID(t *testing.T) {
+	_ = ClientCtxRequestID(context.Background())
+	field := CtxRequestIDField(context.Background())
 	assert.NotNil(t, field)
+	field = ClientCtxRequestIDField(context.Background())
+	assert.NotNil(t, field)
+
+	ctx := WrapServerCtx(context.Background())
+	assert.NotNil(t, ctx)
+	ctx = WrapServerCtx(context.Background(), KV{Key: "foo", Val: "bar"})
+	assert.NotNil(t, ctx)
+	_ = ServerCtxRequestID(context.Background())
 	field = ServerCtxRequestIDField(context.Background())
-	assert.NotNil(t, field)
-	field = CtxRequestIDField(context.Background())
 	assert.NotNil(t, field)
 }
 

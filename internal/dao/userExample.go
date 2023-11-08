@@ -31,8 +31,8 @@ type UserExampleDao interface {
 	GetByColumns(ctx context.Context, params *query.Params) ([]*model.UserExample, int64, error)
 
 	CreateByTx(ctx context.Context, tx *gorm.DB, table *model.UserExample) (uint64, error)
-	UpdateByTx(ctx context.Context, tx *gorm.DB, table *model.UserExample) error
 	DeleteByTx(ctx context.Context, tx *gorm.DB, id uint64) error
+	UpdateByTx(ctx context.Context, tx *gorm.DB, table *model.UserExample) error
 }
 
 type userExampleDao struct {

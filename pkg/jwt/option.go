@@ -16,15 +16,6 @@ var (
 	HS512 = jwt.SigningMethodHS512
 )
 
-var opt *options
-
-// Init initialize jwt
-func Init(opts ...Option) {
-	o := defaultOptions()
-	o.apply(opts...)
-	opt = o
-}
-
 var (
 	defaultSigningKey    = []byte("zaq12wsxmko0") // default key
 	defaultSigningMethod = HS256                  // default HS256

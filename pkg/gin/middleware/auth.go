@@ -60,8 +60,8 @@ func responseUnauthorized(c *gin.Context, isSwitchHTTPCode bool) {
 
 // -------------------------------------------------------------------------------------------
 
-// VerifyFn verify function
-type VerifyFn func(claims *jwt.Claims) error
+// VerifyFn verify function, tokenTail10 is a string that intercepts the last 10 characters of the token.
+type VerifyFn func(claims *jwt.Claims, tokenTail10 string) error
 
 // Auth authorization
 func Auth(opts ...JwtOption) gin.HandlerFunc {
@@ -77,7 +77,8 @@ func Auth(opts ...JwtOption) gin.HandlerFunc {
 			return
 		}
 
-		claims, err := jwt.ParseToken(authorization[7:]) // token=authorization[7:], remove Bearer prefix
+		token := authorization[7:] // remove Bearer prefix
+		claims, err := jwt.ParseToken(token)
 		if err != nil {
 			logger.Warn("ParseToken error", logger.Err(err))
 			responseUnauthorized(c, o.isSwitchHTTPCode)
@@ -86,7 +87,8 @@ func Auth(opts ...JwtOption) gin.HandlerFunc {
 		}
 
 		if o.verify != nil {
-			if err = o.verify(claims); err != nil {
+			tokenTail10 := token[len(token)-10:]
+			if err = o.verify(claims, tokenTail10); err != nil {
 				logger.Warn("verify error", logger.Err(err), logger.String("uid", claims.UID), logger.String("role", claims.Role))
 				responseUnauthorized(c, o.isSwitchHTTPCode)
 				c.Abort()
@@ -103,8 +105,8 @@ func Auth(opts ...JwtOption) gin.HandlerFunc {
 
 // -------------------------------------------------------------------------------------------
 
-// VerifyCustomFn verify custom function
-type VerifyCustomFn func(claims *jwt.CustomClaims) error
+// VerifyCustomFn verify custom function, tokenTail10 is a string that intercepts the last 10 characters of the token.
+type VerifyCustomFn func(claims *jwt.CustomClaims, tokenTail10 string) error
 
 // AuthCustom custom authentication
 func AuthCustom(verify VerifyCustomFn, opts ...JwtOption) gin.HandlerFunc {
@@ -120,7 +122,8 @@ func AuthCustom(verify VerifyCustomFn, opts ...JwtOption) gin.HandlerFunc {
 			return
 		}
 
-		claims, err := jwt.ParseCustomToken(authorization[7:]) // token=authorization[7:], remove Bearer prefix
+		token := authorization[7:] // remove Bearer prefix
+		claims, err := jwt.ParseCustomToken(token)
 		if err != nil {
 			logger.Warn("ParseToken error", logger.Err(err))
 			responseUnauthorized(c, o.isSwitchHTTPCode)
@@ -128,7 +131,8 @@ func AuthCustom(verify VerifyCustomFn, opts ...JwtOption) gin.HandlerFunc {
 			return
 		}
 
-		if err = verify(claims); err != nil {
+		tokenTail10 := token[len(token)-10:]
+		if err = verify(claims, tokenTail10); err != nil {
 			logger.Warn("verify error", logger.Err(err), logger.Any("fields", claims.Fields))
 			responseUnauthorized(c, o.isSwitchHTTPCode)
 			c.Abort()

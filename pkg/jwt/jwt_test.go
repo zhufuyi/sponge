@@ -1,6 +1,7 @@
 package jwt
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 	"time"
@@ -68,7 +69,7 @@ func TestParseToken(t *testing.T) {
 	}
 	time.Sleep(time.Second * 2)
 	v, err = ParseToken(token)
-	assert.Error(t, err)
+	assert.True(t, errors.Is(err, ErrTokenExpired))
 }
 
 func TestGenerateCustomToken(t *testing.T) {
@@ -132,5 +133,5 @@ func TestParseCustomToken(t *testing.T) {
 	}
 	time.Sleep(time.Second * 2)
 	v, err = ParseCustomToken(token)
-	assert.Error(t, err)
+	assert.True(t, errors.Is(err, ErrTokenExpired))
 }
