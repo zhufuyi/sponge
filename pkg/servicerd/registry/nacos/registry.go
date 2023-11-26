@@ -65,10 +65,11 @@ type Registry struct {
 
 // NewRegistry instantiating the nacos registry
 func NewRegistry(nacosIPAddr string, nacosPort int, nacosNamespaceID string,
-	id string, instanceName string, instanceEndpoints []string) (registry.Registry, *registry.ServiceInstance, error) {
+	id string, instanceName string, instanceEndpoints []string,
+	opts ...nacoscli.Option) (registry.Registry, *registry.ServiceInstance, error) {
 	serviceInstance := registry.NewServiceInstance(id, instanceName, instanceEndpoints)
 
-	cli, err := nacoscli.NewNamingClient(nacosIPAddr, nacosPort, nacosNamespaceID)
+	cli, err := nacoscli.NewNamingClient(nacosIPAddr, nacosPort, nacosNamespaceID, opts...)
 	if err != nil {
 		return nil, nil, err
 	}

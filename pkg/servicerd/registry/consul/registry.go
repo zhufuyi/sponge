@@ -43,10 +43,11 @@ type Registry struct {
 }
 
 // NewRegistry instantiating the consul registry
-func NewRegistry(consulAddr string, id string, instanceName string, instanceEndpoints []string) (registry.Registry, *registry.ServiceInstance, error) {
+// Note: If the consulcli.WithConfig(*api.Config) parameter is set, the consulAddr parameter is ignored!
+func NewRegistry(consulAddr string, id string, instanceName string, instanceEndpoints []string, opts ...consulcli.Option) (registry.Registry, *registry.ServiceInstance, error) {
 	serviceInstance := registry.NewServiceInstance(id, instanceName, instanceEndpoints)
 
-	cli, err := consulcli.Init(consulAddr, consulcli.WithWaitTime(time.Second*5))
+	cli, err := consulcli.Init(consulAddr, opts...)
 	if err != nil {
 		return nil, nil, err
 	}

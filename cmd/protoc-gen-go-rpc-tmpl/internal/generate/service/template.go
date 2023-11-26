@@ -98,7 +98,7 @@ func (s *{{.LowerServiceName}}) {{.MethodName}}(ctx context.Context, req *server
 	//     })
 	// 	if err != nil {
 	//			logger.Warn("{{.MethodName}} error", logger.Err(err), interceptor.ServerCtxRequestIDField(ctx))
-	//			return nil, ecode.InternalServerError.Err()
+	//			return nil, ecode.StatusInternalServerError.Err()
 	//		}
 	//
 	//     return &serverNameExampleV1.{{.Reply}}{

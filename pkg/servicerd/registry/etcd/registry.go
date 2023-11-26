@@ -57,10 +57,11 @@ func WithMaxRetry(num int) Option {
 }
 
 // NewRegistry instantiating the etcd registry
-func NewRegistry(etcdEndpoints []string, id string, instanceName string, instanceEndpoints []string) (registry.Registry, *registry.ServiceInstance, error) {
+// Note: If the etcdcli.WithConfig(*clientv3.Config) parameter is set, the etcdEndpoints parameter is ignored!
+func NewRegistry(etcdEndpoints []string, id string, instanceName string, instanceEndpoints []string, opts ...etcdcli.Option) (registry.Registry, *registry.ServiceInstance, error) {
 	serviceInstance := registry.NewServiceInstance(id, instanceName, instanceEndpoints)
 
-	cli, err := etcdcli.Init(etcdEndpoints, etcdcli.WithDialTimeout(time.Second*5))
+	cli, err := etcdcli.Init(etcdEndpoints, opts...)
 	if err != nil {
 		return nil, nil, err
 	}

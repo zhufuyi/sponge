@@ -21,10 +21,12 @@ type Params struct {
 	Port        uint64 // port
 	Scheme      string // http or https
 	ContextPath string // path
-	NamespaceID string // namespace id
-	// if the parameter is not empty, replace the same fields as ClientConfig and ServerConfig above
-	clientConfig  *constant.ClientConfig
+	// if you set this parameter, the above fields(IPAddr, Port, Scheme, ContextPath) are invalid
 	serverConfigs []constant.ServerConfig
+
+	NamespaceID string // namespace id
+	// if you set this parameter, the above field(NamespaceID) is invalid
+	clientConfig *constant.ClientConfig
 
 	Group  string // group, example: dev, prod, test
 	DataID string // config file id
@@ -127,7 +129,9 @@ func Init(obj interface{}, params *Params, opts ...Option) error {
 	return nil
 }
 
-// NewNamingClient create a service registration and discovery of nacos client
+// NewNamingClient create a service registration and discovery of nacos client.
+// Note: If parameter WithClientConfig is set, nacosNamespaceID is invalid,
+// if parameter WithServerConfigs is set, nacosIPAddr and nacosPort are invalid.
 func NewNamingClient(nacosIPAddr string, nacosPort int, nacosNamespaceID string, opts ...Option) (naming_client.INamingClient, error) {
 	params := &Params{
 		IPAddr:      nacosIPAddr,

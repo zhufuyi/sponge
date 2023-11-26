@@ -3,6 +3,7 @@ package etcdcli
 import (
 	"time"
 
+	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/zap"
 )
 
@@ -21,6 +22,9 @@ type options struct {
 
 	autoSyncInterval time.Duration // automatic synchronization of member list intervals
 	logger           *zap.Logger
+
+	// if you set this parameter, all fields above are invalid
+	config *clientv3.Config
 }
 
 func defaultOptions() *options {
@@ -70,5 +74,12 @@ func WithAutoSyncInterval(duration time.Duration) Option {
 func WithLog(l *zap.Logger) Option {
 	return func(o *options) {
 		o.logger = l
+	}
+}
+
+// WithConfig set etcd client config
+func WithConfig(c *clientv3.Config) Option {
+	return func(o *options) {
+		o.config = c
 	}
 }

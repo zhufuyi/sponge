@@ -7,7 +7,7 @@ Get the configuration from the nacos configuration center and parse it into a st
 ```go
 	import "github.com/zhufuyi/sponge/pkg/nacoscli"
 
-	// Way 1: Setting parameters
+	// Way 1: setting parameters
 	a := &config{}
 	params := &Params{
 		IpAddr:      "192.168.3.37",
@@ -19,7 +19,7 @@ Get the configuration from the nacos configuration center and parse it into a st
 	}
 	err := nacoscli.Init(a, params)
 
-	// Way 2: Setting up ClientConfig and ServerConfig
+	// Way 2: setting up ClientConfig and ServerConfig
 	a = &config{}
 	params = &Params{
 		Group:  "dev",

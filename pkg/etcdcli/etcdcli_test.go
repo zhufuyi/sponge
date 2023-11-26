@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/zap"
 )
 
@@ -16,6 +17,14 @@ func TestInit(t *testing.T) {
 		WithAutoSyncInterval(0),
 		WithLog(zap.NewNop()),
 	)
+	t.Log(err, cli)
+
+	cli, err = Init(nil, WithConfig(&clientv3.Config{
+		Endpoints:   endpoints,
+		DialTimeout: time.Second * 2,
+		Username:    "",
+		Password:    "",
+	}))
 	t.Log(err, cli)
 
 	// test error

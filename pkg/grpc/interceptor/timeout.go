@@ -9,7 +9,7 @@ import (
 
 // ---------------------------------- client interceptor ----------------------------------
 
-var timeoutVal = time.Second * 3 // default timeout 3 seconds
+var timeoutVal = time.Second * 10 // default timeout 10 seconds
 
 // default timeout
 func defaultContextTimeout(ctx context.Context) (context.Context, context.CancelFunc) {

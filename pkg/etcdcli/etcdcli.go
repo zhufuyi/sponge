@@ -12,13 +12,19 @@ import (
 )
 
 // Init connecting to the etcd service
+// Note: If the WithConfig(*clientv3.Config) parameter is set, the endpoints parameter is ignored!
 func Init(endpoints []string, opts ...Option) (*clientv3.Client, error) {
+	o := defaultOptions()
+	o.apply(opts...)
+
+	if o.config != nil {
+		return clientv3.New(*o.config)
+	}
+
 	if len(endpoints) == 0 {
 		return nil, fmt.Errorf("etcd endpoints cannot be empty")
 	}
 
-	o := defaultOptions()
-	o.apply(opts...)
 	conf := clientv3.Config{
 		Endpoints:            endpoints,
 		DialTimeout:          o.dialTimeout,

@@ -3,6 +3,8 @@ package consulcli
 import (
 	"testing"
 	"time"
+
+	"github.com/hashicorp/consul/api"
 )
 
 func TestInit(t *testing.T) {
@@ -12,5 +14,13 @@ func TestInit(t *testing.T) {
 		WithWaitTime(time.Second*2),
 		WithDatacenter(""),
 	)
+	t.Log(err, cli)
+
+	cli, err = Init("", WithConfig(&api.Config{
+		Address:    addr,
+		Scheme:     "http",
+		WaitTime:   time.Second * 2,
+		Datacenter: "",
+	}))
 	t.Log(err, cli)
 }
