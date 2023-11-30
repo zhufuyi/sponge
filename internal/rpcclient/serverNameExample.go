@@ -39,8 +39,8 @@ func NewServerNameExampleRPCConn() {
 		}
 	}
 	if grpcClientCfg.Name == "" {
-		panic(fmt.Sprintf("not found server name '%v' in yaml config file (field GrpcClient), "+
-			"please change to the correct server name", serverName))
+		panic(fmt.Sprintf("not found grpc service name '%v' in configuration file(yaml), "+
+			"please add gprc service configuration in the configuration file(yaml) under the field grpcClient.", serverName))
 	}
 
 	var cliOptions = []grpccli.Option{
@@ -132,6 +132,7 @@ func NewServerNameExampleRPCConn() {
 	if err != nil {
 		panic(fmt.Sprintf("dial rpc server failed: %v, name: %s, endpoint: %s", err, serverName, endpoint))
 	}
+	logger.Infof("dialed grpc server (%s) successfully", serverName+", "+endpoint)
 }
 
 // GetServerNameExampleRPCConn get client conn

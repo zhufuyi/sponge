@@ -19,7 +19,6 @@ import (
 	"github.com/zhufuyi/sponge/pkg/servicerd/registry/nacos"
 	"github.com/zhufuyi/sponge/pkg/utils"
 
-	"go.uber.org/zap"
 	"google.golang.org/grpc"
 )
 
@@ -31,46 +30,57 @@ func TestRegisterAllService(t *testing.T) {
 	})
 }
 
-func getRPCClientConnForTest() *grpc.ClientConn {
+// The default is to connect to the local grpc service, if you want to connect to a remote grpc service,
+// pass in the parameter grpcClient.
+func getRPCClientConnForTest(grpcClient ...config.GrpcClient) *grpc.ClientConn {
 	err := config.Init(configs.Path("serverNameExample.yml"))
 	if err != nil {
 		panic(err)
 	}
+	var grpcClientCfg config.GrpcClient
 
-	if len(config.Get().GrpcClient) == 0 {
-		panic("no rpc client configuration information found in the configuration file")
+	if len(grpcClient) == 0 {
+		grpcClientCfg = config.GrpcClient{
+			Host: "127.0.0.1",
+			Port: config.Get().Grpc.Port,
+
+			Name:                  "",
+			EnableLoadBalance:     false,
+			RegistryDiscoveryType: "",
+			ClientSecure:          config.ClientSecure{},
+			ClientToken:           config.ClientToken{},
+		}
+	} else {
+		grpcClientCfg = grpcClient[0]
 	}
 
-	// Change the configuration information of the 0th client before testing
-	rpcClientCfg := config.Get().GrpcClient[0]
-
-	endpoint := rpcClientCfg.Host + ":" + utils.IntToStr(rpcClientCfg.Port)
+	endpoint := grpcClientCfg.Host + ":" + utils.IntToStr(grpcClientCfg.Port)
 	var cliOptions []grpccli.Option
 
 	// load balance
-	if rpcClientCfg.EnableLoadBalance {
+	if grpcClientCfg.EnableLoadBalance {
 		cliOptions = append(cliOptions, grpccli.WithEnableLoadBalance())
 	}
 
 	// secure
 	cliOptions = append(cliOptions, grpccli.WithSecure(
-		rpcClientCfg.ClientSecure.Type,
-		rpcClientCfg.ClientSecure.ServerName,
-		rpcClientCfg.ClientSecure.CaFile,
-		rpcClientCfg.ClientSecure.CertFile,
-		rpcClientCfg.ClientSecure.KeyFile,
+		grpcClientCfg.ClientSecure.Type,
+		grpcClientCfg.ClientSecure.ServerName,
+		grpcClientCfg.ClientSecure.CaFile,
+		grpcClientCfg.ClientSecure.CertFile,
+		grpcClientCfg.ClientSecure.KeyFile,
 	))
 
 	// token
 	cliOptions = append(cliOptions, grpccli.WithToken(
-		rpcClientCfg.ClientToken.Enable,
-		rpcClientCfg.ClientToken.AppID,
-		rpcClientCfg.ClientToken.AppKey,
+		grpcClientCfg.ClientToken.Enable,
+		grpcClientCfg.ClientToken.AppID,
+		grpcClientCfg.ClientToken.AppKey,
 	))
 
 	cliOptions = append(cliOptions,
 		grpccli.WithEnableRequestID(),
-		grpccli.WithEnableLog(zap.NewNop()),
+		grpccli.WithEnableLog(logger.Get()),
 	)
 
 	isUseDiscover := false
@@ -128,7 +138,7 @@ func getRPCClientConnForTest() *grpc.ClientConn {
 		cliOptions = append(cliOptions, grpccli.WithEnableMetrics())
 	}
 
-	msg := "dialing rpc server"
+	msg := "dialing grpc server"
 	if isUseDiscover {
 		msg += " with discovery from " + config.Get().App.RegistryDiscoveryType
 	}

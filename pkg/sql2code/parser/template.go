@@ -90,7 +90,7 @@ type {{.TableName}}ObjDetail struct {
 package api.serverNameExample.v1;
 
 import "api/types/types.proto";
-//import "validate/validate.proto";
+import "validate/validate.proto";
 
 option go_package = "github.com/zhufuyi/sponge/api/serverNameExample/v1;v1";
 
@@ -126,11 +126,11 @@ service {{.TName}} {
 // protoMessageCreateCode
 
 message Create{{.TableName}}Reply {
-  uint64   id =1;
+  uint64   id = 1;
 }
 
 message Delete{{.TableName}}ByIDRequest {
-  uint64   id =1;
+  uint64   id = 1 [(validate.rules).uint64.gt  = 0];
 }
 
 message Delete{{.TableName}}ByIDReply {
@@ -138,7 +138,7 @@ message Delete{{.TableName}}ByIDReply {
 }
 
 message Delete{{.TableName}}ByIDsRequest {
-  repeated uint64 ids = 1;
+  repeated uint64 ids = 1 [(validate.rules).repeated.min_items = 1];
 }
 
 message Delete{{.TableName}}ByIDsReply {
@@ -154,7 +154,7 @@ message Update{{.TableName}}ByIDReply {
 // protoMessageDetailCode
 
 message Get{{.TableName}}ByIDRequest {
-  uint64   id =1;
+  uint64   id = 1 [(validate.rules).uint64.gt  = 0];
 }
 
 message Get{{.TableName}}ByIDReply {
@@ -170,7 +170,7 @@ message Get{{.TableName}}ByConditionReply {
 }
 
 message List{{.TableName}}ByIDsRequest {
-  repeated uint64 ids = 1;
+  repeated uint64 ids = 1 [(validate.rules).repeated.min_items = 1];
 }
 
 message List{{.TableName}}ByIDsReply {
@@ -196,7 +196,7 @@ import "api/types/types.proto";
 import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "tagger/tagger.proto";
-//import "validate/validate.proto";
+import "validate/validate.proto";
 
 option go_package = "github.com/zhufuyi/sponge/api/serverNameExample/v1;v1";
 
@@ -381,11 +381,11 @@ service {{.TName}} {
 // protoMessageCreateCode
 
 message Create{{.TableName}}Reply {
-  uint64   id =1;
+  uint64   id = 1;
 }
 
 message Delete{{.TableName}}ByIDRequest {
-  uint64   id =1 [(tagger.tags) = "uri:\"id\"" ];
+  uint64   id =1 [(validate.rules).uint64.gte  = 1, (tagger.tags) = "uri:\"id\"" ];
 }
 
 message Delete{{.TableName}}ByIDReply {
@@ -393,7 +393,7 @@ message Delete{{.TableName}}ByIDReply {
 }
 
 message Delete{{.TableName}}ByIDsRequest {
-  repeated uint64 ids = 1;
+  repeated uint64 ids = 1 [(validate.rules).repeated.min_items = 1];
 }
 
 message Delete{{.TableName}}ByIDsReply {
@@ -409,7 +409,7 @@ message Update{{.TableName}}ByIDReply {
 // protoMessageDetailCode
 
 message Get{{.TableName}}ByIDRequest {
-  uint64   id =1 [(tagger.tags) = "uri:\"id\"" ];
+  uint64   id =1 [(validate.rules).uint64.gte  = 1, (tagger.tags) = "uri:\"id\"" ];
 }
 
 message Get{{.TableName}}ByIDReply {
@@ -425,7 +425,7 @@ message Get{{.TableName}}ByConditionReply {
 }
 
 message List{{.TableName}}ByIDsRequest {
-  repeated uint64 ids = 1;
+  repeated uint64 ids = 1 [(validate.rules).repeated.min_items = 1];
 }
 
 message List{{.TableName}}ByIDsReply {

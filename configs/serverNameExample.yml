@@ -45,7 +45,7 @@ grpc:
 
 
 
-# grpc client settings, support for setting up multiple grpc clients
+# grpc client-side settings, support for setting up multiple grpc clients.
 grpcClient:
   - name: "serverNameExample"   # grpc server name, used for service discovery
     host: "127.0.0.1"                    # grpc service address, used for direct connection
