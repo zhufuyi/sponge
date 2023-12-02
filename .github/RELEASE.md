@@ -1,5 +1,5 @@
 ## Change log
 
-- Support for upgrading to specific versions.
-- Adjustment Authorization function.
-- Update Documentation.
+- Sponge command ui service support docker deployment.
+- Adjustment option code.
+

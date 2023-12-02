@@ -1,0 +1,11 @@
+version: "3.7"
+
+services:
+  sponge:
+    image: zhufuyi/sponge:latest
+    container_name: sponge
+    restart: always
+    # address of the front-end page requesting the sponge service
+    command: ["-l","-a","http://192.168.3.37:24631"]
+    ports:
+      - "24631:24631"

@@ -110,3 +110,42 @@ sponge tools
 # 查看sponge版本
 sponge -v
 ```
+
+<br>
+
+### docker部署
+
+注意：使用docker部署的只是sponge ui界面服务，如果需要在生成的服务代码基础上进行开发，还需要根据上面的安装说明，在本地安装sponge和依赖的插件。
+
+**方式一：Docker启动**
+
+```bash
+docker run -d --name sponge -p 24631:24631 zhufuyi/sponge:latest -l -a http://你的宿主机ip:24631
+```
+
+<br>
+
+**方式二：docker-compose启动**
+
+docker-compose.yaml 文件内容如下：
+
+```yaml
+version: "3.7"
+
+services:
+  sponge:
+    image: zhufuyi/sponge:latest
+    container_name: sponge
+    restart: always
+    command: ["-l","-a","http://你的宿主机ip:24631"]
+    ports:
+      - "24631:24631"
+```
+
+```bash
+# 启动服务
+docker-compose up -d
+
+```
+
+在docker部署成功后，在浏览器访问 `http://你的宿主机ip:24631`。

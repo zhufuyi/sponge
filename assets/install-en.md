@@ -108,3 +108,42 @@ sponge tools
 # Check Sponge version
 sponge -v
 ```
+
+<br>
+
+### Docker Deployment
+
+> ⚠ Docker deployment is specifically for the Sponge UI service. If you need to develop based on the generated service code, you also need to install Sponge and the required plugins locally according to the installation instructions above.
+
+**Option 1: Docker Run**
+
+```bash
+docker run -d --name sponge -p 24631:24631 zhufuyi/sponge:latest -l -a http://your_host_ip:24631
+```
+
+<br>
+
+**Option 2: Docker Compose**
+
+The content of the `docker-compose.yaml` file is as follows:
+
+```yaml
+version: "3.7"
+
+services:
+  sponge:
+    image: zhufuyi/sponge:latest
+    container_name: sponge
+    restart: always
+    command: ["-l","-a","http://your_host_ip:24631"]
+    ports:
+      - "24631:24631"
+```
+
+Start the service:
+
+```bash
+docker-compose up -d
+```
+
+After a successful Docker deployment, access `http://your_host_ip:24631` in your browser.

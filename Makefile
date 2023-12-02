@@ -100,6 +100,12 @@ build-sponge:
 	@echo "building 'sponge', linux binary file will output to 'cmd/sponge'"
 	@cd cmd/sponge && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "all=-s -w"
 
+.PHONY: image-build-sponge
+# build a sponge docker image, e.g. make image-build-sponge TAG=v1.5.8
+image-build-sponge:
+	@echo "build a sponge docker image'"
+	@cd cmd/sponge/scripts && bash image-build.sh  $(TAG)
+
 # delete the templates code end
 
 .PHONY: run
