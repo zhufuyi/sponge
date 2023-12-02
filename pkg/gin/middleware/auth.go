@@ -61,7 +61,7 @@ func responseUnauthorized(c *gin.Context, isSwitchHTTPCode bool) {
 // -------------------------------------------------------------------------------------------
 
 // VerifyFn verify function, tokenTail10 is a string that intercepts the last 10 characters of the token.
-type VerifyFn func(claims *jwt.Claims, tokenTail10 string) error
+type VerifyFn func(claims *jwt.Claims, tokenTail10 string, c *gin.Context) error
 
 // Auth authorization
 func Auth(opts ...JwtOption) gin.HandlerFunc {
@@ -88,7 +88,7 @@ func Auth(opts ...JwtOption) gin.HandlerFunc {
 
 		if o.verify != nil {
 			tokenTail10 := token[len(token)-10:]
-			if err = o.verify(claims, tokenTail10); err != nil {
+			if err = o.verify(claims, tokenTail10, c); err != nil {
 				logger.Warn("verify error", logger.Err(err), logger.String("uid", claims.UID), logger.String("role", claims.Role))
 				responseUnauthorized(c, o.isSwitchHTTPCode)
 				c.Abort()
@@ -106,7 +106,7 @@ func Auth(opts ...JwtOption) gin.HandlerFunc {
 // -------------------------------------------------------------------------------------------
 
 // VerifyCustomFn verify custom function, tokenTail10 is a string that intercepts the last 10 characters of the token.
-type VerifyCustomFn func(claims *jwt.CustomClaims, tokenTail10 string) error
+type VerifyCustomFn func(claims *jwt.CustomClaims, tokenTail10 string, c *gin.Context) error
 
 // AuthCustom custom authentication
 func AuthCustom(verify VerifyCustomFn, opts ...JwtOption) gin.HandlerFunc {
@@ -132,7 +132,7 @@ func AuthCustom(verify VerifyCustomFn, opts ...JwtOption) gin.HandlerFunc {
 		}
 
 		tokenTail10 := token[len(token)-10:]
-		if err = verify(claims, tokenTail10); err != nil {
+		if err = verify(claims, tokenTail10, c); err != nil {
 			logger.Warn("verify error", logger.Err(err), logger.Any("fields", claims.Fields))
 			responseUnauthorized(c, o.isSwitchHTTPCode)
 			c.Abort()

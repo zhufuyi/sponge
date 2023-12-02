@@ -85,7 +85,7 @@ func main() {
     r.Run(serverAddr)
 }
 
-func adminVerify(claims *jwt.Claims, token string) error {
+func adminVerify(claims *jwt.Claims, tokenTail10 string, c *gin.Context) error {
     if claims.Role != "admin" {
         return errors.New("verify failed")
     }
@@ -120,7 +120,7 @@ func main() {
     r.Run(serverAddr)
 }
 
-func verify(claims *jwt.CustomClaims, tokenTail10 string) error {
+func verify(claims *jwt.CustomClaims, tokenTail10 string, c *gin.Context) error {
     err := errors.New("verify failed")
 
     // token := getToken(id)

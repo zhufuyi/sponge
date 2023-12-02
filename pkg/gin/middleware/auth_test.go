@@ -22,7 +22,7 @@ var (
 	fields = jwt.KV{"id": 1, "foo": "bar"}
 )
 
-func verify(claims *jwt.Claims, tokenTail10 string) error {
+func verify(claims *jwt.Claims, tokenTail10 string, c *gin.Context) error {
 	if claims.UID != uid || claims.Role != role {
 		return errors.New("verify failed")
 	}
@@ -33,7 +33,7 @@ func verify(claims *jwt.Claims, tokenTail10 string) error {
 	return nil
 }
 
-func verifyCustom(claims *jwt.CustomClaims, tokenTail10 string) error {
+func verifyCustom(claims *jwt.CustomClaims, tokenTail10 string, c *gin.Context) error {
 	err := errors.New("verify failed")
 
 	id, exist := claims.Get("id")
