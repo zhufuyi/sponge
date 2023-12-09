@@ -57,6 +57,7 @@ func TestParse(t *testing.T) {
 		err := Init(conf, params,
 			WithClientConfig(clientConfig),
 			WithServerConfigs(serverConfigs),
+			WithAuth("foo", "bar"),
 		)
 		t.Log(err, conf)
 	})

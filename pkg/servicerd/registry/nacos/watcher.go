@@ -37,8 +37,8 @@ func newWatcher(ctx context.Context, cli naming_client.INamingClient, serviceNam
 
 	e := w.cli.Subscribe(&vo.SubscribeParam{
 		ServiceName: serviceName,
-		Clusters:    clusters,
 		GroupName:   groupName,
+		//Clusters:    clusters, // if set the clusters, subscription messages cannot be received
 		SubscribeCallback: func(services []model.Instance, err error) {
 			w.watchChan <- struct{}{}
 		},
@@ -55,7 +55,7 @@ func (w *watcher) Next() ([]*registry.ServiceInstance, error) {
 	res, err := w.cli.GetService(vo.GetServiceParam{
 		ServiceName: w.serviceName,
 		GroupName:   w.groupName,
-		Clusters:    w.clusters,
+		//Clusters:    w.clusters, // if cluster is set, the latest service is not obtained.
 	})
 	if err != nil {
 		return nil, err
@@ -63,11 +63,18 @@ func (w *watcher) Next() ([]*registry.ServiceInstance, error) {
 	items := make([]*registry.ServiceInstance, 0, len(res.Hosts))
 	for _, in := range res.Hosts {
 		kind := w.kind
-		if k, ok := in.Metadata["kind"]; ok {
-			kind = k
+		id := in.InstanceId
+		if in.Metadata != nil {
+			if k, ok := in.Metadata["kind"]; ok {
+				kind = k
+			}
+			if v, ok := in.Metadata["id"]; ok {
+				id = v
+				delete(in.Metadata, "id")
+			}
 		}
 		items = append(items, &registry.ServiceInstance{
-			ID:        in.InstanceId,
+			ID:        id,
 			Name:      res.Name,
 			Version:   in.Metadata["version"],
 			Metadata:  in.Metadata,

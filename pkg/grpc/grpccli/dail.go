@@ -15,7 +15,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-// Dial to rpc server
+// Dial to grpc server
 func Dial(ctx context.Context, endpoint string, opts ...Option) (*grpc.ClientConn, error) {
 	o := defaultOptions()
 	o.apply(opts...)

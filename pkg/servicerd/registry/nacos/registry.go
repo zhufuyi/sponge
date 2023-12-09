@@ -116,6 +116,7 @@ func (r *Registry) Register(_ context.Context, si *registry.ServiceInstance) err
 		var rmd map[string]string
 		if si.Metadata == nil {
 			rmd = map[string]string{
+				"id":      si.ID,
 				"kind":    u.Scheme,
 				"version": si.Version,
 			}
@@ -124,6 +125,7 @@ func (r *Registry) Register(_ context.Context, si *registry.ServiceInstance) err
 			for k, v := range si.Metadata {
 				rmd[k] = v
 			}
+			rmd["id"] = si.ID
 			rmd["kind"] = u.Scheme
 			rmd["version"] = si.Version
 		}
@@ -140,7 +142,7 @@ func (r *Registry) Register(_ context.Context, si *registry.ServiceInstance) err
 			GroupName:   r.opts.group,
 		})
 		if e != nil {
-			return fmt.Errorf("RegisterInstance err %v,%v", e, endpoint)
+			return fmt.Errorf("RegisterInstance err %v, id = %s", e, si.ID)
 		}
 	}
 	return nil
@@ -193,11 +195,18 @@ func (r *Registry) GetService(_ context.Context, serviceName string) ([]*registr
 	items := make([]*registry.ServiceInstance, 0, len(res))
 	for _, in := range res {
 		kind := r.opts.kind
-		if k, ok := in.Metadata["kind"]; ok {
-			kind = k
+		id := in.InstanceId
+		if in.Metadata != nil {
+			if k, ok := in.Metadata["kind"]; ok {
+				kind = k
+			}
+			if v, ok := in.Metadata["id"]; ok {
+				id = v
+				delete(in.Metadata, "id")
+			}
 		}
 		items = append(items, &registry.ServiceInstance{
-			ID:        in.InstanceId,
+			ID:        id,
 			Name:      in.ServiceName,
 			Version:   in.Metadata["version"],
 			Metadata:  in.Metadata,

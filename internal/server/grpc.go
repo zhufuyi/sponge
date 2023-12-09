@@ -124,7 +124,7 @@ func (s *grpcServer) secureServerOption() grpc.ServerOption {
 		if err != nil {
 			panic(err)
 		}
-		logger.Info("rpc security type: sever-side certification")
+		logger.Info("grpc security type: sever-side certification")
 		return grpc.Creds(credentials)
 
 	case "two-way": // both client and server side certification
@@ -136,11 +136,11 @@ func (s *grpcServer) secureServerOption() grpc.ServerOption {
 		if err != nil {
 			panic(err)
 		}
-		logger.Info("rpc security type: both client-side and server-side certification")
+		logger.Info("grpc security type: both client-side and server-side certification")
 		return grpc.Creds(credentials)
 	}
 
-	logger.Info("rpc security type: insecure")
+	logger.Info("grpc security type: insecure")
 	return nil
 }
 

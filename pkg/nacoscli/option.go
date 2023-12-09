@@ -5,6 +5,10 @@ import (
 )
 
 type options struct {
+	username string
+	password string
+
+	// if set the clientConfig, the above fields(username, password) are invalid
 	clientConfig  *constant.ClientConfig
 	serverConfigs []constant.ServerConfig
 }
@@ -22,6 +26,14 @@ type Option func(*options)
 func (o *options) apply(opts ...Option) {
 	for _, opt := range opts {
 		opt(o)
+	}
+}
+
+// WithAuth set authentication
+func WithAuth(username string, password string) Option {
+	return func(o *options) {
+		o.username = username
+		o.password = password
 	}
 }
 

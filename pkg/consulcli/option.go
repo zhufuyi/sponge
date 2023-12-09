@@ -13,6 +13,7 @@ type options struct {
 	scheme     string
 	waitTime   time.Duration
 	datacenter string
+	token      string
 
 	// if you set this parameter, all fields above are invalid
 	config *api.Config
@@ -49,6 +50,13 @@ func WithScheme(scheme string) Option {
 func WithDatacenter(datacenter string) Option {
 	return func(o *options) {
 		o.datacenter = datacenter
+	}
+}
+
+// WithToken set token
+func WithToken(token string) Option {
+	return func(o *options) {
+		o.token = token
 	}
 }
 

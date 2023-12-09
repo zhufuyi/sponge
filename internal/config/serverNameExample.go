@@ -19,7 +19,7 @@ func Show(hiddenFields ...string) string {
 
 func Get() *Config {
 	if config == nil {
-		panic("config is nil")
+		panic("config is nil, please call config.Init() first")
 	}
 	return config
 }

@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"strconv"
 	"testing"
 	"time"
 
@@ -30,7 +31,7 @@ func TestRegisterAllService(t *testing.T) {
 	})
 }
 
-// The default is to connect to the local grpc service, if you want to connect to a remote grpc service,
+// The default is to connect to the local grpc server, if you want to connect to a remote grpc server,
 // pass in the parameter grpcClient.
 func getRPCClientConnForTest(grpcClient ...config.GrpcClient) *grpc.ClientConn {
 	err := config.Init(configs.Path("serverNameExample.yml"))
@@ -40,21 +41,22 @@ func getRPCClientConnForTest(grpcClient ...config.GrpcClient) *grpc.ClientConn {
 	var grpcClientCfg config.GrpcClient
 
 	if len(grpcClient) == 0 {
+		// default config from configuration file serverNameExample.yml
 		grpcClientCfg = config.GrpcClient{
-			Host: "127.0.0.1",
+			Host: config.Get().App.Host,
 			Port: config.Get().Grpc.Port,
-
-			Name:                  "",
-			EnableLoadBalance:     false,
-			RegistryDiscoveryType: "",
-			ClientSecure:          config.ClientSecure{},
-			ClientToken:           config.ClientToken{},
+			// If RegistryDiscoveryType is not empty, service discovery is used, and Host and Port values are invalid
+			RegistryDiscoveryType: config.Get().App.RegistryDiscoveryType, // supports consul, etcd and nacos
+			Name:                  config.Get().App.Name,
+		}
+		if grpcClientCfg.RegistryDiscoveryType != "" {
+			grpcClientCfg.EnableLoadBalance = true
 		}
 	} else {
+		// custom config
 		grpcClientCfg = grpcClient[0]
 	}
 
-	endpoint := grpcClientCfg.Host + ":" + utils.IntToStr(grpcClientCfg.Port)
 	var cliOptions []grpccli.Option
 
 	// load balance
@@ -83,66 +85,58 @@ func getRPCClientConnForTest(grpcClient ...config.GrpcClient) *grpc.ClientConn {
 		grpccli.WithEnableLog(logger.Get()),
 	)
 
-	isUseDiscover := false
-	if config.Get().App.RegistryDiscoveryType != "" {
-		var iDiscovery registry.Discovery
-		endpoint = "discovery:///" + config.Get().App.Name // Connecting to grpc services by service name
+	var (
+		endpoint      string
+		isUseDiscover bool
+		iDiscovery    registry.Discovery
+	)
 
-		// Use consul service discovery, note that the host field in the configuration file serverNameExample.yml
-		// needs to be filled with the local ip, not 127.0.0.1, to do the health check
-		if config.Get().App.RegistryDiscoveryType == "consul" {
-			cli, err := consulcli.Init(config.Get().Consul.Addr, consulcli.WithWaitTime(time.Second*2))
-			if err != nil {
-				panic(err)
-			}
-			iDiscovery = consul.New(cli)
-			isUseDiscover = true
+	switch grpcClientCfg.RegistryDiscoveryType {
+	case "consul":
+		endpoint = "discovery:///" + grpcClientCfg.Name // Connecting to grpc services by service name
+		cli, err := consulcli.Init(config.Get().Consul.Addr, consulcli.WithWaitTime(time.Second*2))
+		if err != nil {
+			panic(err)
 		}
+		iDiscovery = consul.New(cli)
+		isUseDiscover = true
 
-		// Use etcd service discovery, use the command etcdctl get / --prefix to see if the service is registered before testing,
-		// note: the IDE using a proxy may cause the connection to the etcd service to fail
-		if config.Get().App.RegistryDiscoveryType == "etcd" {
-			cli, err := etcdcli.Init(config.Get().Etcd.Addrs, etcdcli.WithDialTimeout(time.Second*2))
-			if err != nil {
-				panic(err)
-			}
-			iDiscovery = etcd.New(cli)
-			isUseDiscover = true
+	case "etcd":
+		endpoint = "discovery:///" + grpcClientCfg.Name // Connecting to grpc services by service name
+		cli, err := etcdcli.Init(config.Get().Etcd.Addrs, etcdcli.WithDialTimeout(time.Second*2))
+		if err != nil {
+			panic(err)
 		}
-
-		// Use nacos service discovery
-		if config.Get().App.RegistryDiscoveryType == "nacos" {
-			// example: endpoint = "discovery:///serverName.scheme"
-			endpoint = "discovery:///" + config.Get().App.Name + ".grpc"
-			cli, err := nacoscli.NewNamingClient(
-				config.Get().NacosRd.IPAddr,
-				config.Get().NacosRd.Port,
-				config.Get().NacosRd.NamespaceID)
-			if err != nil {
-				panic(err)
-			}
-			iDiscovery = nacos.New(cli)
-			isUseDiscover = true
+		iDiscovery = etcd.New(cli)
+		isUseDiscover = true
+	case "nacos":
+		// example: endpoint = "discovery:///serverName.scheme"
+		endpoint = "discovery:///" + grpcClientCfg.Name + ".grpc"
+		cli, err := nacoscli.NewNamingClient(
+			config.Get().NacosRd.IPAddr,
+			config.Get().NacosRd.Port,
+			config.Get().NacosRd.NamespaceID)
+		if err != nil {
+			panic(err)
 		}
+		iDiscovery = nacos.New(cli)
+		isUseDiscover = true
 
+	default:
+		endpoint = grpcClientCfg.Host + ":" + strconv.Itoa(grpcClientCfg.Port)
+		iDiscovery = nil
+		isUseDiscover = false
+	}
+
+	if iDiscovery != nil {
 		cliOptions = append(cliOptions, grpccli.WithDiscovery(iDiscovery))
-	}
-
-	if config.Get().App.EnableTrace {
-		cliOptions = append(cliOptions, grpccli.WithEnableTrace())
-	}
-	if config.Get().App.EnableCircuitBreaker {
-		cliOptions = append(cliOptions, grpccli.WithEnableCircuitBreaker())
-	}
-	if config.Get().App.EnableMetrics {
-		cliOptions = append(cliOptions, grpccli.WithEnableMetrics())
 	}
 
 	msg := "dialing grpc server"
 	if isUseDiscover {
-		msg += " with discovery from " + config.Get().App.RegistryDiscoveryType
+		msg += " with discovery from " + grpcClientCfg.RegistryDiscoveryType
 	}
-	logger.Info(msg, logger.String("name", config.Get().App.Name), logger.String("endpoint", endpoint))
+	logger.Info(msg, logger.String("name", grpcClientCfg.Name), logger.String("endpoint", endpoint))
 
 	conn, err := grpccli.Dial(context.Background(), endpoint, cliOptions...)
 	if err != nil {

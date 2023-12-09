@@ -19,7 +19,7 @@ import (
 type Params struct {
 	IPAddr      string // server address
 	Port        uint64 // port
-	Scheme      string // http or https
+	Scheme      string // http or grpc
 	ContextPath string // path
 	// if you set this parameter, the above fields(IPAddr, Port, Scheme, ContextPath) are invalid
 	serverConfigs []constant.ServerConfig
@@ -70,6 +70,8 @@ func setParams(params *Params, opts ...Option) {
 			NotLoadCacheAtStart: true,
 			LogDir:              os.TempDir() + "/nacos/log",
 			CacheDir:            os.TempDir() + "/nacos/cache",
+			Username:            o.username,
+			Password:            o.password,
 		}
 	}
 
@@ -86,7 +88,7 @@ func setParams(params *Params, opts ...Option) {
 	}
 }
 
-// Init get configuration from nacos and parse to struct
+// Init get configuration from nacos and parse to struct, use for configuration centre
 func Init(obj interface{}, params *Params, opts ...Option) error {
 	err := params.valid()
 	if err != nil {

@@ -13,6 +13,7 @@ func TestInit(t *testing.T) {
 		WithScheme("http"),
 		WithWaitTime(time.Second*2),
 		WithDatacenter(""),
+		WithToken("your-token"),
 	)
 	t.Log(err, cli)
 
