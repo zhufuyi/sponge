@@ -81,8 +81,8 @@ func runGenHTTPPbCommand(moduleName string, serverName string, projectName strin
 		"sponge/.gitignore", "sponge/.golangci.yml", "sponge/go.mod", "sponge/go.sum",
 		"sponge/Jenkinsfile", "sponge/Makefile", "sponge/README.md",
 	}
-	ignoreDirs := []string{} // specify the directory in the subdirectory where processing is ignored
-	ignoreFiles := []string{ // specify the files in the subdirectory to be ignored for processing
+	ignoreDirs := []string{"cmd/sponge"} // specify the directory in the subdirectory where processing is ignored
+	ignoreFiles := []string{             // specify the files in the subdirectory to be ignored for processing
 		"types.pb.validate.go", "types.pb.go", // api/types
 		"swagger.json", "swagger.yaml", "apis.swagger.json", "apis.html", "docs.go", // sponge/docs
 		"userExample_rpc.go", "systemCode_rpc.go", "userExample_http.go", // internal/ecode

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"math"
 
 	"github.com/zhufuyi/sponge/internal/cache"
 	"github.com/zhufuyi/sponge/internal/dao"
@@ -30,6 +31,7 @@ type UserExampleHandler interface {
 	GetByID(c *gin.Context)
 	GetByCondition(c *gin.Context)
 	ListByIDs(c *gin.Context)
+	ListByLastID(c *gin.Context)
 	List(c *gin.Context)
 }
 
@@ -312,6 +314,47 @@ func (h *userExampleHandler) ListByIDs(c *gin.Context) {
 
 	response.Success(c, gin.H{
 		"userExamples": userExamples,
+	})
+}
+
+// ListByLastID get records by last id and limit
+// @Summary list of userExamples by last id and limit
+// @Description list of userExamples by last id and limit
+// @Tags userExample
+// @accept json
+// @Produce json
+// @Param lastID query int true "last id, default is MaxInt64"
+// @Param limit query int false "size in each page" default(10)
+// @Param sort query string false "sort by column name of table, and the "-" sign before column name indicates reverse order" default(-id)
+// @Success 200 {object} types.ListUserExamplesRespond{}
+// @Router /api/v1/userExample/list [get]
+func (h *userExampleHandler) ListByLastID(c *gin.Context) {
+	lastID := utils.StrToUint64(c.Query("lastID"))
+	if lastID == 0 {
+		lastID = math.MaxInt64
+	}
+	limit := utils.StrToInt(c.Query("limit"))
+	if limit == 0 {
+		limit = 10
+	}
+	sort := c.Query("sort")
+
+	ctx := middleware.WrapCtx(c)
+	userExamples, err := h.iDao.GetByLastID(ctx, lastID, limit, sort)
+	if err != nil {
+		logger.Error("GetByLastID error", logger.Err(err), logger.Uint64("latsID", lastID), logger.Int("limit", limit), middleware.GCtxRequestIDField(c))
+		response.Output(c, ecode.InternalServerError.ToHTTPCode())
+		return
+	}
+
+	data, err := convertUserExamples(userExamples)
+	if err != nil {
+		response.Error(c, ecode.ErrListByLastIDUserExample)
+		return
+	}
+
+	response.Success(c, gin.H{
+		"userExamples": data,
 	})
 }
 

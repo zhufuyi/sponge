@@ -67,6 +67,7 @@ sponge包含丰富的组件(按需使用)：
 - 鉴权 [jwt](https://github.com/golang-jwt/jwt)
 - 校验 [validator](https://github.com/go-playground/validator)
 - 消息组件 [rabbitmq](github.com/rabbitmq/amqp091-go)
+- 分布式事务管理器 [dtm](https://github.com/dtm-labs/dtm)
 - 自适应限流 [ratelimit](https://github.com/zhufuyi/sponge/tree/main/pkg/shield/ratelimit)
 - 自适应熔断 [circuitbreaker](https://github.com/zhufuyi/sponge/tree/main/pkg/shield/circuitbreaker)
 - 链路跟踪 [opentelemetry](https://github.com/open-telemetry/opentelemetry-go)
@@ -152,6 +153,10 @@ sponge run
 
 - [7_community-single](https://github.com/zhufuyi/sponge_examples/tree/main/7_community-single)
 - [8_community-cluster](https://github.com/zhufuyi/sponge_examples/tree/main/8_community-cluster)
+
+#### 分布式事务示例
+
+- [9_order-system](https://github.com/zhufuyi/sponge_examples/tree/main/9_order-grpc-distributed-transaction)
 
 <br>
 

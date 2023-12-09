@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"math"
 	"strings"
 
 	serverNameExampleV1 "github.com/zhufuyi/sponge/api/serverNameExample/v1"
@@ -226,6 +227,41 @@ func (s *userExample) ListByIDs(ctx context.Context, req *serverNameExampleV1.Li
 	}
 
 	return &serverNameExampleV1.ListUserExampleByIDsReply{UserExamples: userExamples}, nil
+}
+
+// ListByLastID list userExample by last id
+func (s *userExample) ListByLastID(ctx context.Context, req *serverNameExampleV1.ListUserExampleByLastIDRequest) (*serverNameExampleV1.ListUserExampleByLastIDReply, error) {
+	err := req.Validate()
+	if err != nil {
+		logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req), interceptor.CtxRequestIDField(ctx))
+		return nil, ecode.StatusInvalidParams.Err()
+	}
+	if req.LastID == 0 {
+		req.LastID = math.MaxInt64
+	}
+	if req.Limit == 0 {
+		req.Limit = 10
+	}
+
+	records, err := s.iDao.GetByLastID(ctx, req.LastID, int(req.Limit), req.Sort)
+	if err != nil {
+		logger.Error("ListByLastID error", logger.Err(err), interceptor.CtxRequestIDField(ctx))
+		return nil, ecode.StatusInternalServerError.ToRPCErr()
+	}
+
+	userExamples := []*serverNameExampleV1.UserExample{}
+	for _, record := range records {
+		data, err := convertUserExample(record)
+		if err != nil {
+			logger.Warn("convertUserExample error", logger.Err(err), logger.Any("id", record.ID), interceptor.ServerCtxRequestIDField(ctx))
+			continue
+		}
+		userExamples = append(userExamples, data)
+	}
+
+	return &serverNameExampleV1.ListUserExampleByLastIDReply{
+		UserExamples: userExamples,
+	}, nil
 }
 
 // List of records by query parameters

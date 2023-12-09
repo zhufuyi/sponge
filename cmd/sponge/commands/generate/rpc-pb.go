@@ -80,8 +80,8 @@ func runGenRPCPbCommand(moduleName string, serverName string, projectName string
 		"sponge/.gitignore", "sponge/.golangci.yml", "sponge/go.mod", "sponge/go.sum",
 		"sponge/Jenkinsfile", "sponge/Makefile", "sponge/README.md",
 	}
-	ignoreDirs := []string{} // specify the directory in the subdirectory where processing is ignored
-	ignoreFiles := []string{ // specify the files in the subdirectory to be ignored for processing
+	ignoreDirs := []string{"cmd/sponge"} // specify the directory in the subdirectory where processing is ignored
+	ignoreFiles := []string{             // specify the files in the subdirectory to be ignored for processing
 		"types.pb.validate.go", "types.pb.go", // api/types
 		"userExample_rpc.go", "systemCode_http.go", "userExample_http.go", // internal/ecode
 		"http.go", "http_option.go", "http_test.go", // internal/server

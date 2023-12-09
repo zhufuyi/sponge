@@ -74,8 +74,8 @@ After downloading, extract it to the directory `D:\Program Files\cmder`, and add
 
 Perform basic configuration for cmder:
 
-- **Configure Right-Click Launch for cmder**: Press the `win+x` key combination, then press the letter `a` to enter the administrative terminal. Execute the command `Cmder.exe /REGISTER ALL`. Right-click in any folder and choose `Cmder Here` to open the cmder interface.
 - **Resolve Space Issue While Typing Commands**: Open the cmder interface, press `win+alt+p` to access the settings, search for `Monospace` in the upper left corner, uncheck it, and save and exit.
+- **Configure Right-Click Launch for cmder**: Press the `win+x` key combination, then press the letter `a` to enter the administrative terminal. Execute the command `Cmder.exe /REGISTER ALL`. Right-click in any folder and choose `Cmder Here` to open the cmder interface.
 
 > ⚠ When developing projects with Sponge in a Windows environment, to avoid issues with missing Linux commands, please use cmder instead of the built-in cmd terminal, the terminal in Goland, or the terminal in VS Code.
 
@@ -87,6 +87,7 @@ make --version
 cp --version
 chmod --version
 rm --version
+sed --version
 ```
 
 <br>

@@ -88,7 +88,7 @@ func setParams(params *Params, opts ...Option) {
 	}
 }
 
-// Init get configuration from nacos and parse to struct, use for configuration centre
+// Init get configuration from nacos and parse to struct, use for configuration center
 func Init(obj interface{}, params *Params, opts ...Option) error {
 	err := params.valid()
 	if err != nil {

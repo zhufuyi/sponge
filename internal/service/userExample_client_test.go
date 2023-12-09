@@ -129,6 +129,20 @@ func Test_service_userExample_methods(t *testing.T) {
 		},
 
 		{
+			name: "ListByLastID",
+			fn: func() (interface{}, error) {
+				// todo type in the parameters to test
+				req := &serverNameExampleV1.ListUserExampleByLastIDRequest{
+					LastID: 0,
+					Limit:  5,
+					Sort:   "-age",
+				}
+				return cli.ListByLastID(ctx, req)
+			},
+			wantErr: false,
+		},
+
+		{
 			name: "List",
 			fn: func() (interface{}, error) {
 				// todo type in the parameters to test
@@ -213,6 +227,25 @@ func Test_service_userExample_benchmark(t *testing.T) {
 				}
 				var total uint = 1000 // total number of requests
 				b, err := benchmark.New(host, protoFile, "ListByIDs", message, total, importPaths...)
+				if err != nil {
+					return err
+				}
+				return b.Run()
+			},
+			wantErr: false,
+		},
+
+		{
+			name: "ListByLastID",
+			fn: func() error {
+				// todo type in the parameters to test
+				message := &serverNameExampleV1.ListUserExampleByLastIDRequest{
+					LastID: 0,
+					Limit:  5,
+					Sort:   "-id",
+				}
+				var total uint = 100 // total number of requests
+				b, err := benchmark.New(host, protoFile, "ListByLastID", message, total, importPaths...)
 				if err != nil {
 					return err
 				}

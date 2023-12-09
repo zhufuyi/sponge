@@ -59,6 +59,7 @@ func (u mock) UpdateByID(c *gin.Context)     { return }
 func (u mock) GetByID(c *gin.Context)        { return }
 func (u mock) GetByCondition(c *gin.Context) { return }
 func (u mock) ListByIDs(c *gin.Context)      { return }
+func (u mock) ListByLastID(c *gin.Context)   { return }
 func (u mock) List(c *gin.Context)           { return }
 
 func Test_userExampleRouter(t *testing.T) {

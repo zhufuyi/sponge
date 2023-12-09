@@ -139,7 +139,7 @@ func deleteFieldsMark(r replacer.Replacer, filename string, startMark []byte, en
 
 	data, err := r.ReadFile(filename)
 	if err != nil {
-		fmt.Printf("readFile error: %v, please execute the \"sponge update\" command to resolve\n ", err)
+		fmt.Printf("readFile error: %v, please execute the \"sponge upgrade\" command to resolve\n ", err)
 		return fields
 	}
 	if subBytes := gofile.FindSubBytes(data, startMark, endMark); len(subBytes) > 0 {
@@ -159,7 +159,7 @@ func deleteAllFieldsMark(r replacer.Replacer, filename string, startMark []byte,
 
 	data, err := r.ReadFile(filename)
 	if err != nil {
-		fmt.Printf("readFile error: %v, please execute the \"sponge update\" command to resolve\n ", err)
+		fmt.Printf("readFile error: %v, please execute the \"sponge upgrade\" command to resolve\n ", err)
 		return fields
 	}
 	allSubBytes := gofile.FindAllSubBytes(data, startMark, endMark)

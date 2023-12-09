@@ -116,6 +116,9 @@ service {{.TName}} {
   // list of {{.TName}} by batch id
   rpc ListByIDs(List{{.TableName}}ByIDsRequest) returns (List{{.TableName}}ByIDsReply) {}
 
+  // list {{.TName}} by last id
+  rpc ListByLastID(List{{.TableName}}ByLastIDRequest) returns (List{{.TableName}}ByLastIDReply) {}
+
   // list of {{.TName}} by query parameters
   rpc List(List{{.TableName}}Request) returns (List{{.TableName}}Reply) {}
 }
@@ -174,6 +177,16 @@ message List{{.TableName}}ByIDsRequest {
 }
 
 message List{{.TableName}}ByIDsReply {
+  repeated {{.TableName}} {{.TName}}s = 1;
+}
+
+message List{{.TableName}}ByLastIDRequest {
+  uint64 lastID = 1; // last id
+  uint32 limit = 2; // page size
+  string sort = 3; // sort by column name of table, default is -id, the - sign indicates descending order.
+}
+
+message List{{.TableName}}ByLastIDReply {
   repeated {{.TableName}} {{.TName}}s = 1;
 }
 
@@ -346,6 +359,23 @@ service {{.TName}} {
     };
   }
 
+  // list {{.TName}} by last id
+  rpc ListByLastID(List{{.TableName}}ByLastIDRequest) returns (List{{.TableName}}ByLastIDReply) {
+    option (google.api.http) = {
+      get: "/api/v1/{{.TName}}/list"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "list of {{.TName}} by last id",
+      description: "list of {{.TName}} by last id",
+      //security: {
+      //  security_requirement: {
+      //    key: "BearerAuth";
+      //    value: {}
+      //  }
+      //}
+    };
+  }
+
   // list of {{.TName}} by query parameters
   rpc List(List{{.TableName}}Request) returns (List{{.TableName}}Reply) {
     option (google.api.http) = {
@@ -429,6 +459,16 @@ message List{{.TableName}}ByIDsRequest {
 }
 
 message List{{.TableName}}ByIDsReply {
+  repeated {{.TableName}} {{.TName}}s = 1;
+}
+
+message List{{.TableName}}ByLastIDRequest {
+  uint64 lastID = 1 [(tagger.tags) = "form:\"lastID\""]; // last id
+  uint32 limit = 2 [(tagger.tags) = "form:\"limit\""]; // page size
+  string sort = 3 [(tagger.tags) = "form:\"sort\""]; // sort by column name of table, default is -id, the - sign indicates descending order.
+}
+
+message List{{.TableName}}ByLastIDReply {
   repeated {{.TableName}} {{.TName}}s = 1;
 }
 

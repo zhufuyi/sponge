@@ -251,6 +251,31 @@ func Test_userExampleDao_GetByIDs(t *testing.T) {
 	}
 }
 
+func Test_userExampleDao_GetByLastID(t *testing.T) {
+	d := newUserExampleDao()
+	defer d.Close()
+	testData := d.TestData.(*model.UserExample)
+
+	rows := sqlmock.NewRows([]string{"id", "created_at", "updated_at"}).
+		AddRow(testData.ID, testData.CreatedAt, testData.UpdatedAt)
+
+	d.SQLMock.ExpectQuery("SELECT .*").WillReturnRows(rows)
+
+	_, err := d.IDao.(UserExampleDao).GetByLastID(d.Ctx, 0, 10, "")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = d.SQLMock.ExpectationsWereMet()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// err test
+	_, err = d.IDao.(UserExampleDao).GetByLastID(d.Ctx, 0, 10, "unknown-column")
+	assert.Error(t, err)
+}
+
 func Test_userExampleDao_GetByColumns(t *testing.T) {
 	d := newUserExampleDao()
 	defer d.Close()

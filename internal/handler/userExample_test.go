@@ -87,6 +87,12 @@ func newUserExampleHandler() *gotest.Handler {
 			HandlerFunc: iHandler.ListByIDs,
 		},
 		{
+			FuncName:    "ListByLastID",
+			Method:      http.MethodGet,
+			Path:        "/userExample/list",
+			HandlerFunc: iHandler.ListByLastID,
+		},
+		{
 			FuncName:    "List",
 			Method:      http.MethodPost,
 			Path:        "/userExample/list",
@@ -337,6 +343,30 @@ func Test_userExampleHandler_ListByIDs(t *testing.T) {
 	assert.Error(t, err)
 }
 
+func Test_userExampleHandler_ListByLastID(t *testing.T) {
+	h := newUserExampleHandler()
+	defer h.Close()
+	testData := h.TestData.(*model.UserExample)
+
+	rows := sqlmock.NewRows([]string{"id", "created_at", "updated_at"}).
+		AddRow(testData.ID, testData.CreatedAt, testData.UpdatedAt)
+
+	h.MockDao.SQLMock.ExpectQuery("SELECT .*").WillReturnRows(rows)
+
+	result := &gohttp.StdResult{}
+	err := gohttp.Get(result, h.GetRequestURL("ListByLastID"), gohttp.KV{"lastID": 0, "size": 10})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result.Code != 0 {
+		t.Fatalf("%+v", result)
+	}
+
+	// error test
+	err = gohttp.Get(result, h.GetRequestURL("ListByLastID"), gohttp.KV{"lastID": 0, "size": 10, "sort": "unknown-column"})
+	assert.Error(t, err)
+}
+
 func Test_userExampleHandler_List(t *testing.T) {
 	h := newUserExampleHandler()
 	defer h.Close()
@@ -362,12 +392,15 @@ func Test_userExampleHandler_List(t *testing.T) {
 
 	// nil params error test
 	err = gohttp.Post(result, h.GetRequestURL("List"), nil)
+	assert.NoError(t, err)
 
 	// get error test
 	err = gohttp.Post(result, h.GetRequestURL("List"), &types.ListUserExamplesRequest{query.Params{
 		Page: 0,
 		Size: 10,
+		Sort: "unknown-column",
 	}})
+	assert.Error(t, err)
 }
 
 func TestNewUserExampleHandler(t *testing.T) {

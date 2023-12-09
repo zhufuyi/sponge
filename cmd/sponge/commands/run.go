@@ -54,7 +54,7 @@ visit %s in your browser.
 		},
 	}
 	cmd.Flags().IntVarP(&port, "port", "p", 24631, "port on which the sponge service listens")
-	cmd.Flags().StringVarP(&spongeAddr, "addr", "a", "", "address of the front-end page requesting the sponge service, e.g. http://192.168.1.10:24631 or https://go-sponge.com/ui")
+	cmd.Flags().StringVarP(&spongeAddr, "addr", "a", "", "address of the front-end page requesting the sponge service, e.g. http://192.168.1.10:24631 or https://your-domain.com")
 	cmd.Flags().BoolVarP(&isLog, "log", "l", false, "enable service logging")
 	return cmd
 }

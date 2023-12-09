@@ -28,6 +28,7 @@ type UserExampleDao interface {
 	GetByID(ctx context.Context, id uint64) (*model.UserExample, error)
 	GetByCondition(ctx context.Context, condition *query.Conditions) (*model.UserExample, error)
 	GetByIDs(ctx context.Context, ids []uint64) (map[uint64]*model.UserExample, error)
+	GetByLastID(ctx context.Context, lastID uint64, limit int, sort string) ([]*model.UserExample, error)
 	GetByColumns(ctx context.Context, params *query.Params) ([]*model.UserExample, int64, error)
 
 	CreateByTx(ctx context.Context, tx *gorm.DB, table *model.UserExample) (uint64, error)
@@ -214,7 +215,7 @@ func (d *userExampleDao) GetByCondition(ctx context.Context, c *query.Conditions
 	return table, nil
 }
 
-// GetByIDs list of records by batch id
+// GetByIDs get records by batch id
 func (d *userExampleDao) GetByIDs(ctx context.Context, ids []uint64) (map[uint64]*model.UserExample, error) {
 	itemMap, err := d.cache.MultiGet(ctx, ids)
 	if err != nil {
@@ -268,7 +269,19 @@ func (d *userExampleDao) GetByIDs(ctx context.Context, ids []uint64) (map[uint64
 	return itemMap, nil
 }
 
-// GetByColumns get records by paging and column information,
+// GetByLastID get paging records by last id and limit
+func (d *userExampleDao) GetByLastID(ctx context.Context, lastID uint64, limit int, sort string) ([]*model.UserExample, error) {
+	page := query.NewPage(0, limit, sort)
+
+	records := []*model.UserExample{}
+	err := d.db.WithContext(ctx).Order(page.Sort()).Limit(page.Size()).Where("id < ?", lastID).Find(&records).Error
+	if err != nil {
+		return nil, err
+	}
+	return records, nil
+}
+
+// GetByColumns get paging records by column information,
 // Note: query performance degrades when table rows are very large because of the use of offset.
 //
 // params includes paging parameters and query parameters

@@ -36,6 +36,8 @@ type UserExampleClient interface {
 	GetByCondition(ctx context.Context, in *GetUserExampleByConditionRequest, opts ...grpc.CallOption) (*GetUserExampleByConditionReply, error)
 	// list of userExample by batch id
 	ListByIDs(ctx context.Context, in *ListUserExampleByIDsRequest, opts ...grpc.CallOption) (*ListUserExampleByIDsReply, error)
+	// list userExample by last id
+	ListByLastID(ctx context.Context, in *ListUserExampleByLastIDRequest, opts ...grpc.CallOption) (*ListUserExampleByLastIDReply, error)
 	// list of userExample by query parameters
 	List(ctx context.Context, in *ListUserExampleRequest, opts ...grpc.CallOption) (*ListUserExampleReply, error)
 }
@@ -111,6 +113,15 @@ func (c *userExampleClient) ListByIDs(ctx context.Context, in *ListUserExampleBy
 	return out, nil
 }
 
+func (c *userExampleClient) ListByLastID(ctx context.Context, in *ListUserExampleByLastIDRequest, opts ...grpc.CallOption) (*ListUserExampleByLastIDReply, error) {
+	out := new(ListUserExampleByLastIDReply)
+	err := c.cc.Invoke(ctx, "/api.serverNameExample.v1.userExample/ListByLastID", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *userExampleClient) List(ctx context.Context, in *ListUserExampleRequest, opts ...grpc.CallOption) (*ListUserExampleReply, error) {
 	out := new(ListUserExampleReply)
 	err := c.cc.Invoke(ctx, "/api.serverNameExample.v1.userExample/List", in, out, opts...)
@@ -138,6 +149,8 @@ type UserExampleServer interface {
 	GetByCondition(context.Context, *GetUserExampleByConditionRequest) (*GetUserExampleByConditionReply, error)
 	// list of userExample by batch id
 	ListByIDs(context.Context, *ListUserExampleByIDsRequest) (*ListUserExampleByIDsReply, error)
+	// list userExample by last id
+	ListByLastID(context.Context, *ListUserExampleByLastIDRequest) (*ListUserExampleByLastIDReply, error)
 	// list of userExample by query parameters
 	List(context.Context, *ListUserExampleRequest) (*ListUserExampleReply, error)
 	mustEmbedUnimplementedUserExampleServer()
@@ -167,6 +180,9 @@ func (UnimplementedUserExampleServer) GetByCondition(context.Context, *GetUserEx
 }
 func (UnimplementedUserExampleServer) ListByIDs(context.Context, *ListUserExampleByIDsRequest) (*ListUserExampleByIDsReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListByIDs not implemented")
+}
+func (UnimplementedUserExampleServer) ListByLastID(context.Context, *ListUserExampleByLastIDRequest) (*ListUserExampleByLastIDReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListByLastID not implemented")
 }
 func (UnimplementedUserExampleServer) List(context.Context, *ListUserExampleRequest) (*ListUserExampleReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
@@ -310,6 +326,24 @@ func _UserExample_ListByIDs_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserExample_ListByLastID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListUserExampleByLastIDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserExampleServer).ListByLastID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.serverNameExample.v1.userExample/ListByLastID",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserExampleServer).ListByLastID(ctx, req.(*ListUserExampleByLastIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _UserExample_List_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListUserExampleRequest)
 	if err := dec(in); err != nil {
@@ -362,6 +396,10 @@ var UserExample_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListByIDs",
 			Handler:    _UserExample_ListByIDs_Handler,
+		},
+		{
+			MethodName: "ListByLastID",
+			Handler:    _UserExample_ListByLastID_Handler,
 		},
 		{
 			MethodName: "List",

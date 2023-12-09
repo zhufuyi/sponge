@@ -104,7 +104,7 @@ build-sponge:
 # build a sponge docker image, e.g. make image-build-sponge TAG=v1.5.8
 image-build-sponge:
 	@echo "build a sponge docker image'"
-	@cd cmd/sponge/scripts && bash image-build.sh  $(TAG)
+	@cd cmd/sponge/scripts && bash build-sponge-image.sh  $(TAG)
 
 # delete the templates code end
 

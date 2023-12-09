@@ -21,6 +21,7 @@ type UserExampleLogicer interface {
 	GetByID(ctx context.Context, req *GetUserExampleByIDRequest) (*GetUserExampleByIDReply, error)
 	List(ctx context.Context, req *ListUserExampleRequest) (*ListUserExampleReply, error)
 	ListByIDs(ctx context.Context, req *ListUserExampleByIDsRequest) (*ListUserExampleByIDsReply, error)
+	ListByLastID(ctx context.Context, req *ListUserExampleByLastIDRequest) (*ListUserExampleByLastIDReply, error)
 	UpdateByID(ctx context.Context, req *UpdateUserExampleByIDRequest) (*UpdateUserExampleByIDReply, error)
 }
 
@@ -130,6 +131,7 @@ func (r *userExampleRouter) register() {
 	r.iRouter.Handle("GET", "/api/v1/userExample/:id", r.withMiddleware("GET", "/api/v1/userExample/:id", r.GetByID_0)...)
 	r.iRouter.Handle("POST", "/api/v1/userExample/condition", r.withMiddleware("POST", "/api/v1/userExample/condition", r.GetByCondition_0)...)
 	r.iRouter.Handle("POST", "/api/v1/userExample/list/ids", r.withMiddleware("POST", "/api/v1/userExample/list/ids", r.ListByIDs_0)...)
+	r.iRouter.Handle("GET", "/api/v1/userExample/list", r.withMiddleware("GET", "/api/v1/userExample/list", r.ListByLastID_0)...)
 	r.iRouter.Handle("POST", "/api/v1/userExample/list", r.withMiddleware("POST", "/api/v1/userExample/list", r.List_0)...)
 
 }
@@ -175,7 +177,7 @@ func (r *userExampleRouter) Create_0(c *gin.Context) {
 	if r.wrapCtxFn != nil {
 		ctx = r.wrapCtxFn(c)
 	} else {
-		ctx = c
+		ctx = middleware.WrapCtx(c)
 	}
 
 	out, err := r.iLogic.Create(ctx, req)
@@ -207,7 +209,7 @@ func (r *userExampleRouter) DeleteByID_0(c *gin.Context) {
 	if r.wrapCtxFn != nil {
 		ctx = r.wrapCtxFn(c)
 	} else {
-		ctx = c
+		ctx = middleware.WrapCtx(c)
 	}
 
 	out, err := r.iLogic.DeleteByID(ctx, req)
@@ -233,7 +235,7 @@ func (r *userExampleRouter) DeleteByIDs_0(c *gin.Context) {
 	if r.wrapCtxFn != nil {
 		ctx = r.wrapCtxFn(c)
 	} else {
-		ctx = c
+		ctx = middleware.WrapCtx(c)
 	}
 
 	out, err := r.iLogic.DeleteByIDs(ctx, req)
@@ -265,7 +267,7 @@ func (r *userExampleRouter) UpdateByID_0(c *gin.Context) {
 	if r.wrapCtxFn != nil {
 		ctx = r.wrapCtxFn(c)
 	} else {
-		ctx = c
+		ctx = middleware.WrapCtx(c)
 	}
 
 	out, err := r.iLogic.UpdateByID(ctx, req)
@@ -297,7 +299,7 @@ func (r *userExampleRouter) GetByID_0(c *gin.Context) {
 	if r.wrapCtxFn != nil {
 		ctx = r.wrapCtxFn(c)
 	} else {
-		ctx = c
+		ctx = middleware.WrapCtx(c)
 	}
 
 	out, err := r.iLogic.GetByID(ctx, req)
@@ -323,7 +325,7 @@ func (r *userExampleRouter) GetByCondition_0(c *gin.Context) {
 	if r.wrapCtxFn != nil {
 		ctx = r.wrapCtxFn(c)
 	} else {
-		ctx = c
+		ctx = middleware.WrapCtx(c)
 	}
 
 	out, err := r.iLogic.GetByCondition(ctx, req)
@@ -349,10 +351,36 @@ func (r *userExampleRouter) ListByIDs_0(c *gin.Context) {
 	if r.wrapCtxFn != nil {
 		ctx = r.wrapCtxFn(c)
 	} else {
-		ctx = c
+		ctx = middleware.WrapCtx(c)
 	}
 
 	out, err := r.iLogic.ListByIDs(ctx, req)
+	if err != nil {
+		r.iResponse.Error(c, err)
+		return
+	}
+
+	r.iResponse.Success(c, out)
+}
+
+func (r *userExampleRouter) ListByLastID_0(c *gin.Context) {
+	req := &ListUserExampleByLastIDRequest{}
+	var err error
+
+	if err = c.ShouldBindQuery(req); err != nil {
+		r.zapLog.Warn("ShouldBindQuery error", zap.Error(err), middleware.GCtxRequestIDField(c))
+		r.iResponse.ParamError(c, err)
+		return
+	}
+
+	var ctx context.Context
+	if r.wrapCtxFn != nil {
+		ctx = r.wrapCtxFn(c)
+	} else {
+		ctx = middleware.WrapCtx(c)
+	}
+
+	out, err := r.iLogic.ListByLastID(ctx, req)
 	if err != nil {
 		r.iResponse.Error(c, err)
 		return
@@ -375,7 +403,7 @@ func (r *userExampleRouter) List_0(c *gin.Context) {
 	if r.wrapCtxFn != nil {
 		ctx = r.wrapCtxFn(c)
 	} else {
-		ctx = c
+		ctx = middleware.WrapCtx(c)
 	}
 
 	out, err := r.iLogic.List(ctx, req)

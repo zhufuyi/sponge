@@ -124,6 +124,50 @@
       }
     },
     "/api/v1/userExample/list": {
+      "get": {
+        "summary": "list of userExamples by last id",
+        "description": "list of userExamples by last id",
+        "operationId": "userExample_ListByLastID",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListUserExampleByLastIDReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "lastID",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "uint64"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "userExample"
+        ]
+      },
       "post": {
         "summary": "list of userExamples by query parameters",
         "description": "list of userExamples by paging and conditions",
@@ -511,6 +555,17 @@
           "items": {
             "type": "integer",
             "format": "uint64"
+          }
+        }
+      }
+    },
+    "v1ListUserExampleByLastIDReply": {
+      "type": "object",
+      "properties": {
+        "userExamples": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1UserExample"
           }
         }
       }

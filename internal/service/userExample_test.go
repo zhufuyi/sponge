@@ -288,6 +288,33 @@ func Test_userExampleService_List(t *testing.T) {
 	assert.Error(t, err)
 }
 
+func Test_userExampleService_ListByLastID(t *testing.T) {
+	s := newUserExampleService()
+	defer s.Close()
+	testData := s.TestData.(*model.UserExample)
+
+	rows := sqlmock.NewRows([]string{"id", "created_at", "updated_at"}).
+		AddRow(testData.ID, testData.CreatedAt, testData.UpdatedAt)
+
+	s.MockDao.SQLMock.ExpectQuery("SELECT .*").WillReturnRows(rows)
+
+	reply, err := s.IServiceClient.(serverNameExampleV1.UserExampleClient).ListByLastID(s.Ctx, &serverNameExampleV1.ListUserExampleByLastIDRequest{
+		LastID: 0,
+		Limit:  0,
+		Sort:   "",
+	})
+	assert.NoError(t, err)
+	t.Log(reply.String())
+
+	// get error test
+	reply, err = s.IServiceClient.(serverNameExampleV1.UserExampleClient).ListByLastID(s.Ctx, &serverNameExampleV1.ListUserExampleByLastIDRequest{
+		LastID: 0,
+		Limit:  0,
+		Sort:   "unknown-column",
+	})
+	assert.Error(t, err)
+}
+
 func Test_convertUserExample(t *testing.T) {
 	testData := &model.UserExample{}
 	testData.ID = 1

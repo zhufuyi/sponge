@@ -216,6 +216,35 @@ func (h *userExamplePbHandler) ListByIDs(ctx context.Context, req *serverNameExa
 	}, nil
 }
 
+// ListByLastID get records by last id
+func (h *userExamplePbHandler) ListByLastID(ctx context.Context, req *serverNameExampleV1.ListUserExampleByLastIDRequest) (*serverNameExampleV1.ListUserExampleByLastIDReply, error) {
+	err := req.Validate()
+	if err != nil {
+		logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req), middleware.CtxRequestIDField(ctx))
+		return nil, ecode.InvalidParams.Err()
+	}
+
+	records, err := h.userExampleDao.GetByLastID(ctx, req.LastID, int(req.Limit), req.Sort)
+	if err != nil {
+		logger.Error("GetByColumns error", logger.Err(err), logger.Any("req", req), middleware.CtxRequestIDField(ctx))
+		return nil, ecode.InternalServerError.Err()
+	}
+
+	userExamples := []*serverNameExampleV1.UserExample{}
+	for _, record := range records {
+		data, err := convertUserExamplePb(record)
+		if err != nil {
+			logger.Warn("convertUserExample error", logger.Err(err), logger.Any("id", record.ID), middleware.CtxRequestIDField(ctx))
+			continue
+		}
+		userExamples = append(userExamples, data)
+	}
+
+	return &serverNameExampleV1.ListUserExampleByLastIDReply{
+		UserExamples: userExamples,
+	}, nil
+}
+
 // List of records by query parameters
 func (h *userExamplePbHandler) List(ctx context.Context, req *serverNameExampleV1.ListUserExampleRequest) (*serverNameExampleV1.ListUserExampleReply, error) {
 	err := req.Validate()

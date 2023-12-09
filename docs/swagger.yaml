@@ -15,6 +15,14 @@ definitions:
       value:
         description: column value
     type: object
+  github_com_zhufuyi_sponge_internal_types.Conditions:
+    properties:
+      columns:
+        description: columns info
+        items:
+          $ref: '#/definitions/github_com_zhufuyi_sponge_internal_types.Column'
+        type: array
+    type: object
   github_com_zhufuyi_sponge_internal_types.Params:
     properties:
       columns:
@@ -38,14 +46,6 @@ definitions:
         type: string
       status:
         type: string
-    type: object
-  types.Conditions:
-    properties:
-      columns:
-        description: columns info
-        items:
-          $ref: '#/definitions/github_com_zhufuyi_sponge_internal_types.Column'
-        type: array
     type: object
   types.CreateUserExampleRequest:
     properties:
@@ -376,7 +376,7 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/types.Conditions'
+          $ref: '#/definitions/github_com_zhufuyi_sponge_internal_types.Conditions'
       produces:
       - application/json
       responses:
@@ -410,6 +410,36 @@ paths:
       tags:
       - userExample
   /api/v1/userExample/list:
+    get:
+      consumes:
+      - application/json
+      description: list of userExamples by last id and limit
+      parameters:
+      - description: last id, default is MaxInt64
+        in: query
+        name: lastID
+        required: true
+        type: integer
+      - default: 10
+        description: size in each page
+        in: query
+        name: limit
+        type: integer
+      - default: -id
+        description: 'sort by column name of table, and the '
+        in: query
+        name: sort
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.ListUserExamplesRespond'
+      summary: list of userExamples by last id and limit
+      tags:
+      - userExample
     post:
       consumes:
       - application/json

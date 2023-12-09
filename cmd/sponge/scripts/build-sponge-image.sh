@@ -2,16 +2,15 @@
 
 TAG=$1
 if [ "X${TAG}" = "X" ];then
-    echo "image tag cannot be empty, example: ./image-build.sh v1.0.0"
+    echo "image tag cannot be empty, example: ./image-build.sh v1.5.8"
     exit 1
 fi
 
 function rmFile() {
     sFile=$1
-    if [ "X${sFile}" = "X" ];then
-        return 0
+    if [ -e "${sFile}" ]; then
+        rm -rf ${sFile}
     fi
-    rm -f ${sFile}
 }
 
 function checkResult() {
@@ -48,7 +47,7 @@ docker build -t zhufuyi/sponge:${TAG}  .
 checkResult $?
 
 rmFile sponge
-rmFile .sponge
+rm -rf .sponge
 
 # delete none image
 noneImages=$(docker images | grep "<none>" | awk '{print $3}')

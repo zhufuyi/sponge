@@ -76,8 +76,8 @@ sponge -v
 
 对cmder进行简单的配置：
 
-- **配置右键启动cmder**，按下组合键`win+x`，再按字母`a`进入有管理权限的终端，执行命令`Cmder.exe /REGISTER ALL`。 随便在一个文件夹里按下鼠标右键，选择`Cmder Here`即可打开cmder界面。
 - **解决输入命令时的空格问题**，打开cmder界面，按下组合键win+alt+p进入设置界面，在左上角搜索`Monospace`，取消勾选，保存退出。
+- **配置右键启动cmder**，按下组合键`win+x`，再按字母`a`进入有管理权限的终端，执行命令`Cmder.exe /REGISTER ALL`。 随便在一个文件夹里按下鼠标右键，选择`Cmder Here`即可打开cmder界面。
 
 > ⚠ 在windows环境使用sponge开发项目，为了避免找不到linux命令错误，请使用cmder，不要用系统自带的cmd终端、Goland和VS Code下的终端。
 
@@ -89,6 +89,7 @@ make --version
 cp --version
 chmod --version
 rm --version
+sed --version
 ```
 
 <br>

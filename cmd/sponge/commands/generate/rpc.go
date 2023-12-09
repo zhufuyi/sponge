@@ -143,7 +143,7 @@ func runGenRPCCommand(moduleName string, serverName string, projectName string, 
 		"sponge/Jenkinsfile", "sponge/Makefile", "sponge/README.md",
 	}
 	ignoreDirs := []string{ // specify the directory in the subdirectory where processing is ignored
-		"internal/handler", "internal/rpcclient", "internal/routers", "internal/types",
+		"internal/handler", "internal/rpcclient", "internal/routers", "internal/types", "cmd/sponge",
 	}
 	ignoreFiles := []string{ // specify the files in the subdirectory to be ignored for processing
 		"types.pb.validate.go", "types.pb.go", // api/types

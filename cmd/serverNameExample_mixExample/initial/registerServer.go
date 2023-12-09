@@ -54,7 +54,7 @@ func registryService(scheme string, host string, port int) (registry.Registry, *
 		instance  *registry.ServiceInstance
 		err       error
 
-		id       = cfg.App.Name + "_" + scheme + "_" + host
+		id       = cfg.App.Name + "_" + scheme + "_" + host + "_" + strconv.Itoa(port)
 		logField logger.Field
 	)
 
@@ -103,7 +103,7 @@ func registryService(scheme string, host string, port int) (registry.Registry, *
 
 	if instance != nil {
 		msg := fmt.Sprintf("register service address to %s", cfg.App.RegistryDiscoveryType)
-		logger.Info(msg, logField, logger.String("id", id), logger.String("name", cfg.App.Name), logger.String("endpoint", instanceEndpoint))
+		logger.Info(msg, logger.String("name", cfg.App.Name), logger.String("endpoint", instanceEndpoint), logger.String("id", id), logField)
 		return iRegistry, instance
 	}
 

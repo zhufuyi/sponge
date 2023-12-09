@@ -70,7 +70,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/types.Conditions"
+                            "$ref": "#/definitions/github_com_zhufuyi_sponge_internal_types.Conditions"
                         }
                     }
                 ],
@@ -119,6 +119,50 @@ const docTemplate = `{
             }
         },
         "/api/v1/userExample/list": {
+            "get": {
+                "description": "list of userExamples by last id and limit",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "userExample"
+                ],
+                "summary": "list of userExamples by last id and limit",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "last id, default is MaxInt64",
+                        "name": "lastID",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "size in each page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "-id",
+                        "description": "sort by column name of table, and the ",
+                        "name": "sort",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.ListUserExamplesRespond"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "list of userExamples by paging and conditions",
                 "consumes": [
@@ -380,6 +424,18 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_zhufuyi_sponge_internal_types.Conditions": {
+            "type": "object",
+            "properties": {
+                "columns": {
+                    "description": "columns info",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_zhufuyi_sponge_internal_types.Column"
+                    }
+                }
+            }
+        },
         "github_com_zhufuyi_sponge_internal_types.Params": {
             "type": "object",
             "properties": {
@@ -412,18 +468,6 @@ const docTemplate = `{
                 },
                 "status": {
                     "type": "string"
-                }
-            }
-        },
-        "types.Conditions": {
-            "type": "object",
-            "properties": {
-                "columns": {
-                    "description": "columns info",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/github_com_zhufuyi_sponge_internal_types.Column"
-                    }
                 }
             }
         },

@@ -64,6 +64,12 @@ func (c *userExampleClient) ListByIDs(ctx context.Context, req *serverNameExampl
 	return c.userExampleCli.ListByIDs(ctx, req)
 }
 
+func (c *userExampleClient) ListByLastID(ctx context.Context, req *serverNameExampleV1.ListUserExampleByLastIDRequest) (*serverNameExampleV1.ListUserExampleByLastIDReply, error) {
+	// implement me
+	// If required, fill in the code to fetch data from other rpc servers here.
+	return c.userExampleCli.ListByLastID(ctx, req)
+}
+
 func (c *userExampleClient) List(ctx context.Context, req *serverNameExampleV1.ListUserExampleRequest) (*serverNameExampleV1.ListUserExampleReply, error) {
 	// implement me
 	// If required, fill in the code to fetch data from other rpc servers here.

@@ -142,7 +142,7 @@ func runGenHTTPCommand(moduleName string, serverName string, projectName string,
 		"sponge/Jenkinsfile", "sponge/Makefile", "sponge/README.md",
 	}
 	ignoreDirs := []string{ // specify the directory in the subdirectory where processing is ignored
-		"internal/service", "internal/rpcclient",
+		"internal/service", "internal/rpcclient", "cmd/sponge",
 	}
 	ignoreFiles := []string{ // specify the files in the subdirectory to be ignored for processing
 		"swagger.json", "swagger.yaml", "apis.swagger.json", "apis.html", "apis.go", // sponge/docs
