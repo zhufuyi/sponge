@@ -32,17 +32,13 @@ package service
 
 import (
 	"context"
-
 	serverNameExampleV1 "moduleNameExample/api/serverNameExample/v1"
-
 	//"moduleNameExample/internal/cache"
 	//"moduleNameExample/internal/dao"
 	//"moduleNameExample/internal/ecode"
 	//"moduleNameExample/internal/model"
-
 	//"github.com/zhufuyi/sponge/pkg/grpc/interceptor"
 	//"github.com/zhufuyi/sponge/pkg/logger"
-
 	"google.golang.org/grpc"
 )
 
@@ -83,9 +79,8 @@ func (s *{{.LowerServiceName}}) {{.MethodName}}(ctx context.Context, req *server
 	panic("implement me")
 
 	// fill in the business logic code here
-	// example:
-	//	    err := req.Validate()
-	//	    if err != nil {
+	// example: 
+	//	    if err := req.Validate();err != nil {
 	//		    logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req), interceptor.ServerCtxRequestIDField(ctx))
 	//		    return nil, ecode.StatusInvalidParams.Err()
 	//	    }
@@ -126,11 +121,9 @@ import (
 	"fmt"
 	"testing"
 	"time"
-
 	serverNameExampleV1 "moduleNameExample/api/serverNameExample/v1"
 	"moduleNameExample/configs"
 	"moduleNameExample/internal/config"
-
 	"github.com/zhufuyi/sponge/pkg/grpc/benchmark"
 )
 

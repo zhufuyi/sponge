@@ -66,8 +66,7 @@ func (h *{{.LowerServiceName}}Handler) {{.MethodName}}(ctx context.Context, req 
 
 	// fill in the business logic code here
 	// example:
-	//	    err := req.Validate()
-	//	    if err != nil {
+	//	    if err := req.Validate();err != nil {
 	//		    logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req), middleware.CtxRequestIDField(ctx))
 	//		    return nil, ecode.InvalidParams.Err()
 	//	    }

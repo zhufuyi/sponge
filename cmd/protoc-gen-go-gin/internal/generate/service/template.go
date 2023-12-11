@@ -32,7 +32,6 @@ package service
 
 import (
 	"context"
-
 	serverNameExampleV1 "moduleNameExample/api/serverNameExample/v1"
 	//"moduleNameExample/internal/rpcclient"
 )
@@ -62,9 +61,8 @@ func (c *{{.LowerServiceName}}Client) {{.MethodName}}(ctx context.Context, req *
 	panic("implement me")
 
 	// fill in the business logic code here
-	// example:
-	//	    err := req.Validate()
-	//	    if err != nil {
+	// example: 
+	//	    if err := req.Validate();err != nil {
 	//		    logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req), interceptor.CtxRequestIDField(ctx))
 	//		    return nil, ecode.StatusInvalidParams.Err()
 	//	    }
@@ -100,13 +98,10 @@ package routers
 
 import (
 	"context"
-
 	serverNameExampleV1 "moduleNameExample/api/serverNameExample/v1"
 	"moduleNameExample/internal/service"
-
 	"github.com/zhufuyi/sponge/pkg/gin/middleware"
 	"github.com/zhufuyi/sponge/pkg/logger"
-
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc/metadata"
 )
