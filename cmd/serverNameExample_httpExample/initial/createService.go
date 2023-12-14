@@ -16,15 +16,15 @@ import (
 	"github.com/zhufuyi/sponge/pkg/servicerd/registry/nacos"
 )
 
-// RegisterServers register for the app service
-func RegisterServers() []app.IServer {
+// CreateServices create grpc or http service
+func CreateServices() []app.IServer {
 	var cfg = config.Get()
 	var servers []app.IServer
 
 	// creating http service
 	httpAddr := ":" + strconv.Itoa(cfg.HTTP.Port)
-	httpRegistry, httpInstance := registryService("http", cfg.App.Host, cfg.HTTP.Port)
-	httpServer := server.NewHTTPServer_pbExample(httpAddr,
+	httpRegistry, httpInstance := registerService("http", cfg.App.Host, cfg.HTTP.Port)
+	httpServer := server.NewHTTPServer(httpAddr,
 		server.WithHTTPReadTimeout(time.Second*time.Duration(cfg.HTTP.ReadTimeout)),
 		server.WithHTTPWriteTimeout(time.Second*time.Duration(cfg.HTTP.WriteTimeout)),
 		server.WithHTTPRegistry(httpRegistry, httpInstance),
@@ -35,7 +35,7 @@ func RegisterServers() []app.IServer {
 	return servers
 }
 
-func registryService(scheme string, host string, port int) (registry.Registry, *registry.ServiceInstance) {
+func registerService(scheme string, host string, port int) (registry.Registry, *registry.ServiceInstance) {
 	var (
 		instanceEndpoint = fmt.Sprintf("%s://%s:%d", scheme, host, port)
 		cfg              = config.Get()

@@ -13,6 +13,7 @@ import (
 
 	//"github.com/zhufuyi/sponge/internal/rpcclient"
 
+	"github.com/zhufuyi/sponge/pkg/conf"
 	"github.com/zhufuyi/sponge/pkg/logger"
 	"github.com/zhufuyi/sponge/pkg/nacoscli"
 	"github.com/zhufuyi/sponge/pkg/stat"
@@ -27,8 +28,8 @@ var (
 	enableConfigCenter bool
 )
 
-// Config initial app configuration
-func Config() {
+// InitApp initial app configuration
+func InitApp() {
 	initConfig()
 	cfg := config.Get()
 
@@ -41,6 +42,8 @@ func Config() {
 	if err != nil {
 		panic(err)
 	}
+	logger.Debug(config.Show())
+	logger.Info("init logger succeeded")
 
 	// initializing tracing
 	if cfg.App.EnableTrace {
@@ -52,6 +55,7 @@ func Config() {
 			strconv.Itoa(cfg.Jaeger.AgentPort),
 			cfg.App.TracingSamplingRate,
 		)
+		logger.Info("init tracer succeeded")
 	}
 
 	// initializing the rpc server connection
@@ -64,6 +68,7 @@ func Config() {
 			stat.WithLog(logger.Get()),
 			stat.WithAlarm(), // invalid if it is windows, the default threshold for cpu and memory is 0.8, you can modify them
 		)
+		logger.Info("init statistics succeeded")
 	}
 }
 
@@ -87,9 +92,13 @@ func initConfig() {
 		appConfig := &config.Config{}
 		params := &nacoscli.Params{}
 		_ = copier.Copy(params, &nacosConfig.Nacos)
-		err = nacoscli.Init(appConfig, params)
+		format, data, err := nacoscli.GetConfig(params)
 		if err != nil {
 			panic(fmt.Sprintf("connect to configuration center err, %v", err))
+		}
+		err = conf.ParseConfigData(data, format, appConfig)
+		if err != nil {
+			panic(fmt.Sprintf("parse configuration data err, %v", err))
 		}
 		if appConfig.App.Name == "" {
 			panic("read the config from center error, config data is empty")
@@ -109,5 +118,4 @@ func initConfig() {
 	if version != "" {
 		config.Get().App.Version = version
 	}
-	//fmt.Println(config.Show())
 }

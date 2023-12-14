@@ -17,10 +17,10 @@ import (
 // @name Authorization
 // @description Type "Bearer your-jwt-token" to Value
 func main() {
-	initial.Config()
-	servers := initial.RegisterServers()
-	closes := initial.RegisterClose(servers)
+	initial.InitApp()
+	services := initial.CreateServices()
+	closes := initial.Close(services)
 
-	a := app.New(servers, closes)
+	a := app.New(services, closes)
 	a.Run()
 }

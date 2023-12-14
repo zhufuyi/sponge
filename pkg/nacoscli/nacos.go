@@ -2,7 +2,6 @@
 package nacoscli
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"os"
@@ -12,7 +11,6 @@ import (
 	"github.com/nacos-group/nacos-sdk-go/v2/clients/naming_client"
 	"github.com/nacos-group/nacos-sdk-go/v2/common/constant"
 	"github.com/nacos-group/nacos-sdk-go/v2/vo"
-	"github.com/spf13/viper"
 )
 
 // Params nacos parameters
@@ -88,11 +86,11 @@ func setParams(params *Params, opts ...Option) {
 	}
 }
 
-// Init get configuration from nacos and parse to struct, use for configuration center
-func Init(obj interface{}, params *Params, opts ...Option) error {
+// GetConfig get configuration from nacos
+func GetConfig(params *Params, opts ...Option) (string, []byte, error) {
 	err := params.valid()
 	if err != nil {
-		return err
+		return "", nil, err
 	}
 
 	setParams(params, opts...)
@@ -105,30 +103,26 @@ func Init(obj interface{}, params *Params, opts ...Option) error {
 		},
 	)
 	if err != nil {
-		return err
+		return "", nil, err
 	}
 
 	// read config content
-	content, err := configClient.GetConfig(vo.ConfigParam{
+	data, err := configClient.GetConfig(vo.ConfigParam{
 		DataId: params.DataID,
 		Group:  params.Group,
 	})
 	if err != nil {
-		return err
+		return "", nil, err
 	}
 
-	// parse config
-	viper.SetConfigType(params.Format)
-	err = viper.ReadConfig(bytes.NewBuffer([]byte(content)))
-	if err != nil {
-		return err
-	}
-	err = viper.Unmarshal(obj)
-	if err != nil {
-		return err
-	}
+	return params.Format, []byte(data), err
+}
 
-	return nil
+// Init get configuration from nacos and parse to struct, use for configuration center
+//
+// Deprecated: use GetConfig instead.
+func Init(obj interface{}, params *Params, opts ...Option) error {
+	return errors.New("not implemented")
 }
 
 // NewNamingClient create a service registration and discovery of nacos client.

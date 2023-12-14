@@ -1,6 +1,6 @@
 ## nacoscli
 
-Get the configuration from the nacos configuration center and parse it into a structure.
+Get the configuration from the nacos configuration center.
 
 ### Example of use
 
@@ -17,7 +17,7 @@ Get the configuration from the nacos configuration center and parse it into a st
 		DataId:      "user-srv.yml",
 		Format:      "yaml",
 	}
-	err := nacoscli.Init(a, params)
+	_, _, err = GetConfig(params)
 
 	// Way 2: setting up ClientConfig and ServerConfig
 	a = &config{}
@@ -39,7 +39,7 @@ Get the configuration from the nacos configuration center and parse it into a st
 			Port:   8848,
 		},
 	}
-	err = nacoscli.Init(a, params,
+	_, _, err = GetConfig(params,
 		WithClientConfig(clientConfig),
 		WithServerConfigs(serverConfigs),
 	)

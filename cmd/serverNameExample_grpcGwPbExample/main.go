@@ -8,10 +8,10 @@ import (
 )
 
 func main() {
-	initial.Config()
-	servers := initial.RegisterServers()
-	closes := initial.RegisterClose(servers)
+	initial.InitApp()
+	services := initial.CreateServices()
+	closes := initial.Close(services)
 
-	a := app.New(servers, closes)
+	a := app.New(services, closes)
 	a.Run()
 }

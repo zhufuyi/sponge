@@ -11,8 +11,8 @@ import (
 	"github.com/zhufuyi/sponge/pkg/tracer"
 )
 
-// RegisterClose register for released resources
-func RegisterClose(servers []app.IServer) []app.Close {
+// Close releasing resources after service exit
+func Close(servers []app.IServer) []app.Close {
 	var closes []app.Close
 
 	// close server

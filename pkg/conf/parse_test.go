@@ -74,3 +74,14 @@ func TestWatch(t *testing.T) {
 	_ = os.WriteFile("test.yml", content, 0666) // recovery documents
 	time.Sleep(time.Millisecond * 100)
 }
+
+func TestParseConfigData(t *testing.T) {
+	conf := make(map[string]interface{})
+	data, _ := os.ReadFile("test.yml")
+	err := ParseConfigData(data, "yaml", &conf)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	t.Log(conf)
+}

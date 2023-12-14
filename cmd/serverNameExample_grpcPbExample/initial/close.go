@@ -5,14 +5,14 @@ import (
 	"time"
 
 	"github.com/zhufuyi/sponge/internal/config"
-	"github.com/zhufuyi/sponge/internal/model"
+	//"github.com/zhufuyi/sponge/internal/model"
 
 	"github.com/zhufuyi/sponge/pkg/app"
 	"github.com/zhufuyi/sponge/pkg/tracer"
 )
 
-// RegisterClose register for released resources
-func RegisterClose(servers []app.IServer) []app.Close {
+// Close releasing resources after service exit
+func Close(servers []app.IServer) []app.Close {
 	var closes []app.Close
 
 	// close server
@@ -21,16 +21,16 @@ func RegisterClose(servers []app.IServer) []app.Close {
 	}
 
 	// close mysql
-	closes = append(closes, func() error {
-		return model.CloseMysql()
-	})
+	//closes = append(closes, func() error {
+	//	return model.CloseMysql()
+	//})
 
 	// close redis
-	if config.Get().App.CacheType == "redis" {
-		closes = append(closes, func() error {
-			return model.CloseRedis()
-		})
-	}
+	//if config.Get().App.CacheType == "redis" {
+	//	closes = append(closes, func() error {
+	//		return model.CloseRedis()
+	//	})
+	//}
 
 	// close tracing
 	if config.Get().App.EnableTrace {

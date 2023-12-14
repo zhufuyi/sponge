@@ -19,7 +19,7 @@ var (
 )
 
 func TestParse(t *testing.T) {
-	conf := new(map[string]interface{})
+	//conf := new(map[string]interface{})
 	params := &Params{
 		IPAddr:      ipAddr,
 		Port:        uint64(port),
@@ -30,11 +30,11 @@ func TestParse(t *testing.T) {
 	}
 
 	utils.SafeRunWithTimeout(time.Second*2, func(cancel context.CancelFunc) {
-		err := Init(conf, params)
-		t.Log(err, conf)
+		format, data, err := GetConfig(params)
+		t.Log(err, format, data)
 	})
 
-	conf = new(map[string]interface{})
+	//conf = new(map[string]interface{})
 	params = &Params{
 		Group:  "dev",
 		DataID: "serverNameExample.yml",
@@ -54,12 +54,12 @@ func TestParse(t *testing.T) {
 		},
 	}
 	utils.SafeRunWithTimeout(time.Second*2, func(cancel context.CancelFunc) {
-		err := Init(conf, params,
+		format, data, err := GetConfig(params,
 			WithClientConfig(clientConfig),
 			WithServerConfigs(serverConfigs),
 			WithAuth("foo", "bar"),
 		)
-		t.Log(err, conf)
+		t.Log(err, format, data)
 	})
 }
 
@@ -99,6 +99,6 @@ func TestError(t *testing.T) {
 	err = p.valid()
 	assert.Error(t, err)
 
-	err = Init(nil, p)
+	_, _, err = GetConfig(&Params{})
 	assert.Error(t, err)
 }

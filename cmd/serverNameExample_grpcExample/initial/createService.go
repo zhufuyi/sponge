@@ -16,26 +16,25 @@ import (
 	"github.com/zhufuyi/sponge/pkg/servicerd/registry/nacos"
 )
 
-// RegisterServers register for the app service
-func RegisterServers() []app.IServer {
+// CreateServices create grpc or http service
+func CreateServices() []app.IServer {
 	var cfg = config.Get()
 	var servers []app.IServer
 
-	// creating http service
-	httpAddr := ":" + strconv.Itoa(cfg.HTTP.Port)
-	httpRegistry, httpInstance := registryService("http", cfg.App.Host, cfg.HTTP.Port)
-	httpServer := server.NewHTTPServer(httpAddr,
-		server.WithHTTPReadTimeout(time.Second*time.Duration(cfg.HTTP.ReadTimeout)),
-		server.WithHTTPWriteTimeout(time.Second*time.Duration(cfg.HTTP.WriteTimeout)),
-		server.WithHTTPRegistry(httpRegistry, httpInstance),
-		server.WithHTTPIsProd(cfg.App.Env == "prod"),
+	// creating grpc service
+	grpcAddr := ":" + strconv.Itoa(cfg.Grpc.Port)
+	grpcRegistry, grpcInstance := registerService("grpc", cfg.App.Host, cfg.Grpc.Port)
+	grpcServer := server.NewGRPCServer(grpcAddr,
+		server.WithGrpcReadTimeout(time.Duration(cfg.Grpc.ReadTimeout)*time.Second),
+		server.WithGrpcWriteTimeout(time.Duration(cfg.Grpc.WriteTimeout)*time.Second),
+		server.WithGrpcRegistry(grpcRegistry, grpcInstance),
 	)
-	servers = append(servers, httpServer)
+	servers = append(servers, grpcServer)
 
 	return servers
 }
 
-func registryService(scheme string, host string, port int) (registry.Registry, *registry.ServiceInstance) {
+func registerService(scheme string, host string, port int) (registry.Registry, *registry.ServiceInstance) {
 	var (
 		instanceEndpoint = fmt.Sprintf("%s://%s:%d", scheme, host, port)
 		cfg              = config.Get()

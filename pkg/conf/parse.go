@@ -123,3 +123,13 @@ func replaceDSN(str string) string {
 
 	return fmt.Sprintf("%s******%s", data[:start+1], data[end:])
 }
+
+// ParseConfigData parse data to struct
+func ParseConfigData(data []byte, format string, obj interface{}) error {
+	viper.SetConfigType(format)
+	err := viper.ReadConfig(bytes.NewBuffer(data))
+	if err != nil {
+		return err
+	}
+	return viper.Unmarshal(obj)
+}

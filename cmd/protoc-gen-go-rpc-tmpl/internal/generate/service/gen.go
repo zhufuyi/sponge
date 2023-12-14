@@ -3,10 +3,10 @@ package service
 
 import (
 	"bytes"
+	"runtime"
 	"strings"
 
 	"github.com/zhufuyi/sponge/cmd/protoc-gen-go-rpc-tmpl/internal/parse"
-	"github.com/zhufuyi/sponge/pkg/gofile"
 
 	"google.golang.org/protobuf/compiler/protogen"
 )
@@ -80,7 +80,7 @@ func (f *errCodeFields) execute() []byte {
 
 func getProtoFilename(filenamePrefix string) string {
 	filenamePrefix = strings.ReplaceAll(filenamePrefix, ".proto", "")
-	filenamePrefix = strings.ReplaceAll(filenamePrefix, gofile.GetPathDelimiter(), "/")
+	filenamePrefix = strings.ReplaceAll(filenamePrefix, getPathDelimiter(), "/")
 	ss := strings.Split(filenamePrefix, "/")
 
 	if len(ss) == 0 {
@@ -108,4 +108,13 @@ func handleSplitLineMark(data []byte) []byte {
 		}
 	}
 	return out
+}
+
+func getPathDelimiter() string {
+	delimiter := "/"
+	if runtime.GOOS == "windows" {
+		delimiter = "\\"
+	}
+
+	return delimiter
 }

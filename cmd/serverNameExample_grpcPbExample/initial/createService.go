@@ -16,25 +16,14 @@ import (
 	"github.com/zhufuyi/sponge/pkg/servicerd/registry/nacos"
 )
 
-// RegisterServers register for the app service
-func RegisterServers() []app.IServer {
+// CreateServices create grpc or http service
+func CreateServices() []app.IServer {
 	var cfg = config.Get()
 	var servers []app.IServer
 
-	// creating http service
-	httpAddr := ":" + strconv.Itoa(cfg.HTTP.Port)
-	httpRegistry, httpInstance := registryService("http", cfg.App.Host, cfg.HTTP.Port)
-	httpServer := server.NewHTTPServer(httpAddr,
-		server.WithHTTPReadTimeout(time.Second*time.Duration(cfg.HTTP.ReadTimeout)),
-		server.WithHTTPWriteTimeout(time.Second*time.Duration(cfg.HTTP.WriteTimeout)),
-		server.WithHTTPRegistry(httpRegistry, httpInstance),
-		server.WithHTTPIsProd(cfg.App.Env == "prod"),
-	)
-	servers = append(servers, httpServer)
-
 	// creating grpc service
 	grpcAddr := ":" + strconv.Itoa(cfg.Grpc.Port)
-	grpcRegistry, grpcInstance := registryService("grpc", cfg.App.Host, cfg.Grpc.Port)
+	grpcRegistry, grpcInstance := registerService("grpc", cfg.App.Host, cfg.Grpc.Port)
 	grpcServer := server.NewGRPCServer(grpcAddr,
 		server.WithGrpcReadTimeout(time.Duration(cfg.Grpc.ReadTimeout)*time.Second),
 		server.WithGrpcWriteTimeout(time.Duration(cfg.Grpc.WriteTimeout)*time.Second),
@@ -45,7 +34,7 @@ func RegisterServers() []app.IServer {
 	return servers
 }
 
-func registryService(scheme string, host string, port int) (registry.Registry, *registry.ServiceInstance) {
+func registerService(scheme string, host string, port int) (registry.Registry, *registry.ServiceInstance) {
 	var (
 		instanceEndpoint = fmt.Sprintf("%s://%s:%d", scheme, host, port)
 		cfg              = config.Get()
@@ -54,7 +43,7 @@ func registryService(scheme string, host string, port int) (registry.Registry, *
 		instance  *registry.ServiceInstance
 		err       error
 
-		id       = cfg.App.Name + "_" + scheme + "_" + host + "_" + strconv.Itoa(port)
+		id       = cfg.App.Name + "_" + scheme + "_" + host
 		logField logger.Field
 	)
 
@@ -103,7 +92,7 @@ func registryService(scheme string, host string, port int) (registry.Registry, *
 
 	if instance != nil {
 		msg := fmt.Sprintf("register service address to %s", cfg.App.RegistryDiscoveryType)
-		logger.Info(msg, logger.String("name", cfg.App.Name), logger.String("endpoint", instanceEndpoint), logger.String("id", id), logField)
+		logger.Info(msg, logField, logger.String("id", id), logger.String("name", cfg.App.Name), logger.String("endpoint", instanceEndpoint))
 		return iRegistry, instance
 	}
 

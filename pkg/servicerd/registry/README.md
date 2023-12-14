@@ -7,7 +7,7 @@ Service registry, corresponding to service [discovery](../discovery) corresponds
 ```go
 import "github.com/zhufuyi/sponge/pkg/servicerd/registry"
 
-func registryService(scheme string, host string, port int) (registry.Registry, *registry.ServiceInstance) {
+func registerService(scheme string, host string, port int) (registry.Registry, *registry.ServiceInstance) {
 	var (
 		instanceEndpoint = fmt.Sprintf("%s://%s:%d", scheme, host, port)
 		cfg              = config.Get()
@@ -74,7 +74,7 @@ func registryService(scheme string, host string, port int) (registry.Registry, *
 
 // ------------------------------------------------------------------------------------------
 
-    iRegistry, serviceInstance := registryService("http", "127.0.0.1", 8080)
+    iRegistry, serviceInstance := registerService("http", "127.0.0.1", 8080)
     
     // register service
     ctx, _ := context.WithTimeout(context.Background(), 3*time.Second)
@@ -88,4 +88,3 @@ func registryService(scheme string, host string, port int) (registry.Registry, *
         return err
     }
 ```
-

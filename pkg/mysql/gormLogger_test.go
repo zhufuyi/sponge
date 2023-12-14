@@ -3,10 +3,10 @@ package mysql
 import (
 	"context"
 	"errors"
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
 	"gorm.io/gorm/logger"
 )
