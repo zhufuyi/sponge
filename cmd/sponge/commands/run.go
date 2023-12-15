@@ -43,9 +43,7 @@ Examples:
 					return err
 				}
 			}
-			fmt.Printf(`sponge command ui service started successfully, verson is %s, listening port is %d,
-visit %s in your browser.
-`, getVersion(), port, spongeAddr)
+			fmt.Printf("sponge command ui service is running, port = %d, verson = %s, visit %s in your browser.\n\n", port, getVersion(), spongeAddr)
 			go func() {
 				_ = open(spongeAddr)
 			}()

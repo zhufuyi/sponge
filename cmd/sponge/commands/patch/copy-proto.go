@@ -25,6 +25,8 @@ func CopyProtoCommand() *cobra.Command {
 		serverDir     string // server dir
 		versionFolder string // proto file version folder
 		outPath       string // output directory
+		protoFile     string // proto file names
+		targetModule  string // target module
 	)
 
 	cmd := &cobra.Command{
@@ -35,11 +37,14 @@ don't worry about losing the proto file after overwriting it, before copying pro
 the directory /tmp/sponge_copy_backup_proto_files.
 
 Examples:
-  # copy proto file from a grpc service directory
-  sponge patch copy-proto --server-dir=../rpc-server
+  # copy all proto files from a grpc service directory
+  sponge patch copy-proto --server-dir=../grpc-server
 
-  # copy proto file from multiple grpc services directory
-  sponge patch copy-proto --server-dir=../rpc-server1,../rpc-server2
+  # copy all proto files from multiple grpc services directory
+  sponge patch copy-proto --server-dir=../grpc-server1,../rpc-server2
+
+  # copy the specified proto files in the grpc service directory
+  sponge patch copy-proto --server-dir=../grpc-server --proto-file=name1.proto,name2.proto
 `,
 		SilenceErrors: true,
 		SilenceUsage:  true,
@@ -48,9 +53,17 @@ Examples:
 				_ = os.MkdirAll(outPath, 0766)
 			}
 
-			moduleName, _, err := getModuleAndServerName(".")
-			if err != nil {
-				return err
+			if targetModule == "" {
+				moduleName, _, err := getModuleAndServerName(".")
+				if err != nil {
+					return err
+				}
+				targetModule = moduleName
+			}
+
+			var selectProtoFiles []string
+			if protoFile != "" {
+				selectProtoFiles = strings.Split(protoFile, ",")
 			}
 
 			serverDirs := strings.Split(serverDir, ",")
@@ -60,12 +73,13 @@ Examples:
 					return err
 				}
 				pc := &protoCopier{
-					moduleName:       moduleName,
+					moduleName:       targetModule,
 					outPath:          outPath,
 					srcModuleName:    srcModuleName,
 					srcServerName:    srcServerName,
 					srcDir:           srcDir,
 					srcVersionFolder: versionFolder,
+					selectProtoFiles: selectProtoFiles,
 					copiedFiles:      make(map[string]struct{}),
 				}
 				err = pc.copyProtoFiles()
@@ -85,6 +99,8 @@ Examples:
 
 	cmd.Flags().StringVarP(&serverDir, "server-dir", "s", "", "server directory, multiple names separated by commas")
 	_ = cmd.MarkFlagRequired("server-dir")
+	cmd.Flags().StringVarP(&protoFile, "proto-file", "p", "", "proto files, multiple names separated by commas")
+	cmd.Flags().StringVarP(&targetModule, "target-module", "t", "", "target module name, same module name as the target project's go.mod")
 	cmd.Flags().StringVarP(&versionFolder, "version-folder", "v", "v1", "proto file version folder")
 	cmd.Flags().StringVarP(&outPath, "out", "o", "./api", "output directory, if the proto file already exists, it will be overwritten directly")
 	return cmd
@@ -116,7 +132,8 @@ type protoCopier struct {
 	srcDir           string
 	srcVersionFolder string
 
-	copiedFiles map[string]struct{}
+	selectProtoFiles []string
+	copiedFiles      map[string]struct{}
 }
 
 func (c *protoCopier) copyProtoFiles() error {
@@ -126,6 +143,23 @@ func (c *protoCopier) copyProtoFiles() error {
 	protoFiles, err := gofile.ListFiles(srcProtoFolder, gofile.WithSuffix(".proto"))
 	if err != nil {
 		return err
+	}
+
+	// match proto files
+	if len(c.selectProtoFiles) > 0 {
+		var matchProtoFiles []string
+		for _, filePath := range protoFiles {
+			for _, file := range c.selectProtoFiles {
+				if gofile.GetFilename(filePath) == file {
+					matchProtoFiles = append(matchProtoFiles, filePath)
+					break
+				}
+			}
+		}
+		if len(matchProtoFiles) == 0 {
+			return nil
+		}
+		protoFiles = matchProtoFiles
 	}
 
 	if len(protoFiles) > 0 {

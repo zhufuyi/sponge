@@ -139,7 +139,7 @@ func runGenHTTPCommand(moduleName string, serverName string, projectName string,
 	}
 	subFiles := []string{ // specify the sub-documents to be processed
 		"sponge/.gitignore", "sponge/.golangci.yml", "sponge/go.mod", "sponge/go.sum",
-		"sponge/Jenkinsfile", "sponge/Makefile", "sponge/README.md",
+		"sponge/Jenkinsfile", "sponge/Makefile-for-http", "sponge/README.md",
 	}
 	ignoreDirs := []string{ // specify the directory in the subdirectory where processing is ignored
 		"internal/service", "internal/rpcclient", "cmd/sponge",
@@ -151,6 +151,7 @@ func runGenHTTPCommand(moduleName string, serverName string, projectName string,
 		"grpc.go", "grpc_option.go", "grpc_test.go", // internal/server
 		"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", // internal/cache
 		"handler/userExample_logic.go", "handler/userExample_logic_test.go", // internal/handler
+		"scripts/image-rpc-test.sh", "scripts/patch.sh", "scripts/protoc.sh", "scripts/proto-doc.sh", // sponge/scripts
 	}
 
 	r.SetSubDirsAndFiles(subDirs, subFiles...)
@@ -186,7 +187,7 @@ func addHTTPFields(moduleName string, serverName string, projectName string, rep
 	fields = append(fields, deleteFieldsMark(r, k8sServiceFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, imageBuildFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, imageBuildLocalFile, wellStartMark, wellEndMark)...)
-	fields = append(fields, deleteAllFieldsMark(r, makeFile, wellStartMark, wellEndMark)...)
+	//fields = append(fields, deleteAllFieldsMark(r, makeFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, gitIgnoreFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteAllFieldsMark(r, protoShellFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, appConfigFile, wellStartMark, wellEndMark)...)
@@ -302,6 +303,10 @@ func addHTTPFields(moduleName string, serverName string, projectName string, rep
 		{
 			Old: "root:123456@(192.168.3.37:3306)/account",
 			New: dbDSN,
+		},
+		{
+			Old: "Makefile-for-http",
+			New: "Makefile",
 		},
 		{
 			Old:             "UserExample",

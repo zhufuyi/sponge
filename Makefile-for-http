@@ -4,23 +4,7 @@ PROJECT_NAME := "github.com/zhufuyi/sponge"
 PKG := "$(PROJECT_NAME)"
 PKG_LIST := $(shell go list ${PKG}/... | grep -v /vendor/ | grep -v /api/)
 
-# delete the templates code start
-.PHONY: install
-# installation of dependent tools
-install:
-	go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
-	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
-	go install github.com/envoyproxy/protoc-gen-validate@latest
-	go install github.com/srikrsna/protoc-gen-gotag@latest
-	go install github.com/zhufuyi/sponge/cmd/protoc-gen-go-gin@latest
-	go install github.com/zhufuyi/sponge/cmd/protoc-gen-go-rpc-tmpl@latest
-	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@latest
-	go install github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc@latest
-	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
-	go install github.com/swaggo/swag/cmd/swag@v1.8.12
-	go install github.com/ofabry/go-callvis@latest
-	go install golang.org/x/pkgsite/cmd/pkgsite@latest
-# delete the templates code end
+
 
 .PHONY: mod
 # maintaining module dependencies
@@ -35,7 +19,7 @@ fmt:
 
 
 .PHONY: ci-lint
-# check code formatting, naming conventions, security, maintainability, etc. the rules in the .golangci.yml file
+# check the code specification against the rules in the .golangci.yml file
 ci-lint: fmt
 	golangci-lint run ./...
 
@@ -61,23 +45,11 @@ graph:
 	go-callvis -skipbrowser -format=svg -nostd -file=serverNameExample_mixExample github.com/zhufuyi/sponge
 	@rm -f main.go serverNameExample_mixExample.gv
 
-# delete the templates code start
+
 .PHONY: docs
-# generate swagger docs, only for ⓵ Web services created based on sql, the host address can be changed via parameters, e.g. make docs HOST=192.168.3.37
+# generate swagger docs, the host address can be changed via parameters, e.g. make docs HOST=192.168.3.37
 docs: mod fmt
 	@bash scripts/swag-docs.sh $(HOST)
-# delete the templates code end
-
-.PHONY: proto
-# generate *.go and template code by proto files, if you do not refer to the proto file, the default is all the proto files in the api directory. you can specify the proto file, multiple files are separated by commas, e.g. make proto FILES=api/user/v1/user.proto. only for ⓶ Microservices created based on sql, ⓷ Web services created based on protobuf, ⓸ Microservices created based on protobuf, ⓹ grpc gateway service created based on protobuf
-proto: mod fmt
-	@bash scripts/protoc.sh $(FILES)
-
-
-.PHONY: proto-doc
-# generate doc from *.proto files
-proto-doc:
-	@bash scripts/proto-doc.sh
 
 
 .PHONY: build
@@ -86,21 +58,6 @@ build:
 	@echo "building 'serverNameExample_mixExample', linux binary file will output to 'cmd/serverNameExample_mixExample'"
 	@cd cmd/serverNameExample_mixExample && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build
 
-# delete the templates code start
-
-.PHONY: build-sponge
-# build sponge for linux amd64 binary
-build-sponge:
-	@echo "building 'sponge', linux binary file will output to 'cmd/sponge'"
-	@cd cmd/sponge && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "all=-s -w"
-
-.PHONY: image-build-sponge
-# build a sponge docker image, e.g. make image-build-sponge TAG=v1.5.8
-image-build-sponge:
-	@echo "build a sponge docker image'"
-	@cd cmd/sponge/scripts && bash build-sponge-image.sh  $(TAG)
-
-# delete the templates code end
 
 .PHONY: run
 # run service
@@ -115,7 +72,7 @@ run-nohup:
 
 
 .PHONY: run-docker
-# run service in local docker, if you want to update the service, run the make run-docker command again.
+# deploy service in local docker, if you want to update the service, run the make run-docker command again.
 run-docker: image-build-local
 	@bash scripts/deploy-docker.sh
 
@@ -160,24 +117,6 @@ image-push:
 # deploy service to k8s
 deploy-k8s:
 	@bash scripts/deploy-k8s.sh
-
-
-.PHONY: image-build-rpc-test
-# build grpc test image for remote repositories, e.g. make image-build-rpc-test REPO_HOST=addr TAG=latest
-image-build-rpc-test:
-	@bash scripts/image-rpc-test.sh $(REPO_HOST) $(TAG)
-
-
-.PHONY: patch
-# patch some dependent code, such as types.proto, mysql initialization code. e.g. make patch TYPE=types-pb , make patch TYPE=mysql-init
-patch:
-	@bash scripts/patch.sh $(TYPE)
-
-
-.PHONY: copy-proto
-# copy proto file from the grpc server directory, multiple directories or proto files separated by commas. copy all proto files, e.g. make copy-proto SERVER=yourServerDir, copy specified proto files, e.g. make copy-proto SERVER=yourServerDir PROTO_FILE=yourProtoFile1,yourProtoFile2
-copy-proto:
-	@sponge patch copy-proto --server-dir=$(SERVER) --proto-file=$(PROTO_FILE)
 
 
 .PHONY: update-config
