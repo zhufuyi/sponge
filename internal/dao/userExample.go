@@ -38,12 +38,15 @@ type UserExampleDao interface {
 
 type userExampleDao struct {
 	db    *gorm.DB
-	cache cache.UserExampleCache
-	sfg   *singleflight.Group
+	cache cache.UserExampleCache // if nil, the cache is not used.
+	sfg   *singleflight.Group    // if cache is nil, the sfg is not used.
 }
 
 // NewUserExampleDao creating the dao interface
 func NewUserExampleDao(db *gorm.DB, xCache cache.UserExampleCache) UserExampleDao {
+	if xCache == nil {
+		return &userExampleDao{db: db}
+	}
 	return &userExampleDao{
 		db:    db,
 		cache: xCache,
@@ -51,10 +54,17 @@ func NewUserExampleDao(db *gorm.DB, xCache cache.UserExampleCache) UserExampleDa
 	}
 }
 
+func (d *userExampleDao) deleteCache(ctx context.Context, id uint64) error {
+	if d.cache != nil {
+		return d.cache.Del(ctx, id)
+	}
+	return nil
+}
+
 // Create a record, insert the record and the id value is written back to the table
 func (d *userExampleDao) Create(ctx context.Context, table *model.UserExample) error {
 	err := d.db.WithContext(ctx).Create(table).Error
-	_ = d.cache.Del(ctx, table.ID)
+	_ = d.deleteCache(ctx, table.ID)
 	return err
 }
 
@@ -66,7 +76,7 @@ func (d *userExampleDao) DeleteByID(ctx context.Context, id uint64) error {
 	}
 
 	// delete cache
-	_ = d.cache.Del(ctx, id)
+	_ = d.deleteCache(ctx, id)
 
 	return nil
 }
@@ -80,7 +90,7 @@ func (d *userExampleDao) DeleteByIDs(ctx context.Context, ids []uint64) error {
 
 	// delete cache
 	for _, id := range ids {
-		_ = d.cache.Del(ctx, id)
+		_ = d.deleteCache(ctx, id)
 	}
 
 	return nil
@@ -91,7 +101,7 @@ func (d *userExampleDao) UpdateByID(ctx context.Context, table *model.UserExampl
 	err := d.updateDataByID(ctx, d.db, table)
 
 	// delete cache
-	_ = d.cache.Del(ctx, table.ID)
+	_ = d.deleteCache(ctx, table.ID)
 
 	return err
 }
@@ -135,6 +145,14 @@ func (d *userExampleDao) updateDataByID(ctx context.Context, db *gorm.DB, table 
 
 // GetByID get a record by id
 func (d *userExampleDao) GetByID(ctx context.Context, id uint64) (*model.UserExample, error) {
+	// no cache
+	if d.cache == nil {
+		record := &model.UserExample{}
+		err := d.db.WithContext(ctx).Where("id = ?", id).First(record).Error
+		return record, err
+	}
+
+	// get from cache or mysql
 	record, err := d.cache.Get(ctx, id)
 	if err == nil {
 		return record, nil
@@ -217,6 +235,21 @@ func (d *userExampleDao) GetByCondition(ctx context.Context, c *query.Conditions
 
 // GetByIDs get records by batch id
 func (d *userExampleDao) GetByIDs(ctx context.Context, ids []uint64) (map[uint64]*model.UserExample, error) {
+	// no cache
+	if d.cache == nil {
+		var records []*model.UserExample
+		err := d.db.WithContext(ctx).Where("id IN (?)", ids).Find(&records).Error
+		if err != nil {
+			return nil, err
+		}
+		itemMap := make(map[uint64]*model.UserExample)
+		for _, record := range records {
+			itemMap[record.ID] = record
+		}
+		return itemMap, nil
+	}
+
+	// get form cache or mysql
 	itemMap, err := d.cache.MultiGet(ctx, ids)
 	if err != nil {
 		return nil, err
@@ -358,7 +391,7 @@ func (d *userExampleDao) DeleteByTx(ctx context.Context, tx *gorm.DB, id uint64)
 	}
 
 	// delete cache
-	_ = d.cache.Del(ctx, id)
+	_ = d.deleteCache(ctx, id)
 
 	return nil
 }
@@ -368,7 +401,7 @@ func (d *userExampleDao) UpdateByTx(ctx context.Context, tx *gorm.DB, table *mod
 	err := d.updateDataByID(ctx, tx, table)
 
 	// delete cache
-	_ = d.cache.Del(ctx, table.ID)
+	_ = d.deleteCache(ctx, table.ID)
 
 	return err
 }

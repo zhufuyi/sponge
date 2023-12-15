@@ -1,5 +1,5 @@
 ## Change log
 
-- Fix bug with naocs as service discovery.
-- Add support for distributed transaction manager [DTM](https://github.com/dtm-labs/dtm).
-- Add a list api interface for GET methods.
+- Adjust the code.
+- Support copying the specified proto file to the grpc service.
+- The default is not to use the cache, according to the need to choose to use redis or memory as a cache.

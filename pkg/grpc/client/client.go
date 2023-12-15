@@ -1,3 +1,4 @@
+// Package client is generic grpc client-side.
 package client
 
 import (
@@ -45,9 +46,9 @@ func WithLoadBalance() Option {
 }
 
 // WithSecure set secure
-func WithSecure(credentials credentials.TransportCredentials) Option {
+func WithSecure(credential credentials.TransportCredentials) Option {
 	return func(o *options) {
-		o.credentials = credentials
+		o.credentials = credential
 	}
 }
 

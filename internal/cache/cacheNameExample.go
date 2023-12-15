@@ -22,7 +22,7 @@ const (
 	// cache prefix key, must end with a colon
 	cacheNameExampleCachePrefixKey = "prefixKeyExample:"
 	// CacheNameExampleExpireTime expire time
-	CacheNameExampleExpireTime = 10 * time.Minute
+	CacheNameExampleExpireTime = 5 * time.Minute
 )
 
 var _ CacheNameExampleCache = (*cacheNameExampleCache)(nil)
@@ -46,16 +46,17 @@ func NewCacheNameExampleCache(cacheType *model.CacheType) CacheNameExampleCache 
 	cachePrefix := ""
 	jsonEncoding := encoding.JSONEncoding{}
 
-	var c cache.Cache
-	if strings.ToLower(cacheType.CType) == "redis" {
-		c = cache.NewRedisCache(cacheType.Rdb, cachePrefix, jsonEncoding, newObject)
-	} else {
-		c = cache.NewMemoryCache(cachePrefix, jsonEncoding, newObject)
+	cType := strings.ToLower(cacheType.CType)
+	switch cType {
+	case "redis":
+		c := cache.NewRedisCache(cacheType.Rdb, cachePrefix, jsonEncoding, newObject)
+		return &cacheNameExampleCache{cache: c}
+	case "memory":
+		c := cache.NewMemoryCache(cachePrefix, jsonEncoding, newObject)
+		return &cacheNameExampleCache{cache: c}
 	}
 
-	return &cacheNameExampleCache{
-		cache: c,
-	}
+	panic(fmt.Sprintf("unsupported cache type='%s'", cacheType.CType))
 }
 
 // cache key

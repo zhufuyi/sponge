@@ -7,7 +7,7 @@ require (
 	github.com/alicebob/miniredis/v2 v2.23.0
 	github.com/blastrain/vitess-sqlparser v0.0.0-20201030050434-a139afbb1aba
 	github.com/bojand/ghz v0.110.0
-	github.com/dgraph-io/ristretto v0.1.0
+	github.com/dgraph-io/ristretto v0.1.1
 	github.com/felixge/fgprof v0.9.3
 	github.com/fsnotify/fsnotify v1.5.4
 	github.com/gin-contrib/cors v1.3.1

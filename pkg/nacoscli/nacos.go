@@ -121,8 +121,8 @@ func GetConfig(params *Params, opts ...Option) (string, []byte, error) {
 // Init get configuration from nacos and parse to struct, use for configuration center
 //
 // Deprecated: use GetConfig instead.
-func Init(obj interface{}, params *Params, opts ...Option) error {
-	return errors.New("not implemented")
+func Init(_ interface{}, _ *Params, _ ...Option) error {
+	return errors.New("not implemented, use GetConfig instead")
 }
 
 // NewNamingClient create a service registration and discovery of nacos client.

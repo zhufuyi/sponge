@@ -6,13 +6,13 @@ package initial
 import (
 	"flag"
 	"fmt"
-	"github.com/zhufuyi/sponge/pkg/conf"
 	"strconv"
 
 	"github.com/zhufuyi/sponge/configs"
 	"github.com/zhufuyi/sponge/internal/config"
 	"github.com/zhufuyi/sponge/internal/model"
 
+	"github.com/zhufuyi/sponge/pkg/conf"
 	"github.com/zhufuyi/sponge/pkg/logger"
 	"github.com/zhufuyi/sponge/pkg/nacoscli"
 	"github.com/zhufuyi/sponge/pkg/stat"

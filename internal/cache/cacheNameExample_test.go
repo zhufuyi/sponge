@@ -21,8 +21,8 @@ type cacheNameExampleData struct {
 func newCacheNameExampleCache() *gotest.Cache {
 	// change the type of the value before testing
 	var (
-		key keyTypeExample   = "foo1"
-		val valueTypeExample = "bar1"
+		key = "foo1"
+		val = "bar1"
 	)
 
 	record1 := &cacheNameExampleData{ID: 1, Key: key, Value: val}
@@ -81,4 +81,18 @@ func Test_cacheNameExampleCache_Del(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+}
+
+func TestNewCacheNameExampleCache(t *testing.T) {
+	c := NewCacheNameExampleCache(&model.CacheType{
+		CType: "memory",
+	})
+	assert.NotNil(t, c)
+
+	defer func() {
+		_ = recover()
+	}()
+	c = NewCacheNameExampleCache(&model.CacheType{
+		CType: "",
+	})
 }

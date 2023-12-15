@@ -189,7 +189,7 @@ update-config:
 .PHONY: clean
 # clean binary file, cover.out, template file
 clean:
-	@rm -vrf cmd/serverNameExample_mixExample/serverNameExample_mixExample
+	@rm -vrf cmd/serverNameExample_mixExample/serverNameExample_mixExample*
 	@rm -vrf cover.out
 	@rm -vrf main.go serverNameExample_mixExample.gv
 	@rm -vrf internal/ecode/*.go.gen*

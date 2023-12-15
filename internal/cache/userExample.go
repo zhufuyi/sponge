@@ -16,7 +16,7 @@ const (
 	// cache prefix key, must end with a colon
 	userExampleCachePrefixKey = "userExample:"
 	// UserExampleExpireTime expire time
-	UserExampleExpireTime = 10 * time.Minute
+	UserExampleExpireTime = 5 * time.Minute
 )
 
 var _ UserExampleCache = (*userExampleCache)(nil)
@@ -40,20 +40,22 @@ type userExampleCache struct {
 func NewUserExampleCache(cacheType *model.CacheType) UserExampleCache {
 	jsonEncoding := encoding.JSONEncoding{}
 	cachePrefix := ""
-	var c cache.Cache
-	if strings.ToLower(cacheType.CType) == "redis" {
-		c = cache.NewRedisCache(cacheType.Rdb, cachePrefix, jsonEncoding, func() interface{} {
+
+	cType := strings.ToLower(cacheType.CType)
+	switch cType {
+	case "redis":
+		c := cache.NewRedisCache(cacheType.Rdb, cachePrefix, jsonEncoding, func() interface{} {
 			return &model.UserExample{}
 		})
-	} else {
-		c = cache.NewMemoryCache(cachePrefix, jsonEncoding, func() interface{} {
+		return &userExampleCache{cache: c}
+	case "memory":
+		c := cache.NewMemoryCache(cachePrefix, jsonEncoding, func() interface{} {
 			return &model.UserExample{}
 		})
+		return &userExampleCache{cache: c}
 	}
 
-	return &userExampleCache{
-		cache: c,
-	}
+	return nil // no cache
 }
 
 // GetUserExampleCacheKey cache key

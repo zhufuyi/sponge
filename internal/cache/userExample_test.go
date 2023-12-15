@@ -130,8 +130,15 @@ func Test_userExampleCache_SetCacheWithNotFound(t *testing.T) {
 
 func TestNewUserExampleCache(t *testing.T) {
 	c := NewUserExampleCache(&model.CacheType{
+		CType: "",
+	})
+	assert.Nil(t, c)
+	c = NewUserExampleCache(&model.CacheType{
 		CType: "memory",
 	})
-
+	assert.NotNil(t, c)
+	c = NewUserExampleCache(&model.CacheType{
+		CType: "redis",
+	})
 	assert.NotNil(t, c)
 }

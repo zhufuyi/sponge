@@ -1,3 +1,4 @@
+// Package server is generic grpc server-side.
 package server
 
 import (
@@ -36,9 +37,9 @@ func (o *options) apply(opts ...Option) {
 }
 
 // WithSecure set secure
-func WithSecure(credentials credentials.TransportCredentials) Option {
+func WithSecure(credential credentials.TransportCredentials) Option {
 	return func(o *options) {
-		o.credentials = credentials
+		o.credentials = credential
 	}
 }
 
