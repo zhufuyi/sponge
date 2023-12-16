@@ -6,7 +6,7 @@
 
 下载go地址： [https://studygolang.com/dl](https://studygolang.com/dl)
 
-> 要求1.16以上版本，把`go install`命令编译生成的二进制文件所在目录(通常是$GOPATH/bin)添加到系统环境变量path。
+> 要求1.16以上版本。
 
 查看go版本 `go version`
 
@@ -16,7 +16,7 @@
 
 下载protoc地址： [https://github.com/protocolbuffers/protobuf/releases/tag/v3.20.3](https://github.com/protocolbuffers/protobuf/releases/tag/v3.20.3)
 
-> 要求v3.20以上版本，把 protoc 二进制文件所在目录(建议是$GOPATH/bin)添加到系统环境变量path。
+> 要求v3.20以上版本，把 protoc 二进制文件所在目录添加到系统环境变量path。
 
 查看protoc版本: `protoc --version`
 
@@ -30,6 +30,24 @@
 <br>
 
 ### linux或macOS环境
+
+把`GOPATH/bin`添加到系统path，如果已经设置过跳过此步骤。
+
+```bash
+# 查看是否设置了GOPATH
+go env GOPATH
+
+# 如果为空，设置GOPATH目录
+go env -w GOPATH=你的目录(示例~/golang/package)
+
+# 把GOPATH下的bin目录(示例~/golang/package/bin) 添加到系统path
+echo 'export PATH=$PATH:你的GOPATH/bin目录' >> ~/.bashrc
+source ~/.bashrc
+```
+
+<br>
+
+执行命令安装sponge，sponge和依赖插件将安装到 `GOPATH/bin` 目录下。
 
 ```bash
 # 安装sponge
@@ -96,7 +114,23 @@ sed --version
 
 **✅ 安装 sponge**
 
-打开`cmder.exe`终端(不是windows自带的cmd)，执行命令安装sponge：
+打开`cmder.exe`终端(不是windows自带的cmd)。
+
+把`GOPATH/bin`添加到系统path，如果已经设置过跳过此步骤。
+
+```bash
+# 查看是否设置了GOPATH
+go env GOPATH
+
+# 如果为空，设置GOPATH目录，有可能需要使用管理员权限执行此命令
+go env -w GOPATH=你的目录(示例D:\golang\package)
+
+# 把GOPATH下的bin目录(示例D:\golang\package\bin)添加到系统path
+```
+
+<br>
+
+执行命令安装sponge，sponge和依赖插件将安装到`GOPATH/bin`目录下
 
 ```bash
 # 安装sponge
@@ -114,9 +148,9 @@ sponge -v
 
 <br>
 
-### docker部署
+### 在docker安装sponge
 
-注意：使用docker部署的只是sponge ui界面服务，如果需要在生成的服务代码基础上进行开发，还需要根据上面的安装说明，在本地安装sponge和依赖的插件。
+> ⚠ 使用docker安装的sponge只是sponge ui界面服务，如果需要在生成的服务代码基础上进行开发，还是需要根据上面的安装说明，在本地安装sponge和依赖插件的二进制文件。
 
 **方式一：Docker启动**
 

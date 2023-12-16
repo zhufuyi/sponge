@@ -38,7 +38,7 @@ sponge生成的微服务代码框架如下图所示，这是典型的微服务�
 
 <br>
 
-### 完整的服务代码的鸡蛋模型
+### sponge生成的一个web服务代码的鸡蛋模型
 
 sponge生成代码过程中剥离了业务逻辑与非业务逻辑两大部分代码。例如把一个完整web服务代码看作一个鸡蛋，蛋壳表示web服务框架代码，蛋白和蛋黄都表示业务逻辑代码，蛋黄是业务逻辑的核心(需要人工编写的代码)，例如定义mysql表、定义api接口、编写具体逻辑代码都属于蛋黄部分。蛋白是业务逻辑核心代码与web框架代码连接的桥梁(自动生成，不需要人工编写)，例如根据proto文件生成的注册路由代码、handler方法函数代码、参数校验代码、错误码、swagger文档等都属于蛋白部分。
 
@@ -56,6 +56,9 @@ sponge生成代码过程中剥离了业务逻辑与非业务逻辑两大部分�
 
 sponge包含丰富的组件(按需使用)：
 
+- 生成代码命令UI界面化，简单易用。
+- 自动合并新增模板代码，实现api接口"低代码开发"。
+- 代码解耦模块化设计，丰富功能组件开箱即用，也可以很方便使用自己的组件。
 - Web 框架 [gin](https://github.com/gin-gonic/gin)
 - RPC 框架 [grpc](https://github.com/grpc/grpc-go)
 - 配置解析 [viper](https://github.com/spf13/viper)
@@ -116,7 +119,7 @@ sponge包含丰富的组件(按需使用)：
 
 **安装sponge：**
 
-支持在windows、mac、linux环境下安装sponge，点击[查看安装说明](https://github.com/zhufuyi/sponge/blob/main/assets/install-cn.md)。
+支持在windows、mac、linux和docker环境下安装sponge，点击[查看安装说明](https://github.com/zhufuyi/sponge/blob/main/assets/install-cn.md)。
 
 安装完成sponge后，启动UI服务：
 
@@ -128,9 +131,9 @@ sponge run
 
 <br>
 
-### 使用文档
+### sponge开发文档
 
-[使用sponge开发项目文档](https://go-sponge.com/zh-cn/)。
+使用sponge开发项目的详细的操作、配置、部署说明，点击查看[sponge开发文档](https://go-sponge.com/zh-cn/)。
 
 <br>
 
@@ -180,12 +183,6 @@ sponge run
 
 <br>
 
-如果对您有帮助给个star⭐，欢迎加入**go sponge微信群交流**，加微信进群。
-
-<img width="300px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/wechat-group.jpg">
-
-<br>
-
 ### 如何贡献
 
 非常欢迎您的加入，提 Issue 或 Pull Request。
@@ -198,4 +195,8 @@ Pull Request说明:
 4. 推送您的分支: `git push origin feat/xxxx`
 5. 提交pull request
 
-<br><br>
+<br>
+
+如果对您有帮助给个star⭐，欢迎加入**go sponge微信群交流**，加微信(备注`sponge`)进群。
+
+<img width="300px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/wechat-group.jpg">
