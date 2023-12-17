@@ -124,7 +124,7 @@ func copyToTempDir(targetVersion string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	err = executeCommand("chmod", "-R", "644", targetDir)
+	err = executeCommand("chmod", "-R", "744", targetDir)
 	if err != nil {
 		return "", err
 	}
