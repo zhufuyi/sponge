@@ -6,9 +6,9 @@ app:
   env: "dev"                           # runtime environment, dev: development environment, prod: production environment, test: test environment
   version: "v0.0.0"
   host: "127.0.0.1"                  # domain or ip, for service registration
-  enableHTTPProfile: false        # whether to turn on performance analysis, true:enable, false:disable
   enableStat: true                   # whether to turn on printing statistics, true:enable, false:disable
   enableMetrics: true               # whether to turn on indicator collection, true:enable, false:disable
+  enableHTTPProfile: false        # whether to turn on performance analysis, true:enable, false:disable
   enableLimit: false                 # whether to turn on rate limiting (adaptive), true:on, false:off
   enableCircuitBreaker: false    # whether to turn on circuit breaker(adaptive), true:on, false:off
   enableTrace: false                 # whether to turn on trace, true:enable, false:disable, if true jaeger configuration must be set
@@ -47,7 +47,7 @@ grpc:
 
 # grpc client-side settings, support for setting up multiple grpc clients.
 grpcClient:
-  - name: "serverNameExample"   # grpc server name, used for service discovery
+  - name: "serverNameExample"   # grpc service name, used for service discovery
     host: "127.0.0.1"                    # grpc service address, used for direct connection
     port: 8282                              # grpc service port
     registryDiscoveryType: ""         # registration and discovery types: consul, etcd, nacos, if empty, connecting to server using host and port
@@ -73,6 +73,12 @@ logger:
   level: "info"             # output log levels debug, info, warn, error, default is debug
   format: "console"     # output format, console or json, default is console
   isSave: false           # false:output to terminal, true:output to file, default is false
+  #logFileConfig:               # Effective when isSave=true
+    #filename: "out.log"      # File name (default is out.log)
+    #maxSize: 20               # Maximum file size (MB, default is 10MB)
+    #maxBackups: 50         # Maximum number of old files to retain (default is 100)
+    #maxAge: 15               # Maximum number of days to retain old files (default is 30 days)
+    #isCompression: true    # Whether to compress/archive old files (default is false)
 
 
 # mysql settings

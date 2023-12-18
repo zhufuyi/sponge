@@ -31,23 +31,28 @@
 
 ### linux或macOS环境
 
-把`GOPATH/bin`添加到系统path，如果已经设置过跳过此步骤。
+(1) 把`$GOBIN`添加到系统path，如果已经设置过可以跳过此步骤。
 
 ```bash
-# 查看是否设置了GOPATH
-go env GOPATH
+# 打开 .bashrc 文件
+vim ~/.bashrc
 
-# 如果为空，设置GOPATH目录
-go env -w GOPATH=你的目录(示例~/golang/package)
+# 复制下面命令到.bashrc
+export GOROOT="/opt/go"     # 你的go安装目录
+export GOPATH=$HOME/go      # 设置 go get 命令下载第三方包的目录
+export GOBIN=$GOPATH/bin    # 设置 go install 命令编译后生成可执行二进制文件的存放目录
+export PATH=$PATH:$GOBIN:$GOROOT/bin   # 把$GOBIN目录添加到系统path
 
-# 把GOPATH下的bin目录(示例~/golang/package/bin) 添加到系统path
-echo 'export PATH=$PATH:你的GOPATH/bin目录' >> ~/.bashrc
+# 保存 .bashrc 文件后，使设置生效
 source ~/.bashrc
+
+# 查看GOBIN目录
+go env GOBIN
 ```
 
 <br>
 
-执行命令安装sponge，sponge和依赖插件将安装到 `GOPATH/bin` 目录下。
+(2) 执行命令安装sponge，sponge和依赖插件将安装到 `$GOBIN` 目录下。
 
 ```bash
 # 安装sponge
@@ -116,21 +121,21 @@ sed --version
 
 打开`cmder.exe`终端(不是windows自带的cmd)。
 
-把`GOPATH/bin`添加到系统path，如果已经设置过跳过此步骤。
+(1) 把`GOBIN`添加到系统path，如果已经设置过可以跳过此步骤。
 
 ```bash
-# 查看是否设置了GOPATH
-go env GOPATH
+# 设置 go get 命令下载第三方包的目录
+setx GOPATH "D:\你的目录"
+# 设置 go install 命令编译后生成可执行二进制文件的存放目录
+setx GOBIN "D:\你的目录\bin"
 
-# 如果为空，设置GOPATH目录，有可能需要使用管理员权限执行此命令
-go env -w GOPATH=你的目录(示例D:\golang\package)
-
-# 把GOPATH下的bin目录(示例D:\golang\package\bin)添加到系统path
+# 关闭终端，然后开启一个新的终端，查看GOBIN目录
+go env GOBIN
 ```
 
 <br>
 
-执行命令安装sponge，sponge和依赖插件将安装到`GOPATH/bin`目录下
+(2) 执行命令安装sponge，sponge和依赖插件将安装到`GOBIN`目录下。
 
 ```bash
 # 安装sponge
