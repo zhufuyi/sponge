@@ -9,8 +9,8 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-var fns = []RegisterFn{
-	func(s *grpc.Server) {},
+var fn = func(s *grpc.Server) {
+	// pb.RegisterGreeterServer(s, &greeterServer{})
 }
 
 var unaryInterceptors = []grpc.UnaryServerInterceptor{
@@ -27,7 +27,7 @@ var streamInterceptors = []grpc.StreamServerInterceptor{
 
 func TestRun(t *testing.T) {
 	port := 50082
-	Run(port, fns,
+	Run(port, fn,
 		WithSecure(insecure.NewCredentials()),
 		WithUnaryInterceptor(unaryInterceptors...),
 		WithStreamInterceptor(streamInterceptors...),

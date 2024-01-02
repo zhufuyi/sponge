@@ -8,11 +8,11 @@ Generic grpc server.
 	import "github.com/zhufuyi/sponge/pkg/grpc/server"
 
 	port := 8282
-	fn := func(s *grpc.Server) {
+	registerFn := func(s *grpc.Server) {
 		pb.RegisterGreeterServer(s, &greeterServer{})
 	}
 	
-	server.Run(port, []server.RegisterFn{fn},
+	server.Run(port, registerFn,
 		//server.WithSecure(credentials),
 		//server.WithUnaryInterceptor(unaryInterceptors...),
 		//server.WithStreamInterceptor(streamInterceptors...),
@@ -22,4 +22,4 @@ Generic grpc server.
 	select{}
 ```
 
-Examples of practical use https://github.com/zhufuyi/grpc_examples/blob/main/wrapGrpc/server/main.go
+Examples of practical use https://github.com/zhufuyi/grpc_examples/blob/main/usage/server/main.go

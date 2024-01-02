@@ -88,7 +88,7 @@ func customInterceptorOptions(o *options) []grpc.ServerOption {
 }
 
 // Run grpc server
-func Run(port int, registerFns []RegisterFn, options ...Option) {
+func Run(port int, registerFn RegisterFn, options ...Option) {
 	o := defaultServerOptions()
 	o.apply(options...)
 
@@ -102,9 +102,7 @@ func Run(port int, registerFns []RegisterFn, options ...Option) {
 	srv := grpc.NewServer(customInterceptorOptions(o)...)
 
 	// register object to the server
-	for _, fn := range registerFns {
-		fn(srv)
-	}
+	registerFn(srv)
 
 	// register service to target
 	if o.serviceRegisterFn != nil {
