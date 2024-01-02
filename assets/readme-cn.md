@@ -117,17 +117,19 @@ sponge包含丰富的组件(按需使用)：
 
 ### 快速开始
 
-**安装sponge：**
+#### 安装sponge
 
-支持在windows、mac、linux和docker环境下安装sponge，点击[查看安装说明](https://github.com/zhufuyi/sponge/blob/main/assets/install-cn.md)。
+支持在windows、mac、linux环境下安装sponge，点击[查看安装说明](https://github.com/zhufuyi/sponge/blob/main/assets/install-cn.md)。
 
-安装完成sponge后，启动UI服务：
+#### 启动UI服务
+
+安装完成后，启动sponge UI服务：
 
 ```bash
 sponge run
 ```
 
-在浏览器访问 `http://localhost:24631`，在UI页面上操作生成代码。
+在本地浏览器访问 `http://localhost:24631`，在UI页面上操作生成代码。 如果想要在跨主机的浏览器上访问，启动UI时需要指定宿主机ip或域名，示例 `sponge run -a http://192.168.3.10:24631`。 也可以在docker上启动UI服务来支持跨主机访问，点击查看[docker启动sponge UI服务](https://github.com/zhufuyi/sponge/blob/main/assets/install-cn.md#Docker%E7%8E%AF%E5%A2%83)。
 
 <br>
 

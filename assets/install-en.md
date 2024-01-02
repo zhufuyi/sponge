@@ -25,6 +25,9 @@ Check protoc version: `protoc --version`
 After installing go and protoc, proceed to install Sponge. Sponge can be installed on Windows, macOS, and Linux environments.
 
 <br>
+
+---
+
 <br>
 
 ### Linux or macOS Environment
@@ -67,6 +70,9 @@ sponge -v
 ```
 
 <br>
+
+---
+
 <br>
 
 ### Windows Environment
@@ -151,14 +157,18 @@ sponge -v
 
 <br>
 
-### Installing sponge in docker
+---
 
-> ⚠ Docker deployment is specifically for the Sponge UI service. If you need to develop based on the generated service code, you also need to install Sponge and the required plugins locally according to the installation instructions above.
+<br>
+
+### Docker Environment
+
+> ⚠ Sponge UI service started by docker only supports code generation function. If you need to develop based on the generated service code, you also need to install Sponge and the required plugins locally according to the installation instructions above.
 
 **Docker Run**
 
 ```bash
-docker run -d --name sponge -p 24631:24631 zhufuyi/sponge:latest -l -a http://your_host_ip:24631
+docker run -d --name sponge -p 24631:24631 zhufuyi/sponge:latest -a http://your_host_ip:24631
 ```
 
 <br>
@@ -175,7 +185,7 @@ services:
     image: zhufuyi/sponge:latest
     container_name: sponge
     restart: always
-    command: ["-l","-a","http://your_host_ip:24631"]
+    command: ["-a","http://your_host_ip:24631"]
     ports:
       - "24631:24631"
 ```

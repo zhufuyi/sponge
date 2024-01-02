@@ -26,11 +26,11 @@ func OpenUICommand() *cobra.Command {
 		Long: `open the sponge UI interface.
 
 Examples:
-  # no log for running.
+  # running ui service, local browser access only.
   sponge run
 
-  # log for running.
-  sponge run -l
+  # running ui service, can be accessed from other host browsers.
+  sponge run -a http://your-host-ip:24631
 `,
 		SilenceErrors: true,
 		SilenceUsage:  true,

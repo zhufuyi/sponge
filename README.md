@@ -70,9 +70,11 @@ This is the egg model for web service code, and there are egg models for microse
 
 ### Quick start
 
-**Installation sponge:**
+#### Installation sponge
 
 sponge can be installed on Windows, macOS, Linux and Docker environments. Click here to view [Installation Instructions](https://github.com/zhufuyi/sponge/blob/main/assets/install-en.md).
+
+#### Starting UI service
 
 After installing the sponge, start the UI service:
 
@@ -80,7 +82,7 @@ After installing the sponge, start the UI service:
 sponge run
 ```
 
-Visit `http://localhost:24631` in your browser, generate code by manipulating it on the page.
+Access `http://localhost:24631` in a local browser and manipulate the generated code on the UI page. If you want to access it on a cross-host browser, you need to specify the host ip or domain name when starting the UI, example `sponge run -a http://192.168.3.10:24631`. It is also possible to start the UI service on docker to support cross-host access, click to see [start sponge UI service in docker](https://github.com/zhufuyi/sponge/blob/main/assets/install-cn.md#Docker%E7%8E% AF%E5%A2%83).
 
 <br>
 

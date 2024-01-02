@@ -1,5 +1,4 @@
 ## Change log
 
-- Adjust the code.
-- Support copying the specified proto file to the grpc service.
-- The default is not to use the cache, according to the need to choose to use redis or memory as a cache.
+- Fix the permissions problem when installing sponge for linux normal users. [#13](https://github.com/zhufuyi/sponge/issues/13)
+- Embedded front-end static files in gin library.

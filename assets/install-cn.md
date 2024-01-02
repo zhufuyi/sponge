@@ -27,9 +27,12 @@
 > 如果不能科学上网，安装sponge时，获取github的库会遇到超时失败问题，建议设置为国内代理，执行命令 **go env -w GOPROXY=https://goproxy.cn,direct**
 
 <br>
+
+---
+
 <br>
 
-### linux或macOS环境
+### Linux或MacOS环境
 
 (1) 把`$GOBIN`添加到系统path，如果已经设置过可以跳过此步骤。
 
@@ -69,6 +72,9 @@ sponge -v
 ```
 
 <br>
+
+---
+
 <br>
 
 ### Windows环境
@@ -117,7 +123,7 @@ sed --version
 
 <br>
 
-**✅ 安装 sponge**
+**✅ 安装和运行 sponge**
 
 打开`cmder.exe`终端(不是windows自带的cmd)。
 
@@ -153,14 +159,18 @@ sponge -v
 
 <br>
 
-### 在docker安装sponge
+---
 
-> ⚠ 使用docker安装的sponge只是sponge ui界面服务，如果需要在生成的服务代码基础上进行开发，还是需要根据上面的安装说明，在本地安装sponge和依赖插件的二进制文件。
+<br>
+
+### Docker环境
+
+> ⚠ 使用docker启动的sponge UI服务，只支持在界面操作来生成代码功能，如果需要在生成的服务代码基础上进行开发，还是需要根据上面的安装说明，在本地安装sponge和依赖插件的二进制文件。
 
 **方式一：Docker启动**
 
 ```bash
-docker run -d --name sponge -p 24631:24631 zhufuyi/sponge:latest -l -a http://你的宿主机ip:24631
+docker run -d --name sponge -p 24631:24631 zhufuyi/sponge:latest -a http://你的宿主机ip:24631
 ```
 
 <br>
@@ -177,7 +187,7 @@ services:
     image: zhufuyi/sponge:latest
     container_name: sponge
     restart: always
-    command: ["-l","-a","http://你的宿主机ip:24631"]
+    command: ["-a","http://你的宿主机ip:24631"]
     ports:
       - "24631:24631"
 ```
