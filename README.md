@@ -14,7 +14,7 @@
 
 </div>
 
-[sponge](https://github.com/zhufuyi/sponge) is a powerful golang productivity tool that integrates `automatic code generation`, `web and microservices frameworks`, `basic development framework`. sponge has a wealth of generating code commands, generating different functional code can be combined into a complete service (similar to the way that artificially broken sponge cells can automatically recombine into a new sponge). The code is decoupled and modularly designed, it is easy to build a complete project from development to deployment, so that you develop web or microservices project easily, golang can also be "low-code development".
+[Sponge](https://github.com/zhufuyi/sponge) is a powerful golang productivity tool that integrates `automatic code generation`, `web and microservices frameworks`, `basic development framework`. sponge has a wealth of generating code commands, generating different functional code can be combined into a complete service (similar to the way that artificially broken sponge cells can automatically recombine into a new sponge). The code is decoupled and modularly designed, it is easy to build a complete project from development to deployment, so that you develop web or microservices project easily, golang can also be "low-code development".
 
 <br>
 
@@ -65,24 +65,6 @@ Egg model profiling diagram for `⓷Web services created based on protobuf`:
 </p>
 
 This is the egg model for web service code, and there are egg models for microservice (grpc) code, and grpc gateway service code described in [sponge documentation](https://go-sponge.com/learn-about-sponge?id=%f0%9f%8f%b7project-code-egg-model).
-
-<br>
-
-### Quick start
-
-#### Installation sponge
-
-sponge can be installed on Windows, macOS, Linux and Docker environments. Click here to view [Installation Instructions](https://github.com/zhufuyi/sponge/blob/main/assets/install-en.md).
-
-#### Starting UI service
-
-After installing the sponge, start the UI service:
-
-```bash
-sponge run
-```
-
-Access `http://localhost:24631` in a local browser and manipulate the generated code on the UI page. If you want to access it on a cross-host browser, you need to specify the host ip or domain name when starting the UI, example `sponge run -a http://192.168.3.10:24631`. It is also possible to start the UI service on docker to support cross-host access, click to see [start sponge UI service in docker](https://github.com/zhufuyi/sponge/blob/main/assets/install-cn.md#Docker%E7%8E% AF%E5%A2%83).
 
 <br>
 
@@ -147,6 +129,26 @@ The project code directory structure created by sponge follows the [project-layo
 ├── test           # Directory for scripts required for testing services, such as scripts to start dependencies (e.g., MySQL, Redis) and test data (SQL).
 └── third_party    # Directory for external helper programs, forked code, and other third-party tools.
 ```
+
+<br>
+
+### Quick start
+
+#### Installation sponge
+
+sponge can be installed on Windows, macOS, Linux and Docker environments. Click here for [instructions on installing sponge](https://github.com/zhufuyi/sponge/blob/main/assets/install-en.md).
+
+#### Starting UI service
+
+After installing the sponge, start the UI service:
+
+```bash
+sponge run
+```
+
+Access `http://localhost:24631` in a local browser and manipulate the generated code on the UI page.
+
+> If you want to access it on a cross-host browser, you need to specify the host ip or domain name when starting the UI, example `sponge run -a http://your_host_ip:24631`. It is also possible to start the UI service on docker to support cross-host access, Click for instructions on [starting the sponge UI service in docker](https://github.com/zhufuyi/sponge/blob/main/assets/install-en.md#docker-environment).
 
 <br>
 
