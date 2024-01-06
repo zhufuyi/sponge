@@ -13,7 +13,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var toolNames = []string{
+var pluginNames = []string{
 	"go",
 	"protoc",
 	"protoc-gen-go",
@@ -29,7 +29,7 @@ var toolNames = []string{
 	"go-callvis",
 }
 
-var installToolCommands = map[string]string{
+var installPluginCommands = map[string]string{
 	"go":                     "go: please install manually yourself, download url is https://go.dev/dl/ or https://golang.google.cn/dl/",
 	"protoc":                 "protoc: please install manually yourself, download url is https://github.com/protocolbuffers/protobuf/releases/tag/v3.20.3",
 	"protoc-gen-go":          "google.golang.org/protobuf/cmd/protoc-gen-go@latest",
@@ -51,43 +51,49 @@ const (
 	warnSymbol      = "⚠ "
 )
 
-// ToolsCommand tools management
-func ToolsCommand() *cobra.Command {
+// PluginsCommand plugins management
+func PluginsCommand() *cobra.Command {
 	var installFlag bool
+	var skipPluginName string
 
 	cmd := &cobra.Command{
-		Use:   "tools",
-		Short: "Managing sponge dependency tools",
-		Long: `managing sponge dependency tools.
+		Use:   "plugins",
+		Short: "Managing sponge dependency plugins",
+		Long: `managing sponge dependency plugins.
 
 Examples:
-  # show all dependencies tools.
-  sponge tools
+  # show all dependency plugins.
+  sponge plugins
 
-  # install all dependencies tools.
-  sponge tools --install
+  # install all dependency plugins.
+  sponge plugins --install
+
+  # skip installing dependency plugins, multiple plugin names separated by commas
+  sponge plugins --install --skip=go-callvis
 `,
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			installedNames, lackNames := checkInstallTools()
+			installedNames, lackNames := checkInstallPlugins()
+			lackNames = filterLackNames(lackNames, skipPluginName)
 			if installFlag {
-				installTools(lackNames)
+				installPlugins(lackNames)
 			} else {
-				showDependencyTools(installedNames, lackNames)
+				showDependencyPlugins(installedNames, lackNames)
 			}
 
 			return nil
 		},
 	}
-	cmd.Flags().BoolVarP(&installFlag, "install", "i", false, "install dependent tools")
+	cmd.Flags().BoolVarP(&installFlag, "install", "i", false, "install dependency plugins")
+	cmd.Flags().StringVarP(&skipPluginName, "skip", "s", "", "skip installing dependency plugins")
 
 	return cmd
 }
 
-func checkInstallTools() ([]string, []string) {
+func checkInstallPlugins() ([]string, []string) {
 	var installedNames, lackNames = []string{}, []string{}
-	for _, name := range toolNames {
+	for _, name := range pluginNames {
 		_, err := gobash.Exec("which", name)
 		if err != nil {
 			lackNames = append(lackNames, name)
@@ -105,35 +111,35 @@ func checkInstallTools() ([]string, []string) {
 	return installedNames, lackNames
 }
 
-func showDependencyTools(installedNames []string, lackNames []string) {
+func showDependencyPlugins(installedNames []string, lackNames []string) {
 	var content string
 
 	if len(installedNames) > 0 {
-		content = "Installed dependency tools:\n"
+		content = "Installed dependency plugins:\n"
 		for _, name := range installedNames {
 			content += "    " + isntalledSymbol + " " + name + "\n"
 		}
 	}
 
 	if len(lackNames) > 0 {
-		content += "\nUninstalled dependency tools:\n"
+		content += "\nUninstalled dependency plugins:\n"
 		for _, name := range lackNames {
 			content += "    " + lackSymbol + " " + name + "\n"
 		}
-		content += "\nInstalling dependency tools using the command: sponge tools --install\n"
+		content += "\nInstalling dependency plugins using the command: sponge plugins --install\n"
 	} else {
-		content += "\nAll dependent tools installed.\n"
+		content += "\nAll dependency plugins installed.\n"
 	}
 
 	fmt.Println(content)
 }
 
-func installTools(lackNames []string) {
+func installPlugins(lackNames []string) {
 	if len(lackNames) == 0 {
-		fmt.Printf("\n    All dependent tools installed.\n\n")
+		fmt.Printf("\n    All dependency plugins installed.\n\n")
 		return
 	}
-	fmt.Printf("install a total of %d dependent tools, need to wait a little time.\n\n", len(lackNames))
+	fmt.Printf("install a total of %d dependency plugins, need to wait a little time.\n\n", len(lackNames))
 
 	var wg = &sync.WaitGroup{}
 	var manuallyNames []string
@@ -147,7 +153,7 @@ func installTools(lackNames []string) {
 		go func(name string) {
 			defer wg.Done()
 			ctx, _ := context.WithTimeout(context.Background(), time.Minute*3) //nolint
-			pkgAddr, ok := installToolCommands[name]
+			pkgAddr, ok := installPluginCommands[name]
 			if !ok {
 				return
 			}
@@ -167,7 +173,7 @@ func installTools(lackNames []string) {
 	wg.Wait()
 
 	for _, name := range manuallyNames {
-		fmt.Println(warnSymbol + " " + installToolCommands[name])
+		fmt.Println(warnSymbol + " " + installPluginCommands[name])
 	}
 	fmt.Println()
 }
@@ -180,4 +186,26 @@ func adaptInternalCommand(name string, pkgAddr string) string {
 	}
 
 	return pkgAddr
+}
+
+func filterLackNames(lackNames []string, skipPluginName string) []string {
+	if skipPluginName == "" {
+		return lackNames
+	}
+	skipPluginNames := strings.Split(skipPluginName, ",")
+
+	names := []string{}
+	for _, name := range lackNames {
+		isMatch := false
+		for _, pluginName := range skipPluginNames {
+			if name == pluginName {
+				isMatch = true
+				continue
+			}
+		}
+		if !isMatch {
+			names = append(names, name)
+		}
+	}
+	return names
 }

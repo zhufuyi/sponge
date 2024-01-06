@@ -6,7 +6,7 @@ According to protobuf to generate gin registration route codes, you can use thei
 
 ### Installation
 
-#### Installation of dependency tools
+#### Installation of dependency plugins
 
 ```bash
 # install protoc in linux

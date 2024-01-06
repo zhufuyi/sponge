@@ -64,8 +64,8 @@ go install github.com/zhufuyi/sponge/cmd/sponge@latest
 # 初始化sponge，自动安装sponge依赖插件
 sponge init
 
-# 查看插件是否都安装成功，如果发现有插件没有安装成功，执行命令重试 sponge tools --install
-sponge tools
+# 查看插件是否都安装成功，如果发现有插件没有安装成功，执行命令重试 sponge plugins --install
+sponge plugins
 
 # 查看sponge版本
 sponge -v
@@ -150,8 +150,8 @@ go install github.com/zhufuyi/sponge/cmd/sponge@latest
 # 初始化sponge，自动安装sponge依赖插件
 sponge init
 
-# 查看插件是否都安装成功，如果发现有插件没有安装成功，执行命令重试 sponge tools --install
-sponge tools
+# 查看插件是否都安装成功，如果发现有插件没有安装成功，执行命令重试 sponge plugins --install
+sponge plugins
 
 # 查看sponge版本
 sponge -v

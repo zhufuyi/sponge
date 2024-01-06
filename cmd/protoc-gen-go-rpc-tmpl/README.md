@@ -6,7 +6,7 @@ According to protobuf to generate rpc service template codes and rpc error code 
 
 ### Installation
 
-#### Installation of dependency tools
+#### Installation of dependency plugins
 
 ```bash
 # install protoc in linux

@@ -62,8 +62,8 @@ go install github.com/zhufuyi/sponge/cmd/sponge@latest
 # Initialize Sponge, automatically install Sponge's dependency plugins
 sponge init
 
-# Check if all plugins have been successfully installed. If any plugins fail to install, retry with the command: sponge tools --install
-sponge tools
+# Check if all plugins have been successfully installed. If any plugins fail to install, retry with the command: sponge plugins --install
+sponge plugins
 
 # Check Sponge version
 sponge -v
@@ -148,8 +148,8 @@ go install github.com/zhufuyi/sponge/cmd/sponge@latest
 # Initialize Sponge, automatically install Sponge's dependency plugins
 sponge init
 
-# Check if all plugins have been successfully installed. If any plugins fail to install, retry with the command: sponge tools --install
-sponge tools
+# Check if all plugins have been successfully installed. If any plugins fail to install, retry with the command: sponge plugins --install
+sponge plugins
 
 # Check Sponge version
 sponge -v

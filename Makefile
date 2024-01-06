@@ -6,7 +6,7 @@ PKG_LIST := $(shell go list ${PKG}/... | grep -v /vendor/ | grep -v /api/)
 
 # delete the templates code start
 .PHONY: install
-# installation of dependent tools
+# installation of dependent plugins
 install:
 	go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest

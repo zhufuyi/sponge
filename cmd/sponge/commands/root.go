@@ -31,7 +31,7 @@ docs: https://go-sponge.com`,
 	cmd.AddCommand(
 		InitCommand(),
 		UpgradeCommand(),
-		ToolsCommand(),
+		PluginsCommand(),
 		GenWebCommand(),
 		GenMicroCommand(),
 		generate.ConfigCommand(),

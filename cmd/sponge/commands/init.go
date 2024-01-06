@@ -16,7 +16,7 @@ func InitCommand() *cobra.Command {
 		Long: `initialize sponge.
 
 Examples:
-  # run init, download code and install tools.
+  # run init, download code and install plugins.
   sponge init
 `,
 		SilenceErrors: true,
@@ -31,9 +31,9 @@ Examples:
 				return err
 			}
 
-			// installing dependent plug-ins
-			_, lackNames := checkInstallTools()
-			installTools(lackNames)
+			// installing dependency plugins
+			_, lackNames := checkInstallPlugins()
+			installPlugins(lackNames)
 
 			return nil
 		},
