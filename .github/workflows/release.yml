@@ -18,7 +18,8 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.20
+          go-version: 1.19
+          cache: true
 
       - name: Create release on GitHub
         uses: goreleaser/goreleaser-action@v3
