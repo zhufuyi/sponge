@@ -80,7 +80,7 @@ func main() {
 
     r.POST("/user/login", Login)
     r.GET("/user/:id", middleware.Auth(), h.GetByID) // no verify field
-    // r.GET("/user/:id", middleware.Auth(middleware.WithVerify(adminVerify)), userFun) // with verify field
+    // r.GET("/user/:id", middleware.Auth(middleware.WithVerify(adminVerify)), h.GetByID) // with verify field
 
     r.Run(serverAddr)
 }
@@ -115,7 +115,7 @@ func main() {
     r := gin.Default()
 
     r.POST("/user/login", Login)
-    r.GET("/user/:id", middleware.AuthCustom(verify), userFun)
+    r.GET("/user/:id", middleware.AuthCustom(verify), h.GetByID)
 
     r.Run(serverAddr)
 }

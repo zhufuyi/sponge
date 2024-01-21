@@ -2,7 +2,6 @@
 package frontend
 
 import (
-	"bytes"
 	"embed"
 	"fmt"
 	"io/fs"
@@ -24,48 +23,40 @@ var targetDir = "frontend"
 
 // FrontEnd is the frontend router configuration
 type FrontEnd struct {
-	// directory where index.html is located, e.g. web/html.
-	htmlDir string
-	// defaultAddr is the default address of the back-end api request, e.g. http://localhost:8080.
-
-	defaultAddr string
-	// custom address，the default is defaultAddr, which is used to configure whether cross-host access is possible.
-	customAddr string
-	// configuration file in which js requests the address of the back-end api request, e.g. config.js.
-	addrConfigFile string
-
 	// embed.FS static resources.
 	staticFS embed.FS
+	// must be set to false if cross-host access is required, otherwise true
+	isUseEmbedFS bool
+	// directory where index.html is located, e.g. web/html
+	htmlDir string
+	// configuration file in which js requests the address of the back-end api request, e.g. config.js
+	configFile string
+	// modify config
+	modifyConfigFn func(content []byte) []byte
 }
 
 // New create a new frontend
-func New(htmlDir string, defaultAddr string, customAddr string, addrConfigFile string, staticFS embed.FS) *FrontEnd {
-	if defaultAddr == "" {
-		panic("default address cannot be empty")
-	}
-	if customAddr == "" {
-		customAddr = defaultAddr
-	}
+func New(staticFS embed.FS, isUseEmbedFS bool, htmlDir string, configFile string, modifyConfigFn func(content []byte) []byte) *FrontEnd {
 	htmlDir = strings.Trim(htmlDir, "/")
 	return &FrontEnd{
-		htmlDir:        htmlDir,
-		defaultAddr:    defaultAddr,
-		customAddr:     customAddr,
-		addrConfigFile: addrConfigFile,
 		staticFS:       staticFS,
+		isUseEmbedFS:   isUseEmbedFS,
+		htmlDir:        htmlDir,
+		configFile:     configFile,
+		modifyConfigFn: modifyConfigFn,
 	}
 }
 
 // SetRouter set frontend router
 func (f *FrontEnd) SetRouter(r *gin.Engine) error {
-	routerPath := fmt.Sprintf("/%s/index.html", f.htmlDir)
+	routerPath := fmt.Sprintf("%s/index.html", f.htmlDir)
 	// solve vue using history route 404 problem
 	r.NoRoute(browserRefreshFS(f.staticFS, routerPath))
 
 	relativePath := fmt.Sprintf("/%s/*filepath", f.htmlDir)
 
 	// use embed file
-	if f.isUseEmbedFS() {
+	if f.isUseEmbedFS {
 		r.GET(relativePath, func(c *gin.Context) {
 			staticServer := http.FileServer(http.FS(f.staticFS))
 			staticServer.ServeHTTP(c.Writer, c.Request)
@@ -85,10 +76,6 @@ func (f *FrontEnd) SetRouter(r *gin.Engine) error {
 	})
 
 	return nil
-}
-
-func (f *FrontEnd) isUseEmbedFS() bool {
-	return f.defaultAddr == f.customAddr
 }
 
 func (f *FrontEnd) saveFSToLocal() error {
@@ -116,8 +103,8 @@ func (f *FrontEnd) saveFSToLocal() error {
 			}
 
 			// replace config address
-			if path == f.addrConfigFile {
-				content = bytes.ReplaceAll(content, []byte(f.defaultAddr), []byte(f.customAddr))
+			if path == f.configFile {
+				content = f.modifyConfigFn(content)
 			}
 
 			// Save the content to the local file

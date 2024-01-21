@@ -2,11 +2,12 @@
 package model
 
 import (
+	"context"
+	"database/sql"
 	"sync"
 	"time"
 
 	"github.com/zhufuyi/sponge/internal/config"
-
 	"github.com/zhufuyi/sponge/pkg/goredis"
 	"github.com/zhufuyi/sponge/pkg/logger"
 	"github.com/zhufuyi/sponge/pkg/mysql"
@@ -90,10 +91,24 @@ func CloseMysql() error {
 	if err != nil {
 		return err
 	}
-	if sqlDB != nil {
-		return sqlDB.Close()
+
+	checkInUse(sqlDB, time.Second*5)
+
+	return sqlDB.Close()
+}
+
+func checkInUse(sqlDB *sql.DB, duration time.Duration) {
+	ctx, _ := context.WithTimeout(context.Background(), duration) //nolint
+	for {
+		select {
+		case <-time.After(time.Millisecond * 500):
+			if v := sqlDB.Stats().InUse; v == 0 {
+				return
+			}
+		case <-ctx.Done():
+			return
+		}
 	}
-	return nil
 }
 
 // ------------------------------------------------------------------------------------------
