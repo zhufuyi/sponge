@@ -3,9 +3,11 @@ package commands
 import (
 	"errors"
 	"fmt"
+	"net"
 	"net/url"
 	"os/exec"
 	"runtime"
+	"strconv"
 
 	"github.com/zhufuyi/sponge/cmd/sponge/server"
 
@@ -37,9 +39,9 @@ Examples:
 
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if spongeAddr == "" {
-				spongeAddr = "http://localhost:24631"
+				spongeAddr = fmt.Sprintf("http://localhost:%d", port)
 			} else {
-				if err := checkSpongeAddr(spongeAddr); err != nil {
+				if err := checkSpongeAddr(spongeAddr, port); err != nil {
 					return err
 				}
 			}
@@ -75,7 +77,7 @@ func open(visitURL string) error {
 	return exec.Command(cmd, args...).Start()
 }
 
-func checkSpongeAddr(spongeAddr string) error {
+func checkSpongeAddr(spongeAddr string, port int) error {
 	paramErr := errors.New("the addr parameter is invalid,  e.g. sponge run --addr=http://192.168.1.10:24631")
 	u, err := url.Parse(spongeAddr)
 	if err != nil {
@@ -84,6 +86,13 @@ func checkSpongeAddr(spongeAddr string) error {
 
 	if (u.Scheme != "http" && u.Scheme != "https") || u.Host == "" {
 		return paramErr
+	}
+
+	ip := net.ParseIP(u.Hostname())
+	if ip != nil {
+		if u.Port() != strconv.Itoa(port) {
+			return errors.New("the port parameter is invalid, e.g. sponge run --port=8080 --addr=http://192.168.1.10:8080")
+		}
 	}
 
 	return nil
