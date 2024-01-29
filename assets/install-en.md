@@ -6,7 +6,7 @@
 
 Download go from: [https://go.dev/doc/install](https://go.dev/doc/install)
 
-> Required version: 1.16 or above. 
+> Recommended version: 1.20 or above.
 
 Check go version: `go version`
 
@@ -14,9 +14,9 @@ Check go version: `go version`
 
 **✅ Installing protoc**
 
-Download protoc from: [https://github.com/protocolbuffers/protobuf/releases/tag/v3.20.3](https://github.com/protocolbuffers/protobuf/releases/tag/v3.20.3)
+Download protoc from: [https://github.com/protocolbuffers/protobuf/releases/tag/v25.2](https://github.com/protocolbuffers/protobuf/releases/tag/v25.2)
 
-> Required version: v3.20 or above. add the directory where the protoc binaries are located to the system environment variable path.
+> Required version: v3.20 or above. Download the protoc binaries according to the system type, move the protoc binaries to the directory where the go binaries are located.
 
 Check protoc version: `protoc --version`
 

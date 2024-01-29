@@ -6,7 +6,7 @@
 
 下载go地址： [https://studygolang.com/dl](https://studygolang.com/dl)
 
-> 要求1.16以上版本。
+> 建议是1.20以上版本。
 
 查看go版本 `go version`
 
@@ -14,9 +14,9 @@
 
 **✅ 安装 protoc**
 
-下载protoc地址： [https://github.com/protocolbuffers/protobuf/releases/tag/v3.20.3](https://github.com/protocolbuffers/protobuf/releases/tag/v3.20.3)
+下载protoc地址： [https://github.com/protocolbuffers/protobuf/releases/tag/v25.2](https://github.com/protocolbuffers/protobuf/releases/tag/v25.2)
 
-> 要求v3.20以上版本，把 protoc 二进制文件所在目录添加到系统环境变量path。
+> 要求v3.20以上版本，根据系统类型下载对应的 protoc 二进制文件，把 protoc 二进制文件移动到go二进制文件所在的目录。
 
 查看protoc版本: `protoc --version`
 
@@ -24,7 +24,7 @@
 
 安装完go和protoc之后，接下来安装sponge，支持在windows、mac、linux环境安装。
 
-> 如果不能科学上网，安装sponge时，获取github的库会遇到超时失败问题，建议设置为国内代理，执行命令 **go env -w GOPROXY=https://goproxy.cn,direct**
+> 如果不能科学上网，安装sponge时，获取github的库可能会遇到超时失败问题，建议设置为国内代理，执行命令 **go env -w GOPROXY=https://goproxy.cn,direct**
 
 <br>
 
@@ -192,10 +192,10 @@ services:
       - "24631:24631"
 ```
 
-```bash
-# 启动服务
-docker-compose up -d
+启动服务：
 
+```bash
+docker-compose up -d
 ```
 
 在docker部署成功后，在浏览器访问 `http://你的宿主机ip:24631`。

@@ -2,7 +2,7 @@
 
 TAG=$1
 if [ "X${TAG}" = "X" ];then
-    echo "image tag cannot be empty, example: ./image-build.sh v1.5.8"
+    echo "image tag cannot be empty, example: ./build-sponge-image.sh v1.5.8"
     exit 1
 fi
 

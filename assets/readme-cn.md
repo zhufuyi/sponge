@@ -48,7 +48,7 @@ sponge生成代码过程中剥离了业务逻辑与非业务逻辑两大部分�
 <img width="1200px" src="https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/web-http-pb-anatomy.png">
 </p>
 
-这是web服务代码鸡蛋模型，还有微服务(grpc)代码、grpc网关服务代码的鸡蛋模型在[sponge文档](https://go-sponge.com/zh-cn/learn-about-sponge?id=%f0%9f%8f%b7%e9%a1%b9%e7%9b%ae%e4%bb%a3%e7%a0%81%e9%b8%a1%e8%9b%8b%e6%a8%a1%e5%9e%8b)中有介绍。
+这是web服务代码鸡蛋模型，还有grpc服务代码、grpc网关服务代码的鸡蛋模型在[sponge文档](https://go-sponge.com/zh-cn/learn-about-sponge?id=%f0%9f%8f%b7%e9%a1%b9%e7%9b%ae%e4%bb%a3%e7%a0%81%e9%b8%a1%e8%9b%8b%e6%a8%a1%e5%9e%8b)中有介绍。
 
 <br>
 
@@ -69,7 +69,7 @@ sponge包含丰富的组件(按需使用)：
 - 自动化api接口文档 [swagger](https://github.com/swaggo/swag), [protoc-gen-openapiv2](https://github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2)
 - 鉴权 [jwt](https://github.com/golang-jwt/jwt)
 - 校验 [validator](https://github.com/go-playground/validator)
-- 消息组件 [rabbitmq](github.com/rabbitmq/amqp091-go)
+- 消息组件 [rabbitmq](https://github.com/rabbitmq/amqp091-go)
 - 分布式事务管理器 [dtm](https://github.com/dtm-labs/dtm)
 - 自适应限流 [ratelimit](https://github.com/zhufuyi/sponge/tree/main/pkg/shield/ratelimit)
 - 自适应熔断 [circuitbreaker](https://github.com/zhufuyi/sponge/tree/main/pkg/shield/circuitbreaker)
