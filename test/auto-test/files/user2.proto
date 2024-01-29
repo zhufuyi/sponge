@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package api.user.v1;
+
+import "validate/validate.proto";
+
+option go_package = "edusys/api/user/v1;v1";
+
+service user {
+  // Register
+  rpc Register(RegisterRequest) returns (RegisterReply) {}
+  // Login
+  rpc Login(LoginRequest) returns (LoginReply) {}
+  // Logout
+  rpc Logout(LogoutRequest) returns (LogoutReply) {}
+  // ChangePassword
+  rpc ChangePassword(ChangePasswordRequest) returns (ChangeRegisterReply)  {}
+}
+
+message RegisterRequest {
+  string email = 1 [(validate.rules).string.email = true];
+  string password = 2 [(validate.rules).string.min_len = 6];
+}
+
+message RegisterReply {
+  uint64 id = 1;
+}
+
+message LoginRequest {
+  string email = 1 [(validate.rules).string.email = true];
+  string password = 2 [(validate.rules).string.min_len = 6];
+}
+
+message LoginReply {
+  uint64 id = 1;
+  string token = 2;
+}
+
+message LogoutRequest {
+  uint64 id = 1 [(validate.rules).uint64.gte  = 1];
+  string token = 2 [(validate.rules).string.min_len  = 20];
+}
+
+message LogoutReply {
+}
+
+message ChangePasswordRequest {
+  uint64 id = 1 [(validate.rules).uint64.gte  = 1];
+  string password = 2 [(validate.rules).string.min_len = 6];
+}
+
+message ChangeRegisterReply {
+}

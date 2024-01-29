@@ -1,0 +1,24 @@
+// define rpc clients interface here|-|-|-|-|-|teacherCli userV1.TeacherClient|-|-|-|-|-|userCli: userV1.NewUserClient(rpcclient.GetUserRPCConn()),|-|-|-|-|-|
+	    teacherCli: userV1.NewTeacherClient(rpcclient.GetUserRPCConn()),|-|-|-|-|-|func (c *userClient) Register(ctx context.Context, req *user_gwV1.RegisterRequest) (*user_gwV1.RegisterReply, error) {|-|-|-|-|-|func (c *userClient) Register(ctx context.Context, req *user_gwV1.RegisterRequest) (reply *user_gwV1.RegisterReply, err error) {
+	err = req.Validate()
+	if err != nil {
+		logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req), interceptor.ClientCtxRequestIDField(ctx))
+		return nil, ecode.StatusInvalidParams.Err()
+	}
+
+	rep, err := c.teacherCli.GetByID(ctx, &userV1.GetTeacherByIDRequest{Id: 1})
+	if err != nil {
+		logger.Warn("Register error", logger.Err(err), interceptor.ClientCtxRequestIDField(ctx))
+		return nil, err
+	}
+	logger.Info("GetByID", logger.Any("reply", rep.Teacher), interceptor.ClientCtxRequestIDField(ctx))
+
+	return &user_gwV1.RegisterReply{
+		Id: rep.Teacher.Id,
+	}, nil
+|-|-|-|-|-|//"user_gw/internal/rpcclient"|-|-|-|-|-|"user_gw/internal/rpcclient"
+	userV1 "user_gw/api/user/v1"
+	"user_gw/internal/ecode"
+
+	"github.com/zhufuyi/sponge/pkg/grpc/interceptor"
+	"github.com/zhufuyi/sponge/pkg/logger"

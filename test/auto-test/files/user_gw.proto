@@ -1,0 +1,129 @@
+syntax = "proto3";
+
+package api.user_gw.v1;
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+
+option go_package = "user_gw/api/user_gw/v1;v1";
+
+// Default settings for generating swagger documents
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  host: "localhost:8080"
+  base_path: ""
+  info: {
+    title: "user api docs";
+    version: "2.0";
+  }
+  schemes: HTTP;
+  schemes: HTTPS;
+  consumes: "application/json";
+  produces: "application/json";
+  security_definitions: {
+    security: {
+      key: "BearerAuth";
+      value: {
+        type: TYPE_API_KEY;
+        in: IN_HEADER;
+        name: "Authorization";
+        description: "Input a \"Bearer your-jwt-token\" to Value";
+      }
+    }
+  }
+};
+
+service user {
+  // Register
+  rpc Register(RegisterRequest) returns (RegisterReply) {
+    option (google.api.http) = {
+      post: "/api/v1/user/register"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "register",
+      description: "register",
+    };
+  }
+  // Login
+  rpc Login(LoginRequest) returns (LoginReply) {
+    option (google.api.http) = {
+      post: "/api/v1/user/login"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "login",
+      description: "login",
+    };
+  }
+  // Logout
+  rpc Logout(LogoutRequest) returns (LogoutReply) {
+    option (google.api.http) = {
+      post: "/api/v1/user/logout"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "logout",
+      description: "logout",
+      security: {
+        security_requirement: {
+          key: "BearerAuth";
+          value: {}
+        }
+      }
+    };
+  }
+  // ChangePassword
+  rpc ChangePassword(ChangePasswordRequest) returns (ChangeRegisterReply)  {
+    option (google.api.http) = {
+      post: "/api/v1/user/change_password"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "change password",
+      description: "change password",
+      security: {
+        security_requirement: {
+          key: "BearerAuth";
+          value: {}
+        }
+      }
+    };
+  }
+}
+
+message RegisterRequest {
+  string email = 1 [(validate.rules).string.email = true];
+  string password = 2 [(validate.rules).string.min_len = 6];
+}
+
+message RegisterReply {
+  uint64 id = 1;
+}
+
+message LoginRequest {
+  string email = 1 [(validate.rules).string.email = true];
+  string password = 2 [(validate.rules).string.min_len = 6];
+}
+
+message LoginReply {
+  uint64 id = 1;
+  string token = 2;
+}
+
+message LogoutRequest {
+  uint64 id = 1 [(validate.rules).uint64.gte  = 1];
+  string token = 2 [(validate.rules).string.min_len  = 20];
+}
+
+message LogoutReply {
+}
+
+message ChangePasswordRequest {
+  uint64 id = 1 [(validate.rules).uint64.gte  = 1];
+  string password = 2 [(validate.rules).string.min_len = 6];
+}
+
+message ChangeRegisterReply {
+}
+
