@@ -17,13 +17,19 @@ func TestGenerateToken(t *testing.T) {
 	Init()
 	token, err = GenerateToken("123")
 	assert.NoError(t, err)
-	t.Log(token)
 
 	v, err := ParseToken(token)
 	if err != nil {
 		t.Fatal(err)
 	}
-	fmt.Println(v)
+	t.Log(v)
+
+	time.Sleep(time.Second)
+	newToken, err := RefreshToken(token)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(token, newToken)
 }
 
 func TestParseToken(t *testing.T) {
@@ -77,7 +83,6 @@ func TestGenerateCustomToken(t *testing.T) {
 	Init()
 	token, err := GenerateCustomToken(fields)
 	assert.NoError(t, err)
-	t.Log(token)
 
 	claims, err := ParseCustomToken(token)
 	assert.NoError(t, err)
@@ -90,6 +95,13 @@ func TestGenerateCustomToken(t *testing.T) {
 	claims.Fields = nil
 	foo, _ = claims.Get("foo")
 	assert.Nil(t, foo)
+
+	time.Sleep(time.Second)
+	newToken, err := RefreshCustomToken(token)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(token, newToken)
 }
 
 func TestParseCustomToken(t *testing.T) {

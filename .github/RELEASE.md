@@ -1,3 +1,4 @@
 ## Change log
 
-- Modify sponge ui.
+- Add auto test scripts.
+- Repack gorm package.

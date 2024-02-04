@@ -70,6 +70,18 @@ func ParseToken(tokenString string) (*Claims, error) {
 	return nil, errSignature
 }
 
+// RefreshToken refresh token
+func RefreshToken(tokenString string) (string, error) {
+	claims, err := ParseToken(tokenString)
+	if err != nil {
+		return "", err
+	}
+	claims.RegisteredClaims.ExpiresAt = jwt.NewNumericDate(time.Now().Add(opt.expire))
+	claims.RegisteredClaims.IssuedAt = jwt.NewNumericDate(time.Now())
+	token := jwt.NewWithClaims(opt.signingMethod, claims)
+	return token.SignedString(opt.signingKey)
+}
+
 // -------------------------------------------------------------------------------------------
 
 // KV map type
@@ -127,4 +139,16 @@ func ParseCustomToken(tokenString string) (*CustomClaims, error) {
 	}
 
 	return nil, errSignature
+}
+
+// RefreshCustomToken refresh custom token
+func RefreshCustomToken(tokenString string) (string, error) {
+	claims, err := ParseCustomToken(tokenString)
+	if err != nil {
+		return "", err
+	}
+	claims.RegisteredClaims.ExpiresAt = jwt.NewNumericDate(time.Now().Add(opt.expire))
+	claims.RegisteredClaims.IssuedAt = jwt.NewNumericDate(time.Now())
+	token := jwt.NewWithClaims(opt.signingMethod, claims)
+	return token.SignedString(opt.signingKey)
 }
