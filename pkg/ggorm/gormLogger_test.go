@@ -1,4 +1,4 @@
-package mysql
+package ggorm
 
 import (
 	"context"

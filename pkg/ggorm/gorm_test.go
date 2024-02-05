@@ -1,4 +1,4 @@
-package mysql
+package ggorm
 
 import (
 	"fmt"
@@ -14,6 +14,17 @@ func TestInitMysql(t *testing.T) {
 	db, err := InitMysql(dsn, WithEnableTrace())
 	if err != nil {
 		// ignore test error about not being able to connect to real mysql
+		t.Logf(fmt.Sprintf("connect to mysql failed, err=%v, dsn=%s", err, dsn))
+		return
+	}
+
+	t.Logf("%+v", db.Name())
+}
+
+func TestInitTidb(t *testing.T) {
+	db, err := InitTidb(dsn)
+	if err != nil {
+		// ignore test error about not being able to connect to real tidb
 		t.Logf(fmt.Sprintf("connect to mysql failed, err=%v, dsn=%s", err, dsn))
 		return
 	}

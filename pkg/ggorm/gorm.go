@@ -1,5 +1,5 @@
-// Package mysql is a library wrapped on top of gorm.io/gorm, with added features such as link tracing, paging queries, etc.
-package mysql
+// Package ggorm is a library wrapped on top of gorm.io/gorm, with added features such as link tracing, paging queries, etc.
+package ggorm
 
 import (
 	"database/sql"
@@ -99,6 +99,21 @@ func InitPostgresql(dsn string, opts ...Option) (*gorm.DB, error) {
 
 	return db, nil
 }
+
+// InitTidb init tidb
+func InitTidb(dsn string, opts ...Option) (*gorm.DB, error) {
+	return InitMysql(dsn, opts...)
+}
+
+// InitClickhouse init clickhouse
+//func InitClickhouse(dsn string, opts ...Option) (*gorm.DB, error) {
+//	return InitMysql(dsn, opts...)
+//}
+
+// InitSqlite init sqlite
+//func InitSqlite(dsn string, opts ...Option) (*gorm.DB, error) {
+//	panic("not implemented")
+//}
 
 // gorm setting
 func gormConfig(o *options) *gorm.Config {

@@ -15,7 +15,7 @@
 
 </div>
 
-[Sponge](https://github.com/zhufuyi/sponge) is a powerful golang productivity tool that integrates `automatic code generation`, `web and microservices frameworks`, `basic development framework`. sponge has a wealth of generating code commands, generating different functional code can be combined into a complete service (similar to the way that artificially broken sponge cells can automatically recombine into a new sponge). The code is decoupled and modularly designed, it is easy to build a complete project from development to deployment, so that you develop web or microservices project easily, golang can also be "low-code development".
+**Sponge** is a basic development framework that integrates `code auto generation`, `gin and grpc`, sponge has a wealth of generating code commands, generating different functional code can be combined into a complete service (similar to the way that artificially broken sponge cells can automatically recombine into a new sponge). The code is decoupled and modularly designed, it is easy to build a complete project from development to deployment, so that you develop web or microservices project easily, Go can also be "low-code development".
 
 <br>
 
@@ -47,7 +47,7 @@ sponge is mainly based on **SQL** and **Protobuf** two ways to generate code, ea
 
 ### Services framework
 
-sponge generated microservice code framework is shown in the figure below, which is a typical microservice hierarchical structure, with high performance, high scalability, contains commonly used service governance features, you can easily replace or add their own service governance features.
+Sponge is essentially a microservice framework that includes code generation and deployment capabilities. The microservice framework is shown in the following figure, which is a typical microservice hierarchical structure, with high performance, high scalability, contains commonly used service governance features, you can easily replace or add their own service governance features.
 
 <p align="center">
 <img width="1000px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/microservices-framework.png">

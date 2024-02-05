@@ -16,7 +16,7 @@
 
 下载protoc地址： [https://github.com/protocolbuffers/protobuf/releases/tag/v25.2](https://github.com/protocolbuffers/protobuf/releases/tag/v25.2)
 
-> 要求v3.20以上版本，根据系统类型下载对应的 protoc 二进制文件，把 protoc 二进制文件移动到go二进制文件所在的目录。
+> 根据系统类型下载对应的 protoc 二进制文件，把 protoc 二进制文件移动到go二进制文件所在的目录。
 
 查看protoc版本: `protoc --version`
 

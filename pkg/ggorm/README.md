@@ -1,6 +1,8 @@
-### mysql
+### ggorm
 
-`mysql` library wrapped in [gorm](gorm.io/gorm), with added features such as tracer, paging queries, etc.
+`ggorm` library wrapped in [gorm](gorm.io/gorm), with added features such as tracer, paging queries, etc.
+
+Support `mysql`, `postgresql`, `tidb`, `clickhouse`, `sqlite`.
 
 <br>
 

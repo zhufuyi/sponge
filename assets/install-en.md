@@ -16,7 +16,7 @@ Check go version: `go version`
 
 Download protoc from: [https://github.com/protocolbuffers/protobuf/releases/tag/v25.2](https://github.com/protocolbuffers/protobuf/releases/tag/v25.2)
 
-> Required version: v3.20 or above. Download the protoc binaries according to the system type, move the protoc binaries to the directory where the go binaries are located.
+> Download the protoc binaries according to the system type, move the protoc binaries to the directory where the go binaries are located.
 
 Check protoc version: `protoc --version`
 
