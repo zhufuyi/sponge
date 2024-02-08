@@ -21,10 +21,10 @@ func TestInitMysql(t *testing.T) {
 	}
 
 	config.Get().App.EnableTrace = true
-	config.Get().Mysql.EnableLog = true
+	config.Get().Database.Mysql.EnableLog = true
 
 	time.Sleep(time.Millisecond * 10)
-	err = CloseMysql()
+	err = CloseDB()
 	assert.NoError(t, err)
 
 	utils.SafeRunWithTimeout(time.Second*2, func(cancel context.CancelFunc) {
@@ -41,20 +41,20 @@ func TestInitMysqlError(t *testing.T) {
 	}
 
 	// change config error test
-	config.Get().Mysql.Dsn = "root:123456@(127.0.0.1:3306)/test"
+	config.Get().Database.Mysql.Dsn = "root:123456@(127.0.0.1:3306)/test"
 
 	utils.SafeRunWithTimeout(time.Second*2, func(cancel context.CancelFunc) {
-		_ = CloseMysql()
+		_ = CloseDB()
 		InitMysql()
 		assert.NotNil(t, db)
 		cancel()
 	})
 }
 
-func TestCloseMysql(t *testing.T) {
+func TestCloseDB(t *testing.T) {
 	defer func() { recover() }()
 	db = &gorm.DB{}
-	err := CloseMysql()
+	err := CloseDB()
 	assert.NoError(t, err)
 }
 

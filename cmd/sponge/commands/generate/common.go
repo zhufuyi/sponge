@@ -2,6 +2,7 @@
 package generate
 
 import (
+	"bufio"
 	"bytes"
 	"errors"
 	"fmt"
@@ -19,11 +20,21 @@ import (
 const (
 	// TplNameSponge name of the template
 	TplNameSponge = "sponge"
+
+	// DBDriverMysql mysql driver
+	DBDriverMysql = "mysql"
+	// DBDriverPostgresql postgresql driver
+	DBDriverPostgresql = "postgresql"
+	// DBDriverTidb tidb driver
+	DBDriverTidb = "tidb"
 )
 
 var (
 	modelFile     = "model/userExample.go"
 	modelFileMark = "// todo generate model code to here"
+
+	modelInitDBFile     = "model/init.go"
+	modelInitDBFileMark = "// todo generate initialisation database code here"
 
 	cacheFile = "cache/cacheNameExample.go"
 
@@ -34,6 +45,10 @@ var (
 	handlerFile     = "types/userExample_types.go"
 	handlerFileMark = "// todo generate the request and response struct to here"
 	handlerTestFile = "handler/userExample_test.go"
+
+	handlerLogicFile = "handler/userExample_logic.go"
+	serviceLogicFile = "service/userExample.go"
+	embedTimeMark    = "// todo generate the conversion createdAt and updatedAt code here"
 
 	httpFile = "server/http.go"
 
@@ -69,8 +84,16 @@ var (
 	protoShellFileGRPCMark = "# todo generate grpc files here"
 	protoShellFileMark     = "# todo generate api template code command here"
 
-	appConfigFile     = "configs/serverNameExample.yml"
-	appConfigFileMark = "# todo generate http or rpc server configuration here"
+	appConfigFile      = "configs/serverNameExample.yml"
+	appConfigFileMark  = "# todo generate http or rpc server configuration here"
+	appConfigFileMark2 = "# todo generate the database configuration here"
+
+	deploymentConfigFile     = "kubernetes/serverNameExample-configmap.yml"
+	deploymentConfigFileMark = "# todo generate the database configuration for deployment here"
+
+	spongeTemplateVersionMark = "// todo generate the local sponge template code version here"
+
+	configmapFileMark = "# todo generate server configuration code here"
 
 	readmeFile    = "sponge/README.md"
 	makeFile      = "sponge/Makefile"
@@ -85,6 +108,13 @@ var (
 
 	// embed FS template file when using
 	selfPackageName = "github.com/zhufuyi/sponge"
+)
+
+var (
+	ModelInitDBFile     = modelInitDBFile
+	ModelInitDBFileMark = modelInitDBFileMark
+	StartMark           = startMark
+	EndMark             = endMark
 )
 
 func symbolConvert(str string, additionalChar ...string) []byte {
@@ -152,6 +182,11 @@ func deleteFieldsMark(r replacer.Replacer, filename string, startMark []byte, en
 	}
 
 	return fields
+}
+
+// DeleteCodeMark delete code mark fragment
+func DeleteCodeMark(r replacer.Replacer, filename string, startMark []byte, endMark []byte) []replacer.Field {
+	return deleteFieldsMark(r, filename, startMark, endMark)
 }
 
 func deleteAllFieldsMark(r replacer.Replacer, filename string, startMark []byte, endMark []byte) []replacer.Field {
@@ -335,4 +370,115 @@ func replacePackage(data []byte, moduleName string, serverName string) []byte {
 	}
 
 	return data
+}
+
+func getDBConfigCode(dbDriver string, forDeployment ...bool) string {
+	isDeployment := false
+	if len(forDeployment) > 0 {
+		isDeployment = forDeployment[0]
+	}
+
+	dbConfigCode := ""
+	switch strings.ToLower(dbDriver) {
+	case DBDriverMysql, DBDriverTidb:
+		if isDeployment {
+			dbConfigCode = mysqlConfigForDeploymentCode
+		} else {
+			dbConfigCode = mysqlConfigCode
+		}
+
+	case DBDriverPostgresql:
+		if isDeployment {
+			dbConfigCode = postgresqlConfigForDeploymentCode
+		} else {
+			dbConfigCode = postgresqlConfigCode
+		}
+	default:
+		panic("getDBConfigCode error, unsupported database driver: " + dbDriver)
+	}
+	return dbConfigCode
+}
+
+func getInitDBCode(dbDriver string) string {
+	initDBCode := ""
+	switch strings.ToLower(dbDriver) {
+	case DBDriverMysql, DBDriverTidb:
+		initDBCode = modelInitDBFileMysqlCode
+	case DBDriverPostgresql:
+		initDBCode = modelInitDBFilePostgresqlCode
+	default:
+		panic("getInitDBCode error, unsupported database driver: " + dbDriver)
+	}
+	return initDBCode
+}
+
+// GetInitDataBaseCode get init db code
+func GetInitDataBaseCode(dbDriver string) string {
+	return getInitDBCode(dbDriver)
+}
+
+func getLocalSpongeTemplateVersion() string {
+	dir, err := os.UserHomeDir()
+	if err != nil {
+		fmt.Println("os.UserHomeDir error:", err)
+		return ""
+	}
+
+	versionFile := dir + "/.sponge/.github/version"
+	data, err := os.ReadFile(versionFile)
+	if err != nil {
+		fmt.Printf("read file %s error: %v\n", versionFile, err)
+		return ""
+	}
+
+	v := string(data)
+	if v == "" {
+		return ""
+	}
+	return fmt.Sprintf("github.com/zhufuyi/sponge %s", v)
+}
+
+func getEmbedTimeCode(isEmbed bool) string {
+	if isEmbed {
+		return embedTimeCode
+	}
+	return ""
+}
+
+func convertYamlConfig(configFile string) (string, error) {
+	f, err := os.Open(configFile)
+	if err != nil {
+		return "", err
+	}
+	defer f.Close() //nolint
+
+	scanner := bufio.NewScanner(f)
+	modifiedLines := []string{}
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		modifiedLine := "    " + line
+		modifiedLines = append(modifiedLines, modifiedLine)
+	}
+
+	if err := scanner.Err(); err != nil {
+		return "", err
+	}
+
+	return strings.Join(modifiedLines, "\n"), nil
+}
+
+func generateConfigmap(serverName string, outPath string) error {
+	configFile := fmt.Sprintf(outPath+"/configs/%s.yml", serverName)
+	configmapFile := fmt.Sprintf(outPath+"/deployments/kubernetes/%s-configmap.yml", serverName)
+	configFileData, err := convertYamlConfig(configFile)
+	if err != nil {
+		return err
+	}
+	configmapFileData, err := os.ReadFile(configmapFile)
+	if err != nil {
+		return err
+	}
+	data := strings.ReplaceAll(string(configmapFileData), configmapFileMark, configFileData)
+	return os.WriteFile(configmapFile, []byte(data), 0666)
 }

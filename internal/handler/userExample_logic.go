@@ -11,9 +11,9 @@ import (
 	"github.com/zhufuyi/sponge/internal/ecode"
 	"github.com/zhufuyi/sponge/internal/model"
 
+	"github.com/zhufuyi/sponge/pkg/ggorm/query"
 	"github.com/zhufuyi/sponge/pkg/gin/middleware"
 	"github.com/zhufuyi/sponge/pkg/logger"
-	"github.com/zhufuyi/sponge/pkg/mysql/query"
 
 	"github.com/jinzhu/copier"
 )
@@ -125,7 +125,7 @@ func (h *userExamplePbHandler) GetByID(ctx context.Context, req *serverNameExamp
 
 	record, err := h.userExampleDao.GetByID(ctx, req.Id)
 	if err != nil {
-		if errors.Is(err, query.ErrNotFound) {
+		if errors.Is(err, model.ErrRecordNotFound) {
 			logger.Warn("GetByID error", logger.Err(err), logger.Any("id", req.Id), middleware.CtxRequestIDField(ctx))
 			return nil, ecode.NotFound.Err()
 		}
@@ -166,7 +166,7 @@ func (h *userExamplePbHandler) GetByCondition(ctx context.Context, req *serverNa
 
 	record, err := h.userExampleDao.GetByCondition(ctx, conditions)
 	if err != nil {
-		if errors.Is(err, query.ErrNotFound) {
+		if errors.Is(err, model.ErrRecordNotFound) {
 			logger.Warn("GetByID error", logger.Err(err), logger.Any("req", req), middleware.CtxRequestIDField(ctx))
 			return nil, ecode.NotFound.Err()
 		}
@@ -293,7 +293,10 @@ func convertUserExamplePb(record *model.UserExample) (*serverNameExampleV1.UserE
 		return nil, err
 	}
 	value.Id = record.ID
+	// todo generate the conversion createdAt and updatedAt code here
+	// delete the templates code start
 	value.CreatedAt = record.CreatedAt.Unix()
 	value.UpdatedAt = record.UpdatedAt.Unix()
+	// delete the templates code end
 	return value, nil
 }

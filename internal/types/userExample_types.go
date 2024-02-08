@@ -4,7 +4,7 @@ package types
 import (
 	"time"
 
-	"github.com/zhufuyi/sponge/pkg/mysql/query"
+	"github.com/zhufuyi/sponge/pkg/ggorm/query"
 )
 
 var _ time.Time

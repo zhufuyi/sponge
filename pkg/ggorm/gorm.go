@@ -2,10 +2,12 @@
 package ggorm
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/uptrace/opentelemetry-go-extra/otelgorm"
 	mysqlDriver "gorm.io/driver/mysql"
@@ -68,7 +70,6 @@ func InitPostgresql(dsn string, opts ...Option) (*gorm.DB, error) {
 	o.apply(opts...)
 
 	db, err := gorm.Open(postgres.Open(dsn), gormConfig(o))
-
 	if err != nil {
 		return nil, err
 	}
@@ -114,6 +115,36 @@ func InitTidb(dsn string, opts ...Option) (*gorm.DB, error) {
 //func InitSqlite(dsn string, opts ...Option) (*gorm.DB, error) {
 //	panic("not implemented")
 //}
+
+// CloseDB close gorm db
+func CloseDB(db *gorm.DB) error {
+	if db == nil {
+		return nil
+	}
+
+	sqlDB, err := db.DB()
+	if err != nil {
+		return err
+	}
+
+	checkInUse(sqlDB, time.Second*5)
+
+	return sqlDB.Close()
+}
+
+func checkInUse(sqlDB *sql.DB, duration time.Duration) {
+	ctx, _ := context.WithTimeout(context.Background(), duration) //nolint
+	for {
+		select {
+		case <-time.After(time.Millisecond * 500):
+			if v := sqlDB.Stats().InUse; v == 0 {
+				return
+			}
+		case <-ctx.Done():
+			return
+		}
+	}
+}
 
 // gorm setting
 func gormConfig(o *options) *gorm.Config {

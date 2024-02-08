@@ -61,6 +61,7 @@ func NewRouter(spongeAddr string, isLog bool) *gin.Engine {
 	apiV1.POST("/generate", GenerateCode)
 	apiV1.POST("/uploadFiles", UploadFiles)
 	apiV1.POST("/listTables", ListTables)
+	apiV1.GET("/listDrivers", ListDbDrivers)
 	apiV1.GET("/record/:path", GetRecord)
 
 	return r

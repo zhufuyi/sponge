@@ -16,6 +16,7 @@ import (
 )
 
 // Init mysql
+// Deprecated: will be moved to package pkg/gorm InitMysql
 func Init(dns string, opts ...Option) (*gorm.DB, error) {
 	o := defaultOptions()
 	o.apply(opts...)

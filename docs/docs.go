@@ -134,7 +134,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "last id, default is MaxInt64",
+                        "description": "last id, default is MaxInt32",
                         "name": "lastID",
                         "in": "query",
                         "required": true

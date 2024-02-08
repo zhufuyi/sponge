@@ -74,7 +74,13 @@ Examples:
 					isIncludeInitDB = false
 				}
 
-				outPath, err = runGenDaoCommand(moduleName, isIncludeInitDB, codes, outPath)
+				g := &daoGenerator{
+					moduleName:      moduleName,
+					isIncludeInitDB: isIncludeInitDB,
+					codes:           codes,
+					outPath:         outPath,
+				}
+				outPath, err = g.generateCode()
 				if err != nil {
 					return err
 				}
@@ -90,9 +96,10 @@ using help:
 		},
 	}
 
+	cmd.Flags().StringVarP(&sqlArgs.DBDriver, "db-driver", "k", "mysql", "database driver, support mysql, postgresql")
 	cmd.Flags().StringVarP(&moduleName, "module-name", "m", "", "module-name is the name of the module in the go.mod file")
 	//_ = cmd.MarkFlagRequired("module-name")
-	cmd.Flags().StringVarP(&sqlArgs.DBDsn, "db-dsn", "d", "", "db content addr, e.g. user:password@(host:port)/database")
+	cmd.Flags().StringVarP(&sqlArgs.DBDsn, "db-dsn", "d", "", "database content address, e.g. user:password@(host:port)/database")
 	_ = cmd.MarkFlagRequired("db-dsn")
 	cmd.Flags().StringVarP(&dbTables, "db-table", "t", "", "table name, multiple names separated by commas")
 	_ = cmd.MarkFlagRequired("db-table")
@@ -105,7 +112,14 @@ using help:
 	return cmd
 }
 
-func runGenDaoCommand(moduleName string, isIncludeInitDB bool, codes map[string]string, outPath string) (string, error) {
+type daoGenerator struct {
+	moduleName      string
+	isIncludeInitDB bool
+	codes           map[string]string
+	outPath         string
+}
+
+func (g *daoGenerator) generateCode() (string, error) {
 	subTplName := "dao"
 	r := Replacers[TplNameSponge]
 	if r == nil {
@@ -121,7 +135,7 @@ func runGenDaoCommand(moduleName string, isIncludeInitDB bool, codes map[string]
 		"init.go", "init_test.go", // internal/model
 		"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", // internal/cache
 	}
-	if isIncludeInitDB {
+	if g.isIncludeInitDB {
 		ignoreFiles = []string{
 			"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", // internal/cache
 		}
@@ -130,9 +144,9 @@ func runGenDaoCommand(moduleName string, isIncludeInitDB bool, codes map[string]
 	r.SetSubDirsAndFiles(subDirs)
 	r.SetIgnoreSubDirs(ignoreDirs...)
 	r.SetIgnoreSubFiles(ignoreFiles...)
-	fields := addDAOFields(moduleName, r, codes)
+	fields := g.addFields(r)
 	r.SetReplacementFields(fields)
-	_ = r.SetOutputDir(outPath, subTplName)
+	_ = r.SetOutputDir(g.outPath, subTplName)
 	if err := r.SaveFiles(); err != nil {
 		return "", err
 	}
@@ -141,37 +155,41 @@ func runGenDaoCommand(moduleName string, isIncludeInitDB bool, codes map[string]
 }
 
 // set fields
-func addDAOFields(moduleName string, r replacer.Replacer, codes map[string]string) []replacer.Field {
+func (g *daoGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	var fields []replacer.Field
 
 	fields = append(fields, deleteFieldsMark(r, modelFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, daoFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, daoTestFile, startMark, endMark)...)
 	fields = append(fields, []replacer.Field{
-		{
+		{ // replace the contents of the model/userExample.go file
 			Old: modelFileMark,
-			New: codes[parser.CodeTypeModel],
+			New: g.codes[parser.CodeTypeModel],
 		},
 		{
 			Old: daoFileMark,
-			New: codes[parser.CodeTypeDAO],
+			New: g.codes[parser.CodeTypeDAO],
 		},
 		{
 			Old: selfPackageName + "/" + r.GetSourcePath(),
-			New: moduleName,
+			New: g.moduleName,
 		},
 		{
 			Old: "github.com/zhufuyi/sponge",
-			New: moduleName,
+			New: g.moduleName,
 		},
 		{
-			Old: moduleName + "/pkg",
+			Old: g.moduleName + "/pkg",
 			New: "github.com/zhufuyi/sponge/pkg",
 		},
 		{
 			Old:             "UserExample",
-			New:             codes[parser.TableName],
+			New:             g.codes[parser.TableName],
 			IsCaseSensitive: true,
+		},
+		{
+			Old: "github.com/zhufuyi/sponge/pkg/ggorm",
+			New: "user/pkg/ggorm",
 		},
 	}...)
 

@@ -10,7 +10,7 @@ import (
 	"github.com/zhufuyi/sponge/internal/model"
 
 	cacheBase "github.com/zhufuyi/sponge/pkg/cache"
-	"github.com/zhufuyi/sponge/pkg/mysql/query"
+	"github.com/zhufuyi/sponge/pkg/ggorm/query"
 	"github.com/zhufuyi/sponge/pkg/utils"
 
 	"golang.org/x/sync/singleflight"

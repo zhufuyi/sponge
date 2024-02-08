@@ -5,11 +5,12 @@ app:
   version: "v0.0.0"
   password: "123456"
 
+database:
+  driver: "mysql"
 # mysql settings
-mysql:
-  # dsn format, <user>:<pass>@(127.0.0.1:3306)/<db>?[k=v& ......]
-  dsn: "root:123456@(192.168.3.37:3306)/account?parseTime=true&loc=Local&charset=utf8,utf8mb4"
-
+  mysql:
+    # dsn format, <user>:<pass>@(127.0.0.1:3306)/<db>?[k=v& ......]
+    dsn: "root:123456@(192.168.3.37:3306)/account?parseTime=true&loc=Local&charset=utf8,utf8mb4"
 
 # redis settings
 redis:

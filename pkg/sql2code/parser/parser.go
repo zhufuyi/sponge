@@ -34,6 +34,13 @@ const (
 	CodeTypeProto = "proto"
 	// CodeTypeService grpc service code
 	CodeTypeService = "service"
+
+	// DBDriverMysql mysql driver
+	DBDriverMysql = "mysql"
+	// DBDriverPostgresql postgresql driver
+	DBDriverPostgresql = "postgresql"
+	// DBDriverTidb tidb driver
+	DBDriverTidb = "tidb"
 )
 
 // Codes content
@@ -199,7 +206,7 @@ const (
 )
 
 var replaceFields = map[string]string{
-	__mysqlModel__: "mysql.Model",
+	__mysqlModel__: "ggorm.Model",
 	__type__:       "",
 }
 
@@ -299,7 +306,12 @@ func makeCode(stmt *ast.CreateTableStmt, opt options) (*codeText, error) {
 		gormTag.WriteString(colName)
 		if opt.GormType {
 			gormTag.WriteString(";type:")
-			gormTag.WriteString(col.Tp.InfoSchemaStr())
+			switch opt.DBDriver {
+			case DBDriverMysql, DBDriverTidb:
+				gormTag.WriteString(col.Tp.InfoSchemaStr())
+			case DBDriverPostgresql:
+				gormTag.WriteString(opt.FieldTypes[colName])
+			}
 		}
 		if isPrimaryKey[colName] {
 			gormTag.WriteString(";primary_key")
@@ -431,13 +443,13 @@ func getModelStructCode(data tmplData, importPaths []string, isEmbed bool) (stri
 			newImportPaths = importPaths
 		} else {
 			for _, path := range importPaths {
-				if path == "time" {
+				if path == "time" { //nolint
 					continue
 				}
 				newImportPaths = append(newImportPaths, path)
 			}
 		}
-		newImportPaths = append(newImportPaths, "github.com/zhufuyi/sponge/pkg/mysql")
+		newImportPaths = append(newImportPaths, "github.com/zhufuyi/sponge/pkg/ggorm")
 	} else {
 		for i, field := range data.Fields {
 			if strings.Contains(field.GoType, "time.Time") {
@@ -716,7 +728,7 @@ func mysqlToGoType(colTp *types.FieldType, style NullStyle) (name string, path s
 			mysql.TypeBlob, mysql.TypeTinyBlob, mysql.TypeMediumBlob, mysql.TypeLongBlob:
 			name = "string"
 		case mysql.TypeTimestamp, mysql.TypeDatetime, mysql.TypeDate:
-			path = "time"
+			path = "time" //nolint
 			name = "time.Time"
 		case mysql.TypeDecimal, mysql.TypeNewDecimal:
 			name = "string"

@@ -145,7 +145,7 @@ func Test_getOptions(t *testing.T) {
 		NullStyle:      "sql",
 	}
 
-	o := getOptions(a)
+	o := setOptions(a)
 	assert.NotNil(t, o)
 	a.NullStyle = "ptr"
 	assert.NotNil(t, o)

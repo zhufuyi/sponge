@@ -39,8 +39,23 @@ Examples:
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			var err error
 			projectName, serverName = convertProjectAndServerName(projectName, serverName)
-			return runGenHTTPPbCommand(moduleName, serverName, projectName, protobufFile, repoAddr, outPath)
+			g := &httpPbGenerator{
+				moduleName:   moduleName,
+				serverName:   serverName,
+				projectName:  projectName,
+				protobufFile: protobufFile,
+				repoAddr:     repoAddr,
+				outPath:      outPath,
+			}
+			outPath, err = g.generateCode()
+			if err != nil {
+				return err
+			}
+
+			_ = generateConfigmap(serverName, outPath)
+			return nil
 		},
 	}
 
@@ -59,16 +74,25 @@ Examples:
 	return cmd
 }
 
-func runGenHTTPPbCommand(moduleName string, serverName string, projectName string, protobufFile string, repoAddr string, outPath string) error {
-	protobufFiles, isImportTypes, err := parseProtobufFiles(protobufFile)
+type httpPbGenerator struct {
+	moduleName   string
+	serverName   string
+	projectName  string
+	protobufFile string
+	repoAddr     string
+	outPath      string
+}
+
+func (g *httpPbGenerator) generateCode() (string, error) {
+	protobufFiles, isImportTypes, err := parseProtobufFiles(g.protobufFile)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	subTplName := "http-pb"
 	r := Replacers[TplNameSponge]
 	if r == nil {
-		return errors.New("replacer is nil")
+		return "", errors.New("replacer is nil")
 	}
 
 	// setting up template information
@@ -97,15 +121,15 @@ func runGenHTTPPbCommand(moduleName string, serverName string, projectName strin
 	r.SetSubDirsAndFiles(subDirs, subFiles...)
 	r.SetIgnoreSubDirs(ignoreDirs...)
 	r.SetIgnoreSubFiles(ignoreFiles...)
-	fields := addHTTPPbFields(moduleName, serverName, projectName, repoAddr, r)
+	fields := g.addFields(r)
 	r.SetReplacementFields(fields)
-	_ = r.SetOutputDir(outPath, serverName+"_"+subTplName)
+	_ = r.SetOutputDir(g.outPath, g.serverName+"_"+subTplName)
 	if err = r.SaveFiles(); err != nil {
-		return err
+		return "", err
 	}
 
-	_ = saveProtobufFiles(moduleName, serverName, r.GetOutputDir(), protobufFiles)
-	_ = saveGenInfo(moduleName, serverName, r.GetOutputDir())
+	_ = saveProtobufFiles(g.moduleName, g.serverName, r.GetOutputDir(), protobufFiles)
+	_ = saveGenInfo(g.moduleName, g.serverName, r.GetOutputDir())
 	_ = saveEmptySwaggerJSON(r.GetOutputDir())
 
 	fmt.Printf(`
@@ -116,15 +140,15 @@ using help:
   4. visit http://localhost:8080/apis/swagger/index.html in your browser, and test api interface.
 
 `)
-	fmt.Printf("generate %s's web service code successfully, out = %s\n", serverName, r.GetOutputDir())
-	return nil
+	outpath := r.GetOutputDir()
+	fmt.Printf("generate %s's web service code successfully, out = %s\n", g.serverName, outpath)
+	return outpath, nil
 }
 
-func addHTTPPbFields(moduleName string, serverName string, projectName string, repoAddr string,
-	r replacer.Replacer) []replacer.Field {
+func (g *httpPbGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	var fields []replacer.Field
 
-	repoHost, _ := parseImageRepoAddr(repoAddr)
+	repoHost, _ := parseImageRepoAddr(g.repoAddr)
 
 	fields = append(fields, deleteFieldsMark(r, httpFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, dockerFile, wellStartMark, wellEndMark)...)
@@ -137,9 +161,22 @@ func addHTTPPbFields(moduleName string, serverName string, projectName string, r
 	fields = append(fields, deleteAllFieldsMark(r, makeFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, gitIgnoreFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteAllFieldsMark(r, protoShellFile, wellStartMark, wellEndMark)...)
-	fields = append(fields, deleteFieldsMark(r, appConfigFile, wellStartMark, wellEndMark)...)
-	fields = append(fields, replaceFileContentMark(r, readmeFile, "## "+serverName)...)
+	fields = append(fields, deleteAllFieldsMark(r, appConfigFile, wellStartMark, wellEndMark)...)
+	fields = append(fields, deleteFieldsMark(r, deploymentConfigFile, wellStartMark, wellEndMark)...)
+	fields = append(fields, replaceFileContentMark(r, readmeFile, "## "+g.serverName)...)
 	fields = append(fields, []replacer.Field{
+		{ // replace the configuration of the *.yml file
+			Old: appConfigFileMark,
+			New: httpServerConfigCode,
+		},
+		{ // replace the configuration of the *.yml file
+			Old: appConfigFileMark2,
+			New: getDBConfigCode(DBDriverMysql),
+		},
+		{ // replace the contents of the model/init.go file
+			Old: modelInitDBFileMark,
+			New: getInitDBCode(DBDriverMysql), // default is mysql
+		},
 		{ // replace the contents of the Dockerfile file
 			Old: dockerFileMark,
 			New: dockerFileHTTPCode,
@@ -160,6 +197,10 @@ func addHTTPPbFields(moduleName string, serverName string, projectName string, r
 			Old: dockerComposeFileMark,
 			New: dockerComposeFileHTTPCode,
 		},
+		{ // replace the contents of the *-configmap.yml file
+			Old: deploymentConfigFileMark,
+			New: getDBConfigCode(DBDriverMysql, true),
+		},
 		{ // replace the contents of the *-deployment.yml file
 			Old: k8sDeploymentFileMark,
 			New: k8sDeploymentFileHTTPCode,
@@ -167,10 +208,6 @@ func addHTTPPbFields(moduleName string, serverName string, projectName string, r
 		{ // replace the contents of the *-svc.yml file
 			Old: k8sServiceFileMark,
 			New: k8sServiceFileHTTPCode,
-		},
-		{ // replace the configuration of the *.yml file
-			Old: appConfigFileMark,
-			New: httpServerConfigCode,
 		},
 		{ // replace the contents of the proto.sh file
 			Old: protoShellFileGRPCMark,
@@ -182,33 +219,41 @@ func addHTTPPbFields(moduleName string, serverName string, projectName string, r
 		},
 		{
 			Old: "github.com/zhufuyi/sponge",
-			New: moduleName,
+			New: g.moduleName,
 		},
 		{
-			Old: moduleName + "/pkg",
+			Old: g.moduleName + "/pkg",
 			New: "github.com/zhufuyi/sponge/pkg",
+		},
+		{ // replace the sponge version of the go.mod file
+			Old: spongeTemplateVersionMark,
+			New: getLocalSpongeTemplateVersion(),
 		},
 		{
 			Old: "sponge api docs",
-			New: serverName + " api docs",
+			New: g.serverName + " api docs",
 		},
 		{
 			Old: "serverNameExample",
-			New: serverName,
+			New: g.serverName,
 		},
 		// docker image and k8s deployment script replacement
 		{
 			Old: "server-name-example",
-			New: xstrings.ToKebabCase(serverName), // convert to kebab-case format
+			New: xstrings.ToKebabCase(g.serverName), // convert to kebab-case format
 		},
 		// docker image and k8s deployment script replacement
 		{
 			Old: "project-name-example",
-			New: projectName,
+			New: g.projectName,
+		},
+		{
+			Old: "projectNameExample",
+			New: g.projectName,
 		},
 		{
 			Old: "repo-addr-example",
-			New: repoAddr,
+			New: g.repoAddr,
 		},
 		{
 			Old: "image-repo-host",

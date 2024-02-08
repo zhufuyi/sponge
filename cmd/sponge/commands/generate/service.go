@@ -76,7 +76,14 @@ Examples:
 					return err
 				}
 
-				outPath, err = runGenServiceCommand(moduleName, serverName, codes, outPath)
+				g := &serviceGenerator{
+					moduleName: moduleName,
+					serverName: serverName,
+					isEmbed:    sqlArgs.IsEmbed,
+					codes:      codes,
+					outPath:    outPath,
+				}
+				outPath, err = g.generateCode()
 				if err != nil {
 					return err
 				}
@@ -95,11 +102,12 @@ using help:
 		},
 	}
 
+	cmd.Flags().StringVarP(&sqlArgs.DBDriver, "db-driver", "k", "mysql", "database driver, support mysql, postgresql")
 	cmd.Flags().StringVarP(&moduleName, "module-name", "m", "", "module-name is the name of the module in the go.mod file")
 	//_ = cmd.MarkFlagRequired("module-name")
 	cmd.Flags().StringVarP(&serverName, "server-name", "s", "", "server name")
 	//_ = cmd.MarkFlagRequired("server-name")
-	cmd.Flags().StringVarP(&sqlArgs.DBDsn, "db-dsn", "d", "", "db content addr, e.g. user:password@(host:port)/database")
+	cmd.Flags().StringVarP(&sqlArgs.DBDsn, "db-dsn", "d", "", "database content address, e.g. user:password@(host:port)/database")
 	_ = cmd.MarkFlagRequired("db-dsn")
 	cmd.Flags().StringVarP(&dbTables, "db-table", "t", "", "table name, multiple names separated by commas")
 	_ = cmd.MarkFlagRequired("db-table")
@@ -111,15 +119,23 @@ using help:
 	return cmd
 }
 
-func runGenServiceCommand(moduleName string, serverName string, codes map[string]string, outPath string) (string, error) {
+type serviceGenerator struct {
+	moduleName string
+	serverName string
+	isEmbed    bool
+	codes      map[string]string
+	outPath    string
+}
+
+func (g *serviceGenerator) generateCode() (string, error) {
 	subTplName := "service"
 	r := Replacers[TplNameSponge]
 	if r == nil {
 		return "", errors.New("replacer is nil")
 	}
 
-	if serverName == "" {
-		serverName = moduleName
+	if g.serverName == "" {
+		g.serverName = g.moduleName
 	}
 
 	// setting up template information
@@ -137,9 +153,9 @@ func runGenServiceCommand(moduleName string, serverName string, codes map[string
 	r.SetSubDirsAndFiles(subDirs)
 	r.SetIgnoreSubDirs(ignoreDirs...)
 	r.SetIgnoreSubFiles(ignoreFiles...)
-	fields := addServiceFields(moduleName, serverName, r, codes)
+	fields := g.addFields(r)
 	r.SetReplacementFields(fields)
-	_ = r.SetOutputDir(outPath, subTplName)
+	_ = r.SetOutputDir(g.outPath, subTplName)
 	if err := r.SaveFiles(); err != nil {
 		return "", err
 	}
@@ -147,70 +163,79 @@ func runGenServiceCommand(moduleName string, serverName string, codes map[string
 	return r.GetOutputDir(), nil
 }
 
-func addServiceFields(moduleName string, serverName string, r replacer.Replacer, codes map[string]string) []replacer.Field {
+func (g *serviceGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	var fields []replacer.Field
 
 	fields = append(fields, deleteFieldsMark(r, modelFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, daoFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, daoTestFile, startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, serviceLogicFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, protoFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, serviceClientFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, serviceTestFile, startMark, endMark)...)
 	fields = append(fields, []replacer.Field{
 		{ // replace the contents of the model/userExample.go file
 			Old: modelFileMark,
-			New: codes[parser.CodeTypeModel],
+			New: g.codes[parser.CodeTypeModel],
 		},
 		{ // replace the contents of the dao/userExample.go file
 			Old: daoFileMark,
-			New: codes[parser.CodeTypeDAO],
+			New: g.codes[parser.CodeTypeDAO],
+		},
+		{ // replace the contents of the handler/userExample_logic.go file
+			Old: embedTimeMark,
+			New: getEmbedTimeCode(g.isEmbed),
 		},
 		{ // replace the contents of the v1/userExample.proto file
 			Old: protoFileMark,
-			New: codes[parser.CodeTypeProto],
+			New: g.codes[parser.CodeTypeProto],
 		},
 		{ // replace the contents of the service/userExample_client_test.go file
 			Old: serviceFileMark,
-			New: adjustmentOfIDType(codes[parser.CodeTypeService]),
+			New: adjustmentOfIDType(g.codes[parser.CodeTypeService]),
 		},
 		{
 			Old: selfPackageName + "/" + r.GetSourcePath(),
-			New: moduleName,
+			New: g.moduleName,
 		},
 		{
 			Old: "github.com/zhufuyi/sponge",
-			New: moduleName,
+			New: g.moduleName,
 		},
 		// replace directory name
 		{
 			Old: strings.Join([]string{"api", "serverNameExample", "v1"}, gofile.GetPathDelimiter()),
-			New: strings.Join([]string{"api", serverName, "v1"}, gofile.GetPathDelimiter()),
+			New: strings.Join([]string{"api", g.serverName, "v1"}, gofile.GetPathDelimiter()),
 		},
 		{
 			Old: "api/serverNameExample/v1",
-			New: fmt.Sprintf("api/%s/v1", serverName),
+			New: fmt.Sprintf("api/%s/v1", g.serverName),
 		},
 		// Note: protobuf package no "-" signs allowed
 		{
 			Old: "api.serverNameExample.v1",
-			New: fmt.Sprintf("api.%s.v1", serverName),
+			New: fmt.Sprintf("api.%s.v1", g.serverName),
 		},
 		{
 			Old: "_userExampleNO       = 2",
 			New: fmt.Sprintf("_userExampleNO       = %d", rand.Intn(100)),
 		},
 		{
-			Old: moduleName + "/pkg",
+			Old: g.moduleName + "/pkg",
 			New: "github.com/zhufuyi/sponge/pkg",
 		},
 		{
 			Old: "serverNameExample",
-			New: serverName,
+			New: g.serverName,
 		},
 		{
 			Old:             "UserExample",
-			New:             codes[parser.TableName],
+			New:             g.codes[parser.TableName],
 			IsCaseSensitive: true,
+		},
+		{
+			Old: "github.com/zhufuyi/sponge/pkg/ggorm",
+			New: "user/pkg/ggorm",
 		},
 	}...)
 

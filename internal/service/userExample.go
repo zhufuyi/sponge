@@ -12,9 +12,9 @@ import (
 	"github.com/zhufuyi/sponge/internal/ecode"
 	"github.com/zhufuyi/sponge/internal/model"
 
+	"github.com/zhufuyi/sponge/pkg/ggorm/query"
 	"github.com/zhufuyi/sponge/pkg/grpc/interceptor"
 	"github.com/zhufuyi/sponge/pkg/logger"
-	"github.com/zhufuyi/sponge/pkg/mysql/query"
 
 	"github.com/jinzhu/copier"
 	"google.golang.org/grpc"
@@ -140,7 +140,7 @@ func (s *userExample) GetByID(ctx context.Context, req *serverNameExampleV1.GetU
 
 	record, err := s.iDao.GetByID(ctx, req.Id)
 	if err != nil {
-		if errors.Is(err, query.ErrNotFound) {
+		if errors.Is(err, model.ErrRecordNotFound) {
 			logger.Warn("GetByID error", logger.Err(err), logger.Any("id", req.Id), interceptor.ServerCtxRequestIDField(ctx))
 			return nil, ecode.StatusNotFound.Err()
 		}
@@ -180,7 +180,7 @@ func (s *userExample) GetByCondition(ctx context.Context, req *serverNameExample
 
 	record, err := s.iDao.GetByCondition(ctx, conditions)
 	if err != nil {
-		if errors.Is(err, query.ErrNotFound) {
+		if errors.Is(err, model.ErrRecordNotFound) {
 			logger.Warn("GetByCondition error", logger.Err(err), logger.Any("req", req), interceptor.ServerCtxRequestIDField(ctx))
 			return nil, ecode.StatusNotFound.Err()
 		}
@@ -237,7 +237,7 @@ func (s *userExample) ListByLastID(ctx context.Context, req *serverNameExampleV1
 		return nil, ecode.StatusInvalidParams.Err()
 	}
 	if req.LastID == 0 {
-		req.LastID = math.MaxInt64
+		req.LastID = math.MaxInt32
 	}
 	if req.Limit == 0 {
 		req.Limit = 10
@@ -313,7 +313,10 @@ func convertUserExample(record *model.UserExample) (*serverNameExampleV1.UserExa
 		return nil, err
 	}
 	value.Id = record.ID
+	// todo generate the conversion createdAt and updatedAt code here
+	// delete the templates code start
 	value.CreatedAt = record.CreatedAt.Unix()
 	value.UpdatedAt = record.UpdatedAt.Unix()
+	// delete the templates code end
 	return value, nil
 }

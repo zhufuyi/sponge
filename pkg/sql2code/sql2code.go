@@ -7,8 +7,10 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/zhufuyi/sponge/pkg/sql2code/parser"
+	"github.com/zhufuyi/sponge/pkg/utils"
 )
 
 // Args generate code arguments
@@ -17,8 +19,10 @@ type Args struct {
 
 	DDLFile string // DDL file
 
-	DBDsn   string // connecting to mysql's dsn
-	DBTable string
+	DBDriver   string            // db driver name, such as mysql, postgres, default is mysql
+	DBDsn      string            // connecting to mysql's dsn
+	DBTable    string            // table name
+	fieldTypes map[string]string // field name:type
 
 	Package        string // specify the package name (only valid for model types)
 	GormType       bool   // whether to display the gorm type name (only valid for model type codes)
@@ -40,37 +44,63 @@ func (a *Args) checkValid() error {
 	if a.SQL == "" && a.DDLFile == "" && (a.DBDsn == "" && a.DBTable == "") {
 		return errors.New("you must specify sql or ddl file")
 	}
+	if a.DBDriver == "" {
+		a.DBDriver = parser.DBDriverMysql
+	}
 	return nil
 }
 
-func getSQL(args *Args) (string, error) {
+func getSQL(args *Args) (string, map[string]string, error) {
 	if args.SQL != "" {
-		return args.SQL, nil
+		return args.SQL, nil, nil
 	}
 
 	sql := ""
+	dbDriverName := strings.ToLower(args.DBDriver)
 	if args.DDLFile != "" {
+		if dbDriverName != parser.DBDriverMysql {
+			return sql, nil, fmt.Errorf("not support driver %s for parsing the sql file, only mysql is supported", args.DBDriver)
+		}
 		b, err := os.ReadFile(args.DDLFile)
 		if err != nil {
-			return sql, fmt.Errorf("read %s failed, %s", args.DDLFile, err)
+			return sql, nil, fmt.Errorf("read %s failed, %s", args.DDLFile, err)
 		}
-		return string(b), nil
+		return string(b), nil, nil
 	} else if args.DBDsn != "" {
 		if args.DBTable == "" {
-			return sql, errors.New("miss mysql table")
+			return sql, nil, errors.New("miss database table")
 		}
-		sqlStr, err := parser.GetTableInfo(args.DBDsn, args.DBTable)
-		if err != nil {
-			return sql, err
+
+		switch dbDriverName {
+		case parser.DBDriverMysql, parser.DBDriverTidb:
+			dsn := utils.AdaptiveMysqlDsn(args.DBDsn)
+			sqlStr, err := parser.GetMysqlTableInfo(dsn, args.DBTable)
+			return sqlStr, nil, err
+		case parser.DBDriverPostgresql:
+			dsn := utils.AdaptivePostgresqlDsn(args.DBDsn)
+			fields, err := parser.GetPostgresqlTableInfo(dsn, args.DBTable)
+			if err != nil {
+				return "", nil, err
+			}
+			sqlStr, pgTypeMap := parser.ConvertToMysqlTable(args.DBTable, fields)
+			return sqlStr, pgTypeMap, nil
+		default:
+			return "", nil, fmt.Errorf("unsupported database driver: " + dbDriverName)
 		}
-		return sqlStr, nil
 	}
 
-	return sql, errors.New("no SQL input(-sql|-f|-db-dsn)")
+	return sql, nil, errors.New("no SQL input(-sql|-f|-db-dsn)")
 }
 
-func getOptions(args *Args) []parser.Option {
+func setOptions(args *Args) []parser.Option {
 	var opts []parser.Option
+
+	if args.DBDriver != "" {
+		opts = append(opts, parser.WithDBDriver(args.DBDriver))
+	}
+	if args.fieldTypes != nil {
+		opts = append(opts, parser.WithFieldTypes(args.fieldTypes))
+	}
 
 	if args.Charset != "" {
 		opts = append(opts, parser.WithCharset(args.Charset))
@@ -147,12 +177,15 @@ func Generate(args *Args) (map[string]string, error) {
 		return nil, err
 	}
 
-	sql, err := getSQL(args)
+	sql, fieldTypes, err := getSQL(args)
 	if err != nil {
 		return nil, err
 	}
+	if fieldTypes != nil {
+		args.fieldTypes = fieldTypes
+	}
 
-	opt := getOptions(args)
+	opt := setOptions(args)
 
 	return parser.ParseSQL(sql, opt...)
 }

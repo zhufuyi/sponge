@@ -126,6 +126,7 @@ func (c *Column) convert() error {
 }
 
 // ConvertToPage converted to conform to gorm rules based on the page size sort parameter
+// Deprecated: will be moved to package pkg/gorm/query ConvertToPage
 func (p *Params) ConvertToPage() (order string, limit int, offset int) { //nolint
 	page := NewPage(p.Page, p.Size, p.Sort)
 	order = page.sort
@@ -136,6 +137,7 @@ func (p *Params) ConvertToPage() (order string, limit int, offset int) { //nolin
 
 // ConvertToGormConditions conversion to gorm-compliant parameters based on the Columns parameter
 // ignore the logical type of the last column, whether it is a one-column or multi-column query
+// Deprecated: will be moved to package pkg/gorm/query ConvertToGormConditions
 func (p *Params) ConvertToGormConditions() (string, []interface{}, error) {
 	str := ""
 	args := []interface{}{}
@@ -272,6 +274,7 @@ func (c *Conditions) CheckValid() error {
 
 // ConvertToGorm conversion to gorm-compliant parameters based on the Columns parameter
 // ignore the logical type of the last column, whether it is a one-column or multi-column query
+// Deprecated: will be moved to package pkg/gorm/query ConvertToGorm
 func (c *Conditions) ConvertToGorm() (string, []interface{}, error) {
 	p := &Params{Columns: c.Columns}
 	return p.ConvertToGormConditions()

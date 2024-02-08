@@ -7,11 +7,11 @@ import (
 	_ "github.com/go-sql-driver/mysql" //nolint
 )
 
-// GetTableInfo get table info from mysql
-func GetTableInfo(dsn, tableName string) (string, error) {
+// GetMysqlTableInfo get table info from mysql
+func GetMysqlTableInfo(dsn, tableName string) (string, error) {
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
-		return "", fmt.Errorf("connect mysql error, %v", err)
+		return "", fmt.Errorf("GetMysqlTableInfo error, %v", err)
 	}
 	defer db.Close() //nolint
 
@@ -33,4 +33,10 @@ func GetTableInfo(dsn, tableName string) (string, error) {
 	}
 
 	return info, nil
+}
+
+// GetTableInfo get table info from mysql
+// Deprecated: replaced by GetMysqlTableInfo
+func GetTableInfo(dsn, tableName string) (string, error) {
+	return GetMysqlTableInfo(dsn, tableName)
 }

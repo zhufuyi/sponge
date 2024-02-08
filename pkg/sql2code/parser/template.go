@@ -182,7 +182,7 @@ message List{{.TableName}}ByIDsReply {
 
 message List{{.TableName}}ByLastIDRequest {
   uint64 lastID = 1; // last id
-  uint32 limit = 2 [(validate.rules).uint32.gt  = 0]; // page size
+  uint32 limit = 2 [(validate.rules).uint32.gt  = 0]; // limit size per page
   string sort = 3; // sort by column name of table, default is -id, the - sign indicates descending order.
 }
 
@@ -464,7 +464,7 @@ message List{{.TableName}}ByIDsReply {
 
 message List{{.TableName}}ByLastIDRequest {
   uint64 lastID = 1 [(tagger.tags) = "form:\"lastID\""]; // last id
-  uint32 limit = 2 [(validate.rules).uint32.gt  = 0, (tagger.tags) = "form:\"limit\""]; // page size
+  uint32 limit = 2 [(validate.rules).uint32.gt  = 0, (tagger.tags) = "form:\"limit\""]; // limit size per page
   string sort = 3 [(tagger.tags) = "form:\"sort\""]; // sort by column name of table, default is -id, the - sign indicates descending order.
 }
 

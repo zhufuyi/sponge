@@ -415,7 +415,7 @@ paths:
       - application/json
       description: list of userExamples by last id and limit
       parameters:
-      - description: last id, default is MaxInt64
+      - description: last id, default is MaxInt32
         in: query
         name: lastID
         required: true

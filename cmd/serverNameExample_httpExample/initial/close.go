@@ -20,9 +20,9 @@ func Close(servers []app.IServer) []app.Close {
 		closes = append(closes, s.Stop)
 	}
 
-	// close mysql
+	// close database
 	closes = append(closes, func() error {
-		return model.CloseMysql()
+		return model.CloseDB()
 	})
 
 	// close redis

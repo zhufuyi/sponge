@@ -13,8 +13,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// ProtoBufCommand generate protobuf code
-func ProtoBufCommand() *cobra.Command {
+// ProtobufCommand generate protobuf code
+func ProtobufCommand() *cobra.Command {
 	var (
 		moduleName string // module name for go.mod
 		serverName string // server name
@@ -73,7 +73,13 @@ Examples:
 					return err
 				}
 
-				outPath, err = runGenProtoCommand(moduleName, serverName, codes, outPath)
+				g := &protobufGenerator{
+					moduleName: moduleName,
+					serverName: serverName,
+					codes:      codes,
+					outPath:    outPath,
+				}
+				outPath, err = g.generateCode()
 				if err != nil {
 					return err
 				}
@@ -90,11 +96,12 @@ using help:
 		},
 	}
 
+	cmd.Flags().StringVarP(&sqlArgs.DBDriver, "db-driver", "k", "mysql", "database driver, support mysql, postgresql")
 	cmd.Flags().StringVarP(&moduleName, "module-name", "m", "", "module-name is the name of the module in the go.mod file")
 	//_ = cmd.MarkFlagRequired("module-name")
 	cmd.Flags().StringVarP(&serverName, "server-name", "s", "", "server name")
 	//_ = cmd.MarkFlagRequired("server-name")
-	cmd.Flags().StringVarP(&sqlArgs.DBDsn, "db-dsn", "d", "", "db content addr, e.g. user:password@(host:port)/database")
+	cmd.Flags().StringVarP(&sqlArgs.DBDsn, "db-dsn", "d", "", "database content address, e.g. user:password@(host:port)/database")
 	_ = cmd.MarkFlagRequired("db-dsn")
 	cmd.Flags().StringVarP(&dbTables, "db-table", "t", "", "table name, multiple names separated by commas")
 	_ = cmd.MarkFlagRequired("db-table")
@@ -106,15 +113,22 @@ using help:
 	return cmd
 }
 
-func runGenProtoCommand(moduleName string, serverName string, codes map[string]string, outPath string) (string, error) {
+type protobufGenerator struct {
+	moduleName string
+	serverName string
+	codes      map[string]string
+	outPath    string
+}
+
+func (g *protobufGenerator) generateCode() (string, error) {
 	subTplName := "protobuf"
 	r := Replacers[TplNameSponge]
 	if r == nil {
 		return "", errors.New("replacer is nil")
 	}
 
-	if serverName == "" {
-		serverName = moduleName
+	if g.serverName == "" {
+		g.serverName = g.moduleName
 	}
 
 	// setting up template information
@@ -129,9 +143,9 @@ func runGenProtoCommand(moduleName string, serverName string, codes map[string]s
 	r.SetSubDirsAndFiles(subDirs)
 	r.SetIgnoreSubDirs(ignoreDirs...)
 	r.SetIgnoreSubFiles(ignoreFiles...)
-	fields := addProtoFields(moduleName, serverName, r, codes)
+	fields := g.addFields(r)
 	r.SetReplacementFields(fields)
-	_ = r.SetOutputDir(outPath, subTplName)
+	_ = r.SetOutputDir(g.outPath, subTplName)
 	if err := r.SaveFiles(); err != nil {
 		return "", err
 	}
@@ -139,40 +153,40 @@ func runGenProtoCommand(moduleName string, serverName string, codes map[string]s
 	return r.GetOutputDir(), nil
 }
 
-func addProtoFields(moduleName string, serverName string, r replacer.Replacer, codes map[string]string) []replacer.Field {
+func (g *protobufGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	var fields []replacer.Field
 
 	fields = append(fields, deleteFieldsMark(r, protoFile, startMark, endMark)...)
 	fields = append(fields, []replacer.Field{
 		{ // replace the contents of the v1/userExample.proto file
 			Old: protoFileMark,
-			New: codes[parser.CodeTypeProto],
+			New: g.codes[parser.CodeTypeProto],
 		},
 		{
 			Old: "github.com/zhufuyi/sponge",
-			New: moduleName,
+			New: g.moduleName,
 		},
 		// replace directory name
 		{
 			Old: strings.Join([]string{"api", "serverNameExample", "v1"}, gofile.GetPathDelimiter()),
-			New: strings.Join([]string{"api", serverName, "v1"}, gofile.GetPathDelimiter()),
+			New: strings.Join([]string{"api", g.serverName, "v1"}, gofile.GetPathDelimiter()),
 		},
 		{
 			Old: "api/serverNameExample/v1",
-			New: fmt.Sprintf("api/%s/v1", serverName),
+			New: fmt.Sprintf("api/%s/v1", g.serverName),
 		},
 		// Note: protobuf package no "-" signs allowed
 		{
 			Old: "api.serverNameExample.v1",
-			New: fmt.Sprintf("api.%s.v1", serverName),
+			New: fmt.Sprintf("api.%s.v1", g.serverName),
 		},
 		{
 			Old: "serverNameExample",
-			New: serverName,
+			New: g.serverName,
 		},
 		{
 			Old:             "UserExample",
-			New:             codes[parser.TableName],
+			New:             g.codes[parser.TableName],
 			IsCaseSensitive: true,
 		},
 	}...)

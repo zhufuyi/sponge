@@ -13,7 +13,6 @@ import (
 	"github.com/zhufuyi/sponge/pkg/gin/middleware"
 	"github.com/zhufuyi/sponge/pkg/gin/response"
 	"github.com/zhufuyi/sponge/pkg/logger"
-	"github.com/zhufuyi/sponge/pkg/mysql/query"
 	"github.com/zhufuyi/sponge/pkg/utils"
 
 	"github.com/gin-gonic/gin"
@@ -204,7 +203,7 @@ func (h *userExampleHandler) GetByID(c *gin.Context) {
 	ctx := middleware.WrapCtx(c)
 	userExample, err := h.iDao.GetByID(ctx, id)
 	if err != nil {
-		if errors.Is(err, query.ErrNotFound) {
+		if errors.Is(err, model.ErrRecordNotFound) {
 			logger.Warn("GetByID not found", logger.Err(err), logger.Any("id", id), middleware.GCtxRequestIDField(c))
 			response.Error(c, ecode.NotFound)
 		} else {
@@ -252,7 +251,7 @@ func (h *userExampleHandler) GetByCondition(c *gin.Context) {
 	ctx := middleware.WrapCtx(c)
 	userExample, err := h.iDao.GetByCondition(ctx, &form.Conditions)
 	if err != nil {
-		if errors.Is(err, query.ErrNotFound) {
+		if errors.Is(err, model.ErrRecordNotFound) {
 			logger.Warn("GetByCondition not found", logger.Err(err), logger.Any("form", form), middleware.GCtxRequestIDField(c))
 			response.Error(c, ecode.NotFound)
 		} else {
@@ -323,7 +322,7 @@ func (h *userExampleHandler) ListByIDs(c *gin.Context) {
 // @Tags userExample
 // @accept json
 // @Produce json
-// @Param lastID query int true "last id, default is MaxInt64"
+// @Param lastID query int true "last id, default is MaxInt32"
 // @Param limit query int false "size in each page" default(10)
 // @Param sort query string false "sort by column name of table, and the "-" sign before column name indicates reverse order" default(-id)
 // @Success 200 {object} types.ListUserExamplesRespond{}
@@ -331,7 +330,7 @@ func (h *userExampleHandler) ListByIDs(c *gin.Context) {
 func (h *userExampleHandler) ListByLastID(c *gin.Context) {
 	lastID := utils.StrToUint64(c.Query("lastID"))
 	if lastID == 0 {
-		lastID = math.MaxInt64
+		lastID = math.MaxInt32
 	}
 	limit := utils.StrToInt(c.Query("limit"))
 	if limit == 0 {

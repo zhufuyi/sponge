@@ -73,7 +73,18 @@ Examples:
 			if err != nil {
 				return err
 			}
-			outPath, err = runGenRPCCommand(moduleName, serverName, projectName, repoAddr, sqlArgs.DBDsn, codes, outPath)
+			g := &rpcGenerator{
+				moduleName:  moduleName,
+				serverName:  serverName,
+				projectName: projectName,
+				repoAddr:    repoAddr,
+				dbDSN:       sqlArgs.DBDsn,
+				dbDriver:    sqlArgs.DBDriver,
+				isEmbed:     sqlArgs.IsEmbed,
+				codes:       codes,
+				outPath:     outPath,
+			}
+			outPath, err = g.generateCode()
 			if err != nil {
 				return err
 			}
@@ -89,7 +100,14 @@ Examples:
 					return err
 				}
 
-				outPath, err = runGenServiceCommand(moduleName, serverName, codes, outPath)
+				sg := &serviceGenerator{
+					moduleName: moduleName,
+					serverName: serverName,
+					isEmbed:    sqlArgs.IsEmbed,
+					codes:      codes,
+					outPath:    outPath,
+				}
+				outPath, err = sg.generateCode()
 				if err != nil {
 					return err
 				}
@@ -103,17 +121,20 @@ using help:
 
 `)
 			fmt.Printf("generate %s's grpc service code successfully, out = %s\n", serverName, outPath)
+
+			_ = generateConfigmap(serverName, outPath)
 			return nil
 		},
 	}
 
+	cmd.Flags().StringVarP(&sqlArgs.DBDriver, "db-driver", "k", "mysql", "database driver, support mysql, postgresql")
 	cmd.Flags().StringVarP(&moduleName, "module-name", "m", "", "module-name is the name of the module in the go.mod file")
 	_ = cmd.MarkFlagRequired("module-name")
 	cmd.Flags().StringVarP(&serverName, "server-name", "s", "", "server name")
 	_ = cmd.MarkFlagRequired("server-name")
 	cmd.Flags().StringVarP(&projectName, "project-name", "p", "", "project name")
 	_ = cmd.MarkFlagRequired("project-name")
-	cmd.Flags().StringVarP(&sqlArgs.DBDsn, "db-dsn", "d", "", "db content addr, e.g. user:password@(host:port)/database")
+	cmd.Flags().StringVarP(&sqlArgs.DBDsn, "db-dsn", "d", "", "database content address, e.g. user:password@(host:port)/database")
 	_ = cmd.MarkFlagRequired("db-dsn")
 	cmd.Flags().StringVarP(&dbTables, "db-table", "t", "", "table name, multiple names separated by commas")
 	_ = cmd.MarkFlagRequired("db-table")
@@ -125,8 +146,19 @@ using help:
 	return cmd
 }
 
-func runGenRPCCommand(moduleName string, serverName string, projectName string, repoAddr string,
-	dbDSN string, codes map[string]string, outPath string) (string, error) {
+type rpcGenerator struct {
+	moduleName  string
+	serverName  string
+	projectName string
+	repoAddr    string
+	dbDSN       string
+	dbDriver    string
+	isEmbed     bool
+	codes       map[string]string
+	outPath     string
+}
+
+func (g *rpcGenerator) generateCode() (string, error) {
 	subTplName := "rpc"
 	r := Replacers[TplNameSponge]
 	if r == nil {
@@ -158,27 +190,28 @@ func runGenRPCCommand(moduleName string, serverName string, projectName string, 
 	r.SetSubDirsAndFiles(subDirs, subFiles...)
 	r.SetIgnoreSubDirs(ignoreDirs...)
 	r.SetIgnoreSubFiles(ignoreFiles...)
-	fields := addRPCFields(moduleName, serverName, projectName, repoAddr, r, dbDSN, codes)
+	fields := g.addFields(r)
 	r.SetReplacementFields(fields)
-	_ = r.SetOutputDir(outPath, serverName+"_"+subTplName)
+	_ = r.SetOutputDir(g.outPath, g.serverName+"_"+subTplName)
 	if err := r.SaveFiles(); err != nil {
 		return "", err
 	}
-	_ = saveGenInfo(moduleName, serverName, r.GetOutputDir())
+	_ = saveGenInfo(g.moduleName, g.serverName, r.GetOutputDir())
 
 	return r.GetOutputDir(), nil
 }
 
-func addRPCFields(moduleName string, serverName string, projectName string, repoAddr string,
-	r replacer.Replacer, dbDSN string, codes map[string]string) []replacer.Field {
+func (g *rpcGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	var fields []replacer.Field
 
-	repoHost, _ := parseImageRepoAddr(repoAddr)
+	repoHost, _ := parseImageRepoAddr(g.repoAddr)
 
 	fields = append(fields, deleteFieldsMark(r, modelFile, startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, modelInitDBFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, daoFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, daoTestFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, protoFile, startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, serviceLogicFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, serviceClientFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, serviceTestFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, dockerFile, wellStartMark, wellEndMark)...)
@@ -191,20 +224,37 @@ func addRPCFields(moduleName string, serverName string, projectName string, repo
 	fields = append(fields, deleteAllFieldsMark(r, makeFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, gitIgnoreFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteAllFieldsMark(r, protoShellFile, wellStartMark, wellEndMark)...)
-	fields = append(fields, deleteFieldsMark(r, appConfigFile, wellStartMark, wellEndMark)...)
-	fields = append(fields, replaceFileContentMark(r, readmeFile, "## "+serverName)...)
+	fields = append(fields, deleteAllFieldsMark(r, appConfigFile, wellStartMark, wellEndMark)...)
+	fields = append(fields, deleteFieldsMark(r, deploymentConfigFile, wellStartMark, wellEndMark)...)
+	fields = append(fields, replaceFileContentMark(r, readmeFile, "## "+g.serverName)...)
 	fields = append(fields, []replacer.Field{
+		{ // replace the configuration of the *.yml file
+			Old: appConfigFileMark,
+			New: rpcServerConfigCode,
+		},
+		{ // replace the configuration of the *.yml file
+			Old: appConfigFileMark2,
+			New: getDBConfigCode(g.dbDriver),
+		},
 		{ // replace the contents of the model/userExample.go file
 			Old: modelFileMark,
-			New: codes[parser.CodeTypeModel],
+			New: g.codes[parser.CodeTypeModel],
+		},
+		{ // replace the contents of the model/init.go file
+			Old: modelInitDBFileMark,
+			New: getInitDBCode(g.dbDriver),
 		},
 		{ // replace the contents of the dao/userExample.go file
 			Old: daoFileMark,
-			New: codes[parser.CodeTypeDAO],
+			New: g.codes[parser.CodeTypeDAO],
+		},
+		{ // replace the contents of the handler/userExample_logic.go file
+			Old: embedTimeMark,
+			New: getEmbedTimeCode(g.isEmbed),
 		},
 		{ // replace the contents of the v1/userExample.proto file
 			Old: protoFileMark,
-			New: codes[parser.CodeTypeProto],
+			New: g.codes[parser.CodeTypeProto],
 		},
 		{ // replace the contents of the proto.sh file
 			Old: protoShellFileGRPCMark,
@@ -216,7 +266,7 @@ func addRPCFields(moduleName string, serverName string, projectName string, repo
 		},
 		{ // replace the contents of the service/userExample_client_test.go file
 			Old: serviceFileMark,
-			New: adjustmentOfIDType(codes[parser.CodeTypeService]),
+			New: adjustmentOfIDType(g.codes[parser.CodeTypeService]),
 		},
 		{ // replace the contents of the Dockerfile file
 			Old: dockerFileMark,
@@ -238,6 +288,10 @@ func addRPCFields(moduleName string, serverName string, projectName string, repo
 			Old: dockerComposeFileMark,
 			New: dockerComposeFileGrpcCode,
 		},
+		{ // replace the contents of the *-configmap.yml file
+			Old: deploymentConfigFileMark,
+			New: getDBConfigCode(g.dbDriver, true),
+		},
 		{ // replace the contents of the *-deployment.yml file
 			Old: k8sDeploymentFileMark,
 			New: k8sDeploymentFileGrpcCode,
@@ -246,39 +300,38 @@ func addRPCFields(moduleName string, serverName string, projectName string, repo
 			Old: k8sServiceFileMark,
 			New: k8sServiceFileGrpcCode,
 		},
-		{ // replace the configuration of the *.yml file
-			Old: appConfigFileMark,
-			New: rpcServerConfigCode,
-		},
-		// replace github.com/zhufuyi/sponge/templates/sponge
-		{
+		{ // replace github.com/zhufuyi/sponge/templates/sponge
 			Old: selfPackageName + "/" + r.GetSourcePath(),
-			New: moduleName,
+			New: g.moduleName,
 		},
 		// replace directory name
 		{
 			Old: strings.Join([]string{"api", "userExample", "v1"}, gofile.GetPathDelimiter()),
-			New: strings.Join([]string{"api", serverName, "v1"}, gofile.GetPathDelimiter()),
+			New: strings.Join([]string{"api", g.serverName, "v1"}, gofile.GetPathDelimiter()),
 		},
 		{
 			Old: "github.com/zhufuyi/sponge",
-			New: moduleName,
+			New: g.moduleName,
 		},
 		{
-			Old: moduleName + "/pkg",
+			Old: g.moduleName + "/pkg",
 			New: "github.com/zhufuyi/sponge/pkg",
+		},
+		{ // replace the sponge version of the go.mod file
+			Old: spongeTemplateVersionMark,
+			New: getLocalSpongeTemplateVersion(),
 		},
 		{
 			Old: "api/userExample/v1",
-			New: fmt.Sprintf("api/%s/v1", serverName),
+			New: fmt.Sprintf("api/%s/v1", g.serverName),
 		},
 		{
 			Old: "api.userExample.v1",
-			New: fmt.Sprintf("api.%s.v1", serverName), // protobuf package no "-" signs allowed
+			New: fmt.Sprintf("api.%s.v1", g.serverName), // protobuf package no "-" signs allowed
 		},
 		{
 			Old: "sponge api docs",
-			New: serverName + " api docs",
+			New: g.serverName + " api docs",
 		},
 		{
 			Old: "_userExampleNO       = 2",
@@ -286,21 +339,25 @@ func addRPCFields(moduleName string, serverName string, projectName string, repo
 		},
 		{
 			Old: "serverNameExample",
-			New: serverName,
+			New: g.serverName,
 		},
 		// docker image and k8s deployment script replacement
 		{
 			Old: "server-name-example",
-			New: xstrings.ToKebabCase(serverName), // snake_case to kebab_case
+			New: xstrings.ToKebabCase(g.serverName), // snake_case to kebab_case
 		},
 		// docker image and k8s deployment script replacement
 		{
 			Old: "project-name-example",
-			New: projectName,
+			New: g.projectName,
+		},
+		{
+			Old: "projectNameExample",
+			New: g.projectName,
 		},
 		{
 			Old: "repo-addr-example",
-			New: repoAddr,
+			New: g.repoAddr,
 		},
 		{
 			Old: "image-repo-host",
@@ -316,12 +373,20 @@ func addRPCFields(moduleName string, serverName string, projectName string, repo
 		},
 		{
 			Old: "root:123456@(192.168.3.37:3306)/account",
-			New: dbDSN,
+			New: g.dbDSN,
+		},
+		{
+			Old: "root:123456@192.168.3.37:5432/account",
+			New: g.dbDSN,
 		},
 		{
 			Old:             "UserExample",
-			New:             codes[parser.TableName],
+			New:             g.codes[parser.TableName],
 			IsCaseSensitive: true,
+		},
+		{
+			Old: "github.com/zhufuyi/sponge/pkg/ggorm",
+			New: "user/pkg/ggorm",
 		},
 	}...)
 

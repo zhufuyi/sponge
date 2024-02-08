@@ -40,7 +40,21 @@ Examples:
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			projectName, serverName = convertProjectAndServerName(projectName, serverName)
-			return runGenRPCPbCommand(moduleName, serverName, projectName, protobufFile, repoAddr, outPath)
+			g := &rpcPbGenerator{
+				moduleName:   moduleName,
+				serverName:   serverName,
+				projectName:  projectName,
+				protobufFile: protobufFile,
+				repoAddr:     repoAddr,
+				outPath:      outPath,
+			}
+			err := g.generateCode()
+			if err != nil {
+				return err
+			}
+
+			_ = generateConfigmap(serverName, outPath)
+			return nil
 		},
 	}
 
@@ -58,8 +72,17 @@ Examples:
 	return cmd
 }
 
-func runGenRPCPbCommand(moduleName string, serverName string, projectName string, protobufFile string, repoAddr string, outPath string) error {
-	protobufFiles, isImportTypes, err := parseProtobufFiles(protobufFile)
+type rpcPbGenerator struct {
+	moduleName   string
+	serverName   string
+	projectName  string
+	protobufFile string
+	repoAddr     string
+	outPath      string
+}
+
+func (g *rpcPbGenerator) generateCode() error {
+	protobufFiles, isImportTypes, err := parseProtobufFiles(g.protobufFile)
 	if err != nil {
 		return err
 	}
@@ -95,15 +118,15 @@ func runGenRPCPbCommand(moduleName string, serverName string, projectName string
 	r.SetSubDirsAndFiles(subDirs, subFiles...)
 	r.SetIgnoreSubDirs(ignoreDirs...)
 	r.SetIgnoreSubFiles(ignoreFiles...)
-	fields := addRPCPbFields(moduleName, serverName, projectName, repoAddr, r)
+	fields := g.addFields(r)
 	r.SetReplacementFields(fields)
-	_ = r.SetOutputDir(outPath, serverName+"_"+subTplName)
+	_ = r.SetOutputDir(g.outPath, g.serverName+"_"+subTplName)
 	if err = r.SaveFiles(); err != nil {
 		return err
 	}
 
-	_ = saveProtobufFiles(moduleName, serverName, r.GetOutputDir(), protobufFiles)
-	_ = saveGenInfo(moduleName, serverName, r.GetOutputDir())
+	_ = saveProtobufFiles(g.moduleName, g.serverName, r.GetOutputDir(), protobufFiles)
+	_ = saveGenInfo(g.moduleName, g.serverName, r.GetOutputDir())
 
 	fmt.Printf(`
 using help:
@@ -113,14 +136,14 @@ using help:
   4. open the file "internal/service/xxx_client_test.go" using Goland or VS Code, testing the grpc methods.
 
 `)
-	fmt.Printf("generate %s's grpc service code successfully, out = %s\n", serverName, r.GetOutputDir())
+	fmt.Printf("generate %s's grpc service code successfully, out = %s\n", g.serverName, r.GetOutputDir())
 	return nil
 }
 
-func addRPCPbFields(moduleName string, serverName string, projectName string, repoAddr string, r replacer.Replacer) []replacer.Field {
+func (g *rpcPbGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	var fields []replacer.Field
 
-	repoHost, _ := parseImageRepoAddr(repoAddr)
+	repoHost, _ := parseImageRepoAddr(g.repoAddr)
 
 	fields = append(fields, deleteFieldsMark(r, dockerFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, dockerFileBuild, wellStartMark, wellEndMark)...)
@@ -132,9 +155,22 @@ func addRPCPbFields(moduleName string, serverName string, projectName string, re
 	fields = append(fields, deleteAllFieldsMark(r, makeFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, gitIgnoreFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteAllFieldsMark(r, protoShellFile, wellStartMark, wellEndMark)...)
-	fields = append(fields, deleteFieldsMark(r, appConfigFile, wellStartMark, wellEndMark)...)
-	fields = append(fields, replaceFileContentMark(r, readmeFile, "## "+serverName)...)
+	fields = append(fields, deleteAllFieldsMark(r, appConfigFile, wellStartMark, wellEndMark)...)
+	fields = append(fields, deleteFieldsMark(r, deploymentConfigFile, wellStartMark, wellEndMark)...)
+	fields = append(fields, replaceFileContentMark(r, readmeFile, "## "+g.serverName)...)
 	fields = append(fields, []replacer.Field{
+		{ // replace the configuration of the *.yml file
+			Old: appConfigFileMark,
+			New: rpcServerConfigCode,
+		},
+		{ // replace the configuration of the *.yml file
+			Old: appConfigFileMark2,
+			New: getDBConfigCode(DBDriverMysql),
+		},
+		{ // replace the contents of the model/init.go file
+			Old: modelInitDBFileMark,
+			New: getInitDBCode(DBDriverMysql), // default is mysql
+		},
 		{ // replace the contents of the Dockerfile file
 			Old: dockerFileMark,
 			New: dockerFileGrpcCode,
@@ -155,6 +191,10 @@ func addRPCPbFields(moduleName string, serverName string, projectName string, re
 			Old: dockerComposeFileMark,
 			New: dockerComposeFileGrpcCode,
 		},
+		{ // replace the contents of the *-configmap.yml file
+			Old: deploymentConfigFileMark,
+			New: getDBConfigCode(DBDriverMysql, true),
+		},
 		{ // replace the contents of the *-deployment.yml file
 			Old: k8sDeploymentFileMark,
 			New: k8sDeploymentFileGrpcCode,
@@ -162,10 +202,6 @@ func addRPCPbFields(moduleName string, serverName string, projectName string, re
 		{ // replace the contents of the *-svc.yml file
 			Old: k8sServiceFileMark,
 			New: k8sServiceFileGrpcCode,
-		},
-		{ // replace the configuration of the *.yml file
-			Old: appConfigFileMark,
-			New: rpcServerConfigCode,
 		},
 		{ // replace the contents of the proto.sh file
 			Old: protoShellFileGRPCMark,
@@ -177,33 +213,41 @@ func addRPCPbFields(moduleName string, serverName string, projectName string, re
 		},
 		{
 			Old: "github.com/zhufuyi/sponge",
-			New: moduleName,
+			New: g.moduleName,
 		},
 		{
-			Old: moduleName + "/pkg",
+			Old: g.moduleName + "/pkg",
 			New: "github.com/zhufuyi/sponge/pkg",
+		},
+		{ // replace the sponge version of the go.mod file
+			Old: spongeTemplateVersionMark,
+			New: getLocalSpongeTemplateVersion(),
 		},
 		{
 			Old: "sponge api docs",
-			New: serverName + " api docs",
+			New: g.serverName + " api docs",
 		},
 		{
 			Old: "serverNameExample",
-			New: serverName,
+			New: g.serverName,
 		},
 		// docker image and k8s deployment script replacement
 		{
 			Old: "server-name-example",
-			New: xstrings.ToKebabCase(serverName), // snake_case to kebab_case
+			New: xstrings.ToKebabCase(g.serverName), // snake_case to kebab_case
 		},
 		// docker image and k8s deployment script replacement
 		{
 			Old: "project-name-example",
-			New: projectName,
+			New: g.projectName,
+		},
+		{
+			Old: "projectNameExample",
+			New: g.projectName,
 		},
 		{
 			Old: "repo-addr-example",
-			New: repoAddr,
+			New: g.repoAddr,
 		},
 		{
 			Old: "image-repo-host",

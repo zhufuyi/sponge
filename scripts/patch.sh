@@ -2,7 +2,9 @@
 
 patchType=$1
 typesPb="types-pb"
-mysqlInit="mysql-init"
+initMysql="init-mysql"
+initTidb="init-tidb"
+initPostgresql="init-postgresql"
 
 function checkResult() {
     result=$1
@@ -11,24 +13,37 @@ function checkResult() {
     fi
 }
 
-function patchTypesPb() {
+function generateTypesPbCode() {
     sponge patch gen-types-pb --out=./
     checkResult $?
 }
 
-function patchMysqlInit() {
-    sponge patch gen-mysql-init --out=./
+function generateInitMysqlCode() {
+    sponge patch gen-db-init --db-driver=mysql --out=./
     checkResult $?
 }
 
-if [ "X$patchType" = "X" ];then
-    patchTypesPb
-    patchMysqlInit
-elif [  "$patchType" = "$typesPb"  ]; then
-    patchTypesPb
-elif [ "$patchType" = "$mysqlInit" ]; then
-    patchMysqlInit
+function generateInitTidbCode() {
+    sponge patch gen-db-init --db-driver=tidb --out=./
+    checkResult $?
+}
+
+function generateInitPostgresqlCode() {
+    sponge patch gen-db-init --db-driver=postgresql --out=./
+    checkResult $?
+}
+
+if [  "$patchType" = "$typesPb"  ]; then
+    generateTypesPbCode
+elif [ "$patchType" = "$initMysql" ]; then
+    generateInitMysqlCode
+elif [ "$patchType" = "$initTidb" ]; then
+    generateInitTidbCode
+elif [ "$patchType" = "$initPostgresql" ]; then
+    generateInitPostgresqlCode
 else
-    echo "TYPE should be "", $typesPb or $mysqlInit."
+    echo "invalid patch type: '$patchType'"
+    echo "supported types: $initMysql, $initTidb, $initPostgresql, $typesPb"
+    echo "e.g. make patch TYPE=init-mysql"
     exit 1
 fi

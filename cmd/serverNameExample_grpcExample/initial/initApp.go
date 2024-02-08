@@ -45,8 +45,8 @@ func InitApp() {
 	logger.Info("init logger succeeded")
 
 	// initializing database
-	model.InitMysql()
-	logger.Info("init mysql succeeded")
+	model.InitDB()
+	logger.Infof("init %s succeeded", cfg.Database.Driver)
 	model.InitCache(cfg.App.CacheType)
 
 	// initializing tracing

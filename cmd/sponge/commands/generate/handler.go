@@ -67,7 +67,12 @@ Examples:
 					return err
 				}
 
-				outPath, err = runGenHandlerCommand(moduleName, codes, outPath)
+				g := &handlerGenerator{
+					moduleName: moduleName,
+					codes:      codes,
+					outPath:    outPath,
+				}
+				outPath, err = g.generateCode()
 				if err != nil {
 					return err
 				}
@@ -78,7 +83,7 @@ using help:
   1. move the folder "internal" to your project code folder.
   2. open a terminal and execute the command: make docs
   3. compile and run service: make run
-  4. visit http://localhost:8080/swagger/index.html to your browser, and test the CRUD api interface.
+  4. visit http://localhost:8080/swagger/index.html in your browser, and test the CRUD api interface.
 
 `)
 			fmt.Printf("generate \"handler\" code successfully, out = %s\n", outPath)
@@ -86,9 +91,10 @@ using help:
 		},
 	}
 
+	cmd.Flags().StringVarP(&sqlArgs.DBDriver, "db-driver", "k", "mysql", "database driver, support mysql, postgresql")
 	cmd.Flags().StringVarP(&moduleName, "module-name", "m", "", "module-name is the name of the module in the go.mod file")
 	//_ = cmd.MarkFlagRequired("module-name")
-	cmd.Flags().StringVarP(&sqlArgs.DBDsn, "db-dsn", "d", "", "db content addr, e.g. user:password@(host:port)/database")
+	cmd.Flags().StringVarP(&sqlArgs.DBDsn, "db-dsn", "d", "", "database content address, e.g. user:password@(host:port)/database")
 	_ = cmd.MarkFlagRequired("db-dsn")
 	cmd.Flags().StringVarP(&dbTables, "db-table", "t", "", "table name, multiple names separated by commas")
 	_ = cmd.MarkFlagRequired("db-table")
@@ -100,7 +106,13 @@ using help:
 	return cmd
 }
 
-func runGenHandlerCommand(moduleName string, codes map[string]string, outPath string) (string, error) {
+type handlerGenerator struct {
+	moduleName string
+	codes      map[string]string
+	outPath    string
+}
+
+func (g *handlerGenerator) generateCode() (string, error) {
 	subTplName := "handler"
 	r := Replacers[TplNameSponge]
 	if r == nil {
@@ -123,9 +135,9 @@ func runGenHandlerCommand(moduleName string, codes map[string]string, outPath st
 	r.SetSubDirsAndFiles(subDirs)
 	r.SetIgnoreSubDirs(ignoreDirs...)
 	r.SetIgnoreSubFiles(ignoreFiles...)
-	fields := addHandlerFields(moduleName, r, codes)
+	fields := g.addFields(r)
 	r.SetReplacementFields(fields)
-	_ = r.SetOutputDir(outPath, subTplName)
+	_ = r.SetOutputDir(g.outPath, subTplName)
 	if err := r.SaveFiles(); err != nil {
 		return "", err
 	}
@@ -133,7 +145,7 @@ func runGenHandlerCommand(moduleName string, codes map[string]string, outPath st
 	return r.GetOutputDir(), nil
 }
 
-func addHandlerFields(moduleName string, r replacer.Replacer, codes map[string]string) []replacer.Field {
+func (g *handlerGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	var fields []replacer.Field
 
 	fields = append(fields, deleteFieldsMark(r, modelFile, startMark, endMark)...)
@@ -144,36 +156,40 @@ func addHandlerFields(moduleName string, r replacer.Replacer, codes map[string]s
 	fields = append(fields, []replacer.Field{
 		{ // replace the contents of the model/userExample.go file
 			Old: modelFileMark,
-			New: codes[parser.CodeTypeModel],
+			New: g.codes[parser.CodeTypeModel],
 		},
 		{ // replace the contents of the dao/userExample.go file
 			Old: daoFileMark,
-			New: codes[parser.CodeTypeDAO],
+			New: g.codes[parser.CodeTypeDAO],
 		},
 		{ // replace the contents of the handler/userExample.go file
 			Old: handlerFileMark,
-			New: adjustmentOfIDType(codes[parser.CodeTypeHandler]),
+			New: adjustmentOfIDType(g.codes[parser.CodeTypeHandler]),
 		},
 		{
 			Old: selfPackageName + "/" + r.GetSourcePath(),
-			New: moduleName,
+			New: g.moduleName,
 		},
 		{
 			Old: "github.com/zhufuyi/sponge",
-			New: moduleName,
+			New: g.moduleName,
 		},
 		{
 			Old: "userExampleNO       = 1",
 			New: fmt.Sprintf("userExampleNO = %d", rand.Intn(100)),
 		},
 		{
-			Old: moduleName + "/pkg",
+			Old: g.moduleName + "/pkg",
 			New: "github.com/zhufuyi/sponge/pkg",
 		},
 		{
 			Old:             "UserExample",
-			New:             codes[parser.TableName],
+			New:             g.codes[parser.TableName],
 			IsCaseSensitive: true,
+		},
+		{
+			Old: "github.com/zhufuyi/sponge/pkg/ggorm",
+			New: "user/pkg/ggorm",
 		},
 	}...)
 

@@ -301,7 +301,7 @@ message ListUserExampleByIDsReply {
 
 message ListUserExampleByLastIDRequest {
   uint64 lastID = 1 [(tagger.tags) = "form:\"lastID\""]; // last id
-  uint32 limit = 2 [(validate.rules).uint32.gt  = 0, (tagger.tags) = "form:\"limit\""]; // page size
+  uint32 limit = 2 [(validate.rules).uint32.gt  = 0, (tagger.tags) = "form:\"limit\""]; // limit size per page
   string sort = 3 [(tagger.tags) = "form:\"sort\""]; // sort by column name of table, default is -id, the - sign indicates descending order.
 }
 

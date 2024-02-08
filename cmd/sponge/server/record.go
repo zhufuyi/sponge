@@ -25,6 +25,7 @@ type parameters struct {
 	RepoAddr      string `json:"repoAddr"`
 	ProtobufFile  string `json:"-"`
 	YamlFile      string `json:"-"`
+	DbDriver      string `json:"dbDriver"`
 	Dsn           string `json:"dsn"`
 	TableName     string `json:"tableName"`
 	Embed         bool   `json:"embed"`
@@ -34,7 +35,7 @@ type parameters struct {
 
 type record struct {
 	mux        *sync.Mutex
-	HostRecord map[string]*parameters
+	HostRecord map[string]*parameters // [ip + "-" + commandType]:parameters
 }
 
 func initRecord() {
@@ -114,6 +115,8 @@ func parseCommandArgs(args []string) *parameters {
 			switch ss[0] {
 			case "--db-dsn":
 				params.Dsn = val
+			case "--db-driver":
+				params.DbDriver = val
 			case "--db-table":
 				params.TableName = val
 			case "--embed":

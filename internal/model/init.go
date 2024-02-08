@@ -2,15 +2,15 @@
 package model
 
 import (
-	"context"
-	"database/sql"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/zhufuyi/sponge/internal/config"
+	"github.com/zhufuyi/sponge/pkg/ggorm"
 	"github.com/zhufuyi/sponge/pkg/goredis"
 	"github.com/zhufuyi/sponge/pkg/logger"
-	"github.com/zhufuyi/sponge/pkg/mysql"
+	"github.com/zhufuyi/sponge/pkg/utils"
 
 	"github.com/go-redis/redis/v8"
 	"gorm.io/gorm"
@@ -34,84 +34,6 @@ var (
 	cacheType *CacheType
 	once3     sync.Once
 )
-
-// InitMysql connect mysql
-func InitMysql() {
-	opts := []mysql.Option{
-		mysql.WithMaxIdleConns(config.Get().Mysql.MaxIdleConns),
-		mysql.WithMaxOpenConns(config.Get().Mysql.MaxOpenConns),
-		mysql.WithConnMaxLifetime(time.Duration(config.Get().Mysql.ConnMaxLifetime) * time.Minute),
-	}
-	if config.Get().Mysql.EnableLog {
-		opts = append(opts,
-			mysql.WithLogging(logger.Get()),
-			mysql.WithLogRequestIDKey("request_id"),
-		)
-	}
-
-	if config.Get().App.EnableTrace {
-		opts = append(opts, mysql.WithEnableTrace())
-	}
-
-	// setting mysql slave and master dsn addresses,
-	// if there is no read/write separation, you can comment out the following piece of code
-	opts = append(opts, mysql.WithRWSeparation(
-		config.Get().Mysql.SlavesDsn,
-		config.Get().Mysql.MastersDsn...,
-	))
-
-	// add custom gorm plugin
-	//opts = append(opts, mysql.WithGormPlugin(yourPlugin))
-
-	var err error
-	db, err = mysql.Init(config.Get().Mysql.Dsn, opts...)
-	if err != nil {
-		panic("mysql.Init error: " + err.Error())
-	}
-}
-
-// GetDB get db
-func GetDB() *gorm.DB {
-	if db == nil {
-		once1.Do(func() {
-			InitMysql()
-		})
-	}
-
-	return db
-}
-
-// CloseMysql close mysql
-func CloseMysql() error {
-	if db == nil {
-		return nil
-	}
-
-	sqlDB, err := db.DB()
-	if err != nil {
-		return err
-	}
-
-	checkInUse(sqlDB, time.Second*5)
-
-	return sqlDB.Close()
-}
-
-func checkInUse(sqlDB *sql.DB, duration time.Duration) {
-	ctx, _ := context.WithTimeout(context.Background(), duration) //nolint
-	for {
-		select {
-		case <-time.After(time.Millisecond * 500):
-			if v := sqlDB.Stats().InUse; v == 0 {
-				return
-			}
-		case <-ctx.Done():
-			return
-		}
-	}
-}
-
-// ------------------------------------------------------------------------------------------
 
 // CacheType cache type
 type CacheType struct {
@@ -182,4 +104,111 @@ func CloseRedis() error {
 	}
 
 	return nil
+}
+
+// ------------------------------------------------------------------------------------------
+
+// todo generate initialisation database code here
+// delete the templates code start
+
+// InitDB connect database
+func InitDB() {
+	switch strings.ToLower(config.Get().Database.Driver) {
+	case "mysql", "tidb":
+		InitMysql()
+	case "postgres", "postgresql":
+		InitPostgresql()
+	default:
+		panic("unsupported database driver: " + config.Get().Database.Driver)
+	}
+}
+
+// GetDB get db
+func GetDB() *gorm.DB {
+	if db == nil {
+		once1.Do(func() {
+			switch strings.ToLower(config.Get().Database.Driver) {
+			case "mysql", "tidb":
+				InitMysql()
+			case "postgres", "postgresql":
+				InitPostgresql()
+			default:
+				panic("unsupported database driver: " + config.Get().Database.Driver)
+			}
+		})
+	}
+
+	return db
+}
+
+// InitMysql connect mysql
+func InitMysql() {
+	opts := []ggorm.Option{
+		ggorm.WithMaxIdleConns(config.Get().Database.Mysql.MaxIdleConns),
+		ggorm.WithMaxOpenConns(config.Get().Database.Mysql.MaxOpenConns),
+		ggorm.WithConnMaxLifetime(time.Duration(config.Get().Database.Mysql.ConnMaxLifetime) * time.Minute),
+	}
+	if config.Get().Database.Mysql.EnableLog {
+		opts = append(opts,
+			ggorm.WithLogging(logger.Get()),
+			ggorm.WithLogRequestIDKey("request_id"),
+		)
+	}
+
+	if config.Get().App.EnableTrace {
+		opts = append(opts, ggorm.WithEnableTrace())
+	}
+
+	// setting mysql slave and master dsn addresses,
+	// if there is no read/write separation, you can comment out the following piece of code
+	opts = append(opts, ggorm.WithRWSeparation(
+		config.Get().Database.Mysql.SlavesDsn,
+		config.Get().Database.Mysql.MastersDsn...,
+	))
+
+	// add custom gorm plugin
+	//opts = append(opts, ggorm.WithGormPlugin(yourPlugin))
+
+	var dsn = utils.AdaptiveMysqlDsn(config.Get().Database.Mysql.Dsn)
+	var err error
+	db, err = ggorm.InitMysql(dsn, opts...)
+	if err != nil {
+		panic("ggorm.InitMysql error: " + err.Error())
+	}
+}
+
+// InitPostgresql connect postgresql
+func InitPostgresql() {
+	opts := []ggorm.Option{
+		ggorm.WithMaxIdleConns(config.Get().Database.Postgresql.MaxIdleConns),
+		ggorm.WithMaxOpenConns(config.Get().Database.Postgresql.MaxOpenConns),
+		ggorm.WithConnMaxLifetime(time.Duration(config.Get().Database.Postgresql.ConnMaxLifetime) * time.Minute),
+	}
+	if config.Get().Database.Postgresql.EnableLog {
+		opts = append(opts,
+			ggorm.WithLogging(logger.Get()),
+			ggorm.WithLogRequestIDKey("request_id"),
+		)
+	}
+
+	if config.Get().App.EnableTrace {
+		opts = append(opts, ggorm.WithEnableTrace())
+	}
+
+	// add custom gorm plugin
+	//opts = append(opts, ggorm.WithGormPlugin(yourPlugin))
+
+	var dsn = utils.AdaptivePostgresqlDsn(config.Get().Database.Postgresql.Dsn)
+	var err error
+	db, err = ggorm.InitPostgresql(dsn, opts...)
+	if err != nil {
+		panic("ggorm.InitPostgresql error: " + err.Error())
+	}
+}
+
+// delete the templates code end
+
+// CloseDB close db
+func CloseDB() error {
+	return ggorm.CloseDB(db)
 }

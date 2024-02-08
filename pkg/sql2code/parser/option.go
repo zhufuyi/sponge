@@ -14,6 +14,8 @@ const (
 type Option func(*options)
 
 type options struct {
+	DBDriver       string
+	FieldTypes     map[string]string // name:type
 	Charset        string
 	Collation      string
 	JSONTag        bool
@@ -30,11 +32,31 @@ type options struct {
 }
 
 var defaultOptions = options{
-	NullStyle: NullInSql,
-	Package:   "model",
+	DBDriver:   "mysql",
+	FieldTypes: map[string]string{},
+	NullStyle:  NullInSql,
+	Package:    "model",
 }
 
-// WithCharset  set charset
+// WithDBDriver set db driver
+func WithDBDriver(driver string) Option {
+	return func(o *options) {
+		if driver != "" {
+			o.DBDriver = driver
+		}
+	}
+}
+
+// WithFieldTypes set field types
+func WithFieldTypes(fieldTypes map[string]string) Option {
+	return func(o *options) {
+		if fieldTypes != nil {
+			o.FieldTypes = fieldTypes
+		}
+	}
+}
+
+// WithCharset set charset
 func WithCharset(charset string) Option {
 	return func(o *options) {
 		o.Charset = charset

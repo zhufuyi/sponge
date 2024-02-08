@@ -1,7 +1,9 @@
 package ggorm
 
 import (
+	"database/sql"
 	"fmt"
+	"gorm.io/gorm"
 	"testing"
 	"time"
 
@@ -17,6 +19,7 @@ func TestInitMysql(t *testing.T) {
 		t.Logf(fmt.Sprintf("connect to mysql failed, err=%v, dsn=%s", err, dsn))
 		return
 	}
+	defer CloseDB(db)
 
 	t.Logf("%+v", db.Name())
 }
@@ -28,6 +31,7 @@ func TestInitTidb(t *testing.T) {
 		t.Logf(fmt.Sprintf("connect to mysql failed, err=%v, dsn=%s", err, dsn))
 		return
 	}
+	defer CloseDB(db)
 
 	t.Logf("%+v", db.Name())
 }
@@ -40,6 +44,7 @@ func TestInitPostgresql(t *testing.T) {
 		t.Logf(fmt.Sprintf("connect to postgresql failed, err=%v, dsn=%s", err, dsn))
 		return
 	}
+	defer CloseDB(db)
 
 	t.Logf("%+v", db.Name())
 }
@@ -87,4 +92,13 @@ func TestGetTableName(t *testing.T) {
 
 	name = GetTableName("table")
 	assert.Empty(t, name)
+}
+
+func TestCloseDB(t *testing.T) {
+	sqlDB := new(sql.DB)
+	checkInUse(sqlDB, time.Millisecond*100)
+	checkInUse(sqlDB, time.Millisecond*600)
+	db := new(gorm.DB)
+	defer func() { recover() }()
+	CloseDB(db)
 }

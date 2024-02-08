@@ -102,6 +102,8 @@ func Test_toCamel(t *testing.T) {
 
 func Test_parseOption(t *testing.T) {
 	opts := []Option{
+		WithDBDriver("foo"),
+		WithFieldTypes(map[string]string{"foo": "bar"}),
 		WithCharset("foo"),
 		WithCollation("foo"),
 		WithTablePrefix("foo"),
@@ -148,11 +150,6 @@ func Test_goTypeToProto(t *testing.T) {
 	assert.NotNil(t, v)
 }
 
-func TestGetTableInfo(t *testing.T) {
-	info, err := GetTableInfo("root:123456@(192.168.3.37:3306)/test", "user")
-	t.Log(err, info)
-}
-
 func Test_initTemplate(t *testing.T) {
 	initTemplate()
 
@@ -173,4 +170,47 @@ func Test_initTemplate(t *testing.T) {
 	serviceUpdateStructTmplRaw = "{{if .foo}}"
 	serviceStructTmplRaw = "{{if .foo}}"
 	initTemplate()
+}
+
+func TestGetTableInfo(t *testing.T) {
+	info, err := GetMysqlTableInfo("root:123456@(192.168.3.37:3306)/test", "user")
+	t.Log(err, info)
+}
+
+func TestGetPostgresqlTableInfo(t *testing.T) {
+	fields, err := GetPostgresqlTableInfo("host=192.168.3.37 port=5432 user=root password=123456 dbname=account sslmode=disable", "user_example")
+	t.Log(fields, err)
+	sql, fieldTypes := ConvertToMysqlTable("user_example", fields)
+	t.Log(sql, fieldTypes)
+}
+
+func TestConvertToMysqlTable(t *testing.T) {
+	fields := []*PGField{
+		{Name: "id", Type: "smallint"},
+		{Name: "name", Type: "character", Lengthvar: 24, Notnull: false},
+		{Name: "age", Type: "smallint", Notnull: true},
+	}
+	sql, tps := ConvertToMysqlTable("foobar", fields)
+	t.Log(sql, tps)
+}
+
+func Test_toMysqlTable(t *testing.T) {
+	fields := []*PGField{
+		{Type: "smallint"},
+		{Type: "bigint"},
+		{Type: "real"},
+		{Type: "decimal"},
+		{Type: "double precision"},
+		{Type: "money"},
+		{Type: "character", Lengthvar: 24},
+		{Type: "text"},
+		{Type: "timestamp"},
+		{Type: "date"},
+		{Type: "time"},
+		{Type: "interval"},
+		{Type: "boolean"},
+	}
+	for _, field := range fields {
+		t.Log(toMysqlType(field), getType(field))
+	}
 }

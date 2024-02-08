@@ -134,8 +134,8 @@ func Test_service_userExample_methods(t *testing.T) {
 				// todo type in the parameters to test
 				req := &serverNameExampleV1.ListUserExampleByLastIDRequest{
 					LastID: 0,
-					Limit:  5,
-					Sort:   "-age",
+					Limit:  10,
+					Sort:   "",
 				}
 				return cli.ListByLastID(ctx, req)
 			},

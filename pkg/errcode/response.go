@@ -17,6 +17,7 @@ type Responser interface {
 	Error(ctx *gin.Context, err error) bool
 }
 
+// NewResponse creates a new responser
 // Deprecated: NewResponse use NewResponser instead
 func NewResponse(isFromRPC bool) Responser {
 	return &defaultResponse{isFromRPC, make(map[int]*Error), make(map[int]*RPCStatus)}

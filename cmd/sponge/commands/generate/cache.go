@@ -45,7 +45,17 @@ Examples:
 			}
 
 			var err error
-			outPath, err = runCacheCommand(moduleName, cacheName, prefixKey, keyName, keyType, valueName, valueType, outPath)
+			var g = &stringCacheGenerator{
+				moduleName: moduleName,
+				cacheName:  cacheName,
+				prefixKey:  prefixKey,
+				keyName:    keyName,
+				keyType:    keyType,
+				valueName:  valueName,
+				valueType:  valueType,
+				outPath:    outPath,
+			}
+			outPath, err = g.generateCode()
 			if err != nil {
 				return err
 			}
@@ -78,18 +88,28 @@ using help:
 	return cmd
 }
 
-func runCacheCommand(moduleName string, cacheName string, prefixKey string, keyName string,
-	keyType string, valueName string, valueType string, outPath string) (string, error) {
+type stringCacheGenerator struct {
+	moduleName string
+	cacheName  string
+	prefixKey  string
+	keyName    string
+	keyType    string
+	valueName  string
+	valueType  string
+	outPath    string
+}
+
+func (g *stringCacheGenerator) generateCode() (string, error) {
 	subTplName := "cache"
 	r := Replacers[TplNameSponge]
 	if r == nil {
 		return "", errors.New("replacer is nil")
 	}
 
-	if prefixKey == "" || prefixKey == ":" {
-		prefixKey = cacheName + ":"
-	} else if prefixKey[len(prefixKey)-1] != ':' {
-		prefixKey += ":"
+	if g.prefixKey == "" || g.prefixKey == ":" {
+		g.prefixKey = g.cacheName + ":"
+	} else if g.prefixKey[len(g.prefixKey)-1] != ':' {
+		g.prefixKey += ":"
 	}
 
 	// setting up template information
@@ -106,9 +126,9 @@ func runCacheCommand(moduleName string, cacheName string, prefixKey string, keyN
 	r.SetSubDirsAndFiles(subDirs)
 	r.SetIgnoreSubDirs(ignoreDirs...)
 	r.SetIgnoreSubFiles(ignoreFiles...)
-	fields := addCacheFields(moduleName, r, cacheName, prefixKey, keyName, keyType, valueName, valueType)
+	fields := g.addFields(r)
 	r.SetReplacementFields(fields)
-	_ = r.SetOutputDir(outPath, subTplName)
+	_ = r.SetOutputDir(g.outPath, subTplName)
 	if err := r.SaveFiles(); err != nil {
 		return "", err
 	}
@@ -116,22 +136,21 @@ func runCacheCommand(moduleName string, cacheName string, prefixKey string, keyN
 	return r.GetOutputDir(), nil
 }
 
-func addCacheFields(moduleName string, r replacer.Replacer, cacheName string, prefixKey string, keyName string,
-	keyType string, valueName string, valueType string) []replacer.Field {
+func (g *stringCacheGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	var fields []replacer.Field
 	fields = append(fields, deleteFieldsMark(r, cacheFile, startMark, endMark)...)
 
 	// match the case where the value type is a pointer
-	if valueType[0] == '*' {
+	if g.valueType[0] == '*' {
 		fields = append(fields, []replacer.Field{
 			{
 				Old:             "var valueNameExample valueTypeExample",
-				New:             fmt.Sprintf("%s := &%s{}", valueName, valueType[1:]),
+				New:             fmt.Sprintf("%s := &%s{}", g.valueName, g.valueType[1:]),
 				IsCaseSensitive: false,
 			},
 			{
 				Old:             "&valueNameExample",
-				New:             valueName,
+				New:             g.valueName,
 				IsCaseSensitive: false,
 			},
 		}...)
@@ -140,36 +159,36 @@ func addCacheFields(moduleName string, r replacer.Replacer, cacheName string, pr
 	fields = append(fields, []replacer.Field{
 		{
 			Old: "github.com/zhufuyi/sponge/internal/model",
-			New: moduleName + "/internal/model",
+			New: g.moduleName + "/internal/model",
 		},
 		{
 			Old:             "cacheNameExample",
-			New:             cacheName,
+			New:             g.cacheName,
 			IsCaseSensitive: true,
 		},
 		{
 			Old:             "prefixKeyExample:",
-			New:             prefixKey,
+			New:             g.prefixKey,
 			IsCaseSensitive: false,
 		},
 		{
 			Old:             "keyNameExample",
-			New:             keyName,
+			New:             g.keyName,
 			IsCaseSensitive: false,
 		},
 		{
 			Old:             "keyTypeExample",
-			New:             keyType,
+			New:             g.keyType,
 			IsCaseSensitive: false,
 		},
 		{
 			Old:             "valueNameExample",
-			New:             valueName,
+			New:             g.valueName,
 			IsCaseSensitive: false,
 		},
 		{
 			Old:             "valueTypeExample",
-			New:             valueType,
+			New:             g.valueType,
 			IsCaseSensitive: false,
 		},
 	}...)

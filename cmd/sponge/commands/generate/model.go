@@ -58,7 +58,11 @@ Examples:
 					return err
 				}
 
-				outPath, err = runGenModelCommand(codes, outPath)
+				g := &modelGenerator{
+					codes:   codes,
+					outPath: outPath,
+				}
+				outPath, err = g.generateCode()
 				if err != nil {
 					return err
 				}
@@ -74,7 +78,8 @@ using help:
 		},
 	}
 
-	cmd.Flags().StringVarP(&sqlArgs.DBDsn, "db-dsn", "d", "", "db content addr, e.g. user:password@(host:port)/database")
+	cmd.Flags().StringVarP(&sqlArgs.DBDriver, "db-driver", "k", "mysql", "database driver, support mysql, postgresql")
+	cmd.Flags().StringVarP(&sqlArgs.DBDsn, "db-dsn", "d", "", "database content address, e.g. user:password@(host:port)/database")
 	_ = cmd.MarkFlagRequired("db-dsn")
 	cmd.Flags().StringVarP(&dbTables, "db-table", "t", "", "table name, multiple names separated by commas")
 	_ = cmd.MarkFlagRequired("db-table")
@@ -85,7 +90,12 @@ using help:
 	return cmd
 }
 
-func runGenModelCommand(codes map[string]string, outPath string) (string, error) {
+type modelGenerator struct {
+	codes   map[string]string
+	outPath string
+}
+
+func (g *modelGenerator) generateCode() (string, error) {
 	subTplName := "model"
 	r := Replacers[TplNameSponge]
 	if r == nil {
@@ -102,9 +112,9 @@ func runGenModelCommand(codes map[string]string, outPath string) (string, error)
 	r.SetSubDirsAndFiles(subDirs)
 	r.SetIgnoreSubDirs(ignoreDirs...)
 	r.SetIgnoreSubFiles(ignoreFiles...)
-	fields := addModelFields(r, codes)
+	fields := g.addFields(r)
 	r.SetReplacementFields(fields)
-	_ = r.SetOutputDir(outPath, subTplName)
+	_ = r.SetOutputDir(g.outPath, subTplName)
 	if err := r.SaveFiles(); err != nil {
 		return "", err
 	}
@@ -112,19 +122,23 @@ func runGenModelCommand(codes map[string]string, outPath string) (string, error)
 	return r.GetOutputDir(), nil
 }
 
-func addModelFields(r replacer.Replacer, codes map[string]string) []replacer.Field {
+func (g *modelGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	var fields []replacer.Field
 
 	fields = append(fields, deleteFieldsMark(r, modelFile, startMark, endMark)...)
 	fields = append(fields, []replacer.Field{
 		{ // replace the contents of the model/userExample.go file
 			Old: modelFileMark,
-			New: codes[parser.CodeTypeModel],
+			New: g.codes[parser.CodeTypeModel],
 		},
 		{
 			Old:             "UserExample",
-			New:             codes[parser.TableName],
+			New:             g.codes[parser.TableName],
 			IsCaseSensitive: true,
+		},
+		{
+			Old: "github.com/zhufuyi/sponge/pkg/ggorm",
+			New: "user/pkg/ggorm",
 		},
 	}...)
 

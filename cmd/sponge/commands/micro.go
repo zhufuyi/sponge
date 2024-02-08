@@ -17,7 +17,7 @@ func GenMicroCommand() *cobra.Command {
 	}
 
 	cmd.AddCommand(
-		generate.ProtoBufCommand(),
+		generate.ProtobufCommand(),
 		generate.ModelCommand("micro"),
 		generate.DaoCommand("micro"),
 		generate.CacheCommand("micro"),
@@ -25,7 +25,7 @@ func GenMicroCommand() *cobra.Command {
 		generate.RPCCommand(),
 		generate.RPCGwPbCommand(),
 		generate.RPCPbCommand(),
-		generate.RPCConnectionCommand(),
+		generate.GRPCConnectionCommand(),
 		generate.ConvertSwagJSONCommand("micro"),
 	)
 

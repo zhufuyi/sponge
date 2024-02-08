@@ -14,11 +14,12 @@ import (
 
 	"github.com/zhufuyi/sponge/internal/ecode"
 	"github.com/zhufuyi/sponge/pkg/errcode"
+	"github.com/zhufuyi/sponge/pkg/ggorm"
 	"github.com/zhufuyi/sponge/pkg/gin/response"
 	"github.com/zhufuyi/sponge/pkg/gobash"
 	"github.com/zhufuyi/sponge/pkg/gofile"
 	"github.com/zhufuyi/sponge/pkg/krand"
-	"github.com/zhufuyi/sponge/pkg/mysql"
+	"github.com/zhufuyi/sponge/pkg/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -28,8 +29,15 @@ var (
 	saveDir       = fmt.Sprintf("%s/.%s", getSpongeDir(), recordDirName)
 )
 
-type mysqlForm struct {
-	Dsn string `json:"dsn" binding:"required"`
+const (
+	dbDriverMysql      = "mysql"
+	dbDriverPostgresql = "postgresql"
+	dbDriverTidb       = "tidb"
+)
+
+type dbInfoForm struct {
+	Dsn      string `json:"dsn" binding:"required"`
+	DbDriver string `json:"dbDriver"`
 }
 
 type kv struct {
@@ -37,23 +45,47 @@ type kv struct {
 	Value string `json:"value"`
 }
 
+// ListDbDrivers list db drivers
+func ListDbDrivers(c *gin.Context) {
+	dbDrivers := []string{
+		dbDriverMysql,
+		dbDriverPostgresql,
+		dbDriverTidb,
+	}
+
+	data := []kv{}
+	for _, driver := range dbDrivers {
+		data = append(data, kv{
+			Label: driver,
+			Value: driver,
+		})
+	}
+
+	response.Success(c, data)
+}
+
 // ListTables list tables
 func ListTables(c *gin.Context) {
-	form := &mysqlForm{}
+	form := &dbInfoForm{}
 	err := c.ShouldBindJSON(form)
 	if err != nil {
 		response.Error(c, ecode.InvalidParams.WithDetails(err.Error()))
 		return
 	}
 
-	db, err := mysql.Init(form.Dsn)
-	if err != nil {
-		response.Error(c, ecode.InternalServerError.WithDetails(err.Error()))
+	var tables []string
+	switch strings.ToLower(form.DbDriver) {
+	case dbDriverMysql, dbDriverTidb:
+		tables, err = getMysqlTables(form.Dsn)
+	case dbDriverPostgresql:
+		tables, err = getPostgresqlTables(form.Dsn)
+	case "":
+		response.Error(c, ecode.InternalServerError.WithDetails("database type is empty"))
+		return
+	default:
+		response.Error(c, ecode.InternalServerError.WithDetails("unsupported database driver: "+form.DbDriver))
 		return
 	}
-
-	var tables []string
-	err = db.Raw("show tables").Scan(&tables).Error
 	if err != nil {
 		response.Error(c, ecode.InternalServerError.WithDetails(err.Error()))
 		return
@@ -339,4 +371,38 @@ func getSpongeDir() string {
 	}
 
 	return dir
+}
+
+func getMysqlTables(dsn string) ([]string, error) {
+	dsn = utils.AdaptiveMysqlDsn(dsn)
+	db, err := ggorm.InitMysql(dsn)
+	if err != nil {
+		return nil, err
+	}
+	defer ggorm.CloseDB(db) //nolint
+
+	var tables []string
+	err = db.Raw("show tables").Scan(&tables).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return tables, nil
+}
+
+func getPostgresqlTables(dsn string) ([]string, error) {
+	dsn = utils.AdaptivePostgresqlDsn(dsn)
+	db, err := ggorm.InitPostgresql(dsn)
+	if err != nil {
+		return nil, err
+	}
+	defer ggorm.CloseDB(db) //nolint
+
+	var tables []string
+	err = db.Raw("SELECT table_name FROM information_schema.tables WHERE table_schema = ?", "public").Scan(&tables).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return tables, nil
 }

@@ -10,9 +10,9 @@ import (
 	"github.com/zhufuyi/sponge/internal/model"
 	"github.com/zhufuyi/sponge/internal/types"
 
+	"github.com/zhufuyi/sponge/pkg/ggorm/query"
 	"github.com/zhufuyi/sponge/pkg/gohttp"
 	"github.com/zhufuyi/sponge/pkg/gotest"
-	"github.com/zhufuyi/sponge/pkg/mysql/query"
 	"github.com/zhufuyi/sponge/pkg/utils"
 
 	"github.com/DATA-DOG/go-sqlmock"
