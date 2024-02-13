@@ -172,7 +172,7 @@ func Test_initTemplate(t *testing.T) {
 	initTemplate()
 }
 
-func TestGetTableInfo(t *testing.T) {
+func TestGetMysqlTableInfo(t *testing.T) {
 	info, err := GetMysqlTableInfo("root:123456@(192.168.3.37:3306)/test", "user")
 	t.Log(err, info)
 }
@@ -182,6 +182,11 @@ func TestGetPostgresqlTableInfo(t *testing.T) {
 	t.Log(fields, err)
 	sql, fieldTypes := ConvertToMysqlTable("user_example", fields)
 	t.Log(sql, fieldTypes)
+}
+
+func TestGetSqliteTableInfo(t *testing.T) {
+	info, err := GetSqliteTableInfo("..\\..\\..\\test\\sql\\sqlite\\sponge.db", "user_example")
+	t.Log(err, info)
 }
 
 func TestConvertToMysqlTable(t *testing.T) {

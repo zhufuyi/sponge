@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"errors"
+	"math"
 	"strings"
 
 	serverNameExampleV1 "github.com/zhufuyi/sponge/api/serverNameExample/v1"
@@ -222,6 +223,9 @@ func (h *userExamplePbHandler) ListByLastID(ctx context.Context, req *serverName
 	if err != nil {
 		logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req), middleware.CtxRequestIDField(ctx))
 		return nil, ecode.InvalidParams.Err()
+	}
+	if req.LastID == 0 {
+		req.LastID = math.MaxInt32
 	}
 
 	records, err := h.userExampleDao.GetByLastID(ctx, req.LastID, int(req.Limit), req.Sort)

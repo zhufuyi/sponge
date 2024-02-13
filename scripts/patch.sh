@@ -13,6 +13,10 @@ function checkResult() {
     fi
 }
 
+function importPkg() {
+    go mod tidy
+}
+
 function generateTypesPbCode() {
     sponge patch gen-types-pb --out=./
     checkResult $?
@@ -21,16 +25,19 @@ function generateTypesPbCode() {
 function generateInitMysqlCode() {
     sponge patch gen-db-init --db-driver=mysql --out=./
     checkResult $?
+    importPkg
 }
 
 function generateInitTidbCode() {
     sponge patch gen-db-init --db-driver=tidb --out=./
     checkResult $?
+    importPkg
 }
 
 function generateInitPostgresqlCode() {
     sponge patch gen-db-init --db-driver=postgresql --out=./
     checkResult $?
+    importPkg
 }
 
 if [  "$patchType" = "$typesPb"  ]; then

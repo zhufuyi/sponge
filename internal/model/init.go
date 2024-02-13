@@ -114,31 +114,15 @@ func CloseRedis() error {
 // InitDB connect database
 func InitDB() {
 	switch strings.ToLower(config.Get().Database.Driver) {
-	case "mysql", "tidb":
+	case ggorm.DBDriverMysql, ggorm.DBDriverTidb:
 		InitMysql()
-	case "postgres", "postgresql":
+	case ggorm.DBDriverPostgresql:
 		InitPostgresql()
+	case ggorm.DBDriverSqlite:
+		InitSqlite()
 	default:
 		panic("unsupported database driver: " + config.Get().Database.Driver)
 	}
-}
-
-// GetDB get db
-func GetDB() *gorm.DB {
-	if db == nil {
-		once1.Do(func() {
-			switch strings.ToLower(config.Get().Database.Driver) {
-			case "mysql", "tidb":
-				InitMysql()
-			case "postgres", "postgresql":
-				InitPostgresql()
-			default:
-				panic("unsupported database driver: " + config.Get().Database.Driver)
-			}
-		})
-	}
-
-	return db
 }
 
 // InitMysql connect mysql
@@ -206,7 +190,43 @@ func InitPostgresql() {
 	}
 }
 
+// InitSqlite connect sqlite
+func InitSqlite() {
+	opts := []ggorm.Option{
+		ggorm.WithMaxIdleConns(config.Get().Database.Sqlite.MaxIdleConns),
+		ggorm.WithMaxOpenConns(config.Get().Database.Sqlite.MaxOpenConns),
+		ggorm.WithConnMaxLifetime(time.Duration(config.Get().Database.Sqlite.ConnMaxLifetime) * time.Minute),
+	}
+	if config.Get().Database.Sqlite.EnableLog {
+		opts = append(opts,
+			ggorm.WithLogging(logger.Get()),
+			ggorm.WithLogRequestIDKey("request_id"),
+		)
+	}
+
+	if config.Get().App.EnableTrace {
+		opts = append(opts, ggorm.WithEnableTrace())
+	}
+
+	var err error
+	db, err = ggorm.InitSqlite(config.Get().Database.Sqlite.DBFile, opts...)
+	if err != nil {
+		panic("ggorm.InitSqlite error: " + err.Error())
+	}
+}
+
 // delete the templates code end
+
+// GetDB get db
+func GetDB() *gorm.DB {
+	if db == nil {
+		once1.Do(func() {
+			InitDB()
+		})
+	}
+
+	return db
+}
 
 // CloseDB close db
 func CloseDB() error {

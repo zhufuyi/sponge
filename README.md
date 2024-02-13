@@ -15,7 +15,7 @@
 
 </div>
 
-**Sponge** is a basic development framework that integrates `code auto generation`, `gin and grpc`, sponge has a wealth of generating code commands, generating different functional code can be combined into a complete service (similar to the way that artificially broken sponge cells can automatically recombine into a new sponge). The code is decoupled and modularly designed, it is easy to build a complete project from development to deployment, so that you develop web or microservices project easily, Go can also be "low-code development".
+**Sponge** is a basic development framework that integrates `code auto generation`, `Gin and GRPC`, sponge has a rich set of code generation commands, generating different functional code can be combined into a complete service (similar to the way that artificially broken sponge cells can automatically recombine into a new sponge). The code is decoupled and modularly designed, it is easy to build a complete project from development to deployment, just fill in the business logic code on the generated template code, greatly improved development efficiency and reduced development difficulty, the use of Go can also be "low-code development".
 
 <br>
 

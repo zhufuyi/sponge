@@ -27,6 +27,8 @@ const (
 	DBDriverPostgresql = "postgresql"
 	// DBDriverTidb tidb driver
 	DBDriverTidb = "tidb"
+	// DBDriverSqlite sqlite driver
+	DBDriverSqlite = "sqlite"
 )
 
 var (
@@ -88,8 +90,8 @@ var (
 	appConfigFileMark  = "# todo generate http or rpc server configuration here"
 	appConfigFileMark2 = "# todo generate the database configuration here"
 
-	deploymentConfigFile     = "kubernetes/serverNameExample-configmap.yml"
-	deploymentConfigFileMark = "# todo generate the database configuration for deployment here"
+	//deploymentConfigFile     = "kubernetes/serverNameExample-configmap.yml"
+	//deploymentConfigFileMark = "# todo generate the database configuration for deployment here"
 
 	spongeTemplateVersionMark = "// todo generate the local sponge template code version here"
 
@@ -372,27 +374,42 @@ func replacePackage(data []byte, moduleName string, serverName string) []byte {
 	return data
 }
 
-func getDBConfigCode(dbDriver string, forDeployment ...bool) string {
-	isDeployment := false
-	if len(forDeployment) > 0 {
-		isDeployment = forDeployment[0]
-	}
+//func getDBConfigCode(dbDriver string, forDeployment ...bool) string {
+//	isDeployment := false
+//	if len(forDeployment) > 0 {
+//		isDeployment = forDeployment[0]
+//	}
+//
+//	dbConfigCode := ""
+//	switch strings.ToLower(dbDriver) {
+//	case DBDriverMysql, DBDriverTidb:
+//		if isDeployment {
+//			dbConfigCode = mysqlConfigForDeploymentCode
+//		} else {
+//			dbConfigCode = mysqlConfigCode
+//		}
+//
+//	case DBDriverPostgresql:
+//		if isDeployment {
+//			dbConfigCode = postgresqlConfigForDeploymentCode
+//		} else {
+//			dbConfigCode = postgresqlConfigCode
+//		}
+//	default:
+//		panic("getDBConfigCode error, unsupported database driver: " + dbDriver)
+//	}
+//	return dbConfigCode
+//}
 
+func getDBConfigCode(dbDriver string) string {
 	dbConfigCode := ""
 	switch strings.ToLower(dbDriver) {
 	case DBDriverMysql, DBDriverTidb:
-		if isDeployment {
-			dbConfigCode = mysqlConfigForDeploymentCode
-		} else {
-			dbConfigCode = mysqlConfigCode
-		}
-
+		dbConfigCode = mysqlConfigCode
 	case DBDriverPostgresql:
-		if isDeployment {
-			dbConfigCode = postgresqlConfigForDeploymentCode
-		} else {
-			dbConfigCode = postgresqlConfigCode
-		}
+		dbConfigCode = postgresqlConfigCode
+	case DBDriverSqlite:
+		dbConfigCode = sqliteConfigCode
 	default:
 		panic("getDBConfigCode error, unsupported database driver: " + dbDriver)
 	}
@@ -406,6 +423,8 @@ func getInitDBCode(dbDriver string) string {
 		initDBCode = modelInitDBFileMysqlCode
 	case DBDriverPostgresql:
 		initDBCode = modelInitDBFilePostgresqlCode
+	case DBDriverSqlite:
+		initDBCode = modelInitDBFileSqliteCode
 	default:
 		panic("getInitDBCode error, unsupported database driver: " + dbDriver)
 	}
@@ -481,4 +500,12 @@ func generateConfigmap(serverName string, outPath string) error {
 	}
 	data := strings.ReplaceAll(string(configmapFileData), configmapFileMark, configFileData)
 	return os.WriteFile(configmapFile, []byte(data), 0666)
+}
+
+func sqliteDSNAdaptation(dbDriver string, dsn string) string {
+	if dbDriver == DBDriverSqlite && gofile.IsWindows() {
+		dsn = strings.Replace(dsn, "\\", "\\\\", -1)
+		dsn = strings.Replace(dsn, "/", "\\\\", -1)
+	}
+	return dsn
 }

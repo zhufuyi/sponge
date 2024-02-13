@@ -12,10 +12,22 @@ import (
 	"github.com/uptrace/opentelemetry-go-extra/otelgorm"
 	mysqlDriver "gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
 	"gorm.io/plugin/dbresolver"
+)
+
+const (
+	// DBDriverMysql mysql driver
+	DBDriverMysql = "mysql"
+	// DBDriverPostgresql postgresql driver
+	DBDriverPostgresql = "postgresql"
+	// DBDriverTidb tidb driver
+	DBDriverTidb = "tidb"
+	// DBDriverSqlite sqlite driver
+	DBDriverSqlite = "sqlite"
 )
 
 // InitMysql init mysql or tidb
@@ -106,15 +118,36 @@ func InitTidb(dsn string, opts ...Option) (*gorm.DB, error) {
 	return InitMysql(dsn, opts...)
 }
 
-// InitClickhouse init clickhouse
-//func InitClickhouse(dsn string, opts ...Option) (*gorm.DB, error) {
-//	return InitMysql(dsn, opts...)
-//}
-
 // InitSqlite init sqlite
-//func InitSqlite(dsn string, opts ...Option) (*gorm.DB, error) {
-//	panic("not implemented")
-//}
+func InitSqlite(dbFile string, opts ...Option) (*gorm.DB, error) {
+	o := defaultOptions()
+	o.apply(opts...)
+
+	dsn := fmt.Sprintf("%s?_journal=WAL&_vacuum=incremental", dbFile)
+	db, err := gorm.Open(sqlite.Open(dsn), gormConfig(o))
+	if err != nil {
+		return nil, err
+	}
+	db.Set("gorm:auto_increment", true)
+
+	// register trace plugin
+	if o.enableTrace {
+		err = db.Use(otelgorm.NewPlugin())
+		if err != nil {
+			return nil, fmt.Errorf("using gorm opentelemetry, err: %v", err)
+		}
+	}
+
+	// register plugins
+	for _, plugin := range o.plugins {
+		err = db.Use(plugin)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return db, nil
+}
 
 // CloseDB close gorm db
 func CloseDB(db *gorm.DB) error {
@@ -136,7 +169,7 @@ func checkInUse(sqlDB *sql.DB, duration time.Duration) {
 	ctx, _ := context.WithTimeout(context.Background(), duration) //nolint
 	for {
 		select {
-		case <-time.After(time.Millisecond * 500):
+		case <-time.After(time.Millisecond * 100):
 			if v := sqlDB.Stats().InUse; v == 0 {
 				return
 			}
@@ -144,6 +177,15 @@ func checkInUse(sqlDB *sql.DB, duration time.Duration) {
 			return
 		}
 	}
+}
+
+// CloseSQLDB close sql db
+func CloseSQLDB(db *gorm.DB) {
+	sqlDB, err := db.DB()
+	if err != nil {
+		return
+	}
+	_ = sqlDB.Close()
 }
 
 // gorm setting

@@ -86,6 +86,9 @@ func (r *replacerInfo) SetReplacementFields(fields []Field) {
 	var newFields []Field
 	for _, field := range fields {
 		if field.IsCaseSensitive && isFirstAlphabet(field.Old) { // splitting the initial case field
+			if field.New == "" {
+				continue
+			}
 			newFields = append(newFields,
 				Field{ // convert the first letter to upper case
 					Old: strings.ToUpper(field.Old[:1]) + field.Old[1:],

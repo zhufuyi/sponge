@@ -1,12 +1,14 @@
-### ggorm
+## ggorm
 
 `ggorm` library wrapped in [gorm](gorm.io/gorm), with added features such as tracer, paging queries, etc.
 
-Support `mysql`, `postgresql`, `tidb`, `clickhouse`, `sqlite`.
+Support `mysql`, `postgresql`, `tidb`, `sqlite`.
 
 <br>
 
-### Example of use
+## Examples of use
+
+### mysql
 
 #### Initializing the connection
 
@@ -15,13 +17,13 @@ Support `mysql`, `postgresql`, `tidb`, `clickhouse`, `sqlite`.
         "github.com/zhufuyi/sponge/pkg/ggorm"
     )
 
-    var dsn = "root:123456@(192.168.1.6:3306)/test?charset=utf8mb4&parseTime=True&loc=Local"
+    var dsn = "root:123456@(127.0.0.1:3306)/test?charset=utf8mb4&parseTime=True&loc=Local"
 
     // (1) connect to the database using the default settings
     db, err := ggorm.InitMysql(dsn)
 
     // (2) customised settings to connect to the database
-    db, err := ggorm.Init(
+    db, err := ggorm.InitMysql(
         dsn,
         ggorm.WithLogging(logger.Get()),  // print log
         ggorm.WithLogRequestIDKey("request_id"),  // print request_id
@@ -57,7 +59,7 @@ type UserExample struct {
 
 // TableName get table name
 func (table *UserExample) TableName() string {
-	return gorm.GetTableName(table)
+	return ggorm.GetTableName(table)
 }
 ```
 
@@ -96,6 +98,66 @@ func (table *UserExample) TableName() string {
         return tx.Commit().Error
     }
 ```
+<br>
+
+### Postgresql
+
+```go
+import (
+   "github.com/zhufuyi/sponge/pkg/ggorm"
+   "github.com/zhufuyi/sponge/pkg/utils"
+)
+
+func InitSqlite() {
+	opts := []ggorm.Option{
+		ggorm.WithMaxIdleConns(10),
+		ggorm.WithMaxOpenConns(100),
+		ggorm.WithConnMaxLifetime(time.Duration(10) * time.Minute),
+		ggorm.WithLogging(logger.Get()),
+		ggorm.WithLogRequestIDKey("request_id"),
+	}
+
+	dsn := "root:123456@127.0.0.1:5432/test"
+	dsn = utils.AdaptivePostgresqlDsn(dsn)
+	db, err := ggorm.InitPostgresql(dsn, opts...)
+	if err != nil {
+		panic("ggorm.InitPostgresql error: " + err.Error())
+	}
+}
+```
+
+<br>
+
+### Tidb
+
+Tidb is mysql compatible, just use **InitMysql**.
+
+<br>
+
+### Sqlite
+
+```go
+import (
+   "github.com/zhufuyi/sponge/pkg/ggorm"
+)
+
+func InitSqlite() {
+	opts := []ggorm.Option{
+		ggorm.WithMaxIdleConns(10),
+		ggorm.WithMaxOpenConns(100),
+		ggorm.WithConnMaxLifetime(time.Duration(10) * time.Minute),
+		ggorm.WithLogging(logger.Get()),
+		ggorm.WithLogRequestIDKey("request_id"),
+	}
+
+	dbFile: = "test.db"
+	db, err := ggorm.InitSqlite(dbFile, opts...)
+	if err != nil {
+		panic("ggorm.InitSqlite error: " + err.Error())
+	}
+}
+```
+
 <br>
 
 ### gorm User Guide

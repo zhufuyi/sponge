@@ -32,16 +32,16 @@ func ModelCommand(parentName string) *cobra.Command {
 
 Examples:
   # generate model code and embed gorm.model struct.
-  sponge %s model --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
+  sponge %s model --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
   # generate model code with multiple table names.
-  sponge %s model --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=t1,t2
+  sponge %s model --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=t1,t2
 
   # generate model code, structure fields correspond to the column names of the table.
-  sponge %s model --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --embed=false
+  sponge %s model --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --embed=false
 
   # generate model code and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
-  sponge %s model --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
+  sponge %s model --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
 `, parentName, parentName, parentName, parentName),
 		SilenceErrors: true,
 		SilenceUsage:  true,
@@ -78,8 +78,8 @@ using help:
 		},
 	}
 
-	cmd.Flags().StringVarP(&sqlArgs.DBDriver, "db-driver", "k", "mysql", "database driver, support mysql, postgresql")
-	cmd.Flags().StringVarP(&sqlArgs.DBDsn, "db-dsn", "d", "", "database content address, e.g. user:password@(host:port)/database")
+	cmd.Flags().StringVarP(&sqlArgs.DBDriver, "db-driver", "k", "mysql", "database driver, support mysql, postgresql, tidb, sqlite")
+	cmd.Flags().StringVarP(&sqlArgs.DBDsn, "db-dsn", "d", "", "database content address, e.g. user:password@(host:port)/database. Note: if db-driver=sqlite, db-dsn must be a local sqlite db file, e.g. --db-dsn=/tmp/sponge_sqlite.db") //nolint
 	_ = cmd.MarkFlagRequired("db-dsn")
 	cmd.Flags().StringVarP(&dbTables, "db-table", "t", "", "table name, multiple names separated by commas")
 	_ = cmd.MarkFlagRequired("db-table")
@@ -135,10 +135,6 @@ func (g *modelGenerator) addFields(r replacer.Replacer) []replacer.Field {
 			Old:             "UserExample",
 			New:             g.codes[parser.TableName],
 			IsCaseSensitive: true,
-		},
-		{
-			Old: "github.com/zhufuyi/sponge/pkg/ggorm",
-			New: "user/pkg/ggorm",
 		},
 	}...)
 

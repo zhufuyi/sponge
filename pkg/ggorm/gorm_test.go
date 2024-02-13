@@ -36,11 +36,24 @@ func TestInitTidb(t *testing.T) {
 	t.Logf("%+v", db.Name())
 }
 
+func TestInitSqlite(t *testing.T) {
+	dbFile := "test_sqlite.db"
+	db, err := InitSqlite(dbFile)
+	if err != nil {
+		// ignore test error about not being able to connect to real sqlite
+		t.Logf(fmt.Sprintf("connect to sqlite failed, err=%v, dbFile=%s", err, dbFile))
+		return
+	}
+	defer CloseDB(db)
+
+	t.Logf("%+v", db.Name())
+}
+
 func TestInitPostgresql(t *testing.T) {
 	dsn = "host=192.168.3.37 user=root password=123456 dbname=account port=5432 sslmode=disable TimeZone=Asia/Shanghai"
 	db, err := InitPostgresql(dsn, WithEnableTrace())
 	if err != nil {
-		// ignore test error about not being able to connect to real mysql
+		// ignore test error about not being able to connect to real postgresql
 		t.Logf(fmt.Sprintf("connect to postgresql failed, err=%v, dsn=%s", err, dsn))
 		return
 	}
@@ -100,5 +113,11 @@ func TestCloseDB(t *testing.T) {
 	checkInUse(sqlDB, time.Millisecond*600)
 	db := new(gorm.DB)
 	defer func() { recover() }()
-	CloseDB(db)
+	_ = CloseDB(db)
+}
+
+func TestCloseSqlDB(t *testing.T) {
+	db := new(gorm.DB)
+	defer func() { recover() }()
+	CloseSQLDB(db)
 }

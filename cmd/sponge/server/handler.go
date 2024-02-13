@@ -29,12 +29,6 @@ var (
 	saveDir       = fmt.Sprintf("%s/.%s", getSpongeDir(), recordDirName)
 )
 
-const (
-	dbDriverMysql      = "mysql"
-	dbDriverPostgresql = "postgresql"
-	dbDriverTidb       = "tidb"
-)
-
 type dbInfoForm struct {
 	Dsn      string `json:"dsn" binding:"required"`
 	DbDriver string `json:"dbDriver"`
@@ -48,9 +42,10 @@ type kv struct {
 // ListDbDrivers list db drivers
 func ListDbDrivers(c *gin.Context) {
 	dbDrivers := []string{
-		dbDriverMysql,
-		dbDriverPostgresql,
-		dbDriverTidb,
+		ggorm.DBDriverMysql,
+		ggorm.DBDriverPostgresql,
+		ggorm.DBDriverTidb,
+		ggorm.DBDriverSqlite,
 	}
 
 	data := []kv{}
@@ -75,10 +70,12 @@ func ListTables(c *gin.Context) {
 
 	var tables []string
 	switch strings.ToLower(form.DbDriver) {
-	case dbDriverMysql, dbDriverTidb:
+	case ggorm.DBDriverMysql, ggorm.DBDriverTidb:
 		tables, err = getMysqlTables(form.Dsn)
-	case dbDriverPostgresql:
+	case ggorm.DBDriverPostgresql:
 		tables, err = getPostgresqlTables(form.Dsn)
+	case ggorm.DBDriverSqlite:
+		tables, err = getSqliteTables(form.Dsn)
 	case "":
 		response.Error(c, ecode.InternalServerError.WithDetails("database type is empty"))
 		return
@@ -379,7 +376,7 @@ func getMysqlTables(dsn string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer ggorm.CloseDB(db) //nolint
+	defer ggorm.CloseSQLDB(db)
 
 	var tables []string
 	err = db.Raw("show tables").Scan(&tables).Error
@@ -396,7 +393,7 @@ func getPostgresqlTables(dsn string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer ggorm.CloseDB(db) //nolint
+	defer ggorm.CloseSQLDB(db)
 
 	var tables []string
 	err = db.Raw("SELECT table_name FROM information_schema.tables WHERE table_schema = ?", "public").Scan(&tables).Error
@@ -405,4 +402,32 @@ func getPostgresqlTables(dsn string) ([]string, error) {
 	}
 
 	return tables, nil
+}
+
+func getSqliteTables(dbFile string) ([]string, error) {
+	if !gofile.IsExists(dbFile) {
+		return nil, fmt.Errorf("sqlite db file %s not found in local host", dbFile)
+	}
+
+	db, err := ggorm.InitSqlite(dbFile)
+	if err != nil {
+		return nil, err
+	}
+	defer ggorm.CloseSQLDB(db)
+
+	var tables []string
+	err = db.Raw("select name from sqlite_master where type = ?", "table").Scan(&tables).Error
+	if err != nil {
+		return nil, err
+	}
+
+	filteredTables := []string{}
+	for _, table := range tables {
+		if table == "sqlite_sequence" {
+			continue
+		}
+		filteredTables = append(filteredTables, table)
+	}
+
+	return filteredTables, nil
 }

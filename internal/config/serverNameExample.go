@@ -102,6 +102,14 @@ type GrpcClient struct {
 	RegistryDiscoveryType string       `yaml:"registryDiscoveryType" json:"registryDiscoveryType"`
 }
 
+type Sqlite struct {
+	ConnMaxLifetime int    `yaml:"connMaxLifetime" json:"connMaxLifetime"`
+	DBFile          string `yaml:"dbFile" json:"dbFile"`
+	EnableLog       bool   `yaml:"enableLog" json:"enableLog"`
+	MaxIdleConns    int    `yaml:"maxIdleConns" json:"maxIdleConns"`
+	MaxOpenConns    int    `yaml:"maxOpenConns" json:"maxOpenConns"`
+}
+
 type Mysql struct {
 	ConnMaxLifetime int      `yaml:"connMaxLifetime" json:"connMaxLifetime"`
 	Dsn             string   `yaml:"dsn" json:"dsn"`
@@ -131,6 +139,7 @@ type Database struct {
 	Driver     string     `yaml:"driver" json:"driver"`
 	Mysql      Mysql      `yaml:"mysql" json:"mysql"`
 	Postgresql Postgresql `yaml:"postgresql" json:"postgresql"`
+	Sqlite     Sqlite     `yaml:"sqlite" json:"sqlite"`
 }
 
 type Grpc struct {

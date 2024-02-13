@@ -34,16 +34,16 @@ func DaoCommand(parentName string) *cobra.Command {
 
 Examples:
   # generate dao code and embed gorm.model struct.
-  sponge %s dao --module-name=yourModuleName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
+  sponge %s dao --module-name=yourModuleName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
   # generate dao code with multiple table names.
-  sponge %s dao --module-name=yourModuleName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=t1,t2
+  sponge %s dao --module-name=yourModuleName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=t1,t2
 
   # generate dao code, structure fields correspond to the column names of the table.
-  sponge %s dao --module-name=yourModuleName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --embed=false
+  sponge %s dao --module-name=yourModuleName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --embed=false
 
   # generate dao code and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
-  sponge %s dao --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
+  sponge %s dao --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
 `, parentName, parentName, parentName, parentName),
 		SilenceErrors: true,
 		SilenceUsage:  true,
@@ -96,10 +96,10 @@ using help:
 		},
 	}
 
-	cmd.Flags().StringVarP(&sqlArgs.DBDriver, "db-driver", "k", "mysql", "database driver, support mysql, postgresql")
 	cmd.Flags().StringVarP(&moduleName, "module-name", "m", "", "module-name is the name of the module in the go.mod file")
 	//_ = cmd.MarkFlagRequired("module-name")
-	cmd.Flags().StringVarP(&sqlArgs.DBDsn, "db-dsn", "d", "", "database content address, e.g. user:password@(host:port)/database")
+	cmd.Flags().StringVarP(&sqlArgs.DBDriver, "db-driver", "k", "mysql", "database driver, support mysql, postgresql, tidb, sqlite")
+	cmd.Flags().StringVarP(&sqlArgs.DBDsn, "db-dsn", "d", "", "database content address, e.g. user:password@(host:port)/database. Note: if db-driver=sqlite, db-dsn must be a local sqlite db file, e.g. --db-dsn=/tmp/sponge_sqlite.db") //nolint
 	_ = cmd.MarkFlagRequired("db-dsn")
 	cmd.Flags().StringVarP(&dbTables, "db-table", "t", "", "table name, multiple names separated by commas")
 	_ = cmd.MarkFlagRequired("db-table")
@@ -186,10 +186,6 @@ func (g *daoGenerator) addFields(r replacer.Replacer) []replacer.Field {
 			Old:             "UserExample",
 			New:             g.codes[parser.TableName],
 			IsCaseSensitive: true,
-		},
-		{
-			Old: "github.com/zhufuyi/sponge/pkg/ggorm",
-			New: "user/pkg/ggorm",
 		},
 	}...)
 

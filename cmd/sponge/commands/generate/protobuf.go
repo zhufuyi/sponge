@@ -33,16 +33,16 @@ func ProtobufCommand() *cobra.Command {
 
 Examples:
   # generate protobuf code.
-  sponge micro protobuf --module-name=yourModuleName --server-name=yourServerName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
+  sponge micro protobuf --module-name=yourModuleName --server-name=yourServerName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
   # generate protobuf code with multiple table names.
-  sponge micro protobuf --module-name=yourModuleName --server-name=yourServerName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=t1,t2
+  sponge micro protobuf --module-name=yourModuleName --server-name=yourServerName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=t1,t2
 
   # generate protobuf code that include router path and swagger info.
-  sponge micro protobuf --module-name=yourModuleName --server-name=yourServerName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --web-type=true
+  sponge micro protobuf --module-name=yourModuleName --server-name=yourServerName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --web-type=true
 
   # generate protobuf code and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
-  sponge micro protobuf --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
+  sponge micro protobuf --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
 `,
 		SilenceErrors: true,
 		SilenceUsage:  true,
@@ -96,12 +96,12 @@ using help:
 		},
 	}
 
-	cmd.Flags().StringVarP(&sqlArgs.DBDriver, "db-driver", "k", "mysql", "database driver, support mysql, postgresql")
 	cmd.Flags().StringVarP(&moduleName, "module-name", "m", "", "module-name is the name of the module in the go.mod file")
 	//_ = cmd.MarkFlagRequired("module-name")
 	cmd.Flags().StringVarP(&serverName, "server-name", "s", "", "server name")
 	//_ = cmd.MarkFlagRequired("server-name")
-	cmd.Flags().StringVarP(&sqlArgs.DBDsn, "db-dsn", "d", "", "database content address, e.g. user:password@(host:port)/database")
+	cmd.Flags().StringVarP(&sqlArgs.DBDriver, "db-driver", "k", "mysql", "database driver, support mysql, postgresql, tidb, sqlite")
+	cmd.Flags().StringVarP(&sqlArgs.DBDsn, "db-dsn", "d", "", "database content address, e.g. user:password@(host:port)/database. Note: if db-driver=sqlite, db-dsn must be a local sqlite db file, e.g. --db-dsn=/tmp/sponge_sqlite.db") //nolint
 	_ = cmd.MarkFlagRequired("db-dsn")
 	cmd.Flags().StringVarP(&dbTables, "db-table", "t", "", "table name, multiple names separated by commas")
 	_ = cmd.MarkFlagRequired("db-table")

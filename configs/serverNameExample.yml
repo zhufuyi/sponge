@@ -85,7 +85,7 @@ logger:
 # delete the templates code start
 # database setting
 database:
-  driver: "mysql"           # database driver, currently support mysql, postgres, tidb
+  driver: "mysql"           # database driver, currently support mysql, postgres, tidb, sqlite
   # mysql settings
   mysql:
     # dsn format,  <user>:<pass>@(127.0.0.1:3306)/<db>?[k=v& ......]
@@ -93,7 +93,7 @@ database:
     enableLog: true         # whether to turn on printing of all logs
     maxIdleConns: 10        # set the maximum number of connections in the idle connection pool
     maxOpenConns: 100       # set the maximum number of open database connections
-    connMaxLifetime: 30     # sets the maximum time for which the connection can be reused, in minutes
+    connMaxLifetime: 10     # sets the maximum time for which the connection can be reused, in minutes
     #slavesDsn:             # sets slaves mysql dsn, array type
     #  - "your slave dsn 1"
     #  - "your slave dsn 2"
@@ -107,7 +107,15 @@ database:
     enableLog: true         # whether to turn on printing of all logs
     maxIdleConns: 10        # set the maximum number of connections in the idle connection pool
     maxOpenConns: 100       # set the maximum number of open database connections
-    connMaxLifetime: 30     # sets the maximum time for which the connection can be reused, in minutes
+    connMaxLifetime: 10     # sets the maximum time for which the connection can be reused, in minutes
+
+  # sqlite settings
+  sqlite:
+    dbFile: "test/sql/sqlite/sponge.db"   # if you are in a windows environment, the path separator is \\
+    enableLog: true         # whether to turn on printing of all logs
+    maxIdleConns: 10        # set the maximum number of connections in the idle connection pool
+    maxOpenConns: 100       # set the maximum number of open database connections
+    connMaxLifetime: 10     # sets the maximum time for which the connection can be reused, in minutes
 
 # delete the templates code end
 

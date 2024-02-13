@@ -169,7 +169,7 @@ image-build-rpc-test:
 
 
 .PHONY: patch
-# patch some dependent code, such as types.proto, mysql initialization code. e.g. make patch TYPE=types-pb , make patch TYPE=init-mysql, make patch TYPE=init-postgresql
+# patch some dependent code, such as types.proto, mysql initialization code. e.g. make patch TYPE=types-pb , make patch TYPE=init-your_db_driver, replace "your_db_driver" with mysql, postgresql, tidb, sqlite
 patch:
 	@bash scripts/patch.sh $(TYPE)
 

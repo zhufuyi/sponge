@@ -41,6 +41,8 @@ const (
 	DBDriverPostgresql = "postgresql"
 	// DBDriverTidb tidb driver
 	DBDriverTidb = "tidb"
+	// DBDriverSqlite sqlite driver
+	DBDriverSqlite = "sqlite"
 )
 
 // Codes content
@@ -307,7 +309,7 @@ func makeCode(stmt *ast.CreateTableStmt, opt options) (*codeText, error) {
 		if opt.GormType {
 			gormTag.WriteString(";type:")
 			switch opt.DBDriver {
-			case DBDriverMysql, DBDriverTidb:
+			case DBDriverMysql, DBDriverTidb, DBDriverSqlite:
 				gormTag.WriteString(col.Tp.InfoSchemaStr())
 			case DBDriverPostgresql:
 				gormTag.WriteString(opt.FieldTypes[colName])

@@ -156,7 +156,7 @@ func (g *rpcPbGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	fields = append(fields, deleteFieldsMark(r, gitIgnoreFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteAllFieldsMark(r, protoShellFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteAllFieldsMark(r, appConfigFile, wellStartMark, wellEndMark)...)
-	fields = append(fields, deleteFieldsMark(r, deploymentConfigFile, wellStartMark, wellEndMark)...)
+	//fields = append(fields, deleteFieldsMark(r, deploymentConfigFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, replaceFileContentMark(r, readmeFile, "## "+g.serverName)...)
 	fields = append(fields, []replacer.Field{
 		{ // replace the configuration of the *.yml file
@@ -191,10 +191,10 @@ func (g *rpcPbGenerator) addFields(r replacer.Replacer) []replacer.Field {
 			Old: dockerComposeFileMark,
 			New: dockerComposeFileGrpcCode,
 		},
-		{ // replace the contents of the *-configmap.yml file
-			Old: deploymentConfigFileMark,
-			New: getDBConfigCode(DBDriverMysql, true),
-		},
+		//{ // replace the contents of the *-configmap.yml file
+		//	Old: deploymentConfigFileMark,
+		//	New: getDBConfigCode(DBDriverMysql, true),
+		//},
 		{ // replace the contents of the *-deployment.yml file
 			Old: k8sDeploymentFileMark,
 			New: k8sDeploymentFileGrpcCode,

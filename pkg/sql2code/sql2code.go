@@ -9,6 +9,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/zhufuyi/sponge/pkg/gofile"
 	"github.com/zhufuyi/sponge/pkg/sql2code/parser"
 	"github.com/zhufuyi/sponge/pkg/utils"
 )
@@ -20,7 +21,7 @@ type Args struct {
 	DDLFile string // DDL file
 
 	DBDriver   string            // db driver name, such as mysql, postgres, default is mysql
-	DBDsn      string            // connecting to mysql's dsn
+	DBDsn      string            // connecting to mysql's dsn, if DBDriver is sqlite, DBDsn is local db file
 	DBTable    string            // table name
 	fieldTypes map[string]string // field name:type
 
@@ -46,6 +47,10 @@ func (a *Args) checkValid() error {
 	}
 	if a.DBDriver == "" {
 		a.DBDriver = parser.DBDriverMysql
+	} else if a.DBDriver == parser.DBDriverSqlite {
+		if !gofile.IsExists(a.DBDsn) {
+			return fmt.Errorf("sqlite db file %s not found in local host", a.DBDsn)
+		}
 	}
 	return nil
 }
@@ -84,6 +89,9 @@ func getSQL(args *Args) (string, map[string]string, error) {
 			}
 			sqlStr, pgTypeMap := parser.ConvertToMysqlTable(args.DBTable, fields)
 			return sqlStr, pgTypeMap, nil
+		case parser.DBDriverSqlite:
+			sqlStr, err := parser.GetSqliteTableInfo(args.DBDsn, args.DBTable)
+			return sqlStr, nil, err
 		default:
 			return "", nil, fmt.Errorf("unsupported database driver: " + dbDriverName)
 		}
@@ -183,6 +191,9 @@ func Generate(args *Args) (map[string]string, error) {
 	}
 	if fieldTypes != nil {
 		args.fieldTypes = fieldTypes
+	}
+	if sql == "" {
+		return nil, fmt.Errorf("get sql from %s error, maybe the table %s doesn't exist", args.DBDriver, args.DBTable)
 	}
 
 	opt := setOptions(args)

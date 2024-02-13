@@ -7,14 +7,13 @@ import (
 
 	"github.com/zhufuyi/sponge/configs"
 	"github.com/zhufuyi/sponge/internal/config"
-
 	"github.com/zhufuyi/sponge/pkg/utils"
 
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )
 
-func TestInitMysql(t *testing.T) {
+func TestGetDB(t *testing.T) {
 	err := config.Init(configs.Path("serverNameExample.yml"))
 	if err != nil {
 		panic(err)
@@ -46,6 +45,29 @@ func TestInitMysqlError(t *testing.T) {
 	utils.SafeRunWithTimeout(time.Second*2, func(cancel context.CancelFunc) {
 		_ = CloseDB()
 		InitMysql()
+		assert.NotNil(t, db)
+		cancel()
+	})
+}
+
+func TestInitPostgresqlError(t *testing.T) {
+	_ = config.Init(configs.Path("serverNameExample.yml"))
+
+	// change config error test
+	config.Get().Database.Postgresql.Dsn = "root:123456@(127.0.0.1:5432)/test"
+
+	utils.SafeRunWithTimeout(time.Second*2, func(cancel context.CancelFunc) {
+		_ = CloseDB()
+		InitPostgresql()
+		assert.NotNil(t, db)
+		cancel()
+	})
+}
+
+func TestInitSqliteError(t *testing.T) {
+	_ = config.Init(configs.Path("serverNameExample.yml"))
+	utils.SafeRunWithTimeout(time.Second*2, func(cancel context.CancelFunc) {
+		InitSqlite()
 		assert.NotNil(t, db)
 		cancel()
 	})

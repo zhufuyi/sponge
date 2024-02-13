@@ -38,19 +38,19 @@ func HTTPCommand() *cobra.Command {
 
 Examples:
   # generate web service code and embed gorm.model struct.
-  sponge web http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
+  sponge web http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
   # generate web service code, structure fields correspond to the column names of the table.
-  sponge web http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --embed=false
+  sponge web http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --embed=false
 
   # generate web service code with multiple table names.
-  sponge web http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=t1,t2
+  sponge web http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=t1,t2
 
   # generate web service code and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
-  sponge web http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
+  sponge web http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
 
   # generate web service code and specify the docker image repository address.
-  sponge web http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
+  sponge web http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 `,
 		SilenceErrors: true,
 		SilenceUsage:  true,
@@ -123,14 +123,14 @@ using help:
 		},
 	}
 
-	cmd.Flags().StringVarP(&sqlArgs.DBDriver, "db-driver", "k", "mysql", "database driver, support mysql, postgresql")
 	cmd.Flags().StringVarP(&moduleName, "module-name", "m", "", "module-name is the name of the module in the go.mod file")
 	_ = cmd.MarkFlagRequired("module-name")
 	cmd.Flags().StringVarP(&serverName, "server-name", "s", "", "server name")
 	_ = cmd.MarkFlagRequired("server-name")
 	cmd.Flags().StringVarP(&projectName, "project-name", "p", "", "project name")
 	_ = cmd.MarkFlagRequired("project-name")
-	cmd.Flags().StringVarP(&sqlArgs.DBDsn, "db-dsn", "d", "", "database content address, e.g. user:password@(host:port)/database")
+	cmd.Flags().StringVarP(&sqlArgs.DBDriver, "db-driver", "k", "mysql", "database driver, support mysql, postgresql, tidb, sqlite")
+	cmd.Flags().StringVarP(&sqlArgs.DBDsn, "db-dsn", "d", "", "database content address, e.g. user:password@(host:port)/database. Note: if db-driver=sqlite, db-dsn must be a local sqlite db file, e.g. --db-dsn=/tmp/sponge_sqlite.db") //nolint
 	_ = cmd.MarkFlagRequired("db-dsn")
 	cmd.Flags().StringVarP(&dbTables, "db-table", "t", "", "table name, multiple names separated by commas")
 	_ = cmd.MarkFlagRequired("db-table")
@@ -180,6 +180,7 @@ func (g *httpGenerator) generateCode() (string, error) {
 		"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", // internal/cache
 		"handler/userExample_logic.go", "handler/userExample_logic_test.go", // internal/handler
 		"scripts/image-rpc-test.sh", "scripts/patch.sh", "scripts/protoc.sh", "scripts/proto-doc.sh", // sponge/scripts
+		"init_test.go", // model
 	}
 
 	r.SetSubDirsAndFiles(subDirs, subFiles...)
@@ -219,7 +220,7 @@ func (g *httpGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	fields = append(fields, deleteFieldsMark(r, gitIgnoreFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteAllFieldsMark(r, protoShellFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteAllFieldsMark(r, appConfigFile, wellStartMark, wellEndMark)...)
-	fields = append(fields, deleteFieldsMark(r, deploymentConfigFile, wellStartMark, wellEndMark)...)
+	//fields = append(fields, deleteFieldsMark(r, deploymentConfigFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, replaceFileContentMark(r, readmeFile, "## "+g.serverName)...)
 	fields = append(fields, []replacer.Field{
 		{ // replace the configuration of the *.yml file
@@ -266,10 +267,10 @@ func (g *httpGenerator) addFields(r replacer.Replacer) []replacer.Field {
 			Old: dockerComposeFileMark,
 			New: dockerComposeFileHTTPCode,
 		},
-		{ // replace the contents of the *-configmap.yml file
-			Old: deploymentConfigFileMark,
-			New: getDBConfigCode(g.dbDriver, true),
-		},
+		//{ // replace the contents of the *-configmap.yml file
+		//	Old: deploymentConfigFileMark,
+		//	New: getDBConfigCode(g.dbDriver, true),
+		//},
 		{ // replace the contents of the *-deployment.yml file
 			Old: k8sDeploymentFileMark,
 			New: k8sDeploymentFileHTTPCode,
@@ -357,6 +358,10 @@ func (g *httpGenerator) addFields(r replacer.Replacer) []replacer.Field {
 			New: g.dbDSN,
 		},
 		{
+			Old: "test/sql/sqlite/sponge.db",
+			New: sqliteDSNAdaptation(g.dbDriver, g.dbDSN),
+		},
+		{
 			Old: "Makefile-for-http",
 			New: "Makefile",
 		},
@@ -364,10 +369,6 @@ func (g *httpGenerator) addFields(r replacer.Replacer) []replacer.Field {
 			Old:             "UserExample",
 			New:             g.codes[parser.TableName],
 			IsCaseSensitive: true,
-		},
-		{
-			Old: "github.com/zhufuyi/sponge/pkg/ggorm",
-			New: "user/pkg/ggorm",
 		},
 	}...)
 

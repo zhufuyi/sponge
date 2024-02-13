@@ -8,6 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// PGField postgresql field
 type PGField struct {
 	Name      string `gorm:"column:name;" json:"name"`
 	Type      string `gorm:"column:type;" json:"type"`
@@ -23,6 +24,7 @@ func GetPostgresqlTableInfo(dsn string, tableName string) ([]*PGField, error) {
 	if err != nil {
 		return nil, fmt.Errorf("GetPostgresqlTableInfo error: %v", err)
 	}
+	defer closeDB(db)
 
 	return getPostgresqlTableFields(db, tableName)
 }
@@ -115,4 +117,12 @@ func getType(field *PGField) string {
 		}
 	}
 	return field.Type
+}
+
+func closeDB(db *gorm.DB) {
+	sqlDB, err := db.DB()
+	if err != nil {
+		return
+	}
+	_ = sqlDB.Close()
 }
