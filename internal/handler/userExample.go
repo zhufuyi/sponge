@@ -286,8 +286,7 @@ func (h *userExampleHandler) ListByIDs(c *gin.Context) {
 	err := c.ShouldBindJSON(form)
 	if err != nil {
 		logger.Warn("ShouldBindJSON error: ", logger.Err(err), middleware.GCtxRequestIDField(c))
-		response.Error(c, ecode.InvalidParams.WithOutMsg("参数错误"), "详细错误信息")
-		response.Output(c, ecode.Unauthorized.WithOutMsg("错误简单描述").ToHTTPCode(), "详细错误信息")
+		response.Error(c, ecode.InvalidParams)
 		return
 	}
 

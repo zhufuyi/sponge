@@ -152,14 +152,14 @@ func (d *userExampleDao) GetByID(ctx context.Context, id uint64) (*model.UserExa
 		return record, err
 	}
 
-	// get from cache or mysql
+	// get from cache or database
 	record, err := d.cache.Get(ctx, id)
 	if err == nil {
 		return record, nil
 	}
 
 	if errors.Is(err, model.ErrCacheNotFound) {
-		// for the same id, prevent high concurrent simultaneous access to mysql
+		// for the same id, prevent high concurrent simultaneous access to database
 		val, err, _ := d.sfg.Do(utils.Uint64ToStr(id), func() (interface{}, error) { //nolint
 			table := &model.UserExample{}
 			err = d.db.WithContext(ctx).Where("id = ?", id).First(table).Error
@@ -249,7 +249,7 @@ func (d *userExampleDao) GetByIDs(ctx context.Context, ids []uint64) (map[uint64
 		return itemMap, nil
 	}
 
-	// get form cache or mysql
+	// get form cache or database
 	itemMap, err := d.cache.MultiGet(ctx, ids)
 	if err != nil {
 		return nil, err
@@ -266,7 +266,7 @@ func (d *userExampleDao) GetByIDs(ctx context.Context, ids []uint64) (map[uint64
 
 	// get missed data
 	if len(missedIDs) > 0 {
-		// find the id of an active placeholder, i.e. an id that does not exist in mysql
+		// find the id of an active placeholder, i.e. an id that does not exist in database
 		var realMissedIDs []uint64
 		for _, id := range missedIDs {
 			_, err = d.cache.Get(ctx, id)
