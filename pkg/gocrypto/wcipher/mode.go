@@ -16,11 +16,14 @@ type cipherMode struct {
 
 // SetPadding set padding
 func (c *cipherMode) SetPadding(padding Padding) CipherMode {
+	_ = padding
 	return c
 }
 
 // Cipher mode cipher
 func (c *cipherMode) Cipher(block cipher.Block, iv []byte) Cipher {
+	_ = block
+	_ = iv
 	return nil
 }
 
@@ -39,6 +42,7 @@ func (ecb *ecbCipherModel) SetPadding(padding Padding) CipherMode {
 
 // Cipher ecb cipher
 func (ecb *ecbCipherModel) Cipher(block cipher.Block, iv []byte) Cipher {
+	_ = iv
 	encrypter := NewECBEncrypt(block)
 	decrypter := NewECBDecrypt(block)
 	return NewBlockCipher(ecb.padding, encrypter, decrypter)

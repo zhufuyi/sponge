@@ -191,54 +191,6 @@ func (p *Params) ConvertToGormConditions() (string, []interface{}, error) {
 	return str, args, nil
 }
 
-func getExpsAndLogics(keyLen int, paramSrc string) ([]string, []string) { //nolint
-	exps, logics := []string{}, []string{}
-	param := strings.Replace(paramSrc, " ", "", -1)
-	sps := strings.SplitN(param, "?", 2)
-	if len(sps) == 2 {
-		param = sps[1]
-	}
-
-	num := keyLen
-	if num == 0 {
-		return exps, logics
-	}
-
-	fields := []string{}
-	kvs := strings.Split(param, "&")
-	for _, kv := range kvs {
-		if strings.Contains(kv, "page=") || strings.Contains(kv, "size=") || strings.Contains(kv, "sort=") {
-			continue
-		}
-		fields = append(fields, kv)
-	}
-
-	// divide into num groups based on non-repeating keys, and determine in each group whether exp and logic exist
-	group := map[string]string{}
-	for _, field := range fields {
-		split := strings.SplitN(field, "=", 2)
-		if len(split) != 2 {
-			continue
-		}
-
-		if _, ok := group[split[0]]; ok {
-			// if exp does not exist, the default value of null is filled, and if logic does not exist, the default value of null is filled.
-			exps = append(exps, group["exp"])
-			logics = append(logics, group["logic"])
-
-			group = map[string]string{}
-			continue
-		}
-		group[split[0]] = split[1]
-	}
-
-	// handling the last group
-	exps = append(exps, group["exp"])
-	logics = append(logics, group["logic"])
-
-	return exps, logics
-}
-
 // Conditions query conditions
 type Conditions struct {
 	Columns []Column `json:"columns" form:"columns" binding:"min=1"` // columns info

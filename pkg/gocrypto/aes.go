@@ -8,7 +8,7 @@ import (
 	"encoding/hex"
 	"errors"
 
-	"testCode/pkg/gocrypto/wcipher"
+	"github.com/zhufuyi/sponge/pkg/gocrypto/wcipher"
 )
 
 // AesEncrypt aes encryption, returns ciphertext is not transcoded
@@ -16,7 +16,7 @@ func AesEncrypt(rawData []byte, opts ...AesOption) ([]byte, error) {
 	o := defaultAesOptions()
 	o.apply(opts...)
 
-	return aesEncrypt(o.mode, rawData, o.aesKey)
+	return aesEncryptByMode(o.mode, rawData, o.aesKey)
 }
 
 // AesDecrypt aes decryption, parameter input un-transcode cipher text
@@ -24,7 +24,7 @@ func AesDecrypt(cipherData []byte, opts ...AesOption) ([]byte, error) {
 	o := defaultAesOptions()
 	o.apply(opts...)
 
-	return aesDecrypt(o.mode, cipherData, o.aesKey)
+	return aesDecryptByMode(o.mode, cipherData, o.aesKey)
 }
 
 // AesEncryptHex aes encryption, the returned ciphertext is transcoded
@@ -32,7 +32,7 @@ func AesEncryptHex(rawData string, opts ...AesOption) (string, error) {
 	o := defaultAesOptions()
 	o.apply(opts...)
 
-	cipherData, err := aesEncrypt(o.mode, []byte(rawData), o.aesKey)
+	cipherData, err := aesEncryptByMode(o.mode, []byte(rawData), o.aesKey)
 	if err != nil {
 		return "", err
 	}
@@ -50,7 +50,7 @@ func AesDecryptHex(cipherStr string, opts ...AesOption) (string, error) {
 		return "", err
 	}
 
-	rawData, err := aesDecrypt(o.mode, cipherData, o.aesKey)
+	rawData, err := aesDecryptByMode(o.mode, cipherData, o.aesKey)
 	if err != nil {
 		return "", err
 	}
@@ -76,7 +76,7 @@ func getCipherMode(mode string) (wcipher.CipherMode, error) {
 	return cipherMode, nil
 }
 
-func aesEncrypt(mode string, rawData []byte, key []byte) ([]byte, error) {
+func aesEncryptByMode(mode string, rawData []byte, key []byte) ([]byte, error) {
 	cipherMode, err := getCipherMode(mode)
 	if err != nil {
 		return nil, err
@@ -90,7 +90,7 @@ func aesEncrypt(mode string, rawData []byte, key []byte) ([]byte, error) {
 	return cip.Encrypt(rawData), nil
 }
 
-func aesDecrypt(mode string, cipherData []byte, key []byte) ([]byte, error) {
+func aesDecryptByMode(mode string, cipherData []byte, key []byte) ([]byte, error) {
 	cipherMode, err := getCipherMode(mode)
 	if err != nil {
 		return nil, err

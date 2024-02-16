@@ -1,3 +1,4 @@
+// Package gocron is scheduled task library.
 package gocron
 
 import (
@@ -113,22 +114,22 @@ func Stop() {
 	}
 }
 
-// EverySecond executed every size second (1~59)
+// EverySecond every second size (1~59)
 func EverySecond(size int) string {
 	return fmt.Sprintf("@every %ds", size)
 }
 
-// EveryMinute every size minute (1~59)
+// EveryMinute every minute size (1~59)
 func EveryMinute(size int) string {
 	return fmt.Sprintf("@every %dm", size)
 }
 
-// EveryHour every size hour (1~23)
+// EveryHour every hour size (1~23)
 func EveryHour(size int) string {
 	return fmt.Sprintf("@every %dh", size)
 }
 
-// EveryDay every size day (1~31)
-func EveryDay(size int) string {
-	return fmt.Sprintf("@every %dd", size)
+// Everyday size (1~31)
+func Everyday(size int) string {
+	return fmt.Sprintf("@every %dh", size*24)
 }

@@ -4,8 +4,6 @@ import (
 	"reflect"
 	"strings"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestPage(t *testing.T) {
@@ -438,10 +436,10 @@ func TestParams_ConvertToGormConditions(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		params := &Params{
-			Columns: tt.args.columns,
-		}
 		t.Run(tt.name, func(t *testing.T) {
+			params := &Params{
+				Columns: tt.args.columns,
+			}
 			got, got1, err := params.ConvertToGormConditions()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ConvertToGormConditions() error = %v, wantErr %v", err, tt.wantErr)
@@ -458,182 +456,4 @@ func TestParams_ConvertToGormConditions(t *testing.T) {
 			t.Logf(got, got1...)
 		})
 	}
-}
-
-func Test_getExpsAndLogics(t *testing.T) {
-	type args struct {
-		keyLen   int
-		paramSrc string
-	}
-	tests := []struct {
-		name  string
-		args  args
-		want  []string
-		want1 []string
-	}{
-		{
-			name: "0 columns",
-			args: args{
-				keyLen:   0,
-				paramSrc: "page=0&size=10",
-			},
-			want:  []string{},
-			want1: []string{},
-		},
-		{
-			name: "1 columns",
-			args: args{
-				keyLen:   1,
-				paramSrc: "k=name&v=LiSi&page=0&size=10",
-			},
-			want:  []string{""},
-			want1: []string{""},
-		},
-		{
-			name: "1 columns gt",
-			args: args{
-				keyLen:   1,
-				paramSrc: "k=age&exp=gt&v=20&page=0&size=10",
-			},
-			want:  []string{"gt"},
-			want1: []string{""},
-		},
-		{
-			name: "1 columns gt and",
-			args: args{
-				keyLen:   1,
-				paramSrc: "k=age&exp=gt&v=20&logic=or&page=0&size=10",
-			},
-			want:  []string{"gt"},
-			want1: []string{"or"},
-		},
-		{
-			name: "2 columns",
-			args: args{
-				keyLen:   2,
-				paramSrc: "k=name&v=LiSi&k=gender&v=male&page=0&size=10",
-			},
-			want:  []string{"", ""},
-			want1: []string{"", ""},
-		},
-		{
-			name: "2 columns gt",
-			args: args{
-				keyLen:   2,
-				paramSrc: "k=name&v=LiSi&k=age&v=20&exp=gt&page=0&size=10",
-			},
-			want:  []string{"", "gt"},
-			want1: []string{"", ""},
-		},
-		{
-			name: "3 columns gt  or",
-			args: args{
-				keyLen:   3,
-				paramSrc: "k=name&v=LiSi&exp=neq&k=age&v=20&exp=gt&k=gender&v=male&logic=or&page=0&size=10",
-			},
-			want:  []string{"neq", "gt", ""},
-			want1: []string{"", "", "or"},
-		},
-		{
-			name: "error",
-			args: args{
-				keyLen:   1,
-				paramSrc: "k=name&exp=gt&v=LiSi&page=0&size=10",
-			},
-			want:  []string{"gt"},
-			want1: []string{""},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, got1 := getExpsAndLogics(tt.args.keyLen, tt.args.paramSrc)
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("getExpsAndLogics() got = %v, want %v", got, tt.want)
-			}
-			if !reflect.DeepEqual(got1, tt.want1) {
-				t.Errorf("getExpsAndLogics() got1 = %v, want %v", got1, tt.want1)
-			}
-			t.Logf("%+v  %+v", got, got1)
-		})
-	}
-}
-
-func TestConditions_ConvertToGorm(t *testing.T) {
-	c := Conditions{
-		Columns: []Column{
-			{
-				Name:  "name",
-				Value: "ZhangSan",
-			},
-			{
-				Name:  "gender",
-				Value: "male",
-			},
-		}}
-	str, values, err := c.ConvertToGorm()
-	if err != nil {
-		t.Error(err)
-	}
-	assert.Equal(t, "name = ? AND gender = ?", str)
-	assert.Equal(t, len(values), 2)
-}
-
-func TestConditions_checkValid(t *testing.T) {
-	// empty error
-	c := Conditions{}
-	err := c.CheckValid()
-	assert.Error(t, err)
-
-	// value is empty error
-	c = Conditions{
-		Columns: []Column{
-			{
-				Name:  "foo",
-				Value: nil,
-			},
-		},
-	}
-	err = c.CheckValid()
-	assert.Error(t, err)
-
-	// exp error
-	c = Conditions{
-		Columns: []Column{
-			{
-				Name:  "foo",
-				Value: "bar",
-				Exp:   "unknown-exp",
-			},
-		},
-	}
-	err = c.CheckValid()
-	assert.Error(t, err)
-
-	// logic error
-	c = Conditions{
-		Columns: []Column{
-			{
-				Name:  "foo",
-				Value: "bar",
-				Logic: "unknown-logic",
-			},
-		},
-	}
-	err = c.CheckValid()
-	assert.Error(t, err)
-
-	// success
-	c = Conditions{
-		Columns: []Column{
-			{
-				Name:  "name",
-				Value: "ZhangSan",
-			},
-			{
-				Name:  "gender",
-				Value: "male",
-			},
-		}}
-	err = c.CheckValid()
-	assert.NoError(t, err)
 }

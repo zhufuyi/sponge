@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"testing"
 	"time"
+
+	"go.uber.org/zap"
 )
 
 func TestInitAndRun(t *testing.T) {
@@ -68,7 +70,7 @@ func TestRunOnce(t *testing.T) {
 		},
 	}
 
-	err := Init()
+	err := Init(WithLog(zap.NewNop()))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -92,6 +94,9 @@ func TestEvery(t *testing.T) {
 	task_3 := func() {
 		fmt.Println("this is task_3")
 	}
+	task_4 := func() {
+		fmt.Println("this is task_4")
+	}
 
 	tasks := []*Task{
 		{
@@ -108,6 +113,11 @@ func TestEvery(t *testing.T) {
 			TimeSpec: EveryHour(1),
 			Name:     "task_3",
 			Fn:       task_3,
+		},
+		{
+			TimeSpec: Everyday(1),
+			Name:     "task_4",
+			Fn:       task_4,
 		},
 	}
 

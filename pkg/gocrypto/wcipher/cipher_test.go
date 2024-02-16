@@ -78,3 +78,9 @@ func TestNewAES(t *testing.T) {
 	_, err = NewDESWith(key, NewCFBMode())
 	assert.NotNil(t, err)
 }
+
+func Test_cipherMode(t *testing.T) {
+	c := &cipherMode{}
+	c.SetPadding(NewPKCS57Padding())
+	c.Cipher(nil, nil)
+}

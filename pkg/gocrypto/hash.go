@@ -68,7 +68,7 @@ func md5Sha1(slices [][]byte) string {
 }
 
 // Hash commonly used hash sets
-func Hash(hashType crypto.Hash, rawData []byte) (string, error) {
+func Hash(hashType crypto.Hash, rawData []byte) (string, error) { //nolint
 	var (
 		err    error
 		hasher hash.Hash

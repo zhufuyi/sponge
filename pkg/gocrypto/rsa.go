@@ -25,7 +25,7 @@ func RsaEncrypt(publicKey []byte, rawData []byte, opts ...RsaOption) ([]byte, er
 	o := defaultRsaOptions()
 	o.apply(opts...)
 
-	return rsaEncrypt(publicKey, rawData)
+	return rsaEncryptWithPublicKey(publicKey, rawData)
 }
 
 // RsaDecrypt rsa decryption, parameter input untranscoded cipher text
@@ -33,7 +33,7 @@ func RsaDecrypt(privateKey []byte, cipherData []byte, opts ...RsaOption) ([]byte
 	o := defaultRsaOptions()
 	o.apply(opts...)
 
-	return rsaDecrypt(privateKey, cipherData, o.format)
+	return rsaDecryptWithPrivateKey(privateKey, cipherData, o.format)
 }
 
 // RsaEncryptHex rsa encryption, return hex
@@ -41,7 +41,7 @@ func RsaEncryptHex(publicKey []byte, rawData []byte, opts ...RsaOption) (string,
 	o := defaultRsaOptions()
 	o.apply(opts...)
 
-	cipherData, err := rsaEncrypt(publicKey, rawData)
+	cipherData, err := rsaEncryptWithPublicKey(publicKey, rawData)
 	if err != nil {
 		return "", err
 	}
@@ -59,7 +59,7 @@ func RsaDecryptHex(privateKey []byte, cipherHex string, opts ...RsaOption) (stri
 		return "", err
 	}
 
-	rawData, err := rsaDecrypt(privateKey, cipherData, o.format)
+	rawData, err := rsaDecryptWithPrivateKey(privateKey, cipherData, o.format)
 	if err != nil {
 		return "", err
 	}
@@ -72,7 +72,7 @@ func RsaSign(privateKey []byte, rawData []byte, opts ...RsaOption) ([]byte, erro
 	o := defaultRsaOptions()
 	o.apply(opts...)
 
-	return rsaSign(privateKey, o.hashType, rawData, o.format)
+	return rsaSignWithPrivateKey(privateKey, o.hashType, rawData, o.format)
 }
 
 // RsaVerify rsa signature verification
@@ -80,7 +80,7 @@ func RsaVerify(publicKey []byte, rawData []byte, signData []byte, opts ...RsaOpt
 	o := defaultRsaOptions()
 	o.apply(opts...)
 
-	return rsaVerify(publicKey, o.hashType, rawData, signData)
+	return rsaVerifyWithPublicKey(publicKey, o.hashType, rawData, signData)
 }
 
 // RsaSignBase64 rsa signature, return base64
@@ -88,7 +88,7 @@ func RsaSignBase64(privateKey []byte, rawData []byte, opts ...RsaOption) (string
 	o := defaultRsaOptions()
 	o.apply(opts...)
 
-	cipherData, err := rsaSign(privateKey, o.hashType, rawData, o.format)
+	cipherData, err := rsaSignWithPrivateKey(privateKey, o.hashType, rawData, o.format)
 	if err != nil {
 		return "", err
 	}
@@ -106,11 +106,11 @@ func RsaVerifyBase64(publicKey []byte, rawData []byte, signBase64 string, opts .
 		return err
 	}
 
-	return rsaVerify(publicKey, o.hashType, rawData, signData)
+	return rsaVerifyWithPublicKey(publicKey, o.hashType, rawData, signData)
 }
 
-// public key encryption
-func rsaEncrypt(publicKey []byte, rawData []byte) ([]byte, error) {
+// encrypt with public key
+func rsaEncryptWithPublicKey(publicKey []byte, rawData []byte) ([]byte, error) {
 	block, _ := pem.Decode(publicKey)
 	if block == nil {
 		return nil, errors.New("public key is not pem format")
@@ -128,8 +128,8 @@ func rsaEncrypt(publicKey []byte, rawData []byte) ([]byte, error) {
 	return rsa.EncryptPKCS1v15(rand.Reader, prk, rawData)
 }
 
-// private key decryption
-func rsaDecrypt(privateKey []byte, cipherData []byte, format string) ([]byte, error) {
+// decrypt with private key
+func rsaDecryptWithPrivateKey(privateKey []byte, cipherData []byte, format string) ([]byte, error) {
 	block, _ := pem.Decode(privateKey)
 	if block == nil {
 		return nil, errors.New("private key is not pem format")
@@ -143,7 +143,8 @@ func rsaDecrypt(privateKey []byte, cipherData []byte, format string) ([]byte, er
 	return rsa.DecryptPKCS1v15(rand.Reader, prk, cipherData)
 }
 
-func rsaSign(privateKey []byte, hash crypto.Hash, rawData []byte, format string) ([]byte, error) {
+// sign with private key
+func rsaSignWithPrivateKey(privateKey []byte, hash crypto.Hash, rawData []byte, format string) ([]byte, error) {
 	if !hash.Available() {
 		return nil, errors.New("not supported hash type")
 	}
@@ -168,7 +169,8 @@ func rsaSign(privateKey []byte, hash crypto.Hash, rawData []byte, format string)
 	return rsa.SignPKCS1v15(rand.Reader, prk, hash, hashed)
 }
 
-func rsaVerify(publicKey []byte, hash crypto.Hash, rawData []byte, signData []byte) (err error) {
+// verify with public key
+func rsaVerifyWithPublicKey(publicKey []byte, hash crypto.Hash, rawData []byte, signData []byte) (err error) {
 	block, _ := pem.Decode(publicKey)
 	if block == nil {
 		return errors.New("public key is not pem format")
