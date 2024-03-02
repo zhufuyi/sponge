@@ -88,7 +88,7 @@ database:
   driver: "mysql"           # database driver, currently support mysql, postgres, tidb, sqlite
   # mysql settings
   mysql:
-    # dsn format,  <user>:<pass>@(127.0.0.1:3306)/<db>?[k=v& ......]
+    # dsn format,  <username>:<password>@(<hostname>:<port>)/<db>?[k=v& ......]
     dsn: "root:123456@(192.168.3.37:3306)/account?parseTime=true&loc=Local&charset=utf8,utf8mb4"
     enableLog: true         # whether to turn on printing of all logs
     maxIdleConns: 10        # set the maximum number of connections in the idle connection pool
@@ -102,7 +102,7 @@ database:
 
   # postgresql settings
   postgresql:
-    # dsn format,  <user>:<pass>@127.0.0.1:5432/<db>?[k=v& ......]
+    # dsn format,  <username>:<password>@<hostname>:<port>/<db>?[k=v& ......]
     dsn: "root:123456@192.168.3.37:5432/account?sslmode=disable"
     enableLog: true         # whether to turn on printing of all logs
     maxIdleConns: 10        # set the maximum number of connections in the idle connection pool
@@ -116,6 +116,12 @@ database:
     maxIdleConns: 10        # set the maximum number of connections in the idle connection pool
     maxOpenConns: 100       # set the maximum number of open database connections
     connMaxLifetime: 10     # sets the maximum time for which the connection can be reused, in minutes
+
+  # mongodb settings
+  mongodb:
+    # dsn format,  <username>:<password>@<hostname1>:<port1>[,<hostname2>:<port2>,......]/<db>?[k=v& ......]
+    # parameter k=v see https://www.mongodb.com/docs/drivers/go/current/fundamentals/connections/connection-guide/#connection-options
+    dsn: "root:123456@192.168.3.37:27017/account?connectTimeoutMS=15000"
 
 # delete the templates code end
 
