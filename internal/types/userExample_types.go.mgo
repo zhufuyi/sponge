@@ -3,10 +3,13 @@ package types
 import (
 	"time"
 
-	"github.com/zhufuyi/sponge/pkg/ggorm/query"
+	"github.com/zhufuyi/sponge/internal/model"
+
+	"github.com/zhufuyi/sponge/pkg/mgo/query"
 )
 
 var _ time.Time
+var _ = model.MaxObjectID
 
 // Tip: suggested filling in the binding rules https://github.com/go-playground/validator in request struct fields tag.
 
@@ -26,7 +29,7 @@ type CreateUserExampleRequest struct {
 
 // UpdateUserExampleByIDRequest request params
 type UpdateUserExampleByIDRequest struct {
-	ID       uint64 `json:"id" binding:"-"`      // id
+	ID       string `json:"id" binding:"-"`      // id
 	Name     string `json:"name" binding:""`     // username
 	Email    string `json:"email" binding:""`    // email
 	Password string `json:"password" binding:""` // password
@@ -83,7 +86,7 @@ type DeleteUserExampleByIDRespond struct {
 
 // DeleteUserExamplesByIDsRequest request params
 type DeleteUserExamplesByIDsRequest struct {
-	IDs []uint64 `json:"ids" binding:"min=1"` // id list
+	IDs []string `json:"ids" binding:"min=1"` // id list
 }
 
 // DeleteUserExamplesByIDsRespond only for api docs
@@ -107,7 +110,7 @@ type GetUserExampleByConditionRespond struct {
 
 // ListUserExamplesByIDsRequest request params
 type ListUserExamplesByIDsRequest struct {
-	IDs []uint64 `json:"ids" binding:"min=1"` // id list
+	IDs []string `json:"ids" binding:"min=1"` // id list
 }
 
 // ListUserExamplesByIDsRespond only for api docs

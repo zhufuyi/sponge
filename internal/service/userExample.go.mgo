@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"errors"
-	"math"
 	"strings"
 
 	serverNameExampleV1 "github.com/zhufuyi/sponge/api/serverNameExample/v1"
@@ -12,9 +11,9 @@ import (
 	"github.com/zhufuyi/sponge/internal/ecode"
 	"github.com/zhufuyi/sponge/internal/model"
 
-	"github.com/zhufuyi/sponge/pkg/ggorm/query"
 	"github.com/zhufuyi/sponge/pkg/grpc/interceptor"
 	"github.com/zhufuyi/sponge/pkg/logger"
+	"github.com/zhufuyi/sponge/pkg/mgo/query"
 
 	"github.com/jinzhu/copier"
 	"google.golang.org/grpc"
@@ -36,9 +35,10 @@ type userExample struct {
 
 // NewUserExampleServer create a new service
 func NewUserExampleServer() serverNameExampleV1.UserExampleServer {
+	collectionName := new(model.UserExample).TableName()
 	return &userExample{
 		iDao: dao.NewUserExampleDao(
-			model.GetDB(),
+			model.GetDB().Collection(collectionName),
 			cache.NewUserExampleCache(model.GetCacheType()),
 		),
 	}
@@ -58,6 +58,7 @@ func (s *userExample) Create(ctx context.Context, req *serverNameExampleV1.Creat
 	if err != nil {
 		return nil, ecode.StatusCreateUserExample.Err()
 	}
+	// todo if copier.Copy cannot assign a value to a field, add it here
 
 	err = s.iDao.Create(ctx, record)
 	if err != nil {
@@ -65,7 +66,7 @@ func (s *userExample) Create(ctx context.Context, req *serverNameExampleV1.Creat
 		return nil, ecode.StatusInternalServerError.ToRPCErr()
 	}
 
-	return &serverNameExampleV1.CreateUserExampleReply{Id: record.ID}, nil
+	return &serverNameExampleV1.CreateUserExampleReply{Id: record.ID.Hex()}, nil
 }
 
 // DeleteByID delete a record by id
@@ -118,7 +119,8 @@ func (s *userExample) UpdateByID(ctx context.Context, req *serverNameExampleV1.U
 	if err != nil {
 		return nil, ecode.StatusUpdateByIDUserExample.Err()
 	}
-	record.ID = req.Id
+	record.ID = model.ToObjectID(req.Id)
+	// todo if copier.Copy cannot assign a value to a field, add it here
 
 	err = s.iDao.UpdateByID(ctx, record)
 	if err != nil {
@@ -236,8 +238,8 @@ func (s *userExample) ListByLastID(ctx context.Context, req *serverNameExampleV1
 		logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req), interceptor.CtxRequestIDField(ctx))
 		return nil, ecode.StatusInvalidParams.Err()
 	}
-	if req.LastID == 0 {
-		req.LastID = math.MaxInt32
+	if req.LastID == "" {
+		req.LastID = model.MaxObjectID
 	}
 	if req.Limit == 0 {
 		req.Limit = 10
@@ -279,6 +281,7 @@ func (s *userExample) List(ctx context.Context, req *serverNameExampleV1.ListUse
 		return nil, ecode.StatusListUserExample.Err()
 	}
 	params.Size = int(req.Params.Limit)
+	// todo if copier.Copy cannot assign a value to a field, add it here
 
 	records, total, err := s.iDao.GetByColumns(ctx, params)
 	if err != nil {
@@ -312,7 +315,7 @@ func convertUserExample(record *model.UserExample) (*serverNameExampleV1.UserExa
 	if err != nil {
 		return nil, err
 	}
-	value.Id = record.ID
+	value.Id = record.ID.Hex()
 	// todo if copier.Copy cannot assign a value to a field, add it here, e.g. CreatedAt, UpdatedAt
 	// todo generate the conversion createdAt and updatedAt code here
 	// delete the templates code start

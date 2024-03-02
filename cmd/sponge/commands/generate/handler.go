@@ -29,8 +29,8 @@ func HandlerCommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "handler",
-		Short: "Generate handler code based on mysql table",
-		Long: `generate handler code based on mysql table.
+		Short: "Generate handler code based on sql",
+		Long: `generate handler code based on sql.
 
 Examples:
   # generate handler code and embed gorm.model struct.
@@ -54,6 +54,9 @@ Examples:
 			} else if moduleName == "" {
 				return errors.New(`required flag(s) "module-name" not set, use "sponge web handler -h" for help`)
 			}
+			if sqlArgs.DBDriver == DBDriverMongodb {
+				sqlArgs.IsEmbed = false
+			}
 
 			tableNames := strings.Split(dbTables, ",")
 			for _, tableName := range tableNames {
@@ -69,6 +72,7 @@ Examples:
 
 				g := &handlerGenerator{
 					moduleName: moduleName,
+					dbDriver:   sqlArgs.DBDriver,
 					codes:      codes,
 					outPath:    outPath,
 				}
@@ -93,7 +97,7 @@ using help:
 
 	cmd.Flags().StringVarP(&moduleName, "module-name", "m", "", "module-name is the name of the module in the go.mod file")
 	//_ = cmd.MarkFlagRequired("module-name")
-	cmd.Flags().StringVarP(&sqlArgs.DBDriver, "db-driver", "k", "mysql", "database driver, support mysql, postgresql, tidb, sqlite")
+	cmd.Flags().StringVarP(&sqlArgs.DBDriver, "db-driver", "k", "mysql", "database driver, support mysql, mongodb, postgresql, tidb, sqlite")
 	cmd.Flags().StringVarP(&sqlArgs.DBDsn, "db-dsn", "d", "", "database content address, e.g. user:password@(host:port)/database. Note: if db-driver=sqlite, db-dsn must be a local sqlite db file, e.g. --db-dsn=/tmp/sponge_sqlite.db") //nolint
 	_ = cmd.MarkFlagRequired("db-dsn")
 	cmd.Flags().StringVarP(&dbTables, "db-table", "t", "", "table name, multiple names separated by commas")
@@ -108,6 +112,7 @@ using help:
 
 type handlerGenerator struct {
 	moduleName string
+	dbDriver   string
 	codes      map[string]string
 	outPath    string
 }
@@ -123,13 +128,30 @@ func (g *handlerGenerator) generateCode() (string, error) {
 	subDirs := []string{"internal/model", "internal/cache", "internal/dao",
 		"internal/ecode", "internal/handler", "internal/routers", "internal/types"} // only the specified subdirectory is processed, if empty or no subdirectory is specified, it means all files
 	ignoreDirs := []string{} // specify the directory in the subdirectory where processing is ignored
-	ignoreFiles := []string{ // specify the files in the subdirectory to be ignored for processing
-		"systemCode_http.go", "systemCode_rpc.go", "userExample_rpc.go", // internal/ecode
-		"init.go", "init_test.go", // internal/model
-		"routers.go", "routers_test.go", "routers_pbExample.go", "routers_pbExample_test.go", "userExample_router.go", // internal/routers
-		"swagger_types.go",                                          // internal/types
-		"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", // internal/cache
-		"handler/userExample_logic.go", "handler/userExample_logic_test.go", // internal/handler
+	var ignoreFiles []string
+	switch strings.ToLower(g.dbDriver) {
+	case DBDriverMysql, DBDriverPostgresql, DBDriverTidb, DBDriverSqlite:
+		ignoreFiles = []string{ // specify the files in the subdirectory to be ignored for processing
+			"systemCode_http.go", "systemCode_rpc.go", "userExample_rpc.go", // internal/ecode
+			"routers.go", "routers_test.go", "routers_pbExample.go", "routers_pbExample_test.go", "userExample_router.go", // internal/routers
+			"init.go", "init_test.go", "init.go.mgo", // internal/model
+			"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", "cache/userExample.go.mgo", // internal/cache
+			"dao/userExample.go.mgo",                                                                                                              // internal/dao
+			"handler/userExample_logic.go", "handler/userExample_logic_test.go", "handler/userExample.go.mgo", "handler/userExample_logic.go.mgo", // internal/handler
+			"swagger_types.go", "userExample_types.go.mgo", // internal/types
+		}
+	case DBDriverMongodb:
+		ignoreFiles = []string{ // specify the files in the subdirectory to be ignored for processing
+			"systemCode_http.go", "systemCode_rpc.go", "userExample_rpc.go", // internal/ecode
+			"routers.go", "routers_test.go", "routers_pbExample.go", "routers_pbExample_test.go", "userExample_router.go", // internal/routers
+			"init.go", "init_test.go", "init.go.mgo", // internal/model
+			"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", "cache/userExample.go", "cache/userExample_test.go", // internal/cache
+			"dao/userExample_test.go", "dao/userExample.go", // internal/dao
+			"handler/userExample_logic.go", "handler/userExample_logic_test.go", "handler/userExample.go", "handler/userExample_test.go", "handler/userExample_logic.go.mgo", // internal/handler
+			"swagger_types.go", "userExample_types.go", // internal/types
+		}
+	default:
+		return "", errors.New("unsupported db driver: " + g.dbDriver)
 	}
 
 	r.SetSubDirsAndFiles(subDirs)
@@ -150,8 +172,10 @@ func (g *handlerGenerator) addFields(r replacer.Replacer) []replacer.Field {
 
 	fields = append(fields, deleteFieldsMark(r, modelFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, daoFile, startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, daoMgoFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, daoTestFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, handlerFile, startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, handlerMgoFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, handlerTestFile, startMark, endMark)...)
 	fields = append(fields, []replacer.Field{
 		{ // replace the contents of the model/userExample.go file
@@ -164,7 +188,7 @@ func (g *handlerGenerator) addFields(r replacer.Replacer) []replacer.Field {
 		},
 		{ // replace the contents of the handler/userExample.go file
 			Old: handlerFileMark,
-			New: adjustmentOfIDType(g.codes[parser.CodeTypeHandler]),
+			New: adjustmentOfIDType(g.codes[parser.CodeTypeHandler], g.dbDriver),
 		},
 		{
 			Old: selfPackageName + "/" + r.GetSourcePath(),
@@ -181,6 +205,14 @@ func (g *handlerGenerator) addFields(r replacer.Replacer) []replacer.Field {
 		{
 			Old: g.moduleName + "/pkg",
 			New: "github.com/zhufuyi/sponge/pkg",
+		},
+		{
+			Old: "userExample_types.go.mgo",
+			New: "userExample_types.go",
+		},
+		{
+			Old: "userExample.go.mgo",
+			New: "userExample.go",
 		},
 		{
 			Old:             "UserExample",

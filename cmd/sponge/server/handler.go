@@ -6,22 +6,24 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net/url"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
 	"time"
 
-	"github.com/zhufuyi/sponge/internal/ecode"
 	"github.com/zhufuyi/sponge/pkg/errcode"
 	"github.com/zhufuyi/sponge/pkg/ggorm"
 	"github.com/zhufuyi/sponge/pkg/gin/response"
 	"github.com/zhufuyi/sponge/pkg/gobash"
 	"github.com/zhufuyi/sponge/pkg/gofile"
 	"github.com/zhufuyi/sponge/pkg/krand"
+	"github.com/zhufuyi/sponge/pkg/mgo"
 	"github.com/zhufuyi/sponge/pkg/utils"
 
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 var (
@@ -43,6 +45,7 @@ type kv struct {
 func ListDbDrivers(c *gin.Context) {
 	dbDrivers := []string{
 		ggorm.DBDriverMysql,
+		mgo.DBDriverName,
 		ggorm.DBDriverPostgresql,
 		ggorm.DBDriverTidb,
 		ggorm.DBDriverSqlite,
@@ -64,7 +67,7 @@ func ListTables(c *gin.Context) {
 	form := &dbInfoForm{}
 	err := c.ShouldBindJSON(form)
 	if err != nil {
-		response.Error(c, ecode.InvalidParams.WithDetails(err.Error()))
+		response.Error(c, errcode.InvalidParams.WithDetails(err.Error()))
 		return
 	}
 
@@ -76,15 +79,17 @@ func ListTables(c *gin.Context) {
 		tables, err = getPostgresqlTables(form.Dsn)
 	case ggorm.DBDriverSqlite:
 		tables, err = getSqliteTables(form.Dsn)
+	case mgo.DBDriverName:
+		tables, err = getMongodbTables(form.Dsn)
 	case "":
-		response.Error(c, ecode.InternalServerError.WithDetails("database type is empty"))
+		response.Error(c, errcode.InternalServerError.WithDetails("database type is empty"))
 		return
 	default:
-		response.Error(c, ecode.InternalServerError.WithDetails("unsupported database driver: "+form.DbDriver))
+		response.Error(c, errcode.InternalServerError.WithDetails("unsupported database driver: "+form.DbDriver))
 		return
 	}
 	if err != nil {
-		response.Error(c, ecode.InternalServerError.WithDetails(err.Error()))
+		response.Error(c, errcode.InternalServerError.WithDetails(err.Error()))
 		return
 	}
 
@@ -113,7 +118,7 @@ func GenerateCode(c *gin.Context) {
 	form := &GenerateCodeForm{}
 	err := c.ShouldBindJSON(form)
 	if err != nil {
-		responseErr(c, err, ecode.InvalidParams)
+		responseErr(c, err, errcode.InvalidParams)
 		return
 	}
 
@@ -150,20 +155,20 @@ func handleGenerateCode(c *gin.Context, outPath string, arg string) {
 		_ = v
 	}
 	if result.Err != nil {
-		responseErr(c, result.Err, ecode.InternalServerError)
+		responseErr(c, result.Err, errcode.InternalServerError)
 		return
 	}
 
 	zipFile := out + ".zip"
 	err := CompressPathToZip(out, zipFile)
 	if err != nil {
-		responseErr(c, err, ecode.InternalServerError)
+		responseErr(c, err, errcode.InternalServerError)
 		return
 	}
 
 	if !gofile.IsExists(zipFile) {
 		err = errors.New("no found file " + zipFile)
-		responseErr(c, err, ecode.InternalServerError)
+		responseErr(c, err, errcode.InternalServerError)
 		return
 	}
 
@@ -186,7 +191,7 @@ func handleGenerateCode(c *gin.Context, outPath string, arg string) {
 func GetRecord(c *gin.Context) {
 	pathParam := c.Param("path")
 	if pathParam == "" {
-		response.Out(c, ecode.InvalidParams.WithDetails("path param is empty"))
+		response.Out(c, errcode.InvalidParams.WithDetails("path param is empty"))
 		return
 	}
 
@@ -209,18 +214,18 @@ func responseErr(c *gin.Context, err error, ec *errcode.Error) {
 func UploadFiles(c *gin.Context) {
 	form, err := c.MultipartForm()
 	if err != nil {
-		response.Error(c, ecode.InvalidParams.WithDetails(err.Error()))
+		response.Error(c, errcode.InvalidParams.WithDetails(err.Error()))
 		return
 	}
 
 	if len(form.File) == 0 {
-		response.Error(c, ecode.InvalidParams.WithDetails("upload file is empty"))
+		response.Error(c, errcode.InvalidParams.WithDetails("upload file is empty"))
 		return
 	}
 
 	//spongeArg, err := getFormValue(form.Value, "spongeArg")
 	//if err != nil {
-	//	response.Error(c, ecode.InvalidParams.WithDetails("the field 'spongeArg' cannot be empty"))
+	//	response.Error(c, errcode.InvalidParams.WithDetails("the field 'spongeArg' cannot be empty"))
 	//	return
 	//}
 
@@ -233,7 +238,7 @@ func UploadFiles(c *gin.Context) {
 			filename := filepath.Base(file.Filename)
 			fileType = path.Ext(filename)
 			if !checkFileType(fileType) {
-				response.Error(c, ecode.InvalidParams.WithDetails("only .proto or yaml files are allowed to be uploaded"))
+				response.Error(c, errcode.InvalidParams.WithDetails("only .proto or yaml files are allowed to be uploaded"))
 				return
 			}
 
@@ -242,7 +247,7 @@ func UploadFiles(c *gin.Context) {
 				continue
 			}
 			if err = c.SaveUploadedFile(file, filePath); err != nil {
-				response.Error(c, ecode.InternalServerError.WithDetails(err.Error()))
+				response.Error(c, errcode.InternalServerError.WithDetails(err.Error()))
 				return
 			}
 
@@ -430,4 +435,25 @@ func getSqliteTables(dbFile string) ([]string, error) {
 	}
 
 	return filteredTables, nil
+}
+
+func getMongodbTables(dsn string) ([]string, error) {
+	dsn = utils.AdaptiveMongodbDsn(dsn)
+	db, err := mgo.Init(dsn)
+	if err != nil {
+		return nil, err
+	}
+	defer mgo.Close(db) //nolint
+
+	tables, err := db.ListCollectionNames(context.Background(), bson.M{})
+	if err != nil {
+		return nil, err
+	}
+
+	if len(tables) == 0 {
+		u, _ := url.Parse(dsn)
+		return nil, fmt.Errorf("mongodb db %s has no tables", strings.TrimLeft(u.Path, "/"))
+	}
+
+	return tables, nil
 }

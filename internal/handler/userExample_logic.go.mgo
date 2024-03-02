@@ -3,7 +3,6 @@ package handler
 import (
 	"context"
 	"errors"
-	"math"
 	"strings"
 
 	serverNameExampleV1 "github.com/zhufuyi/sponge/api/serverNameExample/v1"
@@ -12,9 +11,9 @@ import (
 	"github.com/zhufuyi/sponge/internal/ecode"
 	"github.com/zhufuyi/sponge/internal/model"
 
-	"github.com/zhufuyi/sponge/pkg/ggorm/query"
 	"github.com/zhufuyi/sponge/pkg/gin/middleware"
 	"github.com/zhufuyi/sponge/pkg/logger"
+	"github.com/zhufuyi/sponge/pkg/mgo/query"
 
 	"github.com/jinzhu/copier"
 )
@@ -27,9 +26,10 @@ type userExamplePbHandler struct {
 
 // NewUserExamplePbHandler create a handler
 func NewUserExamplePbHandler() serverNameExampleV1.UserExampleLogicer {
+	collectionName := new(model.UserExample).TableName()
 	return &userExamplePbHandler{
 		userExampleDao: dao.NewUserExampleDao(
-			model.GetDB(),
+			model.GetDB().Collection(collectionName),
 			cache.NewUserExampleCache(model.GetCacheType()),
 		),
 	}
@@ -48,6 +48,7 @@ func (h *userExamplePbHandler) Create(ctx context.Context, req *serverNameExampl
 	if err != nil {
 		return nil, ecode.ErrCreateUserExample.Err()
 	}
+	// todo if copier.Copy cannot assign a value to a field, add it here
 
 	err = h.userExampleDao.Create(ctx, userExample)
 	if err != nil {
@@ -55,7 +56,7 @@ func (h *userExamplePbHandler) Create(ctx context.Context, req *serverNameExampl
 		return nil, ecode.InternalServerError.Err()
 	}
 
-	return &serverNameExampleV1.CreateUserExampleReply{Id: userExample.ID}, nil
+	return &serverNameExampleV1.CreateUserExampleReply{Id: userExample.ID.Hex()}, nil
 }
 
 // DeleteByID delete a record by id
@@ -105,7 +106,8 @@ func (h *userExamplePbHandler) UpdateByID(ctx context.Context, req *serverNameEx
 	if err != nil {
 		return nil, ecode.ErrUpdateByIDUserExample.Err()
 	}
-	userExample.ID = req.Id
+	userExample.ID = model.ToObjectID(req.Id)
+	// todo if copier.Copy cannot assign a value to a field, add it here
 
 	err = h.userExampleDao.UpdateByID(ctx, userExample)
 	if err != nil {
@@ -224,8 +226,8 @@ func (h *userExamplePbHandler) ListByLastID(ctx context.Context, req *serverName
 		logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req), middleware.CtxRequestIDField(ctx))
 		return nil, ecode.InvalidParams.Err()
 	}
-	if req.LastID == 0 {
-		req.LastID = math.MaxInt32
+	if req.LastID == "" {
+		req.LastID = model.MaxObjectID
 	}
 
 	records, err := h.userExampleDao.GetByLastID(ctx, req.LastID, int(req.Limit), req.Sort)
@@ -263,6 +265,7 @@ func (h *userExamplePbHandler) List(ctx context.Context, req *serverNameExampleV
 		return nil, ecode.ErrListUserExample.Err()
 	}
 	params.Size = int(req.Params.Limit)
+	// todo if copier.Copy cannot assign a value to a field, add it here
 
 	records, total, err := h.userExampleDao.GetByColumns(ctx, params)
 	if err != nil {
@@ -296,7 +299,7 @@ func convertUserExamplePb(record *model.UserExample) (*serverNameExampleV1.UserE
 	if err != nil {
 		return nil, err
 	}
-	value.Id = record.ID
+	value.Id = record.ID.Hex()
 	// todo if copier.Copy cannot assign a value to a field, add it here, e.g. CreatedAt, UpdatedAt
 	// todo generate the conversion createdAt and updatedAt code here
 	// delete the templates code start

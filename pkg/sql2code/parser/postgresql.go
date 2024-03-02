@@ -50,8 +50,8 @@ ORDER BY a.attnum;`, tableName)
 	return fields, nil
 }
 
-// ConvertToMysqlTable convert to mysql table ddl
-func ConvertToMysqlTable(tableName string, fields []*PGField) (string, map[string]string) {
+// ConvertToSQLByPgFields convert to mysql table ddl
+func ConvertToSQLByPgFields(tableName string, fields []*PGField) (string, map[string]string) {
 	fieldStr := ""
 	pgTypeMap := make(map[string]string) // name:type
 	for _, field := range fields {
@@ -71,14 +71,13 @@ func ConvertToMysqlTable(tableName string, fields []*PGField) (string, map[strin
 	return fmt.Sprintf("CREATE TABLE %s (\n%s\n);", tableName, fieldStr), pgTypeMap
 }
 
+// nolint
 func toMysqlType(field *PGField) string {
 	switch field.Type {
-	// 整型
 	case "smallint", "integer", "smallserial", "serial", "int2", "int4":
 		return "int"
 	case "bigint", "bigserial", "int8":
 		return "bigint"
-	// 浮点数
 	case "real":
 		return "float"
 	case "decimal", "numeric":
@@ -87,14 +86,12 @@ func toMysqlType(field *PGField) string {
 		return "double"
 	case "money":
 		return "varchar(30)"
-	// 字符串
 	case "character", "character varying", "varchar", "char", "bpchar":
 		if field.Lengthvar > 4 {
 			return fmt.Sprintf("varchar(%d)", field.Lengthvar-4)
 		}
 	case "text":
 		return "text"
-	// 日期时间
 	case "timestamp":
 		return "timestamp"
 	case "date":

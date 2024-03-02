@@ -1,7 +1,7 @@
-// Package main sponge is a powerful tool for generating web and microservice code, a microservice
-// framework based on gin and grpc encapsulation, and an open source framework for rapid application
-// development. Sponge has a wealth of code generation commands, sponge generate code unified in
-// the UI interface operation, it is easy to build a complete project engineering code.
+// Package main sponge is a basic development framework that integrates code auto generation,
+// Gin and GRPC, a microservice framework. it is easy to build a complete project from development
+// to deployment, just fill in the business logic code on the generated template code, greatly improved
+// development efficiency and reduced development difficulty, the use of Go can also be "low-code development".
 package main
 
 import (

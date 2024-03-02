@@ -1,0 +1,155 @@
+package model
+
+import (
+	"strings"
+	"sync"
+	"time"
+
+	"github.com/zhufuyi/sponge/internal/config"
+
+	"github.com/zhufuyi/sponge/pkg/goredis"
+	"github.com/zhufuyi/sponge/pkg/mgo"
+	"github.com/zhufuyi/sponge/pkg/utils"
+
+	"github.com/go-redis/redis/v8"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+)
+
+// MaxObjectID max object id
+const MaxObjectID = "fffffffffffffffffffffffe"
+
+var (
+	// ErrCacheNotFound No hit cache
+	ErrCacheNotFound = redis.Nil
+
+	// ErrRecordNotFound no records found
+	ErrRecordNotFound = mongo.ErrNoDocuments
+)
+
+var (
+	db    *mongo.Database
+	once1 sync.Once
+
+	redisCli *redis.Client
+	once2    sync.Once
+
+	cacheType *CacheType
+	once3     sync.Once
+)
+
+// CacheType cache type
+type CacheType struct {
+	CType string        // cache type  memory or redis
+	Rdb   *redis.Client // if CType=redis, Rdb cannot be empty
+}
+
+// InitCache initial cache
+func InitCache(cType string) {
+	cacheType = &CacheType{
+		CType: cType,
+	}
+
+	if cType == "redis" {
+		cacheType.Rdb = GetRedisCli()
+	}
+}
+
+// GetCacheType get cacheType
+func GetCacheType() *CacheType {
+	if cacheType == nil {
+		once3.Do(func() {
+			InitCache(config.Get().App.CacheType)
+		})
+	}
+
+	return cacheType
+}
+
+// InitRedis connect redis
+func InitRedis() {
+	opts := []goredis.Option{
+		goredis.WithDialTimeout(time.Duration(config.Get().Redis.DialTimeout) * time.Second),
+		goredis.WithReadTimeout(time.Duration(config.Get().Redis.ReadTimeout) * time.Second),
+		goredis.WithWriteTimeout(time.Duration(config.Get().Redis.WriteTimeout) * time.Second),
+	}
+	if config.Get().App.EnableTrace {
+		opts = append(opts, goredis.WithEnableTrace())
+	}
+
+	var err error
+	redisCli, err = goredis.Init(config.Get().Redis.Dsn, opts...)
+	if err != nil {
+		panic("goredis.Init error: " + err.Error())
+	}
+}
+
+// GetRedisCli get redis client
+func GetRedisCli() *redis.Client {
+	if redisCli == nil {
+		once2.Do(func() {
+			InitRedis()
+		})
+	}
+
+	return redisCli
+}
+
+// CloseRedis close redis
+func CloseRedis() error {
+	if redisCli == nil {
+		return nil
+	}
+
+	err := redisCli.Close()
+	if err != nil && err.Error() != redis.ErrClosed.Error() {
+		return err
+	}
+
+	return nil
+}
+
+// ---------------------------------------------------------------------------------------
+
+// InitDB connect database
+func InitDB() {
+	dbDriver := config.Get().Database.Driver
+	switch strings.ToLower(dbDriver) {
+	case mgo.DBDriverName:
+		InitMongodb()
+	default:
+		panic("InitDB error, unsupported database driver: " + dbDriver)
+	}
+}
+
+// GetDB get db
+func GetDB() *mongo.Database {
+	if db == nil {
+		once1.Do(func() {
+			InitDB()
+		})
+	}
+
+	return db
+}
+
+// CloseDB close db
+func CloseDB() error {
+	return mgo.Close(db)
+}
+
+// InitMongodb connect mongodb
+func InitMongodb() {
+	var err error
+	var dsn = utils.AdaptiveMongodbDsn(config.Get().Database.Mongodb.Dsn)
+	db, err = mgo.Init(dsn)
+	if err != nil {
+		panic("mgo.Init error: " + err.Error())
+	}
+}
+
+// ToObjectID convert string to ObjectID
+func ToObjectID(id string) primitive.ObjectID {
+	oid, _ := primitive.ObjectIDFromHex(id)
+	return oid
+}

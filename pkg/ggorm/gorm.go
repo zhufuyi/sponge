@@ -169,7 +169,7 @@ func checkInUse(sqlDB *sql.DB, duration time.Duration) {
 	ctx, _ := context.WithTimeout(context.Background(), duration) //nolint
 	for {
 		select {
-		case <-time.After(time.Millisecond * 100):
+		case <-time.After(time.Millisecond * 250):
 			if v := sqlDB.Stats().InUse; v == 0 {
 				return
 			}

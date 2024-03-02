@@ -52,6 +52,9 @@ func (a *Args) checkValid() error {
 			return fmt.Errorf("sqlite db file %s not found in local host", a.DBDsn)
 		}
 	}
+	if a.fieldTypes == nil {
+		a.fieldTypes = make(map[string]string)
+	}
 	return nil
 }
 
@@ -87,13 +90,21 @@ func getSQL(args *Args) (string, map[string]string, error) {
 			if err != nil {
 				return "", nil, err
 			}
-			sqlStr, pgTypeMap := parser.ConvertToMysqlTable(args.DBTable, fields)
+			sqlStr, pgTypeMap := parser.ConvertToSQLByPgFields(args.DBTable, fields)
 			return sqlStr, pgTypeMap, nil
 		case parser.DBDriverSqlite:
 			sqlStr, err := parser.GetSqliteTableInfo(args.DBDsn, args.DBTable)
 			return sqlStr, nil, err
+		case parser.DBDriverMongodb:
+			dsn := utils.AdaptiveMongodbDsn(args.DBDsn)
+			fields, err := parser.GetMongodbTableInfo(dsn, args.DBTable)
+			if err != nil {
+				return "", nil, err
+			}
+			sqlStr, mongoTypeMap := parser.ConvertToSQLByMgoFields(args.DBTable, fields)
+			return sqlStr, mongoTypeMap, nil
 		default:
-			return "", nil, fmt.Errorf("unsupported database driver: " + dbDriverName)
+			return "", nil, fmt.Errorf("getsql error, unsupported database driver: " + dbDriverName)
 		}
 	}
 

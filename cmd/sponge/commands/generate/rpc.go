@@ -34,8 +34,8 @@ func RPCCommand() *cobra.Command {
 	//nolint
 	cmd := &cobra.Command{
 		Use:   "rpc",
-		Short: "Generate grpc service code based on mysql table",
-		Long: `generate grpc service code based on mysql table.
+		Short: "Generate grpc service code based on sql",
+		Long: `generate grpc service code based on sql.
 
 Examples:
   # generate grpc service code and embed gorm.model struct.
@@ -67,6 +67,9 @@ Examples:
 			}
 
 			projectName, serverName = convertProjectAndServerName(projectName, serverName)
+			if sqlArgs.DBDriver == DBDriverMongodb {
+				sqlArgs.IsEmbed = false
+			}
 
 			sqlArgs.DBTable = firstTable
 			codes, err := sql2code.Generate(&sqlArgs)
@@ -133,7 +136,7 @@ using help:
 	_ = cmd.MarkFlagRequired("server-name")
 	cmd.Flags().StringVarP(&projectName, "project-name", "p", "", "project name")
 	_ = cmd.MarkFlagRequired("project-name")
-	cmd.Flags().StringVarP(&sqlArgs.DBDriver, "db-driver", "k", "mysql", "database driver, support mysql, postgresql, tidb, sqlite")
+	cmd.Flags().StringVarP(&sqlArgs.DBDriver, "db-driver", "k", "mysql", "database driver, support mysql, mongodb, postgresql, tidb, sqlite")
 	cmd.Flags().StringVarP(&sqlArgs.DBDsn, "db-dsn", "d", "", "database content address, e.g. user:password@(host:port)/database. Note: if db-driver=sqlite, db-dsn must be a local sqlite db file, e.g. --db-dsn=/tmp/sponge_sqlite.db") //nolint
 	_ = cmd.MarkFlagRequired("db-dsn")
 	cmd.Flags().StringVarP(&dbTables, "db-table", "t", "", "table name, multiple names separated by commas")
@@ -177,15 +180,34 @@ func (g *rpcGenerator) generateCode() (string, error) {
 	ignoreDirs := []string{ // specify the directory in the subdirectory where processing is ignored
 		"internal/handler", "internal/rpcclient", "internal/routers", "internal/types", "cmd/sponge",
 	}
-	ignoreFiles := []string{ // specify the files in the subdirectory to be ignored for processing
-		"types.pb.validate.go", "types.pb.go", // api/types
-		"userExample.pb.go", "userExample.pb.validate.go", "userExample_grpc.pb.go", "userExample_router.pb.go", // api/serverNameExample/v1
-		"userExample_http.go", "systemCode_http.go", // internal/ecode
-		"http.go", "http_option.go", "http_test.go", // internal/server
-		"userExample_logic.go", "userExample_logic_test.go", "service/userExample_test.go", // internal/service
-		"scripts/swag-docs.sh",                                      // sponge/scripts
-		"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", // internal/cache
-		"init_test.go", // model
+	var ignoreFiles []string
+	switch strings.ToLower(g.dbDriver) {
+	case DBDriverMysql, DBDriverPostgresql, DBDriverTidb, DBDriverSqlite:
+		ignoreFiles = []string{ // specify the files in the subdirectory to be ignored for processing
+			"userExample_http.go", "systemCode_http.go", // internal/ecode
+			"http.go", "http_option.go", "http_test.go", // internal/server
+			"scripts/swag-docs.sh",                // sponge/scripts
+			"types.pb.validate.go", "types.pb.go", // api/types
+			"userExample.pb.go", "userExample.pb.validate.go", "userExample_grpc.pb.go", "userExample_router.pb.go", // api/serverNameExample/v1
+			"init_test.go", "init.go.mgo", // model
+			"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", "cache/userExample.go.mgo", // internal/cache
+			"dao/userExample.go.mgo",                                                                                                                                   // internal/dao
+			"userExample_logic.go", "userExample_logic_test.go", "service/userExample_test.go", "service/userExample.go.mgo", "service/userExample_client_test.go.mgo", // internal/service
+		}
+	case DBDriverMongodb:
+		ignoreFiles = []string{ // specify the files in the subdirectory to be ignored for processing
+			"userExample_http.go", "systemCode_http.go", // internal/ecode
+			"http.go", "http_option.go", "http_test.go", // internal/server
+			"scripts/swag-docs.sh",                // sponge/scripts
+			"types.pb.validate.go", "types.pb.go", // api/types
+			"userExample.pb.go", "userExample.pb.validate.go", "userExample_grpc.pb.go", "userExample_router.pb.go", // api/serverNameExample/v1
+			"init_test.go", "init.go", // model
+			"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", "cache/userExample.go", "cache/userExample_test.go", // internal/cache
+			"dao/userExample_test.go", "dao/userExample.go", // internal/dao
+			"userExample_logic.go", "userExample_logic_test.go", "service/userExample_test.go", "service/userExample.go", "service/userExample_client_test.go", // internal/service
+		}
+	default:
+		return "", errors.New("unsupported db driver: " + g.dbDriver)
 	}
 
 	r.SetSubDirsAndFiles(subDirs, subFiles...)
@@ -210,10 +232,12 @@ func (g *rpcGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	fields = append(fields, deleteFieldsMark(r, modelFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, modelInitDBFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, daoFile, startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, daoMgoFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, daoTestFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, protoFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, serviceLogicFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, serviceClientFile, startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, serviceClientMgoFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, serviceTestFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, dockerFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, dockerFileBuild, wellStartMark, wellEndMark)...)
@@ -267,7 +291,7 @@ func (g *rpcGenerator) addFields(r replacer.Replacer) []replacer.Field {
 		},
 		{ // replace the contents of the service/userExample_client_test.go file
 			Old: serviceFileMark,
-			New: adjustmentOfIDType(g.codes[parser.CodeTypeService]),
+			New: adjustmentOfIDType(g.codes[parser.CodeTypeService], g.dbDriver),
 		},
 		{ // replace the contents of the Dockerfile file
 			Old: dockerFileMark,
@@ -383,6 +407,18 @@ func (g *rpcGenerator) addFields(r replacer.Replacer) []replacer.Field {
 		{
 			Old: "test/sql/sqlite/sponge.db",
 			New: sqliteDSNAdaptation(g.dbDriver, g.dbDSN),
+		},
+		{
+			Old: "init.go.mgo",
+			New: "init.go",
+		},
+		{
+			Old: "userExample_client_test.go.mgo",
+			New: "userExample_client_test.go",
+		},
+		{
+			Old: "userExample.go.mgo",
+			New: "userExample.go",
 		},
 		{
 			Old:             "UserExample",

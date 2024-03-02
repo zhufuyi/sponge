@@ -42,7 +42,7 @@ import (
 	updateFieldTmpl    *template.Template
 	updateFieldTmplRaw = `
 {{- range .Fields}}
-	if table.{{.Name}} {{.ConditionZero}} {
+	if table.{{.Name}}{{.ConditionZero}} {
 		update["{{.ColName}}"] = table.{{.Name}}
 	}
 {{- end}}`
@@ -129,11 +129,11 @@ service {{.TName}} {
 // protoMessageCreateCode
 
 message Create{{.TableName}}Reply {
-  uint64   id = 1;
+  // createTableReplyFieldCode
 }
 
 message Delete{{.TableName}}ByIDRequest {
-  uint64   id = 1 [(validate.rules).uint64.gt  = 0];
+  // deleteTableByIDRequestFieldCode
 }
 
 message Delete{{.TableName}}ByIDReply {
@@ -141,7 +141,7 @@ message Delete{{.TableName}}ByIDReply {
 }
 
 message Delete{{.TableName}}ByIDsRequest {
-  repeated uint64 ids = 1 [(validate.rules).repeated.min_items = 1];
+  // deleteTableByIDsRequestFieldCode
 }
 
 message Delete{{.TableName}}ByIDsReply {
@@ -157,7 +157,7 @@ message Update{{.TableName}}ByIDReply {
 // protoMessageDetailCode
 
 message Get{{.TableName}}ByIDRequest {
-  uint64   id = 1 [(validate.rules).uint64.gt  = 0];
+  // getTableByIDRequestFieldCode
 }
 
 message Get{{.TableName}}ByIDReply {
@@ -173,7 +173,7 @@ message Get{{.TableName}}ByConditionReply {
 }
 
 message List{{.TableName}}ByIDsRequest {
-  repeated uint64 ids = 1 [(validate.rules).repeated.min_items = 1];
+  // getTableByIDsRequestFieldCode
 }
 
 message List{{.TableName}}ByIDsReply {
@@ -181,8 +181,8 @@ message List{{.TableName}}ByIDsReply {
 }
 
 message List{{.TableName}}ByLastIDRequest {
-  uint64 lastID = 1; // last id
-  uint32 limit = 2 [(validate.rules).uint32.gt  = 0]; // limit size per page
+  // listTableByLastIDRequestFieldCode
+  uint32 limit = 2 [(validate.rules).uint32.gt = 0]; // limit size per page
   string sort = 3; // sort by column name of table, default is -id, the - sign indicates descending order.
 }
 
@@ -411,11 +411,11 @@ service {{.TName}} {
 // protoMessageCreateCode
 
 message Create{{.TableName}}Reply {
-  uint64   id = 1;
+  // createTableReplyFieldCode
 }
 
 message Delete{{.TableName}}ByIDRequest {
-  uint64   id =1 [(validate.rules).uint64.gte  = 1, (tagger.tags) = "uri:\"id\"" ];
+  // deleteTableByIDRequestFieldCode
 }
 
 message Delete{{.TableName}}ByIDReply {
@@ -423,7 +423,7 @@ message Delete{{.TableName}}ByIDReply {
 }
 
 message Delete{{.TableName}}ByIDsRequest {
-  repeated uint64 ids = 1 [(validate.rules).repeated.min_items = 1];
+  // deleteTableByIDsRequestFieldCode
 }
 
 message Delete{{.TableName}}ByIDsReply {
@@ -439,7 +439,7 @@ message Update{{.TableName}}ByIDReply {
 // protoMessageDetailCode
 
 message Get{{.TableName}}ByIDRequest {
-  uint64   id =1 [(validate.rules).uint64.gte  = 1, (tagger.tags) = "uri:\"id\"" ];
+  // getTableByIDRequestFieldCode
 }
 
 message Get{{.TableName}}ByIDReply {
@@ -455,7 +455,7 @@ message Get{{.TableName}}ByConditionReply {
 }
 
 message List{{.TableName}}ByIDsRequest {
-  repeated uint64 ids = 1 [(validate.rules).repeated.min_items = 1];
+  // getTableByIDsRequestFieldCode
 }
 
 message List{{.TableName}}ByIDsReply {
@@ -463,8 +463,8 @@ message List{{.TableName}}ByIDsReply {
 }
 
 message List{{.TableName}}ByLastIDRequest {
-  uint64 lastID = 1 [(tagger.tags) = "form:\"lastID\""]; // last id
-  uint32 limit = 2 [(validate.rules).uint32.gt  = 0, (tagger.tags) = "form:\"limit\""]; // limit size per page
+  // listTableByLastIDRequestFieldCode
+  uint32 limit = 2 [(validate.rules).uint32.gt = 0, (tagger.tags) = "form:\"limit\""]; // limit size per page
   string sort = 3 [(tagger.tags) = "form:\"sort\""]; // sort by column name of table, default is -id, the - sign indicates descending order.
 }
 

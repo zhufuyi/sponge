@@ -136,7 +136,7 @@ import (
 
 {{- range .PbServices}}
 
-// Test each method of {{.LowerName}} via the rpc client
+// Test each method of {{.LowerName}} via the grpc client
 func Test_service_{{.LowerName}}_methods(t *testing.T) {
 	conn := getRPCClientConnForTest()
 	cli := serverNameExampleV1.New{{.Name}}Client(conn)

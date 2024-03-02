@@ -370,7 +370,7 @@ grpc:
 
 # grpc client-side settings, support for setting up multiple grpc clients.
 grpcClient:
-  - name: "serverNameExample"    # grpc service name, used for service discovery
+  - name: "your_grpc_service_name"    # grpc service name, used for service discovery
     host: "127.0.0.1"            # grpc service address, used for direct connection
     port: 8282                   # grpc service port
     registryDiscoveryType: ""    # registration and discovery types: consul, etcd, nacos, if empty, connecting to server using host and port
@@ -399,7 +399,7 @@ http:
 
 # grpc client-side settings, support for setting up multiple grpc clients.
 grpcClient:
-  - name: "serverNameExample"    # grpc service name, used for service discovery
+  - name: "your_grpc_service_name"    # grpc service name, used for service discovery
     host: "127.0.0.1"            # grpc service address, used for direct connection
     port: 8282                   # grpc service port
     registryDiscoveryType: ""    # registration and discovery types: consul, etcd, nacos, if empty, connecting to server using host and port
@@ -421,10 +421,10 @@ grpcClient:
 
 	mysqlConfigCode = `# database setting
 database:
-  driver: "mysql"           # database driver, currently support mysql, postgres, tidb, sqlite
+  driver: "mysql"           # database driver
   # mysql settings
   mysql:
-    # dsn format,  <user>:<pass>@(127.0.0.1:3306)/<db>?[k=v& ......]
+    # dsn format,  <username>:<password>@(<hostname>:<port>)/<db>?[k=v& ......]
     dsn: "root:123456@(192.168.3.37:3306)/account?parseTime=true&loc=Local&charset=utf8,utf8mb4"
     enableLog: true         # whether to turn on printing of all logs
     maxIdleConns: 10        # set the maximum number of connections in the idle connection pool
@@ -436,29 +436,11 @@ database:
     #mastersDsn:            # sets masters mysql dsn, array type, non-required field, if there is only one master, there is no need to set the mastersDsn field, the default dsn field is mysql master.
     #  - "your master dsn`
 
-	//mysqlConfigForDeploymentCode = `  # database setting
-	//database:
-	//  driver: "mysql"  # database driver, currently support mysql, postgres, tidb, sqlite
-	//  # mysql settings
-	//  mysql:
-	//    # dsn format,  <user>:<pass>@(127.0.0.1:3306)/<db>?[k=v& ......]
-	//    dsn: "root:123456@(192.168.3.37:3306)/account?parseTime=true&loc=Local&charset=utf8,utf8mb4"
-	//    enableLog: true                    # whether to turn on printing of all logs
-	//    slowThreshold: 0                  # if greater than 0, only print logs with a time greater than the threshold, with a higher priority than enableLog, in (ms)
-	//    maxIdleConns: 3                  # set the maximum number of connections in the idle connection pool
-	//    maxOpenConns: 100            # set the maximum number of open database connections
-	//    connMaxLifetime: 30            # sets the maximum time for which the connection can be reused, in minutes
-	//    #slavesDsn:                         # sets slaves mysql dsn, array type
-	//      #  - "your slave dsn 1"
-	//      #  - "your slave dsn 2"
-	//    #mastersDsn:                 # sets masters mysql dsn, array type, non-required field, if there is only one master, the default dsn field is mysql master.
-	//      #  - "your master dsn"`
-
 	postgresqlConfigCode = `database:
-  driver: "postgresql"      # database driver, currently support mysql, postgres, tidb, sqlite
+  driver: "postgresql"      # database driver
   # postgresql settings
   postgresql:
-    # dsn format,  <user>:<pass>@127.0.0.1:5432/<db>?[k=v& ......]
+    # dsn format,  <username>:<password>@<hostname>:<port>/<db>?[k=v& ......]
     dsn: "root:123456@192.168.3.37:5432/account?sslmode=disable"
     enableLog: true         # whether to turn on printing of all logs
     maxIdleConns: 10        # set the maximum number of connections in the idle connection pool
@@ -466,7 +448,7 @@ database:
     connMaxLifetime: 30     # sets the maximum time for which the connection can be reused, in minutes`
 
 	sqliteConfigCode = `database:
-  driver: "sqlite"      # database driver, currently support mysql, postgres, tidb, sqlite
+  driver: "sqlite"      # database driver
   # sqlite settings
   sqlite:
     dbFile: "test/sql/sqlite/sponge.db"
@@ -475,17 +457,13 @@ database:
     maxOpenConns: 100       # set the maximum number of open database connections
     connMaxLifetime: 30     # sets the maximum time for which the connection can be reused, in minutes`
 
-	//postgresqlConfigForDeploymentCode = `  # database setting
-	//database:
-	//  driver: "postgresql"  # database driver, currently support mysql, postgres, tidb, sqlite
-	//  # postgresql settings
-	//  postgresql:
-	//    # dsn format,  <user>:<pass>@127.0.0.1:5432/<db>?[k=v& ......]
-	//    dsn: "root:123456@192.168.3.37:5432/account?sslmode=disable"
-	//    enableLog: true                    # whether to turn on printing of all logs
-	//    maxIdleConns: 10                  # set the maximum number of connections in the idle connection pool
-	//    maxOpenConns: 100            # set the maximum number of open database connections
-	//    connMaxLifetime: 30            # sets the maximum time for which the connection can be reused, in minutes`
+	mongodbConfigCode = `database:
+  driver: "mongodb"      # database driver
+  # mongodb settings
+  mongodb:
+    # dsn format,  <username>:<password>@<hostname1>:<port1>[,<hostname2>:<port2>,......]/<db>?[k=v& ......]
+    # parameter k=v see https://www.mongodb.com/docs/drivers/go/current/fundamentals/connections/connection-guide/#connection-options
+    dsn: "root:123456@192.168.3.37:27017/account?connectTimeoutMS=15000"`
 
 	modelInitDBFileMysqlCode = `// InitDB connect database
 func InitDB() {
@@ -493,7 +471,7 @@ func InitDB() {
 	case ggorm.DBDriverMysql, ggorm.DBDriverTidb:
 		InitMysql()
 	default:
-		panic("unsupported database driver: " + config.Get().Database.Driver)
+		panic("InitDB error, unsupported database driver: " + config.Get().Database.Driver)
 	}
 }
 
@@ -529,7 +507,7 @@ func InitMysql() {
 	var err error
 	db, err = ggorm.InitMysql(dsn, opts...)
 	if err != nil {
-		panic("ggorm.InitMysql error: " + err.Error())
+		panic("InitMysql error: " + err.Error())
 	}
 }`
 
@@ -539,7 +517,7 @@ func InitDB() {
 	case ggorm.DBDriverPostgresql:
 		InitPostgresql()
 	default:
-		panic("unsupported database driver: " + config.Get().Database.Driver)
+		panic("InitDB error, unsupported database driver: " + config.Get().Database.Driver)
 	}
 }
 
@@ -568,7 +546,7 @@ func InitPostgresql() {
 	var err error
 	db, err = ggorm.InitPostgresql(dsn, opts...)
 	if err != nil {
-		panic("ggorm.InitPostgresql error: " + err.Error())
+		panic("InitPostgresql error: " + err.Error())
 	}
 }`
 
@@ -578,7 +556,7 @@ func InitDB() {
 	case ggorm.DBDriverSqlite:
 		InitSqlite()
 	default:
-		panic("unsupported database driver: " + config.Get().Database.Driver)
+		panic("InitDB error, unsupported database driver: " + config.Get().Database.Driver)
 	}
 }
 
@@ -601,12 +579,13 @@ func InitSqlite() {
 	}
 
 	var err error
-	db, err = ggorm.InitSqlite(config.Get().Database.Sqlite.DBFile, opts...)
+	var dbFile = utils.AdaptiveSqlite(config.Get().Database.Sqlite.DBFile)
+	db, err = ggorm.InitSqlite(dbFile, opts...)
 	if err != nil {
-		panic("ggorm.InitSqlite error: " + err.Error())
+		panic("InitSqlite error: " + err.Error())
 	}
 }`
 
-	embedTimeCode = `	value.CreatedAt = record.CreatedAt.Unix()
+	embedTimeCode = `value.CreatedAt = record.CreatedAt.Unix()
 	value.UpdatedAt = record.UpdatedAt.Unix()`
 )

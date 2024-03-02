@@ -120,6 +120,7 @@ func (g *stringCacheGenerator) generateCode() (string, error) {
 	ignoreFiles := []string{ // specify the files in the subdirectory to be ignored for processing
 		"doc.go",
 		"userExample.go",
+		"userExample.go.mgo",
 		"userExample_test.go",
 	}
 

@@ -1,3 +1,4 @@
+// Package types define the structure of request parameters and respond results in this package
 package types
 
 // This file is public struct, only used to generate swagger documents, it is recommended

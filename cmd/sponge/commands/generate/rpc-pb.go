@@ -81,6 +81,7 @@ type rpcPbGenerator struct {
 	outPath      string
 }
 
+// nolint
 func (g *rpcPbGenerator) generateCode() error {
 	protobufFiles, isImportTypes, err := parseProtobufFiles(g.protobufFile)
 	if err != nil {
@@ -108,7 +109,7 @@ func (g *rpcPbGenerator) generateCode() error {
 		"types.pb.validate.go", "types.pb.go", // api/types
 		"userExample_rpc.go", "systemCode_http.go", "userExample_http.go", // internal/ecode
 		"http.go", "http_option.go", "http_test.go", // internal/server
-		"userExample.go", "userExample_client_test.go", "userExample_logic.go", "userExample_logic_test.go", "userExample_test.go", // internal/service
+		"userExample.go", "userExample_client_test.go", "userExample_logic.go", "userExample_logic_test.go", "userExample_test.go", "userExample.go.mgo", "userExample_client_test.go.mgo", // internal/service
 	}
 
 	if !isImportTypes {

@@ -33,8 +33,8 @@ func HTTPCommand() *cobra.Command {
 	//nolint
 	cmd := &cobra.Command{
 		Use:   "http",
-		Short: "Generate web service code based on mysql table",
-		Long: `generate web service code based on mysql table.
+		Short: "Generate web service code based on sql",
+		Long: `generate web service code based on sql.
 
 Examples:
   # generate web service code and embed gorm.model struct.
@@ -66,6 +66,9 @@ Examples:
 			}
 
 			projectName, serverName = convertProjectAndServerName(projectName, serverName)
+			if sqlArgs.DBDriver == DBDriverMongodb {
+				sqlArgs.IsEmbed = false
+			}
 
 			sqlArgs.DBTable = firstTable
 			codes, err := sql2code.Generate(&sqlArgs)
@@ -100,6 +103,7 @@ Examples:
 
 				hg := &handlerGenerator{
 					moduleName: moduleName,
+					dbDriver:   sqlArgs.DBDriver,
 					codes:      codes,
 					outPath:    outPath,
 				}
@@ -129,7 +133,7 @@ using help:
 	_ = cmd.MarkFlagRequired("server-name")
 	cmd.Flags().StringVarP(&projectName, "project-name", "p", "", "project name")
 	_ = cmd.MarkFlagRequired("project-name")
-	cmd.Flags().StringVarP(&sqlArgs.DBDriver, "db-driver", "k", "mysql", "database driver, support mysql, postgresql, tidb, sqlite")
+	cmd.Flags().StringVarP(&sqlArgs.DBDriver, "db-driver", "k", "mysql", "database driver, support mysql, mongodb, postgresql, tidb, sqlite")
 	cmd.Flags().StringVarP(&sqlArgs.DBDsn, "db-dsn", "d", "", "database content address, e.g. user:password@(host:port)/database. Note: if db-driver=sqlite, db-dsn must be a local sqlite db file, e.g. --db-dsn=/tmp/sponge_sqlite.db") //nolint
 	_ = cmd.MarkFlagRequired("db-dsn")
 	cmd.Flags().StringVarP(&dbTables, "db-table", "t", "", "table name, multiple names separated by commas")
@@ -172,15 +176,36 @@ func (g *httpGenerator) generateCode() (string, error) {
 	ignoreDirs := []string{ // specify the directory in the subdirectory where processing is ignored
 		"internal/service", "internal/rpcclient", "cmd/sponge",
 	}
-	ignoreFiles := []string{ // specify the files in the subdirectory to be ignored for processing
-		"swagger.json", "swagger.yaml", "apis.swagger.json", "apis.html", "apis.go", // sponge/docs
-		"userExample_rpc.go", "systemCode_rpc.go", // internal/ecode
-		"routers_pbExample.go", "routers_pbExample_test.go", "userExample_router.go", // internal/routers
-		"grpc.go", "grpc_option.go", "grpc_test.go", // internal/server
-		"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", // internal/cache
-		"handler/userExample_logic.go", "handler/userExample_logic_test.go", // internal/handler
-		"scripts/image-rpc-test.sh", "scripts/patch.sh", "scripts/protoc.sh", "scripts/proto-doc.sh", // sponge/scripts
-		"init_test.go", // model
+	var ignoreFiles []string
+	switch strings.ToLower(g.dbDriver) {
+	case DBDriverMysql, DBDriverPostgresql, DBDriverTidb, DBDriverSqlite:
+		ignoreFiles = []string{ // specify the files in the subdirectory to be ignored for processing
+			"swagger.json", "swagger.yaml", "apis.swagger.json", "apis.html", "apis.go", // sponge/docs
+			"userExample_rpc.go", "systemCode_rpc.go", // internal/ecode
+			"routers_pbExample.go", "routers_pbExample_test.go", "userExample_router.go", // internal/routers
+			"grpc.go", "grpc_option.go", "grpc_test.go", // internal/server
+			"scripts/image-rpc-test.sh", "scripts/patch.sh", "scripts/protoc.sh", "scripts/proto-doc.sh", // sponge/scripts
+			"init_test.go", "init.go.mgo", // model
+			"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", "cache/userExample.go.mgo", // internal/cache
+			"dao/userExample.go.mgo",                                                                                                              // internal/dao
+			"handler/userExample_logic.go", "handler/userExample_logic_test.go", "handler/userExample.go.mgo", "handler/userExample_logic.go.mgo", // internal/handler
+			"userExample_types.go.mgo", // internal/types
+		}
+	case DBDriverMongodb:
+		ignoreFiles = []string{ // specify the files in the subdirectory to be ignored for processing
+			"swagger.json", "swagger.yaml", "apis.swagger.json", "apis.html", "apis.go", // sponge/docs
+			"userExample_rpc.go", "systemCode_rpc.go", // internal/ecode
+			"routers_pbExample.go", "routers_pbExample_test.go", "userExample_router.go", // internal/routers
+			"grpc.go", "grpc_option.go", "grpc_test.go", // internal/server
+			"scripts/image-rpc-test.sh", "scripts/patch.sh", "scripts/protoc.sh", "scripts/proto-doc.sh", // sponge/scripts
+			"init_test.go", "init.go", // model
+			"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", "cache/userExample.go", "cache/userExample_test.go", // internal/cache
+			"dao/userExample_test.go", "dao/userExample.go", // internal/dao
+			"handler/userExample_logic.go", "handler/userExample_logic_test.go", "handler/userExample.go", "handler/userExample_test.go", "handler/userExample_logic.go.mgo", // internal/handler
+			"userExample_types.go", // internal/types
+		}
+	default:
+		return "", errors.New("unsupported db driver: " + g.dbDriver)
 	}
 
 	r.SetSubDirsAndFiles(subDirs, subFiles...)
@@ -205,8 +230,10 @@ func (g *httpGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	fields = append(fields, deleteFieldsMark(r, modelFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, modelInitDBFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, daoFile, startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, daoMgoFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, daoTestFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, handlerFile, startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, handlerMgoFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, handlerTestFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, httpFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, dockerFile, wellStartMark, wellEndMark)...)
@@ -245,7 +272,7 @@ func (g *httpGenerator) addFields(r replacer.Replacer) []replacer.Field {
 		},
 		{ // replace the contents of the handler/userExample.go file
 			Old: handlerFileMark,
-			New: adjustmentOfIDType(g.codes[parser.CodeTypeHandler]),
+			New: adjustmentOfIDType(g.codes[parser.CodeTypeHandler], g.dbDriver),
 		},
 		{ // replace the contents of the Dockerfile file
 			Old: dockerFileMark,
@@ -354,6 +381,10 @@ func (g *httpGenerator) addFields(r replacer.Replacer) []replacer.Field {
 			New: g.dbDSN,
 		},
 		{
+			Old: "root:123456@192.168.3.37:27017/account",
+			New: g.dbDSN,
+		},
+		{
 			Old: "root:123456@192.168.3.37:5432/account",
 			New: g.dbDSN,
 		},
@@ -364,6 +395,18 @@ func (g *httpGenerator) addFields(r replacer.Replacer) []replacer.Field {
 		{
 			Old: "Makefile-for-http",
 			New: "Makefile",
+		},
+		{
+			Old: "init.go.mgo",
+			New: "init.go",
+		},
+		{
+			Old: "userExample_types.go.mgo",
+			New: "userExample_types.go",
+		},
+		{
+			Old: "userExample.go.mgo",
+			New: "userExample.go",
 		},
 		{
 			Old:             "UserExample",

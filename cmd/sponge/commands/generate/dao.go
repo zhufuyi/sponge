@@ -29,8 +29,8 @@ func DaoCommand(parentName string) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "dao",
-		Short: "Generate dao code based on mysql table",
-		Long: fmt.Sprintf(`generate dao code based on mysql table.
+		Short: "Generate dao code based on sql",
+		Long: fmt.Sprintf(`generate dao code based on sql.
 
 Examples:
   # generate dao code and embed gorm.model struct.
@@ -61,6 +61,9 @@ Examples:
 					continue
 				}
 
+				if sqlArgs.DBDriver == DBDriverMongodb {
+					sqlArgs.IsEmbed = false
+				}
 				sqlArgs.DBTable = tableName
 				codes, err := sql2code.Generate(&sqlArgs)
 				if err != nil {
@@ -76,6 +79,7 @@ Examples:
 
 				g := &daoGenerator{
 					moduleName:      moduleName,
+					dbDriver:        sqlArgs.DBDriver,
 					isIncludeInitDB: isIncludeInitDB,
 					codes:           codes,
 					outPath:         outPath,
@@ -98,7 +102,7 @@ using help:
 
 	cmd.Flags().StringVarP(&moduleName, "module-name", "m", "", "module-name is the name of the module in the go.mod file")
 	//_ = cmd.MarkFlagRequired("module-name")
-	cmd.Flags().StringVarP(&sqlArgs.DBDriver, "db-driver", "k", "mysql", "database driver, support mysql, postgresql, tidb, sqlite")
+	cmd.Flags().StringVarP(&sqlArgs.DBDriver, "db-driver", "k", "mysql", "database driver, support mysql, mongodb, postgresql, tidb, sqlite")
 	cmd.Flags().StringVarP(&sqlArgs.DBDsn, "db-dsn", "d", "", "database content address, e.g. user:password@(host:port)/database. Note: if db-driver=sqlite, db-dsn must be a local sqlite db file, e.g. --db-dsn=/tmp/sponge_sqlite.db") //nolint
 	_ = cmd.MarkFlagRequired("db-dsn")
 	cmd.Flags().StringVarP(&dbTables, "db-table", "t", "", "table name, multiple names separated by commas")
@@ -114,6 +118,7 @@ using help:
 
 type daoGenerator struct {
 	moduleName      string
+	dbDriver        string
 	isIncludeInitDB bool
 	codes           map[string]string
 	outPath         string
@@ -131,14 +136,28 @@ func (g *daoGenerator) generateCode() (string, error) {
 		"internal/model", "internal/cache", "internal/dao",
 	}
 	ignoreDirs := []string{} // specify the directory in the subdirectory where processing is ignored
-	ignoreFiles := []string{ // specify the files in the subdirectory to be ignored for processing
-		"init.go", "init_test.go", // internal/model
-		"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", // internal/cache
-	}
-	if g.isIncludeInitDB {
-		ignoreFiles = []string{
-			"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", // internal/cache
+	var ignoreFiles []string
+	switch strings.ToLower(g.dbDriver) {
+	case DBDriverMysql, DBDriverPostgresql, DBDriverTidb, DBDriverSqlite:
+		ignoreFiles = []string{ // specify the files in the subdirectory to be ignored for processing
+			"init.go", "init_test.go", "init.go.mgo", // internal/model
+			"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", "cache/userExample.go.mgo", // internal/cache
+			"dao/userExample.go.mgo", // internal/dao
 		}
+		if g.isIncludeInitDB {
+			ignoreFiles = removeElement(ignoreFiles, "init.go")
+		}
+	case DBDriverMongodb:
+		ignoreFiles = []string{ // specify the files in the subdirectory to be ignored for processing
+			"init.go", "init_test.go", "init.go.mgo", // internal/model
+			"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", "cache/userExample.go", "cache/userExample_test.go", // internal/cache
+			"dao/userExample_test.go", "dao/userExample.go", // internal/dao
+		}
+		if g.isIncludeInitDB {
+			ignoreFiles = removeElement(ignoreFiles, "init.go.mgo")
+		}
+	default:
+		return "", errors.New("unsupported db driver: " + g.dbDriver)
 	}
 
 	r.SetSubDirsAndFiles(subDirs)
@@ -160,6 +179,7 @@ func (g *daoGenerator) addFields(r replacer.Replacer) []replacer.Field {
 
 	fields = append(fields, deleteFieldsMark(r, modelFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, daoFile, startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, daoMgoFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, daoTestFile, startMark, endMark)...)
 	fields = append(fields, []replacer.Field{
 		{ // replace the contents of the model/userExample.go file
@@ -181,6 +201,14 @@ func (g *daoGenerator) addFields(r replacer.Replacer) []replacer.Field {
 		{
 			Old: g.moduleName + "/pkg",
 			New: "github.com/zhufuyi/sponge/pkg",
+		},
+		{
+			Old: "init.go.mgo",
+			New: "init.go",
+		},
+		{
+			Old: "userExample.go.mgo",
+			New: "userExample.go",
 		},
 		{
 			Old:             "UserExample",

@@ -71,10 +71,10 @@ type Params struct {
 
 // Column query info
 type Column struct {
-	Name  string      `json:"name" form:"columns"`  // column name
-	Exp   string      `json:"exp" form:"columns"`   // expressions, which default to = when the value is null, have =, !=, >, >=, <, <=, like, in
-	Value interface{} `json:"value" form:"columns"` // column value
-	Logic string      `json:"logic" form:"columns"` // logical type, defaults to and when the value is null, with &(and), ||(or)
+	Name  string      `json:"name" form:"name"`   // column name
+	Exp   string      `json:"exp" form:"exp"`     // expressions, which default to = when the value is null, have =, !=, >, >=, <, <=, like, in
+	Value interface{} `json:"value" form:"value"` // column value
+	Logic string      `json:"logic" form:"logic"` // logical type, defaults to and when the value is null, with &(and), ||(or)
 }
 
 func (c *Column) checkValid() error {

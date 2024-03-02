@@ -29,6 +29,8 @@ const (
 	DBDriverTidb = "tidb"
 	// DBDriverSqlite sqlite driver
 	DBDriverSqlite = "sqlite"
+	// DBDriverMongodb mongodb driver
+	DBDriverMongodb = "mongodb"
 )
 
 var (
@@ -41,10 +43,12 @@ var (
 	cacheFile = "cache/cacheNameExample.go"
 
 	daoFile     = "dao/userExample.go"
+	daoMgoFile  = "dao/userExample.go.mgo"
 	daoFileMark = "// todo generate the update fields code to here"
 	daoTestFile = "dao/userExample_test.go"
 
 	handlerFile     = "types/userExample_types.go"
+	handlerMgoFile  = "types/userExample_types.go.mgo"
 	handlerFileMark = "// todo generate the request and response struct to here"
 	handlerTestFile = "handler/userExample_test.go"
 
@@ -57,9 +61,10 @@ var (
 	protoFile     = "v1/userExample.proto"
 	protoFileMark = "// todo generate the protobuf code here"
 
-	serviceTestFile   = "service/userExample_test.go"
-	serviceClientFile = "service/userExample_client_test.go"
-	serviceFileMark   = "// todo generate the service struct code here"
+	serviceTestFile      = "service/userExample_test.go"
+	serviceClientFile    = "service/userExample_client_test.go"
+	serviceClientMgoFile = "service/userExample_client_test.go.mgo"
+	serviceFileMark      = "// todo generate the service struct code here"
 
 	dockerFile     = "scripts/build/Dockerfile"
 	dockerFileMark = "# todo generate dockerfile code for http or grpc here"
@@ -138,7 +143,10 @@ func convertProjectAndServerName(projectName, serverName string) (pn string, sn 
 	return pn, sn
 }
 
-func adjustmentOfIDType(handlerCodes string) string {
+func adjustmentOfIDType(handlerCodes string, dbDriver string) string {
+	if dbDriver == DBDriverMongodb {
+		return idTypeToStr(handlerCodes)
+	}
 	return idTypeToStr(idTypeFixToUint64(handlerCodes))
 }
 
@@ -374,33 +382,6 @@ func replacePackage(data []byte, moduleName string, serverName string) []byte {
 	return data
 }
 
-//func getDBConfigCode(dbDriver string, forDeployment ...bool) string {
-//	isDeployment := false
-//	if len(forDeployment) > 0 {
-//		isDeployment = forDeployment[0]
-//	}
-//
-//	dbConfigCode := ""
-//	switch strings.ToLower(dbDriver) {
-//	case DBDriverMysql, DBDriverTidb:
-//		if isDeployment {
-//			dbConfigCode = mysqlConfigForDeploymentCode
-//		} else {
-//			dbConfigCode = mysqlConfigCode
-//		}
-//
-//	case DBDriverPostgresql:
-//		if isDeployment {
-//			dbConfigCode = postgresqlConfigForDeploymentCode
-//		} else {
-//			dbConfigCode = postgresqlConfigCode
-//		}
-//	default:
-//		panic("getDBConfigCode error, unsupported database driver: " + dbDriver)
-//	}
-//	return dbConfigCode
-//}
-
 func getDBConfigCode(dbDriver string) string {
 	dbConfigCode := ""
 	switch strings.ToLower(dbDriver) {
@@ -410,6 +391,8 @@ func getDBConfigCode(dbDriver string) string {
 		dbConfigCode = postgresqlConfigCode
 	case DBDriverSqlite:
 		dbConfigCode = sqliteConfigCode
+	case DBDriverMongodb:
+		dbConfigCode = mongodbConfigCode
 	default:
 		panic("getDBConfigCode error, unsupported database driver: " + dbDriver)
 	}
@@ -425,6 +408,8 @@ func getInitDBCode(dbDriver string) string {
 		initDBCode = modelInitDBFilePostgresqlCode
 	case DBDriverSqlite:
 		initDBCode = modelInitDBFileSqliteCode
+	case DBDriverMongodb:
+		initDBCode = "" // do nothing
 	default:
 		panic("getInitDBCode error, unsupported database driver: " + dbDriver)
 	}
@@ -508,4 +493,14 @@ func sqliteDSNAdaptation(dbDriver string, dsn string) string {
 		dsn = strings.Replace(dsn, "/", "\\\\", -1)
 	}
 	return dsn
+}
+
+func removeElement(slice []string, element string) []string {
+	result := make([]string, 0, len(slice)-1)
+	for _, s := range slice {
+		if s != element {
+			result = append(result, s)
+		}
+	}
+	return result
 }

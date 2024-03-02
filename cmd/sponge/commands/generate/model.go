@@ -27,8 +27,8 @@ func ModelCommand(parentName string) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "model",
-		Short: "Generate model code based on mysql table",
-		Long: fmt.Sprintf(`generate model code based on mysql table.
+		Short: "Generate model code based on sql",
+		Long: fmt.Sprintf(`generate model code based on sql.
 
 Examples:
   # generate model code and embed gorm.model struct.
@@ -52,6 +52,9 @@ Examples:
 					continue
 				}
 
+				if sqlArgs.DBDriver == DBDriverMongodb {
+					sqlArgs.IsEmbed = false
+				}
 				sqlArgs.DBTable = tableName
 				codes, err := sql2code.Generate(&sqlArgs)
 				if err != nil {
@@ -78,7 +81,7 @@ using help:
 		},
 	}
 
-	cmd.Flags().StringVarP(&sqlArgs.DBDriver, "db-driver", "k", "mysql", "database driver, support mysql, postgresql, tidb, sqlite")
+	cmd.Flags().StringVarP(&sqlArgs.DBDriver, "db-driver", "k", "mysql", "database driver, support mysql, mongodb, postgresql, tidb, sqlite")
 	cmd.Flags().StringVarP(&sqlArgs.DBDsn, "db-dsn", "d", "", "database content address, e.g. user:password@(host:port)/database. Note: if db-driver=sqlite, db-dsn must be a local sqlite db file, e.g. --db-dsn=/tmp/sponge_sqlite.db") //nolint
 	_ = cmd.MarkFlagRequired("db-dsn")
 	cmd.Flags().StringVarP(&dbTables, "db-table", "t", "", "table name, multiple names separated by commas")
@@ -106,7 +109,7 @@ func (g *modelGenerator) generateCode() (string, error) {
 	subDirs := []string{"internal/model"} // only the specified subdirectory is processed, if empty or no subdirectory is specified, it means all files
 	ignoreDirs := []string{}              // specify the directory in the subdirectory where processing is ignored
 	ignoreFiles := []string{              // specify the files in the subdirectory to be ignored for processing
-		"init.go", "init_test.go",
+		"init.go", "init_test.go", "init.go.mgo",
 	}
 
 	r.SetSubDirsAndFiles(subDirs)

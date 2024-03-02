@@ -136,10 +136,15 @@ type Redis struct {
 }
 
 type Database struct {
-	Driver     string     `yaml:"driver" json:"driver"`
-	Mysql      Mysql      `yaml:"mysql" json:"mysql"`
-	Postgresql Postgresql `yaml:"postgresql" json:"postgresql"`
-	Sqlite     Sqlite     `yaml:"sqlite" json:"sqlite"`
+	Driver     string  `yaml:"driver" json:"driver"`
+	Mongodb    Mongodb `yaml:"mongodb" json:"mongodb"`
+	Mysql      Mysql   `yaml:"mysql" json:"mysql"`
+	Postgresql Mysql   `yaml:"postgresql" json:"postgresql"`
+	Sqlite     Sqlite  `yaml:"sqlite" json:"sqlite"`
+}
+
+type Mongodb struct {
+	Dsn string `yaml:"dsn" json:"dsn"`
 }
 
 type Grpc struct {

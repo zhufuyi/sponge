@@ -32,8 +32,8 @@ func HandlerPbCommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "handler-pb",
-		Short: "Generate handler and protobuf code based on mysql table",
-		Long: `generate handler and protobuf code based on mysql table.
+		Short: "Generate handler and protobuf code based on sql",
+		Long: `generate handler and protobuf code based on sql.
 
 Examples:
   # generate handler and protobuf code and embed gorm.model struct.
@@ -64,6 +64,9 @@ Examples:
 			}
 
 			serverName = convertServerName(serverName)
+			if sqlArgs.DBDriver == DBDriverMongodb {
+				sqlArgs.IsEmbed = false
+			}
 
 			tableNames := strings.Split(dbTables, ",")
 			for _, tableName := range tableNames {
@@ -80,6 +83,7 @@ Examples:
 				g := &handlerPbGenerator{
 					moduleName: moduleName,
 					serverName: serverName,
+					dbDriver:   sqlArgs.DBDriver,
 					isEmbed:    sqlArgs.IsEmbed,
 					codes:      codes,
 					outPath:    outPath,
@@ -107,7 +111,7 @@ using help:
 	//_ = cmd.MarkFlagRequired("module-name")
 	cmd.Flags().StringVarP(&serverName, "server-name", "s", "", "server name")
 	//_ = cmd.MarkFlagRequired("server-name")
-	cmd.Flags().StringVarP(&sqlArgs.DBDriver, "db-driver", "k", "mysql", "database driver, support mysql, postgresql, tidb, sqlite")
+	cmd.Flags().StringVarP(&sqlArgs.DBDriver, "db-driver", "k", "mysql", "database driver, support mysql, mongodb, postgresql, tidb, sqlite")
 	cmd.Flags().StringVarP(&sqlArgs.DBDsn, "db-dsn", "d", "", "database content address, e.g. user:password@(host:port)/database. Note: if db-driver=sqlite, db-dsn must be a local sqlite db file, e.g. --db-dsn=/tmp/sponge_sqlite.db") //nolint
 	_ = cmd.MarkFlagRequired("db-dsn")
 	cmd.Flags().StringVarP(&dbTables, "db-table", "t", "", "table name, multiple names separated by commas")
@@ -123,6 +127,7 @@ using help:
 type handlerPbGenerator struct {
 	moduleName string
 	serverName string
+	dbDriver   string
 	isEmbed    bool
 	codes      map[string]string
 	outPath    string
@@ -143,12 +148,28 @@ func (g *handlerPbGenerator) generateCode() (string, error) {
 	subDirs := []string{"internal/model", "internal/cache", "internal/dao", "internal/ecode",
 		"internal/handler", "api/serverNameExample"} // only the specified subdirectory is processed, if empty or no subdirectory is specified, it means all files
 	ignoreDirs := []string{} // specify the directory in the subdirectory where processing is ignored
-	ignoreFiles := []string{ // specify the files in the subdirectory to be ignored for processing
-		"userExample.pb.go", "userExample.pb.validate.go", "userExample_grpc.pb.go", "userExample_router.pb.go", // api/serverNameExample
-		"systemCode_http.go", "systemCode_rpc.go", "userExample_rpc.go", // internal/ecode
-		"init.go", "init_test.go", // internal/model
-		"handler/userExample.go", "handler/userExample_test.go", "handler/userExample_logic_test.go", // internal/handler
-		"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", // internal/cache
+	var ignoreFiles []string
+	switch strings.ToLower(g.dbDriver) {
+	case DBDriverMysql, DBDriverPostgresql, DBDriverTidb, DBDriverSqlite:
+		ignoreFiles = []string{ // specify the files in the subdirectory to be ignored for processing
+			"userExample.pb.go", "userExample.pb.validate.go", "userExample_grpc.pb.go", "userExample_router.pb.go", // api/serverNameExample
+			"systemCode_http.go", "systemCode_rpc.go", "userExample_rpc.go", // internal/ecode
+			"init.go", "init_test.go", "init.go.mgo", // internal/model
+			"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", "cache/userExample.go.mgo", // internal/cache
+			"dao/userExample.go.mgo",                                                                                                         // internal/dao
+			"handler/userExample.go", "handler/userExample_test.go", "handler/userExample_logic_test.go", "handler/userExample_logic.go.mgo", // internal/handler
+		}
+	case DBDriverMongodb:
+		ignoreFiles = []string{ // specify the files in the subdirectory to be ignored for processing
+			"userExample.pb.go", "userExample.pb.validate.go", "userExample_grpc.pb.go", "userExample_router.pb.go", // api/serverNameExample
+			"systemCode_http.go", "systemCode_rpc.go", "userExample_rpc.go", // internal/ecode
+			"init.go", "init_test.go", "init.go.mgo", // internal/model
+			"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", "cache/userExample.go", "cache/userExample_test.go", // internal/cache
+			"dao/userExample_test.go", "dao/userExample.go", // internal/dao
+			"handler/userExample.go", "handler/userExample_test.go", "handler/userExample_logic_test.go", "handler/userExample_test.go", "handler/userExample_logic.go", // internal/handler
+		}
+	default:
+		return "", errors.New("unsupported db driver: " + g.dbDriver)
 	}
 
 	r.SetSubDirsAndFiles(subDirs)
@@ -169,6 +190,7 @@ func (g *handlerPbGenerator) addFields(r replacer.Replacer) []replacer.Field {
 
 	fields = append(fields, deleteFieldsMark(r, modelFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, daoFile, startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, daoMgoFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, daoTestFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, handlerLogicFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, protoFile, startMark, endMark)...)
@@ -220,7 +242,15 @@ func (g *handlerPbGenerator) addFields(r replacer.Replacer) []replacer.Field {
 			New: "github.com/zhufuyi/sponge/pkg",
 		},
 		{
+			Old: "userExample_logic.go.mgo",
+			New: "userExample.go",
+		},
+		{
 			Old: "userExample_logic.go",
+			New: "userExample.go",
+		},
+		{
+			Old: "userExample.go.mgo",
 			New: "userExample.go",
 		},
 		{

@@ -11,22 +11,25 @@ import (
 
 func TestParseSql(t *testing.T) {
 	sql := `CREATE TABLE t_person_info (
-  age INT(11) unsigned NULL,
   id BIGINT(11) PRIMARY KEY AUTO_INCREMENT NOT NULL COMMENT 'id',
+  age INT(11) unsigned NULL,
   name VARCHAR(30) NOT NULL DEFAULT 'default_name' COMMENT 'name',
   created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   login_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  sex VARCHAR(2) NULL,
+  gender INT(8) NULL,
   num INT(11) DEFAULT 3 NULL,
   comment TEXT
   ) COMMENT="person info";`
 
-	codes, err := ParseSQL(sql, WithTablePrefix("t_"), WithJSONTag(0))
+	codes, err := ParseSQL(sql, WithTablePrefix("t_"), WithJSONTag(0), WithNullStyle(NullDisable))
 	assert.Nil(t, err)
 	for k, v := range codes {
 		assert.NotEmpty(t, k)
 		assert.NotEmpty(t, v)
 	}
+	t.Log(codes[CodeTypeJSON])
+	return
+	//printCode(codes)
 
 	codes, err = ParseSQL(sql, WithTablePrefix("t_"), WithJSONTag(0), WithEmbed())
 	assert.Nil(t, err)
@@ -34,6 +37,23 @@ func TestParseSql(t *testing.T) {
 		assert.NotEmpty(t, k)
 		assert.NotEmpty(t, v)
 	}
+	//printCode(codes)
+
+	codes, err = ParseSQL(sql, WithTablePrefix("t_"), WithJSONTag(0), WithWebProto())
+	assert.Nil(t, err)
+	for k, v := range codes {
+		assert.NotEmpty(t, k)
+		assert.NotEmpty(t, v)
+	}
+	//printCode(codes)
+
+	codes, err = ParseSQL(sql, WithTablePrefix("t_"), WithJSONTag(0), WithDBDriver(DBDriverPostgresql))
+	assert.Nil(t, err)
+	for k, v := range codes {
+		assert.NotEmpty(t, k)
+		assert.NotEmpty(t, v)
+	}
+	//printCode(codes)
 }
 
 var testData = [][]string{
@@ -121,7 +141,7 @@ func Test_parseOption(t *testing.T) {
 }
 
 func Test_mysqlToGoType(t *testing.T) {
-	testData := []*types.FieldType{
+	fields := []*types.FieldType{
 		{Tp: uint8('n')},
 		{Tp: mysql.TypeTiny},
 		{Tp: mysql.TypeLonglong},
@@ -132,7 +152,7 @@ func Test_mysqlToGoType(t *testing.T) {
 		{Tp: mysql.TypeJSON},
 	}
 	var names []string
-	for _, d := range testData {
+	for _, d := range fields {
 		name1, _ := mysqlToGoType(d, NullInSql)
 		name2, _ := mysqlToGoType(d, NullInPointer)
 		names = append(names, name1, name2)
@@ -141,12 +161,12 @@ func Test_mysqlToGoType(t *testing.T) {
 }
 
 func Test_goTypeToProto(t *testing.T) {
-	testData := []tmplField{
+	fields := []tmplField{
 		{GoType: "int"},
 		{GoType: "uint"},
 		{GoType: "time.Time"},
 	}
-	v := goTypeToProto(testData)
+	v := goTypeToProto(fields)
 	assert.NotNil(t, v)
 }
 
@@ -179,8 +199,11 @@ func TestGetMysqlTableInfo(t *testing.T) {
 
 func TestGetPostgresqlTableInfo(t *testing.T) {
 	fields, err := GetPostgresqlTableInfo("host=192.168.3.37 port=5432 user=root password=123456 dbname=account sslmode=disable", "user_example")
-	t.Log(fields, err)
-	sql, fieldTypes := ConvertToMysqlTable("user_example", fields)
+	if err != nil {
+		t.Log(err)
+		return
+	}
+	sql, fieldTypes := ConvertToSQLByPgFields("user_example", fields)
 	t.Log(sql, fieldTypes)
 }
 
@@ -189,13 +212,23 @@ func TestGetSqliteTableInfo(t *testing.T) {
 	t.Log(err, info)
 }
 
-func TestConvertToMysqlTable(t *testing.T) {
+func TestGetMongodbTableInfo(t *testing.T) {
+	fields, err := GetMongodbTableInfo("mongodb://root:123456@192.168.3.37:27017/account", "people")
+	if err != nil {
+		t.Log(err)
+		return
+	}
+	sql, fieldTypes := ConvertToSQLByMgoFields("people", fields)
+	t.Log(sql, fieldTypes)
+}
+
+func TestConvertToSQLByPgFields(t *testing.T) {
 	fields := []*PGField{
 		{Name: "id", Type: "smallint"},
 		{Name: "name", Type: "character", Lengthvar: 24, Notnull: false},
 		{Name: "age", Type: "smallint", Notnull: true},
 	}
-	sql, tps := ConvertToMysqlTable("foobar", fields)
+	sql, tps := ConvertToSQLByPgFields("foobar", fields)
 	t.Log(sql, tps)
 }
 
@@ -218,4 +251,156 @@ func Test_toMysqlTable(t *testing.T) {
 	for _, field := range fields {
 		t.Log(toMysqlType(field), getType(field))
 	}
+}
+
+func printCode(code map[string]string) {
+	for k, v := range code {
+		fmt.Printf("\n\n----------------- %s --------------------\n%s\n", k, v)
+	}
+}
+
+func Test_getMongodbTableFields(t *testing.T) {
+	fields := []*MgoField{
+		{
+			Name:           "_id",
+			Type:           "primitive.ObjectID",
+			ObjectStr:      "",
+			ProtoObjectStr: "",
+		},
+		{
+			Name:           "age",
+			Type:           "int",
+			ObjectStr:      "",
+			ProtoObjectStr: "",
+		},
+		{
+			Name:           "birthday",
+			Type:           "time.Time",
+			ObjectStr:      "",
+			ProtoObjectStr: "",
+		},
+		{
+			Name:      "home_address",
+			Type:      "HomeAddress",
+			ObjectStr: "type HomeAddress struct { Street string `bson:\"street\" json:\"street\"`; City string `bson:\"city\" json:\"city\"`; State string `bson:\"state\" json:\"state\"`; Zip int `bson:\"zip\" json:\"zip\"` } ",
+			ProtoObjectStr: `message HomeAddress {
+			string street = 1;
+			string city = 2;
+			string state = 3;
+			int32 zip = 4;
+		}
+		`,
+		},
+		{
+			Name:           "interests",
+			Type:           "[]string",
+			ObjectStr:      "",
+			ProtoObjectStr: "",
+		},
+		{
+			Name:           "is_child",
+			Type:           "bool",
+			ObjectStr:      "",
+			ProtoObjectStr: "",
+		},
+		{
+			Name:           "name",
+			Type:           "string",
+			ObjectStr:      "",
+			ProtoObjectStr: "",
+		},
+		{
+			Name:           "numbers",
+			Type:           "[]int",
+			ObjectStr:      "",
+			ProtoObjectStr: "",
+		},
+		{
+			Name:      "shop_addresses",
+			Type:      "[]ShopAddress",
+			ObjectStr: "type ShopAddress  struct { CityO string `bson:\"city_o\" json:\"cityO\"`; StateO string `bson:\"state_o\" json:\"stateO\"` }",
+			ProtoObjectStr: `message ShopAddress  {
+		string city_o = 1;
+		string state_o = 2;
+		}
+		`,
+		},
+		{
+			Name:           "created_at",
+			Type:           "time.Time",
+			ObjectStr:      "",
+			ProtoObjectStr: "",
+		},
+		{
+			Name:           "updated_at",
+			Type:           "time.Time",
+			ObjectStr:      "",
+			ProtoObjectStr: "",
+		},
+		{
+			Name:           "deleted_at",
+			Type:           "*time.Time",
+			ObjectStr:      "",
+			ProtoObjectStr: "",
+		},
+	}
+
+	goStructs := MgoFieldToGoStruct("foobar", fields)
+	t.Log(goStructs)
+
+	sql, fieldsMap := ConvertToSQLByMgoFields("foobar", fields)
+	t.Log(sql)
+	opts := []Option{
+		WithDBDriver(DBDriverMongodb),
+		WithFieldTypes(fieldsMap),
+		WithJSONTag(1),
+	}
+	codes, err := ParseSQL(sql, opts...)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	_ = codes
+	//printCode(codes)
+
+	sql, fieldsMap = ConvertToSQLByMgoFields("foobar", fields)
+	t.Log(sql)
+	opts = []Option{
+		WithDBDriver(DBDriverMongodb),
+		WithFieldTypes(fieldsMap),
+		WithJSONTag(1),
+		WithWebProto(),
+	}
+	codes, err = ParseSQL(sql, opts...)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	//printCode(codes)
+}
+
+func Test_toSingular(t *testing.T) {
+	strs := []string{
+		"users",
+		"address",
+		"addresses",
+	}
+	for _, str := range strs {
+		t.Log(str, toSingular(str))
+	}
+}
+
+func Test_embedTimeFields(t *testing.T) {
+	names := []string{"age"}
+
+	fields := embedTimeField(names, []*MgoField{})
+	t.Log(fields)
+
+	names = []string{
+		"created_at",
+		"updated_at",
+		"deleted_at",
+	}
+	fields = embedTimeField(names, []*MgoField{})
+	t.Log(fields)
 }

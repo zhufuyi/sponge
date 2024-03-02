@@ -41,6 +41,21 @@ func AdaptivePostgresqlDsn(dsn string) string {
 		u.Hostname(), u.Port(), u.User.Username(), password, u.Path[1:], strings.Join(ss, " "))
 }
 
+// AdaptiveSqlite adaptive sqlite
+func AdaptiveSqlite(dbFile string) string {
+	// todo convert to absolute path
+	return dbFile
+}
+
+// AdaptiveMongodbDsn adaptive mongodb dsn
+func AdaptiveMongodbDsn(dsn string) string {
+	if !strings.Contains(dsn, "mongodb://") {
+		dsn = "mongodb://" + dsn
+	}
+
+	return deleteBrackets(dsn)
+}
+
 func deleteBrackets(str string) string {
 	start := strings.Index(str, "@(")
 	end := strings.LastIndex(str, ")/")

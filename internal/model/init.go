@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/zhufuyi/sponge/internal/config"
+
 	"github.com/zhufuyi/sponge/pkg/ggorm"
 	"github.com/zhufuyi/sponge/pkg/goredis"
 	"github.com/zhufuyi/sponge/pkg/logger"
@@ -121,7 +122,7 @@ func InitDB() {
 	case ggorm.DBDriverSqlite:
 		InitSqlite()
 	default:
-		panic("unsupported database driver: " + config.Get().Database.Driver)
+		panic("InitDB error, unsupported database driver: " + config.Get().Database.Driver)
 	}
 }
 
@@ -157,7 +158,7 @@ func InitMysql() {
 	var err error
 	db, err = ggorm.InitMysql(dsn, opts...)
 	if err != nil {
-		panic("ggorm.InitMysql error: " + err.Error())
+		panic("InitMysql error: " + err.Error())
 	}
 }
 
@@ -186,7 +187,7 @@ func InitPostgresql() {
 	var err error
 	db, err = ggorm.InitPostgresql(dsn, opts...)
 	if err != nil {
-		panic("ggorm.InitPostgresql error: " + err.Error())
+		panic("InitPostgresql error: " + err.Error())
 	}
 }
 
@@ -209,9 +210,10 @@ func InitSqlite() {
 	}
 
 	var err error
-	db, err = ggorm.InitSqlite(config.Get().Database.Sqlite.DBFile, opts...)
+	var dbFile = utils.AdaptiveSqlite(config.Get().Database.Sqlite.DBFile)
+	db, err = ggorm.InitSqlite(dbFile, opts...)
 	if err != nil {
-		panic("ggorm.InitSqlite error: " + err.Error())
+		panic("InitSqlite error: " + err.Error())
 	}
 }
 
