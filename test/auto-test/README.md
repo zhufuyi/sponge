@@ -32,3 +32,19 @@ After testing, remove the code generated during the testing process.
 ```bash
 bash clean.sh
 ```
+
+<br>
+
+## Generate Command Test
+
+A total of 13 service codes are generated, including web, grpc, grpc gateway services
+
+```bash
+bash generate_test.sh
+```
+
+After testing, remove the code generated code.
+
+```bash
+bash clean_generate.sh
+```

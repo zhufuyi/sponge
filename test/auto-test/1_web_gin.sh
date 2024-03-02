@@ -23,25 +23,25 @@ function stopService() {
 function testRequest() {
   echo "--------------------- 20s 后测试开始 ---------------------"
   sleep 20
-  for i in {1..3}; do
-    echo -e "\n\n"
-    echo "${i} 获取详情 [GET] curl http://localhost:8080/api/v1/teacher/1"
-    curl http://localhost:8080/api/v1/teacher/1
-    echo -e "\n\n"
-    sleep 3
 
-    echo -e "\n\n"
-    echo "${i} 获取列表 [GET] curl http://localhost:8080/api/v1/teacher/list"
-    curl http://localhost:8080/api/v1/teacher/list
-    echo -e "\n\n"
-    sleep 3
+  echo -e "\n\n"
+  echo "$获取详情 [GET] curl http://localhost:8080/api/v1/${mysqlTable}/1"
+  curl http://localhost:8080/api/v1/${mysqlTable}/1
+  echo -e "\n\n"
+  sleep 3
 
-    echo -e "\n\n"
-    echo ${i}' 获取列表 [POST] curl -X POST http://localhost:8080/api/v1/teacher/list -H "X-Request-Id: qaz12wx3ed4" -H "Content-Type: application/json" -d "{\"columns\":[{\"exp\":\">\",\"name\":\"id\",\"value\":1}],\"page\":0,\"size\":10}"'
-    curl -X POST http://localhost:8080/api/v1/teacher/list -H "X-Request-Id: qaz12wx3ed4" -H "Content-Type: application/json" -d "{\"columns\":[{\"exp\":\">\",\"name\":\"id\",\"value\":1}],\"page\":0,\"size\":10}"
-    echo -e "\n\n"
-    sleep 3
-  done
+  echo -e "\n\n"
+  echo "获取列表1 [GET] curl http://localhost:8080/api/v1/${mysqlTable}/list"
+  curl http://localhost:8080/api/v1/${mysqlTable}/list
+  echo -e "\n\n"
+  sleep 3
+
+  echo -e "\n\n"
+  echo '获取列表2 [POST] curl -X POST http://localhost:8080/api/v1/${mysqlTable}/list -H "X-Request-Id: qaz12wx3ed4" -H "Content-Type: application/json" -d "{\"columns\":[{\"exp\":\">\",\"name\":\"id\",\"value\":1}],\"page\":0,\"size\":10}"'
+  curl -X POST http://localhost:8080/api/v1/${mysqlTable}/list -H "X-Request-Id: qaz12wx3ed4" -H "Content-Type: application/json" -d "{\"columns\":[{\"exp\":\">\",\"name\":\"id\",\"value\":1}],\"page\":0,\"size\":10}"
+  echo -e "\n\n"
+  sleep 3
+
   echo ""
   echo "--------------------- 测试结束！---------------------"
   stopService

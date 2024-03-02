@@ -94,7 +94,7 @@ else
   checkResult $?
 
   echo "修改配置文件的grpcClient字段"
-  sed -i "s/your-rpc-server-name/user/g" ./${rpcGwDir}/configs/user_gw.yml
+  sed -i "s/your_grpc_service_name/user/g" ./${rpcGwDir}/configs/user_gw.yml
   checkResult $?
 
   echo "复制proto文件到rpc网关目录"

@@ -20,19 +20,19 @@ function stopService() {
 function testRequest() {
   echo "--------------------- 20s 后测试开始 ---------------------"
   sleep 20
-  for i in {1..3}; do
-    echo -e "\n\n"
-    echo ${i} 'curl -X POST http://localhost:8080/api/v1/auth/register -H "Content-Type: application/json" -d "{\"email\":\"foo@bar.com\",\"password\":\"123456\"}"'
-    curl -X POST http://localhost:8080/api/v1/auth/register -H "Content-Type: application/json" -d "{\"email\":\"foo@bar.com\",\"password\":\"123456\"}"
-    echo -e "\n\n"
-    sleep 3
 
-    echo -e "\n\n"
-    echo 'curl -X POST http://localhost:8080/api/v1/auth/register  -H "Content-Type: application/json" -H "X-Request-Id: qaz12wx3ed4" -d "{\"email\":\"foo@bar.com\",\"password\":\"123456\"}"'
-    curl -X POST http://localhost:8080/api/v1/auth/register -H "Content-Type: application/json" -H "X-Request-Id: qaz12wx3ed4" -d "{\"email\":\"foo@bar.com\",\"password\":\"123456\"}"
-    echo -e "\n\n"
-    sleep 3
-  done
+  echo -e "\n\n"
+  echo 'curl -X POST http://localhost:8080/api/v1/auth/register -H "Content-Type: application/json" -d "{\"email\":\"foo@bar.com\",\"password\":\"123456\"}"'
+  curl -X POST http://localhost:8080/api/v1/auth/register -H "Content-Type: application/json" -d "{\"email\":\"foo@bar.com\",\"password\":\"123456\"}"
+  echo -e "\n\n"
+  sleep 3
+
+  echo -e "\n\n"
+  echo 'curl -X POST http://localhost:8080/api/v1/auth/register  -H "Content-Type: application/json" -H "X-Request-Id: qaz12wx3ed4" -d "{\"email\":\"foo@bar.com\",\"password\":\"123456\"}"'
+  curl -X POST http://localhost:8080/api/v1/auth/register -H "Content-Type: application/json" -H "X-Request-Id: qaz12wx3ed4" -d "{\"email\":\"foo@bar.com\",\"password\":\"123456\"}"
+  echo -e "\n\n"
+  sleep 3
+
   echo "--------------------- 测试结束！---------------------"
   stopService
 }
