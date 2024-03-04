@@ -106,6 +106,7 @@ Examples:
 				sg := &serviceGenerator{
 					moduleName: moduleName,
 					serverName: serverName,
+					dbDriver:   sqlArgs.DBDriver,
 					isEmbed:    sqlArgs.IsEmbed,
 					codes:      codes,
 					outPath:    outPath,
