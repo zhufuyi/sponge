@@ -29,21 +29,15 @@ sponge主要基于`SQL`和`Protobuf`两种方式生成代码，每种方式拥�
 
 <br>
 
-#### 生成代码的鸡蛋模型
+#### 生成服务代码的鸡蛋模型
 
-sponge生成代码过程中剥离了业务逻辑与非业务逻辑两大部分代码，把sponge的生成代码功能看作是母鸡，生成的服务代码就是鸡蛋，以生成的一个web服务后端代码为例：
-
-- `蛋壳`是web服务框架代码(自动生成，不需要人工编写)。
-- `蛋黄`是业务逻辑的核心，例如定义mysql表、在proto定义api接口、编写具体逻辑代码都属于蛋黄部分(需要人工编写的代码)。
-- `蛋白`是业务逻辑核心代码与web框架代码连接的桥梁，例如根据proto文件生成的注册路由代码、handler代码、dao代码、参数校验代码、错误码、swagger文档等都属于蛋白部分(自动生成，不需要人工编写)。
-
-下面是`⓷基于protobuf创建的web服务`代码的鸡蛋模型剖析图：
+sponge生成代码过程中剥离了业务逻辑与非业务逻辑两大部分代码，把sponge的生成代码功能看作是母鸡，生成的服务代码就是鸡蛋，以生成的一个web服务后端代码为例，鸡蛋模型剖析图：
 
 <p align="center">
 <img width="1200px" src="https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/web-http-pb-anatomy.png">
 </p>
 
-除了web服务后端代码鸡蛋模型，还有grpc服务代码、grpc网关服务代码的鸡蛋模型，在[sponge文档](https://go-sponge.com/zh-cn/learn-about-sponge?id=%f0%9f%8f%b7%e9%a1%b9%e7%9b%ae%e4%bb%a3%e7%a0%81%e9%b8%a1%e8%9b%8b%e6%a8%a1%e5%9e%8b)中有介绍。
+除了web服务后端代码鸡蛋模型，还有grpc服务代码和grpc网关服务代码的鸡蛋模型，点击[这里查看](https://go-sponge.com/zh-cn/learn-about-sponge?id=%f0%9f%8f%b7%e7%94%9f%e6%88%90%e6%9c%8d%e5%8a%a1%e4%bb%a3%e7%a0%81%e7%9a%84%e9%b8%a1%e8%9b%8b%e6%a8%a1%e5%9e%8b)。
 
 <br>
 

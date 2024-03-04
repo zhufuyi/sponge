@@ -64,16 +64,16 @@ var mgoTypeToGo = map[bsontype.Type]string{
 	bson.TypeJavaScript:       goTypeString,
 }
 
-var jsonTagFormat int32 // 0: camel case, 1: snake case
+var jsonTagFormat int32 = 1 // 0: snake case, 1: camel case
 
 // SetJSONTagSnakeCase set json tag format to snake case
 func SetJSONTagSnakeCase() {
-	atomic.AddInt32(&jsonTagFormat, 1)
+	atomic.AddInt32(&jsonTagFormat, -jsonTagFormat)
 }
 
 // SetJSONTagCamelCase set json tag format to camel case
 func SetJSONTagCamelCase() {
-	atomic.AddInt32(&jsonTagFormat, -jsonTagFormat)
+	atomic.AddInt32(&jsonTagFormat, 1)
 }
 
 // MgoField mongo field
@@ -172,9 +172,9 @@ func parseObject(name string, elements []bson.RawElement) (goTypeStr string, goO
 
 		var jsonTag string
 		if jsonTagFormat == 0 {
-			jsonTag = toLowerFirst(xstrings.ToCamelCase(k))
-		} else {
 			jsonTag = xstrings.ToSnakeCase(k)
+		} else {
+			jsonTag = toLowerFirst(xstrings.ToCamelCase(k))
 		}
 
 		goObjStr += fmt.Sprintf("    %s %s `bson:\"%s\" json:\"%s\"`\n", xstrings.ToCamelCase(k), t, k, jsonTag)

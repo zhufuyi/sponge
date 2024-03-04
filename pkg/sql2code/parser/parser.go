@@ -320,6 +320,14 @@ func makeCode(stmt *ast.CreateTableStmt, opt options) (*codeText, error) {
 	if opt.ForceTableName || data.RawTableName != inflection.Plural(data.RawTableName) {
 		data.NameFunc = true
 	}
+	switch opt.DBDriver {
+	case DBDriverMongodb:
+		if opt.JSONNamedType != 0 {
+			SetJSONTagCamelCase()
+		} else {
+			SetJSONTagSnakeCase()
+		}
+	}
 
 	data.TableName = toCamel(data.TableName)
 	data.TName = firstLetterToLow(data.TableName)

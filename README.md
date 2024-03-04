@@ -45,21 +45,15 @@ sponge is mainly based on `SQL` and `Protobuf` two ways to generate code, each w
 
 <br>
 
-#### Generate Code for Egg Model
+#### Generate Service Code for Egg Model
 
-The sponge code generation process strips away the business logic and non-business logic of the two major parts of the code. Sponge's code generation function as a hen, the generated service code is the egg, take the generated web service backend code as an example:
-
-- `Eggshell` is web service framework code (automatically generated without manual writing).
-- `Yolk` is the core of business logic. For example, defining mysql tables, defining api interfaces, and writing specific logic codes all belong to yolk (code that needs to be written manually).
-- `Albumen` is a bridge connecting the core code of business logic and the web framework code. For example, the registration route code, handler code, parameter verification code, error code, and swagger document generated according to the proto file belong to the albumen (code that automatically generated without manual writing).
-
-Here is egg model profiling diagram for `⓷Create web service based on protobuf`:
+The sponge code generation process strips away the business logic and non-business logic of the two major parts of the code. Sponge's code generation function as a hen, the generated service code is the egg, take the generated web service backend code as an example, egg model profiling diagram:
 
 <p align="center">
 <img width="1200px" src="https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/en_web-http-pb-anatomy.png">
 </p>
 
-In addition to the egg model of web service backend code, there are egg models of grpc service code and grpc gateway service code described in [sponge documentation](https://go-sponge.com/learn-about-sponge?id=%f0%9f%8f%b7project-code-egg-model).
+In addition to the egg model of web service backend code, there are egg models of grpc service code and grpc gateway service code, [click here to view](https://go-sponge.com/learn-about-sponge?id=%f0%9f%8f%b7egg-model-for-generate-service-code).
 
 <br>
 

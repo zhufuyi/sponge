@@ -345,6 +345,7 @@ func Test_getMongodbTableFields(t *testing.T) {
 		},
 	}
 
+	SetJSONTagCamelCase()
 	goStructs := MgoFieldToGoStruct("foobar", fields)
 	t.Log(goStructs)
 
@@ -363,6 +364,7 @@ func Test_getMongodbTableFields(t *testing.T) {
 	_ = codes
 	//printCode(codes)
 
+	SetJSONTagSnakeCase()
 	sql, fieldsMap = ConvertToSQLByMgoFields("foobar", fields)
 	t.Log(sql)
 	opts = []Option{

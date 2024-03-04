@@ -146,7 +146,6 @@ func handleGenerateCode(c *gin.Context, outPath string, arg string) {
 	}
 
 	out = os.TempDir() + gofile.GetPathDelimiter() + out
-	//fmt.Println("outTmp =", out)
 	args = append(args, fmt.Sprintf("--out=%s", out))
 
 	ctx, _ := context.WithTimeout(context.Background(), time.Second*10) // nolint

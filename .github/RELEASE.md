@@ -1,5 +1,4 @@
 ## Change log
 
-- Add model, dao, handler, service, web service, and grpc service code generated from mongodb sql.
-- Add test generation code command script.
-- Update document.
+- Fix `⓶ create grpc service based on sql`, selecting multiple tables to generate code reports **unsupported db driver error**.
+- The mongodb json tag supports both shake case and camel case naming.

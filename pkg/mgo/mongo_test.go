@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 	mgoOptions "go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -13,6 +14,9 @@ func TestInit(t *testing.T) {
 	dsns := []string{
 		"mongodb://root:123456@192.168.3.37:27017/account",
 		"mongodb://root:123456@192.168.3.37:27017/account?connectTimeoutMS=2000",
+		// error
+		"mongodb-dsn",
+		"mongodb://root:123456@192.168.3.37",
 	}
 	for _, dsn := range dsns {
 		timeout := time.Second * 2
@@ -20,11 +24,15 @@ func TestInit(t *testing.T) {
 		db, err := Init(dsn, opts)
 		if err != nil {
 			t.Log(err)
-			return
+			continue
 		}
 		time.Sleep(time.Millisecond * 100)
 		defer Close(db)
 	}
+
+	defer func() { recover() }()
+	db := &mongo.Database{}
+	_ = Close(db)
 }
 
 func TestInit2(t *testing.T) {

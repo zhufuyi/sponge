@@ -97,7 +97,6 @@ type dbInitGenerator struct {
 }
 
 func (g *dbInitGenerator) generateCode() (string, error) {
-	fmt.Println(*g)
 	subTplName := "init-" + g.dbDriver
 	r := generate.Replacers[generate.TplNameSponge]
 	if r == nil {
