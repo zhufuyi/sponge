@@ -6,9 +6,9 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/zhufuyi/sponge/cmd/protoc-gen-go-rpc-tmpl/internal/parse"
-
 	"google.golang.org/protobuf/compiler/protogen"
+
+	"github.com/zhufuyi/sponge/cmd/protoc-gen-go-rpc-tmpl/internal/parse"
 )
 
 // GenerateFiles generate service template code and error codes

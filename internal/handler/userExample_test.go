@@ -5,19 +5,19 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zhufuyi/sponge/internal/cache"
-	"github.com/zhufuyi/sponge/internal/dao"
-	"github.com/zhufuyi/sponge/internal/model"
-	"github.com/zhufuyi/sponge/internal/types"
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/jinzhu/copier"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/zhufuyi/sponge/pkg/ggorm/query"
 	"github.com/zhufuyi/sponge/pkg/gohttp"
 	"github.com/zhufuyi/sponge/pkg/gotest"
 	"github.com/zhufuyi/sponge/pkg/utils"
 
-	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/jinzhu/copier"
-	"github.com/stretchr/testify/assert"
+	"github.com/zhufuyi/sponge/internal/cache"
+	"github.com/zhufuyi/sponge/internal/dao"
+	"github.com/zhufuyi/sponge/internal/model"
+	"github.com/zhufuyi/sponge/internal/types"
 )
 
 func newUserExampleHandler() *gotest.Handler {

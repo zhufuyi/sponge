@@ -1,7 +1,5 @@
 package gocrypto
 
-// 单向加密md5、sha1、sha256、sha512 ......
-
 import (
 	"crypto"
 	"crypto/md5"

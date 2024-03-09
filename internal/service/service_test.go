@@ -6,8 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zhufuyi/sponge/configs"
-	"github.com/zhufuyi/sponge/internal/config"
+	"google.golang.org/grpc"
 
 	"github.com/zhufuyi/sponge/pkg/consulcli"
 	"github.com/zhufuyi/sponge/pkg/etcdcli"
@@ -20,7 +19,8 @@ import (
 	"github.com/zhufuyi/sponge/pkg/servicerd/registry/nacos"
 	"github.com/zhufuyi/sponge/pkg/utils"
 
-	"google.golang.org/grpc"
+	"github.com/zhufuyi/sponge/configs"
+	"github.com/zhufuyi/sponge/internal/config"
 )
 
 func TestRegisterAllService(t *testing.T) {

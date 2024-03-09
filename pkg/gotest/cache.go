@@ -3,10 +3,10 @@ package gotest
 import (
 	"context"
 
-	"github.com/zhufuyi/sponge/pkg/utils"
-
 	"github.com/alicebob/miniredis/v2"
 	"github.com/go-redis/redis/v8"
+
+	"github.com/zhufuyi/sponge/pkg/utils"
 )
 
 // Cache redis cache

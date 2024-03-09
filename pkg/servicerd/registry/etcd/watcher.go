@@ -3,9 +3,9 @@ package etcd
 import (
 	"context"
 
-	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
-
 	clientv3 "go.etcd.io/etcd/client/v3"
+
+	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
 )
 
 var _ registry.Watcher = &watcher{}

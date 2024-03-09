@@ -4,9 +4,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/zhufuyi/sponge/pkg/replacer"
-
 	"github.com/spf13/cobra"
+
+	"github.com/zhufuyi/sponge/pkg/replacer"
 )
 
 // CacheCommand generate cache code

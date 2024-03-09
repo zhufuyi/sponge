@@ -7,15 +7,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zhufuyi/sponge/configs"
-	"github.com/zhufuyi/sponge/internal/config"
+	"github.com/stretchr/testify/assert"
+	"google.golang.org/grpc"
 
 	"github.com/zhufuyi/sponge/pkg/grpc/gtls/certfile"
 	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
 	"github.com/zhufuyi/sponge/pkg/utils"
 
-	"github.com/stretchr/testify/assert"
-	"google.golang.org/grpc"
+	"github.com/zhufuyi/sponge/configs"
+	"github.com/zhufuyi/sponge/internal/config"
 )
 
 func TestGRPCServer(t *testing.T) {

@@ -13,11 +13,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zhufuyi/sponge/pkg/utils"
-
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/zhufuyi/sponge/pkg/utils"
 )
 
 func runValidatorHTTPServer() string {

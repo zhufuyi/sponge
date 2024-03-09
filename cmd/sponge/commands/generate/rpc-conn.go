@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/zhufuyi/sponge/pkg/replacer"
-
 	"github.com/spf13/cobra"
+
+	"github.com/zhufuyi/sponge/pkg/replacer"
 )
 
 // GRPCConnectionCommand generate grpc connection code

@@ -7,12 +7,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/zhufuyi/sponge/pkg/grpc/benchmark"
+
 	serverNameExampleV1 "github.com/zhufuyi/sponge/api/serverNameExample/v1"
 	"github.com/zhufuyi/sponge/api/types"
 	"github.com/zhufuyi/sponge/configs"
 	"github.com/zhufuyi/sponge/internal/config"
-
-	"github.com/zhufuyi/sponge/pkg/grpc/benchmark"
 )
 
 // Test each method of userExample via the rpc client

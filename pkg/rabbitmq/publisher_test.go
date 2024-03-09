@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zhufuyi/sponge/pkg/utils"
-
 	amqp "github.com/rabbitmq/amqp091-go"
+
+	"github.com/zhufuyi/sponge/pkg/utils"
 )
 
 var testChannelName = "pub-sub"

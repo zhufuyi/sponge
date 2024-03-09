@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.opentelemetry.io/otel/propagation"
 	oteltrace "go.opentelemetry.io/otel/trace"
+	"go.opentelemetry.io/otel/trace/embedded"
 )
 
 func TestTracing(t *testing.T) {
@@ -41,6 +42,7 @@ func TestTracing(t *testing.T) {
 }
 
 type propagators struct {
+	embedded.TracerProvider
 }
 
 func (p *propagators) Tracer(instrumentationName string, opts ...oteltrace.TracerOption) oteltrace.Tracer {
@@ -48,6 +50,7 @@ func (p *propagators) Tracer(instrumentationName string, opts ...oteltrace.Trace
 }
 
 type tracer struct {
+	embedded.Tracer
 }
 
 func (t *tracer) Start(ctx context.Context, spanName string, opts ...oteltrace.SpanStartOption) (context.Context, oteltrace.Span) {

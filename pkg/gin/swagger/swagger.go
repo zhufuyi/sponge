@@ -6,12 +6,12 @@ import (
 	"os"
 	"strings"
 
-	"github.com/zhufuyi/sponge/pkg/gofile"
-
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swaggo/swag"
+
+	"github.com/zhufuyi/sponge/pkg/gofile"
 )
 
 // DefaultRouter default swagger router, request url is http://<ip:port>/swagger/index.html

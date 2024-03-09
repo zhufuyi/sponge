@@ -5,10 +5,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
 	"github.com/zhufuyi/sponge/pkg/utils"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestNewRegistry(t *testing.T) {

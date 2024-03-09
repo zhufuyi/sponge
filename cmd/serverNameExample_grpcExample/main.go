@@ -2,9 +2,9 @@
 package main
 
 import (
-	"github.com/zhufuyi/sponge/cmd/serverNameExample_grpcExample/initial"
-
 	"github.com/zhufuyi/sponge/pkg/app"
+
+	"github.com/zhufuyi/sponge/cmd/serverNameExample_grpcExample/initial"
 )
 
 func main() {

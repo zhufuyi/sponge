@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/zhufuyi/sponge/internal/config"
+	"google.golang.org/grpc"
 
 	"github.com/zhufuyi/sponge/pkg/consulcli"
 	"github.com/zhufuyi/sponge/pkg/etcdcli"
@@ -18,7 +18,7 @@ import (
 	"github.com/zhufuyi/sponge/pkg/servicerd/registry/etcd"
 	"github.com/zhufuyi/sponge/pkg/servicerd/registry/nacos"
 
-	"google.golang.org/grpc"
+	"github.com/zhufuyi/sponge/internal/config"
 )
 
 var (

@@ -4,10 +4,10 @@ import (
 	"context"
 	"testing"
 
-	"github.com/zhufuyi/sponge/pkg/jwt"
-
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/metadata"
+
+	"github.com/zhufuyi/sponge/pkg/jwt"
 )
 
 func TestJwtVerify(t *testing.T) {

@@ -5,13 +5,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zhufuyi/sponge/configs"
-	"github.com/zhufuyi/sponge/internal/config"
+	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/zhufuyi/sponge/pkg/utils"
 
-	"github.com/gin-gonic/gin"
-	"github.com/stretchr/testify/assert"
+	"github.com/zhufuyi/sponge/configs"
+	"github.com/zhufuyi/sponge/internal/config"
 )
 
 func TestNewRouter(t *testing.T) {

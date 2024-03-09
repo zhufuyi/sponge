@@ -6,10 +6,10 @@ import (
 	"math/rand"
 	"time"
 
+	clientv3 "go.etcd.io/etcd/client/v3"
+
 	"github.com/zhufuyi/sponge/pkg/etcdcli"
 	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
-
-	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
 var (

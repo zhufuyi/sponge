@@ -8,11 +8,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/spf13/cobra"
+
 	"github.com/zhufuyi/sponge/pkg/gobash"
 	"github.com/zhufuyi/sponge/pkg/gofile"
 	"github.com/zhufuyi/sponge/pkg/utils"
-
-	"github.com/spf13/cobra"
 )
 
 // UpgradeCommand upgrade sponge binaries

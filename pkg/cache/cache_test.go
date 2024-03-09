@@ -4,11 +4,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/zhufuyi/sponge/pkg/encoding"
 	"github.com/zhufuyi/sponge/pkg/gotest"
 	"github.com/zhufuyi/sponge/pkg/utils"
-
-	"github.com/stretchr/testify/assert"
 )
 
 type cacheUser struct {

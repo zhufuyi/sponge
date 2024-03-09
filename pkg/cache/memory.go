@@ -7,9 +7,9 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/zhufuyi/sponge/pkg/encoding"
-
 	"github.com/dgraph-io/ristretto"
+
+	"github.com/zhufuyi/sponge/pkg/encoding"
 )
 
 type memoryCache struct {

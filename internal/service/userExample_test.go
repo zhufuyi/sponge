@@ -4,18 +4,18 @@ import (
 	"testing"
 	"time"
 
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/jinzhu/copier"
+	"github.com/stretchr/testify/assert"
+
+	"github.com/zhufuyi/sponge/pkg/gotest"
+	"github.com/zhufuyi/sponge/pkg/utils"
+
 	serverNameExampleV1 "github.com/zhufuyi/sponge/api/serverNameExample/v1"
 	"github.com/zhufuyi/sponge/api/types"
 	"github.com/zhufuyi/sponge/internal/cache"
 	"github.com/zhufuyi/sponge/internal/dao"
 	"github.com/zhufuyi/sponge/internal/model"
-
-	"github.com/zhufuyi/sponge/pkg/gotest"
-	"github.com/zhufuyi/sponge/pkg/utils"
-
-	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/jinzhu/copier"
-	"github.com/stretchr/testify/assert"
 )
 
 func newUserExampleService() *gotest.Service {

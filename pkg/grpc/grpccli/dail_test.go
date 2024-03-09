@@ -5,12 +5,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zhufuyi/sponge/pkg/grpc/gtls/certfile"
-	"github.com/zhufuyi/sponge/pkg/servicerd/registry/etcd"
-
 	"github.com/stretchr/testify/assert"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/zap"
+
+	"github.com/zhufuyi/sponge/pkg/grpc/gtls/certfile"
+	"github.com/zhufuyi/sponge/pkg/servicerd/registry/etcd"
 )
 
 func TestDial(t *testing.T) {

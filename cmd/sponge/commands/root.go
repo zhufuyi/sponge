@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/zhufuyi/sponge/cmd/sponge/commands/generate"
-
 	"github.com/spf13/cobra"
+
+	"github.com/zhufuyi/sponge/cmd/sponge/commands/generate"
 )
 
 var (

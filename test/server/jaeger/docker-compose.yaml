@@ -1,7 +1,7 @@
 version: '3'
 services:
   jaeger-collector:
-    image: jaegertracing/jaeger-collector:1.34
+    image: jaegertracing/jaeger-collector:1.52
     container_name: jaeger-collector
     restart: always
     environment:
@@ -14,7 +14,7 @@ services:
       - jaeger-net
 
   jaeger-agent:
-    image: jaegertracing/jaeger-agent:1.34
+    image: jaegertracing/jaeger-agent:1.52
     container_name: jaeger-agent
     restart: always
     command: "--reporter.grpc.host-port=jaeger-collector:14250"
@@ -31,7 +31,7 @@ services:
       - jaeger-collector
 
   jaeger-query:
-    image: jaegertracing/jaeger-query:1.34
+    image: jaegertracing/jaeger-query:1.52
     container_name: jaeger-query
     restart: always
     environment:

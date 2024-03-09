@@ -85,7 +85,7 @@ logger:
 # delete the templates code start
 # database setting
 database:
-  driver: "mysql"           # database driver, currently support mysql, postgres, tidb, sqlite
+  driver: "mysql"           # database driver, currently support mysql, postgresql, tidb, sqlite
   # mysql settings
   mysql:
     # dsn format,  <username>:<password>@(<hostname>:<port>)/<db>?[k=v& ......]

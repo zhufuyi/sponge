@@ -5,11 +5,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/zhufuyi/sponge/pkg/utils"
+
 	"github.com/zhufuyi/sponge/configs"
 	"github.com/zhufuyi/sponge/internal/config"
 	"github.com/zhufuyi/sponge/internal/rpcclient"
-
-	"github.com/zhufuyi/sponge/pkg/utils"
 )
 
 func TestNewUserExampleServiceClient(t *testing.T) {

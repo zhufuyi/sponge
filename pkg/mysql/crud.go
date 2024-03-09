@@ -3,9 +3,9 @@ package mysql
 import (
 	"context"
 
-	"github.com/zhufuyi/sponge/pkg/mysql/query"
-
 	"gorm.io/gorm"
+
+	"github.com/zhufuyi/sponge/pkg/mysql/query"
 )
 
 // TableName get table name

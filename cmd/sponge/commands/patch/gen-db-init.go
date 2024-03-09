@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/spf13/cobra"
+
 	"github.com/zhufuyi/sponge/cmd/sponge/commands/generate"
 	"github.com/zhufuyi/sponge/pkg/gofile"
 	"github.com/zhufuyi/sponge/pkg/replacer"
-
-	"github.com/spf13/cobra"
 )
 
 // GenerateDBInitCommand generate database initialization code

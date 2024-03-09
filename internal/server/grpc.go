@@ -8,9 +8,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/zhufuyi/sponge/internal/config"
-	"github.com/zhufuyi/sponge/internal/ecode"
-	"github.com/zhufuyi/sponge/internal/service"
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/zhufuyi/sponge/pkg/app"
 	"github.com/zhufuyi/sponge/pkg/errcode"
@@ -21,10 +22,9 @@ import (
 	"github.com/zhufuyi/sponge/pkg/prof"
 	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
 
-	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	"github.com/zhufuyi/sponge/internal/config"
+	"github.com/zhufuyi/sponge/internal/ecode"
+	"github.com/zhufuyi/sponge/internal/service"
 )
 
 var _ app.IServer = (*grpcServer)(nil)

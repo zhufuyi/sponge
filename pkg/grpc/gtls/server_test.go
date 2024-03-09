@@ -3,9 +3,9 @@ package gtls
 import (
 	"testing"
 
-	"github.com/zhufuyi/sponge/pkg/grpc/gtls/certfile"
-
 	"github.com/stretchr/testify/assert"
+
+	"github.com/zhufuyi/sponge/pkg/grpc/gtls/certfile"
 )
 
 func TestGetServerTLSCredentials(t *testing.T) {

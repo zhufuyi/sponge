@@ -5,8 +5,10 @@ package routers
 import (
 	"net/http"
 
-	"github.com/zhufuyi/sponge/docs"
-	"github.com/zhufuyi/sponge/internal/config"
+	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 
 	"github.com/zhufuyi/sponge/pkg/errcode"
 	"github.com/zhufuyi/sponge/pkg/gin/handlerfunc"
@@ -17,10 +19,8 @@ import (
 	"github.com/zhufuyi/sponge/pkg/jwt"
 	"github.com/zhufuyi/sponge/pkg/logger"
 
-	"github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin/binding"
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
+	"github.com/zhufuyi/sponge/docs"
+	"github.com/zhufuyi/sponge/internal/config"
 )
 
 var (

@@ -4,12 +4,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zhufuyi/sponge/internal/model"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/zhufuyi/sponge/pkg/gotest"
 	"github.com/zhufuyi/sponge/pkg/utils"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/zhufuyi/sponge/internal/model"
 )
 
 func newUserExampleCache() *gotest.Cache {

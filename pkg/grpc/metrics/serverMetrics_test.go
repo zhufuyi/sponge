@@ -6,11 +6,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zhufuyi/sponge/pkg/utils"
-
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc"
+
+	"github.com/zhufuyi/sponge/pkg/utils"
 )
 
 func Test_srvRegisterMetrics(t *testing.T) {

@@ -5,12 +5,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zhufuyi/sponge/configs"
-	"github.com/zhufuyi/sponge/internal/config"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/zhufuyi/sponge/pkg/utils"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/zhufuyi/sponge/configs"
+	"github.com/zhufuyi/sponge/internal/config"
 )
 
 func TestNewServerNameExampleRPCConn(t *testing.T) {

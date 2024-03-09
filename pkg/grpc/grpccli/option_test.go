@@ -1,16 +1,16 @@
 package grpccli
 
 import (
-	"go.uber.org/zap"
 	"testing"
 	"time"
 
-	"github.com/zhufuyi/sponge/pkg/grpc/interceptor"
-	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
-
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+
+	"github.com/zhufuyi/sponge/pkg/grpc/interceptor"
+	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
 )
 
 func TestWithDialOptions(t *testing.T) {

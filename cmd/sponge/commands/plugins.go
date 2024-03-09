@@ -8,9 +8,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/zhufuyi/sponge/pkg/gobash"
-
 	"github.com/spf13/cobra"
+
+	"github.com/zhufuyi/sponge/pkg/gobash"
 )
 
 var pluginNames = []string{
@@ -31,7 +31,7 @@ var pluginNames = []string{
 
 var installPluginCommands = map[string]string{
 	"go":                     "go: please install manually yourself, download url is https://go.dev/dl/ or https://golang.google.cn/dl/",
-	"protoc":                 "protoc: please install manually yourself, download url is https://github.com/protocolbuffers/protobuf/releases/tag/v3.20.3",
+	"protoc":                 "protoc: please install manually yourself, download url is https://github.com/protocolbuffers/protobuf/releases/tag/v25.2",
 	"protoc-gen-go":          "google.golang.org/protobuf/cmd/protoc-gen-go@latest",
 	"protoc-gen-go-grpc":     "google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest",
 	"protoc-gen-validate":    "github.com/envoyproxy/protoc-gen-validate@latest",

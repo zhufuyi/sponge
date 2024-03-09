@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/zhufuyi/sponge/pkg/errcode"
-
 	"github.com/gin-gonic/gin"
+
+	"github.com/zhufuyi/sponge/pkg/errcode"
 )
 
 // Result output data format

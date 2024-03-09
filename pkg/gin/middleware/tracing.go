@@ -55,7 +55,7 @@ func Tracing(serviceName string, opts ...TraceOption) gin.HandlerFunc {
 	}
 	tracer := cfg.TracerProvider.Tracer(
 		tracerName,
-		oteltrace.WithInstrumentationVersion(otelcontrib.SemVersion()),
+		oteltrace.WithInstrumentationVersion(otelcontrib.Version()),
 	)
 	if cfg.Propagators == nil {
 		cfg.Propagators = otel.GetTextMapPropagator()
@@ -69,7 +69,8 @@ func Tracing(serviceName string, opts ...TraceOption) gin.HandlerFunc {
 		}()
 		ctx := cfg.Propagators.Extract(savedCtx, propagation.HeaderCarrier(c.Request.Header))
 		route := c.FullPath()
-		opts := []oteltrace.SpanStartOption{
+
+		tOpts := []oteltrace.SpanStartOption{
 			oteltrace.WithAttributes(semconv.NetAttributesFromHTTPRequest("tcp", c.Request)...),
 			oteltrace.WithAttributes(semconv.EndUserAttributesFromHTTPRequest(c.Request)...),
 			oteltrace.WithAttributes(semconv.HTTPServerAttributesFromHTTPRequest(serviceName, route, c.Request)...),
@@ -79,7 +80,7 @@ func Tracing(serviceName string, opts ...TraceOption) gin.HandlerFunc {
 		if spanName == "" {
 			spanName = fmt.Sprintf("HTTP %s route not found", c.Request.Method)
 		}
-		ctx, span := tracer.Start(ctx, spanName, opts...)
+		ctx, span := tracer.Start(ctx, spanName, tOpts...)
 		defer span.End()
 
 		// pass the span through the request context

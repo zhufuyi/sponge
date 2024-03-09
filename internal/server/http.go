@@ -6,12 +6,12 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/zhufuyi/sponge/internal/routers"
+	"github.com/gin-gonic/gin"
 
 	"github.com/zhufuyi/sponge/pkg/app"
 	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
 
-	"github.com/gin-gonic/gin"
+	"github.com/zhufuyi/sponge/internal/routers"
 )
 
 var _ app.IServer = (*httpServer)(nil)
@@ -59,7 +59,7 @@ func (s *httpServer) String() string {
 	return "http service address " + s.addr
 }
 
-// NewHTTPServer creates a new web server
+// NewHTTPServer creates a new http server
 func NewHTTPServer(addr string, opts ...HTTPOption) app.IServer {
 	o := defaultHTTPOptions()
 	o.apply(opts...)

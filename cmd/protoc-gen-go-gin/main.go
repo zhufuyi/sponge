@@ -10,12 +10,12 @@ import (
 	"strings"
 	"time"
 
+	"google.golang.org/protobuf/compiler/protogen"
+	"google.golang.org/protobuf/types/pluginpb"
+
 	"github.com/zhufuyi/sponge/cmd/protoc-gen-go-gin/internal/generate/handler"
 	"github.com/zhufuyi/sponge/cmd/protoc-gen-go-gin/internal/generate/router"
 	"github.com/zhufuyi/sponge/cmd/protoc-gen-go-gin/internal/generate/service"
-
-	"google.golang.org/protobuf/compiler/protogen"
-	"google.golang.org/protobuf/types/pluginpb"
 )
 
 const (

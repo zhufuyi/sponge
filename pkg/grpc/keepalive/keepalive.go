@@ -5,9 +5,9 @@ import (
 	"math"
 	"time"
 
-	"google.golang.org/grpc"
-
 	"google.golang.org/grpc/keepalive"
+
+	"google.golang.org/grpc"
 )
 
 // ---------------------------------- client option ----------------------------------

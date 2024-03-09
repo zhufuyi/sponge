@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/zhufuyi/sponge/docs"
-	"github.com/zhufuyi/sponge/internal/config"
+	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 
 	"github.com/zhufuyi/sponge/pkg/errcode"
 	"github.com/zhufuyi/sponge/pkg/gin/handlerfunc"
@@ -17,8 +17,8 @@ import (
 	"github.com/zhufuyi/sponge/pkg/jwt"
 	"github.com/zhufuyi/sponge/pkg/logger"
 
-	"github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin/binding"
+	"github.com/zhufuyi/sponge/docs"
+	"github.com/zhufuyi/sponge/internal/config"
 )
 
 type routeFns = []func(r *gin.Engine, groupPathMiddlewares map[string][]gin.HandlerFunc, singlePathMiddlewares map[string][]gin.HandlerFunc)

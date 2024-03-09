@@ -5,12 +5,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zhufuyi/sponge/pkg/gotest"
-	"github.com/zhufuyi/sponge/pkg/mysql/query"
-
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
+
+	"github.com/zhufuyi/sponge/pkg/gotest"
+	"github.com/zhufuyi/sponge/pkg/mysql/query"
 )
 
 var table = &userExample{}

@@ -1,13 +1,14 @@
 package errcode
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/zhufuyi/sponge/pkg/utils"
 	"net/http"
 	"testing"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/zhufuyi/sponge/pkg/utils"
 )
 
 func TestRPCStatus(t *testing.T) {

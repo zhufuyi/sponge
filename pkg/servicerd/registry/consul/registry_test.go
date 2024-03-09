@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
-
 	"github.com/hashicorp/consul/api"
+
+	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
 )
 
 func TestNewRegistry(t *testing.T) {

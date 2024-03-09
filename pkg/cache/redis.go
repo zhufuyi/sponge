@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/zhufuyi/sponge/pkg/encoding"
-
 	"github.com/go-redis/redis/v8"
+
+	"github.com/zhufuyi/sponge/pkg/encoding"
 )
 
 // CacheNotFound no hit cache

@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zhufuyi/sponge/pkg/utils"
-
 	"github.com/stretchr/testify/assert"
+
+	"github.com/zhufuyi/sponge/pkg/utils"
 )
 
 func TestClientHTTPService(t *testing.T) {

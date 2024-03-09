@@ -40,4 +40,4 @@ checkResult $?
 
 mv -f apis.html docs/apis.html
 
-echo "generate proto doc file successfully, see by 'docs/apis.html'"
+echo "generate proto doc file successfully, view in docs/apis.html"

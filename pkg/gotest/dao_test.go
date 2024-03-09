@@ -6,10 +6,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zhufuyi/sponge/pkg/ggorm/query"
-
 	"github.com/DATA-DOG/go-sqlmock"
 	"gorm.io/gorm"
+
+	"github.com/zhufuyi/sponge/pkg/ggorm/query"
 )
 
 func TestNewDao(t *testing.T) {

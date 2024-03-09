@@ -6,13 +6,13 @@ import (
 	"math/rand"
 	"strings"
 
+	"github.com/huandu/xstrings"
+	"github.com/spf13/cobra"
+
 	"github.com/zhufuyi/sponge/pkg/gofile"
 	"github.com/zhufuyi/sponge/pkg/replacer"
 	"github.com/zhufuyi/sponge/pkg/sql2code"
 	"github.com/zhufuyi/sponge/pkg/sql2code/parser"
-
-	"github.com/huandu/xstrings"
-	"github.com/spf13/cobra"
 )
 
 // RPCCommand generate grpc service code

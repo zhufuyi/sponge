@@ -4,9 +4,9 @@ package service
 import (
 	"bytes"
 
-	"github.com/zhufuyi/sponge/cmd/protoc-gen-go-gin/internal/parse"
-
 	"google.golang.org/protobuf/compiler/protogen"
+
+	"github.com/zhufuyi/sponge/cmd/protoc-gen-go-gin/internal/parse"
 )
 
 // GenerateFiles generate service logic, router, error code files.

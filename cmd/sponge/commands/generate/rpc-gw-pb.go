@@ -4,10 +4,10 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/zhufuyi/sponge/pkg/replacer"
-
 	"github.com/huandu/xstrings"
 	"github.com/spf13/cobra"
+
+	"github.com/zhufuyi/sponge/pkg/replacer"
 )
 
 // RPCGwPbCommand generate grpc gateway service code base on protobuf file

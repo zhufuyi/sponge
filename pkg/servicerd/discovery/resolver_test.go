@@ -6,11 +6,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
-
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/resolver"
 	"google.golang.org/grpc/serviceconfig"
+
+	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
 )
 
 type cliConn struct {

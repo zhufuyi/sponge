@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/zhufuyi/sponge/pkg/gofile"
-
 	"github.com/bojand/ghz/printer"
 	"github.com/bojand/ghz/runner"
 	"google.golang.org/protobuf/proto"
+
+	"github.com/zhufuyi/sponge/pkg/gofile"
 )
 
 // Runner interface

@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/spf13/cobra"
+
 	"github.com/zhufuyi/sponge/pkg/replacer"
 	"github.com/zhufuyi/sponge/pkg/sql2code"
 	"github.com/zhufuyi/sponge/pkg/sql2code/parser"
-
-	"github.com/spf13/cobra"
 )
 
 // ModelCommand generate model code

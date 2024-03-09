@@ -2,9 +2,10 @@ package rabbitmq
 
 import (
 	"context"
-	amqp "github.com/rabbitmq/amqp091-go"
 	"testing"
 	"time"
+
+	amqp "github.com/rabbitmq/amqp091-go"
 
 	"github.com/zhufuyi/sponge/pkg/utils"
 )

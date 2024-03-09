@@ -3,7 +3,7 @@ package tracer
 import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/sdk/resource"
-	semconv "go.opentelemetry.io/otel/semconv/v1.12.0"
+	semconv "go.opentelemetry.io/otel/semconv/v1.24.0"
 )
 
 // alias, for other structs, the following code does not need to change the names of the resourceOptions

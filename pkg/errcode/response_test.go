@@ -9,12 +9,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zhufuyi/sponge/pkg/utils"
-
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	"github.com/zhufuyi/sponge/pkg/utils"
 )
 
 func runHTTPServer(isFromRPC bool) string {

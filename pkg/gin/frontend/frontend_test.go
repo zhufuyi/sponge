@@ -45,7 +45,3 @@ func TestFrontEnd_SetRouter(t *testing.T) {
 		t.Error(err)
 	}
 }
-
-func TestAutoOpenBrowser(t *testing.T) {
-	_ = AutoOpenBrowser("http://localhost:8080")
-}

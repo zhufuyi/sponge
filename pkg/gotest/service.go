@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/zhufuyi/sponge/pkg/utils"
-
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+
+	"github.com/zhufuyi/sponge/pkg/utils"
 )
 
 // Service info

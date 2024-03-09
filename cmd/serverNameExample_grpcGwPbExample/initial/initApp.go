@@ -8,10 +8,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/zhufuyi/sponge/configs"
-	"github.com/zhufuyi/sponge/internal/config"
-
-	//"github.com/zhufuyi/sponge/internal/rpcclient"
+	"github.com/jinzhu/copier"
 
 	"github.com/zhufuyi/sponge/pkg/conf"
 	"github.com/zhufuyi/sponge/pkg/logger"
@@ -19,7 +16,9 @@ import (
 	"github.com/zhufuyi/sponge/pkg/stat"
 	"github.com/zhufuyi/sponge/pkg/tracer"
 
-	"github.com/jinzhu/copier"
+	"github.com/zhufuyi/sponge/configs"
+	"github.com/zhufuyi/sponge/internal/config"
+	//"github.com/zhufuyi/sponge/internal/rpcclient"
 )
 
 var (

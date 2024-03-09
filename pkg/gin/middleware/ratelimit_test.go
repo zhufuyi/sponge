@@ -8,11 +8,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gin-gonic/gin"
+
 	"github.com/zhufuyi/sponge/pkg/gin/response"
 	"github.com/zhufuyi/sponge/pkg/gohttp"
 	"github.com/zhufuyi/sponge/pkg/utils"
-
-	"github.com/gin-gonic/gin"
 )
 
 func runRateLimiterHTTPServer() string {

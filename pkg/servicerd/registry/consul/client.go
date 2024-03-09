@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
-
 	"github.com/hashicorp/consul/api"
+
+	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
 )
 
 // Client is consul client config

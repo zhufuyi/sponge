@@ -5,14 +5,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
-
 	"github.com/stretchr/testify/assert"
 	clientv3 "go.etcd.io/etcd/client/v3"
+
+	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
 )
 
-type wt struct {
-}
+type wt struct{}
 
 func (w wt) Watch(ctx context.Context, key string, opts ...clientv3.OpOption) clientv3.WatchChan {
 	c := make(chan clientv3.WatchResponse)

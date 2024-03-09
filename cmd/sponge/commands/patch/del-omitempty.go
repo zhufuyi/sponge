@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/zhufuyi/sponge/pkg/gofile"
-
 	"github.com/spf13/cobra"
+
+	"github.com/zhufuyi/sponge/pkg/gofile"
 )
 
 // DeleteJSONOmitemptyCommand delete json omitempty

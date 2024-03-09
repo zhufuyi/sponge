@@ -8,10 +8,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/spf13/cobra"
+
 	"github.com/zhufuyi/sponge/pkg/gofile"
 	"github.com/zhufuyi/sponge/pkg/jy2struct"
-
-	"github.com/spf13/cobra"
 )
 
 // ConfigCommand convert yaml to struct command

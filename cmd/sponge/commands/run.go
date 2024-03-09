@@ -9,9 +9,9 @@ import (
 	"runtime"
 	"strconv"
 
-	"github.com/zhufuyi/sponge/cmd/sponge/server"
-
 	"github.com/spf13/cobra"
+
+	"github.com/zhufuyi/sponge/cmd/sponge/server"
 )
 
 // OpenUICommand open the sponge UI interface

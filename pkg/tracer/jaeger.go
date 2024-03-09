@@ -1,7 +1,7 @@
 package tracer
 
 import (
-	"go.opentelemetry.io/otel/exporters/jaeger"
+	"go.opentelemetry.io/otel/exporters/jaeger" //nolint
 	sdkTrace "go.opentelemetry.io/otel/sdk/trace"
 )
 

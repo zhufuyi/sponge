@@ -5,10 +5,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zhufuyi/sponge/pkg/nacoscli"
-
 	"github.com/nacos-group/nacos-sdk-go/v2/clients/naming_client"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/zhufuyi/sponge/pkg/nacoscli"
 )
 
 func getCli() naming_client.INamingClient {

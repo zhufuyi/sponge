@@ -6,10 +6,10 @@ import (
 	"runtime"
 	"time"
 
+	"go.uber.org/zap"
+
 	"github.com/zhufuyi/sponge/pkg/stat/cpu"
 	"github.com/zhufuyi/sponge/pkg/stat/mem"
-
-	"go.uber.org/zap"
 )
 
 var (

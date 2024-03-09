@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zhufuyi/sponge/pkg/shield/window"
-
 	"github.com/stretchr/testify/assert"
+
+	"github.com/zhufuyi/sponge/pkg/shield/window"
 )
 
 func getSREBreaker() *Breaker {

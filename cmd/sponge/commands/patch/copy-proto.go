@@ -11,10 +11,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/spf13/cobra"
+
 	"github.com/zhufuyi/sponge/pkg/gobash"
 	"github.com/zhufuyi/sponge/pkg/gofile"
-
-	"github.com/spf13/cobra"
 )
 
 var copyCount = 0

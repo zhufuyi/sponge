@@ -4,11 +4,11 @@ import (
 	"context"
 	"time"
 
-	"github.com/zhufuyi/sponge/internal/config"
-	"github.com/zhufuyi/sponge/internal/model"
-
 	"github.com/zhufuyi/sponge/pkg/app"
 	"github.com/zhufuyi/sponge/pkg/tracer"
+
+	"github.com/zhufuyi/sponge/internal/config"
+	"github.com/zhufuyi/sponge/internal/model"
 )
 
 // Close releasing resources after service exit

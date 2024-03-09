@@ -2,10 +2,11 @@ package gotest
 
 import (
 	"context"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"testing"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 func newHandler() *Handler {

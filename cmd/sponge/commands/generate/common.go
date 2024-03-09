@@ -11,10 +11,10 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/huandu/xstrings"
+
 	"github.com/zhufuyi/sponge/pkg/gofile"
 	"github.com/zhufuyi/sponge/pkg/replacer"
-
-	"github.com/huandu/xstrings"
 )
 
 const (

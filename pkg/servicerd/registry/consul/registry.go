@@ -8,10 +8,10 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/hashicorp/consul/api"
+
 	"github.com/zhufuyi/sponge/pkg/consulcli"
 	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
-
-	"github.com/hashicorp/consul/api"
 )
 
 var (

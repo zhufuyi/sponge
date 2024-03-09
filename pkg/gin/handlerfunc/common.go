@@ -7,10 +7,10 @@ import (
 	"os"
 	"strings"
 
+	"github.com/gin-gonic/gin"
+
 	"github.com/zhufuyi/sponge/pkg/errcode"
 	"github.com/zhufuyi/sponge/pkg/utils"
-
-	"github.com/gin-gonic/gin"
 )
 
 // checkHealthResponse check health result

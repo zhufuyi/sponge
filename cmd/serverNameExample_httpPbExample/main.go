@@ -2,9 +2,9 @@
 package main
 
 import (
-	"github.com/zhufuyi/sponge/cmd/serverNameExample_httpPbExample/initial"
-
 	"github.com/zhufuyi/sponge/pkg/app"
+
+	"github.com/zhufuyi/sponge/cmd/serverNameExample_httpPbExample/initial"
 )
 
 func main() {

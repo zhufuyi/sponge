@@ -6,10 +6,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zhufuyi/sponge/pkg/utils"
-
 	"github.com/nacos-group/nacos-sdk-go/v2/common/constant"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/zhufuyi/sponge/pkg/utils"
 )
 
 var (

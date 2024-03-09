@@ -4,9 +4,9 @@ package proto
 import (
 	"fmt"
 
-	"github.com/zhufuyi/sponge/pkg/encoding"
-
 	"google.golang.org/protobuf/proto"
+
+	"github.com/zhufuyi/sponge/pkg/encoding"
 )
 
 // Name is the name registered for the proto compressor.

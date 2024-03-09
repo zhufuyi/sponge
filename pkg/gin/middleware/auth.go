@@ -2,12 +2,12 @@
 package middleware
 
 import (
+	"github.com/gin-gonic/gin"
+
 	"github.com/zhufuyi/sponge/pkg/errcode"
 	"github.com/zhufuyi/sponge/pkg/gin/response"
 	"github.com/zhufuyi/sponge/pkg/jwt"
 	"github.com/zhufuyi/sponge/pkg/logger"
-
-	"github.com/gin-gonic/gin"
 )
 
 const (

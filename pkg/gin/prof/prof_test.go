@@ -1,14 +1,14 @@
 package prof
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"testing"
 	"time"
 
-	"github.com/zhufuyi/sponge/pkg/utils"
-
+	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/zhufuyi/sponge/pkg/utils"
 )
 
 func TestRegister(t *testing.T) {

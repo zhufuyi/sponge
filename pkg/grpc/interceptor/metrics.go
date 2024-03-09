@@ -1,9 +1,9 @@
 package interceptor
 
 import (
-	"github.com/zhufuyi/sponge/pkg/grpc/metrics"
-
 	"google.golang.org/grpc"
+
+	"github.com/zhufuyi/sponge/pkg/grpc/metrics"
 )
 
 // UnaryClientMetrics client-side metrics unary interceptor

@@ -1,9 +1,9 @@
 package commands
 
 import (
-	"github.com/zhufuyi/sponge/cmd/sponge/commands/generate"
-
 	"github.com/spf13/cobra"
+
+	"github.com/zhufuyi/sponge/cmd/sponge/commands/generate"
 )
 
 // GenWebCommand generate web server code

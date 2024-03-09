@@ -10,8 +10,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zhufuyi/sponge/pkg/utils"
-
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc"
@@ -20,6 +18,8 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/runtime/protoimpl"
+
+	"github.com/zhufuyi/sponge/pkg/utils"
 )
 
 func newUnaryRPCServer(unaryServerInterceptors ...grpc.UnaryServerInterceptor) string {

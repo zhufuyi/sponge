@@ -6,15 +6,15 @@ import (
 	"sync"
 	"time"
 
-	"github.com/zhufuyi/sponge/internal/config"
+	"github.com/go-redis/redis/v8"
+	"gorm.io/gorm"
 
 	"github.com/zhufuyi/sponge/pkg/ggorm"
 	"github.com/zhufuyi/sponge/pkg/goredis"
 	"github.com/zhufuyi/sponge/pkg/logger"
 	"github.com/zhufuyi/sponge/pkg/utils"
 
-	"github.com/go-redis/redis/v8"
-	"gorm.io/gorm"
+	"github.com/zhufuyi/sponge/internal/config"
 )
 
 var (

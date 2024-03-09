@@ -8,9 +8,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/zhufuyi/sponge/pkg/gofile"
-
 	"github.com/spf13/cobra"
+
+	"github.com/zhufuyi/sponge/pkg/gofile"
 )
 
 // ConvertSwagJSONCommand convert 64-bit fields type string to integer

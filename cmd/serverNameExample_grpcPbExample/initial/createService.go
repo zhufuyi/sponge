@@ -5,15 +5,15 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/zhufuyi/sponge/internal/config"
-	"github.com/zhufuyi/sponge/internal/server"
-
 	"github.com/zhufuyi/sponge/pkg/app"
 	"github.com/zhufuyi/sponge/pkg/logger"
 	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
 	"github.com/zhufuyi/sponge/pkg/servicerd/registry/consul"
 	"github.com/zhufuyi/sponge/pkg/servicerd/registry/etcd"
 	"github.com/zhufuyi/sponge/pkg/servicerd/registry/nacos"
+
+	"github.com/zhufuyi/sponge/internal/config"
+	"github.com/zhufuyi/sponge/internal/server"
 )
 
 // CreateServices create grpc or http service
