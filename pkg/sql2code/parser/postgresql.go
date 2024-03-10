@@ -89,6 +89,8 @@ func toMysqlType(field *PGField) string {
 	case "character", "character varying", "varchar", "char", "bpchar":
 		if field.Lengthvar > 4 {
 			return fmt.Sprintf("varchar(%d)", field.Lengthvar-4)
+		} else {
+			return "varchar(255)"
 		}
 	case "text":
 		return "text"
