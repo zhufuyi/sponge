@@ -12,6 +12,19 @@ function checkResult() {
     fi
 }
 
+function buildCode() {
+  serverName=$1
+  if [ "$serverName"x = x ];then
+    echo "please input serverName"
+    exit 1
+  fi
+
+  go build cmd/${serverName}/main.go
+  checkResult $?
+  echo "build successfully"
+  rm -f main main.exe
+}
+
 function generate_http_mysql() {
   local outDir="./http-mysql"
   echo "generate http-mysql service code"
@@ -29,8 +42,9 @@ function generate_http_mysql() {
   cd $outDir
   make docs
   checkResult $?
+  buildCode user
   #make run
-  cd - && echo -e "\n\n"
+  cd - && echo -e "\n\n\n\n"
 }
 
 function generate_http_postgresql() {
@@ -47,8 +61,9 @@ function generate_http_postgresql() {
   cd $outDir
   make docs
   checkResult $?
+  buildCode user
   #make run
-  cd - && echo -e "\n\n"
+  cd - && echo -e "\n\n\n\n"
 }
 
 function generate_http_sqlite() {
@@ -65,8 +80,9 @@ function generate_http_sqlite() {
   cd $outDir
   make docs
   checkResult $?
+  buildCode user
   #make run
-  cd - && echo -e "\n\n"
+  cd - && echo -e "\n\n\n\n"
 }
 
 function generate_http_mongodb() {
@@ -83,8 +99,9 @@ function generate_http_mongodb() {
   cd $outDir
   make docs
   checkResult $?
+  buildCode user
   #make run
-  cd - && echo -e "\n\n"
+  cd - && echo -e "\n\n\n\n"
 }
 
 # ---------------------------------------------------------------
@@ -103,8 +120,9 @@ function generate_grpc_mysql() {
   cd $outDir
   make proto
   checkResult $?
+  buildCode user
   #make run
-  cd - && echo -e "\n\n"
+  cd - && echo -e "\n\n\n\n"
 }
 
 function generate_grpc_postgresql() {
@@ -121,8 +139,9 @@ function generate_grpc_postgresql() {
   cd $outDir
   make proto
   checkResult $?
+  buildCode user
   #make run
-  cd - && echo -e "\n\n"
+  cd - && echo -e "\n\n\n\n"
 }
 
 function generate_grpc_sqlite() {
@@ -140,8 +159,9 @@ function generate_grpc_sqlite() {
   cd $outDir
   make proto
   checkResult $?
+  buildCode user
   #make run
-  cd - && echo -e "\n\n"
+  cd - && echo -e "\n\n\n\n"
 }
 
 function generate_grpc_mongodb() {
@@ -158,8 +178,9 @@ function generate_grpc_mongodb() {
   cd $outDir
   make proto
   checkResult $?
+  buildCode user
   #make run
-  cd - && echo -e "\n\n"
+  cd - && echo -e "\n\n\n\n"
 }
 
 # ---------------------------------------------------------------
@@ -183,8 +204,9 @@ function generate_http_pb_mysql() {
   make patch TYPE=init-mysql
   make proto
   checkResult $?
+  buildCode user
   #make run
-  cd - && echo -e "\n\n"
+  cd - && echo -e "\n\n\n\n"
 }
 
 function generate_http_pb_mongodb() {
@@ -207,8 +229,9 @@ function generate_http_pb_mongodb() {
   checkResult $?
   make proto
   checkResult $?
+  buildCode user
   #make run
-  cd - && echo -e "\n\n"
+  cd - && echo -e "\n\n\n\n"
 }
 
 # ---------------------------------------------------------------
@@ -224,7 +247,7 @@ function generate_grpc_pb_mysql() {
   sponge micro rpc-pb --module-name=user --server-name=user --project-name=edusys --protobuf-file=./files/user2.proto --out=$outDir
   checkResult $?
 
-  sponge micro service --db-dsn=$mysqlDsn --db-table=user_example --out=$outDir
+  sponge micro service --db-driver=mysql --db-dsn=$mysqlDsn --db-table=user_example --out=$outDir
   checkResult $?
 
   cd $outDir
@@ -233,8 +256,9 @@ function generate_grpc_pb_mysql() {
   checkResult $?
   make proto
   checkResult $?
+  buildCode user
   #make run
-  cd - && echo -e "\n\n"
+  cd - && echo -e "\n\n\n\n"
 }
 
 
@@ -257,8 +281,9 @@ function generate_grpc_pb_mongodb() {
   make patch TYPE=init-mongodb
   make proto
   checkResult $?
+  buildCode user
   #make run
-  cd - && echo -e "\n\n"
+  cd - && echo -e "\n\n\n\n"
 }
 
 
@@ -283,8 +308,9 @@ function generate_grpc_gw_pb() {
   make proto
   checkResult $?
   # modify yaml configuration field "grpcClient"
+  buildCode edusys
   #make run
-  cd - && echo -e "\n\n"
+  cd - && echo -e "\n\n\n\n"
 }
 
 function main() {

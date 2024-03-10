@@ -161,7 +161,7 @@ func newUserExamplePbHandler() *gotest.Handler {
 			Path:     "/userExample/list",
 			HandlerFunc: func(c *gin.Context) {
 				req := &serverNameExampleV1.ListUserExampleByLastIDRequest{}
-				_ = c.ShouldBindJSON(req)
+				_ = c.ShouldBindQuery(req)
 				_, err := iHandler.ListByLastID(c, req)
 				if err != nil {
 					response.Error(c, ecode.ErrListByLastIDUserExample)
@@ -456,7 +456,7 @@ func Test_userExamplePbHandler_ListByLastID(t *testing.T) {
 	h.MockDao.SQLMock.ExpectQuery("SELECT .*").WillReturnRows(rows)
 
 	result := &gohttp.StdResult{}
-	err := gohttp.Get(result, h.GetRequestURL("ListByLastID"), gohttp.KV{"lastID": 0, "size": 10})
+	err := gohttp.Get(result, h.GetRequestURL("ListByLastID"), gohttp.KV{"lastID": 0, "limit": 10})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -465,7 +465,7 @@ func Test_userExamplePbHandler_ListByLastID(t *testing.T) {
 	}
 
 	// get error test
-	err = gohttp.Get(result, h.GetRequestURL("ListByLastID"), gohttp.KV{"lastID": 0, "size": 10, "sort": "unknown-column"})
+	err = gohttp.Get(result, h.GetRequestURL("ListByLastID"), gohttp.KV{"lastID": 0, "limit": 10, "sort": "unknown-column"})
 	assert.NoError(t, err)
 }
 

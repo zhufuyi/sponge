@@ -1942,7 +1942,16 @@ func (m *ListUserExampleByLastIDRequest) validate(all bool) error {
 
 	// no validation rules for LastID
 
-	// no validation rules for Limit
+	if m.GetLimit() <= 0 {
+		err := ListUserExampleByLastIDRequestValidationError{
+			field:  "Limit",
+			reason: "value must be greater than 0",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
 
 	// no validation rules for Sort
 

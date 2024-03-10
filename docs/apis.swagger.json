@@ -631,12 +631,10 @@
           "format": "int64"
         },
         "createdAt": {
-          "type": "integer",
-          "format": "int64"
+          "type": "string"
         },
         "updatedAt": {
-          "type": "integer",
-          "format": "int64"
+          "type": "string"
         }
       }
     }

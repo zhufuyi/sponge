@@ -29,21 +29,9 @@ func GetSqliteTableInfo(dbFile string, tableName string) (string, error) {
 		return "", err
 	}
 
-	//sql = handleID(sql)
 	for k, v := range sqliteToMysqlTypeMap {
 		sql = strings.ReplaceAll(sql, k, v)
 	}
 
 	return sql, nil
 }
-
-//func handleID(sql string) string {
-//	re := regexp.MustCompile(`id\s+INTEGER`)
-//	matches := re.FindAllStringSubmatch(sql, -1)
-//
-//	for _, match := range matches {
-//		sql = strings.ReplaceAll(sql, match[0], " id bigint unsigned")
-//	}
-//
-//	return sql
-//}

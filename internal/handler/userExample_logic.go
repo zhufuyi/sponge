@@ -5,6 +5,7 @@ import (
 	"errors"
 	"math"
 	"strings"
+	"time"
 
 	"github.com/jinzhu/copier"
 
@@ -19,6 +20,7 @@ import (
 	"github.com/zhufuyi/sponge/internal/model"
 )
 
+var _ time.Time // import time
 var _ serverNameExampleV1.UserExampleLogicer = (*userExamplePbHandler)(nil)
 
 type userExamplePbHandler struct {
@@ -300,8 +302,8 @@ func convertUserExamplePb(record *model.UserExample) (*serverNameExampleV1.UserE
 	// todo if copier.Copy cannot assign a value to a field, add it here, e.g. CreatedAt, UpdatedAt
 	// todo generate the conversion createdAt and updatedAt code here
 	// delete the templates code start
-	value.CreatedAt = record.CreatedAt.Unix()
-	value.UpdatedAt = record.UpdatedAt.Unix()
+	value.CreatedAt = record.CreatedAt.Format(time.RFC3339)
+	value.UpdatedAt = record.UpdatedAt.Format(time.RFC3339)
 	// delete the templates code end
 	return value, nil
 }

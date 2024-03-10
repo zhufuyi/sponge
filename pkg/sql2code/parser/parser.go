@@ -956,8 +956,8 @@ func goTypeToProto(fields []tmplField) []tmplField {
 			field.GoType = "int32"
 		case "uint":
 			field.GoType = "uint32"
-		case "time.Time":
-			field.GoType = "int64"
+		case "time.Time", "*time.Time":
+			field.GoType = "string"
 		case "float32":
 			field.GoType = "float"
 		case "float64":
@@ -977,6 +977,13 @@ func goTypeToProto(fields []tmplField) []tmplField {
 				field.GoType = field.GoType[1:]
 			} else if strings.Contains(field.GoType, "[]*") {
 				field.GoType = "repeated " + strings.ReplaceAll(field.GoType, "[]*", "")
+			}
+			if field.GoType == "[]time.Time" {
+				field.GoType = "repeated string"
+			}
+		} else {
+			if strings.ToLower(field.Name) == "id" {
+				field.GoType = "uint64"
 			}
 		}
 

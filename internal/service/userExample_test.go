@@ -300,7 +300,7 @@ func Test_userExampleService_ListByLastID(t *testing.T) {
 
 	reply, err := s.IServiceClient.(serverNameExampleV1.UserExampleClient).ListByLastID(s.Ctx, &serverNameExampleV1.ListUserExampleByLastIDRequest{
 		LastID: 0,
-		Limit:  0,
+		Limit:  10,
 		Sort:   "",
 	})
 	assert.NoError(t, err)

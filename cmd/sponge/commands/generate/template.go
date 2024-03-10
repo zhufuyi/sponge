@@ -586,6 +586,6 @@ func InitSqlite() {
 	}
 }`
 
-	embedTimeCode = `value.CreatedAt = record.CreatedAt.Unix()
-	value.UpdatedAt = record.UpdatedAt.Unix()`
+	embedTimeCode = `value.CreatedAt = record.CreatedAt.Format(time.RFC3339)
+	value.UpdatedAt = record.UpdatedAt.Format(time.RFC3339)`
 )

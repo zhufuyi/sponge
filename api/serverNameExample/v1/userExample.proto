@@ -271,8 +271,8 @@ message UserExample {
   GenderType  gender = 7; // gender, 1:Male, 2:Female, other values:unknown
   int32  status = 8;           // account status
   int64  loginAt = 9;        // login timestamp
-  int64 createdAt = 10;   // creation time
-  int64 updatedAt = 11;  // update time
+  string createdAt = 10;   // creation time
+  string updatedAt = 11;  // update time
 }
 
 message GetUserExampleByIDRequest {
