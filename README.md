@@ -74,7 +74,7 @@ Sponge is essentially a microservice framework that includes code generation cap
 - Configuration parsing [viper](https://github.com/spf13/viper)
 - Configuration center [nacos](https://github.com/alibaba/nacos)
 - Logging component [zap](https://github.com/uber-go/zap)
-- Database ORM component [gorm](https://github.com/go-gorm/gorm)
+- Database ORM component [gorm](https://github.com/go-gorm/gorm), [mongo-go-driver](https://github.com/mongodb/mongo-go-driver)
 - Cache component [go-redis](https://github.com/go-redis/redis), [ristretto](https://github.com/dgraph-io/ristretto)
 - Automated API documentation [swagger](https://github.com/swaggo/swag), [protoc-gen-openapiv2](https://github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2)
 - Authentication [jwt](https://github.com/golang-jwt/jwt)
@@ -106,7 +106,7 @@ The project code directory structure created by sponge follows the [project-layo
 │         ├── initial     # Program initialization, consisting of three files: initApp initializes configurations, registerServers registers services (HTTP or grpc), and registerClose registers resource cleanup.
 │         └── main.go     # Program entry file
 ├── configs        # Directory for configuration files
-├── deployments    # Directory for deployment scripts, supporting binary, Docker and Kubernetes deployments.
+├── deployments    # Directory for deployment scripts, supporting Bare Metal, Docker and Kubernetes deployments.
 ├─ docs            # Directory for API interface Swagger documentation.
 ├── internal       # Directory for code of private applications and libraries.
 │    ├── cache        # Cache directory wrapped around business logic.

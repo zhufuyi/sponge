@@ -1,28 +1,37 @@
-### Installing Dependencies
 
-> Before installing Sponge, you need to install two dependencies: `go` and `protoc`.
-
-**✅ Installing go**
-
-Download go from: [https://go.dev/doc/install](https://go.dev/doc/install)
-
-> Recommended version: 1.20 or above.
-
-Check go version: `go version`
+Requirements Go 1.16 and above, [https://go.dev/doc/install](https://go.dev/doc/install)
 
 <br>
 
-**✅ Installing protoc**
-
-Download protoc from: [https://github.com/protocolbuffers/protobuf/releases/tag/v25.2](https://github.com/protocolbuffers/protobuf/releases/tag/v25.2)
-
-> Download the protoc binaries according to the system type, move the protoc binaries to the directory where the go binaries are located.
-
-Check protoc version: `protoc --version`
+---
 
 <br>
 
-After installing go and protoc, proceed to install Sponge. Sponge can be installed on Windows, macOS, and Linux environments.
+### Windows Environment
+
+> Because sponge depends on some linux commands, git bash and make need to be installed in windows to support the linux command environment.
+
+<br>
+
+For installation convenience, sponge and its dependent programs have been packaged together, download address: [sponge-install.zip](https://drive.google.com/drive/folders/1T55lLXDBIQCnL5IQ-i1hWJovgLI2l0k1?usp=sharing)
+
+After downloading the file:
+
+1. Unzip the file, double-click **install.bat** to install, the installation process of git is always the default (if you have installed git, you can skip this step)
+
+2. Right-click any folder (Show more options) and select **Open Git Bash here** to open the git bash terminal:
+
+```bash
+# Initialize sponge, automatically install sponge's dependency plugins
+sponge init
+
+# Check sponge version
+sponge -v
+```
+
+> Note: When using sponge development, please use git bash terminal, do not use the system default cmd, otherwise there will be an error that cannot find the command.
+
+In addition to the above installation of sponge in windows, it also provides native installation, click to view **Installing Sponge** --> **Windows Environment** [installation documentation](https://go-sponge.com/quick-start?id=%f0%9f%8f%b7installing-sponge).
 
 <br>
 
@@ -32,7 +41,7 @@ After installing go and protoc, proceed to install Sponge. Sponge can be install
 
 ### Linux or macOS Environment
 
-1. Add `$GOBIN` to the system path, skip this step if already set.
+1. Add `GOBIN` to the system environment variable path, skip this step if already set.
 
 ```bash
 # Open .bashrc file
@@ -42,7 +51,7 @@ vim ~/.bashrc
 export GOROOT="/opt/go"     # your go installation directory
 export GOPATH=$HOME/go      # Set the directory where the "go get" command downloads third-party packages
 export GOBIN=$GOPATH/bin    # Set the directory where the executable binaries are compiled by the "go install" command.
-export PATH=$PATH:$GOBIN:$GOROOT/bin  # Add the $GOBIN directory to the system path.
+export PATH=$PATH:$GOBIN:$GOROOT/bin  # Add the GOBIN directory to the system environment variable path.
 
 # Save .bashrc file, and make the settings take effect
 source ~/.bashrc
@@ -53,93 +62,13 @@ go env GOBIN
 
 <br>
 
-2. Execute the command to install sponge, sponge and dependent plugins will be installed to the `$GOBIN` directory.
+2. Install sponge and its dependent plugins into the `GOBIN` directory.
 
-```bash
-# Install Sponge
-go install github.com/zhufuyi/sponge/cmd/sponge@latest
+**✅ Install protoc**
 
-# Initialize Sponge, automatically install Sponge's dependency plugins
-sponge init
+Download protoc from: [https://github.com/protocolbuffers/protobuf/releases/tag/v25.2](https://github.com/protocolbuffers/protobuf/releases/tag/v25.2)
 
-# Check if all plugins have been successfully installed. If any plugins fail to install, retry with the command: sponge plugins --install
-sponge plugins
-
-# Check Sponge version
-sponge -v
-```
-
-<br>
-
----
-
-<br>
-
-### Windows Environment
-
-> In the Windows environment, you need to install mingw64, make, and cmder to support the Linux command environment required by Sponge.
-
-**✅ Installing mingw64**
-
-Download mingw64 from: [x86_64-8.1.0-release-posix-seh-rt_v6-rev0.7z](https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/8.1.0/threads-posix/seh/x86_64-8.1.0-release-posix-seh-rt_v6-rev0.7z)
-
-After downloading, extract it to the directory `D:\Program Files\mingw64`, and add the directory containing frequently used Linux commands, such as `D:\Program Files\mingw64\bin`, to the system environment variable "PATH".
-
-<br>
-
-**✅ Installing the make command**
-
-Navigate to the directory `D:\Program Files\mingw64\bin`, find the executable file `mingw32-make.exe`, and copy and rename it to `make.exe`.
-
-Check make version: `make -v`
-
-<br>
-
-**✅ Installing cmder**
-
-Download cmder from: [cmder-v1.3.20.zip](https://github.com/cmderdev/cmder/releases/download/v1.3.20/cmder.zip)
-
-After downloading, extract it to the directory `D:\Program Files\cmder`, and add the directory `D:\Program Files\cmder` to the system environment variable "PATH".
-
-Perform basic configuration for cmder:
-
-- **Resolve Space Issue While Typing Commands**: Open the cmder interface, press `win+alt+p` to access the settings, search for `Monospace` in the upper left corner, uncheck it, and save and exit.
-- **Configure Right-Click Launch for cmder**: Press the `win+x` key combination, then press the letter `a` to enter the administrative terminal. Execute the command `Cmder.exe /REGISTER ALL`. Right-click in any folder and choose `Cmder Here` to open the cmder interface.
-
-> ⚠ When developing projects with Sponge in a Windows environment, to avoid issues with missing Linux commands, please use cmder instead of the built-in cmd terminal, the terminal in Goland, or the terminal in VS Code.
-
-Open the `cmder.exe` terminal and check if common Linux commands are supported.
-
-```bash
-ls --version
-make --version
-cp --version
-chmod --version
-rm --version
-sed --version
-```
-
-<br>
-
-**✅ Installing Sponge**
-
-Open the `cmder.exe` terminal (not the built-in Windows cmd).
-
-1. Add `GOBIN` to the system path, skip this step if already set.
-
-```bash
-# Set the directory where the "go get" command downloads third-party packages
-setx GOPATH "D:\your-directory"
-# Set the directory where the executable binary files generated by the "go install" command are stored.
-setx GOBIN "D:\your-directory\bin"
-
-# Close the terminal and open a new one to view the GOBIN directory.
-go env GOBIN
-```
-
-<br>
-
-2. Execute the command to install sponge, sponge and dependent plugins will be installed to the `GOBIN` directory.
+Download the corresponding **protoc** executable file according to the system type, and move the **protoc** executable file to the same directory as the **go** executable file.
 
 ```bash
 # Install Sponge

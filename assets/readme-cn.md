@@ -1,11 +1,14 @@
+## [English](../README.md) | 简体中文
 
-[sponge](https://github.com/zhufuyi/sponge) 是一个集成了 `自动生成代码`、`Gin和GRPC` 的基础开发框架。sponge拥有丰富的生成代码命令，生成不同的功能代码可以组合成完整的服务(类似人为打散的海绵细胞可以自动重组成一个新的海绵)。代码解耦模块化设计，很容易构建出从开发到部署的完整工程项目，只需在生成的模板代码上填充业务逻辑代码，极大的提高了开发效率和降低了开发难度，使用go也可以"低代码开发"。
+<br>
+
+[sponge](https://github.com/zhufuyi/sponge) 是一个集成了 `自动生成代码`、`Gin和GRPC` 的基础开发框架。sponge拥有丰富的生成代码命令，生成不同的功能代码可以组合成完整的服务(类似人为打散的海绵细胞可以自动重组成一个新的海绵)。代码解耦模块化设计，很容易构建出从开发到部署的完整工程项目，只需在生成的模板代码上填充业务逻辑代码，大幅提高了开发效率和降低了开发难度，使用go也可以"低代码开发"。
 
 <br>
 
 如果开发只有简单CRUD api接口的web或微服务，不需要编写任何go代码就可以编译并部署到linux服务器、docker、k8s上，只需要连接到数据库(mysql、mongodb、postgresql、tidb、sqlite)就可以一键自动生成完整的服务代码。
 
-如果开发通用的web或微服务，只需聚焦在`在数据库定义表`、`在proto文件定义api接口`、`在生成的模板文件填写业务逻辑代码`三个核心部分，其他go代码都由sponge自动生成。
+如果开发通用的web或微服务，只需聚焦`在数据库定义表`、`在proto文件定义api接口`、`在生成的模板文件填写业务逻辑代码`三个核心部分，其他go代码都由sponge自动生成。
 
 <br>
 
@@ -60,7 +63,7 @@ sponge包含丰富的组件(按需使用)：
 - 配置解析 [viper](https://github.com/spf13/viper)
 - 配置中心 [nacos](https://github.com/alibaba/nacos)
 - 日志 [zap](https://github.com/uber-go/zap)
-- 数据库组件 [gorm](https://github.com/go-gorm/gorm)
+- 数据库组件 [gorm](https://github.com/go-gorm/gorm), [mongo-go-driver](https://github.com/mongodb/mongo-go-driver)
 - 缓存组件 [go-redis](https://github.com/go-redis/redis), [ristretto](https://github.com/dgraph-io/ristretto)
 - 自动化api接口文档 [swagger](https://github.com/swaggo/swag), [protoc-gen-openapiv2](https://github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2)
 - 鉴权 [jwt](https://github.com/golang-jwt/jwt)
