@@ -35,7 +35,7 @@ Examples:
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			mdName, _ := getNamesFromOutDir(outPath)
+			mdName, _, _ := getNamesFromOutDir(outPath)
 			if mdName != "" {
 				moduleName = mdName
 			} else if moduleName == "" {

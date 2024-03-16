@@ -101,14 +101,14 @@ package routers
 import (
 	"context"
 
-	serverNameExampleV1 "moduleNameExample/api/serverNameExample/v1"
-	"moduleNameExample/internal/service"
+	"github.com/gin-gonic/gin"
+	"google.golang.org/grpc/metadata"
 
 	"github.com/zhufuyi/sponge/pkg/gin/middleware"
 	"github.com/zhufuyi/sponge/pkg/logger"
 
-	"github.com/gin-gonic/gin"
-	"google.golang.org/grpc/metadata"
+	serverNameExampleV1 "moduleNameExample/api/serverNameExample/v1"
+	"moduleNameExample/internal/service"
 )
 
 func init() {

@@ -33,17 +33,17 @@ package service
 import (
 	"context"
 
+	"google.golang.org/grpc"
+
+	//"github.com/zhufuyi/sponge/pkg/grpc/interceptor"
+	//"github.com/zhufuyi/sponge/pkg/logger"
+
 	serverNameExampleV1 "moduleNameExample/api/serverNameExample/v1"
 
 	//"moduleNameExample/internal/cache"
 	//"moduleNameExample/internal/dao"
 	//"moduleNameExample/internal/ecode"
 	//"moduleNameExample/internal/model"
-
-	//"github.com/zhufuyi/sponge/pkg/grpc/interceptor"
-	//"github.com/zhufuyi/sponge/pkg/logger"
-
-	"google.golang.org/grpc"
 )
 
 func init() {
@@ -127,11 +127,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/zhufuyi/sponge/pkg/grpc/benchmark"
+
 	serverNameExampleV1 "moduleNameExample/api/serverNameExample/v1"
 	"moduleNameExample/configs"
 	"moduleNameExample/internal/config"
-
-	"github.com/zhufuyi/sponge/pkg/grpc/benchmark"
 )
 
 {{- range .PbServices}}

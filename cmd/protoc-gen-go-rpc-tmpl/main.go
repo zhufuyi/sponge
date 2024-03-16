@@ -22,7 +22,9 @@ const (
 protoc --proto_path=. --proto_path=./third_party --go-rpc-tmpl_out=. --go-rpc-tmpl_opt=paths=source_relative \
   --go-rpc-tmpl_opt=moduleName=yourModuleName --go-rpc-tmpl_opt=serverName=yourServerName *.proto
 
-Note:
+# if you want the generated code to support large code repository, you need to specify the parameter --go-rpc-tmpl_opt=isLCR=true
+
+Tip:
     If you want to merge the code, after generating the code, execute the command "sponge merge rpc-pb",
     you don't worry about it affecting the logic code you have already written, in case of accidents,
     you can find the pre-merge code in the directory /tmp/sponge_merge_backup_code.
@@ -50,10 +52,12 @@ func main() {
 	var flags flag.FlagSet
 
 	var moduleName, serverName, tmplDir, ecodeOut string
+	var isSupportLargeCodeRepo bool
 	flags.StringVar(&moduleName, "moduleName", "", "module name")
 	flags.StringVar(&serverName, "serverName", "", "server name")
-	flags.StringVar(&tmplDir, "tmplDir", "internal/service", "rpc template file directory, the default value is internal/service")
-	flags.StringVar(&ecodeOut, "ecodeOut", "internal/ecode", "rpc error code file directory, the default value is internal/ecode")
+	flags.StringVar(&tmplDir, "tmplDir", "", "rpc template file directory, the default value is internal/service")
+	flags.StringVar(&ecodeOut, "ecodeOut", "", "rpc error code file directory, the default value is internal/ecode")
+	flags.BoolVar(&isSupportLargeCodeRepo, "isLCR", false, "iis support large code repository")
 
 	options := protogen.Options{
 		ParamFunc: flags.Set,
@@ -66,7 +70,18 @@ func main() {
 				continue
 			}
 
-			err := saveRPCTmplFiles(f, moduleName, serverName, tmplDir, ecodeOut)
+			dirName := "internal"
+			if isSupportLargeCodeRepo {
+				dirName = "Internal"
+			}
+			if tmplDir == "" {
+				tmplDir = dirName + "/service"
+			}
+			if ecodeOut == "" {
+				ecodeOut = dirName + "/ecode"
+			}
+
+			err := saveRPCTmplFiles(f, moduleName, serverName, tmplDir, ecodeOut, isSupportLargeCodeRepo)
 			if err != nil {
 				continue // skip error, process the next protobuf file
 			}
@@ -75,18 +90,18 @@ func main() {
 	})
 }
 
-func saveRPCTmplFiles(f *protogen.File, moduleName string, serverName string, tmplOut string, ecodeOut string) error {
+func saveRPCTmplFiles(f *protogen.File, moduleName string, serverName string, tmplOut string, ecodeOut string, isSupportLargeCodeRepo bool) error {
 	filenamePrefix := f.GeneratedFilenamePrefix
 	tmplFileContent, testTmplFileContent, ecodeFileContent := service.GenerateFiles(filenamePrefix, f)
 
 	filePath := filenamePrefix + ".go"
-	err := saveFile(moduleName, serverName, tmplOut, filePath, tmplFileContent, false)
+	err := saveFile(moduleName, serverName, tmplOut, filePath, tmplFileContent, false, isSupportLargeCodeRepo)
 	if err != nil {
 		return err
 	}
 
 	filePath = filenamePrefix + "_client_test.go"
-	err = saveFile(moduleName, serverName, tmplOut, filePath, testTmplFileContent, true)
+	err = saveFile(moduleName, serverName, tmplOut, filePath, testTmplFileContent, true, isSupportLargeCodeRepo)
 	if err != nil {
 		return err
 	}
@@ -100,7 +115,7 @@ func saveRPCTmplFiles(f *protogen.File, moduleName string, serverName string, tm
 	return nil
 }
 
-func saveFile(moduleName string, serverName string, out string, filePath string, content []byte, isNeedCovered bool) error {
+func saveFile(moduleName string, serverName string, out string, filePath string, content []byte, isNeedCovered bool, isSupportLargeCodeRepo bool) error {
 	if len(content) == 0 {
 		return nil
 	}
@@ -122,6 +137,10 @@ func saveFile(moduleName string, serverName string, out string, filePath string,
 	content = bytes.ReplaceAll(content, []byte("moduleNameExample"), []byte(moduleName))
 	content = bytes.ReplaceAll(content, []byte("serverNameExample"), []byte(serverName))
 	content = bytes.ReplaceAll(content, firstLetterToUpper("serverNameExample"), firstLetterToUpper(serverName))
+	if isSupportLargeCodeRepo {
+		content = adaptLargeCodeRepo(moduleName, serverName, content)
+	}
+
 	return os.WriteFile(file, content, 0666)
 }
 
@@ -154,4 +173,16 @@ func firstLetterToUpper(s string) []byte {
 	}
 
 	return []byte(strings.ToUpper(s[:1]) + s[1:])
+}
+
+func adaptLargeCodeRepo(moduleName string, serverName string, data []byte) []byte {
+	matchStr := map[string]string{
+		fmt.Sprintf("\"%s/internal/", moduleName): fmt.Sprintf("\"%s/Internal/", moduleName+"/"+serverName),
+		fmt.Sprintf("\"%s/configs", moduleName):   fmt.Sprintf("\"%s/configs", moduleName+"/"+serverName),
+		fmt.Sprintf("\"%s/api", moduleName):       fmt.Sprintf("\"%s/api", moduleName+"/"+serverName),
+	}
+	for oldStr, newStr := range matchStr {
+		data = bytes.ReplaceAll(data, []byte(oldStr), []byte(newStr))
+	}
+	return data
 }

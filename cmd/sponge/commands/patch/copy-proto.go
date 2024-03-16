@@ -116,11 +116,11 @@ func getModuleAndServerName(dir string) (moduleName string, serverName string, e
 	}
 
 	ms := strings.Split(string(data), ",")
-	if len(ms) != 2 {
-		return "", "", errors.New("not found server name in docs/gen.info")
+	if len(ms) >= 2 {
+		return ms[0], ms[1], nil
 	}
 
-	return ms[0], ms[1], nil
+	return "", "", errors.New("not found server name in docs/gen.info")
 }
 
 type protoCopier struct {

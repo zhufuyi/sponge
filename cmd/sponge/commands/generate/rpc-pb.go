@@ -19,6 +19,8 @@ func RPCPbCommand() *cobra.Command {
 		repoAddr     string // image repo address
 		outPath      string // output directory
 		protobufFile string // protobuf file, support * matching
+
+		isSupportLargeCodeRepo bool // is support large code repository
 	)
 
 	cmd := &cobra.Command{
@@ -35,6 +37,8 @@ Examples:
 
   # generate grpc service code and specify the docker image repository address.
   sponge micro rpc-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --protobuf-file=./demo.proto
+
+  # if you want the generated code to support large code repository, you need to specify the parameter --support-large-code-repo=true
 `,
 		SilenceErrors: true,
 		SilenceUsage:  true,
@@ -47,6 +51,8 @@ Examples:
 				protobufFile: protobufFile,
 				repoAddr:     repoAddr,
 				outPath:      outPath,
+
+				isSupportLargeCodeRepo: isSupportLargeCodeRepo,
 			}
 			err := g.generateCode()
 			if err != nil {
@@ -66,6 +72,7 @@ Examples:
 	_ = cmd.MarkFlagRequired("project-name")
 	cmd.Flags().StringVarP(&protobufFile, "protobuf-file", "f", "", "proto file")
 	_ = cmd.MarkFlagRequired("protobuf-file")
+	cmd.Flags().BoolVarP(&isSupportLargeCodeRepo, "support-large-code-repo", "l", false, "whether to support large code repository")
 	cmd.Flags().StringVarP(&repoAddr, "repo-addr", "r", "", "docker image repository address, excluding http and repository names")
 	cmd.Flags().StringVarP(&outPath, "out", "o", "", "output directory, default is ./serverName_rpc-pb_<time>")
 
@@ -79,6 +86,8 @@ type rpcPbGenerator struct {
 	protobufFile string
 	repoAddr     string
 	outPath      string
+
+	isSupportLargeCodeRepo bool
 }
 
 // nolint
@@ -104,6 +113,9 @@ func (g *rpcPbGenerator) generateCode() error {
 		"sponge/.gitignore", "sponge/.golangci.yml", "sponge/go.mod", "sponge/go.sum",
 		"sponge/Jenkinsfile", "sponge/Makefile", "sponge/README.md",
 	}
+	if g.isSupportLargeCodeRepo {
+		subFiles = removeElements(subFiles, "sponge/go.mod", "sponge/go.sum")
+	}
 	ignoreDirs := []string{"cmd/sponge"} // specify the directory in the subdirectory where processing is ignored
 	ignoreFiles := []string{             // specify the files in the subdirectory to be ignored for processing
 		"types.pb.validate.go", "types.pb.go", // api/types
@@ -119,15 +131,15 @@ func (g *rpcPbGenerator) generateCode() error {
 	r.SetSubDirsAndFiles(subDirs, subFiles...)
 	r.SetIgnoreSubDirs(ignoreDirs...)
 	r.SetIgnoreSubFiles(ignoreFiles...)
+	_ = r.SetOutputDir(g.outPath, g.serverName+"_"+subTplName)
 	fields := g.addFields(r)
 	r.SetReplacementFields(fields)
-	_ = r.SetOutputDir(g.outPath, g.serverName+"_"+subTplName)
 	if err = r.SaveFiles(); err != nil {
 		return err
 	}
 
 	_ = saveProtobufFiles(g.moduleName, g.serverName, r.GetOutputDir(), protobufFiles)
-	_ = saveGenInfo(g.moduleName, g.serverName, r.GetOutputDir())
+	_ = saveGenInfo(g.moduleName, g.serverName, g.isSupportLargeCodeRepo, r.GetOutputDir())
 
 	fmt.Printf(`
 using help:
@@ -267,6 +279,11 @@ func (g *rpcPbGenerator) addFields(r replacer.Replacer) []replacer.Field {
 			New: "",
 		},
 	}...)
+
+	if g.isSupportLargeCodeRepo {
+		fs := serverCodeFields(r.GetOutputDir(), g.moduleName, g.serverName)
+		fields = append(fields, fs...)
+	}
 
 	return fields
 }

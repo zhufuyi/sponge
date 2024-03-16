@@ -6,19 +6,21 @@ import (
 )
 
 // get moduleName and serverName from directory
-func getNamesFromOutDir(dir string) (moduleName string, serverName string) {
+func getNamesFromOutDir(dir string) (moduleName string, serverName string, isLCR bool) {
 	if dir == "" {
-		return "", ""
+		return "", "", false
 	}
 	data, err := os.ReadFile(dir + "/docs/gen.info")
 	if err != nil {
-		return "", ""
+		return "", "", false
 	}
 
 	ms := strings.Split(string(data), ",")
-	if len(ms) != 2 {
-		return "", ""
+	if len(ms) == 2 {
+		return ms[0], ms[1], false
+	} else if len(ms) >= 3 {
+		return ms[0], ms[1], ms[2] == "true"
 	}
 
-	return ms[0], ms[1]
+	return "", "", false
 }

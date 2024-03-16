@@ -29,6 +29,8 @@ func RPCCommand() *cobra.Command {
 			JSONTag:  true,
 			GormType: true,
 		}
+
+		isSupportLargeCodeRepo bool // is support large code repository
 	)
 
 	//nolint
@@ -52,6 +54,8 @@ Examples:
 
   # generate grpc service code and specify the docker image repository address.
   sponge micro rpc --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
+
+  # if you want the generated code to support large code repository, you need to specify the parameter --support-large-code-repo=true
 `,
 		SilenceErrors: true,
 		SilenceUsage:  true,
@@ -86,6 +90,8 @@ Examples:
 				isEmbed:     sqlArgs.IsEmbed,
 				codes:       codes,
 				outPath:     outPath,
+
+				isSupportLargeCodeRepo: isSupportLargeCodeRepo,
 			}
 			outPath, err = g.generateCode()
 			if err != nil {
@@ -110,6 +116,8 @@ Examples:
 					isEmbed:    sqlArgs.IsEmbed,
 					codes:      codes,
 					outPath:    outPath,
+
+					isSupportLargeCodeRepo: isSupportLargeCodeRepo,
 				}
 				outPath, err = sg.generateCode()
 				if err != nil {
@@ -143,6 +151,7 @@ using help:
 	cmd.Flags().StringVarP(&dbTables, "db-table", "t", "", "table name, multiple names separated by commas")
 	_ = cmd.MarkFlagRequired("db-table")
 	cmd.Flags().BoolVarP(&sqlArgs.IsEmbed, "embed", "e", true, "whether to embed gorm.model struct")
+	cmd.Flags().BoolVarP(&isSupportLargeCodeRepo, "support-large-code-repo", "l", false, "whether to support large code repository")
 	cmd.Flags().IntVarP(&sqlArgs.JSONNamedType, "json-name-type", "j", 1, "json tags name type, 0:snake case, 1:camel case")
 	cmd.Flags().StringVarP(&repoAddr, "repo-addr", "r", "", "docker image repository address, excluding http and repository names")
 	cmd.Flags().StringVarP(&outPath, "out", "o", "", "output directory, default is ./serverName_rpc_<time>")
@@ -160,6 +169,8 @@ type rpcGenerator struct {
 	isEmbed     bool
 	codes       map[string]string
 	outPath     string
+
+	isSupportLargeCodeRepo bool
 }
 
 func (g *rpcGenerator) generateCode() (string, error) {
@@ -177,6 +188,9 @@ func (g *rpcGenerator) generateCode() (string, error) {
 	subFiles := []string{ // specify the sub-documents to be processed
 		"sponge/.gitignore", "sponge/.golangci.yml", "sponge/go.mod", "sponge/go.sum",
 		"sponge/Jenkinsfile", "sponge/Makefile", "sponge/README.md",
+	}
+	if g.isSupportLargeCodeRepo {
+		subFiles = removeElements(subFiles, "sponge/go.mod", "sponge/go.sum")
 	}
 	ignoreDirs := []string{ // specify the directory in the subdirectory where processing is ignored
 		"internal/handler", "internal/rpcclient", "internal/routers", "internal/types", "cmd/sponge",
@@ -214,13 +228,13 @@ func (g *rpcGenerator) generateCode() (string, error) {
 	r.SetSubDirsAndFiles(subDirs, subFiles...)
 	r.SetIgnoreSubDirs(ignoreDirs...)
 	r.SetIgnoreSubFiles(ignoreFiles...)
+	_ = r.SetOutputDir(g.outPath, g.serverName+"_"+subTplName)
 	fields := g.addFields(r)
 	r.SetReplacementFields(fields)
-	_ = r.SetOutputDir(g.outPath, g.serverName+"_"+subTplName)
 	if err := r.SaveFiles(); err != nil {
 		return "", err
 	}
-	_ = saveGenInfo(g.moduleName, g.serverName, r.GetOutputDir())
+	_ = saveGenInfo(g.moduleName, g.serverName, g.isSupportLargeCodeRepo, r.GetOutputDir())
 
 	return r.GetOutputDir(), nil
 }
@@ -427,6 +441,11 @@ func (g *rpcGenerator) addFields(r replacer.Replacer) []replacer.Field {
 			IsCaseSensitive: true,
 		},
 	}...)
+
+	if g.isSupportLargeCodeRepo {
+		fs := serverCodeFields(r.GetOutputDir(), g.moduleName, g.serverName)
+		fields = append(fields, fs...)
+	}
 
 	return fields
 }

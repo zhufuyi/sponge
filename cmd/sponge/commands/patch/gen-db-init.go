@@ -36,11 +36,17 @@ Examples:
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			mdName, _ := getNamesFromOutDir(outPath)
+			mdName, serverName, isSupportLargeCodeRepo := getNamesFromOutDir(outPath)
 			if mdName != "" {
 				moduleName = mdName
 			} else if moduleName == "" {
 				return fmt.Errorf(`required flag(s) "module-name" not set, use "sponge patch gen-db-init -h" for help`)
+			}
+			if isSupportLargeCodeRepo {
+				if serverName == "" {
+					return fmt.Errorf(`serverName is empty`)
+				}
+				targetFile = strings.ReplaceAll(targetFile, "internal", "Internal")
 			}
 
 			var isEmpty bool
@@ -58,6 +64,9 @@ Examples:
 				moduleName: moduleName,
 				dbDriver:   dbDriver,
 				outPath:    outPath,
+
+				serverName:             serverName,
+				isSupportLargeCodeRepo: isSupportLargeCodeRepo,
 			}
 			var err error
 			outPath, err = g.generateCode()
@@ -77,7 +86,7 @@ using help:
 			} else {
 				targetFile = "/" + targetFile
 			}
-			fmt.Printf("generate \"%s-init\" codes successfully, out = %s\n", dbDriver, outPath+targetFile)
+			fmt.Printf("generate \"init-%s\" codes successfully, out = %s\n", dbDriver, outPath+targetFile)
 			return nil
 		},
 	}
@@ -94,6 +103,9 @@ type dbInitGenerator struct {
 	moduleName string
 	dbDriver   string
 	outPath    string
+
+	serverName             string
+	isSupportLargeCodeRepo bool
 }
 
 func (g *dbInitGenerator) generateCode() (string, error) {
@@ -123,9 +135,9 @@ func (g *dbInitGenerator) generateCode() (string, error) {
 	r.SetSubDirsAndFiles(subDirs)
 	r.SetIgnoreSubDirs(ignoreDirs...)
 	r.SetIgnoreSubFiles(ignoreFiles...)
+	_ = r.SetOutputDir(g.outPath, subTplName)
 	fields := g.addFields(r)
 	r.SetReplacementFields(fields)
-	_ = r.SetOutputDir(g.outPath, subTplName)
 	if err := r.SaveFiles(); err != nil {
 		return "", err
 	}
@@ -157,6 +169,11 @@ func (g *dbInitGenerator) addFields(r replacer.Replacer) []replacer.Field {
 			New: generate.GetInitDataBaseCode(g.dbDriver),
 		},
 	}...)
+
+	if g.isSupportLargeCodeRepo {
+		fs := generate.SubServerCodeFields(r.GetOutputDir(), g.moduleName, g.serverName)
+		fields = append(fields, fs...)
+	}
 
 	return fields
 }

@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/huandu/xstrings"
@@ -281,8 +282,8 @@ func parseProtobufFiles(protobufFile string) ([]string, bool, error) {
 }
 
 // save the moduleName and serverName to the specified file for external use
-func saveGenInfo(moduleName string, serverName string, outputDir string) error {
-	genInfo := moduleName + "," + serverName
+func saveGenInfo(moduleName string, serverName string, isSupportLargeCodeRepo bool, outputDir string) error {
+	genInfo := moduleName + "," + serverName + "," + strconv.FormatBool(isSupportLargeCodeRepo)
 	dir := outputDir + "/docs"
 	_ = os.MkdirAll(dir, 0766)
 	file := dir + "/gen.info"
@@ -305,21 +306,23 @@ func saveEmptySwaggerJSON(outputDir string) error {
 }
 
 // get moduleName and serverName from directory
-func getNamesFromOutDir(dir string) (moduleName string, serverName string) {
+func getNamesFromOutDir(dir string) (moduleName string, serverName string, isSupportLargeCodeRepo bool) {
 	if dir == "" {
-		return "", ""
+		return "", "", false
 	}
 	data, err := os.ReadFile(dir + "/docs/gen.info")
 	if err != nil {
-		return "", ""
+		return "", "", false
 	}
 
 	ms := strings.Split(string(data), ",")
-	if len(ms) != 2 {
-		return "", ""
+	if len(ms) == 2 {
+		return ms[0], ms[1], false
+	} else if len(ms) >= 3 {
+		return ms[0], ms[1], ms[2] == "true"
 	}
 
-	return ms[0], ms[1]
+	return "", "", false
 }
 
 func saveProtobufFiles(moduleName string, serverName string, outputDir string, protobufFiles []string) error {
@@ -503,4 +506,80 @@ func removeElement(slice []string, element string) []string {
 		}
 	}
 	return result
+}
+
+func removeElements(slice []string, elements ...string) []string {
+	if len(elements) == 0 {
+		return slice
+	}
+	filters := make(map[string]struct{})
+	for _, element := range elements {
+		filters[element] = struct{}{}
+	}
+	result := make([]string, 0, len(slice)-1)
+	for _, s := range slice {
+		if _, ok := filters[s]; !ok {
+			result = append(result, s)
+		}
+	}
+	return result
+}
+
+func serverCodeFields(outDir string, moduleName string, serverName string) []replacer.Field {
+	parts := strings.Split(outDir, gofile.GetPathDelimiter())
+
+	return []replacer.Field{
+		{ // internal initial capital means exportable, external code can be referenced
+			Old: fmt.Sprintf("\"%s/internal/", moduleName),
+			New: fmt.Sprintf("\"%s/Internal/", moduleName+"/"+serverName),
+		},
+		{
+			Old: parts[len(parts)-1] + gofile.GetPathDelimiter() + "internal",
+			New: parts[len(parts)-1] + gofile.GetPathDelimiter() + "Internal",
+		},
+		{
+			Old: "--dir=internal/ecode",
+			New: "--dir=Internal/ecode",
+		},
+		{
+			Old: fmt.Sprintf("\"%s/cmd/", moduleName),
+			New: fmt.Sprintf("\"%s/cmd/", moduleName+"/"+serverName),
+		},
+		{
+			Old: fmt.Sprintf("\"%s/configs", moduleName),
+			New: fmt.Sprintf("\"%s/configs", moduleName+"/"+serverName),
+		},
+		{
+			Old: fmt.Sprintf("\"%s/docs", moduleName),
+			New: fmt.Sprintf("\"%s/docs", moduleName+"/"+serverName),
+		},
+		{
+			Old: fmt.Sprintf("\"%s/api", moduleName),
+			New: fmt.Sprintf("\"%s/api", moduleName+"/"+serverName),
+		},
+	}
+}
+
+// SubServerCodeFields sub server code fields
+func SubServerCodeFields(outDir string, moduleName string, serverName string) []replacer.Field {
+	parts := strings.Split(outDir, gofile.GetPathDelimiter())
+
+	return []replacer.Field{
+		{ // internal initial capital means exportable, external code can be referenced
+			Old: fmt.Sprintf("\"%s/internal/", moduleName),
+			New: fmt.Sprintf("\"%s/Internal/", moduleName+"/"+serverName),
+		},
+		{
+			Old: parts[len(parts)-1] + gofile.GetPathDelimiter() + "internal",
+			New: parts[len(parts)-1] + gofile.GetPathDelimiter() + "Internal",
+		},
+		{
+			Old: fmt.Sprintf("\"%s/configs", moduleName),
+			New: fmt.Sprintf("\"%s/configs", moduleName+"/"+serverName),
+		},
+		{
+			Old: fmt.Sprintf("\"%s/api", moduleName),
+			New: fmt.Sprintf("\"%s/api", moduleName+"/"+serverName),
+		},
+	}
 }

@@ -33,9 +33,9 @@ package handler
 import (
 	"context"
 
-	serverNameExampleV1 "moduleNameExample/api/serverNameExample/v1"
-
 	//"github.com/zhufuyi/sponge/pkg/gin/middleware"
+
+	serverNameExampleV1 "moduleNameExample/api/serverNameExample/v1"
 )
 
 {{- range .PbServices}}
@@ -102,13 +102,13 @@ func (h *{{.LowerServiceName}}Handler) {{.MethodName}}(ctx context.Context, req 
 package routers
 
 import (
-	serverNameExampleV1 "moduleNameExample/api/serverNameExample/v1"
-	"moduleNameExample/internal/handler"
+	"github.com/gin-gonic/gin"
 
 	"github.com/zhufuyi/sponge/pkg/logger"
 	//"github.com/zhufuyi/sponge/pkg/middleware"
 
-	"github.com/gin-gonic/gin"
+	serverNameExampleV1 "moduleNameExample/api/serverNameExample/v1"
+	"moduleNameExample/internal/handler"
 )
 
 func init() {
