@@ -1,64 +1,99 @@
 #!/bin/bash
 
-# grpc服务
+# grpc server
 grpcServiceName="user"
 grpcDir="2_micro_grpc_${grpcServiceName}"
+mysqlDSN="root:123456@(192.168.3.37:3306)/school"
+mysqlTable="teacher"
 
-# grpc网关服务
+# grpc gateway server
 rpcGwServiceName="user_gw"
 rpcGwDir="5_grpc_gateway_${rpcGwServiceName}"
 
+colorCyan='\e[1;36m'
+markEnd='\e[0m'
+errCount=0
+
 function checkResult() {
-    result=$1
-    if [ ${result} -ne 0 ]; then
-        exit ${result}
-    fi
+  result=$1
+  if [ ${result} -ne 0 ]; then
+      exit ${result}
+  fi
+}
+
+function checkErrCount() {
+  result=$1
+  if [ ${result} -ne 0 ]; then
+      ((errCount++))
+  fi
 }
 
 function stopService() {
-  pid=$(ps -ef | grep "./cmd/${grpcServiceName}" | grep -v grep | awk '{print $2}')
-  if [ "${pid}" != "" ]; then
-      kill -9 ${pid}
+  local name=$1
+  if [ "$name" == "" ]; then
+    echo "name cannot be empty"
+    exit 1
   fi
 
-  pid=$(ps -ef | grep "./cmd/${rpcGwServiceName}" | grep -v grep | awk '{print $2}')
+  local processMark="./cmd/$name"
+  pid=$(ps -ef | grep "${processMark}" | grep -v grep | awk '{print $2}')
   if [ "${pid}" != "" ]; then
       kill -9 ${pid}
   fi
 }
 
-function testRequest() {
-  echo "--------------------- 20s 后测试开始 ---------------------"
-  sleep 20
-  for i in {1..3}; do
-    echo -e "\n\n"
-    echo ${i} 'curl -X POST http://localhost:8080/api/v1/user/register -H "Content-Type: application/json" -d "{\"email\":\"foo@bar.com\",\"password\":\"123456\"}"'
-    curl -X POST http://localhost:8080/api/v1/user/register -H "Content-Type: application/json" -d "{\"email\":\"foo@bar.com\",\"password\":\"123456\"}"
-    echo -e "\n\n"
-    sleep 3
+function checkServiceStarted() {
+  local name=$1
+  if [ "$name" == "" ]; then
+    echo "name cannot be empty"
+    exit 1
+  fi
 
-    echo -e "\n\n"
-    echo ${i} 'curl -X POST http://localhost:8080/api/v1/user/register  -H "Content-Type: application/json" -H "X-Request-Id: qaz12wx3ed4" -d "{\"email\":\"foo@bar.com\",\"password\":\"123456\"}"'
-    curl -X POST http://localhost:8080/api/v1/user/register -H "Content-Type: application/json" -H "X-Request-Id: qaz12wx3ed4" -d "{\"email\":\"foo@bar.com\",\"password\":\"123456\"}"
-    echo -e "\n\n"
-    sleep 3
+  local processMark="./cmd/$name"
+  local timeCount=0
+  # waiting for service to start
+  while true; do
+    sleep 1
+    pid=$(ps -ef | grep "${processMark}" | grep -v grep | awk '{print $2}')
+    if [ "${pid}" != "" ]; then
+        break
+    fi
+    (( timeCount++ ))
+    if (( timeCount >= 30 )); then
+      echo "service startup timeout"
+      exit 1
+    fi
   done
-  echo "--------------------- 测试结束！---------------------"
-  stopService
+}
+
+function testRequest() {
+  checkServiceStarted $grpcServiceName
+  checkServiceStarted $rpcGwServiceName
+  sleep 1
+  echo "--------------------- start testing ---------------------"
+
+  echo -e "\n\n"
+  echo -e "${colorCyan}curl -X POST http://localhost:8080/api/v1/user/register -H \"Content-Type: application/json\" -d {\"email\":\"foo@bar.com\",\"password\":\"123456\"} ${markEnd}"
+  curl -X POST http://localhost:8080/api/v1/user/register -H "Content-Type: application/json" -d "{\"email\":\"foo@bar.com\",\"password\":\"123456\"}"
+  checkErrCount $?
+
+  echo -e "\n\n"
+  echo -e "${colorCyan}curl -X POST http://localhost:8080/api/v1/user/register  -H \"Content-Type: application/json\" -H \"X-Request-Id: qaz12wx3ed4\" -d {\"email\":\"foo@bar.com\",\"password\":\"123456\"} ${markEnd}"
+  curl -X POST http://localhost:8080/api/v1/user/register -H "Content-Type: application/json" -H "X-Request-Id: qaz12wx3ed4" -d "{\"email\":\"foo@bar.com\",\"password\":\"123456\"}"
+  checkErrCount $?
+
+  echo -e "\n--------------------- the test is over, error result: $errCount ---------------------\n"
+  stopService $grpcServiceName
+  stopService $rpcGwServiceName
 }
 
 function runGRPCService() {
   if [ -d "${grpcDir}" ]; then
-    echo "微服务 ${grpcDir} 已存在"
+    echo "service ${grpcDir} already exists"
   else
-    echo "创建微服务 ${grpcDir}"
-    sponge micro rpc \
-      --module-name=${grpcServiceName} \
-      --server-name=${grpcServiceName} \
-      --project-name=grpcdemo \
-      --db-dsn="root:123456@(192.168.3.37:3306)/school" \
-      --db-table=teacher \
-      --out=./${grpcDir}
+    echo "create service ${grpcDir}"
+    echo -e "${colorCyan}sponge micro rpc --module-name=${grpcServiceName} --server-name=${grpcServiceName} --project-name=grpcdemo --db-dsn=$mysqlDSN --db-table=$mysqlTable --out=./${grpcDir} ${markEnd}"
+    sponge micro rpc --module-name=${grpcServiceName} --server-name=${grpcServiceName} --project-name=grpcdemo --db-dsn=$mysqlDSN --db-table=$mysqlTable --out=./${grpcDir}
     checkResult $?
   fi
 
@@ -74,30 +109,26 @@ function runGRPCService() {
   checkResult $?
 }
 
-echo "运行微服务 ${grpcDir}"
+echo "running service ${grpcDir}"
 runGRPCService &
 
 if [ -d "${rpcGwDir}" ]; then
-  echo "rpc网关服务 ${rpcGwDir} 已存在"
+  echo "service ${rpcGwDir} already exists"
 else
-  echo "创建rpc网关服务 ${rpcGwDir}"
-  sponge micro rpc-gw-pb \
-    --module-name=${rpcGwServiceName} \
-    --server-name=${rpcGwServiceName} \
-    --project-name=grpcgwdemo \
-    --protobuf-file=./files/user_gw.proto \
-    --out=./${rpcGwDir}
+  echo "create service ${rpcGwDir}"
+  echo -e "${colorCyan}sponge micro rpc-gw-pb --module-name=${rpcGwServiceName} --server-name=${rpcGwServiceName} --project-name=grpcgwdemo --protobuf-file=./files/user_gw.proto --out=./${rpcGwDir} ${markEnd}"
+  sponge micro rpc-gw-pb --module-name=${rpcGwServiceName} --server-name=${rpcGwServiceName} --project-name=grpcgwdemo --protobuf-file=./files/user_gw.proto --out=./${rpcGwDir}
   checkResult $?
 
-  echo "生成rpc连接服务代码"
+  echo -e "${colorCyan}sponge micro rpc-conn --rpc-server-name=${grpcServiceName} --out=./${rpcGwDir} ${markEnd}"
   sponge micro rpc-conn --rpc-server-name=${grpcServiceName} --out=./${rpcGwDir}
   checkResult $?
 
-  echo "修改配置文件的grpcClient字段"
+  echo "modify grpcClient field of configuration file"
   sed -i "s/your_grpc_service_name/user/g" ./${rpcGwDir}/configs/user_gw.yml
   checkResult $?
 
-  echo "复制proto文件到rpc网关目录"
+  echo "copy the proto file to the grpc gateway service directory"
   cd ${rpcGwDir}
   make copy-proto SERVER=../${grpcDir}
   checkResult $?
@@ -110,12 +141,11 @@ echo "make proto"
 make proto
 checkResult $?
 
-echo "替换示例模板代码"
+echo "replace the sample template code"
 replaceCode ../files/rpc_gateway_content ./internal/service/user_gw.go
 
-echo "test request"
 testRequest &
 
-echo "运行rpc网关服务 ${rpcGwDir}"
+echo "running service ${rpcGwDir}"
 make run
 checkResult $?

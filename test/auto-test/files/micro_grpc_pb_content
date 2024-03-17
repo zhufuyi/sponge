@@ -1,4 +1,5 @@
-func (s *user) Register(ctx context.Context, req *userV1.RegisterRequest) (*userV1.RegisterReply, error) {|-|-|-|-|-|func (s *user) Register(ctx context.Context, req *userV1.RegisterRequest) (*userV1.RegisterReply, error) {
+func (s *user) Register(ctx context.Context, req *userV1.RegisterRequest) (*userV1.RegisterReply, error) {
+	panic("implement me")|-|-|-|-|-|func (s *user) Register(ctx context.Context, req *userV1.RegisterRequest) (*userV1.RegisterReply, error) {
 	err := req.Validate()
 	if err != nil {
 		logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req), interceptor.ServerCtxRequestIDField(ctx))
@@ -13,3 +14,4 @@ func (s *user) Register(ctx context.Context, req *userV1.RegisterRequest) (*user
 |-|-|-|-|-|//"github.com/zhufuyi/sponge/pkg/grpc/interceptor"|-|-|-|-|-|"github.com/zhufuyi/sponge/pkg/grpc/interceptor"
 	"github.com/zhufuyi/sponge/pkg/logger"
 	"user/internal/ecode"
+|-|-|-|-|-|Email:    "",|-|-|-|-|-|Email:    "foo@bar.com",|-|-|-|-|-|Password: "",|-|-|-|-|-|Password: "123456",
