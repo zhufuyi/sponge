@@ -46,7 +46,7 @@ ORDER BY a.attnum;`, tableName)
 	if result.Error != nil {
 		return nil, fmt.Errorf("failed to get table fields: %v", result.Error)
 	}
-
+	//printString(fields)
 	return fields, nil
 }
 
@@ -55,6 +55,7 @@ func ConvertToSQLByPgFields(tableName string, fields []*PGField) (string, map[st
 	fieldStr := ""
 	pgTypeMap := make(map[string]string) // name:type
 	for _, field := range fields {
+		sqlType := toMysqlType(field)
 		pgTypeMap[field.Name] = getType(field)
 		if field.Name == "id" {
 			fieldStr += fmt.Sprintf("    %s bigint unsigned primary key,\n", field.Name)
@@ -64,7 +65,7 @@ func ConvertToSQLByPgFields(tableName string, fields []*PGField) (string, map[st
 		if !field.Notnull {
 			notnullStr = "null"
 		}
-		fieldStr += fmt.Sprintf("    %s %s %s comment '%s',\n", field.Name, toMysqlType(field), notnullStr, field.Comment)
+		fieldStr += fmt.Sprintf("    %s %s %s comment '%s',\n", field.Name, sqlType, notnullStr, field.Comment)
 	}
 	fieldStr = strings.TrimSuffix(fieldStr, ",\n")
 
@@ -90,7 +91,7 @@ func toMysqlType(field *PGField) string {
 		if field.Lengthvar > 4 {
 			return fmt.Sprintf("varchar(%d)", field.Lengthvar-4)
 		} else {
-			return "varchar(255)"
+			return "varchar(100)"
 		}
 	case "text":
 		return "text"
@@ -105,6 +106,10 @@ func toMysqlType(field *PGField) string {
 	case "boolean":
 		return "tinyint(1)"
 	}
+
+	// unknown type convert to varchar
+	field.Type = "varchar(100)"
+
 	return field.Type
 }
 
@@ -124,4 +129,11 @@ func closeDB(db *gorm.DB) {
 		return
 	}
 	_ = sqlDB.Close()
+}
+
+func printString(fields []*PGField) {
+	fmt.Printf("%-20v %-20v %-20v %-20v %-20v %-20v\n", "Name", "Type", "Length", "Lengthvar", "Notnull", "Comment")
+	for _, p := range fields {
+		fmt.Printf("%-20v %-20v %-20v %-20v %-20v %-20v\n", p.Name, p.Type, p.Length, p.Lengthvar, p.Notnull, p.Comment)
+	}
 }
