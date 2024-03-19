@@ -282,8 +282,8 @@ func parseProtobufFiles(protobufFile string) ([]string, bool, error) {
 }
 
 // save the moduleName and serverName to the specified file for external use
-func saveGenInfo(moduleName string, serverName string, isSupportLargeCodeRepo bool, outputDir string) error {
-	genInfo := moduleName + "," + serverName + "," + strconv.FormatBool(isSupportLargeCodeRepo)
+func saveGenInfo(moduleName string, serverName string, suitedMonoRepo bool, outputDir string) error {
+	genInfo := moduleName + "," + serverName + "," + strconv.FormatBool(suitedMonoRepo)
 	dir := outputDir + "/docs"
 	_ = os.MkdirAll(dir, 0766)
 	file := dir + "/gen.info"
@@ -306,7 +306,7 @@ func saveEmptySwaggerJSON(outputDir string) error {
 }
 
 // get moduleName and serverName from directory
-func getNamesFromOutDir(dir string) (moduleName string, serverName string, isSupportLargeCodeRepo bool) {
+func getNamesFromOutDir(dir string) (moduleName string, serverName string, suitedMonoRepo bool) {
 	if dir == "" {
 		return "", "", false
 	}
@@ -582,4 +582,12 @@ func SubServerCodeFields(outDir string, moduleName string, serverName string) []
 			New: fmt.Sprintf("\"%s/api", moduleName+"/"+serverName),
 		},
 	}
+}
+
+func changeOutPath(outPath string, serverName string) string {
+	switch outPath {
+	case "", ".", "./", ".\\", serverName, "./" + serverName, ".\\" + serverName:
+		return serverName
+	}
+	return outPath + gofile.GetPathDelimiter() + serverName
 }

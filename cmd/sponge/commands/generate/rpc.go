@@ -30,7 +30,7 @@ func RPCCommand() *cobra.Command {
 			GormType: true,
 		}
 
-		isSupportLargeCodeRepo bool // is support large code repository
+		suitedMonoRepo bool // whether the generated code is suitable for mono-repo
 	)
 
 	//nolint
@@ -55,7 +55,7 @@ Examples:
   # generate grpc service code and specify the docker image repository address.
   sponge micro rpc --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
-  # if you want the generated code to support large code repository, you need to specify the parameter --support-large-code-repo=true
+  # if you want the generated code to suited to mono-repo, you need to specify the parameter --suited-mono-repo=true
 `,
 		SilenceErrors: true,
 		SilenceUsage:  true,
@@ -71,6 +71,9 @@ Examples:
 			}
 
 			projectName, serverName = convertProjectAndServerName(projectName, serverName)
+			if suitedMonoRepo {
+				outPath = changeOutPath(outPath, serverName)
+			}
 			if sqlArgs.DBDriver == DBDriverMongodb {
 				sqlArgs.IsEmbed = false
 			}
@@ -91,7 +94,7 @@ Examples:
 				codes:       codes,
 				outPath:     outPath,
 
-				isSupportLargeCodeRepo: isSupportLargeCodeRepo,
+				suitedMonoRepo: suitedMonoRepo,
 			}
 			outPath, err = g.generateCode()
 			if err != nil {
@@ -117,7 +120,7 @@ Examples:
 					codes:      codes,
 					outPath:    outPath,
 
-					isSupportLargeCodeRepo: isSupportLargeCodeRepo,
+					suitedMonoRepo: suitedMonoRepo,
 				}
 				outPath, err = sg.generateCode()
 				if err != nil {
@@ -151,7 +154,7 @@ using help:
 	cmd.Flags().StringVarP(&dbTables, "db-table", "t", "", "table name, multiple names separated by commas")
 	_ = cmd.MarkFlagRequired("db-table")
 	cmd.Flags().BoolVarP(&sqlArgs.IsEmbed, "embed", "e", true, "whether to embed gorm.model struct")
-	cmd.Flags().BoolVarP(&isSupportLargeCodeRepo, "support-large-code-repo", "l", false, "whether to support large code repository")
+	cmd.Flags().BoolVarP(&suitedMonoRepo, "suited-mono-repo", "l", false, "whether the generated code is suitable for mono-repo")
 	cmd.Flags().IntVarP(&sqlArgs.JSONNamedType, "json-name-type", "j", 1, "json tags name type, 0:snake case, 1:camel case")
 	cmd.Flags().StringVarP(&repoAddr, "repo-addr", "r", "", "docker image repository address, excluding http and repository names")
 	cmd.Flags().StringVarP(&outPath, "out", "o", "", "output directory, default is ./serverName_rpc_<time>")
@@ -170,7 +173,7 @@ type rpcGenerator struct {
 	codes       map[string]string
 	outPath     string
 
-	isSupportLargeCodeRepo bool
+	suitedMonoRepo bool
 }
 
 func (g *rpcGenerator) generateCode() (string, error) {
@@ -189,7 +192,7 @@ func (g *rpcGenerator) generateCode() (string, error) {
 		"sponge/.gitignore", "sponge/.golangci.yml", "sponge/go.mod", "sponge/go.sum",
 		"sponge/Jenkinsfile", "sponge/Makefile", "sponge/README.md",
 	}
-	if g.isSupportLargeCodeRepo {
+	if g.suitedMonoRepo {
 		subFiles = removeElements(subFiles, "sponge/go.mod", "sponge/go.sum")
 	}
 	ignoreDirs := []string{ // specify the directory in the subdirectory where processing is ignored
@@ -234,7 +237,7 @@ func (g *rpcGenerator) generateCode() (string, error) {
 	if err := r.SaveFiles(); err != nil {
 		return "", err
 	}
-	_ = saveGenInfo(g.moduleName, g.serverName, g.isSupportLargeCodeRepo, r.GetOutputDir())
+	_ = saveGenInfo(g.moduleName, g.serverName, g.suitedMonoRepo, r.GetOutputDir())
 
 	return r.GetOutputDir(), nil
 }
@@ -442,7 +445,7 @@ func (g *rpcGenerator) addFields(r replacer.Replacer) []replacer.Field {
 		},
 	}...)
 
-	if g.isSupportLargeCodeRepo {
+	if g.suitedMonoRepo {
 		fs := serverCodeFields(r.GetOutputDir(), g.moduleName, g.serverName)
 		fields = append(fields, fs...)
 	}

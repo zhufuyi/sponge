@@ -11,8 +11,8 @@ import (
 	"github.com/zhufuyi/sponge/pkg/gofile"
 )
 
-// AdaptLCRCommand Adapt to large code repository
-func AdaptLCRCommand() *cobra.Command {
+// AdaptMonoRepoCommand Adapt to mono-repo command
+func AdaptMonoRepoCommand() *cobra.Command {
 	var (
 		dir        string
 		moduleName string // module name for go.mod
@@ -20,13 +20,13 @@ func AdaptLCRCommand() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "adapt-lcr",
-		Short: "adapt to large code repository in api directory code",
-		Long: `adapt to large code repository in api directory code
+		Use:   "adapt-mono-repo",
+		Short: "adapt to mono-repo in api directory code",
+		Long: `adapt to mono-repo in api directory code
 
 Examples:
-  # adapt code in ./docs/gen.info directory
-  sponge patch adapt-lcr
+  # adapt to mono-repo code
+  sponge patch adapt-mono-repo
 
 `,
 		SilenceErrors: true,

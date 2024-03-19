@@ -144,8 +144,11 @@ func handleGenerateCode(c *gin.Context, outPath string, arg string) {
 			out = params.ModuleName + "-" + out
 		}
 	}
+	if params.SuitedMonoRepo {
+		out += "-mono-repo"
+	}
 
-	out = os.TempDir() + gofile.GetPathDelimiter() + out
+	out = os.TempDir() + gofile.GetPathDelimiter() + "sponge-generate-code" + gofile.GetPathDelimiter() + out
 	args = append(args, fmt.Sprintf("--out=%s", out))
 
 	ctx, _ := context.WithTimeout(context.Background(), time.Second*10) // nolint
@@ -176,14 +179,39 @@ func handleGenerateCode(c *gin.Context, outPath string, arg string) {
 
 	recordObj().set(c.ClientIP(), outPath, params)
 
-	_ = os.RemoveAll(out)
-	_ = os.RemoveAll(zipFile)
-	if params.ProtobufFile != "" && strings.Contains(params.ProtobufFile, recordDirName) {
-		_ = os.RemoveAll(gofile.GetFileDir(params.ProtobufFile))
-	}
-	if params.YamlFile != "" && strings.Contains(params.YamlFile, recordDirName) {
-		_ = os.RemoveAll(gofile.GetFileDir(params.YamlFile))
-	}
+	go func() {
+		ctx, _ := context.WithTimeout(context.Background(), time.Minute*10)
+
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-time.After(time.Second * 5):
+				err := os.RemoveAll(out)
+				if err != nil {
+					continue
+				}
+				err = os.RemoveAll(zipFile)
+				if err != nil {
+					continue
+				}
+
+				if params.ProtobufFile != "" && strings.Contains(params.ProtobufFile, recordDirName) {
+					err = os.RemoveAll(gofile.GetFileDir(params.ProtobufFile))
+					if err != nil {
+						continue
+					}
+				}
+				if params.YamlFile != "" && strings.Contains(params.YamlFile, recordDirName) {
+					err = os.RemoveAll(gofile.GetFileDir(params.YamlFile))
+					if err != nil {
+						continue
+					}
+				}
+				return
+			}
+		}
+	}()
 }
 
 // GetRecord generate run command record

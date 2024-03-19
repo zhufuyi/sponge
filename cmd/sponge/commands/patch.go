@@ -24,7 +24,7 @@ func PatchCommand() *cobra.Command {
 		patch.CopyProtoCommand(),
 		patch.ModifyDuplicateNumCommand(),
 		patch.ModifyDuplicateErrCodeCommand(),
-		patch.AdaptLCRCommand(),
+		patch.AdaptMonoRepoCommand(),
 	)
 
 	return cmd

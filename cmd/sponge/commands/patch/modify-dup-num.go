@@ -156,7 +156,7 @@ func (r *numbersInfo) modifyGRPCDuplicateNum() (string, error) {
 	msg := ""
 	duplicateNums := []string{}
 
-	if len(r.httpDuplicationNums) == 0 {
+	if len(r.grpcDuplicationNums) == 0 {
 		return msg, nil
 	}
 

@@ -31,6 +31,8 @@ type parameters struct {
 	Embed         bool   `json:"embed"`
 	IncludeInitDB bool   `json:"includeInitDB"`
 	UpdateAt      string `json:"updateAt"`
+
+	SuitedMonoRepo bool `json:"suitedMonoRepo"`
 }
 
 type record struct {
@@ -146,6 +148,8 @@ func parseCommandArgs(args []string) *parameters {
 				params.ProtobufFile = val
 			case "--yaml-file":
 				params.YamlFile = val
+			case "--suited-mono-repo":
+				params.SuitedMonoRepo = (val == "true")
 			}
 		}
 	}

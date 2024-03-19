@@ -20,7 +20,7 @@ func RPCGwPbCommand() *cobra.Command {
 		outPath      string // output directory
 		protobufFile string // protobuf file, support * matching
 
-		isSupportLargeCodeRepo bool // is support large code repository
+		suitedMonoRepo bool // whether the generated code is suitable for mono-repo
 	)
 
 	cmd := &cobra.Command{
@@ -38,12 +38,17 @@ Examples:
   # generate grpc gateway service code and specify the docker image repository address.
   sponge micro rpc-gw-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --protobuf-file=./demo.proto
 
-  # if you want the generated code to support large code repository, you need to specify the parameter --support-large-code-repo=true
+  # if you want the generated code to suited to mono-repo, you need to specify the parameter --suited-mono-repo=true
 `,
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			projectName, serverName = convertProjectAndServerName(projectName, serverName)
+
+			if suitedMonoRepo {
+				outPath = changeOutPath(outPath, serverName)
+			}
+
 			g := &rpcGwPbGenerator{
 				moduleName:   moduleName,
 				serverName:   serverName,
@@ -52,7 +57,7 @@ Examples:
 				repoAddr:     repoAddr,
 				outPath:      outPath,
 
-				isSupportLargeCodeRepo: isSupportLargeCodeRepo,
+				suitedMonoRepo: suitedMonoRepo,
 			}
 			err := g.generateCode()
 			if err != nil {
@@ -72,7 +77,7 @@ Examples:
 	_ = cmd.MarkFlagRequired("project-name")
 	cmd.Flags().StringVarP(&protobufFile, "protobuf-file", "f", "", "proto file")
 	_ = cmd.MarkFlagRequired("protobuf-file")
-	cmd.Flags().BoolVarP(&isSupportLargeCodeRepo, "support-large-code-repo", "l", false, "whether to support large code repository")
+	cmd.Flags().BoolVarP(&suitedMonoRepo, "suited-mono-repo", "l", false, "whether the generated code is suitable for mono-repo")
 	cmd.Flags().StringVarP(&repoAddr, "repo-addr", "r", "", "docker image repository address, excluding http and repository names")
 	cmd.Flags().StringVarP(&outPath, "out", "o", "", "output directory, default is ./serverName_rpc-gw-pb_<time>")
 
@@ -87,7 +92,7 @@ type rpcGwPbGenerator struct {
 	repoAddr     string
 	outPath      string
 
-	isSupportLargeCodeRepo bool
+	suitedMonoRepo bool
 }
 
 func (g *rpcGwPbGenerator) generateCode() error {
@@ -112,7 +117,7 @@ func (g *rpcGwPbGenerator) generateCode() error {
 		"sponge/.gitignore", "sponge/.golangci.yml", "sponge/go.mod", "sponge/go.sum",
 		"sponge/Jenkinsfile", "sponge/Makefile", "sponge/README.md",
 	}
-	if g.isSupportLargeCodeRepo {
+	if g.suitedMonoRepo {
 		subFiles = removeElements(subFiles, "sponge/go.mod", "sponge/go.sum")
 	}
 	ignoreDirs := []string{"cmd/sponge"} // specify the directory in the subdirectory where processing is ignored
@@ -139,7 +144,7 @@ func (g *rpcGwPbGenerator) generateCode() error {
 	}
 
 	_ = saveProtobufFiles(g.moduleName, g.serverName, r.GetOutputDir(), protobufFiles)
-	_ = saveGenInfo(g.moduleName, g.serverName, g.isSupportLargeCodeRepo, r.GetOutputDir())
+	_ = saveGenInfo(g.moduleName, g.serverName, g.suitedMonoRepo, r.GetOutputDir())
 	_ = saveEmptySwaggerJSON(r.GetOutputDir())
 
 	fmt.Printf(`
@@ -288,7 +293,7 @@ func (g *rpcGwPbGenerator) addFields(r replacer.Replacer) []replacer.Field {
 		},
 	}...)
 
-	if g.isSupportLargeCodeRepo {
+	if g.suitedMonoRepo {
 		fs := serverCodeFields(r.GetOutputDir(), g.moduleName, g.serverName)
 		fields = append(fields, fs...)
 	}

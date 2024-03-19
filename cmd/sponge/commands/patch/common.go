@@ -6,7 +6,7 @@ import (
 )
 
 // get moduleName and serverName from directory
-func getNamesFromOutDir(dir string) (moduleName string, serverName string, isLCR bool) {
+func getNamesFromOutDir(dir string) (moduleName string, serverName string, suitedMonoRepo bool) {
 	if dir == "" {
 		return "", "", false
 	}

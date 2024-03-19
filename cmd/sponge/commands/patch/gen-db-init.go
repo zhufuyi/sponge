@@ -36,13 +36,13 @@ Examples:
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			mdName, serverName, isSupportLargeCodeRepo := getNamesFromOutDir(outPath)
+			mdName, serverName, suitedMonoRepo := getNamesFromOutDir(outPath)
 			if mdName != "" {
 				moduleName = mdName
 			} else if moduleName == "" {
 				return fmt.Errorf(`required flag(s) "module-name" not set, use "sponge patch gen-db-init -h" for help`)
 			}
-			if isSupportLargeCodeRepo {
+			if suitedMonoRepo {
 				if serverName == "" {
 					return fmt.Errorf(`serverName is empty`)
 				}
@@ -65,8 +65,8 @@ Examples:
 				dbDriver:   dbDriver,
 				outPath:    outPath,
 
-				serverName:             serverName,
-				isSupportLargeCodeRepo: isSupportLargeCodeRepo,
+				serverName:     serverName,
+				suitedMonoRepo: suitedMonoRepo,
 			}
 			var err error
 			outPath, err = g.generateCode()
@@ -104,8 +104,8 @@ type dbInitGenerator struct {
 	dbDriver   string
 	outPath    string
 
-	serverName             string
-	isSupportLargeCodeRepo bool
+	serverName     string
+	suitedMonoRepo bool
 }
 
 func (g *dbInitGenerator) generateCode() (string, error) {
@@ -170,7 +170,7 @@ func (g *dbInitGenerator) addFields(r replacer.Replacer) []replacer.Field {
 		},
 	}...)
 
-	if g.isSupportLargeCodeRepo {
+	if g.suitedMonoRepo {
 		fs := generate.SubServerCodeFields(r.GetOutputDir(), g.moduleName, g.serverName)
 		fields = append(fields, fs...)
 	}

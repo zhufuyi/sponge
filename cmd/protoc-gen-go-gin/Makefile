@@ -25,31 +25,31 @@ service:
 	  --plugin=./protoc-gen-go-gin* \
 	  api/v1/*.proto
 
-router-lcr:
+router-mr:
 	@go build
 	protoc --proto_path=. --proto_path=./third_party \
 	  --go_out=. --go_opt=paths=source_relative \
 	  --go-gin_out=. --go-gin_opt=paths=source_relative  \
-	  --go-gin_opt=isLCR=true \
+	  --go-gin_opt=suitedMonoRepo=true \
 	  --plugin=./protoc-gen-go-gin* \
 	  api/v1/*.proto
 
-handler-lcr:
+handler-mr:
 	@go build
 	protoc --proto_path=. --proto_path=./third_party \
 	  --go_out=. --go_opt=paths=source_relative \
 	  --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=handler \
-	  --go-gin_opt=moduleName=yourModuleName --go-gin_opt=serverName=yourServerName --go-gin_opt=isLCR=true \
+	  --go-gin_opt=moduleName=yourModuleName --go-gin_opt=serverName=yourServerName --go-gin_opt=suitedMonoRepo=true \
 	  --plugin=./protoc-gen-go-gin* \
 	  api/v1/*.proto
 
-service-lcr:
+service-mr:
 	@go build
 	protoc --proto_path=. --proto_path=./third_party \
 	  --go_out=. --go_opt=paths=source_relative \
 	  --go-grpc_out=. --go-grpc_opt=paths=source_relative \
 	  --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=service \
-	  --go-gin_opt=moduleName=yourModuleName --go-gin_opt=serverName=yourServerName --go-gin_opt=isLCR=true \
+	  --go-gin_opt=moduleName=yourModuleName --go-gin_opt=serverName=yourServerName --go-gin_opt=suitedMonoRepo=true \
 	  --plugin=./protoc-gen-go-gin* \
 	  api/v1/*.proto
 
