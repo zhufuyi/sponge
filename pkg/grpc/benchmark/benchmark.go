@@ -8,9 +8,9 @@ import (
 	"github.com/bojand/ghz/printer"
 	"github.com/bojand/ghz/runner"
 	"google.golang.org/protobuf/proto"
-
-	"github.com/zhufuyi/sponge/pkg/gofile"
 )
+
+type Option = runner.Option
 
 // Runner interface
 type Runner interface {
@@ -21,18 +21,22 @@ type Runner interface {
 type bench struct {
 	rpcServerHost string // rpc server address
 
-	protoFile     string        // proto file
-	packageName   string        // proto file package name
-	serviceName   string        // proto file service name
-	methodName    string        // name of pressure test method
-	methodRequest proto.Message // input parameters corresponding to the method
+	protoFile              string        // proto file
+	packageName            string        // proto file package name
+	serviceName            string        // proto file service name
+	methodName             string        // name of pressure test method
+	methodRequest          proto.Message // input parameters corresponding to the method
+	dependentProtoFilePath []string      // dependent proto file path
 
-	total       uint     // number of requests
-	importPaths []string // reliance on third party protobuf file locations
+	total uint // number of requests
+
+	options []runner.Option
 }
 
 // New create a pressure test instance
-func New(host string, protoFile string, methodName string, req proto.Message, total uint, importPaths ...string) (Runner, error) {
+//
+// invalid parameter total if the option runner.WithRunDuration is set
+func New(host string, protoFile string, methodName string, req proto.Message, dependentProtoFilePath []string, total int, options ...runner.Option) (Runner, error) {
 	data, err := os.ReadFile(protoFile)
 	if err != nil {
 		return nil, err
@@ -55,40 +59,39 @@ func New(host string, protoFile string, methodName string, req proto.Message, to
 	}
 
 	return &bench{
-		protoFile:     protoFile,
-		packageName:   packageName,
-		serviceName:   serviceName,
-		methodName:    mName,
-		methodRequest: req,
-		rpcServerHost: host,
-		total:         total,
-		importPaths:   importPaths,
+		protoFile:              protoFile,
+		packageName:            packageName,
+		serviceName:            serviceName,
+		methodName:             mName,
+		methodRequest:          req,
+		rpcServerHost:          host,
+		total:                  uint(total),
+		dependentProtoFilePath: dependentProtoFilePath,
+		options:                options,
 	}, nil
 }
 
 // Run operational performance benchmarking
 func (b *bench) Run() error {
 	callMethod := fmt.Sprintf("%s.%s/%s", b.packageName, b.serviceName, b.methodName)
-	fmt.Printf("benchmark '%s', total %d requests\n", callMethod, b.total)
 
 	data, err := proto.Marshal(b.methodRequest)
 	if err != nil {
 		return err
 	}
 
-	report, err := runner.Run(
-		callMethod, //  'package.Service/method' or 'package.Service.Method'
-		b.rpcServerHost,
-		runner.WithProtoFile(b.protoFile, b.importPaths),
+	opts := []runner.Option{
+		runner.WithTotalRequests(b.total),
+		runner.WithProtoFile(b.protoFile, b.dependentProtoFilePath),
 		runner.WithBinaryData(data),
 		runner.WithInsecure(true),
-		runner.WithTotalRequests(b.total),
-		// concurrent parameter
-		//runner.WithConcurrencySchedule(runner.ScheduleLine),
-		//runner.WithConcurrencyStep(5),  // add 5 workers per second
-		//runner.WithConcurrencyStart(1), //
-		//runner.WithConcurrencyEnd(20),  // maximum number of concurrent
-	)
+		runner.WithStreamMessageProvider(nil),
+		// more parameter settings https://github.com/bojand/ghz/blob/master/runner/options.go#L41
+		// example settings: https://github.com/bojand/ghz/blob/master/runner/options_test.go#L79
+	}
+	opts = append(opts, b.options...)
+
+	report, err := runner.Run(callMethod, b.rpcServerHost, opts...)
 	if err != nil {
 		return err
 	}
@@ -98,7 +101,9 @@ func (b *bench) Run() error {
 
 func (b *bench) saveReport(callMethod string, report *runner.Report) error {
 	// specify the output path
-	outputFile := fmt.Sprintf("%sreport_%s.html", os.TempDir()+gofile.GetPathDelimiter(), b.methodName)
+	outDir := os.TempDir() + string(os.PathSeparator) + "sponge_grpc_benchmark"
+	_ = os.MkdirAll(outDir, 0666)
+	outputFile := fmt.Sprintf("%sreport_%s.html", outDir+string(os.PathSeparator), b.methodName)
 	file, err := os.Create(outputFile)
 	if err != nil {
 		return err
@@ -112,6 +117,6 @@ func (b *bench) saveReport(callMethod string, report *runner.Report) error {
 		Report: report,
 	}
 
-	fmt.Printf("benchmark '%s' finished, report file=%s\n", callMethod, outputFile)
+	fmt.Printf("\nend of performance pressure testing api '%s', copy the report file path to your browser to view,\nreport file: %s\n\n", callMethod, outputFile)
 	return rp.Print("html")
 }

@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "./v1;v1";
+
+service mixed {
+  // create a record
+  rpc Create(CreateMixedRequest) returns (CreateMixedReply) {
+    option (google.api.http) = {
+      post: "/api/v1/mixed"
+      body: "*"
+    };
+  }
+
+  // get a record by id
+  rpc GetByID(GetMixedByIDRequest) returns (GetMixedByIDReply) {
+    option (google.api.http) = {
+      get: "/api/v1/mixed/{id}"
+    };
+  }
+
+  // delete a record by id
+  rpc DeleteByID(DeleteMixedByIDRequest) returns (DeleteMixedByIDReply) {}
+
+  // client side streaming
+  rpc ClientStream (stream GetMixedByIDRequest) returns (MixedInfo){};
+  // server side streaming
+  rpc ServerStream (GetMixedByIDRequest) returns (stream MixedInfo);
+  // client-server side streaming
+  rpc BidirectionalStream (stream GetMixedByIDRequest) returns (stream MixedInfo);
+}
+
+message CreateMixedRequest {
+  string name = 1;
+  string email = 2;
+  string password = 3;
+}
+
+message CreateMixedReply {
+  uint64   id = 1;
+}
+
+message MixedInfo {
+  uint64   id = 1;
+  string name = 2;
+  string email = 3;
+
+}
+
+message GetMixedByIDRequest {
+  uint64   id = 1;
+}
+
+message GetMixedByIDReply {
+  MixedInfo userExample = 1;
+}
+
+message DeleteMixedByIDRequest {
+  uint64   id = 1;
+}
+
+message DeleteMixedByIDReply {
+
+}
+

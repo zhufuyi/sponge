@@ -92,6 +92,11 @@ func main() {
 
 func saveRPCTmplFiles(f *protogen.File, moduleName string, serverName string, tmplOut string, ecodeOut string, suitedMonoRepo bool) error {
 	filenamePrefix := f.GeneratedFilenamePrefix
+	_, checkFilename := filepath.Split(filenamePrefix + ".proto")
+	if strings.HasSuffix(checkFilename, "_test.proto") {
+		return fmt.Errorf(`the proto file name (%s) suffix "_test" is not supported for code generation, please delete suffix "_test" or change it to another name. `, checkFilename)
+	}
+
 	tmplFileContent, testTmplFileContent, ecodeFileContent := service.GenerateFiles(filenamePrefix, f)
 
 	filePath := filenamePrefix + ".go"

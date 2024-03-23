@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"io"
 	"strconv"
 	"testing"
 	"time"
@@ -22,6 +23,8 @@ import (
 	"github.com/zhufuyi/sponge/configs"
 	"github.com/zhufuyi/sponge/internal/config"
 )
+
+var ioEOF = io.EOF
 
 func TestRegisterAllService(t *testing.T) {
 	utils.SafeRunWithTimeout(time.Second*2, func(cancel context.CancelFunc) {

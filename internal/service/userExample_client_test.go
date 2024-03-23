@@ -32,7 +32,7 @@ func Test_service_userExample_methods(t *testing.T) {
 		{
 			name: "Create",
 			fn: func() (interface{}, error) {
-				// todo type in the parameters to test
+				// todo type in the parameters before testing
 				req := &serverNameExampleV1.CreateUserExampleRequest{
 					Name:     "foo7",
 					Email:    "foo7@bar.com",
@@ -50,7 +50,7 @@ func Test_service_userExample_methods(t *testing.T) {
 		{
 			name: "UpdateByID",
 			fn: func() (interface{}, error) {
-				// todo type in the parameters to test
+				// todo type in the parameters before testing
 				req := &serverNameExampleV1.UpdateUserExampleByIDRequest{
 					Id:    7,
 					Phone: "16000000001",
@@ -64,7 +64,7 @@ func Test_service_userExample_methods(t *testing.T) {
 		{
 			name: "DeleteByID",
 			fn: func() (interface{}, error) {
-				// todo type in the parameters to test
+				// todo type in the parameters before testing
 				req := &serverNameExampleV1.DeleteUserExampleByIDRequest{
 					Id: 100,
 				}
@@ -76,7 +76,7 @@ func Test_service_userExample_methods(t *testing.T) {
 		{
 			name: "DeleteByIDs",
 			fn: func() (interface{}, error) {
-				// todo type in the parameters to test
+				// todo type in the parameters before testing
 				req := &serverNameExampleV1.DeleteUserExampleByIDsRequest{
 					Ids: []uint64{100},
 				}
@@ -88,7 +88,7 @@ func Test_service_userExample_methods(t *testing.T) {
 		{
 			name: "GetByID",
 			fn: func() (interface{}, error) {
-				// todo type in the parameters to test
+				// todo type in the parameters before testing
 				req := &serverNameExampleV1.GetUserExampleByIDRequest{
 					Id: 1,
 				}
@@ -100,7 +100,7 @@ func Test_service_userExample_methods(t *testing.T) {
 		{
 			name: "GetByCondition",
 			fn: func() (interface{}, error) {
-				// todo type in the parameters to test
+				// todo type in the parameters before testing
 				req := &serverNameExampleV1.GetUserExampleByConditionRequest{
 					Conditions: &types.Conditions{
 						Columns: []*types.Column{
@@ -119,7 +119,7 @@ func Test_service_userExample_methods(t *testing.T) {
 		{
 			name: "ListByIDs",
 			fn: func() (interface{}, error) {
-				// todo type in the parameters to test
+				// todo type in the parameters before testing
 				req := &serverNameExampleV1.ListUserExampleByIDsRequest{
 					Ids: []uint64{1, 2, 3},
 				}
@@ -131,7 +131,7 @@ func Test_service_userExample_methods(t *testing.T) {
 		{
 			name: "ListByLastID",
 			fn: func() (interface{}, error) {
-				// todo type in the parameters to test
+				// todo type in the parameters before testing
 				req := &serverNameExampleV1.ListUserExampleByLastIDRequest{
 					LastID: 0,
 					Limit:  10,
@@ -145,7 +145,7 @@ func Test_service_userExample_methods(t *testing.T) {
 		{
 			name: "List",
 			fn: func() (interface{}, error) {
-				// todo type in the parameters to test
+				// todo type in the parameters before testing
 				req := &serverNameExampleV1.ListUserExampleRequest{
 					Params: &types.Params{
 						Page:  0,
@@ -191,7 +191,7 @@ func Test_service_userExample_benchmark(t *testing.T) {
 	protoFile := configs.Path("../api/serverNameExample/v1/userExample.proto")
 	// If third-party dependencies are missing during the press test,
 	// copy them to the project's third_party directory.
-	importPaths := []string{
+	dependentProtoFilePath := []string{
 		configs.Path("../third_party"), // third_party directory
 		configs.Path(".."),             // Previous level of third_party
 	}
@@ -204,12 +204,13 @@ func Test_service_userExample_benchmark(t *testing.T) {
 		{
 			name: "GetByID",
 			fn: func() error {
-				// todo type in the parameters to test
+				// todo type in the parameters before testing
 				message := &serverNameExampleV1.GetUserExampleByIDRequest{
 					Id: 1,
 				}
-				var total uint = 1000 // total number of requests
-				b, err := benchmark.New(host, protoFile, "GetByID", message, total, importPaths...)
+				total := 1000 // total number of requests
+
+				b, err := benchmark.New(host, protoFile, "GetByID", message, dependentProtoFilePath, total)
 				if err != nil {
 					return err
 				}
@@ -221,12 +222,13 @@ func Test_service_userExample_benchmark(t *testing.T) {
 		{
 			name: "ListByIDs",
 			fn: func() error {
-				// todo type in the parameters to test
+				// todo type in the parameters before testing
 				message := &serverNameExampleV1.ListUserExampleByIDsRequest{
 					Ids: []uint64{1, 2, 3},
 				}
-				var total uint = 1000 // total number of requests
-				b, err := benchmark.New(host, protoFile, "ListByIDs", message, total, importPaths...)
+				total := 1000 // total number of requests
+
+				b, err := benchmark.New(host, protoFile, "ListByIDs", message, dependentProtoFilePath, total)
 				if err != nil {
 					return err
 				}
@@ -238,14 +240,15 @@ func Test_service_userExample_benchmark(t *testing.T) {
 		{
 			name: "ListByLastID",
 			fn: func() error {
-				// todo type in the parameters to test
+				// todo type in the parameters before testing
 				message := &serverNameExampleV1.ListUserExampleByLastIDRequest{
 					LastID: 0,
 					Limit:  5,
 					Sort:   "-id",
 				}
-				var total uint = 100 // total number of requests
-				b, err := benchmark.New(host, protoFile, "ListByLastID", message, total, importPaths...)
+				total := 1000 // total number of requests
+
+				b, err := benchmark.New(host, protoFile, "ListByLastID", message, dependentProtoFilePath, total)
 				if err != nil {
 					return err
 				}
@@ -257,7 +260,7 @@ func Test_service_userExample_benchmark(t *testing.T) {
 		{
 			name: "List",
 			fn: func() error {
-				// todo type in the parameters to test
+				// todo type in the parameters before testing
 				message := &serverNameExampleV1.ListUserExampleRequest{
 					Params: &types.Params{
 						Page:  0,
@@ -273,8 +276,9 @@ func Test_service_userExample_benchmark(t *testing.T) {
 						},
 					},
 				}
-				var total uint = 100 // total number of requests
-				b, err := benchmark.New(host, protoFile, "List", message, total, importPaths...)
+				total := 1000 // total number of requests
+
+				b, err := benchmark.New(host, protoFile, "List", message, dependentProtoFilePath, total)
 				if err != nil {
 					return err
 				}

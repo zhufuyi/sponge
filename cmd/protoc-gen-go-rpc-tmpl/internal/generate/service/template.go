@@ -48,9 +48,9 @@ import (
 
 func init() {
 	registerFns = append(registerFns, func(server *grpc.Server) {
-{{- range .PbServices}}
+		{{- range .PbServices}}
 		serverNameExampleV1.Register{{.Name}}Server(server, New{{.Name}}Server())
-{{- end}}
+		{{- end}}
 	})
 }
 
@@ -77,7 +77,126 @@ func New{{.Name}}Server() serverNameExampleV1.{{.Name}}Server {
 }
 
 {{- range .Methods}}
+{{if eq .InvokeType 1}}
+{{.Comment}}
+func (s *{{.LowerServiceName}}) {{.MethodName}}(stream serverNameExampleV1.{{.ServiceName}}_{{.MethodName}}Server) error {
+	panic("implement me")
 
+	// fill in the business logic code here
+	// example:
+	//	    ctx := interceptor.WrapServerCtx(stream.Context())
+	//	    for {
+	//	        req, err := stream.Recv()
+	//	        if err != nil {
+	//	    	    if err == io.EOF {
+	//	    	        return stream.SendAndClose(&serverNameExampleV1.{{.Reply}}{
+		    	            {{- range .ReplyFields}}
+	//	    	            {{.Name}}: reply.{{.Name}},
+		    	            {{- end}}
+	//	    	        })
+	//	    	    }
+	//	    	    return err
+	//	        }
+	//
+	//	        err = req.Validate()
+	//	        if err != nil {
+	//		        logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req), interceptor.ServerCtxRequestIDField(ctx))
+	//		        return ecode.StatusInvalidParams.Err()
+	//	        }
+	//
+	// 	    reply, err := s.iDao.{{.MethodName}}(ctx, &model.{{.ServiceName}}{
+				    {{- range .RequestFields}}
+	//     	    {{.Name}}: req.{{.Name}},
+				    {{- end}}
+	//         })
+	// 	    if err != nil {
+	//			    logger.Warn("{{.MethodName}} error", logger.Err(err), interceptor.ServerCtxRequestIDField(ctx))
+	//			    return ecode.StatusInternalServerError.Err()
+	//		    }
+	//	    }
+}
+{{else if eq .InvokeType 2}}
+{{.Comment}}
+func (s *{{.LowerServiceName}}) {{.MethodName}}(req *serverNameExampleV1.{{.Request}}, stream serverNameExampleV1.{{.ServiceName}}_{{.MethodName}}Server) error {
+	panic("implement me")
+
+	// fill in the business logic code here
+	// example:
+	//	    ctx := interceptor.WrapServerCtx(stream.Context())
+	//	    err := req.Validate()
+	//	    if err != nil {
+	//		    logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req), interceptor.ServerCtxRequestIDField(ctx))
+	//		    return ecode.StatusInvalidParams.Err()
+	//	    }
+	//
+	//	    for i := 0; i < 3; i++ {
+	// 	    reply, err := s.iDao.{{.MethodName}}(ctx, &model.{{.ServiceName}}{
+				    {{- range .RequestFields}}
+	//     	    {{.Name}}: req.{{.Name}},
+				    {{- end}}
+	//         })
+	// 	    if err != nil {
+	//			    logger.Warn("{{.MethodName}} error", logger.Err(err), interceptor.ServerCtxRequestIDField(ctx))
+	//			    return ecode.StatusInternalServerError.Err()
+	//		    }
+	//
+	//	        err = stream.Send(&serverNameExampleV1.{{.Reply}}{
+				    {{- range .ReplyFields}}
+	//	            {{.Name}}: reply.{{.Name}},
+				    {{- end}}
+	//	        })
+	//	        if err != nil {
+	//			    logger.Warn("stream.Send error", logger.Err(err), interceptor.ServerCtxRequestIDField(ctx))
+	//	    	    return err
+	//	        }
+	//	    }
+	//	    return nil
+}
+{{else if eq .InvokeType 3}}
+{{.Comment}}
+func (s *{{.LowerServiceName}}) {{.MethodName}}(stream serverNameExampleV1.{{.ServiceName}}_{{.MethodName}}Server) error {
+	panic("implement me")
+
+	// fill in the business logic code here
+	// example:
+	//	    ctx := interceptor.WrapServerCtx(stream.Context())
+	//	    for {
+	//	        req, err := stream.Recv()
+	//	        if err != nil {
+	//	    	    if err == io.EOF {
+	//	    	        return nil
+	//	    	    }
+	//	    	    return err
+	//	        }
+	//
+	//	        err = req.Validate()
+	//	        if err != nil {
+	//		        logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req), interceptor.ServerCtxRequestIDField(ctx))
+	//		        return ecode.StatusInvalidParams.Err()
+	//	        }
+	//
+	// 	    reply, err := s.iDao.{{.MethodName}}(ctx, &model.{{.ServiceName}}{
+				    {{- range .RequestFields}}
+	//     	    {{.Name}}: req.{{.Name}},
+				    {{- end}}
+	//         })
+	// 	    if err != nil {
+	//			    logger.Warn("{{.MethodName}} error", logger.Err(err), interceptor.ServerCtxRequestIDField(ctx))
+	//			    return ecode.StatusInternalServerError.Err()
+	//		    }
+	//
+	//	    	err = stream.Send(&serverNameExampleV1.{{.Reply}}{
+				    {{- range .ReplyFields}}
+	//			    {{.Name}}: reply.{{.Name}},
+				    {{- end}}
+	//	    	})
+	// 	    if err != nil {
+	//			    logger.Warn("stream.Send error", logger.Err(err), interceptor.ServerCtxRequestIDField(ctx))
+	//			    return ecode.StatusInternalServerError.Err()
+	//		    }
+	//	    }
+}
+{{else}}
 {{.Comment}}
 func (s *{{.LowerServiceName}}) {{.MethodName}}(ctx context.Context, req *serverNameExampleV1.{{.Request}}) (*serverNameExampleV1.{{.Reply}}, error) {
 	panic("implement me")
@@ -92,9 +211,9 @@ func (s *{{.LowerServiceName}}) {{.MethodName}}(ctx context.Context, req *server
     // 	ctx = interceptor.WrapServerCtx(ctx)
     //
 	// 	reply, err := s.iDao.{{.MethodName}}(ctx, &model.{{.ServiceName}}{
-{{- range .RequestFields}}
+				{{- range .RequestFields}}
 	//     	{{.Name}}: req.{{.Name}},
-{{- end}}
+				{{- end}}
 	//     })
 	// 	if err != nil {
 	//			logger.Warn("{{.MethodName}} error", logger.Err(err), interceptor.ServerCtxRequestIDField(ctx))
@@ -102,12 +221,12 @@ func (s *{{.LowerServiceName}}) {{.MethodName}}(ctx context.Context, req *server
 	//		}
 	//
 	//     return &serverNameExampleV1.{{.Reply}}{
-{{- range .ReplyFields}}
+				{{- range .ReplyFields}}
 	//     	{{.Name}}: reply.{{.Name}},
-{{- end}}
+				{{- end}}
 	//     }, nil
 }
-
+{{end}}
 {{- end}}
 
 // ---------- Do not delete or move this split line, this is the merge code marker ----------
@@ -117,6 +236,10 @@ func (s *{{.LowerServiceName}}) {{.MethodName}}(ctx context.Context, req *server
 
 	serviceLogicTestTmpl    *template.Template
 	serviceLogicTestTmplRaw = `// Code generated by https://github.com/zhufuyi/sponge
+{{- range .PbServices}}
+// Test_service_{{.LowerName}}_methods is used to test the {{.LowerName}} api
+// Test_service_{{.LowerName}}_benchmark is used to performance test the {{.LowerName}} api
+{{- end}}
 
 package service
 
@@ -136,7 +259,7 @@ import (
 
 {{- range .PbServices}}
 
-// Test each method of {{.LowerName}} via the grpc client
+// Test service {{.LowerName}} api via grpc client
 func Test_service_{{.LowerName}}_methods(t *testing.T) {
 	conn := getRPCClientConnForTest()
 	cli := serverNameExampleV1.New{{.Name}}Client(conn)
@@ -148,19 +271,119 @@ func Test_service_{{.LowerName}}_methods(t *testing.T) {
 		wantErr bool
 	}{
 {{- range .Methods}}
+{{if eq .InvokeType 1}}
 		{
 			name: "{{.MethodName}}",
 			fn: func() (interface{}, error) {
-				// todo type in the parameters to test
+				// todo type in the parameters before testing
 				req := &serverNameExampleV1.{{.Request}}{
-{{- range .RequestFields}}
+					{{- range .RequestFields}}
 					{{.Name}}: {{.GoTypeZero}}, {{if .Comment}} {{.Comment}}{{end}}
-{{- end}}
+					{{- end}}
 				}
+
+				stream, err := cli.{{.MethodName}}(context.Background())
+				if err != nil {
+					return nil, err
+				}
+				for i:=0; i<3; i++ {
+					err = stream.Send(req)
+					if err != nil {
+						return nil, err
+					}
+				}
+				return stream.CloseAndRecv()
+			},
+			wantErr: false,
+		},
+{{else if eq .InvokeType 2}}
+		{
+			name: "{{.MethodName}}",
+			fn: func() (interface{}, error) {
+				// todo type in the parameters before testing
+				req := &serverNameExampleV1.{{.Request}}{
+					{{- range .RequestFields}}
+					{{.Name}}: {{.GoTypeZero}}, {{if .Comment}} {{.Comment}}{{end}}
+					{{- end}}
+				}
+
+				ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+				stream, err := cli.{{.MethodName}}(ctx, req)
+				if err != nil {
+					return nil, err
+				}
+				result := &serverNameExampleV1.{{.Reply}}{}
+				for {
+					select {
+					case <-ctx.Done():
+						return nil, stream.CloseSend()
+					default:
+						reply, err := stream.Recv()
+						if err == ioEOF {
+							return result, nil
+						}
+						if err != nil {
+							return nil, err
+						}
+						result = reply
+					}
+				}
+			},
+			wantErr: false,
+		},
+{{else if eq .InvokeType 3}}
+		{
+			name: "{{.MethodName}}",
+			fn: func() (interface{}, error) {
+				// todo type in the parameters before testing
+				req := &serverNameExampleV1.{{.Request}}{
+					{{- range .RequestFields}}
+					{{.Name}}: {{.GoTypeZero}}, {{if .Comment}} {{.Comment}}{{end}}
+					{{- end}}
+				}
+
+				stream, err := cli.{{.MethodName}}(context.Background())
+				if err != nil {
+					return nil, err
+				}
+				reply := &serverNameExampleV1.{{.Reply}}{}
+				for i:=0; i<3; i++ {
+					err = stream.Send(req)
+					if err != nil {
+						return nil, err
+					}
+					reply, err = stream.Recv()
+					if err == ioEOF {
+						return &serverNameExampleV1.{{.Reply}}{
+							{{- range .ReplyFields}}
+							{{.Name}}: reply.{{.Name}},
+							{{- end}}
+						}, nil
+					}
+					if err != nil {
+						return nil, err
+					}
+				}
+				return reply, stream.CloseSend()
+			},
+			wantErr: false,
+		},
+{{else}}
+		{
+			name: "{{.MethodName}}",
+			fn: func() (interface{}, error) {
+				// todo type in the parameters before testing
+				req := &serverNameExampleV1.{{.Request}}{
+					{{- range .RequestFields}}
+					{{.Name}}: {{.GoTypeZero}}, {{if .Comment}} {{.Comment}}{{end}}
+					{{- end}}
+				}
+
 				return cli.{{.MethodName}}(ctx, req)
 			},
 			wantErr: false,
 		},
+{{end}}
 {{- end}}
 	}
 
@@ -177,8 +400,8 @@ func Test_service_{{.LowerName}}_methods(t *testing.T) {
 	}
 }
 
-// Perform a stress test on {{.LowerName}}'s method and 
-// copy the press test report to your browser when you are finished.
+// performance test service {{.LowerName}} api, copy the report to
+// the browser to view when the pressure test is finished.
 func Test_service_{{.LowerName}}_benchmark(t *testing.T) {
 	err := config.Init(configs.Path("serverNameExample.yml"))
 	if err != nil {
@@ -188,7 +411,7 @@ func Test_service_{{.LowerName}}_benchmark(t *testing.T) {
 	protoFile := configs.Path("../api/serverNameExample/v1/{{.ProtoName}}")
 	// If third-party dependencies are missing during the press test,
 	// copy them to the project's third_party directory.
-	importPaths := []string{
+	dependentProtoFilePath := []string{
 		configs.Path("../third_party"), // third_party directory
 		configs.Path(".."),             // Previous level of third_party
 	}
@@ -199,17 +422,23 @@ func Test_service_{{.LowerName}}_benchmark(t *testing.T) {
 		wantErr bool
 	}{
 {{- range .Methods}}
+{{if eq .InvokeType 1}}
 		{
 			name: "{{.MethodName}}",
 			fn: func() error {
-				// todo type in the parameters to test
+				// todo type in the parameters before benchmark testing
 				message := &serverNameExampleV1.{{.Request}}{
-{{- range .RequestFields}}
+					{{- range .RequestFields}}
 					{{.Name}}: {{.GoTypeZero}}, {{if .Comment}} {{.Comment}}{{end}}
-{{- end}}
+					{{- end}}
 				}
-				var total uint = 1000 // total number of requests
-				b, err := benchmark.New(host, protoFile, "{{.MethodName}}", message, total, importPaths...)
+				total := 100 // total number of requests
+
+				options := []benchmark.Option{
+					// runner.WithStreamCallCount(10), // steam count, need to import "github.com/bojand/ghz/runner"
+				}
+
+				b, err := benchmark.New(host, protoFile, "{{.MethodName}}", message, dependentProtoFilePath, total, options...)
 				if err != nil {
 					return err
 				}
@@ -217,6 +446,75 @@ func Test_service_{{.LowerName}}_benchmark(t *testing.T) {
 			},
 			wantErr: false,
 		},
+{{else if eq .InvokeType 2}}
+		{
+			name: "{{.MethodName}}",
+			fn: func() error {
+				// todo type in the parameters before benchmark testing
+				message := &serverNameExampleV1.{{.Request}}{
+					{{- range .RequestFields}}
+					{{.Name}}: {{.GoTypeZero}}, {{if .Comment}} {{.Comment}}{{end}}
+					{{- end}}
+				}
+				total := 100 // total number of requests
+
+				options := []benchmark.Option{
+					// runner.WithStreamCallCount(10), // steam count, need to import "github.com/bojand/ghz/runner"
+				}
+
+				b, err := benchmark.New(host, protoFile, "{{.MethodName}}", message, dependentProtoFilePath, total, options...)
+				if err != nil {
+					return err
+				}
+				return b.Run()
+			},
+			wantErr: false,
+		},
+{{else if eq .InvokeType 3}}
+		{
+			name: "{{.MethodName}}",
+			fn: func() error {
+				// todo type in the parameters before benchmark testing
+				message := &serverNameExampleV1.{{.Request}}{
+					{{- range .RequestFields}}
+					{{.Name}}: {{.GoTypeZero}}, {{if .Comment}} {{.Comment}}{{end}}
+					{{- end}}
+				}
+				total := 100 // total number of requests
+
+				options := []benchmark.Option{
+					// runner.WithStreamCallCount(10), // steam count, need to import "github.com/bojand/ghz/runner"
+				}
+
+				b, err := benchmark.New(host, protoFile, "{{.MethodName}}", message, dependentProtoFilePath, total, options...)
+				if err != nil {
+					return err
+				}
+				return b.Run()
+			},
+			wantErr: false,
+		},
+{{else}}
+		{
+			name: "{{.MethodName}}",
+			fn: func() error {
+				// todo type in the parameters before benchmark testing
+				message := &serverNameExampleV1.{{.Request}}{
+					{{- range .RequestFields}}
+					{{.Name}}: {{.GoTypeZero}}, {{if .Comment}} {{.Comment}}{{end}}
+					{{- end}}
+				}
+				total := 1000 // total number of requests
+
+				b, err := benchmark.New(host, protoFile, "{{.MethodName}}", message, dependentProtoFilePath, total)
+				if err != nil {
+					return err
+				}
+				return b.Run()
+			},
+			wantErr: false,
+		},
+{{end}}
 {{- end}}
 	}
 

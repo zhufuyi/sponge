@@ -16,6 +16,7 @@ type ServiceMethod struct {
 	Reply         string   // e.g. CreateReply
 	ReplyFields   []*Field
 	Comment       string // e.g. Create a record
+	InvokeType    int    // 0:unary, 1: client-side streaming, 2: server-side streaming, 3: bidirectional streaming
 
 	ServiceName      string // Greeter
 	LowerServiceName string // greeter first character to lower
@@ -72,6 +73,7 @@ func parsePbService(s *protogen.Service) *PbService {
 			Reply:         m.Output.GoIdent.GoName,
 			ReplyFields:   getFields(m.Output),
 			Comment:       getMethodComment(m),
+			InvokeType:    getInvokeType(m.Desc.IsStreamingClient(), m.Desc.IsStreamingServer()),
 
 			ServiceName:      s.GoName,
 			LowerServiceName: strings.ToLower(s.GoName[:1]) + s.GoName[1:],
@@ -152,4 +154,19 @@ func GetServices(protoName string, file *protogen.File) []*PbService {
 		pss = append(pss, ps)
 	}
 	return pss
+}
+
+func getInvokeType(isStreamingClient bool, isStreamingServer bool) int {
+	if isStreamingClient {
+		if isStreamingServer {
+			return 3 // bidirectional streaming
+		}
+		return 1 // client-side streaming
+	}
+
+	if isStreamingServer {
+		return 2 // server-side streaming
+	}
+
+	return 0 // unary
 }
