@@ -110,7 +110,7 @@ func main() {
 			}
 		case "":
 		default:
-			return fmt.Errorf("protoc-gen-go-gin: unknown plugin %q", plugin)
+			return fmt.Errorf("protoc-gen-go-gin: unknown plugin %q, only 'service' and 'handler' are supported", plugin)
 		}
 
 		gen.SupportedFeatures = uint64(pluginpb.CodeGeneratorResponse_FEATURE_PROTO3_OPTIONAL)
@@ -118,6 +118,11 @@ func main() {
 			if !f.Generate {
 				continue
 			}
+			_, checkFilename := filepath.Split(f.GeneratedFilenamePrefix + ".proto")
+			if strings.HasSuffix(checkFilename, "_test.proto") {
+				return fmt.Errorf(`the proto file name (%s) suffix "_test" is not supported for code generation, please delete suffix "_test" or change it to another name. `, checkFilename)
+			}
+
 			router.GenerateFile(gen, f)
 
 			if handlerFlag {

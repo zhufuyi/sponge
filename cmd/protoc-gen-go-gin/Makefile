@@ -53,6 +53,9 @@ service-mr:
 	  --plugin=./protoc-gen-go-gin* \
 	  api/v1/*.proto
 
+fmt:
+	gofmt -s -w .
+
 clean:
 	@rm -vrf api/v1/*.go
 	@rm -vrf protoc-gen-go-gin*

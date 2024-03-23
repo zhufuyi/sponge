@@ -16,8 +16,9 @@ var (
 	handlerTmpl    *template.Template
 	handlerTmplRaw = `
 type {{$.Name}}Logicer interface {
-{{range .MethodSet}}{{.Name}}(ctx context.Context, req *{{.Request}}) (*{{.Reply}}, error)
-{{end}}
+{{- range $.Methods}}
+{{if eq .InvokeType 0}}{{if .Path}}{{.Name}}(ctx context.Context, req *{{.Request}}) (*{{.Reply}}, error){{end}}{{end}}
+{{- end}}
 }
 
 type {{$.Name}}Option func(*{{$.LowerName}}Options)
@@ -119,7 +120,7 @@ type {{$.LowerName}}Router struct {
 }
 
 func (r *{{$.LowerName}}Router) register() {
-{{range .Methods}}r.iRouter.Handle("{{.Method}}", "{{.Path}}", r.withMiddleware("{{.Method}}", "{{.Path}}", r.{{ .HandlerName }})...)
+{{range .Methods}}{{if eq .InvokeType 0}}{{if .Path}}r.iRouter.Handle("{{.Method}}", "{{.Path}}", r.withMiddleware("{{.Method}}", "{{.Path}}", r.{{ .HandlerName }})...){{end}}{{end}}
 {{end}}
 }
 
@@ -151,7 +152,7 @@ func (r *{{$.LowerName}}Router) withMiddleware(method string, path string, fn gi
 }
 
 {{range .Methods}}
-func (r *{{$.LowerName}}Router) {{ .HandlerName }} (c *gin.Context) {
+{{if eq .InvokeType 0}}{{if .Path}}func (r *{{$.LowerName}}Router) {{ .HandlerName }} (c *gin.Context) {
 	req := &{{.Request}}{}
 	var err error
 {{if .HasPathParams }}
@@ -194,7 +195,7 @@ func (r *{{$.LowerName}}Router) {{ .HandlerName }} (c *gin.Context) {
 	}
 
 	r.iResponse.Success(c, out)
-}
+}{{end}}{{end}}
 {{end}}
 `
 )

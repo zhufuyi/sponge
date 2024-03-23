@@ -28,13 +28,14 @@ func GetMethods(m *protogen.Method) []*RPCMethod {
 	}
 
 	// default http RPCMethod mapping
-	methods = append(methods, defaultMethod(m))
+	// if the http method and path is not set, set default value.
+	//methods = append(methods, defaultMethod(m))
 	return methods
 }
 
 // defaultMethodPath generates a http route based on the function name
 // If the first word of the RPCMethod name is not a http RPCMethod mapping, then POST is returned by default
-func defaultMethod(m *protogen.Method) *RPCMethod {
+func defaultMethod(m *protogen.Method) *RPCMethod { //nolint
 	names := strings.Split(toSnakeCase(m.GoName), "_")
 	var (
 		paths      []string
@@ -105,21 +106,22 @@ func buildMethodDesc(m *protogen.Method, httpMethod, path string) *RPCMethod {
 		methodSets[m.GoName]++
 	}()
 	md := &RPCMethod{
-		Name:    m.GoName,
-		Num:     methodSets[m.GoName],
-		Request: m.Input.GoIdent.GoName,
-		Reply:   m.Output.GoIdent.GoName,
-		Path:    path,
-		Method:  httpMethod,
+		Name:       m.GoName,
+		Num:        methodSets[m.GoName],
+		Request:    m.Input.GoIdent.GoName,
+		Reply:      m.Output.GoIdent.GoName,
+		Path:       path,
+		Method:     httpMethod,
+		InvokeType: getInvokeType(m.Desc.IsStreamingClient(), m.Desc.IsStreamingServer()),
 	}
 	md.InitPathParams()
 	return md
 }
 
-var matchFirstCap = regexp.MustCompile("([A-Z])([A-Z][a-z])")
-var matchAllCap = regexp.MustCompile("([a-z0-9])([A-Z])")
+var matchFirstCap = regexp.MustCompile("([A-Z])([A-Z][a-z])") //nolint
+var matchAllCap = regexp.MustCompile("([a-z0-9])([A-Z])")     //nolint
 
-func toSnakeCase(input string) string {
+func toSnakeCase(input string) string { //nolint
 	output := matchFirstCap.ReplaceAllString(input, "${1}_${2}")
 	output = matchAllCap.ReplaceAllString(output, "${1}_${2}")
 	output = strings.ReplaceAll(output, "-", "_")
@@ -128,10 +130,11 @@ func toSnakeCase(input string) string {
 
 // RPCMethod describes a rpc method
 type RPCMethod struct {
-	Name    string // SayHello
-	Num     int    // one rpc RPCMethod can correspond to multiple http requests
-	Request string // SayHelloReq
-	Reply   string // SayHelloResp
+	Name       string // SayHello
+	Num        int    // one rpc RPCMethod can correspond to multiple http requests
+	Request    string // SayHelloReq
+	Reply      string // SayHelloResp
+	InvokeType int    // 0:unary, 1: client-side streaming, 2: server-side streaming, 3: bidirectional streaming
 
 	// http_rule
 	Path         string // rule

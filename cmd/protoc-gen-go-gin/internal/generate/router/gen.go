@@ -72,19 +72,10 @@ type tmplField struct {
 	FullName  string // v1.Greeter
 	FilePath  string // api/v1/demo.proto
 
-	Methods   []*parse.RPCMethod
-	MethodSet map[string]*parse.RPCMethod
+	Methods []*parse.RPCMethod
 }
 
 func (s *tmplField) execute() string {
-	if s.MethodSet == nil {
-		s.MethodSet = map[string]*parse.RPCMethod{}
-		for _, m := range s.Methods {
-			m := m
-			s.MethodSet[m.Name] = m
-		}
-	}
-
 	buf := new(bytes.Buffer)
 	if err := handlerTmpl.Execute(buf, s); err != nil {
 		panic(err)
