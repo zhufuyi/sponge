@@ -18,7 +18,7 @@ Example 1: common fields jwt
 	)
 
 	uid := "123"
-	role := "admin"
+	name := "admin"
 
 	// generate token
 	token, err := jwt.GenerateToken(uid)
@@ -29,7 +29,7 @@ Example 1: common fields jwt
 	// handle err
 	
 	// verify
-	if claims.Uid != "123" ||claims.Role != "admin" {
+	if claims.Uid != "123" ||claims.Name != "admin" {
 		print("verify failed")
 	    return
 	}

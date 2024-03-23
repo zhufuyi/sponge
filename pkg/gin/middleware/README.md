@@ -86,22 +86,20 @@ func main() {
 }
 
 func adminVerify(claims *jwt.Claims, tokenTail10 string, c *gin.Context) error {
-    if claims.Role != "admin" {
+    if claims.Name != "admin" {
         return errors.New("verify failed")
     }
 
-    // token := getToken(claims.UID)
+    // token := getToken(claims.UID) // from cache or database
     // if tokenTail10 != token[len(token)-10:] { return err }
 
     return nil
 }
 
 func Login(c *gin.Context) {
-    // login success
-
     // generate token
     token, err := jwt.GenerateToken("123", "admin")
-    // handle err
+    // save token
 }
 ```
 <br>
@@ -123,7 +121,7 @@ func main() {
 func verify(claims *jwt.CustomClaims, tokenTail10 string, c *gin.Context) error {
     err := errors.New("verify failed")
 
-    // token := getToken(id)
+    // token, fields := getToken(id) // from cache or database
     // if tokenTail10 != token[len(token)-10:] { return err }
 	
     id, exist := claims.Get("id")
@@ -134,7 +132,8 @@ func verify(claims *jwt.CustomClaims, tokenTail10 string, c *gin.Context) error 
     if !exist {
         return err
     }
-    if int(id.(float64)) != fields["id"].(int) || foo.(string) != fields["foo"].(string) {
+    if int(id.(float64)) != fields["id"].(int) ||
+        foo.(string) != fields["foo"].(string) {
         return err
     }
 
@@ -142,12 +141,10 @@ func verify(claims *jwt.CustomClaims, tokenTail10 string, c *gin.Context) error 
 }
 
 func Login(c *gin.Context) {
-    // login success
-
     // generate token
     fields := jwt.KV{"id": 123, "foo": "bar"}
     token, err := jwt.GenerateCustomToken(fields)
-    // handle err
+    // save token end fields
 }
 ```
 

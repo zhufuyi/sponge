@@ -18,12 +18,12 @@ import (
 
 var (
 	uid    = "123"
-	role   = "admin"
+	name   = "admin"
 	fields = jwt.KV{"id": 1, "foo": "bar"}
 )
 
 func verify(claims *jwt.Claims, tokenTail10 string, c *gin.Context) error {
-	if claims.UID != uid || claims.Role != role {
+	if claims.UID != uid || claims.Name != name {
 		return errors.New("verify failed")
 	}
 
@@ -36,6 +36,9 @@ func verify(claims *jwt.Claims, tokenTail10 string, c *gin.Context) error {
 func verifyCustom(claims *jwt.CustomClaims, tokenTail10 string, c *gin.Context) error {
 	err := errors.New("verify failed")
 
+	//token, fields := getToken(id)
+	// if  token[len(token)-10:] != tokenTail10 { return err }
+
 	id, exist := claims.Get("id")
 	if !exist {
 		return err
@@ -44,12 +47,10 @@ func verifyCustom(claims *jwt.CustomClaims, tokenTail10 string, c *gin.Context) 
 	if !exist {
 		return err
 	}
-	if int(id.(float64)) != fields["id"].(int) || foo.(string) != fields["foo"].(string) {
+	if int(id.(float64)) != fields["id"].(int) ||
+		foo.(string) != fields["foo"].(string) {
 		return err
 	}
-
-	// token := getToken(id)
-	// if  token[len(token)-10:] != tokenTail10 { return err }
 
 	return nil
 }
@@ -64,7 +65,7 @@ func runAuthHTTPServer() string {
 	r.Use(Cors())
 
 	tokenFun := func(c *gin.Context) {
-		token, _ := jwt.GenerateToken(uid, role)
+		token, _ := jwt.GenerateToken(uid, name)
 		fmt.Println("token =", token)
 		response.Success(c, token)
 	}
@@ -122,7 +123,7 @@ func TestAuth(t *testing.T) {
 	t.Log(val)
 
 	// verify error
-	role = "foobar"
+	name = "foobar"
 	val, err = getUser(requestAddr+"/user2/"+uid, authorization)
 	if err != nil {
 		t.Fatal(err)

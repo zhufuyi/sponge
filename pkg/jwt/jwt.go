@@ -22,23 +22,23 @@ func Init(opts ...Option) {
 // Claims my custom claims
 type Claims struct {
 	UID  string `json:"uid"`
-	Role string `json:"role"`
+	Name string `json:"name"`
 	jwt.RegisteredClaims
 }
 
-// GenerateToken generate token by uid and role
-func GenerateToken(uid string, role ...string) (string, error) {
+// GenerateToken generate token by uid and name
+func GenerateToken(uid string, name ...string) (string, error) {
 	if opt == nil {
 		return "", errInit
 	}
 
-	roleVal := ""
-	if len(role) > 0 {
-		roleVal = role[0]
+	nameVal := ""
+	if len(name) > 0 {
+		nameVal = name[0]
 	}
 	claims := Claims{
 		uid,
-		roleVal,
+		nameVal,
 		jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(opt.expire)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),

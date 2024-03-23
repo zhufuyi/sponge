@@ -89,14 +89,14 @@ func Auth(opts ...JwtOption) gin.HandlerFunc {
 		if o.verify != nil {
 			tokenTail10 := token[len(token)-10:]
 			if err = o.verify(claims, tokenTail10, c); err != nil {
-				logger.Warn("verify error", logger.Err(err), logger.String("uid", claims.UID), logger.String("role", claims.Role))
+				logger.Warn("verify error", logger.Err(err), logger.String("uid", claims.UID), logger.String("name", claims.Name))
 				responseUnauthorized(c, o.isSwitchHTTPCode)
 				c.Abort()
 				return
 			}
 		} else {
 			c.Set("uid", claims.UID)
-			c.Set("role", claims.Role)
+			c.Set("name", claims.Name)
 		}
 
 		c.Next()

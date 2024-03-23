@@ -38,7 +38,7 @@ func TestParseToken(t *testing.T) {
 	assert.Error(t, err)
 
 	uid := "123"
-	role := "admin"
+	name := "admin"
 
 	Init(
 		WithSigningKey("123456"),
@@ -47,7 +47,7 @@ func TestParseToken(t *testing.T) {
 	)
 
 	// success
-	token, err := GenerateToken(uid, role)
+	token, err := GenerateToken(uid, name)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -69,7 +69,7 @@ func TestParseToken(t *testing.T) {
 	assert.Error(t, err)
 
 	// token has expired
-	token, err = GenerateToken(uid, role)
+	token, err = GenerateToken(uid, name)
 	if err != nil {
 		t.Fatal(err)
 	}
