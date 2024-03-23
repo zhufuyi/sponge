@@ -45,6 +45,15 @@ func (a *Args) checkValid() error {
 	if a.SQL == "" && a.DDLFile == "" && (a.DBDsn == "" && a.DBTable == "") {
 		return errors.New("you must specify sql or ddl file")
 	}
+	if a.DBTable != "" {
+		tables := strings.Split(a.DBTable, ",")
+		for _, name := range tables {
+			if strings.HasSuffix(name, "_test") {
+				return fmt.Errorf(`the table name (%s) suffix "_test" is not supported for code generation, please delete suffix "_test" or change it to another name. `, name)
+			}
+		}
+	}
+
 	if a.DBDriver == "" {
 		a.DBDriver = parser.DBDriverMysql
 	} else if a.DBDriver == parser.DBDriverSqlite {

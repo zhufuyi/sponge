@@ -203,6 +203,7 @@ func TestGetPostgresqlTableInfo(t *testing.T) {
 		t.Log(err)
 		return
 	}
+	printPGFields(fields)
 	sql, fieldTypes := ConvertToSQLByPgFields("user_example", fields)
 	t.Log(sql, fieldTypes)
 }
@@ -256,6 +257,13 @@ func Test_toMysqlTable(t *testing.T) {
 func printCode(code map[string]string) {
 	for k, v := range code {
 		fmt.Printf("\n\n----------------- %s --------------------\n%s\n", k, v)
+	}
+}
+
+func printPGFields(fields []*PGField) {
+	fmt.Printf("%-20v %-20v %-20v %-20v %-20v %-20v\n", "Name", "Type", "Length", "Lengthvar", "Notnull", "Comment")
+	for _, p := range fields {
+		fmt.Printf("%-20v %-20v %-20v %-20v %-20v %-20v\n", p.Name, p.Type, p.Length, p.Lengthvar, p.Notnull, p.Comment)
 	}
 }
 

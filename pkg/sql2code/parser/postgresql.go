@@ -130,10 +130,3 @@ func closeDB(db *gorm.DB) {
 	}
 	_ = sqlDB.Close()
 }
-
-func printString(fields []*PGField) {
-	fmt.Printf("%-20v %-20v %-20v %-20v %-20v %-20v\n", "Name", "Type", "Length", "Lengthvar", "Notnull", "Comment")
-	for _, p := range fields {
-		fmt.Printf("%-20v %-20v %-20v %-20v %-20v %-20v\n", p.Name, p.Type, p.Length, p.Lengthvar, p.Notnull, p.Comment)
-	}
-}

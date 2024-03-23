@@ -60,6 +60,7 @@ Examples:
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			var err error
 			var firstTable string
 			var servicesTableNames []string
 			tableNames := strings.Split(dbTables, ",")
@@ -70,7 +71,11 @@ Examples:
 				servicesTableNames = tableNames[1:]
 			}
 
-			projectName, serverName = convertProjectAndServerName(projectName, serverName)
+			projectName, serverName, err = convertProjectAndServerName(projectName, serverName)
+			if err != nil {
+				return err
+			}
+
 			if suitedMonoRepo {
 				outPath = changeOutPath(outPath, serverName)
 			}
@@ -375,6 +380,10 @@ func (g *rpcGenerator) addFields(r replacer.Replacer) []replacer.Field {
 		{
 			Old: "sponge api docs",
 			New: g.serverName + " api docs",
+		},
+		{
+			Old: "go 1.19",
+			New: "go 1.20",
 		},
 		{
 			Old: "_userExampleNO       = 2",

@@ -138,10 +138,17 @@ func convertServerName(serverName string) string {
 	return strings.ReplaceAll(serverName, "-", "_")
 }
 
-func convertProjectAndServerName(projectName, serverName string) (pn string, sn string) {
-	pn = xstrings.ToKebabCase(projectName)
+func convertProjectAndServerName(projectName, serverName string) (pn string, sn string, err error) {
+	if strings.HasSuffix(serverName, "-test") {
+		err = fmt.Errorf(`the server name (%s) suffix "-test" is not supported for code generation, please delete suffix "-test" or change it to another name. `, serverName)
+	}
+	if strings.HasSuffix(serverName, "_test") {
+		err = fmt.Errorf(`the server name (%s) suffix "_test" is not supported for code generation, please delete suffix "_test" or change it to another name. `, serverName)
+	}
+
 	sn = strings.ReplaceAll(serverName, "-", "_")
-	return pn, sn
+	pn = xstrings.ToKebabCase(projectName)
+	return pn, sn, err
 }
 
 func adjustmentOfIDType(handlerCodes string, dbDriver string) string {

@@ -21,7 +21,7 @@ func AdaptMonoRepoCommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "adapt-mono-repo",
-		Short: "adapt to mono-repo in api directory code",
+		Short: "Adapt to mono-repo in api directory code",
 		Long: `adapt to mono-repo in api directory code
 
 Examples:

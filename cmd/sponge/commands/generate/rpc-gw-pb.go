@@ -43,7 +43,11 @@ Examples:
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			projectName, serverName = convertProjectAndServerName(projectName, serverName)
+			var err error
+			projectName, serverName, err = convertProjectAndServerName(projectName, serverName)
+			if err != nil {
+				return err
+			}
 
 			if suitedMonoRepo {
 				outPath = changeOutPath(outPath, serverName)
@@ -59,7 +63,7 @@ Examples:
 
 				suitedMonoRepo: suitedMonoRepo,
 			}
-			err := g.generateCode()
+			err = g.generateCode()
 			if err != nil {
 				return err
 			}
@@ -251,6 +255,10 @@ func (g *rpcGwPbGenerator) addFields(r replacer.Replacer) []replacer.Field {
 		{
 			Old: "sponge api docs",
 			New: g.serverName + " api docs",
+		},
+		{
+			Old: "go 1.19",
+			New: "go 1.20",
 		},
 		{
 			Old:             "serverNameExample",

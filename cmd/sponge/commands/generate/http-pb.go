@@ -44,7 +44,10 @@ Examples:
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var err error
-			projectName, serverName = convertProjectAndServerName(projectName, serverName)
+			projectName, serverName, err = convertProjectAndServerName(projectName, serverName)
+			if err != nil {
+				return err
+			}
 
 			if suitedMonoRepo {
 				outPath = changeOutPath(outPath, serverName)
@@ -248,6 +251,10 @@ func (g *httpPbGenerator) addFields(r replacer.Replacer) []replacer.Field {
 		{
 			Old: "sponge api docs",
 			New: g.serverName + " api docs",
+		},
+		{
+			Old: "go 1.19",
+			New: "go 1.20",
 		},
 		{
 			Old: "serverNameExample",
