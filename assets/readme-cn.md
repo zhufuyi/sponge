@@ -2,17 +2,24 @@
 
 <br>
 
-[sponge](https://github.com/zhufuyi/sponge) 是一个集成了 `自动生成代码`、`Gin和GRPC` 的基础开发框架。sponge拥有丰富的生成代码命令，生成不同的功能代码可以组合成完整的服务(类似人为打散的海绵细胞可以自动重组成一个新的海绵)。代码解耦模块化设计，很容易构建出从开发到部署的完整工程项目，只需在生成的模板代码上填充业务逻辑代码，大幅提高了开发效率和降低了开发难度，使用go也可以"低代码开发"。
+[sponge](https://github.com/zhufuyi/sponge) 是一个集成了 `自动生成代码`、`Gin和GRPC` 的强大的开发框架。sponge拥有丰富的生成代码命令，生成不同的功能代码可以组合成完整的服务(类似人为打散的海绵细胞可以自动重组成一个新的海绵)。从开发、测试、api文档到部署一站式项目开发，大幅提高了开发效率和降低了开发难度，使用go也可以使用"低代码方式"开发项目。
 
 <br>
 
-如果开发只有简单CRUD api接口的web或微服务，不需要编写任何go代码就可以编译并部署到linux服务器、docker、k8s上，只需要连接到数据库(mysql、mongodb、postgresql、tidb、sqlite)就可以一键自动生成完整的服务代码。
+如果开发只有CRUD api接口的web或微服务，不需要编写任何go代码就可以编译并部署到linux服务器、docker、k8s上，只需要连接到数据库(mysql、mongodb、postgresql、tidb、sqlite)就可以一键自动生成完整的服务代码。
 
-如果开发通用的web或微服务，只需聚焦`在数据库定义表`、`在proto文件定义api接口`、`在生成的模板文件填写业务逻辑代码`三个核心部分，其他go代码都由sponge自动生成。
+如果开发通用的web或微服务，只需聚焦`在数据库定义表`、`在proto文件定义api描述信息`、`在生成的模板文件填写业务逻辑代码`三个核心部分，其他go代码都由sponge自动生成。
 
 <br>
 
 ### 生成代码框架
+
+sponge生成的服务代码支持两种类型代码仓库：
+
+1. **单体应用单体仓库(monolith)或微服务多仓库(multi-repo)**：每个服务代码都有自己的git仓库，即使把所有服务放在同一个git仓库下，服务之间代码不可以复用，默认是生成这种类型。
+2. **微服务单体仓库(mono-repo)**：在所有服务都在同一个git仓库下，不同服务之间的代码可以复用。
+
+<br>
 
 sponge主要基于`SQL`和`Protobuf`两种方式生成代码，每种方式拥有生成不同用途的代码。其中`SQL`支持数据库**mysql**、**mongodb**、**postgresql**、**tidb**、**sqlite**。
 
@@ -34,7 +41,7 @@ sponge主要基于`SQL`和`Protobuf`两种方式生成代码，每种方式拥�
 
 #### 生成服务代码的鸡蛋模型
 
-sponge生成代码过程中剥离了业务逻辑与非业务逻辑两大部分代码，把sponge的生成代码功能看作是母鸡，生成的服务代码就是鸡蛋，以生成的一个web服务后端代码为例，鸡蛋模型剖析图：
+sponge生成代码过程中剥离了业务逻辑与非业务逻辑两大部分代码，把sponge的生成代码功能看作是一个母鸡，sponge生成的服务代码看作是鸡蛋，目前支持生成常见的5种类型服务代码，以生成的一个web服务后端代码为例，鸡蛋模型剖析图：
 
 <p align="center">
 <img width="1200px" src="https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/web-http-pb-anatomy.png">
@@ -94,7 +101,7 @@ sponge包含丰富的组件(按需使用)：
 ├── configs        # 配置文件的目录
 ├── deployments    # IaaS、PaaS、系统和容器协调部署的配置和模板目录
 ├── docs           # 设计文档和界面文档目录
-├── internal       # 私有应用程序和库的代码目录
+├── i(I)nternal       # 业务逻辑代码目录，如果首字母是小写(internal)，表示私有代码，如果首字母大写(Internal)表示可以被其他代码复用。
 │    ├── cache        # 基于业务包装的缓存目录
 │    ├── config       # Go结构的配置文件目录
 │    ├── dao          # 数据访问目录
@@ -168,7 +175,7 @@ sponge run
 
 ### 视频介绍
 
-> sponge v1.5.0版本以后的UI界面的左边菜单栏有一些修改，下面视频演示使用v1.5.0之前版本，左边菜单栏看起来会有些不同。
+> 视频教程演示使用sponge v1.3.12版本，新版本增加了一些自动化功能、调整了一些UI界面和菜单，建议结合[文档教程](https://go-sponge.com/zh-cn/)使用。
 
 - [01 sponge的形成过程](https://www.bilibili.com/video/BV1s14y1F7Fz/)
 - [02 sponge的框架介绍](https://www.bilibili.com/video/BV13u4y1F7EU/)

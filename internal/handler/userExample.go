@@ -321,7 +321,7 @@ func (h *userExampleHandler) ListByIDs(c *gin.Context) {
 // @Tags userExample
 // @accept json
 // @Produce json
-// @Param lastID query int true "last id, default is MaxInt32"
+// @Param lastID query int true "last id, default is MaxInt32" default(0)
 // @Param limit query int false "size in each page" default(10)
 // @Param sort query string false "sort by column name of table, and the "-" sign before column name indicates reverse order" default(-id)
 // @Success 200 {object} types.ListUserExamplesRespond{}

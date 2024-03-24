@@ -1,5 +1,5 @@
 
-Requirements Go 1.16 and above, [https://go.dev/doc/install](https://go.dev/doc/install)
+Requires go1.20 or higher, [https://go.dev/doc/install](https://go.dev/doc/install)
 
 <br>
 

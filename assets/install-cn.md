@@ -1,5 +1,5 @@
 
-要求使用go 1.16以上版本： [https://studygolang.com/dl](https://studygolang.com/dl)
+要求使用go 1.20以上版本： [https://studygolang.com/dl](https://studygolang.com/dl)
 
 > 注：如果不能科学上网，获取github的库可能会遇到超时失败问题，建议设置为国内代理，执行命令 **go env -w GOPROXY=https://goproxy.cn,direct**
 
@@ -15,7 +15,7 @@
 
 为了安装方便，已经把sponge及其依赖的程序打包在一起，下载地址(选择一个下载即可)：
 
-- 百度云: [**sponge-install.zip**](https://pan.baidu.com/s/1fiTiMROkiIIzAdj2bk93CA?pwd=prys)。
+- 百度云：[**sponge-install.zip**](https://pan.baidu.com/s/1fiTiMROkiIIzAdj2bk93CA?pwd=prys)。
 - 蓝奏云：[**sponge安装文件**](https://wwm.lanzoue.com/b049fldpi) 密码:5rq9，共下载4个文件，安装前先看`安装说明.txt`文件。
 
 下载文件后：

@@ -151,6 +151,74 @@ func FuzzyMatchFiles(f string) []string {
 	return files
 }
 
+// ListDirs list all sub dirs, not including itself
+func ListDirs(specifiedDir string) ([]string, error) {
+	dir, err := os.ReadDir(specifiedDir)
+	if err != nil {
+		return nil, err
+	}
+
+	var dirs []string
+	for _, fi := range dir {
+		if fi.IsDir() {
+			dirs = append(dirs, filepath.Join(specifiedDir, fi.Name()))
+			tmpDirs, err := ListDirs(filepath.Join(specifiedDir, fi.Name()))
+			if err != nil {
+				return nil, err
+			}
+			dirs = append(dirs, tmpDirs...)
+		}
+	}
+
+	return dirs, nil
+}
+
+// FilterDirs filter directories that meet the criteria
+func FilterDirs(dirs []string, opts Option) []string {
+	o := defaultOptions()
+	o.apply(opts)
+
+	var filteredDirs []string
+	for _, dir := range dirs {
+		files, err := os.ReadDir(dir)
+		if err != nil {
+			continue
+		}
+
+		existDir := map[string]struct{}{}
+		for _, file := range files {
+			if file.IsDir() {
+				continue
+			}
+			switch o.filter {
+			case prefix:
+				if matchPrefix(o.name)(file.Name()) {
+					if _, ok := existDir[dir]; !ok {
+						existDir[dir] = struct{}{}
+						filteredDirs = append(filteredDirs, dir)
+					}
+				}
+			case suffix:
+				if matchSuffix(o.name)(file.Name()) {
+					if _, ok := existDir[dir]; !ok {
+						existDir[dir] = struct{}{}
+						filteredDirs = append(filteredDirs, dir)
+					}
+				}
+			case contain:
+				if matchContain(o.name)(file.Name()) {
+					if _, ok := existDir[dir]; !ok {
+						existDir[dir] = struct{}{}
+						filteredDirs = append(filteredDirs, dir)
+					}
+				}
+			}
+		}
+	}
+
+	return filteredDirs
+}
+
 // iterative traversal of documents with filter conditions
 func walkDirWithFilter(dirPath string, allFiles *[]string, filter filterFn) error {
 	files, err := os.ReadDir(dirPath)

@@ -145,3 +145,16 @@ func TestJoin(t *testing.T) {
 	path = Join(elements...)
 	t.Log(path)
 }
+
+func TestListDirs(t *testing.T) {
+	dir := ".."
+	dirs, err := ListDirs(dir)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	t.Log(FilterDirs(dirs, WithSuffix(".txt")))
+	t.Log(FilterDirs(dirs, WithPrefix("query")))
+	t.Log(FilterDirs(dirs, WithContain("auth")))
+}

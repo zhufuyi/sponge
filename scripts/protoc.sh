@@ -188,6 +188,10 @@ function generateBySpecifiedProto(){
   echo -e "${highBright}Tip:${markEnd} execute the command ${colorCyan}make run${markEnd} and then visit ${colorCyan}http://localhost:8080/apis/swagger/index.html${markEnd} in your browser."
   echo ""
   # delete the templates code end
+
+  if [ "$suitedMonoRepo" == "true" ]; then
+    sponge patch adapt-mono-repo
+  fi
 }
 
 # generate pb.go by all proto files
@@ -195,6 +199,9 @@ generateByAllProto
 
 # generate pb.go by specified proto files
 generateBySpecifiedProto
+
+# check and add the special_types.go file
+sponge patch add-special-types
 
 # delete unused packages in pb.go
 handlePbGoFiles $protoBasePath
@@ -205,9 +212,6 @@ sponge patch del-omitempty --dir=$protoBasePath --suffix-name=pb.go > /dev/null
 # modify duplicate numbers and error codes
 sponge patch modify-dup-num --dir=internal/ecode
 sponge patch modify-dup-err-code --dir=internal/ecode
-
-go mod tidy
-checkResult $?
 
 echo "generated code successfully."
 echo ""

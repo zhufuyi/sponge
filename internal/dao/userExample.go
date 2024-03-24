@@ -6,15 +6,15 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/zhufuyi/sponge/internal/cache"
-	"github.com/zhufuyi/sponge/internal/model"
+	"golang.org/x/sync/singleflight"
+	"gorm.io/gorm"
 
 	cacheBase "github.com/zhufuyi/sponge/pkg/cache"
 	"github.com/zhufuyi/sponge/pkg/ggorm/query"
 	"github.com/zhufuyi/sponge/pkg/utils"
 
-	"golang.org/x/sync/singleflight"
-	"gorm.io/gorm"
+	"github.com/zhufuyi/sponge/internal/cache"
+	"github.com/zhufuyi/sponge/internal/model"
 )
 
 var _ UserExampleDao = (*userExampleDao)(nil)
@@ -63,9 +63,7 @@ func (d *userExampleDao) deleteCache(ctx context.Context, id uint64) error {
 
 // Create a record, insert the record and the id value is written back to the table
 func (d *userExampleDao) Create(ctx context.Context, table *model.UserExample) error {
-	err := d.db.WithContext(ctx).Create(table).Error
-	_ = d.deleteCache(ctx, table.ID)
-	return err
+	return d.db.WithContext(ctx).Create(table).Error
 }
 
 // DeleteByID delete a record by id

@@ -85,7 +85,6 @@ func (b *bench) Run() error {
 		runner.WithProtoFile(b.protoFile, b.dependentProtoFilePath),
 		runner.WithBinaryData(data),
 		runner.WithInsecure(true),
-		runner.WithStreamMessageProvider(nil),
 		// more parameter settings https://github.com/bojand/ghz/blob/master/runner/options.go#L41
 		// example settings: https://github.com/bojand/ghz/blob/master/runner/options_test.go#L79
 	}
