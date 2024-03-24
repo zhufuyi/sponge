@@ -125,6 +125,7 @@ func GenerateCode(c *gin.Context) {
 	handleGenerateCode(c, form.Path, form.Arg)
 }
 
+// nolint
 func handleGenerateCode(c *gin.Context, outPath string, arg string) {
 	out := "-" + time.Now().Format("150405")
 	if len(outPath) > 1 {

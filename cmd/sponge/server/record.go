@@ -122,13 +122,13 @@ func parseCommandArgs(args []string) *parameters {
 			case "--db-table":
 				params.TableName = val
 			case "--embed":
-				if val == "true" {
+				if val == "true" { //nolint
 					params.Embed = true
 				} else {
 					params.Embed = false
 				}
 			case "--include-init-db":
-				if val == "true" {
+				if val == "true" { //nolint
 					params.IncludeInitDB = true
 				} else {
 					params.IncludeInitDB = false
