@@ -358,7 +358,7 @@ function generate_grpc_mongodb() {
 function generate_http_pb_mysql() {
   local serverName="user"
   local outDir="./http-pb-mysql"
-  echo "start generating http-pb service code, use database type mysql"
+  echo "start generating http-pb-mysql service code"
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
@@ -393,7 +393,7 @@ function generate_http_pb_mysql() {
 function generate_http_pb_mongodb() {
   local serverName="user"
   local outDir="./http-pb-mongodb"
-  echo "start generating http-pb service code, use database type mongodb"
+  echo "start generating http-pb-mongodb service code"
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
@@ -432,7 +432,7 @@ function generate_http_pb_mongodb() {
 function generate_grpc_pb_mysql() {
   local serverName="user"
   local outDir="./grpc-pb-mysql"
-  echo "start generating grpc-pb service code, use database type mysql"
+  echo "start generating grpc-pb-mysql service code"
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
@@ -468,7 +468,7 @@ function generate_grpc_pb_mysql() {
 function generate_grpc_pb_mongodb() {
   local serverName="user"
   local outDir="./grpc-pb-mongodb"
-  echo "start generating mongodb-pb service code, use database type mongodb"
+  echo "start generating grpc-pb-mongodb service code"
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
@@ -503,6 +503,86 @@ function generate_grpc_pb_mongodb() {
 }
 
 # ---------------------------------------------------------------
+
+function generate_http_pb_mixed() {
+  local serverName="user"
+  local outDir="./http-pb-mixed"
+  echo "start generating http-pb-mixed service code"
+  if [ -d "${outDir}" ]; then
+    echo -e "$outDir already exists\n\n"
+  else
+    echo -e "\n${colorCyan}sponge web http-pb --server-name=$serverName --module-name=user --project-name=edusys --protobuf-file=./files/mixed.proto --out=$outDir ${markEnd}"
+    sponge web http-pb --server-name=$serverName --module-name=user --project-name=edusys --protobuf-file=./files/mixed.proto --out=$outDir
+    checkResult $?
+  fi
+
+  if [ "$isOnlyGenerateCode" == "true" ]; then
+    echo -e "\n\n"
+    return
+  fi
+
+  cd $outDir
+  runningProtoService $serverName
+  checkResult $?
+  sleep 1
+  cd -
+
+  echo -e "\n\n--------------------- $outDir test passed ---------------------\n\n"
+}
+
+function generate_grpc_pb_mixed() {
+  local serverName="user"
+  local outDir="./grpc-pb-mixed"
+  echo "start generating grpc-pb-mixed service code"
+  if [ -d "${outDir}" ]; then
+    echo -e "$outDir already exists\n\n"
+  else
+    echo -e "\n${colorCyan}sponge micro rpc-pb --server-name=$serverName --module-name=user --project-name=edusys --protobuf-file=./files/mixed.proto --out=$outDir ${markEnd}"
+    sponge micro rpc-pb --server-name=$serverName --module-name=user --project-name=edusys --protobuf-file=./files/mixed.proto --out=$outDir
+    checkResult $?
+  fi
+
+  if [ "$isOnlyGenerateCode" == "true" ]; then
+    echo -e "\n\n"
+    return
+  fi
+
+  cd $outDir
+  runningProtoService $serverName
+  checkResult $?
+  sleep 1
+  cd -
+
+  echo -e "\n\n--------------------- $outDir test passed ---------------------\n\n"
+}
+
+# ---------------------------------------------------------------
+
+function generate_grpc_gw_pb_mixed() {
+  local serverName="user_gw"
+  local outDir="./grpc-gw-pb-mixed"
+  echo "start generating grpc-gw-pb-mixed service code"
+  if [ -d "${outDir}" ]; then
+    echo -e "$outDir already exists\n\n"
+  else
+    echo -e "\n${colorCyan}sponge micro rpc-gw-pb --server-name=$serverName --module-name=edusys --project-name=edusys --protobuf-file=./files/mixed.proto --out=$outDir ${markEnd}"
+    sponge micro rpc-gw-pb --server-name=$serverName --module-name=edusys --project-name=edusys --protobuf-file=./files/mixed.proto --out=$outDir
+    checkResult $?
+  fi
+
+  if [ "$isOnlyGenerateCode" == "true" ]; then
+    echo -e "\n\n"
+    return
+  fi
+
+  cd $outDir
+  runningProtoService $serverName
+  checkResult $?
+  sleep 1
+  cd -
+
+  echo -e "\n\n--------------------- $outDir test passed ---------------------\n\n"
+}
 
 function generate_grpc_gw_pb() {
   local serverName="user_gw"
@@ -553,6 +633,10 @@ function main() {
   generate_grpc_pb_mysql
   generate_grpc_pb_mongodb
 
+  generate_http_pb_mixed
+  generate_grpc_pb_mixed
+
+  generate_grpc_gw_pb_mixed
   generate_grpc_gw_pb
 }
 

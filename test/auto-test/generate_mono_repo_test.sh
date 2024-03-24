@@ -378,7 +378,7 @@ function generate_grpc_mongodb() {
 function generate_http_pb_mysql() {
   local serverName="http_pb_mysql"
   local outDir="./$serverName"
-  echo "start generating $serverName service code, use database type mysql"
+  echo "start generating $serverName service code"
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
@@ -415,7 +415,7 @@ function generate_http_pb_mysql() {
 function generate_http_pb_mongodb() {
   local serverName="http_pb_mongodb"
   local outDir="./$serverName"
-  echo "start generating $serverName service code, use database type mongodb"
+  echo "start generating $serverName service code"
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
@@ -456,7 +456,7 @@ function generate_http_pb_mongodb() {
 function generate_grpc_pb_mysql() {
   local serverName="grpc_pb_mysql"
   local outDir="./$serverName"
-  echo "start generating $serverName service code, use database type mysql"
+  echo "start generating $serverName service code"
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
@@ -493,7 +493,7 @@ function generate_grpc_pb_mysql() {
 function generate_grpc_pb_mongodb() {
   local serverName="grpc_pb_mongodb"
   local outDir="./$serverName"
-  echo "start generating $serverName service code, use database type mongodb"
+  echo "start generating $serverName service code"
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
@@ -530,6 +530,91 @@ function generate_grpc_pb_mongodb() {
 
 # ---------------------------------------------------------------
 
+function generate_http_pb_mixed() {
+  local serverName="http_pb_mixed"
+  local outDir="./$serverName"
+  echo "start generating $serverName service code"
+  if [ -d "${outDir}" ]; then
+    echo -e "$outDir already exists\n\n"
+  else
+    echo -e "\n${colorCyan}sponge web http-pb --server-name=$serverName --module-name=edusys --project-name=edusys --protobuf-file=./files/mixed.proto --suited-mono-repo=true --out=$outDir ${markEnd}"
+    sponge web http-pb --server-name=$serverName --module-name=edusys --project-name=edusys --protobuf-file=./files/mixed.proto --suited-mono-repo=true --out=$outDir
+    checkResult $?
+    checkGoModule
+  fi
+
+  if [ "$isOnlyGenerateCode" == "true" ]; then
+    echo -e "\n\n\n\n"
+    return
+  fi
+
+
+  cd $outDir
+  runningProtoService $serverName
+  checkResult $?
+  sleep 1
+  cd -
+
+  echo -e "\n\n--------------------- $outDir test passed ---------------------\n\n"
+}
+
+function generate_grpc_pb_mixed() {
+  local serverName="grpc_pb_mixed"
+  local outDir="./$serverName"
+  echo "start generating $serverName service code"
+  if [ -d "${outDir}" ]; then
+    echo -e "$outDir already exists\n\n"
+  else
+    echo -e "\n${colorCyan}sponge micro rpc-pb --server-name=$serverName --module-name=edusys --project-name=edusys --protobuf-file=./files/mixed.proto --suited-mono-repo=true --out=$outDir ${markEnd}"
+    sponge micro rpc-pb --server-name=$serverName --module-name=edusys --project-name=edusys --protobuf-file=./files/mixed.proto --suited-mono-repo=true --out=$outDir
+    checkResult $?
+    checkGoModule
+  fi
+
+  if [ "$isOnlyGenerateCode" == "true" ]; then
+    echo -e "\n\n\n\n"
+    return
+  fi
+
+  cd $outDir
+  runningProtoService $serverName
+  checkResult $?
+  sleep 1
+  cd -
+
+  echo -e "\n\n--------------------- $outDir test passed ---------------------\n\n"
+}
+
+# ---------------------------------------------------------------
+
+function generate_grpc_gw_pb_mixed() {
+  local serverName="grpc_gw_pb_mixed"
+  local outDir="./$serverName"
+  local rpcServerName="grpc_mysql"
+  echo "generate $serverName service code"
+  if [ -d "${outDir}" ]; then
+    echo -e "$outDir already exists\n\n"
+  else
+    echo -e "\n${colorCyan}sponge micro rpc-gw-pb --server-name=$serverName --module-name=edusys --project-name=edusys --protobuf-file=./files/mixed.proto --suited-mono-repo=true --out=$outDir ${markEnd}"
+    sponge micro rpc-gw-pb --server-name=$serverName --module-name=edusys --project-name=edusys --protobuf-file=./files/mixed.proto --suited-mono-repo=true --out=$outDir
+    checkResult $?
+  fi
+
+  if [ "$isOnlyGenerateCode" == "true" ]; then
+    echo -e "\n\n\n\n"
+    return
+  fi
+
+  checkGoModule
+  cd $outDir
+  runningProtoService $serverName
+  checkResult $?
+  sleep 1
+  cd -
+
+  echo -e "\n\n--------------------- $outDir test passed ---------------------\n\n"
+}
+
 function generate_grpc_gw_pb() {
   local serverName="grpc_gw_pb"
   local outDir="./$serverName"
@@ -546,8 +631,6 @@ function generate_grpc_gw_pb() {
     sponge micro rpc-conn --rpc-server-name=$rpcServerName --suited-mono-repo=true --out=$outDir
     checkResult $?
   fi
-
-
 
   if [ "$isOnlyGenerateCode" == "true" ]; then
     echo -e "\n\n\n\n"
@@ -583,6 +666,10 @@ function main() {
   generate_grpc_pb_mysql
   generate_grpc_pb_mongodb
 
+  generate_http_pb_mixed
+  generate_grpc_pb_mixed
+
+  generate_grpc_gw_pb_mixed
   generate_grpc_gw_pb
 }
 
