@@ -101,7 +101,7 @@ func (b *bench) Run() error {
 func (b *bench) saveReport(callMethod string, report *runner.Report) error {
 	// specify the output path
 	outDir := os.TempDir() + string(os.PathSeparator) + "sponge_grpc_benchmark"
-	_ = os.MkdirAll(outDir, 0666)
+	_ = os.MkdirAll(outDir, 0777)
 	outputFile := fmt.Sprintf("%sreport_%s.html", outDir+string(os.PathSeparator), b.methodName)
 	file, err := os.Create(outputFile)
 	if err != nil {
