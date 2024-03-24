@@ -6,7 +6,7 @@
 
 <br>
 
-如果开发只有CRUD api接口的web或微服务，不需要编写任何go代码就可以编译并部署到linux服务器、docker、k8s上，只需要连接到数据库(mysql、mongodb、postgresql、tidb、sqlite)就可以一键自动生成完整的服务代码。
+如果开发只有CRUD api接口的web或微服务，不需要编写任何go代码就可以编译并部署到linux服务器、docker、k8s上，只需要连接到数据库(mysql、mongodb、postgresql、tidb、sqlite)就可以一键自动生成完整的后端服务go代码。
 
 如果开发通用的web或微服务，只需聚焦`在数据库定义表`、`在proto文件定义api描述信息`、`在生成的模板文件填写业务逻辑代码`三个核心部分，其他go代码都由sponge自动生成。
 
@@ -17,7 +17,7 @@
 sponge生成的服务代码支持两种类型代码仓库：
 
 1. **单体应用单体仓库(monolith)或微服务多仓库(multi-repo)**：每个服务代码都有自己的git仓库，即使把所有服务放在同一个git仓库下，服务之间代码不可以复用，默认是生成这种类型。
-2. **微服务单体仓库(mono-repo)**：在所有服务都在同一个git仓库下，不同服务之间的代码可以复用。
+2. **微服务单体仓库(mono-repo)**：所有服务都在同一个git仓库下，不同服务之间的代码可以复用，这种类型代码仓库也叫大仓库类型。
 
 <br>
 
@@ -192,19 +192,6 @@ sponge run
 - [13 十分钟搭建一个微服务集群示例](https://www.bilibili.com/video/BV1YM4y127YK/)
 
 <br>
-
-### 如何贡献
-
-非常欢迎您的加入，提 Issue 或 Pull Request。
-
-Pull Request说明:
-
-1. Fork 代码
-2. 创建自己的分支: `git checkout -b feat/xxxx`
-3. 提交你的修改: `git commit -am 'feat: add xxxxx'`
-4. 推送您的分支: `git push origin feat/xxxx`
-5. 提交pull request
-
 <br>
 
 如果对您有帮助给个star⭐，欢迎加入**go sponge微信群交流**，加微信(备注`sponge`)进群。
