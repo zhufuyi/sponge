@@ -155,7 +155,7 @@ using help:
   1. open a terminal and execute the command to generate code: make proto
   2. open file "internal/service/xxx.go", replace panic("implement me") according to template code example.
   3. compile and run service: make run
-  4. open the file "internal/service/xxx_client_test.go" using Goland or VS Code, testing the grpc methods.
+  4. open the file "internal/service/xxx_client_test.go" using Goland or VS Code, and test the grpc api.
 
 `)
 	fmt.Printf("generate %s's grpc service code successfully, out = %s\n", g.serverName, r.GetOutputDir())
@@ -187,12 +187,12 @@ func (g *rpcPbGenerator) addFields(r replacer.Replacer) []replacer.Field {
 		},
 		{ // replace the configuration of the *.yml file
 			Old: appConfigFileMark2,
-			New: getDBConfigCode(DBDriverMysql),
+			New: getDBConfigCode(undeterminedDBDriver),
 		},
-		{ // replace the contents of the model/init.go file
-			Old: modelInitDBFileMark,
-			New: getInitDBCode(DBDriverMysql), // default is mysql
-		},
+		//{ // replace the contents of the model/init.go file
+		//	Old: modelInitDBFileMark,
+		//	New: getInitDBCode(DBDriverMysql), // default is mysql
+		//},
 		{ // replace the contents of the Dockerfile file
 			Old: dockerFileMark,
 			New: dockerFileGrpcCode,

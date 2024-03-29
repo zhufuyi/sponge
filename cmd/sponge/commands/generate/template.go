@@ -256,7 +256,7 @@ func NewCenter(configFile string) (*Center, error) {
   moduleName=$(cat docs/gen.info | head -1 | cut -d , -f 1)
   serverName=$(cat docs/gen.info | head -1 | cut -d , -f 2)
   suitedMonoRepo=$(cat docs/gen.info | head -1 | cut -d , -f 3)
-  # Generate 2 files, a logic code template file *.go (default save path in internal/service), a return error code template file *_rpc.go (default save path in internal/ecode)
+
   protoc --proto_path=. --proto_path=./third_party \
     --go-rpc-tmpl_out=. --go-rpc-tmpl_opt=paths=source_relative \
     --go-rpc-tmpl_opt=moduleName=${moduleName} --go-rpc-tmpl_opt=serverName=${serverName} --go-rpc-tmpl_opt=suitedMonoRepo=${suitedMonoRepo} \
@@ -272,7 +272,7 @@ func NewCenter(configFile string) (*Center, error) {
   markEnd='\e[0m'
 
   echo ""
-  echo -e "${highBright}Tip:${markEnd} execute the command ${colorCyan}make run${markEnd} and then test grpc method is in the file ${colorCyan}internal/service/xxx_client_test.go${markEnd}."
+  echo -e "${highBright}Tip:${markEnd} execute the command ${colorCyan}make run${markEnd} and then test grpc api in the file ${colorCyan}internal/service/xxx_client_test.go${markEnd}."
   echo ""`
 
 	// for http-pb
@@ -290,9 +290,7 @@ func NewCenter(configFile string) (*Center, error) {
   moduleName=$(cat docs/gen.info | head -1 | cut -d , -f 1)
   serverName=$(cat docs/gen.info | head -1 | cut -d , -f 2)
   suitedMonoRepo=$(cat docs/gen.info | head -1 | cut -d , -f 3)
-  # A total of four files are generated, namely the registration route file _*router.pb.go (saved in the same directory as the protobuf file),
-  # the injection route file *_router.go (saved by default in the path internal/routers), the logical code template file *.go (default path
-  # is in internal/handler), return error code template file*_http.go (default path is in internal/ecode)
+
   protoc --proto_path=. --proto_path=./third_party \
     --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=handler \
     --go-gin_opt=moduleName=${moduleName} --go-gin_opt=serverName=${serverName} --go-gin_opt=suitedMonoRepo=${suitedMonoRepo} \
@@ -326,9 +324,7 @@ func NewCenter(configFile string) (*Center, error) {
   moduleName=$(cat docs/gen.info | head -1 | cut -d , -f 1)
   serverName=$(cat docs/gen.info | head -1 | cut -d , -f 2)
   suitedMonoRepo=$(cat docs/gen.info | head -1 | cut -d , -f 3)
-  # A total of 4 files are generated, namely the registration route file _*router.pb.go (saved in the same directory as the protobuf file),
-  # the injection route file *_router.go (default save path in internal/routers), the logical code template file *.go (saved in
-  # internal/service by default), return error code template file*_rpc.go (saved in internal/ecode by default)
+
   protoc --proto_path=. --proto_path=./third_party \
     --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=service \
     --go-gin_opt=moduleName=${moduleName} --go-gin_opt=serverName=${serverName} --go-gin_opt=suitedMonoRepo=${suitedMonoRepo} \
@@ -345,6 +341,49 @@ func NewCenter(configFile string) (*Center, error) {
 
   echo ""
   echo -e "${highBright}Tip:${markEnd} execute the command ${colorCyan}make run${markEnd} and then visit ${colorCyan}http://localhost:8080/apis/swagger/index.html${markEnd} in your browser."
+  echo ""`
+
+	// for grpc-http
+	protoShellServiceAndHandlerCode = `
+  # generate the swagger document and merge all files into docs/apis.swagger.json
+  protoc --proto_path=. --proto_path=./third_party \
+    --openapiv2_out=. --openapiv2_opt=logtostderr=true --openapiv2_opt=allow_merge=true --openapiv2_opt=merge_file_name=docs/apis.json \
+    $specifiedProtoFiles
+
+  checkResult $?
+
+  sponge web swagger --file=docs/apis.swagger.json
+  checkResult $?
+
+  moduleName=$(cat docs/gen.info | head -1 | cut -d , -f 1)
+  serverName=$(cat docs/gen.info | head -1 | cut -d , -f 2)
+  suitedMonoRepo=$(cat docs/gen.info | head -1 | cut -d , -f 3)
+
+  protoc --proto_path=. --proto_path=./third_party \
+    --go-rpc-tmpl_out=. --go-rpc-tmpl_opt=paths=source_relative \
+    --go-rpc-tmpl_opt=moduleName=${moduleName} --go-rpc-tmpl_opt=serverName=${serverName} --go-rpc-tmpl_opt=suitedMonoRepo=${suitedMonoRepo} \
+    $specifiedProtoFiles
+
+  checkResult $?
+
+  protoc --proto_path=. --proto_path=./third_party \
+    --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=handler \
+    --go-gin_opt=moduleName=${moduleName} --go-gin_opt=serverName=${serverName} --go-gin_opt=suitedMonoRepo=${suitedMonoRepo} \
+    $specifiedProtoFiles
+
+  checkResult $?
+
+  sponge merge http-pb
+  checkResult $?
+
+  colorCyan='\e[1;36m'
+  highBright='\e[1m'
+  markEnd='\e[0m'
+
+  echo ""
+  echo -e "${highBright}Tip:${markEnd} execute the command ${colorCyan}make run${markEnd} and then"
+  echo -e "    1. test http api in your browser ${colorCyan}http://localhost:8080/apis/swagger/index.html${markEnd}"
+  echo -e "    2. test grpc api in the file ${colorCyan}internal/service/xxx_client_test.go${markEnd}"
   echo ""`
 
 	httpServerConfigCode = `# http server settings
@@ -422,6 +461,53 @@ grpcClient:
       appID: ""             # app id
       appKey: ""            # app key`
 
+	grpcAndHTTPServerConfigCode = `# http server settings
+http:
+  port: 8080                # listen port
+  readTimeout: 5            # read timeout, unit(second)
+  writeTimeout: 5           # write timeout, unit(second), if enableHTTPProfile is true, it needs to be greater than 60s, the default value for pprof to do profiling is 60s
+
+
+# grpc server settings
+grpc:
+  port: 8282                # listen port
+  httpPort: 8283            # profile and metrics ports
+  readTimeout: 5            # read timeout, unit(second)
+  writeTimeout: 5           # write timeout, unit(second)
+  enableToken: false        # whether to enable server-side token authentication, default appID=grpc, appKey=123456
+  # serverSecure parameter setting
+  # if type="", it means no secure connection, no need to fill in any parameters
+  # if type="one-way", it means server-side certification, only the fields 'certFile' and 'keyFile' should be filled in
+  # if type="two-way", it means both client and server side certification, fill in all fields
+  serverSecure:
+    type: ""                # secures type, "", "one-way", "two-way"
+    caFile: ""              # ca certificate file, valid only in "two-way", absolute path
+    certFile: ""            # server side cert file, absolute path
+    keyFile: ""             # server side key file, absolute path
+
+
+# grpc client-side settings, support for setting up multiple grpc clients.
+grpcClient:
+  - name: "your_grpc_service_name"    # grpc service name, used for service discovery
+    host: "127.0.0.1"            # grpc service address, used for direct connection
+    port: 8282                   # grpc service port
+    registryDiscoveryType: ""    # registration and discovery types: consul, etcd, nacos, if empty, connecting to server using host and port
+    enableLoadBalance: true      # whether to turn on the load balancer
+    # clientSecure parameter setting
+    # if type="", it means no secure connection, no need to fill in any parameters
+    # if type="one-way", it means server-side certification, only the fields 'serverName' and 'certFile' should be filled in
+    # if type="two-way", it means both client and server side certification, fill in all fields
+    clientSecure:
+      type: ""              # secures type, "", "one-way", "two-way"
+      serverName: ""        # server name, e.g. *.foo.com
+      caFile: ""            # client side ca file, valid only in "two-way", absolute path
+      certFile: ""          # client side cert file, absolute path, if secureType="one-way", fill in server side cert file here
+      keyFile: ""           # client side key file, valid only in "two-way", absolute path
+    clientToken:
+      enable: false         # whether to enable token authentication
+      appID: ""             # app id
+      appKey: ""            # app key`
+
 	mysqlConfigCode = `# database setting
 database:
   driver: "mysql"           # database driver
@@ -467,6 +553,19 @@ database:
     # dsn format,  <username>:<password>@<hostname1>:<port1>[,<hostname2>:<port2>,......]/<db>?[k=v& ......]
     # parameter k=v see https://www.mongodb.com/docs/drivers/go/current/fundamentals/connections/connection-guide/#connection-options
     dsn: "root:123456@192.168.3.37:27017/account?connectTimeoutMS=15000"`
+
+	undeterminedDatabaseConfigCode = `# set database configuration. reference-db-config-url
+database:
+  driver: "mysql"           # database driver
+  # mysql settings
+  mysql:
+    # dsn format,  <username>:<password>@(<hostname>:<port>)/<db>?[k=v& ......]
+    dsn: "root:123456@(192.168.3.37:3306)/account?parseTime=true&loc=Local&charset=utf8,utf8mb4"
+    enableLog: true         # whether to turn on printing of all logs
+    maxIdleConns: 10        # set the maximum number of connections in the idle connection pool
+    maxOpenConns: 100       # set the maximum number of open database connections
+    connMaxLifetime: 30     # sets the maximum time for which the connection can be reused, in minutes
+`
 
 	modelInitDBFileMysqlCode = `// InitDB connect database
 func InitDB() {

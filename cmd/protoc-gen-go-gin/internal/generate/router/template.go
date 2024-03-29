@@ -151,6 +151,8 @@ func (r *{{$.LowerName}}Router) withMiddleware(method string, path string, fn gi
 	return append(handlerFns, fn)
 }
 
+var _ middleware.CtxKeyString
+
 {{range .Methods}}
 {{if eq .InvokeType 0}}{{if .Path}}func (r *{{$.LowerName}}Router) {{ .HandlerName }} (c *gin.Context) {
 	req := &{{.Request}}{}

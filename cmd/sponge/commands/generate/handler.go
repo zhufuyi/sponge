@@ -32,8 +32,8 @@ func HandlerCommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "handler",
-		Short: "Generate handler code based on sql",
-		Long: `generate handler code based on sql.
+		Short: "Generate handler CRUD code based on sql",
+		Long: `generate handler CRUD code based on sql.
 
 Examples:
   # generate handler code and embed gorm.model struct.

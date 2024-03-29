@@ -19,8 +19,8 @@ import (
 	"github.com/zhufuyi/sponge/internal/model"
 )
 
-var _ time.Time // import time
 var _ serverNameExampleV1.UserExampleLogicer = (*userExamplePbHandler)(nil)
+var _ time.Time
 
 type userExamplePbHandler struct {
 	userExampleDao dao.UserExampleDao

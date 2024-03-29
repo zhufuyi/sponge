@@ -135,7 +135,7 @@ Examples:
 using help:
   1. open a terminal and execute the command to generate the swagger documentation: make docs
   2. compile and run service: make run
-  3. visit http://localhost:8080/swagger/index.html in your browser, and test the CRUD api interface.
+  3. visit http://localhost:8080/swagger/index.html in your browser, and test the http CRUD api.
 
 `)
 			fmt.Printf("generate %s's web service code successfully, out = %s\n", serverName, outPath)

@@ -15,7 +15,7 @@ import (
 // @securityDefinitions.apikey BearerAuth
 // @in header
 // @name Authorization
-// @description Type "Bearer your-jwt-token" to Value
+// @description Type Bearer your-jwt-token to Value
 func main() {
 	initial.InitApp()
 	services := initial.CreateServices()

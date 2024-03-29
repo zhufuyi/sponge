@@ -32,6 +32,8 @@ const (
 	DBDriverSqlite = "sqlite"
 	// DBDriverMongodb mongodb driver
 	DBDriverMongodb = "mongodb"
+
+	undeterminedDBDriver = "undetermined" // used in services created based on protobuf.
 )
 
 var (
@@ -121,6 +123,7 @@ var (
 var (
 	ModelInitDBFile     = modelInitDBFile
 	ModelInitDBFileMark = modelInitDBFileMark
+	AppConfigFileDBMark = appConfigFileMark2
 	StartMark           = startMark
 	EndMark             = endMark
 )
@@ -403,10 +406,17 @@ func getDBConfigCode(dbDriver string) string {
 		dbConfigCode = sqliteConfigCode
 	case DBDriverMongodb:
 		dbConfigCode = mongodbConfigCode
+	case undeterminedDBDriver:
+		dbConfigCode = undeterminedDatabaseConfigCode
 	default:
 		panic("getDBConfigCode error, unsupported database driver: " + dbDriver)
 	}
 	return dbConfigCode
+}
+
+// GetDBConfigurationCode get db config code
+func GetDBConfigurationCode(dbDriver string) string {
+	return getDBConfigCode(dbDriver)
 }
 
 func getInitDBCode(dbDriver string) string {

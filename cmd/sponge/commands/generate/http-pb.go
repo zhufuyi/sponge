@@ -156,7 +156,7 @@ using help:
   1. open a terminal and execute the command to generate code: make proto
   2. open file internal/handler/xxx.go, replace panic("implement me") according to template code example.
   3. compile and run service: make run
-  4. visit http://localhost:8080/apis/swagger/index.html in your browser, and test api interface.
+  4. visit http://localhost:8080/apis/swagger/index.html in your browser, and test the http api.
 
 `)
 	outpath := r.GetOutputDir()
@@ -190,12 +190,12 @@ func (g *httpPbGenerator) addFields(r replacer.Replacer) []replacer.Field {
 		},
 		{ // replace the configuration of the *.yml file
 			Old: appConfigFileMark2,
-			New: getDBConfigCode(DBDriverMysql),
+			New: getDBConfigCode(undeterminedDBDriver),
 		},
-		{ // replace the contents of the model/init.go file
-			Old: modelInitDBFileMark,
-			New: getInitDBCode(DBDriverMysql), // default is mysql
-		},
+		//{ // replace the contents of the model/init.go file
+		//	Old: modelInitDBFileMark,
+		//	New: getInitDBCode(DBDriverMysql), // default is mysql
+		//},
 		{ // replace the contents of the Dockerfile file
 			Old: dockerFileMark,
 			New: dockerFileHTTPCode,

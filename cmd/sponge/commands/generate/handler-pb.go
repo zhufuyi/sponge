@@ -34,8 +34,8 @@ func HandlerPbCommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "handler-pb",
-		Short: "Generate handler and protobuf code based on sql",
-		Long: `generate handler and protobuf code based on sql.
+		Short: "Generate handler and protobuf CRUD code based on sql",
+		Long: `generate handler and protobuf CRUD code based on sql.
 
 Examples:
   # generate handler and protobuf code and embed gorm.model struct.
@@ -107,7 +107,7 @@ using help:
   1. move the folders "api" and "internal" to your project code folder.
   2. open a terminal and execute the command: make proto
   3. compile and run service: make run
-  4. visit http://localhost:8080/apis/swagger/index.html in your browser, and test the CRUD api interface.
+  4. visit http://localhost:8080/apis/swagger/index.html in your browser, and test the http CRUD api.
 
 `)
 			fmt.Printf("generate \"handler-pb\" code successfully, out = %s\n", outPath)
@@ -167,8 +167,8 @@ func (g *handlerPbGenerator) generateCode() (string, error) {
 			"systemCode_http.go", "systemCode_rpc.go", "userExample_rpc.go", // internal/ecode
 			"init.go", "init_test.go", "init.go.mgo", // internal/model
 			"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", "cache/userExample.go.mgo", // internal/cache
-			"dao/userExample.go.mgo",                                                                                                         // internal/dao
-			"handler/userExample.go", "handler/userExample_test.go", "handler/userExample_logic_test.go", "handler/userExample_logic.go.mgo", // internal/handler
+			"dao/userExample.go.mgo",                                                                                                                                       // internal/dao
+			"handler/userExample.go", "handler/userExample.go.mgo", "handler/userExample_test.go", "handler/userExample_logic_test.go", "handler/userExample_logic.go.mgo", // internal/handler
 		}
 	case DBDriverMongodb:
 		ignoreFiles = []string{ // specify the files in the subdirectory to be ignored for processing
@@ -177,7 +177,7 @@ func (g *handlerPbGenerator) generateCode() (string, error) {
 			"init.go", "init_test.go", "init.go.mgo", // internal/model
 			"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", "cache/userExample.go", "cache/userExample_test.go", // internal/cache
 			"dao/userExample_test.go", "dao/userExample.go", // internal/dao
-			"handler/userExample.go", "handler/userExample_test.go", "handler/userExample_logic_test.go", "handler/userExample_test.go", "handler/userExample_logic.go", // internal/handler
+			"handler/userExample.go", "handler/userExample.go.mgo", "handler/userExample_test.go", "handler/userExample_logic_test.go", "handler/userExample_logic.go", // internal/handler
 		}
 	default:
 		return "", errors.New("unsupported db driver: " + g.dbDriver)

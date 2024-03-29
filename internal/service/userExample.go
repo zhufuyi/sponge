@@ -27,8 +27,8 @@ func init() {
 	})
 }
 
-var _ time.Time // import time
 var _ serverNameExampleV1.UserExampleServer = (*userExample)(nil)
+var _ time.Time
 
 type userExample struct {
 	serverNameExampleV1.UnimplementedUserExampleServer
