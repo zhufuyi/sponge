@@ -530,6 +530,83 @@ function generate_grpc_pb_mongodb() {
 
 # ---------------------------------------------------------------
 
+function generate_grpc_http_pb_mysql() {
+  local serverName="grpc_http_pb_mysql"
+  local outDir="./$serverName"
+  echo "start generating $serverName service code"
+  if [ -d "${outDir}" ]; then
+    echo -e "$outDir already exists\n\n"
+  else
+    echo -e "\n${colorCyan}sponge micro grpc-http-pb --server-name=$serverName --module-name=edusys --project-name=edusys --protobuf-file=./files/user.proto --suited-mono-repo=true --out=$outDir ${markEnd}"
+    sponge micro grpc-http-pb --server-name=$serverName --module-name=edusys --project-name=edusys --protobuf-file=./files/user.proto --suited-mono-repo=true --out=$outDir
+    checkResult $?
+
+    echo -e "\n${colorCyan}sponge micro service-handler --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --embed=false --suited-mono-repo=true --out=$outDir ${markEnd}"
+    sponge micro service-handler --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --embed=false --suited-mono-repo=true --out=$outDir
+    checkResult $?
+
+    mysqlDsnTmp=$(echo "$mysqlDsn" | sed -E 's/\(/\\\(/g' | sed -E 's/\)/\\\)/g' | sed -E 's/\//\\\//g')
+    sed -E -i "s/root:123456@\(192.168.3.37:3306\)\/account/${mysqlDsnTmp}/g" ${outDir}/configs/${serverName}.yml
+    checkGoModule
+  fi
+
+  if [ "$isOnlyGenerateCode" == "true" ]; then
+    echo -e "\n\n\n\n"
+    return
+  fi
+
+  cd $outDir
+  make patch TYPE=types-pb
+  make patch TYPE=init-mysql
+  runningProtoService $serverName
+  checkResult $?
+  sleep 1
+  cd -
+
+  echo -e "\n\n--------------------- $outDir test passed ---------------------\n\n"
+}
+
+
+function generate_grpc_http_pb_mongodb() {
+  local serverName="grpc_http_pb_mongodb"
+  local outDir="./$serverName"
+  echo "start generating $serverName service code"
+  if [ -d "${outDir}" ]; then
+    echo -e "$outDir already exists\n\n"
+  else
+    echo -e "\n${colorCyan}sponge micro grpc-http-pb --server-name=$serverName --module-name=edusys --project-name=edusys --protobuf-file=./files/user.proto --suited-mono-repo=true --out=$outDir ${markEnd}"
+    sponge micro grpc-http-pb --server-name=$serverName --module-name=edusys --project-name=edusys --protobuf-file=./files/user.proto --suited-mono-repo=true --out=$outDir
+    checkResult $?
+
+    echo -e "\n${colorCyan}sponge micro service-handler --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=user_example --embed=false --suited-mono-repo=true --out=$outDir ${markEnd}"
+    sponge micro service-handler --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=user_example --embed=false --suited-mono-repo=true --out=$outDir
+    checkResult $?
+
+    sed -E -i 's/\"mysql\"/\"mongodb\"/g' ${outDir}/configs/${serverName}.yml
+    sed -E -i 's/mysql:/mongodb:/g' ${outDir}/configs/${serverName}.yml
+    mongodbDsnTmp=$(echo "$mongodbDsn" | sed -E 's/\(/\\\(/g' | sed -E 's/\)/\\\)/g' | sed -E 's/\//\\\//g')
+    sed -E -i "s/root:123456@\(192.168.3.37:3306\)\/account/${mongodbDsnTmp}/g" ${outDir}/configs/${serverName}.yml
+    checkGoModule
+  fi
+
+  if [ "$isOnlyGenerateCode" == "true" ]; then
+    echo -e "\n\n\n\n"
+    return
+  fi
+
+  cd $outDir
+  make patch TYPE=types-pb
+  make patch TYPE=init-mongodb
+  runningProtoService $serverName
+  checkResult $?
+  sleep 1
+  cd -
+
+  echo -e "\n\n--------------------- $outDir test passed ---------------------\n\n"
+}
+
+# ---------------------------------------------------------------
+
 function generate_http_pb_mixed() {
   local serverName="http_pb_mixed"
   local outDir="./$serverName"
@@ -665,6 +742,9 @@ function main() {
 
   generate_grpc_pb_mysql
   generate_grpc_pb_mongodb
+
+  generate_grpc_http_pb_mysql
+  generate_grpc_http_pb_mongodb
 
   generate_http_pb_mixed
   generate_grpc_pb_mixed
