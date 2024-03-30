@@ -36,7 +36,14 @@ func InitApp() {
 	_, err := logger.Init(
 		logger.WithLevel(cfg.Logger.Level),
 		logger.WithFormat(cfg.Logger.Format),
-		logger.WithSave(cfg.Logger.IsSave),
+		logger.WithSave(
+			cfg.Logger.IsSave,
+			//logger.WithFileName(cfg.Logger.LogFileConfig.Filename),
+			//logger.WithFileMaxSize(cfg.Logger.LogFileConfig.MaxSize),
+			//logger.WithFileMaxBackups(cfg.Logger.LogFileConfig.MaxBackups),
+			//logger.WithFileMaxAge(cfg.Logger.LogFileConfig.MaxAge),
+			//logger.WithFileIsCompression(cfg.Logger.LogFileConfig.IsCompression),
+		),
 	)
 	if err != nil {
 		panic(err)
