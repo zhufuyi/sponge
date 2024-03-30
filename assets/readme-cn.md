@@ -2,7 +2,7 @@
 
 <br>
 
-[sponge](https://github.com/zhufuyi/sponge) 是一个集成了 `自动生成代码`、`Gin和GRPC` 的强大的开发框架。sponge拥有丰富的生成代码命令，生成不同的功能代码可以组合成完整的服务(类似人为打散的海绵细胞可以自动重组成一个新的海绵)。从开发、测试、api文档到部署一站式项目开发，大幅提高了开发效率和降低了开发难度，使用go也可以使用"低代码方式"开发项目。
+[sponge](https://github.com/zhufuyi/sponge) 是一个集成了 `自动生成代码`、`Gin和GRPC` 的强大的开发框架。sponge拥有丰富的生成代码命令，生成不同的功能代码可以组合成完整的服务(类似人为打散的海绵细胞可以自动重组成一个新的海绵)。从开发、测试、api文档到部署一站式项目开发，大幅提高了开发效率和降低了开发难度，实现"低代码方式"开发项目。
 
 <br>
 
@@ -13,13 +13,6 @@
 <br>
 
 ### 生成代码框架
-
-sponge生成的服务代码支持两种类型代码仓库：
-
-1. **单体应用单体仓库(monolith)或微服务多仓库(multi-repo)**：每个服务代码都有自己的git仓库，即使把所有服务放在同一个git仓库下，服务之间代码不可以复用，默认是生成这种类型。
-2. **微服务单体仓库(mono-repo)**：所有服务都在同一个git仓库下，不同服务之间的代码可以复用，这种类型代码仓库也叫大仓库类型。
-
-<br>
 
 sponge主要基于`SQL`和`Protobuf`两种方式生成代码，每种方式拥有生成不同用途的代码。其中`SQL`支持数据库**mysql**、**mongodb**、**postgresql**、**tidb**、**sqlite**。
 
@@ -39,21 +32,9 @@ sponge主要基于`SQL`和`Protobuf`两种方式生成代码，每种方式拥�
 
 <br>
 
-#### 生成服务代码的鸡蛋模型
-
-sponge生成代码过程中剥离了业务逻辑与非业务逻辑两大部分代码，把sponge的生成代码功能看作是一个母鸡，sponge生成的服务代码看作是鸡蛋，目前支持生成常见的5种类型服务代码，以生成的一个web服务后端代码为例，鸡蛋模型剖析图：
-
-<p align="center">
-<img width="1200px" src="https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/web-http-pb-anatomy.png">
-</p>
-
-除了web服务后端代码鸡蛋模型，还有grpc服务代码和grpc网关服务代码的鸡蛋模型，点击[这里查看](https://go-sponge.com/zh-cn/learn-about-sponge?id=%f0%9f%8f%b7%e7%94%9f%e6%88%90%e6%9c%8d%e5%8a%a1%e4%bb%a3%e7%a0%81%e7%9a%84%e9%b8%a1%e8%9b%8b%e6%a8%a1%e5%9e%8b)。
-
-<br>
-
 ### 微服务框架
 
-sponge本质是一个包含了生成代码功能的微服务框架，微服务框架如下图所示，这是典型的微服务分层结构，具有高性能，高扩展性，包含了常用的服务治理功能，可以很方便替换或添加自己的服务治理功能。
+sponge本质是一个包含了自动生成代码功能的微服务框架，微服务框架如下图所示，这是典型的微服务分层结构，具有高性能，高扩展性，包含了常用的服务治理功能，可以很方便替换或添加自己的服务治理功能。
 
 <p align="center">
 <img width="1000px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/microservices-framework.png">
@@ -149,46 +130,42 @@ sponge run
 
 ### 使用示例
 
-#### 简单示例
+#### 使用sponge创建服务示例
 
-不包含具体业务逻辑代码。
+- [基于sql创建web服务(包括CRUD)](https://github.com/zhufuyi/sponge_examples/tree/main/1_web-gin-CRUD)
+- [基于sql创建grpc服务(包括CRUD)](https://github.com/zhufuyi/sponge_examples/tree/main/2_micro-grpc-CRUD)
+- [基于protobuf创建web服务](https://github.com/zhufuyi/sponge_examples/tree/main/3_web-gin-protobuf)
+- [基于protobuf创建grpc服务](https://github.com/zhufuyi/sponge_examples/tree/main/4_micro-grpc-protobuf)
+- [基于protobuf创建grpc网关服务](https://github.com/zhufuyi/sponge_examples/tree/main/5_micro-gin-rpc-gateway)
+- [基于protobuf创建grpc+http服务](https://github.com/zhufuyi/sponge_examples/tree/main/a_micro-grpc-http-protobuf)
 
-- [1_web-gin-CRUD](https://github.com/zhufuyi/sponge_examples/tree/main/1_web-gin-CRUD)
-- [2_micro-grpc-CRUD](https://github.com/zhufuyi/sponge_examples/tree/main/2_micro-grpc-CRUD)
-- [3_web-gin-protobuf](https://github.com/zhufuyi/sponge_examples/tree/main/3_web-gin-protobuf)
-- [4_micro-grpc-protobuf](https://github.com/zhufuyi/sponge_examples/tree/main/4_micro-grpc-protobuf)
-- [5_micro-gin-rpc-gateway](https://github.com/zhufuyi/sponge_examples/tree/main/5_micro-gin-rpc-gateway)
-- [6_micro-cluster](https://github.com/zhufuyi/sponge_examples/tree/main/6_micro-cluster)
+#### 使用sponge开发完整项目示例
 
-#### 完整项目示例
-
-包括具体业务逻辑代码。
-
-- [7_community-single](https://github.com/zhufuyi/sponge_examples/tree/main/7_community-single)
-- [8_community-cluster](https://github.com/zhufuyi/sponge_examples/tree/main/8_community-cluster)
+- [简单的社区web后端服务](https://github.com/zhufuyi/sponge_examples/tree/main/7_community-single)
+- [简单的社区web后端服务拆分为微服务](https://github.com/zhufuyi/sponge_examples/tree/main/8_community-cluster)
 
 #### 分布式事务示例
 
-- [9_order-system](https://github.com/zhufuyi/sponge_examples/tree/main/9_order-grpc-distributed-transaction)
+- [简单的分布式订单系统](https://github.com/zhufuyi/sponge_examples/tree/main/9_order-grpc-distributed-transaction)
 
 <br>
 
 ### 视频介绍
 
-> 视频教程演示使用sponge v1.3.12版本，新版本增加了一些自动化功能、调整了一些UI界面和菜单，建议结合[文档教程](https://go-sponge.com/zh-cn/)使用。
+> 视频教程演示使用sponge v1.3.12版本，后续的版本增加了一些自动化功能、调整了一些UI界面和菜单，建议结合[文档教程](https://go-sponge.com/zh-cn/)使用。
 
 - [01 sponge的形成过程](https://www.bilibili.com/video/BV1s14y1F7Fz/)
 - [02 sponge的框架介绍](https://www.bilibili.com/video/BV13u4y1F7EU/)
-- [03 一键生成web服务完整项目代码](https://www.bilibili.com/video/BV1RY411k7SE/)
-- [04 批量生成CRUD接口代码到web服务](https://www.bilibili.com/video/BV1AY411C7J7/)
-- [05 一键生成通用的web服务项目代码](https://www.bilibili.com/video/BV1CX4y1D7xj/)
-- [06 批量生成任意API接口代码到web服务](https://www.bilibili.com/video/BV1P54y1g7J9/)
-- [07 一键生成微服务(grpc)完整项目代码](https://www.bilibili.com/video/BV1Tg4y1b79U/)
-- [08 批量生成CRUD代码到微服务项目代码](https://www.bilibili.com/video/BV1TY411z7rY/)
-- [09 一键生成通用的微服务(grpc)项目代码](https://www.bilibili.com/video/BV1WY4y1X7zH/)
-- [10 批量生成grpc方法代码到微服务](https://www.bilibili.com/video/BV1Yo4y1q76o/)
+- [03 一键生成完整的web服务代码](https://www.bilibili.com/video/BV1RY411k7SE/)
+- [04 批量生成CRUD api代码到web服务](https://www.bilibili.com/video/BV1AY411C7J7/)
+- [05 一键生成通用的web服务代码](https://www.bilibili.com/video/BV1CX4y1D7xj/)
+- [06 批量生成任意api模板代码到web服务](https://www.bilibili.com/video/BV1P54y1g7J9/)
+- [07 一键生成完整的grpc服务代码](https://www.bilibili.com/video/BV1Tg4y1b79U/)
+- [08 批量生成CRUD api代码到grpc服务](https://www.bilibili.com/video/BV1TY411z7rY/)
+- [09 一键生成通用的grpc微服务代码](https://www.bilibili.com/video/BV1WY4y1X7zH/)
+- [10 批量生成grpc api代码到grpc服务](https://www.bilibili.com/video/BV1Yo4y1q76o/)
 - [11 grpc测试神器，简单便捷](https://www.bilibili.com/video/BV1VT411z7oj/)
-- [12 一键生成grpc网关服务项目代码](https://www.bilibili.com/video/BV1mV4y1D7k9/)
+- [12 一键生成grpc网关服务代码](https://www.bilibili.com/video/BV1mV4y1D7k9/)
 - [13 十分钟搭建一个微服务集群示例](https://www.bilibili.com/video/BV1YM4y127YK/)
 
 <br>
