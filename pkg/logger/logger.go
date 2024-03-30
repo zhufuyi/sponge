@@ -38,6 +38,7 @@ func getLogger() *zap.Logger {
 // print the debug level log in the terminal, example: Init()
 // print the info level log in the terminal, example: Init(WithLevel("info"))
 // print the json format, debug level log in the terminal, example: Init(WithFormat("json"))
+// log with hooks, example: Init(WithHooks(func(zapcore.Entry) error{return nil}))
 // output the log to the file out.log, using the default cut log-related parameters, debug-level log, example: Init(WithSave())
 // output the log to the specified file, custom set the log file cut log parameters, json format, debug level log, example:
 // Init(
@@ -70,6 +71,10 @@ func Init(opts ...Option) (*zap.Logger, error) {
 	} else {
 		zapLog = log2File(encoding, levelName, o.fileConfig)
 		str = fmt.Sprintf("initialize logger finish, config is output to 'file', format=%s, level=%s, file=%s", encoding, levelName, o.fileConfig.filename)
+	}
+
+	if len(o.hooks) > 0 {
+		zapLog = zapLog.WithOptions(zap.Hooks(o.hooks...))
 	}
 
 	defaultLogger = zapLog

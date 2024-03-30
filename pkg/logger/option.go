@@ -1,6 +1,10 @@
 package logger
 
-import "strings"
+import (
+	"strings"
+
+	"go.uber.org/zap/zapcore"
+)
 
 var (
 	defaultLevel    = "debug" // output log levels debug, info, warn, error, default is debug
@@ -20,6 +24,8 @@ type options struct {
 	isSave   bool
 
 	fileConfig *fileOptions
+
+	hooks []func(zapcore.Entry) error
 }
 
 func defaultOptions() *options {
@@ -70,6 +76,13 @@ func WithSave(isSave bool, opts ...FileOption) Option {
 			fo.apply(opts...)
 			o.fileConfig = fo
 		}
+	}
+}
+
+// WithHooks set the log hooks
+func WithHooks(hooks ...func(zapcore.Entry) error) Option {
+	return func(o *options) {
+		o.hooks = hooks
 	}
 }
 

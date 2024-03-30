@@ -3,8 +3,11 @@ package logger
 import (
 	"fmt"
 	"os"
+	"strings"
 	"testing"
 	"time"
+
+	"go.uber.org/zap/zapcore"
 )
 
 func printInfo() {
@@ -52,7 +55,7 @@ func TestInit(t *testing.T) {
 		{
 			name: "terminal json info",
 			args: args{[]Option{
-				WithFormat("json"), WithLevel(levelInfo),
+				WithFormat("json"), WithLevel("info"),
 			}},
 			wantErr: false,
 		},
@@ -60,6 +63,20 @@ func TestInit(t *testing.T) {
 			name: "terminal json warn",
 			args: args{[]Option{
 				WithFormat("json"), WithLevel("warn"),
+			}},
+			wantErr: false,
+		},
+		{
+			name: "with hooks info",
+			args: args{[]Option{
+				WithFormat("json"),
+				WithLevel("info"),
+				WithHooks(func(entry zapcore.Entry) error {
+					if strings.Contains(entry.Message, "this is error") {
+						fmt.Println("it contains error message")
+					}
+					return nil
+				}),
 			}},
 			wantErr: false,
 		},

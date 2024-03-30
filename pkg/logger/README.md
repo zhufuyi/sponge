@@ -34,4 +34,16 @@ Logger library wrapped in [zap](https://github.com/uber-go/zap).
     logger.Info("this is info")
     logger.Warn("this is warn", logger.String("foo","bar"), logger.Int("size",10), logger.Any("obj",obj))
     logger.Error("this is error", logger.Err(err), logger.String("foo","bar"))
+
+// (3) with hooks
+    logger.Init(
+        logger.WithLevel("info"),
+        logger.WithHooks(func(entry zapcore.Entry) error {
+            if strings.Contains(entry.Message, "error") {
+                fmt.Println("it contains error message")
+            }
+            return nil
+        }),
+    )
+    logger.Error("this is error", logger.Err(err), logger.String("foo","bar"))
 ```

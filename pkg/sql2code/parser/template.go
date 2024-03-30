@@ -234,7 +234,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         type: TYPE_API_KEY;
         in: IN_HEADER;
         name: "Authorization";
-        description: "Input a \"Bearer your-jwt-token\" to Value";
+        description: "Type Bearer your-jwt-token to Value";
       }
     }
   }
