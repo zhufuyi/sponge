@@ -33,7 +33,7 @@ Examples:
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			fmt.Println("upgrade sponge ......")
+			fmt.Println("upgrading sponge, please wait a moment ......")
 			if targetVersion == "" {
 				targetVersion = latestVersion
 			}
@@ -56,19 +56,19 @@ func runUpgrade(targetVersion string) (string, error) {
 		fmt.Println(lackSymbol + "upgrade sponge binary.")
 		return "", err
 	}
-	fmt.Println(isntalledSymbol + "upgraded sponge binary.")
+	fmt.Println(installedSymbol + "upgraded sponge binary.")
 	ver, err := copyToTempDir(targetVersion)
 	if err != nil {
 		fmt.Println(lackSymbol + "upgrade template code.")
 		return "", err
 	}
-	fmt.Println(isntalledSymbol + "upgraded template code.")
+	fmt.Println(installedSymbol + "upgraded template code.")
 	err = updateSpongeInternalPlugin(ver)
 	if err != nil {
 		fmt.Println(lackSymbol + "upgrade protoc plugins.")
 		return "", err
 	}
-	fmt.Println(isntalledSymbol + "upgraded protoc plugins.")
+	fmt.Println(installedSymbol + "upgraded protoc plugins.")
 	return ver, nil
 }
 

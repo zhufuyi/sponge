@@ -25,8 +25,8 @@ var pluginNames = []string{
 	"protoc-gen-openapiv2",
 	"protoc-gen-doc",
 	"swag",
-	"golangci-lint",
-	"go-callvis",
+	//"golangci-lint",
+	//"go-callvis",
 }
 
 var installPluginCommands = map[string]string{
@@ -40,13 +40,13 @@ var installPluginCommands = map[string]string{
 	"protoc-gen-go-rpc-tmpl": "github.com/zhufuyi/sponge/cmd/protoc-gen-go-rpc-tmpl@latest",
 	"protoc-gen-openapiv2":   "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@latest",
 	"protoc-gen-doc":         "github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc@latest",
-	"golangci-lint":          "github.com/golangci/golangci-lint/cmd/golangci-lint@latest",
 	"swag":                   "github.com/swaggo/swag/cmd/swag@v1.8.12",
-	"go-callvis":             "github.com/ofabry/go-callvis@latest",
+	//"golangci-lint":          "github.com/golangci/golangci-lint/cmd/golangci-lint@latest",
+	//"go-callvis":             "github.com/ofabry/go-callvis@latest",
 }
 
 const (
-	isntalledSymbol = "✔ "
+	installedSymbol = "✔ "
 	lackSymbol      = "❌ "
 	warnSymbol      = "⚠ "
 )
@@ -117,7 +117,7 @@ func showDependencyPlugins(installedNames []string, lackNames []string) {
 	if len(installedNames) > 0 {
 		content = "Installed dependency plugins:\n"
 		for _, name := range installedNames {
-			content += "    " + isntalledSymbol + " " + name + "\n"
+			content += "    " + installedSymbol + " " + name + "\n"
 		}
 	}
 
@@ -165,7 +165,7 @@ func installPlugins(lackNames []string) {
 			if result.Err != nil {
 				fmt.Printf("%s %s, %v\n", lackSymbol, name, result.Err)
 			} else {
-				fmt.Printf("%s %s\n", isntalledSymbol, name)
+				fmt.Printf("%s %s\n", installedSymbol, name)
 			}
 		}(name)
 	}

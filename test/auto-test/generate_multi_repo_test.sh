@@ -18,8 +18,8 @@ mongodbCollection2="user"
 
 isOnlyGenerateCode="false"
 
-colorCyan='\e[1;36m'
-markEnd='\e[0m'
+colorCyan='\033[1;36m'
+markEnd='\033[0m'
 
 function checkResult() {
     result=$1

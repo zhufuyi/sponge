@@ -23,9 +23,9 @@ checkResult $?
 docker-compose up -d
 checkResult $?
 
-colorCyan='\e[1;36m'
-highBright='\e[1m'
-markEnd='\e[0m'
+colorCyan='\033[1;36m'
+highBright='\033[1m'
+markEnd='\033[0m'
 
 echo ""
 echo -e "run service successfully, if you want to stop the service, go into the ${highBright}${dockerComposeFilePath}${markEnd} directory and execute the command ${colorCyan}docker-compose down${markEnd}."

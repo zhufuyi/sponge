@@ -180,9 +180,9 @@ function generateBySpecifiedProto(){
   sponge merge rpc-gw-pb
   checkResult $?
 
-  colorCyan='\e[1;36m'
-  highBright='\e[1m'
-  markEnd='\e[0m'
+  colorCyan='\033[1;36m'
+  highBright='\033[1m'
+  markEnd='\033[0m'
 
   echo ""
   echo -e "${highBright}Tip:${markEnd} execute the command ${colorCyan}make run${markEnd} and then visit ${colorCyan}http://localhost:8080/apis/swagger/index.html${markEnd} in your browser."

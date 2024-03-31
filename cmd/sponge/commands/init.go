@@ -22,7 +22,7 @@ Examples:
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			fmt.Println("initialize sponge ......")
+			fmt.Println("initializing sponge, please wait a moment ......")
 
 			targetVersion := latestVersion
 			// download sponge template code

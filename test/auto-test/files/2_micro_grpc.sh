@@ -6,8 +6,8 @@ grpcDir="2_micro_grpc_${grpcServiceName}"
 mysqlDSN="root:123456@(192.168.3.37:3306)/school"
 mysqlTable="teacher"
 
-colorCyan='\e[1;36m'
-markEnd='\e[0m'
+colorCyan='\033[1;36m'
+markEnd='\033[0m'
 errCount=0
 
 function checkResult() {

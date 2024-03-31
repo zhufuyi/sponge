@@ -25,9 +25,9 @@ checkResult $?
 sponge patch modify-dup-num --dir=internal/ecode
 sponge patch modify-dup-err-code --dir=internal/ecode
 
-colorCyan='\e[1;36m'
-highBright='\e[1m'
-markEnd='\e[0m'
+colorCyan='\033[1;36m'
+highBright='\033[1m'
+markEnd='\033[0m'
 
 echo ""
 echo -e "${highBright}Tip:${markEnd} execute the command ${colorCyan}make run${markEnd} and then visit ${colorCyan}http://${HOST_ADDR}:8080/swagger/index.html${markEnd} in your browser."

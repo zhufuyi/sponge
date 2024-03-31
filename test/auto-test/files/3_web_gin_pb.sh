@@ -3,8 +3,8 @@
 webServiceName="user"
 webDir="3_web_gin_pb_${webServiceName}"
 
-colorCyan='\e[1;36m'
-markEnd='\e[0m'
+colorCyan='\033[1;36m'
+markEnd='\033[0m'
 errCount=0
 
 function checkResult() {

@@ -267,9 +267,9 @@ func NewCenter(configFile string) (*Center, error) {
   sponge merge rpc-pb
   checkResult $?
 
-  colorCyan='\e[1;36m'
-  highBright='\e[1m'
-  markEnd='\e[0m'
+  colorCyan='\033[1;36m'
+  highBright='\033[1m'
+  markEnd='\033[0m'
 
   echo ""
   echo -e "${highBright}Tip:${markEnd} execute the command ${colorCyan}make run${markEnd} and then test grpc api in the file ${colorCyan}internal/service/xxx_client_test.go${markEnd}."
@@ -301,9 +301,9 @@ func NewCenter(configFile string) (*Center, error) {
   sponge merge http-pb
   checkResult $?
 
-  colorCyan='\e[1;36m'
-  highBright='\e[1m'
-  markEnd='\e[0m'
+  colorCyan='\033[1;36m'
+  highBright='\033[1m'
+  markEnd='\033[0m'
 
   echo ""
   echo -e "${highBright}Tip:${markEnd} execute the command ${colorCyan}make run${markEnd} and then visit ${colorCyan}http://localhost:8080/apis/swagger/index.html${markEnd} in your browser. "
@@ -335,9 +335,9 @@ func NewCenter(configFile string) (*Center, error) {
   sponge merge rpc-gw-pb
   checkResult $?
 
-  colorCyan='\e[1;36m'
-  highBright='\e[1m'
-  markEnd='\e[0m'
+  colorCyan='\033[1;36m'
+  highBright='\033[1m'
+  markEnd='\033[0m'
 
   echo ""
   echo -e "${highBright}Tip:${markEnd} execute the command ${colorCyan}make run${markEnd} and then visit ${colorCyan}http://localhost:8080/apis/swagger/index.html${markEnd} in your browser."
@@ -379,9 +379,9 @@ func NewCenter(configFile string) (*Center, error) {
   sponge merge http-pb
   checkResult $?
 
-  colorCyan='\e[1;36m'
-  highBright='\e[1m'
-  markEnd='\e[0m'
+  colorCyan='\033[1;36m'
+  highBright='\033[1m'
+  markEnd='\033[0m'
 
   echo ""
   echo -e "${highBright}Tip:${markEnd} execute the command ${colorCyan}make run${markEnd} and then"

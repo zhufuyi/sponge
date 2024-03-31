@@ -3,8 +3,8 @@
 grpcServiceName="user"
 grpcDir="4_micro_grpc_pb_${grpcServiceName}"
 
-colorCyan='\e[1;36m'
-markEnd='\e[0m'
+colorCyan='\033[1;36m'
+markEnd='\033[0m'
 errCount=0
 
 function checkResult() {
