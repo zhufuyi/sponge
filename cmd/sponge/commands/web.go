@@ -10,8 +10,8 @@ import (
 func GenWebCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:           "web",
-		Short:         "Generate model, cache, dao, handler, web code",
-		Long:          "generate model, cache, dao, handler, web code.",
+		Short:         "Generate model, cache, dao, handler, http code",
+		Long:          "generate model, cache, dao, handler, http code.",
 		SilenceErrors: true,
 		SilenceUsage:  true,
 	}

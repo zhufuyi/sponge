@@ -1,4 +1,4 @@
-// Package patch is command set for patching server code.
+// Package patch is command set for patching service code.
 package patch
 
 import (

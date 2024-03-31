@@ -10,8 +10,8 @@ import (
 func PatchCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:           "patch",
-		Short:         "Command set for patching server code",
-		Long:          `command set for patching server code.`,
+		Short:         "Command set for patching service code",
+		Long:          `command set for patching service code.`,
 		SilenceErrors: true,
 		SilenceUsage:  true,
 	}
