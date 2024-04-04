@@ -15,7 +15,7 @@ import (
 )
 
 // Parse configuration files to struct, including yaml, toml, json, etc., and turn on listening for configuration file changes if fs is not empty
-func Parse(configFile string, obj interface{}, fs ...func()) error {
+func Parse(configFile string, obj interface{}, reloads ...func()) error {
 	confFileAbs, err := filepath.Abs(configFile)
 	if err != nil {
 		return err
@@ -38,23 +38,45 @@ func Parse(configFile string, obj interface{}, fs ...func()) error {
 		return err
 	}
 
-	if len(fs) > 0 {
-		watchConfig(obj, fs...)
+	if len(reloads) > 0 {
+		watchConfig(obj, reloads...)
+	}
+
+	return nil
+}
+
+// ParseConfigData parse data to struct
+func ParseConfigData(data []byte, format string, obj interface{}, reloads ...func()) error {
+	viper.SetConfigType(format)
+	err := viper.ReadConfig(bytes.NewBuffer(data))
+	if err != nil {
+		return err
+	}
+
+	err = viper.Unmarshal(obj)
+	if err != nil {
+		return err
+	}
+
+	if len(reloads) > 0 {
+		watchConfig(obj, reloads...)
 	}
 
 	return nil
 }
 
 // listening for profile updates
-func watchConfig(obj interface{}, fs ...func()) {
+func watchConfig(obj interface{}, reloads ...func()) {
 	viper.WatchConfig()
+
+	// Note: OnConfigChange is called twice on Windows
 	viper.OnConfigChange(func(e fsnotify.Event) {
 		err := viper.Unmarshal(obj)
 		if err != nil {
 			fmt.Println("viper.Unmarshal error: ", err)
 		} else {
-			for _, f := range fs {
-				f()
+			for _, reload := range reloads {
+				reload()
 			}
 		}
 	})
@@ -122,14 +144,4 @@ func replaceDSN(str string) string {
 	}
 
 	return fmt.Sprintf("%s******%s", data[:start+1], data[end:])
-}
-
-// ParseConfigData parse data to struct
-func ParseConfigData(data []byte, format string, obj interface{}) error {
-	viper.SetConfigType(format)
-	err := viper.ReadConfig(bytes.NewBuffer(data))
-	if err != nil {
-		return err
-	}
-	return viper.Unmarshal(obj)
 }

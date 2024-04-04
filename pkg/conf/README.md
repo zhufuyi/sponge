@@ -9,16 +9,17 @@ Parsing yaml, json, toml configuration files to go struct.
 ```go
     import "github.com/zhufuyi/sponge/pkg/conf"
 
-    // Way 1: No listening profile
+    // Way 1: No listening configuration file
     config := &App{}
     err := conf.Parse("test.yml", config)
 
-    // Way 2: Enable listening profile
+    // Way 2: Enable listening configuration file
     config := &App{}
-    fs := []func(){
+    reloads  := []func(){
         func() {
-            fmt.Println("Listening for updates to the configuration file")
+            fmt.Println("close and reconnect mysql")
+            fmt.Println("close and reconnect redis")
         },
     }
-    err := conf.Parse("test.yml", config, fs...)
+    err := conf.Parse("test.yml", config, reloads...)
 ```

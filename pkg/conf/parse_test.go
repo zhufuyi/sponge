@@ -9,18 +9,6 @@ import (
 
 var c = make(map[string]interface{})
 
-func init() {
-	// result error test
-	_ = Parse("test.yml", nil)
-	// not found error test
-	_ = Parse("notfound.yml", &c)
-
-	err := Parse("test.yml", &c)
-	if err != nil {
-		panic(err)
-	}
-}
-
 func TestShow(t *testing.T) {
 	t.Log(Show(c))
 	t.Log(Show(make(chan string)))
@@ -45,21 +33,18 @@ func Test_hideSensitiveFields(t *testing.T) {
 	fmt.Printf(hideSensitiveFields(str))
 }
 
-// test listening for profile updates
-func TestWatch(t *testing.T) {
-	time.Sleep(time.Second)
+// test listening for configuration file updates
+func TestParse(t *testing.T) {
 	conf := make(map[string]interface{})
 
-	fs := []func(){
+	reloads := []func(){
 		func() {
-			fmt.Println("update field 1")
-		},
-		func() {
-			fmt.Println("update field 2")
+			fmt.Println("close and reconnect mysql")
+			fmt.Println("close and reconnect redis")
 		},
 	}
 
-	err := Parse("test.yml", &conf, fs...)
+	err := Parse("test.yml", &conf, reloads...)
 	if err != nil {
 		t.Error(err)
 		return
@@ -75,13 +60,39 @@ func TestWatch(t *testing.T) {
 	time.Sleep(time.Millisecond * 100)
 }
 
+func TestParseErr(t *testing.T) {
+	// result error test
+	err := Parse("test.yml", nil)
+	t.Log(err)
+
+	// not found error test
+	err = Parse("notfound.yml", &c)
+	t.Log(err)
+}
+
 func TestParseConfigData(t *testing.T) {
 	conf := make(map[string]interface{})
+
+	reloads := []func(){
+		func() {
+			fmt.Println("close and reconnect mysql")
+			fmt.Println("close and reconnect redis")
+		},
+	}
+
 	data, _ := os.ReadFile("test.yml")
-	err := ParseConfigData(data, "yaml", &conf)
+	err := ParseConfigData(data, "yaml", &conf, reloads...)
 	if err != nil {
 		t.Error(err)
 		return
 	}
-	t.Log(conf)
+
+	time.Sleep(time.Second)
+	content, _ := os.ReadFile("test.yml")
+	contentChange := append(content, byte('#'))
+	time.Sleep(time.Millisecond * 100)
+	_ = os.WriteFile("test.yml", contentChange, 0666) // change file
+	time.Sleep(time.Millisecond * 100)
+	_ = os.WriteFile("test.yml", content, 0666) // recovery documents
+	time.Sleep(time.Millisecond * 100)
 }
