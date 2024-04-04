@@ -151,7 +151,7 @@ func (s *grpcServer) unaryServerOptions() grpc.ServerOption {
 		interceptor.UnaryServerRequestID(),
 	}
 
-	// logger interceptor
+	// logger interceptor, to print simple messages, replace interceptor.UnaryServerLog with interceptor.UnaryServerSimpleLog
 	unaryServerInterceptors = append(unaryServerInterceptors, interceptor.UnaryServerLog(
 		logger.Get(),
 		interceptor.WithReplaceGRPCLogger(),
@@ -210,7 +210,7 @@ func (s *grpcServer) streamServerOptions() grpc.ServerOption {
 		//interceptor.StreamServerRequestID(),
 	}
 
-	// logger interceptor
+	// logger interceptor, to print simple messages, replace interceptor.StreamServerLog with interceptor.StreamServerSimpleLog
 	streamServerInterceptors = append(streamServerInterceptors, interceptor.StreamServerLog(
 		logger.Get(),
 		interceptor.WithReplaceGRPCLogger(),
@@ -237,7 +237,6 @@ func (s *grpcServer) streamServerOptions() grpc.ServerOption {
 	// metrics interceptor
 	if config.Get().App.EnableMetrics {
 		streamServerInterceptors = append(streamServerInterceptors, interceptor.StreamServerMetrics())
-		s.registerMetricsMuxAndMethodFunc = s.registerMetricsMuxAndMethod()
 	}
 
 	// limit interceptor

@@ -21,6 +21,7 @@ func TestUnaryServerLog(t *testing.T) {
 	addr := newUnaryRPCServer(
 		UnaryServerRequestID(),
 		UnaryServerLog(logger.Get(), WithReplaceGRPCLogger()),
+		UnaryServerSimpleLog(logger.Get(), WithReplaceGRPCLogger()),
 	)
 	time.Sleep(time.Millisecond * 200)
 	cli := newUnaryRPCClient(addr)
@@ -57,6 +58,10 @@ func TestStreamServerLog(t *testing.T) {
 			WithReplaceGRPCLogger(),
 			WithLogFields(map[string]interface{}{}),
 		),
+		StreamServerSimpleLog(logger.Get(),
+			WithReplaceGRPCLogger(),
+			WithLogFields(map[string]interface{}{}),
+		),
 	)
 	time.Sleep(time.Millisecond * 200)
 	cli := newStreamRPCClient(addr)
@@ -70,5 +75,7 @@ func TestNilLog(t *testing.T) {
 	UnaryClientLog(nil)
 	StreamClientLog(nil)
 	UnaryServerLog(nil)
+	UnaryServerSimpleLog(nil)
 	StreamServerLog(nil)
+	StreamServerSimpleLog(nil)
 }

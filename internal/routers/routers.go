@@ -40,7 +40,7 @@ func NewRouter() *gin.Engine {
 	// request id middleware
 	r.Use(middleware.RequestID())
 
-	// logger middleware
+	// logger middleware, to print simple messages, replace middleware.Logging with middleware.SimpleLog
 	r.Use(middleware.Logging(
 		middleware.WithLog(logger.Get()),
 		middleware.WithRequestIDFromContext(),

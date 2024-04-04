@@ -157,7 +157,7 @@ func runLogHTTPServer2() string {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 	r.Use(RequestID())
-	r.Use(Logging(
+	r.Use(SimpleLog(
 		WithLog(logger.Get()),
 		WithMaxLen(200),
 		WithRequestIDFromContext(),

@@ -40,7 +40,7 @@ func UnaryClientLog(logger *zap.Logger, opts ...LogOption) grpc.UnaryClientInter
 		fields := []zap.Field{
 			zap.String("code", status.Code(err).String()),
 			zap.Error(err),
-			zap.String("rpc_type", "unary"),
+			zap.String("type", "unary"),
 			zap.String("method", method),
 			zap.Int64("time_us", time.Since(startTime).Microseconds()),
 			reqIDField,
@@ -78,7 +78,7 @@ func StreamClientLog(logger *zap.Logger, opts ...LogOption) grpc.StreamClientInt
 		fields := []zap.Field{
 			zap.String("code", status.Code(err).String()),
 			zap.Error(err),
-			zap.String("rpc_type", "stream"),
+			zap.String("type", "stream"),
 			zap.String("method", method),
 			zap.Int64("time_us", time.Since(startTime).Microseconds()),
 			reqIDField,
@@ -166,8 +166,8 @@ func UnaryServerLog(logger *zap.Logger, opts ...LogOption) grpc.UnaryServerInter
 		requestID := ServerCtxRequestID(ctx)
 
 		fields := []zap.Field{
-			zap.String("rpc_type", "unary"),
-			zap.String("full_method", info.FullMethod),
+			zap.String("type", "unary"),
+			zap.String("method", info.FullMethod),
 			zap.Any("request", req),
 		}
 		if requestID != "" {
@@ -185,8 +185,8 @@ func UnaryServerLog(logger *zap.Logger, opts ...LogOption) grpc.UnaryServerInter
 		fields = []zap.Field{
 			zap.String("code", status.Code(err).String()),
 			zap.Error(err),
-			zap.String("rpc_type", "unary"),
-			zap.String("full_method", info.FullMethod),
+			zap.String("type", "unary"),
+			zap.String("method", info.FullMethod),
 			zap.String("response", string(data)),
 			zap.Int64("time_us", time.Since(startTime).Microseconds()),
 		}
@@ -194,6 +194,46 @@ func UnaryServerLog(logger *zap.Logger, opts ...LogOption) grpc.UnaryServerInter
 			fields = append(fields, zap.String(ContextRequestIDKey, requestID))
 		}
 		logger.Info(">>>>", fields...)
+
+		return resp, err
+	}
+}
+
+// UnaryServerSimpleLog server-side log unary interceptor, only print response
+func UnaryServerSimpleLog(logger *zap.Logger, opts ...LogOption) grpc.UnaryServerInterceptor {
+	o := defaultLogOptions()
+	o.apply(opts...)
+	ignoreLogMethods = o.ignoreMethods
+
+	if logger == nil {
+		logger, _ = zap.NewProduction()
+	}
+	if o.isReplaceGRPCLogger {
+		zapLog.ReplaceGRPCLoggerV2(logger)
+	}
+
+	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+		// ignore printing of the specified method
+		if _, ok := ignoreLogMethods[info.FullMethod]; ok {
+			return handler(ctx, req)
+		}
+
+		startTime := time.Now()
+		requestID := ServerCtxRequestID(ctx)
+
+		resp, err := handler(ctx, req)
+
+		fields := []zap.Field{
+			zap.String("code", status.Code(err).String()),
+			zap.Error(err),
+			zap.String("type", "unary"),
+			zap.String("method", info.FullMethod),
+			zap.Int64("time_us", time.Since(startTime).Microseconds()),
+		}
+		if requestID != "" {
+			fields = append(fields, zap.String(ContextRequestIDKey, requestID))
+		}
+		logger.Info("[GRPC]", fields...)
 
 		return resp, err
 	}
@@ -222,8 +262,8 @@ func StreamServerLog(logger *zap.Logger, opts ...LogOption) grpc.StreamServerInt
 		requestID := ServerCtxRequestID(stream.Context())
 
 		fields := []zap.Field{
-			zap.String("rpc_type", "stream"),
-			zap.String("full_method", info.FullMethod),
+			zap.String("type", "stream"),
+			zap.String("method", info.FullMethod),
 		}
 		if requestID != "" {
 			fields = append(fields, zap.String(ContextRequestIDKey, requestID))
@@ -234,14 +274,53 @@ func StreamServerLog(logger *zap.Logger, opts ...LogOption) grpc.StreamServerInt
 
 		fields = []zap.Field{
 			zap.String("code", status.Code(err).String()),
-			zap.String("rpc_type", "stream"),
-			zap.String("full_method", info.FullMethod),
+			zap.String("type", "stream"),
+			zap.String("method", info.FullMethod),
 			zap.Int64("time_us", time.Since(startTime).Microseconds()),
 		}
 		if requestID != "" {
 			fields = append(fields, zap.String(ContextRequestIDKey, requestID))
 		}
 		logger.Info(">>>>", fields...)
+
+		return err
+	}
+}
+
+// StreamServerSimpleLog Server-side log stream interceptor, only print response
+func StreamServerSimpleLog(logger *zap.Logger, opts ...LogOption) grpc.StreamServerInterceptor {
+	o := defaultLogOptions()
+	o.apply(opts...)
+	ignoreLogMethods = o.ignoreMethods
+
+	if logger == nil {
+		logger, _ = zap.NewProduction()
+	}
+	if o.isReplaceGRPCLogger {
+		zapLog.ReplaceGRPCLoggerV2(logger)
+	}
+
+	return func(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+		// ignore printing of the specified method
+		if _, ok := ignoreLogMethods[info.FullMethod]; ok {
+			return handler(srv, stream)
+		}
+
+		startTime := time.Now()
+		requestID := ServerCtxRequestID(stream.Context())
+
+		err := handler(srv, stream)
+
+		fields := []zap.Field{
+			zap.String("code", status.Code(err).String()),
+			zap.String("type", "stream"),
+			zap.String("method", info.FullMethod),
+			zap.Int64("time_us", time.Since(startTime).Microseconds()),
+		}
+		if requestID != "" {
+			fields = append(fields, zap.String(ContextRequestIDKey, requestID))
+		}
+		logger.Info("[GRPC]", fields...)
 
 		return err
 	}

@@ -182,3 +182,46 @@ func Logging(opts ...Option) gin.HandlerFunc {
 		o.log.Info(">>>>", fields...)
 	}
 }
+
+// SimpleLog print response info
+func SimpleLog(opts ...Option) gin.HandlerFunc {
+	o := defaultOptions()
+	o.apply(opts...)
+
+	return func(c *gin.Context) {
+		start := time.Now()
+
+		// ignore printing of the specified route
+		if _, ok := o.ignoreRoutes[c.Request.URL.Path]; ok {
+			c.Next()
+			return
+		}
+
+		reqID := ""
+		if o.requestIDFrom == 1 {
+			if v, isExist := c.Get(ContextRequestIDKey); isExist {
+				if requestID, ok := v.(string); ok {
+					reqID = requestID
+				}
+			}
+		} else if o.requestIDFrom == 2 {
+			reqID = c.Request.Header.Get(HeaderXRequestIDKey)
+		}
+
+		// processing requests
+		c.Next()
+
+		// print return message after processing
+		fields := []zap.Field{
+			zap.Int("code", c.Writer.Status()),
+			zap.String("method", c.Request.Method),
+			zap.String("url", c.Request.URL.String()),
+			zap.Int64("time_us", time.Since(start).Microseconds()),
+			zap.Int("size", c.Writer.Size()),
+		}
+		if reqID != "" {
+			fields = append(fields, zap.String(ContextRequestIDKey, reqID))
+		}
+		o.log.Info("[GIN]", fields...)
+	}
+}

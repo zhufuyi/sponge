@@ -1,6 +1,6 @@
 ## middleware
 
-gin middleware plugin.
+Gin middleware plugin.
 
 <br>
 
@@ -8,23 +8,23 @@ gin middleware plugin.
 
 ### logging middleware
 
-You can set the maximum length for printing, add a request id field, ignore print path, customize [zap](go.uber.org/zap) log
+You can set the maximum length for printing, add a request id field, ignore print path, customize [zap](go.uber.org/zap) log.
 
 ```go
+    import "github.com/zhufuyi/sponge/pkg/gin/middleware"
+
     r := gin.Default()
-	
-    r.Use(middleware.Logging())
 
-    r.Use(middleware.Logging(
+	// default
+    r.Use(middleware.Logging()) // simplified logging using middleware.SimpleLog()
+
+	// custom
+    r.Use(middleware.Logging(    // simplified logging using middleware.SimpleLog(WithRequestIDFromHeader())
         middleware.WithMaxLen(400),
-        //WithRequestIDFromHeader(),
-        WithRequestIDFromContext(),
+        WithRequestIDFromHeader(),
+        //WithRequestIDFromContext(),
+		//middleware.WithLog(log), // custom zap log
         //middleware.WithIgnoreRoutes("/hello"),
-    ))
-
-    log, _ := logger.Init(logger.WithFormat("json"))
-    r.Use(middlewareLogging(
-        middleware.WithLog(log),
     ))
 ```
 
@@ -33,6 +33,8 @@ You can set the maximum length for printing, add a request id field, ignore prin
 ### Allow cross-domain requests middleware
 
 ```go
+    import "github.com/zhufuyi/sponge/pkg/gin/middleware"
+
     r := gin.Default()
     r.Use(middleware.Cors())
 ```
@@ -44,17 +46,19 @@ You can set the maximum length for printing, add a request id field, ignore prin
 Adaptive flow limitation based on hardware resources.
 
 ```go
+    import "github.com/zhufuyi/sponge/pkg/gin/middleware"
+
     r := gin.Default()
 
     // e.g. (1) use default
-    // r.Use(RateLimit())
+    // r.Use(middleware.RateLimit())
     
     // e.g. (2) custom parameters
-    r.Use(RateLimit(
-    WithWindow(time.Second*10),
-    WithBucket(100),
-    WithCPUThreshold(100),
-    WithCPUQuota(0.5),
+    r.Use(middleware.RateLimit(
+        WithWindow(time.Second*10),
+        WithBucket(100),
+        WithCPUThreshold(100),
+        WithCPUQuota(0.5),
     ))
 ```
 
@@ -63,9 +67,12 @@ Adaptive flow limitation based on hardware resources.
 ### Circuit Breaker middleware
 
 ```go
+    import "github.com/zhufuyi/sponge/pkg/gin/middleware"
+
     r := gin.Default()
-    r.Use(CircuitBreaker())
+    r.Use(middleware.CircuitBreaker())
 ```
+
 <br>
 
 ### jwt authorization middleware
@@ -74,6 +81,7 @@ Adaptive flow limitation based on hardware resources.
 
 ```go
 import "github.com/zhufuyi/sponge/pkg/jwt"
+import "github.com/zhufuyi/sponge/pkg/gin/middleware"
 
 func main() {
     r := gin.Default()
@@ -102,12 +110,14 @@ func Login(c *gin.Context) {
     // save token
 }
 ```
+
 <br>
 
 #### custom authorization
 
 ```go
 import "github.com/zhufuyi/sponge/pkg/jwt"
+import "github.com/zhufuyi/sponge/pkg/gin/middleware"
 
 func main() {
     r := gin.Default()
@@ -153,6 +163,9 @@ func Login(c *gin.Context) {
 ### tracing middleware
 
 ```go
+import "github.com/zhufuyi/sponge/pkg/tracer"
+import "github.com/zhufuyi/sponge/pkg/gin/middleware"
+
 func InitTrace(serviceName string) {
 	exporter, err := tracer.NewJaegerAgentExporter("192.168.3.37", "6831")
 	if err != nil {
@@ -192,6 +205,8 @@ func SpanDemo(serviceName string, spanName string, ctx context.Context) {
 ### Metrics middleware
 
 ```go
+	import "github.com/zhufuyi/sponge/pkg/gin/middleware/metrics"
+
 	r := gin.Default()
 
 	r.Use(metrics.Metrics(r,
@@ -205,11 +220,13 @@ func SpanDemo(serviceName string, spanName string, ctx context.Context) {
 ### Request id
 
 ```go
+	import "github.com/zhufuyi/sponge/pkg/gin/middleware"
+
     r := gin.Default()
-    r.Use(RequestID())
+    r.Use(middleware.RequestID())
 
     // Customized request id key
-    //r.User(RequestID(
+    //r.User(middleware.RequestID(
     //    middleware.WithContextRequestIDKey("your ctx request id key"), // default is request_id
     //    middleware.WithHeaderRequestIDKey("your header request id key"), // default is X-Request-Id
     //))
