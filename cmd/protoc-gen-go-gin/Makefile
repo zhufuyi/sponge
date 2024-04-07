@@ -25,6 +25,16 @@ service:
 	  --plugin=./protoc-gen-go-gin* \
 	  api/v1/*.proto
 
+
+mix:
+	@go build
+	protoc --proto_path=. --proto_path=./third_party \
+	  --go_out=. --go_opt=paths=source_relative \
+	  --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=mix \
+	  --go-gin_opt=moduleName=yourModuleName --go-gin_opt=serverName=yourServerName \
+	  --plugin=./protoc-gen-go-gin* \
+	  api/v1/*.proto
+
 router-mr:
 	@go build
 	protoc --proto_path=. --proto_path=./third_party \
@@ -49,6 +59,15 @@ service-mr:
 	  --go_out=. --go_opt=paths=source_relative \
 	  --go-grpc_out=. --go-grpc_opt=paths=source_relative \
 	  --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=service \
+	  --go-gin_opt=moduleName=yourModuleName --go-gin_opt=serverName=yourServerName --go-gin_opt=suitedMonoRepo=true \
+	  --plugin=./protoc-gen-go-gin* \
+	  api/v1/*.proto
+
+mix-mr:
+	@go build
+	protoc --proto_path=. --proto_path=./third_party \
+	  --go_out=. --go_opt=paths=source_relative \
+	  --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=mix \
 	  --go-gin_opt=moduleName=yourModuleName --go-gin_opt=serverName=yourServerName --go-gin_opt=suitedMonoRepo=true \
 	  --plugin=./protoc-gen-go-gin* \
 	  api/v1/*.proto

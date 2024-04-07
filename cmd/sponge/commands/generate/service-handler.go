@@ -172,7 +172,7 @@ func (g *serviceAndHandlerGenerator) generateCode() (string, error) {
 			"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", "cache/userExample.go.mgo", // internal/cache
 			"dao/userExample.go.mgo",                                                                                                                                                                            // internal/dao
 			"service.go", "service_test.go", "service/userExample_logic.go", "userExample_logic_test.go", "service/userExample_test.go", "service/userExample.go.mgo", "service/userExample_client_test.go.mgo", // internal/service
-			"handler/userExample.go", "handler/userExample.go.mgo", "handler/userExample_test.go", "handler/userExample_logic_test.go", "handler/userExample_logic.go.mgo", // internal/handler
+			"handler/userExample.go", "handler/userExample.go.mgo", "handler/userExample_test.go", "handler/userExample_logic_test.go", "handler/userExample_logic.go", "handler/userExample_logic.go.mgo", // internal/handler
 		}
 	case DBDriverMongodb:
 		ignoreFiles = []string{ // specify the files in the subdirectory to be ignored for processing
@@ -181,7 +181,7 @@ func (g *serviceAndHandlerGenerator) generateCode() (string, error) {
 			"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", "cache/userExample.go", "cache/userExample_test.go", // internal/cache
 			"dao/userExample_test.go", "dao/userExample.go", // internal/dao
 			"service.go", "service_test.go", "service/userExample_logic.go", "userExample_logic_test.go", "service/userExample_test.go", "service/userExample.go", "service/userExample_client_test.go", // internal/service
-			"handler/userExample.go", "handler/userExample.go.mgo", "handler/userExample_test.go", "handler/userExample_logic_test.go", "handler/userExample_logic.go", // internal/handler
+			"handler/userExample.go", "handler/userExample.go.mgo", "handler/userExample_test.go", "handler/userExample_logic_test.go", "handler/userExample_logic.go", "handler/userExample_logic.go.mgo", // internal/handler
 		}
 	default:
 		return "", errors.New("unsupported db driver: " + g.dbDriver)
@@ -257,11 +257,11 @@ func (g *serviceAndHandlerGenerator) addFields(r replacer.Replacer) []replacer.F
 		},
 		{
 			Old: "userExampleNO       = 1",
-			New: fmt.Sprintf("userExampleNO = %d", rand.Intn(100)),
+			New: fmt.Sprintf("userExampleNO = %d", rand.Intn(99)+1),
 		},
 		{
 			Old: "_userExampleNO       = 2",
-			New: fmt.Sprintf("_userExampleNO       = %d", rand.Intn(100)),
+			New: fmt.Sprintf("_userExampleNO       = %d", rand.Intn(99)+1),
 		},
 		{
 			Old: g.moduleName + "/pkg",
@@ -277,6 +277,10 @@ func (g *serviceAndHandlerGenerator) addFields(r replacer.Replacer) []replacer.F
 		},
 		{
 			Old: "userExample_logic.go.mgo",
+			New: "userExample.go",
+		},
+		{
+			Old: "userExample.go.service",
 			New: "userExample.go",
 		},
 		{

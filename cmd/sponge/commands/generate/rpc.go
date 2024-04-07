@@ -387,7 +387,7 @@ func (g *rpcGenerator) addFields(r replacer.Replacer) []replacer.Field {
 		},
 		{
 			Old: "_userExampleNO       = 2",
-			New: fmt.Sprintf("_userExampleNO       = %d", rand.Intn(100)),
+			New: fmt.Sprintf("_userExampleNO       = %d", rand.Intn(99)+1),
 		},
 		{
 			Old: "serverNameExample",

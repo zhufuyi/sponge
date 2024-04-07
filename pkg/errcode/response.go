@@ -117,8 +117,9 @@ func (resp *defaultResponse) handleRPCError(c *gin.Context, err error) bool {
 	}
 
 	// response 200
-	e := ToHTTPErr(st)
-	resp.response(c, http.StatusOK, e.code, e.msg, struct{}{})
+	//e := ToHTTPErr(st)
+	//resp.response(c, http.StatusOK, e.code, e.msg, struct{}{})
+	resp.response(c, http.StatusOK, int(st.Code()), st.Message(), struct{}{})
 
 	return false
 }
@@ -189,22 +190,16 @@ func ToHTTPErr(st *status.Status) *Error { //nolint
 	}
 
 	switch st.Code() {
-	//case StatusSuccess.status.Code(), codes.OK:
-	//	return Success
 	case StatusCanceled.status.Code(), codes.Canceled:
 		return Canceled
 	case StatusUnknown.status.Code(), codes.Unknown:
 		return Unknown
-	//case StatusInvalidParams.status.Code(), codes.InvalidArgument:
-	//	return InvalidParams
 	case StatusDeadlineExceeded.status.Code(), codes.DeadlineExceeded:
 		return DeadlineExceeded
 	case StatusNotFound.status.Code(), codes.NotFound:
 		return NotFound
 	case StatusAlreadyExists.status.Code(), codes.AlreadyExists:
 		return AlreadyExists
-	//case StatusPermissionDenied.status.Code(), codes.PermissionDenied:
-	//	return PermissionDenied
 	case StatusResourceExhausted.status.Code(), codes.ResourceExhausted:
 		return ResourceExhausted
 	case StatusFailedPrecondition.status.Code(), codes.FailedPrecondition:
@@ -213,10 +208,6 @@ func ToHTTPErr(st *status.Status) *Error { //nolint
 		return Aborted
 	case StatusOutOfRange.status.Code(), codes.OutOfRange:
 		return OutOfRange
-	//case StatusUnimplemented.status.Code(), codes.Unimplemented:
-	//	return Unimplemented
-	//case StatusInternalServerError.status.Code(), codes.Internal:
-	//	return InternalServerError
 	case StatusServiceUnavailable.status.Code(), codes.Unavailable:
 		return ServiceUnavailable
 	case StatusDataLoss.status.Code(), codes.DataLoss:

@@ -147,15 +147,15 @@ func {{.LowerName}}Router(
 		groupPathMiddlewares,
 		singlePathMiddlewares,
 		iService,
-		serverNameExampleV1.With{{.Name}}RPCResponse(),
 		serverNameExampleV1.With{{.Name}}Logger(logger.Get()),
+		serverNameExampleV1.With{{.Name}}RPCResponse(),
+		serverNameExampleV1.With{{.Name}}WrapCtx(ctxFn),
 		serverNameExampleV1.With{{.Name}}RPCStatusToHTTPCode(
 			// Set some error codes to standard http return codes,
 			// by default there is already ecode.StatusInternalServerError and ecode.StatusServiceUnavailable
 			// example:
 			// 	ecode.StatusUnimplemented, ecode.StatusAborted,
 		),
-		serverNameExampleV1.With{{.Name}}WrapCtx(ctxFn),
 	)
 }
 

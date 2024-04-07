@@ -176,6 +176,7 @@ func (g *handlerGenerator) generateCode() (string, error) {
 	default:
 		return "", errors.New("unsupported db driver: " + g.dbDriver)
 	}
+	ignoreFiles = append(ignoreFiles, "handler/userExample.go.service")
 
 	r.SetSubDirsAndFiles(subDirs)
 	r.SetIgnoreSubDirs(ignoreDirs...)
@@ -223,7 +224,7 @@ func (g *handlerGenerator) addFields(r replacer.Replacer) []replacer.Field {
 		},
 		{
 			Old: "userExampleNO       = 1",
-			New: fmt.Sprintf("userExampleNO = %d", rand.Intn(100)),
+			New: fmt.Sprintf("userExampleNO = %d", rand.Intn(99)+1),
 		},
 		{
 			Old: g.moduleName + "/pkg",

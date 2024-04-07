@@ -370,7 +370,7 @@ func NewCenter(configFile string) (*Center, error) {
   checkResult $?
 
   protoc --proto_path=. --proto_path=./third_party \
-    --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=handler \
+    --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=mix \
     --go-gin_opt=moduleName=${moduleName} --go-gin_opt=serverName=${serverName} --go-gin_opt=suitedMonoRepo=${suitedMonoRepo} \
     $specifiedProtoFiles
 

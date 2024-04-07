@@ -10,15 +10,23 @@ import (
 )
 
 // GenerateFiles generate handler logic, router, error code files.
-func GenerateFiles(file *protogen.File) ([]byte, []byte, []byte) {
+func GenerateFiles(file *protogen.File, isMixType bool) ([]byte, []byte, []byte) {
 	if len(file.Services) == 0 {
 		return nil, nil, nil
 	}
 
 	pss := parse.GetServices(file)
-	logicContent := genHandlerLogicFile(pss)
-	routerFileContent := genRouterFile(pss)
-	errCodeFileContent := genErrCodeFile(pss)
+
+	var logicContent, routerFileContent, errCodeFileContent []byte
+
+	if !isMixType {
+		logicContent = genHandlerLogicFile(pss)
+		routerFileContent = genRouterFile(pss)
+		errCodeFileContent = genErrCodeFile(pss)
+	} else {
+		logicContent = genMixLogicFile(pss)
+		routerFileContent = genMixRouterFile(pss)
+	}
 
 	return logicContent, routerFileContent, errCodeFileContent
 }
@@ -36,6 +44,16 @@ func genRouterFile(fields []*parse.PbService) []byte {
 func genErrCodeFile(fields []*parse.PbService) []byte {
 	cf := &errCodeFields{PbServices: fields}
 	return cf.execute()
+}
+
+func genMixLogicFile(fields []*parse.PbService) []byte {
+	mlf := &mixLogicFields{PbServices: fields}
+	return mlf.execute()
+}
+
+func genMixRouterFile(fields []*parse.PbService) []byte {
+	mrf := &mixRouterFields{PbServices: fields}
+	return mrf.execute()
 }
 
 type handlerLogicFields struct {
@@ -73,6 +91,30 @@ func (f *errCodeFields) execute() []byte {
 	}
 	data := bytes.ReplaceAll(buf.Bytes(), []byte("// --blank line--"), []byte{})
 	return handleSplitLineMark(data)
+}
+
+type mixLogicFields struct {
+	PbServices []*parse.PbService
+}
+
+func (f *mixLogicFields) execute() []byte {
+	buf := new(bytes.Buffer)
+	if err := mixLogicTmpl.Execute(buf, f); err != nil {
+		panic(err)
+	}
+	return handleSplitLineMark(buf.Bytes())
+}
+
+type mixRouterFields struct {
+	PbServices []*parse.PbService
+}
+
+func (f *mixRouterFields) execute() []byte {
+	buf := new(bytes.Buffer)
+	if err := mixRouterTmpl.Execute(buf, f); err != nil {
+		panic(err)
+	}
+	return handleSplitLineMark(buf.Bytes())
 }
 
 var splitLineMark = []byte(`// ---------- Do not delete or move this split line, this is the merge code marker ----------`)
