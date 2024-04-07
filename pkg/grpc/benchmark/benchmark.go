@@ -116,6 +116,6 @@ func (b *bench) saveReport(callMethod string, report *runner.Report) error {
 		Report: report,
 	}
 
-	fmt.Printf("\nend of performance pressure testing api '%s', copy the report file path to your browser to view,\nreport file: %s\n\n", callMethod, outputFile)
+	fmt.Printf("\nperformance testing of api '%s' is now complete, copy the report file path to your browser to view,\nreport file: %s\n\n", callMethod, outputFile)
 	return rp.Print("html")
 }

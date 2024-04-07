@@ -44,16 +44,20 @@ func getRPCClientConnForTest(grpcClient ...config.GrpcClient) *grpc.ClientConn {
 	var grpcClientCfg config.GrpcClient
 
 	if len(grpcClient) == 0 {
-		// default config from configuration file serverNameExample.yml
-		grpcClientCfg = config.GrpcClient{
-			Host: config.Get().App.Host,
-			Port: config.Get().Grpc.Port,
-			// If RegistryDiscoveryType is not empty, service discovery is used, and Host and Port values are invalid
-			RegistryDiscoveryType: config.Get().App.RegistryDiscoveryType, // supports consul, etcd and nacos
-			Name:                  config.Get().App.Name,
-		}
-		if grpcClientCfg.RegistryDiscoveryType != "" {
-			grpcClientCfg.EnableLoadBalance = true
+		// the default priority is to use the GrpcClient's 0th grpc server address
+		if len(config.Get().GrpcClient) > 0 {
+			grpcClientCfg = config.Get().GrpcClient[0]
+		} else {
+			grpcClientCfg = config.GrpcClient{
+				Host: config.Get().App.Host,
+				Port: config.Get().Grpc.Port,
+				// If RegistryDiscoveryType is not empty, service discovery is used, and Host and Port values are invalid
+				RegistryDiscoveryType: config.Get().App.RegistryDiscoveryType, // supports consul, etcd and nacos
+				Name:                  config.Get().App.Name,
+			}
+			if grpcClientCfg.RegistryDiscoveryType != "" {
+				grpcClientCfg.EnableLoadBalance = true
+			}
 		}
 	} else {
 		// custom config
