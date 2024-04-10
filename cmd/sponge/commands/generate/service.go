@@ -37,14 +37,11 @@ func ServiceCommand() *cobra.Command {
 		Long: `generate grpc service CRUD code based on sql.
 
 Examples:
-  # generate service code and embed gorm.model struct.
+  # generate service code.
   sponge micro service --module-name=yourModuleName --server-name=yourServerName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
   # generate service code with multiple table names.
   sponge micro service --module-name=yourModuleName --server-name=yourServerName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=t1,t2
-
-  # generate service code, structure fields correspond to the column names of the table.
-  sponge micro service --module-name=yourModuleName --server-name=yourServerName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --embed=false
 
   # generate service code and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge micro service --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
@@ -125,7 +122,7 @@ using help:
 	_ = cmd.MarkFlagRequired("db-dsn")
 	cmd.Flags().StringVarP(&dbTables, "db-table", "t", "", "table name, multiple names separated by commas")
 	_ = cmd.MarkFlagRequired("db-table")
-	cmd.Flags().BoolVarP(&sqlArgs.IsEmbed, "embed", "e", true, "whether to embed gorm.model struct")
+	cmd.Flags().BoolVarP(&sqlArgs.IsEmbed, "embed", "e", false, "whether to embed gorm.model struct")
 	cmd.Flags().BoolVarP(&suitedMonoRepo, "suited-mono-repo", "l", false, "whether the generated code is suitable for mono-repo")
 	cmd.Flags().IntVarP(&sqlArgs.JSONNamedType, "json-name-type", "j", 1, "json tags name type, 0:snake case, 1:camel case")
 	cmd.Flags().StringVarP(&outPath, "out", "o", "", "output directory, default is ./service_<time>,"+

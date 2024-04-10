@@ -392,15 +392,12 @@ func NewCenter(configFile string) (*Center, error) {
 	httpServerConfigCode = `# http server settings
 http:
   port: 8080                # listen port
-  readTimeout: 5            # read timeout, unit(second)
-  writeTimeout: 5           # write timeout, unit(second), if enableHTTPProfile is true, it needs to be greater than 60s, the default value for pprof to do profiling is 60s`
+  timeout: 10               # request timeout, unit(second), if 0 means not set, if greater than 0 means set timeout, if enableHTTPProfile is true, it needs to set 0 or greater than 60s`
 
 	rpcServerConfigCode = `# grpc server settings
 grpc:
   port: 8282                # listen port
   httpPort: 8283            # profile and metrics ports
-  readTimeout: 5            # read timeout, unit(second)
-  writeTimeout: 5           # write timeout, unit(second)
   enableToken: false        # whether to enable server-side token authentication, default appID=grpc, appKey=123456
   # serverSecure parameter setting
   # if type="", it means no secure connection, no need to fill in any parameters
@@ -438,8 +435,7 @@ grpcClient:
 	rpcGwServerConfigCode = `# http server settings
 http:
   port: 8080                # listen port
-  readTimeout: 5            # read timeout, unit(second)
-  writeTimeout: 5           # write timeout, unit(second), if enableHTTPProfile is true, it needs to be greater than 60s, the default value for pprof to do profiling is 60s
+  timeout: 10                # request timeout, unit(second), if 0 means not set, if greater than 0 means set timeout, if enableHTTPProfile is true, it needs to set 0 or greater than 60s
 
 
 # grpc client-side settings, support for setting up multiple grpc clients.
@@ -467,16 +463,13 @@ grpcClient:
 	grpcAndHTTPServerConfigCode = `# http server settings
 http:
   port: 8080                # listen port
-  readTimeout: 5            # read timeout, unit(second)
-  writeTimeout: 5           # write timeout, unit(second), if enableHTTPProfile is true, it needs to be greater than 60s, the default value for pprof to do profiling is 60s
+  timeout: 10               # request timeout, unit(second), if 0 means not set, if greater than 0 means set timeout, if enableHTTPProfile is true, it needs to set 0 or greater than 60s
 
 
 # grpc server settings
 grpc:
   port: 8282                # listen port
   httpPort: 8283            # profile and metrics ports
-  readTimeout: 5            # read timeout, unit(second)
-  writeTimeout: 5           # write timeout, unit(second)
   enableToken: false        # whether to enable server-side token authentication, default appID=grpc, appKey=123456
   # serverSecure parameter setting
   # if type="", it means no secure connection, no need to fill in any parameters

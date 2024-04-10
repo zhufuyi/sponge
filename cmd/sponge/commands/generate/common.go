@@ -574,6 +574,10 @@ func serverCodeFields(outDir string, moduleName string, serverName string) []rep
 			Old: fmt.Sprintf("\"%s/api", moduleName),
 			New: fmt.Sprintf("\"%s/api", moduleName+"/"+serverName),
 		},
+		{
+			Old: "vrf internal",
+			New: "vrf Internal",
+		},
 	}
 }
 
@@ -597,6 +601,10 @@ func SubServerCodeFields(outDir string, moduleName string, serverName string) []
 		{
 			Old: fmt.Sprintf("\"%s/api", moduleName),
 			New: fmt.Sprintf("\"%s/api", moduleName+"/"+serverName),
+		},
+		{
+			Old: "vrf internal",
+			New: "vrf Internal",
 		},
 	}
 }

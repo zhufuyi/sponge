@@ -31,14 +31,11 @@ func ModelCommand(parentName string) *cobra.Command {
 		Long: fmt.Sprintf(`generate model code based on sql.
 
 Examples:
-  # generate model code and embed gorm.model struct.
+  # generate model code.
   sponge %s model --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
   # generate model code with multiple table names.
   sponge %s model --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=t1,t2
-
-  # generate model code, structure fields correspond to the column names of the table.
-  sponge %s model --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --embed=false
 
   # generate model code and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge %s model --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
@@ -86,7 +83,7 @@ using help:
 	_ = cmd.MarkFlagRequired("db-dsn")
 	cmd.Flags().StringVarP(&dbTables, "db-table", "t", "", "table name, multiple names separated by commas")
 	_ = cmd.MarkFlagRequired("db-table")
-	cmd.Flags().BoolVarP(&sqlArgs.IsEmbed, "embed", "e", true, "whether to embed gorm.model struct")
+	cmd.Flags().BoolVarP(&sqlArgs.IsEmbed, "embed", "e", false, "whether to embed gorm.model struct")
 	cmd.Flags().IntVarP(&sqlArgs.JSONNamedType, "json-name-type", "j", 1, "json tags name type, 0:snake case, 1:camel case")
 	cmd.Flags().StringVarP(&outPath, "out", "o", "", "output directory, default is ./model_<time>")
 
