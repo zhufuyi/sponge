@@ -37,8 +37,6 @@ func TestGRPCServer(t *testing.T) {
 
 	utils.SafeRunWithTimeout(time.Second*2, func(cancel context.CancelFunc) {
 		server := NewGRPCServer(addr,
-			WithGrpcReadTimeout(time.Second),
-			WithGrpcWriteTimeout(time.Second),
 			WithGrpcRegistry(nil, instance),
 		)
 		assert.NotNil(t, server)

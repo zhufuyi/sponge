@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"context"
 	"net/http"
 	"time"
 
@@ -88,5 +89,26 @@ func RateLimit(opts ...RateLimitOption) gin.HandlerFunc {
 		c.Next()
 
 		done(rl.DoneInfo{Err: c.Request.Context().Err()})
+	}
+}
+
+// Timeout request time out
+func Timeout(d time.Duration) gin.HandlerFunc {
+	if d < time.Millisecond {
+		return func(c *gin.Context) {}
+	}
+	return func(c *gin.Context) {
+		ctx, _ := context.WithTimeout(c.Request.Context(), d) //nolint
+		c.Request = c.Request.WithContext(ctx)
+
+		c.Next()
+
+		if ctx.Err() == context.DeadlineExceeded {
+			if c.Writer.Status() == 200 {
+				c.AbortWithStatus(http.StatusGatewayTimeout)
+				return
+			}
+			c.Abort()
+		}
 	}
 }

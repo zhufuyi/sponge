@@ -392,7 +392,7 @@ func NewCenter(configFile string) (*Center, error) {
 	httpServerConfigCode = `# http server settings
 http:
   port: 8080                # listen port
-  timeout: 10               # request timeout, unit(second), if 0 means not set, if greater than 0 means set timeout, if enableHTTPProfile is true, it needs to set 0 or greater than 60s`
+  timeout: 0                # request timeout, unit(second), if 0 means not set, if greater than 0 means set timeout, if enableHTTPProfile is true, it needs to set 0 or greater than 60s`
 
 	rpcServerConfigCode = `# grpc server settings
 grpc:
@@ -415,6 +415,7 @@ grpcClient:
   - name: "your_grpc_service_name"    # grpc service name, used for service discovery
     host: "127.0.0.1"            # grpc service address, used for direct connection
     port: 8282                   # grpc service port
+    timeout: 0                   # request timeout, unit(second), if 0 means not set, if greater than 0 means set timeout, valid only for unary grpc type
     registryDiscoveryType: ""    # registration and discovery types: consul, etcd, nacos, if empty, connecting to server using host and port
     enableLoadBalance: true      # whether to turn on the load balancer
     # clientSecure parameter setting
@@ -435,7 +436,7 @@ grpcClient:
 	rpcGwServerConfigCode = `# http server settings
 http:
   port: 8080                # listen port
-  timeout: 10                # request timeout, unit(second), if 0 means not set, if greater than 0 means set timeout, if enableHTTPProfile is true, it needs to set 0 or greater than 60s
+  timeout: 0                 # request timeout, unit(second), if 0 means not set, if greater than 0 means set timeout, if enableHTTPProfile is true, it needs to set 0 or greater than 60s
 
 
 # grpc client-side settings, support for setting up multiple grpc clients.
@@ -443,6 +444,7 @@ grpcClient:
   - name: "your_grpc_service_name"    # grpc service name, used for service discovery
     host: "127.0.0.1"            # grpc service address, used for direct connection
     port: 8282                   # grpc service port
+    timeout: 0                   # request timeout, unit(second), if 0 means not set, if greater than 0 means set timeout, valid only for unary grpc type
     registryDiscoveryType: ""    # registration and discovery types: consul, etcd, nacos, if empty, connecting to server using host and port
     enableLoadBalance: true      # whether to turn on the load balancer
     # clientSecure parameter setting
@@ -463,7 +465,7 @@ grpcClient:
 	grpcAndHTTPServerConfigCode = `# http server settings
 http:
   port: 8080                # listen port
-  timeout: 10               # request timeout, unit(second), if 0 means not set, if greater than 0 means set timeout, if enableHTTPProfile is true, it needs to set 0 or greater than 60s
+  timeout: 0                # request timeout, unit(second), if 0 means not set, if greater than 0 means set timeout, if enableHTTPProfile is true, it needs to set 0 or greater than 60s
 
 
 # grpc server settings
@@ -487,6 +489,7 @@ grpcClient:
   - name: "your_grpc_service_name"    # grpc service name, used for service discovery
     host: "127.0.0.1"            # grpc service address, used for direct connection
     port: 8282                   # grpc service port
+    timeout: 0                   # request timeout, unit(second), if 0 means not set, if greater than 0 means set timeout, valid only for unary grpc type
     registryDiscoveryType: ""    # registration and discovery types: consul, etcd, nacos, if empty, connecting to server using host and port
     enableLoadBalance: true      # whether to turn on the load balancer
     # clientSecure parameter setting

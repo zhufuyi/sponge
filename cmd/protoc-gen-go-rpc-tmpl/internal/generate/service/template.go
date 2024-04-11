@@ -263,7 +263,7 @@ import (
 func Test_service_{{.LowerName}}_methods(t *testing.T) {
 	conn := getRPCClientConnForTest()
 	cli := serverNameExampleV1.New{{.Name}}Client(conn)
-	ctx, _ := context.WithTimeout(context.Background(), time.Second*5)
+	ctx := context.Background()
 
 	tests := []struct {
 		name    string

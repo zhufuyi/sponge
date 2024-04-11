@@ -9,44 +9,28 @@ import (
 
 // ---------------------------------- client interceptor ----------------------------------
 
-var timeoutVal = time.Second * 10 // default timeout 10 seconds
-
-// default timeout
-func defaultContextTimeout(ctx context.Context) (context.Context, context.CancelFunc) {
-	var cancel context.CancelFunc
-	if _, ok := ctx.Deadline(); !ok {
-		ctx, cancel = context.WithTimeout(ctx, timeoutVal)
-	}
-
-	return ctx, cancel
-}
+var timeoutVal = time.Second * 10
 
 // UnaryClientTimeout client-side timeout unary interceptor
 func UnaryClientTimeout(d time.Duration) grpc.UnaryClientInterceptor {
-	if d > time.Millisecond {
-		timeoutVal = d
+	if d < time.Millisecond {
+		d = timeoutVal
 	}
 
 	return func(ctx context.Context, method string, req, resp interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
-		ctx, cancel := defaultContextTimeout(ctx)
-		if cancel != nil {
-			defer cancel()
-		}
+		ctx, _ = context.WithTimeout(ctx, d) //nolint
 		return invoker(ctx, method, req, resp, cc, opts...)
 	}
 }
 
 // StreamClientTimeout server-side timeout  interceptor
 func StreamClientTimeout(d time.Duration) grpc.StreamClientInterceptor {
-	if d > time.Millisecond {
-		timeoutVal = d
+	if d < time.Millisecond {
+		d = timeoutVal
 	}
 
 	return func(ctx context.Context, desc *grpc.StreamDesc, cc *grpc.ClientConn, method string, streamer grpc.Streamer, opts ...grpc.CallOption) (grpc.ClientStream, error) {
-		ctx, cancel := defaultContextTimeout(ctx)
-		if cancel != nil {
-			defer cancel()
-		}
+		ctx, _ = context.WithTimeout(ctx, d) //nolint
 		return streamer(ctx, desc, cc, method, opts...)
 	}
 }

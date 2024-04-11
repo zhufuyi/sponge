@@ -4,6 +4,7 @@ package routers
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -36,6 +37,11 @@ func NewRouter() *gin.Engine {
 
 	r.Use(gin.Recovery())
 	r.Use(middleware.Cors())
+
+	if config.Get().HTTP.Timeout > 0 {
+		// if you need more fine-grained control over your routes, set the timeout in your routes, unsetting the timeout globally here.
+		r.Use(middleware.Timeout(time.Second * time.Duration(config.Get().HTTP.Timeout)))
+	}
 
 	// request id middleware
 	r.Use(middleware.RequestID())

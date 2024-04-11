@@ -100,6 +100,7 @@ type GrpcClient struct {
 	Name                  string       `yaml:"name" json:"name"`
 	Port                  int          `yaml:"port" json:"port"`
 	RegistryDiscoveryType string       `yaml:"registryDiscoveryType" json:"registryDiscoveryType"`
+	Timeout               int          `yaml:"timeout" json:"timeout"`
 }
 
 type Sqlite struct {
@@ -151,9 +152,7 @@ type Grpc struct {
 	EnableToken  bool         `yaml:"enableToken" json:"enableToken"`
 	HTTPPort     int          `yaml:"httpPort" json:"httpPort"`
 	Port         int          `yaml:"port" json:"port"`
-	ReadTimeout  int          `yaml:"readTimeout" json:"readTimeout"`
 	ServerSecure ServerSecure `yaml:"serverSecure" json:"serverSecure"`
-	WriteTimeout int          `yaml:"writeTimeout" json:"writeTimeout"`
 }
 
 type Logger struct {
@@ -169,7 +168,6 @@ type NacosRd struct {
 }
 
 type HTTP struct {
-	Port         int `yaml:"port" json:"port"`
-	ReadTimeout  int `yaml:"readTimeout" json:"readTimeout"`
-	WriteTimeout int `yaml:"writeTimeout" json:"writeTimeout"`
+	Port    int `yaml:"port" json:"port"`
+	Timeout int `yaml:"timeout" json:"timeout"`
 }

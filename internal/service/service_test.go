@@ -66,6 +66,10 @@ func getRPCClientConnForTest(grpcClient ...config.GrpcClient) *grpc.ClientConn {
 
 	var cliOptions []grpccli.Option
 
+	if grpcClientCfg.Timeout > 0 {
+		cliOptions = append(cliOptions, grpccli.WithTimeout(time.Second*time.Duration(grpcClientCfg.Timeout)))
+	}
+
 	// load balance
 	if grpcClientCfg.EnableLoadBalance {
 		cliOptions = append(cliOptions, grpccli.WithEnableLoadBalance())

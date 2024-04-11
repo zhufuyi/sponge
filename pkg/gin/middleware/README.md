@@ -205,22 +205,24 @@ func SpanDemo(serviceName string, spanName string, ctx context.Context) {
 ### Metrics middleware
 
 ```go
-	import "github.com/zhufuyi/sponge/pkg/gin/middleware/metrics"
+    import "github.com/zhufuyi/sponge/pkg/gin/middleware/metrics"
 
-	r := gin.Default()
+    r := gin.Default()
 
-	r.Use(metrics.Metrics(r,
-		//metrics.WithMetricsPath("/demo/metrics"), // default is /metrics
-		metrics.WithIgnoreStatusCodes(http.StatusNotFound), // ignore status codes
-		//metrics.WithIgnoreRequestMethods(http.MethodHead),  // ignore request methods
-		//metrics.WithIgnoreRequestPaths("/ping", "/health"), // ignore request paths
-	))
+    r.Use(metrics.Metrics(r,
+        //metrics.WithMetricsPath("/demo/metrics"), // default is /metrics
+        metrics.WithIgnoreStatusCodes(http.StatusNotFound), // ignore status codes
+        //metrics.WithIgnoreRequestMethods(http.MethodHead),  // ignore request methods
+        //metrics.WithIgnoreRequestPaths("/ping", "/health"), // ignore request paths
+    ))
 ```
+
+<br>
 
 ### Request id
 
 ```go
-	import "github.com/zhufuyi/sponge/pkg/gin/middleware"
+    import "github.com/zhufuyi/sponge/pkg/gin/middleware"
 
     r := gin.Default()
     r.Use(middleware.RequestID())
@@ -236,4 +238,22 @@ func SpanDemo(serviceName string, spanName string, ctx context.Context) {
         // mysql.WithLogRequestIDKey("your ctx request id key"),  // print request_id
         // ...
     // )
+```
+
+<br>
+
+### Timeout
+
+```go
+    import "github.com/zhufuyi/sponge/pkg/gin/middleware"
+
+    r := gin.Default()
+
+    // way1: global set timeout
+    r.Use(middleware.Timeout(time.Second*5))
+
+    // way2: router set timeout
+    r.GET("/userExample/:id", middleware.Timeout(time.Second*3), h.GetByID)
+
+    // Note: If timeout is set both globally and in the router, the minimum timeout prevails
 ```

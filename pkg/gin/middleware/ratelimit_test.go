@@ -32,6 +32,8 @@ func runRateLimiterHTTPServer() string {
 		WithCPUQuota(0.5),
 	))
 
+	r.Use(Timeout(time.Second * 5))
+
 	r.GET("/hello", func(c *gin.Context) {
 		if rand.Int()%2 == 0 {
 			response.Output(c, http.StatusInternalServerError)

@@ -19,7 +19,7 @@ type Option func(*options)
 
 // options grpc dial options
 type options struct {
-	timeout time.Duration
+	requestTimeout time.Duration // request timeout, valid only for unary
 
 	// secure setting
 	secureType string // secure type "","one-way","two-way"
@@ -60,7 +60,6 @@ func defaultOptions() *options {
 
 		enableLog: false,
 
-		timeout:            time.Second * 5,
 		dialOptions:        nil,
 		unaryInterceptors:  nil,
 		streamInterceptors: nil,
@@ -75,9 +74,9 @@ func (o *options) apply(opts ...Option) {
 }
 
 // WithTimeout set dial timeout
-func WithTimeout(timeout time.Duration) Option {
+func WithTimeout(d time.Duration) Option {
 	return func(o *options) {
-		o.timeout = timeout
+		o.requestTimeout = d
 	}
 }
 

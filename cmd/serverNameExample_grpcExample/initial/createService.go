@@ -3,7 +3,6 @@ package initial
 import (
 	"fmt"
 	"strconv"
-	"time"
 
 	"github.com/zhufuyi/sponge/pkg/app"
 	"github.com/zhufuyi/sponge/pkg/logger"
@@ -25,8 +24,6 @@ func CreateServices() []app.IServer {
 	grpcAddr := ":" + strconv.Itoa(cfg.Grpc.Port)
 	grpcRegistry, grpcInstance := registerService("grpc", cfg.App.Host, cfg.Grpc.Port)
 	grpcServer := server.NewGRPCServer(grpcAddr,
-		server.WithGrpcReadTimeout(time.Duration(cfg.Grpc.ReadTimeout)*time.Second),
-		server.WithGrpcWriteTimeout(time.Duration(cfg.Grpc.WriteTimeout)*time.Second),
 		server.WithGrpcRegistry(grpcRegistry, grpcInstance),
 	)
 	servers = append(servers, grpcServer)

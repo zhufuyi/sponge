@@ -9,7 +9,9 @@ import (
 )
 
 func TestUnaryClientTimeout(t *testing.T) {
-	interceptor := UnaryClientTimeout(time.Second)
+	interceptor := UnaryClientTimeout(time.Millisecond)
+	assert.NotNil(t, interceptor)
+	interceptor = UnaryClientTimeout(time.Second)
 	assert.NotNil(t, interceptor)
 
 	err := interceptor(context.Background(), "/test", nil, nil, nil, unaryClientInvoker)
@@ -17,16 +19,11 @@ func TestUnaryClientTimeout(t *testing.T) {
 }
 
 func TestStreamClientTimeout(t *testing.T) {
-	interceptor := StreamClientTimeout(time.Second)
+	interceptor := StreamClientTimeout(time.Millisecond)
+	assert.NotNil(t, interceptor)
+	interceptor = StreamClientTimeout(time.Second)
 	assert.NotNil(t, interceptor)
 
 	_, err := interceptor(context.Background(), nil, nil, "/test", streamClientFunc)
 	assert.NoError(t, err)
-}
-
-func Test_defaultContextTimeout(t *testing.T) {
-	_, cancel := defaultContextTimeout(context.Background())
-	if cancel != nil {
-		defer cancel()
-	}
 }

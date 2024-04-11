@@ -105,6 +105,10 @@ func unaryClientOptions(o *options) grpc.DialOption {
 
 	unaryClientInterceptors = append(unaryClientInterceptors, interceptor.UnaryClientRecovery())
 
+	if o.requestTimeout > 0 {
+		unaryClientInterceptors = append(unaryClientInterceptors, interceptor.UnaryClientTimeout(o.requestTimeout))
+	}
+
 	// request id
 	if o.enableRequestID {
 		unaryClientInterceptors = append(unaryClientInterceptors, interceptor.UnaryClientRequestID())

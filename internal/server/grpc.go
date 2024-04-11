@@ -31,7 +31,7 @@ var _ app.IServer = (*grpcServer)(nil)
 
 var (
 	defaultTokenAppID  = "grpc"
-	defaultTokenAppKey = "123456"
+	defaultTokenAppKey = "mko09ijn"
 )
 
 type grpcServer struct {
