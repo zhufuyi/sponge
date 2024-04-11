@@ -39,7 +39,7 @@ Examples:
 
   # generate model code and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge %s model --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
-`, parentName, parentName, parentName, parentName),
+`, parentName, parentName, parentName),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {

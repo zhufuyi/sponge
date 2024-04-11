@@ -114,12 +114,12 @@ function generate_http_mysql() {
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
-    echo -e "\n${colorCyan}sponge web http --server-name=$serverName --module-name=user --project-name=edusys --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --out=$outDir ${markEnd}"
-    sponge web http --server-name=$serverName --module-name=user --project-name=edusys --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --out=$outDir
+    echo -e "\n${colorCyan}sponge web http --server-name=$serverName --module-name=user --project-name=edusys --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --embed=true --out=$outDir ${markEnd}"
+    sponge web http --server-name=$serverName --module-name=user --project-name=edusys --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --embed=true --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge web handler --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable2 --out=$outDir ${markEnd}"
-    sponge web handler --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable2 --out=$outDir
+    echo -e "\n${colorCyan}sponge web handler --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable2 --embed=true --out=$outDir ${markEnd}"
+    sponge web handler --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable2 --embed=true --out=$outDir
     checkResult $?
   fi
 

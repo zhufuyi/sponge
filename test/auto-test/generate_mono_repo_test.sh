@@ -122,12 +122,12 @@ function generate_http_mysql() {
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
-    echo -e "\n${colorCyan}sponge web http --server-name=$serverName --module-name=edusys --project-name=edusys --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --embed=false --suited-mono-repo=true --out=$outDir ${markEnd}"
-    sponge web http --server-name=$serverName --module-name=edusys --project-name=edusys --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --embed=false --suited-mono-repo=true --out=$outDir
+    echo -e "\n${colorCyan}sponge web http --server-name=$serverName --module-name=edusys --project-name=edusys --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --embed=true --suited-mono-repo=true --out=$outDir ${markEnd}"
+    sponge web http --server-name=$serverName --module-name=edusys --project-name=edusys --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --embed=true --suited-mono-repo=true --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge web handler --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable2 --embed=false --suited-mono-repo=true --out=$outDir ${markEnd}"
-    sponge web handler --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable2 --embed=false --suited-mono-repo=true --out=$outDir
+    echo -e "\n${colorCyan}sponge web handler --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable2 --embed=true --suited-mono-repo=true --out=$outDir ${markEnd}"
+    sponge web handler --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable2 --embed=true --suited-mono-repo=true --out=$outDir
     checkResult $?
 
     checkGoModule
@@ -154,12 +154,12 @@ function generate_http_postgresql() {
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
-    echo -e "\n${colorCyan}sponge web http --server-name=$serverName --module-name=edusys --project-name=edusys --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable1 --embed=false --suited-mono-repo=true --out=$outDir ${markEnd}"
-    sponge web http --server-name=$serverName --module-name=edusys --project-name=edusys --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable1 --embed=false --suited-mono-repo=true --out=$outDir
+    echo -e "\n${colorCyan}sponge web http --server-name=$serverName --module-name=edusys --project-name=edusys --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable1 --suited-mono-repo=true --out=$outDir ${markEnd}"
+    sponge web http --server-name=$serverName --module-name=edusys --project-name=edusys --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable1 --suited-mono-repo=true --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge web handler --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable2 --embed=false --suited-mono-repo=true --out=$outDir ${markEnd}"
-    sponge web handler --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable2 --embed=false --suited-mono-repo=true --out=$outDir
+    echo -e "\n${colorCyan}sponge web handler --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable2 --suited-mono-repo=true --out=$outDir ${markEnd}"
+    sponge web handler --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable2 --suited-mono-repo=true --out=$outDir
     checkResult $?
     checkGoModule
   fi
@@ -185,12 +185,12 @@ function generate_http_sqlite() {
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
-    echo -e "\n${colorCyan}sponge web http --server-name=$serverName --module-name=edusys --project-name=edusys --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable1 --embed=false --suited-mono-repo=true --out=$outDir ${markEnd}"
-    sponge web http --server-name=$serverName --module-name=edusys --project-name=edusys --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable1 --embed=false --suited-mono-repo=true --out=$outDir
+    echo -e "\n${colorCyan}sponge web http --server-name=$serverName --module-name=edusys --project-name=edusys --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable1 --suited-mono-repo=true --out=$outDir ${markEnd}"
+    sponge web http --server-name=$serverName --module-name=edusys --project-name=edusys --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable1 --suited-mono-repo=true --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge web handler --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable2 --embed=false --suited-mono-repo=true --out=$outDir ${markEnd}"
-    sponge web handler --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable2 --embed=false --suited-mono-repo=true --out=$outDir
+    echo -e "\n${colorCyan}sponge web handler --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable2 --suited-mono-repo=true --out=$outDir ${markEnd}"
+    sponge web handler --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable2 --suited-mono-repo=true --out=$outDir
     checkResult $?
 
     sed -E -i 's/\\\\sql\\\\/\\\\\.\.\\\\\sql\\\\/g' ${outDir}/configs/${serverName}.yml
@@ -218,12 +218,12 @@ function generate_http_mongodb() {
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
-    echo -e "\n${colorCyan}sponge web http --server-name=$serverName --module-name=edusys --project-name=edusys --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection1 --embed=false --suited-mono-repo=true --out=$outDir ${markEnd}"
-    sponge web http --server-name=$serverName --module-name=edusys --project-name=edusys --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection1 --embed=false --suited-mono-repo=true --out=$outDir
+    echo -e "\n${colorCyan}sponge web http --server-name=$serverName --module-name=edusys --project-name=edusys --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection1 --suited-mono-repo=true --out=$outDir ${markEnd}"
+    sponge web http --server-name=$serverName --module-name=edusys --project-name=edusys --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection1 --suited-mono-repo=true --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge web handler --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection2 --embed=false --suited-mono-repo=true --out=$outDir ${markEnd}"
-    sponge web handler --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection2 --embed=false --suited-mono-repo=true --out=$outDir
+    echo -e "\n${colorCyan}sponge web handler --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection2 --suited-mono-repo=true --out=$outDir ${markEnd}"
+    sponge web handler --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection2 --suited-mono-repo=true --out=$outDir
     checkResult $?
     checkGoModule
   fi
@@ -251,12 +251,12 @@ function generate_grpc_mysql() {
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
-    echo -e "\n${colorCyan}sponge micro rpc --server-name=$serverName --module-name=edusys --project-name=edusys --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --embed=false --suited-mono-repo=true --out=$outDir ${markEnd}"
-    sponge micro rpc --server-name=$serverName --module-name=edusys --project-name=edusys --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --embed=false --suited-mono-repo=true --out=$outDir
+    echo -e "\n${colorCyan}sponge micro rpc --server-name=$serverName --module-name=edusys --project-name=edusys --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --suited-mono-repo=true --out=$outDir ${markEnd}"
+    sponge micro rpc --server-name=$serverName --module-name=edusys --project-name=edusys --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --suited-mono-repo=true --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge micro service --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable2 --embed=false --suited-mono-repo=true --out=$outDir ${markEnd}"
-    sponge micro service --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable2 --embed=false --suited-mono-repo=true --out=$outDir
+    echo -e "\n${colorCyan}sponge micro service --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable2 --suited-mono-repo=true --out=$outDir ${markEnd}"
+    sponge micro service --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable2 --suited-mono-repo=true --out=$outDir
     checkResult $?
 
     checkGoModule
@@ -283,12 +283,12 @@ function generate_grpc_postgresql() {
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
-    echo -e "\n${colorCyan}sponge micro rpc --server-name=$serverName --module-name=edusys --project-name=edusys --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable1 --embed=false --suited-mono-repo=true --out=$outDir ${markEnd}"
-    sponge micro rpc --server-name=$serverName --module-name=edusys --project-name=edusys --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable1 --embed=false --suited-mono-repo=true --out=$outDir
+    echo -e "\n${colorCyan}sponge micro rpc --server-name=$serverName --module-name=edusys --project-name=edusys --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable1 --suited-mono-repo=true --out=$outDir ${markEnd}"
+    sponge micro rpc --server-name=$serverName --module-name=edusys --project-name=edusys --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable1 --suited-mono-repo=true --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge micro service --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable2 --embed=false --suited-mono-repo=true --out=$outDir ${markEnd}"
-    sponge micro service --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable2 --embed=false --suited-mono-repo=true --out=$outDir
+    echo -e "\n${colorCyan}sponge micro service --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable2 --suited-mono-repo=true --out=$outDir ${markEnd}"
+    sponge micro service --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable2 --suited-mono-repo=true --out=$outDir
     checkResult $?
 
     checkGoModule
@@ -315,12 +315,12 @@ function generate_grpc_sqlite() {
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
-    echo -e "\n${colorCyan}sponge micro rpc --server-name=$serverName --module-name=edusys --project-name=edusys --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable1 --embed=false --suited-mono-repo=true --out=$outDir ${markEnd}"
-    sponge micro rpc --server-name=$serverName --module-name=edusys --project-name=edusys --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable1 --embed=false --suited-mono-repo=true --out=$outDir
+    echo -e "\n${colorCyan}sponge micro rpc --server-name=$serverName --module-name=edusys --project-name=edusys --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable1 --suited-mono-repo=true --out=$outDir ${markEnd}"
+    sponge micro rpc --server-name=$serverName --module-name=edusys --project-name=edusys --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable1 --suited-mono-repo=true --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge micro service --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable2 --embed=false --suited-mono-repo=true --out=$outDir ${markEnd}"
-    sponge micro service --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable2 --embed=false --suited-mono-repo=true --out=$outDir
+    echo -e "\n${colorCyan}sponge micro service --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable2 --suited-mono-repo=true --out=$outDir ${markEnd}"
+    sponge micro service --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable2 --suited-mono-repo=true --out=$outDir
     checkResult $?
 
     sed -E -i 's/\\\\sql\\\\/\\\\\.\.\\\\\sql\\\\/g' ${outDir}/configs/${serverName}.yml
@@ -348,12 +348,12 @@ function generate_grpc_mongodb() {
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
-    echo -e "\n${colorCyan}sponge micro rpc --server-name=$serverName --module-name=edusys --project-name=edusys --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection1 --embed=false --suited-mono-repo=true --out=$outDir ${markEnd}"
-    sponge micro rpc --server-name=$serverName --module-name=edusys --project-name=edusys --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection1 --embed=false --suited-mono-repo=true --out=$outDir
+    echo -e "\n${colorCyan}sponge micro rpc --server-name=$serverName --module-name=edusys --project-name=edusys --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection1 --suited-mono-repo=true --out=$outDir ${markEnd}"
+    sponge micro rpc --server-name=$serverName --module-name=edusys --project-name=edusys --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection1 --suited-mono-repo=true --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge micro service --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection2 --embed=false --suited-mono-repo=true --out=$outDir ${markEnd}"
-    sponge micro service --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection2 --embed=false --suited-mono-repo=true --out=$outDir
+    echo -e "\n${colorCyan}sponge micro service --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection2 --suited-mono-repo=true --out=$outDir ${markEnd}"
+    sponge micro service --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection2 --suited-mono-repo=true --out=$outDir
     checkResult $?
 
     checkGoModule
@@ -386,8 +386,8 @@ function generate_http_pb_mysql() {
     sponge web http-pb --server-name=$serverName --module-name=edusys --project-name=edusys --protobuf-file=./files/user.proto --suited-mono-repo=true --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge web handler-pb --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --embed=false --suited-mono-repo=true --out=$outDir ${markEnd}"
-    sponge web handler-pb --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --embed=false --suited-mono-repo=true --out=$outDir
+    echo -e "\n${colorCyan}sponge web handler-pb --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --suited-mono-repo=true --out=$outDir ${markEnd}"
+    sponge web handler-pb --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --suited-mono-repo=true --out=$outDir
     checkResult $?
 
     mysqlDsnTmp=$(echo "$mysqlDsn" | sed -E 's/\(/\\\(/g' | sed -E 's/\)/\\\)/g' | sed -E 's/\//\\\//g')
@@ -423,8 +423,8 @@ function generate_http_pb_mongodb() {
     sponge web http-pb --server-name=$serverName --module-name=edusys --project-name=edusys --protobuf-file=./files/user.proto --suited-mono-repo=true --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge web handler-pb --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection1 --embed=false --suited-mono-repo=true --out=$outDir ${markEnd}"
-    sponge web handler-pb --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection1 --embed=false --suited-mono-repo=true --out=$outDir
+    echo -e "\n${colorCyan}sponge web handler-pb --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection1 --suited-mono-repo=true --out=$outDir ${markEnd}"
+    sponge web handler-pb --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection1 --suited-mono-repo=true --out=$outDir
     checkResult $?
 
     sed -E -i 's/\"mysql\"/\"mongodb\"/g' ${outDir}/configs/${serverName}.yml
@@ -464,8 +464,8 @@ function generate_grpc_pb_mysql() {
     sponge micro rpc-pb --server-name=$serverName --module-name=edusys --project-name=edusys --protobuf-file=./files/user2.proto --suited-mono-repo=true --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge micro service --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --embed=false --suited-mono-repo=true --out=$outDir ${markEnd}"
-    sponge micro service --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --embed=false --suited-mono-repo=true --out=$outDir
+    echo -e "\n${colorCyan}sponge micro service --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --suited-mono-repo=true --out=$outDir ${markEnd}"
+    sponge micro service --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --suited-mono-repo=true --out=$outDir
     checkResult $?
 
     mysqlDsnTmp=$(echo "$mysqlDsn" | sed -E 's/\(/\\\(/g' | sed -E 's/\)/\\\)/g' | sed -E 's/\//\\\//g')
@@ -501,8 +501,8 @@ function generate_grpc_pb_mongodb() {
     sponge micro rpc-pb --server-name=$serverName --module-name=edusys --project-name=edusys --protobuf-file=./files/user2.proto --suited-mono-repo=true --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge micro service --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=user_example --embed=false --suited-mono-repo=true --out=$outDir ${markEnd}"
-    sponge micro service --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=user_example --embed=false --suited-mono-repo=true --out=$outDir
+    echo -e "\n${colorCyan}sponge micro service --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=user_example --suited-mono-repo=true --out=$outDir ${markEnd}"
+    sponge micro service --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=user_example --suited-mono-repo=true --out=$outDir
     checkResult $?
 
     sed -E -i 's/\"mysql\"/\"mongodb\"/g' ${outDir}/configs/${serverName}.yml
@@ -541,8 +541,8 @@ function generate_grpc_http_pb_mysql() {
     sponge micro grpc-http-pb --server-name=$serverName --module-name=edusys --project-name=edusys --protobuf-file=./files/user.proto --suited-mono-repo=true --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge micro service-handler --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --embed=false --suited-mono-repo=true --out=$outDir ${markEnd}"
-    sponge micro service-handler --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --embed=false --suited-mono-repo=true --out=$outDir
+    echo -e "\n${colorCyan}sponge micro service-handler --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --suited-mono-repo=true --out=$outDir ${markEnd}"
+    sponge micro service-handler --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --suited-mono-repo=true --out=$outDir
     checkResult $?
 
     mysqlDsnTmp=$(echo "$mysqlDsn" | sed -E 's/\(/\\\(/g' | sed -E 's/\)/\\\)/g' | sed -E 's/\//\\\//g')
@@ -578,8 +578,8 @@ function generate_grpc_http_pb_mongodb() {
     sponge micro grpc-http-pb --server-name=$serverName --module-name=edusys --project-name=edusys --protobuf-file=./files/user.proto --suited-mono-repo=true --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge micro service-handler --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=user_example --embed=false --suited-mono-repo=true --out=$outDir ${markEnd}"
-    sponge micro service-handler --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=user_example --embed=false --suited-mono-repo=true --out=$outDir
+    echo -e "\n${colorCyan}sponge micro service-handler --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=user_example --suited-mono-repo=true --out=$outDir ${markEnd}"
+    sponge micro service-handler --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=user_example --suited-mono-repo=true --out=$outDir
     checkResult $?
 
     sed -E -i 's/\"mysql\"/\"mongodb\"/g' ${outDir}/configs/${serverName}.yml
