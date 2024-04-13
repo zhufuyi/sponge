@@ -44,6 +44,8 @@ type options struct {
 	enableCircuitBreaker bool               // whether to turn on circuit breaker
 	discovery            registry.Discovery // if not nil means use service discovery
 
+	discoveryInsecure bool
+
 	// custom setting
 	dialOptions        []grpc.DialOption              // custom options
 	unaryInterceptors  []grpc.UnaryClientInterceptor  // custom unary interceptor
@@ -58,7 +60,8 @@ func defaultOptions() *options {
 		keyFile:    "",
 		caFile:     "",
 
-		enableLog: false,
+		enableLog:         false,
+		discoveryInsecure: true,
 
 		dialOptions:        nil,
 		unaryInterceptors:  nil,
@@ -131,6 +134,13 @@ func WithEnableRetry() Option {
 func WithEnableCircuitBreaker() Option {
 	return func(o *options) {
 		o.enableCircuitBreaker = true
+	}
+}
+
+// WithDiscoveryInsecure setting discovery insecure
+func WithDiscoveryInsecure(b bool) Option {
+	return func(o *options) {
+		o.discoveryInsecure = b
 	}
 }
 

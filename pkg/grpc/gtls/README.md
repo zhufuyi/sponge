@@ -1,66 +1,88 @@
 ## gtls
 
-gtls provides grpc secure connectivity, supporting both server-only authentication and client-server authentication.
+`gtls` provides grpc secure connectivity by tls, supporting both one-way secure connection and mutual tls connection.
 
-#### Example of use
+### Example of use
 
-#### grpc server
+#### One-way secure connection
+
+**grpc server example**
 
 ```go
 import "github.com/zhufuyi/sponge/pkg/grpc/gtls"
 
 func main() {
-	// one-way authentication (server-side authentication)
-	//credentials, err := gtls.GetServerTLSCredentials(certfile.Path("/one-way/server.crt"), certfile.Path("/one-way/server.key"))
+    // one-way connection
+    credentials, err := gtls.GetServerTLSCredentials(
+        certfile.Path("/one-way/server.crt"),
+        certfile.Path("/one-way/server.key"),
+    )
+    // check err
 
-	// two-way authentication
-	credentials, err := gtls.GetServerTLSCredentialsByCA(
-		certfile.Path("two-way/ca.pem"),
-		certfile.Path("two-way/server/server.pem"),
-		certfile.Path("two-way/server/server.key"),
-	)
-	if err != nil {
-		panic(err)
-	}
-
-	// interceptor
-	opts := []grpc.ServerOption{
-		grpc.Creds(credentials),
-	}
-
-	server := grpc.NewServer(opts...)
-
-	// ......
+    server := grpc.NewServer(grpc.Creds(credentials))
 }
 ```
 
 <br>
 
-#### grpc client
+**grpc client example**
 
 ```go
 import "github.com/zhufuyi/sponge/pkg/grpc/gtls"
 
 func main() {
-	// one-way authentication
-	//credentials, err := gtls.GetClientTLSCredentials("localhost", certfile.Path("/one-way/server.crt"))
-
-	// two-way authentication
-	credentials, err := gtls.GetClientTLSCredentialsByCA(
-		"localhost",
-		certfile.Path("two-way/ca.pem"),
-		certfile.Path("two-way/client/client.pem"),
-		certfile.Path("two-way/client/client.key"),
+    // one-way connection
+    credentials, err := gtls.GetClientTLSCredentials(
+        "localhost",
+        certfile.Path("/one-way/server.crt"),
 	)
-	if err != nil {
-		panic(err)
-	}
+    // check err
 
-	conn, err := grpc.Dial("127.0.0.1:8080", grpc.WithTransportCredentials(credentials))
-	if err != nil {
-		panic(err)
-	}
+    conn, err := grpc.Dial("127.0.0.1:8080", grpc.WithTransportCredentials(credentials))
+    // check err
+}
+```
 
-	// ......
+<br>
+
+#### Mutual tls connection
+
+**grpc server example**
+
+```go
+import "github.com/zhufuyi/sponge/pkg/grpc/gtls"
+
+func main() {
+    // two-way secure connection
+    credentials, err := gtls.GetServerTLSCredentialsByCA(
+        certfile.Path("two-way/ca.pem"),
+        certfile.Path("two-way/server/server.pem"),
+        certfile.Path("two-way/server/server.key"),
+    )
+    // check err
+
+    server := grpc.NewServer(grpc.Creds(credentials))
+}
+```
+
+<br>
+
+**grpc client example**
+
+```go
+import "github.com/zhufuyi/sponge/pkg/grpc/gtls"
+
+func main() {
+    // two-way secure connection
+    credentials, err := gtls.GetClientTLSCredentialsByCA(
+        "localhost",
+        certfile.Path("two-way/ca.pem"),
+        certfile.Path("two-way/client/client.pem"),
+        certfile.Path("two-way/client/client.key"),
+    )
+    // check err
+
+    conn, err := grpc.Dial("127.0.0.1:8080", grpc.WithTransportCredentials(credentials))
+    // check err
 }
 ```

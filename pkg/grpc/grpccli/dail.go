@@ -27,7 +27,7 @@ func Dial(ctx context.Context, endpoint string, opts ...Option) (*grpc.ClientCon
 		clientOptions = append(clientOptions, grpc.WithResolvers(
 			discovery.NewBuilder(
 				o.discovery,
-				discovery.WithInsecure(!o.isSecure()),
+				discovery.WithInsecure(o.discoveryInsecure),
 			)))
 	}
 

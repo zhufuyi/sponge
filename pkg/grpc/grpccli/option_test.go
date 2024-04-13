@@ -93,7 +93,15 @@ func TestWithTimeout(t *testing.T) {
 	opt := WithTimeout(testData)
 	o := new(options)
 	o.apply(opt)
-	assert.Equal(t, testData, o.timeout)
+	assert.Equal(t, testData, o.requestTimeout)
+}
+
+func TestWithDiscoveryInsecure(t *testing.T) {
+	var testData bool
+	opt := WithDiscoveryInsecure(testData)
+	o := new(options)
+	o.apply(opt)
+	assert.Equal(t, testData, o.discoveryInsecure)
 }
 
 func TestWithUnaryInterceptors(t *testing.T) {
