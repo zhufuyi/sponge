@@ -77,6 +77,9 @@ func TestHTTPServerMock(t *testing.T) {
 	addr := fmt.Sprintf(":%d", port)
 
 	o := defaultHTTPOptions()
+	if o.isProd {
+		gin.SetMode(gin.ReleaseMode)
+	}
 	s := &httpServer{
 		addr:      addr,
 		instance:  &registry.ServiceInstance{},
@@ -85,8 +88,6 @@ func TestHTTPServerMock(t *testing.T) {
 	s.server = &http.Server{
 		Addr:           addr,
 		Handler:        http.NewServeMux(),
-		ReadTimeout:    o.readTimeout,
-		WriteTimeout:   o.writeTimeout,
 		MaxHeaderBytes: 1 << 20,
 	}
 

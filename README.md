@@ -47,11 +47,21 @@ Sponge is mainly based on `SQL` and `Protobuf` two ways to generate code, each w
 
 ### Microservice framework
 
-Sponge is essentially a microservice framework that includes code generation capabilities. The microservice framework is shown in the following figure, which is a typical microservice hierarchical structure, with high performance, high scalability, contains commonly used service governance features, you can easily replace or add their own service governance features.
+Sponge is also a microservices framework, the framework diagram is shown below, which is a typical microservice hierarchical structure, with high performance, high scalability, contains commonly used service governance features, you can easily replace or add their own service governance features.
 
 <p align="center">
 <img width="1000px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/microservices-framework.png">
 </p>
+
+<br>
+
+Performance testing of http and grpc service code created by the microservices framework: 50 concurrent, 1 million total requests.
+
+![http-server](https://raw.githubusercontent.com/zhufuyi/microservices_framework_benchmark/main/test/assets/http-server.png)
+
+![grpc-server](https://raw.githubusercontent.com/zhufuyi/microservices_framework_benchmark/main/test/assets/grpc-server.png)
+
+Click to view the [**test code**](https://github.com/zhufuyi/microservices_framework_benchmark).
 
 <br>
 
@@ -83,7 +93,7 @@ Sponge is essentially a microservice framework that includes code generation cap
 
 ### Project Code Directory Structure
 
-The project code directory structure created by sponge follows the [project-layout](https://github.com/golang-standards/project-layout) convention and is structured as follows:
+The project code directory structure created by sponge follows the [project-layout](https://github.com/golang-standards/project-layout) and is structured as follows. Supported repository types are `monolithic application single repository (monolith)`, `microservice multi-repository (multi-repo)`, `microservice single repository (mono-repo)`.
 
 ```bash
 .
@@ -120,7 +130,7 @@ The project code directory structure created by sponge follows the [project-layo
 
 #### Installation sponge
 
-sponge can be installed on Windows, macOS, Linux and Docker environments. Click here for [instructions on installing sponge](https://github.com/zhufuyi/sponge/blob/main/assets/install-en.md).
+Sponge can be installed on Windows, macOS, Linux and Docker environments. Click here for [instructions on installing sponge](https://github.com/zhufuyi/sponge/blob/main/assets/install-en.md).
 
 #### Starting UI service
 
@@ -144,7 +154,7 @@ Detailed instructions for operating, configuring, and deploying a project using 
 
 ### Examples of use
 
-#### Examples of creating a service using sponge
+#### Examples of create services
 
 - [Create **web** service based on **sql** (including CRUD)](https://github.com/zhufuyi/sponge_examples/tree/main/1_web-gin-CRUD)
 - [Create **grpc** service based on **sql** (including CRUD)](https://github.com/zhufuyi/sponge_examples/tree/main/2_micro-grpc-CRUD)
@@ -153,7 +163,7 @@ Detailed instructions for operating, configuring, and deploying a project using 
 - [Create **grpc gateway** service based on **protobuf**](https://github.com/zhufuyi/sponge_examples/tree/main/5_micro-gin-rpc-gateway)
 - [Create **grpc+http** service based on **protobuf**](https://github.com/zhufuyi/sponge_examples/tree/main/a_micro-grpc-http-protobuf)
 
-#### Examples of developing a complete project using sponge
+#### Examples of develop complete project
 
 - [Simple community web backend service](https://github.com/zhufuyi/sponge_examples/tree/main/7_community-single)
 - [Simple community web service broken down into microservice](https://github.com/zhufuyi/sponge_examples/tree/main/8_community-cluster)
