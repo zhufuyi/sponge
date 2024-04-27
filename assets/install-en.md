@@ -1,5 +1,5 @@
 
-Requires go1.20 or higher, [https://go.dev/doc/install](https://go.dev/doc/install)
+Recommended to use go version 1.2.0 or above, [https://go.dev/doc/install](https://go.dev/doc/install)
 
 <br>
 
@@ -31,7 +31,7 @@ sponge -v
 
 > Note: When using sponge development, please use git bash terminal, do not use the system default cmd, otherwise there will be an error that cannot find the command.
 
-In addition to the above installation of sponge in windows, it also provides native installation, click to view **Installing Sponge** --> **Windows Environment** [installation documentation](https://go-sponge.com/quick-start?id=%f0%9f%8f%b7installing-sponge).
+In addition to the above installation of sponge in windows, it also provides native installation, click to view **Installing Sponge** --> **Windows Environment** [installation documentation](https://go-sponge.com/quick-start?id=installing-sponge).
 
 <br>
 

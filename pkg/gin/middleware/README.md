@@ -15,15 +15,17 @@ You can set the maximum length for printing, add a request id field, ignore prin
 
     r := gin.Default()
 
-	// default
+    // default
     r.Use(middleware.Logging()) // simplified logging using middleware.SimpleLog()
 
-	// custom
+    // --- or ---
+
+    // custom
     r.Use(middleware.Logging(    // simplified logging using middleware.SimpleLog(WithRequestIDFromHeader())
         middleware.WithMaxLen(400),
         WithRequestIDFromHeader(),
         //WithRequestIDFromContext(),
-		//middleware.WithLog(log), // custom zap log
+        //middleware.WithLog(log), // custom zap log
         //middleware.WithIgnoreRoutes("/hello"),
     ))
 ```
@@ -50,10 +52,12 @@ Adaptive flow limitation based on hardware resources.
 
     r := gin.Default()
 
-    // e.g. (1) use default
-    // r.Use(middleware.RateLimit())
-    
-    // e.g. (2) custom parameters
+    // default
+    r.Use(middleware.RateLimit())
+
+    // --- or ---
+
+    // custom
     r.Use(middleware.RateLimit(
         WithWindow(time.Second*10),
         WithBucket(100),
@@ -224,8 +228,11 @@ func SpanDemo(serviceName string, spanName string, ctx context.Context) {
 ```go
     import "github.com/zhufuyi/sponge/pkg/gin/middleware"
 
+    // Default request id
     r := gin.Default()
     r.Use(middleware.RequestID())
+
+    // --- or ---
 
     // Customized request id key
     //r.User(middleware.RequestID(
@@ -251,6 +258,8 @@ func SpanDemo(serviceName string, spanName string, ctx context.Context) {
 
     // way1: global set timeout
     r.Use(middleware.Timeout(time.Second*5))
+
+    // --- or ---
 
     // way2: router set timeout
     r.GET("/userExample/:id", middleware.Timeout(time.Second*3), h.GetByID)

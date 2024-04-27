@@ -22,21 +22,11 @@ install:
 	go install golang.org/x/pkgsite/cmd/pkgsite@latest
 # delete the templates code end
 
-.PHONY: mod
-# maintaining module dependencies
-mod:
-	go mod tidy
-
-
-.PHONY: fmt
-# go format *.go files
-fmt:
-	gofmt -s -w .
-
 
 .PHONY: ci-lint
 # check code formatting, naming conventions, security, maintainability, etc. the rules in the .golangci.yml file
-ci-lint: fmt
+ci-lint:
+	@gofmt -s -w .
 	golangci-lint run ./...
 
 
@@ -63,13 +53,15 @@ graph:
 
 # delete the templates code start
 .PHONY: docs
-# generate swagger docs, only for ⓵ Web services created based on sql, the host address can be changed via parameters, e.g. make docs HOST=192.168.3.37
-docs: mod fmt
+# generate swagger docs, only for ⓵ Web services created based on sql
+docs:
+	go mod tidy
+	@gofmt -s -w .
 	@bash scripts/swag-docs.sh $(HOST)
 # delete the templates code end
 
 .PHONY: proto
-# generate *.go and template code by proto files, if you do not refer to the proto file, the default is all the proto files in the api directory. you can specify the proto file, multiple files are separated by commas, e.g. make proto FILES=api/user/v1/user.proto, only for ⓶ Microservices created based on sql, ⓷ Web services created based on protobuf, ⓸ Microservices created based on protobuf, ⓹ grpc gateway service created based on protobuf, ⓺ Create grpc+http service based on protobuf
+# generate *.go and template code by proto files, the default is all the proto files in the api directory. you can specify the proto file, multiple files are separated by commas, e.g. make proto FILES=api/user/v1/user.proto
 proto:
 	@bash scripts/protoc.sh $(FILES)
 	go mod tidy
@@ -105,7 +97,7 @@ image-build-sponge:
 # delete the templates code end
 
 .PHONY: run
-# run service
+# build and run service
 run:
 	@bash scripts/run.sh
 
@@ -171,13 +163,13 @@ image-build-rpc-test:
 
 
 .PHONY: patch
-# patch some dependent code, such as types.proto, mysql initialization code. e.g. make patch TYPE=types-pb , make patch TYPE=init-your_db_driver, replace "your_db_driver" with mysql, mongodb, postgresql, tidb, sqlite
+# patch some dependent code, e.g. make patch TYPE=types-pb , make patch TYPE=init-your_db_driver, replace "your_db_driver" with mysql, mongodb, postgresql, tidb, sqlite
 patch:
 	@bash scripts/patch.sh $(TYPE)
 
 
 .PHONY: copy-proto
-# copy proto file from the grpc server directory, multiple directories or proto files separated by commas. copy all proto files, e.g. make copy-proto SERVER=yourServerDir, copy specified proto files, e.g. make copy-proto SERVER=yourServerDir PROTO_FILE=yourProtoFile1,yourProtoFile2
+# copy proto file from the grpc server directory, multiple directories or proto files separated by commas. default is to copy all proto files, e.g. make copy-proto SERVER=yourServerDir, copy specified proto files, e.g. make copy-proto SERVER=yourServerDir PROTO_FILE=yourProtoFile1,yourProtoFile2
 copy-proto:
 	@sponge patch copy-proto --server-dir=$(SERVER) --proto-file=$(PROTO_FILE)
 
@@ -206,7 +198,7 @@ clean:
 help:
 	@echo ''
 	@echo 'Usage:'
-	@echo ' make [target]'
+	@echo '  make <target>'
 	@echo ''
 	@echo 'Targets:'
 	@awk '/^[a-zA-Z\-_0-9]+:/ { \

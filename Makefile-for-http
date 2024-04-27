@@ -6,21 +6,10 @@ PKG_LIST := $(shell go list ${PKG}/... | grep -v /vendor/ | grep -v /api/)
 
 
 
-.PHONY: mod
-# maintaining module dependencies
-mod:
-	go mod tidy
-
-
-.PHONY: fmt
-# go format *.go files
-fmt:
-	gofmt -s -w .
-
-
 .PHONY: ci-lint
 # check the code specification against the rules in the .golangci.yml file
-ci-lint: fmt
+ci-lint:
+	@gofmt -s -w .
 	golangci-lint run ./...
 
 
@@ -47,8 +36,10 @@ graph:
 
 
 .PHONY: docs
-# generate swagger docs, the host address can be changed via parameters, e.g. make docs HOST=192.168.3.37
-docs: mod fmt
+# generate swagger docs, , only for ⓵ Web services created based on
+docs:
+	go mod tidy
+	@gofmt -s -w .
 	@bash scripts/swag-docs.sh $(HOST)
 
 
@@ -60,7 +51,7 @@ build:
 
 
 .PHONY: run
-# run service
+# build and run service
 run:
 	@bash scripts/run.sh
 
@@ -143,7 +134,7 @@ clean:
 help:
 	@echo ''
 	@echo 'Usage:'
-	@echo ' make [target]'
+	@echo '  make <target>'
 	@echo ''
 	@echo 'Targets:'
 	@awk '/^[a-zA-Z\-_0-9]+:/ { \
