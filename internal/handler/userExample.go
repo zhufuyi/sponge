@@ -57,6 +57,7 @@ func NewUserExampleHandler() UserExampleHandler {
 // @Param data body types.CreateUserExampleRequest true "userExample information"
 // @Success 200 {object} types.CreateUserExampleRespond{}
 // @Router /api/v1/userExample [post]
+// @Security BearerAuth
 func (h *userExampleHandler) Create(c *gin.Context) {
 	form := &types.CreateUserExampleRequest{}
 	err := c.ShouldBindJSON(form)
@@ -93,6 +94,7 @@ func (h *userExampleHandler) Create(c *gin.Context) {
 // @Param id path string true "id"
 // @Success 200 {object} types.DeleteUserExampleByIDRespond{}
 // @Router /api/v1/userExample/{id} [delete]
+// @Security BearerAuth
 func (h *userExampleHandler) DeleteByID(c *gin.Context) {
 	_, id, isAbort := getUserExampleIDFromPath(c)
 	if isAbort {
@@ -120,6 +122,7 @@ func (h *userExampleHandler) DeleteByID(c *gin.Context) {
 // @Produce json
 // @Success 200 {object} types.DeleteUserExamplesByIDsRespond{}
 // @Router /api/v1/userExample/delete/ids [post]
+// @Security BearerAuth
 func (h *userExampleHandler) DeleteByIDs(c *gin.Context) {
 	form := &types.DeleteUserExamplesByIDsRequest{}
 	err := c.ShouldBindJSON(form)
@@ -150,6 +153,7 @@ func (h *userExampleHandler) DeleteByIDs(c *gin.Context) {
 // @Param data body types.UpdateUserExampleByIDRequest true "userExample information"
 // @Success 200 {object} types.UpdateUserExampleByIDRespond{}
 // @Router /api/v1/userExample/{id} [put]
+// @Security BearerAuth
 func (h *userExampleHandler) UpdateByID(c *gin.Context) {
 	_, id, isAbort := getUserExampleIDFromPath(c)
 	if isAbort {
@@ -193,6 +197,7 @@ func (h *userExampleHandler) UpdateByID(c *gin.Context) {
 // @Produce json
 // @Success 200 {object} types.GetUserExampleByIDRespond{}
 // @Router /api/v1/userExample/{id} [get]
+// @Security BearerAuth
 func (h *userExampleHandler) GetByID(c *gin.Context) {
 	idStr, id, isAbort := getUserExampleIDFromPath(c)
 	if isAbort {
@@ -233,6 +238,7 @@ func (h *userExampleHandler) GetByID(c *gin.Context) {
 // @Produce json
 // @Success 200 {object} types.GetUserExampleByConditionRespond{}
 // @Router /api/v1/userExample/condition [post]
+// @Security BearerAuth
 func (h *userExampleHandler) GetByCondition(c *gin.Context) {
 	form := &types.GetUserExampleByConditionRequest{}
 	err := c.ShouldBindJSON(form)
@@ -281,6 +287,7 @@ func (h *userExampleHandler) GetByCondition(c *gin.Context) {
 // @Produce json
 // @Success 200 {object} types.ListUserExamplesByIDsRespond{}
 // @Router /api/v1/userExample/list/ids [post]
+// @Security BearerAuth
 func (h *userExampleHandler) ListByIDs(c *gin.Context) {
 	form := &types.ListUserExamplesByIDsRequest{}
 	err := c.ShouldBindJSON(form)
@@ -326,6 +333,7 @@ func (h *userExampleHandler) ListByIDs(c *gin.Context) {
 // @Param sort query string false "sort by column name of table, and the "-" sign before column name indicates reverse order" default(-id)
 // @Success 200 {object} types.ListUserExamplesRespond{}
 // @Router /api/v1/userExample/list [get]
+// @Security BearerAuth
 func (h *userExampleHandler) ListByLastID(c *gin.Context) {
 	lastID := utils.StrToUint64(c.Query("lastID"))
 	if lastID == 0 {
@@ -365,6 +373,7 @@ func (h *userExampleHandler) ListByLastID(c *gin.Context) {
 // @Param data body types.Params true "query parameters"
 // @Success 200 {object} types.ListUserExamplesRespond{}
 // @Router /api/v1/userExample/list [post]
+// @Security BearerAuth
 func (h *userExampleHandler) List(c *gin.Context) {
 	form := &types.ListUserExamplesRequest{}
 	err := c.ShouldBindJSON(form)

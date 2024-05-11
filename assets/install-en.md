@@ -1,5 +1,5 @@
 
-Recommended to use go version 1.2.0 or above, [https://go.dev/doc/install](https://go.dev/doc/install)
+Recommended to use go version 1.20 or above, [https://go.dev/doc/install](https://go.dev/doc/install)
 
 <br>
 

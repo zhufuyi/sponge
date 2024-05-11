@@ -15,7 +15,7 @@
 
 </div>
 
-**Sponge** is a powerful development framework that integrates `automatic code generation`, `Gin and GRPC`. Sponge has a rich set of code generation commands, and the generated different functional codes can be combined into a complete service (similar to how artificially broken sponge cells can automatically reassemble into a new complete sponge). From development, testing, API documentation to deployment, one-stop project development greatly improves development efficiency and reduces development difficulty, implementation of "low-code way" development projects.
+**Sponge** is a powerful development framework that integrates `automatic code generation`, `Gin and GRPC`. Sponge has a rich set of code generation commands, and the generated different functional codes can be combined into a complete service (similar to how artificially broken sponge cells can automatically reassemble into a new complete sponge). From code generation, development, testing, API documentation to deployment, one-stop project development greatly improves development efficiency and reduces development difficulty, implementation of "low-code way" development projects.
 
 <br>
 
