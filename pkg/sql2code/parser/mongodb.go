@@ -204,10 +204,10 @@ func toLowerFirst(str string) string {
 func embedTimeField(names []string, fields []*MgoField) []*MgoField {
 	isHaveCreatedAt, isHaveUpdatedAt := false, false
 	for _, name := range names {
-		if name == "created_at" {
+		if name == "created_at" || name == "createdAt" {
 			isHaveCreatedAt = true
 		}
-		if name == "updated_at" {
+		if name == "updated_at" || name == "updatedAt" {
 			isHaveUpdatedAt = true
 		}
 		names = append(names, name)

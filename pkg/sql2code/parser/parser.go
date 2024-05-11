@@ -972,7 +972,7 @@ func goTypeToProto(fields []tmplField) []tmplField {
 			field.GoType = "repeated string"
 		}
 
-		if field.DBDriver == DBDriverMongodb {
+		if field.DBDriver == DBDriverMongodb && field.GoType != "" {
 			if field.GoType[0] == '*' {
 				field.GoType = field.GoType[1:]
 			} else if strings.Contains(field.GoType, "[]*") {
