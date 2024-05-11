@@ -21,7 +21,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 	github.com/hashicorp/consul/api v1.12.0
-	github.com/huandu/xstrings v1.3.3
+	github.com/huandu/xstrings v1.4.0
 	github.com/jinzhu/copier v0.3.5
 	github.com/jinzhu/inflection v1.0.0
 	github.com/nacos-group/nacos-sdk-go/v2 v2.1.0
