@@ -3,6 +3,7 @@ package query
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -146,7 +147,8 @@ func (c *Column) convert() error {
 		case lteSymbol:
 			c.Value = bson.M{"$lte": c.Value}
 		case Like:
-			c.Value = bson.M{"$regex": fmt.Sprintf("%v", c.Value)}
+			escapedValue := regexp.QuoteMeta(fmt.Sprintf("%v", c.Value))
+			c.Value = bson.M{"$regex": escapedValue, "$options": "i"}
 		case In:
 			val, ok := c.Value.(string)
 			if !ok {
