@@ -148,7 +148,7 @@ func (c *Column) convert() error {
 			c.Value = bson.M{"$lte": c.Value}
 		case Like:
 			escapedValue := regexp.QuoteMeta(fmt.Sprintf("%v", c.Value))
-			c.Value = bson.M{"$regex": escapedValue}
+			c.Value = bson.M{"$regex": escapedValue, "$options": "i"}
 		case In:
 			val, ok := c.Value.(string)
 			if !ok {
