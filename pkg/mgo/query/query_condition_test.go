@@ -135,7 +135,7 @@ func TestParams_ConvertToMongoFilter(t *testing.T) {
 					},
 				},
 			},
-			want:    bson.M{"name": bson.M{"$regex": "Li"}},
+			want:    bson.M{"name": bson.M{"$options": "i", "$regex": "Li"}},
 			wantErr: false,
 		},
 		{

@@ -117,7 +117,8 @@ database:
 
   # mongodb settings
   mongodb:
-    # dsn format,  <username>:<password>@<hostname1>:<port1>[,<hostname2>:<port2>,......]/<db>?[k=v& ......]
+    # dsn format,  [scheme://]<username>:<password>@<hostname1>:<port1>[,<hostname2>:<port2>,......]/<db>?[k=v& ......]
+    # default scheme is mongodb://, scheme can be omitted, if you want to use ssl, you can use mongodb+srv:// scheme, the scheme must be filled in
     # parameter k=v see https://www.mongodb.com/docs/drivers/go/current/fundamentals/connections/connection-guide/#connection-options
     dsn: "root:123456@192.168.3.37:27017/account?connectTimeoutMS=15000"
 

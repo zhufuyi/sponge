@@ -139,6 +139,7 @@ func CloseDB() error {
 }
 
 // InitMongodb connect mongodb
+// For more information on connecting to mongodb, see https://pkg.go.dev/go.mongodb.org/mongo-driver/mongo#Connect
 func InitMongodb() {
 	var err error
 	var dsn = utils.AdaptiveMongodbDsn(config.Get().Database.Mongodb.Dsn)

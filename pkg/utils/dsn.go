@@ -49,8 +49,9 @@ func AdaptiveSqlite(dbFile string) string {
 
 // AdaptiveMongodbDsn adaptive mongodb dsn
 func AdaptiveMongodbDsn(dsn string) string {
-	if !strings.Contains(dsn, "mongodb://") {
-		dsn = "mongodb://" + dsn
+	if !strings.Contains(dsn, "mongodb://") &&
+		!strings.Contains(dsn, "mongodb+srv://") {
+		dsn = "mongodb://" + dsn // default scheme
 	}
 
 	return deleteBrackets(dsn)

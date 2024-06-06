@@ -42,6 +42,9 @@ func TestAdaptiveMongodbDsn(t *testing.T) {
 
 		"mongodb://root:123456@192.168.3.37:27017/account",
 		"mongodb://root:123456@(192.168.3.37:27017)/account?connectTimeoutMS=15000",
+
+		"mongodb+srv://root:your-mongodb-password@cluster0.abcde.mongodb.net/account",
+		"mongodb+srv://root:your-mongodb-password@(cluster0.abcde.mongodb.net)/account?connectTimeoutMS=15000",
 	}
 	for _, v := range mongoDsns {
 		dsn := AdaptiveMongodbDsn(v)
