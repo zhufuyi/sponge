@@ -906,7 +906,7 @@ func mysqlToGoType(colTp *types.FieldType, style NullStyle) (name string, path s
 			name = "sql.NullTime"
 		case mysql.TypeDecimal, mysql.TypeNewDecimal:
 			name = "sql.NullString"
-		case mysql.TypeJSON:
+		case mysql.TypeJSON, mysql.TypeEnum:
 			name = "sql.NullString"
 		default:
 			return "UnSupport", ""
@@ -935,7 +935,7 @@ func mysqlToGoType(colTp *types.FieldType, style NullStyle) (name string, path s
 			name = "time.Time"
 		case mysql.TypeDecimal, mysql.TypeNewDecimal:
 			name = "string"
-		case mysql.TypeJSON:
+		case mysql.TypeJSON, mysql.TypeEnum:
 			name = "string"
 		default:
 			return "UnSupport", ""
