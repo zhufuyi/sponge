@@ -353,6 +353,7 @@ func TestConsumerErr(t *testing.T) {
 		t.Log(err)
 		return
 	}
+	t.Log(c.Count())
 	c.ch = &amqp.Channel{}
 
 	utils.SafeRunWithTimeout(time.Second, func(cancel context.CancelFunc) {

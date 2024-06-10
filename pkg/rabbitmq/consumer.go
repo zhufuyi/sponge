@@ -4,6 +4,7 @@ import (
 	"context"
 	"strconv"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -79,7 +80,7 @@ func WithConsumerConsumeOptions(opts ...ConsumeOption) ConsumerOption {
 	}
 }
 
-// WithConsumerAutoAck set consumer auto ack option.
+// WithConsumerAutoAck set consumer auto ack option, if false, manual ACK required.
 func WithConsumerAutoAck(enable bool) ConsumerOption {
 	return func(o *consumerOptions) {
 		o.isAutoAck = enable
@@ -233,6 +234,8 @@ type Consumer struct {
 	isAutoAck    bool // auto ack or not
 
 	zapLog *zap.Logger
+
+	count int64 // consumer success message number
 }
 
 // Handler message
@@ -424,6 +427,7 @@ func (c *Consumer) Consume(ctx context.Context, handler Handler) {
 						}
 						c.zapLog.Info("[rabbitmq consumer] manual ack done", zap.String("tagID", tagID))
 					}
+					atomic.AddInt64(&c.count, 1)
 				}
 
 				if isContinueConsume {
@@ -439,4 +443,9 @@ func (c *Consumer) Close() {
 	if c.ch != nil {
 		_ = c.ch.Close()
 	}
+}
+
+// Count consumer success message number
+func (c *Consumer) Count() int64 {
+	return atomic.LoadInt64(&c.count)
 }

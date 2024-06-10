@@ -16,6 +16,7 @@ type producerOptions struct {
 	exchangeDeclare *exchangeDeclareOptions
 	queueDeclare    *queueDeclareOptions
 	queueBind       *queueBindOptions
+	deadLetter      *deadLetterOptions
 
 	isPersistent bool // is it persistent
 
@@ -36,6 +37,7 @@ func defaultProducerOptions() *producerOptions {
 		exchangeDeclare: defaultExchangeDeclareOptions(),
 		queueDeclare:    defaultQueueDeclareOptions(),
 		queueBind:       defaultQueueBindOptions(),
+		deadLetter:      defaultDeadLetterOptions(),
 
 		isPersistent: true,
 		mandatory:    true,
@@ -60,6 +62,13 @@ func WithProducerQueueDeclareOptions(opts ...QueueDeclareOption) ProducerOption 
 func WithProducerQueueBindOptions(opts ...QueueBindOption) ProducerOption {
 	return func(o *producerOptions) {
 		o.queueBind.apply(opts...)
+	}
+}
+
+// WithDeadLetterOptions set dead letter options.
+func WithDeadLetterOptions(opts ...DeadLetterOption) ProducerOption {
+	return func(o *producerOptions) {
+		o.deadLetter.apply(opts...)
 	}
 }
 
@@ -95,6 +104,10 @@ type Producer struct {
 	mandatory bool
 
 	zapLog *zap.Logger
+
+	exchangeArgs  amqp.Table
+	queueArgs     amqp.Table
+	queueBindArgs amqp.Table
 }
 
 // NewProducer create a producer
@@ -133,6 +146,17 @@ func NewProducer(exchange *Exchange, queueName string, connection *Connection, o
 	}
 
 	// declare a queue and create it automatically if it doesn't exist, or skip creation if it does.
+	if o.deadLetter.isEnabled() {
+		if o.queueDeclare.args == nil {
+			o.queueDeclare.args = amqp.Table{
+				"x-dead-letter-exchange":    o.deadLetter.exchangeName,
+				"x-dead-letter-routing-key": o.deadLetter.routingKey,
+			}
+		} else {
+			o.queueDeclare.args["x-dead-letter-exchange"] = o.deadLetter.exchangeName
+			o.queueDeclare.args["x-dead-letter-routing-key"] = o.deadLetter.routingKey
+		}
+	}
 	q, err := ch.QueueDeclare(
 		queueName,
 		o.isPersistent,
@@ -163,13 +187,29 @@ func NewProducer(exchange *Exchange, queueName string, connection *Connection, o
 		return nil, err
 	}
 
+	fields := logFields(queueName, exchange)
+	fields = append(fields, zap.Bool("isPersistent", o.isPersistent))
+
+	// create dead letter exchange and queue if enabled
+	if o.deadLetter.isEnabled() {
+		err = createDeadLetter(ch, o.deadLetter)
+		if err != nil {
+			_ = ch.Close()
+			return nil, err
+		}
+		fields = append(fields, zap.Any("deadLetter", map[string]string{
+			"exchange":   o.deadLetter.exchangeName,
+			"queue":      o.deadLetter.queueName,
+			"routingKey": o.deadLetter.routingKey,
+			"type":       exchangeTypeDirect,
+		}))
+	}
+
 	deliveryMode := amqp.Persistent
 	if !o.isPersistent {
 		deliveryMode = amqp.Transient
 	}
 
-	fields := logFields(queueName, exchange)
-	fields = append(fields, zap.Bool("isPersistent", o.isPersistent))
 	connection.zapLog.Info("[rabbit producer] initialized", fields...)
 
 	return &Producer{
@@ -181,6 +221,10 @@ func NewProducer(exchange *Exchange, queueName string, connection *Connection, o
 		deliveryMode: deliveryMode,
 		mandatory:    o.mandatory,
 		zapLog:       connection.zapLog,
+
+		exchangeArgs:  o.exchangeDeclare.args,
+		queueArgs:     o.queueDeclare.args,
+		queueBindArgs: o.queueBind.args,
 	}, nil
 }
 
@@ -307,6 +351,21 @@ func (p *Producer) Close() {
 	}
 }
 
+// ExchangeArgs returns the exchange declare args.
+func (p *Producer) ExchangeArgs() amqp.Table {
+	return p.exchangeArgs
+}
+
+// QueueArgs returns the queue declare args.
+func (p *Producer) QueueArgs() amqp.Table {
+	return p.queueArgs
+}
+
+// QueueBindArgs returns the queue bind args.
+func (p *Producer) QueueBindArgs() amqp.Table {
+	return p.queueBindArgs
+}
+
 func logFields(queueName string, exchange *Exchange) []zap.Field {
 	fields := []zap.Field{
 		zap.String("queue", queueName),
@@ -328,4 +387,46 @@ func logFields(queueName string, exchange *Exchange) []zap.Field {
 		}
 	}
 	return fields
+}
+
+// -------------------------------------------------------------------------------------------
+
+func createDeadLetter(ch *amqp.Channel, o *deadLetterOptions) error {
+	// declare the exchange type
+	err := ch.ExchangeDeclare(
+		o.exchangeName,
+		exchangeTypeDirect,
+		true,
+		o.exchangeDeclare.autoDelete,
+		o.exchangeDeclare.internal,
+		o.exchangeDeclare.noWait,
+		o.exchangeDeclare.args,
+	)
+	if err != nil {
+		return err
+	}
+
+	// declare a queue and create it automatically if it doesn't exist, or skip creation if it does.
+	q, err := ch.QueueDeclare(
+		o.queueName,
+		true,
+		o.queueDeclare.autoDelete,
+		o.queueDeclare.exclusive,
+		o.queueDeclare.noWait,
+		o.queueDeclare.args,
+	)
+	if err != nil {
+		return err
+	}
+
+	// binding queue and exchange
+	err = ch.QueueBind(
+		q.Name,
+		o.routingKey,
+		o.exchangeName,
+		o.queueBind.noWait,
+		o.queueBind.args,
+	)
+
+	return err
 }

@@ -305,3 +305,69 @@ func WithDelayedMessagePublishHeadersKeys(headersKeys map[string]interface{}) De
 		o.headersKeys = headersKeys
 	}
 }
+
+// -------------------------------------------------------------------------------------------
+
+// DeadLetterOption declare dead letter option.
+type DeadLetterOption func(*deadLetterOptions)
+
+type deadLetterOptions struct {
+	exchangeName string
+	queueName    string
+	routingKey   string
+
+	exchangeDeclare *exchangeDeclareOptions
+	queueDeclare    *queueDeclareOptions
+	queueBind       *queueBindOptions
+}
+
+func (o *deadLetterOptions) apply(opts ...DeadLetterOption) {
+	for _, opt := range opts {
+		opt(o)
+	}
+}
+
+func (o *deadLetterOptions) isEnabled() bool {
+	if o.exchangeName != "" && o.queueName != "" {
+		return true
+	}
+	return false
+}
+
+func defaultDeadLetterOptions() *deadLetterOptions {
+	return &deadLetterOptions{
+		exchangeDeclare: defaultExchangeDeclareOptions(),
+		queueDeclare:    defaultQueueDeclareOptions(),
+		queueBind:       defaultQueueBindOptions(),
+	}
+}
+
+// WithDeadLetterExchangeDeclareOptions set dead letter exchange declare option.
+func WithDeadLetterExchangeDeclareOptions(opts ...ExchangeDeclareOption) DeadLetterOption {
+	return func(o *deadLetterOptions) {
+		o.exchangeDeclare.apply(opts...)
+	}
+}
+
+// WithDeadLetterQueueDeclareOptions set dead letter queue declare option.
+func WithDeadLetterQueueDeclareOptions(opts ...QueueDeclareOption) DeadLetterOption {
+	return func(o *deadLetterOptions) {
+		o.queueDeclare.apply(opts...)
+	}
+}
+
+// WithDeadLetterQueueBindOptions set dead letter queue bind option.
+func WithDeadLetterQueueBindOptions(opts ...QueueBindOption) DeadLetterOption {
+	return func(o *deadLetterOptions) {
+		o.queueBind.apply(opts...)
+	}
+}
+
+// WithDeadLetter set dead letter exchange, queue, routing key.
+func WithDeadLetter(exchangeName string, queueName string, routingKey string) DeadLetterOption {
+	return func(o *deadLetterOptions) {
+		o.exchangeName = exchangeName
+		o.queueName = queueName
+		o.routingKey = routingKey
+	}
+}

@@ -32,6 +32,8 @@ func TestProducerOptions(t *testing.T) {
 		),
 		WithProducerPersistent(true),
 		WithProducerMandatory(true),
+
+		WithDeadLetterOptions(WithDeadLetter("dl-exchange", "dl-queue", "dl-routing-key")),
 	}
 
 	o := defaultProducerOptions()

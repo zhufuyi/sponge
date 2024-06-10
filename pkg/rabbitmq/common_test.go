@@ -89,3 +89,22 @@ func TestDelayedMessagePublishOptions(t *testing.T) {
 	assert.Equal(t, "key1.key2", o.topicKey)
 	assert.Equal(t, "bar", o.headersKeys["foo"])
 }
+
+func TestDelayedMessageConsumeOptions(t *testing.T) {
+	opts := []DeadLetterOption{
+		WithDeadLetter("dl-exchange", "dl-queue", "dl-routing-key"),
+		WithDeadLetterExchangeDeclareOptions(WithExchangeDeclareAutoDelete(false)),
+		WithDeadLetterQueueDeclareOptions(WithQueueDeclareAutoDelete(false)),
+		WithDeadLetterQueueBindOptions(WithQueueBindArgs(map[string]interface{}{"foo": "bar"})),
+	}
+	o := defaultDeadLetterOptions()
+	o.apply(opts...)
+	assert.Equal(t, "dl-exchange", o.exchangeName)
+	assert.Equal(t, "dl-queue", o.queueName)
+	assert.Equal(t, "dl-routing-key", o.routingKey)
+	assert.Equal(t, true, o.isEnabled())
+
+	o = defaultDeadLetterOptions()
+	o.apply()
+	assert.Equal(t, false, o.isEnabled())
+}
