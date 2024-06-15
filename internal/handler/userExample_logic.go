@@ -50,6 +50,7 @@ func (h *userExamplePbHandler) Create(ctx context.Context, req *serverNameExampl
 	if err != nil {
 		return nil, ecode.ErrCreateUserExample.Err()
 	}
+	// Note: if copier.Copy cannot assign a value to a field, add it here
 
 	err = h.userExampleDao.Create(ctx, userExample)
 	if err != nil {
@@ -107,6 +108,7 @@ func (h *userExamplePbHandler) UpdateByID(ctx context.Context, req *serverNameEx
 	if err != nil {
 		return nil, ecode.ErrUpdateByIDUserExample.Err()
 	}
+	// Note: if copier.Copy cannot assign a value to a field, add it here
 	userExample.ID = req.Id
 
 	err = h.userExampleDao.UpdateByID(ctx, userExample)
@@ -264,6 +266,7 @@ func (h *userExamplePbHandler) List(ctx context.Context, req *serverNameExampleV
 	if err != nil {
 		return nil, ecode.ErrListUserExample.Err()
 	}
+	// Note: if copier.Copy cannot assign a value to a field, add it here
 	params.Size = int(req.Params.Limit)
 
 	records, total, err := h.userExampleDao.GetByColumns(ctx, params)

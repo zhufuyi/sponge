@@ -60,6 +60,7 @@ func (s *userExample) Create(ctx context.Context, req *serverNameExampleV1.Creat
 	if err != nil {
 		return nil, ecode.StatusCreateUserExample.Err()
 	}
+	// Note: if copier.Copy cannot assign a value to a field, add it here
 
 	err = s.iDao.Create(ctx, record)
 	if err != nil {
@@ -120,6 +121,7 @@ func (s *userExample) UpdateByID(ctx context.Context, req *serverNameExampleV1.U
 	if err != nil {
 		return nil, ecode.StatusUpdateByIDUserExample.Err()
 	}
+	// Note: if copier.Copy cannot assign a value to a field, add it here
 	record.ID = req.Id
 
 	err = s.iDao.UpdateByID(ctx, record)
@@ -280,6 +282,7 @@ func (s *userExample) List(ctx context.Context, req *serverNameExampleV1.ListUse
 	if err != nil {
 		return nil, ecode.StatusListUserExample.Err()
 	}
+	// Note: if copier.Copy cannot assign a value to a field, add it here
 	params.Size = int(req.Params.Limit)
 
 	records, total, err := s.iDao.GetByColumns(ctx, params)

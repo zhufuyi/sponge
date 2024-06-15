@@ -73,6 +73,7 @@ func (h *userExampleHandler) Create(c *gin.Context) {
 		response.Error(c, ecode.ErrCreateUserExample)
 		return
 	}
+	// Note: if copier.Copy cannot assign a value to a field, add it here
 
 	ctx := middleware.WrapCtx(c)
 	err = h.iDao.Create(ctx, userExample)
@@ -176,6 +177,7 @@ func (h *userExampleHandler) UpdateByID(c *gin.Context) {
 		response.Error(c, ecode.ErrUpdateByIDUserExample)
 		return
 	}
+	// Note: if copier.Copy cannot assign a value to a field, add it here
 
 	ctx := middleware.WrapCtx(c)
 	err = h.iDao.UpdateByID(ctx, userExample)
@@ -224,6 +226,7 @@ func (h *userExampleHandler) GetByID(c *gin.Context) {
 		response.Error(c, ecode.ErrGetByIDUserExample)
 		return
 	}
+	// Note: if copier.Copy cannot assign a value to a field, add it here
 	data.ID = idStr
 
 	response.Success(c, gin.H{"userExample": data})
@@ -273,6 +276,7 @@ func (h *userExampleHandler) GetByCondition(c *gin.Context) {
 		response.Error(c, ecode.ErrGetByIDUserExample)
 		return
 	}
+	// Note: if copier.Copy cannot assign a value to a field, add it here
 	data.ID = utils.Uint64ToStr(userExample.ID)
 
 	response.Success(c, gin.H{"userExample": data})
@@ -420,6 +424,7 @@ func convertUserExample(userExample *model.UserExample) (*types.UserExampleObjDe
 	if err != nil {
 		return nil, err
 	}
+	// Note: if copier.Copy cannot assign a value to a field, add it here
 	data.ID = utils.Uint64ToStr(userExample.ID)
 	return data, nil
 }
