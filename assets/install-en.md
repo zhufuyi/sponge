@@ -56,7 +56,7 @@ export PATH=$PATH:$GOBIN:$GOROOT/bin  # Add the GOBIN directory to the system en
 # Save .bashrc file, and make the settings take effect
 source ~/.bashrc
 
-# View the GOBIN directory
+# View the GOBIN directory, if the output is not empty, the setting is successful.
 go env GOBIN
 ```
 
@@ -83,6 +83,8 @@ sponge plugins
 # Check Sponge version
 sponge -v
 ```
+
+> Note: Do not open the terminal in the `GOBIN` directory to execute the command `sponge run`.
 
 <br>
 

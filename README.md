@@ -76,6 +76,7 @@ Click to view the [**test code**](https://github.com/zhufuyi/microservices_frame
 - Cache component [go-redis](https://github.com/go-redis/redis), [ristretto](https://github.com/dgraph-io/ristretto)
 - Automated API documentation [swagger](https://github.com/swaggo/swag), [protoc-gen-openapiv2](https://github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2)
 - Authentication [jwt](https://github.com/golang-jwt/jwt)
+- Websocket [gorilla/websocket](https://github.com/gorilla/websocket)
 - Message Queue [rabbitmq](https://github.com/rabbitmq/amqp091-go)
 - Distributed Transaction Manager [dtm](https://github.com/dtm-labs/dtm)
 - Parameter validation [validator](https://github.com/go-playground/validator)
