@@ -73,5 +73,5 @@ func Sync() error {
 
 // WithFields carrying field information
 func WithFields(fields ...Field) *zap.Logger {
-	return getLogger().With(fields...)
+	return GetWithSkip(0).With(fields...)
 }
