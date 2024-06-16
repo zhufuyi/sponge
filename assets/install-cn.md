@@ -35,7 +35,7 @@ sponge -v
 注意：
 
 - 使用sponge开发项目时，请使用git bash终端，不要使用系统默认的cmd，否则会出现找不到命令的错误。
-- 不要在`GOBIN`目录下打开终端来执行命令`sponge run`。
+- 不要在`GOBIN`目录(sponge可执行文件所在的目录)下打开终端来执行命令`sponge run`。
 
 在windows除了上面安装sponge方式，还提供了原生安装，点击查看【安装 sponge】 --> 【windows环境】[安装文档](https://go-sponge.com/zh-cn/quick-start?id=%e5%ae%89%e8%a3%85-sponge)。
 

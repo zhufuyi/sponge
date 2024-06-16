@@ -29,7 +29,10 @@ sponge init
 sponge -v
 ```
 
-> Note: When using sponge development, please use git bash terminal, do not use the system default cmd, otherwise there will be an error that cannot find the command.
+Note: 
+
+- When using sponge development, please use git bash terminal, do not use the system default cmd, otherwise there will be an error that cannot find the command.
+- Do not open a terminal in the `GOBIN` directory (the directory where the sponge executable is located) to execute the command `sponge run`.
 
 In addition to the above installation of sponge in windows, it also provides native installation, click to view **Installing Sponge** --> **Windows Environment** [installation documentation](https://go-sponge.com/quick-start?id=installing-sponge).
 

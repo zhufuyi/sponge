@@ -6,9 +6,9 @@
 
 <br>
 
-如果开发只有CRUD api的web或微服务，不需要编写任何go代码就可以编译并部署到linux服务器、docker、k8s上，只需要连接到数据库(mysql、mongodb、postgresql、tidb、sqlite)就可以一键自动生成完整的后端服务go代码。
+如果开发只有CRUD api的web或gRPC服务，不需要编写任何go代码就可以编译并部署到linux服务器、docker、k8s上，只需要连接到数据库(mysql、mongodb、postgresql、tidb、sqlite)就可以一键自动生成完整的后端服务go代码。
 
-如果开发通用的web或微服务，只需聚焦`在数据库定义表`、`在proto文件定义api描述信息`、`在生成的模板文件填写业务逻辑代码`三个核心部分，其他go代码都由sponge自动生成。
+如果开发通用的web或gRPC务，只需聚焦`在数据库定义表`、`在proto文件定义api描述信息`、`在生成的模板文件填写业务逻辑代码`三个核心部分，其他go代码都由sponge自动生成。
 
 <br>
 
