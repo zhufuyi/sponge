@@ -255,7 +255,7 @@ func ConvertToSQLByMgoFields(tableName string, fields []*MgoField) (string, map[
 			continue
 		}
 
-		fieldStr += fmt.Sprintf("    %s %s,\n", field.Name, convertMongoToMysqlType(field.Type))
+		fieldStr += fmt.Sprintf("    `%s` %s,\n", field.Name, convertMongoToMysqlType(field.Type))
 		if field.ObjectStr != "" {
 			objectStrs = append(objectStrs, field.ObjectStr)
 			protoObjectStrs = append(protoObjectStrs, field.ProtoObjectStr)

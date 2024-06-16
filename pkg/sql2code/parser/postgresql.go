@@ -46,7 +46,7 @@ ORDER BY a.attnum;`, tableName)
 	if result.Error != nil {
 		return nil, fmt.Errorf("failed to get table fields: %v", result.Error)
 	}
-	//printString(fields)
+
 	return fields, nil
 }
 
@@ -55,8 +55,8 @@ func ConvertToSQLByPgFields(tableName string, fields []*PGField) (string, map[st
 	fieldStr := ""
 	pgTypeMap := make(map[string]string) // name:type
 	for _, field := range fields {
-		sqlType := toMysqlType(field)
 		pgTypeMap[field.Name] = getType(field)
+		sqlType := toMysqlType(field)
 		if field.Name == "id" {
 			fieldStr += fmt.Sprintf("    %s bigint unsigned primary key,\n", field.Name)
 			continue
@@ -65,11 +65,11 @@ func ConvertToSQLByPgFields(tableName string, fields []*PGField) (string, map[st
 		if !field.Notnull {
 			notnullStr = "null"
 		}
-		fieldStr += fmt.Sprintf("    %s %s %s comment '%s',\n", field.Name, sqlType, notnullStr, field.Comment)
+		fieldStr += fmt.Sprintf("    `%s` %s %s comment '%s',\n", field.Name, sqlType, notnullStr, field.Comment)
 	}
 	fieldStr = strings.TrimSuffix(fieldStr, ",\n")
-
-	return fmt.Sprintf("CREATE TABLE %s (\n%s\n);", tableName, fieldStr), pgTypeMap
+	sqlStr := fmt.Sprintf("CREATE TABLE %s (\n%s\n);", tableName, fieldStr)
+	return sqlStr, pgTypeMap
 }
 
 // nolint
@@ -81,7 +81,7 @@ func toMysqlType(field *PGField) string {
 		return "bigint"
 	case "real":
 		return "float"
-	case "decimal", "numeric":
+	case "decimal", "numeric", "float4", "float8":
 		return "decimal"
 	case "double precision":
 		return "double"
@@ -103,7 +103,11 @@ func toMysqlType(field *PGField) string {
 		return "time" //nolint
 	case "interval":
 		return "year"
-	case "boolean":
+	case "json", "jsonb":
+		return "json"
+	case "boolean", "bool":
+		return "bool"
+	case "bit":
 		return "tinyint(1)"
 	}
 

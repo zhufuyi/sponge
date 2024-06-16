@@ -153,8 +153,8 @@ func Test_mysqlToGoType(t *testing.T) {
 	}
 	var names []string
 	for _, d := range fields {
-		name1, _ := mysqlToGoType(d, NullInSql)
-		name2, _ := mysqlToGoType(d, NullInPointer)
+		name1, _, _ := mysqlToGoType(d, NullInSql)
+		name2, _, _ := mysqlToGoType(d, NullInPointer)
 		names = append(names, name1, name2)
 	}
 	t.Log(names)
@@ -198,14 +198,21 @@ func TestGetMysqlTableInfo(t *testing.T) {
 }
 
 func TestGetPostgresqlTableInfo(t *testing.T) {
-	fields, err := GetPostgresqlTableInfo("host=192.168.3.37 port=5432 user=root password=123456 dbname=account sslmode=disable", "user_example")
+	var (
+		dbname    = "account"
+		tableName = "user_example"
+		dsn       = fmt.Sprintf("host=192.168.3.37 port=5432 user=root password=123456 dbname=%s sslmode=disable", dbname)
+	)
+
+	fields, err := GetPostgresqlTableInfo(dsn, tableName)
 	if err != nil {
 		t.Log(err)
 		return
 	}
 	printPGFields(fields)
-	sql, fieldTypes := ConvertToSQLByPgFields("user_example", fields)
-	t.Log(sql, fieldTypes)
+	sql, fieldTypes := ConvertToSQLByPgFields(tableName, fields)
+	t.Log(sql)
+	t.Log(fieldTypes)
 }
 
 func TestGetSqliteTableInfo(t *testing.T) {
@@ -214,13 +221,20 @@ func TestGetSqliteTableInfo(t *testing.T) {
 }
 
 func TestGetMongodbTableInfo(t *testing.T) {
-	fields, err := GetMongodbTableInfo("mongodb://root:123456@192.168.3.37:27017/account", "people")
+	var (
+		dbname    = "account"
+		tableName = "people"
+		dsn       = fmt.Sprintf("mongodb://root:123456@192.168.3.37:27017/%s", dbname)
+	)
+
+	fields, err := GetMongodbTableInfo(dsn, tableName)
 	if err != nil {
 		t.Log(err)
 		return
 	}
-	sql, fieldTypes := ConvertToSQLByMgoFields("people", fields)
-	t.Log(sql, fieldTypes)
+	sql, fieldTypes := ConvertToSQLByMgoFields(tableName, fields)
+	t.Log(sql)
+	t.Log(fieldTypes)
 }
 
 func TestConvertToSQLByPgFields(t *testing.T) {
