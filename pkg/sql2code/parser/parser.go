@@ -520,6 +520,7 @@ func makeCode(stmt *ast.CreateTableStmt, opt options) (*codeText, error) {
 	}, nil
 }
 
+// nolint
 func getModelStructCode(data tmplData, importPaths []string, isEmbed bool) (string, []string, error) {
 	// filter to ignore field fields
 	var newFields = []tmplField{}
