@@ -14,22 +14,22 @@
 package main
 
 import (
-	"context"
-	"log"
+    "context"
+    "log"
     "github.com/zhufuyi/sponge/pkg/ws"
     "github.com/gin-gonic/gin"
 )
 
 func main() {
-	r := gin.Default()
+    r := gin.Default()
 	
-	r.GET("/ws", func(c *gin.Context) {
-		s := ws.NewServer(c.Writer, c.Request, loopReceiveMessage) // default setting
-		err := s.Run(context.Background())
-		if err != nil {
-			log.Println("webSocket server error:", err)
-		}
-	})
+    r.GET("/ws", func(c *gin.Context) {
+        s := ws.NewServer(c.Writer, c.Request, loopReceiveMessage) // default setting
+        err := s.Run(context.Background())
+        if err != nil {
+            log.Println("webSocket server error:", err)
+        }
+    })
 	
     err := r.Run(":8080")
     if err != nil {
@@ -41,7 +41,7 @@ func loopReceiveMessage(ctx context.Context, conn *ws.Conn) {
     for {
         messageType, message, err := conn.ReadMessage()
         // handle message
-		log.Println(messageType, message, err)
+        log.Println(messageType, message, err)
     }
 }
 ```
@@ -54,42 +54,42 @@ func loopReceiveMessage(ctx context.Context, conn *ws.Conn) {
 package main
 
 import (
-	"strconv"
-	"log"
-	"time"
-	"github.com/zhufuyi/sponge/pkg/ws"
-	"github.com/gorilla/websocket"
+    "strconv"
+    "log"
+    "time"
+    "github.com/zhufuyi/sponge/pkg/ws"
+    "github.com/gorilla/websocket"
 )
 
 var wsURL = "ws://localhost:8080/ws"
 
 func main() {
-	c, err := ws.NewClient(wsURL)
-	if err != nil {
-		log.Println("connect error:", err)
-		return
-	}
-	defer c.Close()
+    c, err := ws.NewClient(wsURL)
+    if err != nil {
+        log.Println("connect error:", err)
+        return
+    }
+    defer c.Close()
 
-	go func() {
-		for {
-			_, message, err := c.GetConn().ReadMessage()
-			if err != nil {
-				log.Println("client read error:", err)
-				return
-			}
-			log.Printf("client received: %s", message)
-		}
-	}()
-	
-	for i := 0; i < 5; i++ {
-		data := "Hello, World " + strconv.Itoa(i)
-		err = c.GetConn().WriteMessage(websocket.TextMessage, []byte(data))
-		if err != nil {
-			log.Println("write error:", err)
-		}
-		time.Sleep(100 * time.Millisecond)
-	}
+    go func() {
+        for {
+            _, message, err := c.GetConn().ReadMessage()
+            if err != nil {
+                log.Println("client read error:", err)
+                return
+            }
+            log.Printf("client received: %s", message)
+        }
+    }()
+    
+    for i := 0; i < 5; i++ {
+        data := "Hello, World " + strconv.Itoa(i)
+        err = c.GetConn().WriteMessage(websocket.TextMessage, []byte(data))
+        if err != nil {
+            log.Println("write error:", err)
+        }
+        time.Sleep(100 * time.Millisecond)
+    }
 }
 ```
 
@@ -103,33 +103,33 @@ func main() {
 package main
 
 import (
-	"context"
-	"log"
-	"time"
-	"http"
+    "context"
+    "log"
+    "time"
+    "http"
     "github.com/zhufuyi/sponge/pkg/ws"
     "github.com/gin-gonic/gin"
-	"github.com/gorilla/websocket"
+    "github.com/gorilla/websocket"
 )
 
 func main() {
-	r := gin.Default()
-	ug := &websocket.Upgrader{
-		CheckOrigin: func(r *http.Request) bool {
-			return true
-		},
-	}	
-	r.GET("/ws", func(c *gin.Context) {
-		s := ws.NewServer(c.Writer, c.Request, loopReceiveMessage,
-			ws.WithUpgrader(ug),
-			ws.WithMaxMessageWaitPeriod(time.Minute),
-		)
-		err := s.Run(context.Background())
-		if err != nil {
-			log.Println("webSocket server error:", err)
-		}
-	})
-	
+    r := gin.Default()
+    ug := &websocket.Upgrader{
+        CheckOrigin: func(r *http.Request) bool {
+            return true
+        },
+    }    
+    r.GET("/ws", func(c *gin.Context) {
+        s := ws.NewServer(c.Writer, c.Request, loopReceiveMessage,
+            ws.WithUpgrader(ug),
+            ws.WithMaxMessageWaitPeriod(time.Minute),
+        )
+        err := s.Run(context.Background())
+        if err != nil {
+            log.Println("webSocket server error:", err)
+        }
+    })
+    
     err := r.Run(":8080")
     if err != nil {
         panic(err)
@@ -137,11 +137,11 @@ func main() {
 }
 
 func loopReceiveMessage(ctx context.Context, conn *ws.Conn) {
-	for {
-		messageType, message, err := conn.ReadMessage()
-		// handle message
-		log.Println(messageType, message, err)
-	}
+    for {
+        messageType, message, err := conn.ReadMessage()
+        // handle message
+        log.Println(messageType, message, err)
+    }
 }
 ```
 
@@ -153,46 +153,46 @@ func loopReceiveMessage(ctx context.Context, conn *ws.Conn) {
 package main
 
 import (
-	"strconv"
-	"log"
-	"time"
-	"github.com/zhufuyi/sponge/pkg/ws"
-	"github.com/gorilla/websocket"
+    "strconv"
+    "log"
+    "time"
+    "github.com/zhufuyi/sponge/pkg/ws"
+    "github.com/gorilla/websocket"
 )
 
 var wsURL = "ws://localhost:8080/ws"
 
 func main() {
-	c, err := NewClient(wsURL,
-		WithDialer(websocket.DefaultDialer),
-		WithPing(time.Second*10),
-	)
-	if err != nil {
-		log.Println("connect error:", err)
-		return
-	}
-	defer c.Close()
+    c, err := NewClient(wsURL,
+        WithDialer(websocket.DefaultDialer),
+        WithPing(time.Second*10),
+    )
+    if err != nil {
+        log.Println("connect error:", err)
+        return
+    }
+    defer c.Close()
 
-	go func() {
-		for {
-			_, message, err := c.GetConn().ReadMessage()
-			if err != nil {
-				log.Println("client read error:", err)
-				return
-			}
-			log.Printf("client received: %s", message)
-		}
-	}()
+    go func() {
+        for {
+            _, message, err := c.GetConn().ReadMessage()
+            if err != nil {
+                log.Println("client read error:", err)
+                return
+            }
+            log.Printf("client received: %s", message)
+        }
+    }()
 
-	for i := 5; i < 10; i++ {
-		data := "Hello, World " + strconv.Itoa(i)
-		err = c.GetConn().WriteMessage(websocket.TextMessage, []byte(data))
-		if err != nil {
-			log.Println("write error:", err)
-		}
-		time.Sleep(100 * time.Millisecond)
-	}
+    for i := 5; i < 10; i++ {
+        data := "Hello, World " + strconv.Itoa(i)
+        err = c.GetConn().WriteMessage(websocket.TextMessage, []byte(data))
+        if err != nil {
+            log.Println("write error:", err)
+        }
+        time.Sleep(100 * time.Millisecond)
+    }
 
-	<-time.After(time.Minute)
+    <-time.After(time.Minute)
 }
 ```

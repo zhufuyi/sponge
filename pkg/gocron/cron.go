@@ -25,8 +25,9 @@ type Task struct {
 	// "0 15,45 9-12 * * * "  indicates execution at the 15th and 45th minutes from 9 a.m. to 12 a.m. each day
 	TimeSpec string
 
-	Name string // task name
-	Fn   func() // task
+	Name      string // task name
+	Fn        func() // task function
+	IsRunOnce bool   // if the task is only run once
 }
 
 // Init initialize and start timed tasks
@@ -62,6 +63,11 @@ func Run(tasks ...*Task) error {
 			continue
 		}
 
+		if err := checkRunOnce(task); err != nil {
+			errs = append(errs, err.Error())
+			continue
+		}
+
 		id, err := c.AddFunc(task.TimeSpec, task.Fn)
 		if err != nil {
 			errs = append(errs, fmt.Sprintf("run task '%s' error: %v", task.Name, err))
@@ -75,6 +81,20 @@ func Run(tasks ...*Task) error {
 		return errors.New(strings.Join(errs, " || "))
 	}
 
+	return nil
+}
+
+func checkRunOnce(task *Task) error {
+	if task.Fn == nil {
+		return fmt.Errorf("task '%s' is nil", task.Name)
+	}
+	if task.IsRunOnce {
+		job := task.Fn
+		task.Fn = func() {
+			job()
+			DeleteTask(task.Name)
+		}
+	}
 	return nil
 }
 
@@ -94,7 +114,7 @@ func GetRunningTasks() []string {
 	return names
 }
 
-// DeleteTask delete task
+// DeleteTask stop and delete the specified task
 func DeleteTask(name string) {
 	if id, ok := nameID.Load(name); ok {
 		entryID, isOk := id.(cron.EntryID)
@@ -107,7 +127,7 @@ func DeleteTask(name string) {
 	}
 }
 
-// Stop scheduled task
+// Stop all scheduled tasks
 func Stop() {
 	if c != nil {
 		c.Stop()

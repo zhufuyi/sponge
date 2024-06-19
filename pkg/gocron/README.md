@@ -22,9 +22,8 @@ var task1 = func() {
 }
 
 var taskOnce = func() {
-	taskName := "taskOnce"
-    fmt.Println("this is taskOnce")
-    gocron.DeleteTask(taskName)
+    fmt.Println("this is task2, only run once")
+    fmt.Println("running task list:", gocron.GetRunningTasks())
 }
 
 func main() {
@@ -41,14 +40,15 @@ func main() {
         },
         {
             Name:     "taskOnce",
-            TimeSpec: "@every 5s",
+            TimeSpec: "@every 3s",
             Fn:       taskOnce,
+            IsRunOnce: true,  // run only once
         },
     }...)
 
-    time.Sleep(time.Minute)
+    time.Sleep(time.Second * 10)
 
-    // delete task1
+    // stop task1
     gocron.DeleteTask("task1")
 
     // view running tasks

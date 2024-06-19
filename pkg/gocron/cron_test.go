@@ -50,36 +50,53 @@ func TestInitAndRun(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	time.Sleep(time.Second * 7)
+	time.Sleep(time.Second * 3)
+	err = Run(tasks[0])
+	if err != nil {
+		t.Log(err)
+	}
+	time.Sleep(time.Second * 4)
+	Stop()
 }
 
 func TestRunOnce(t *testing.T) {
 	myTask := func() {
 		taskName := "myTask"
-		fmt.Println("running task list:", GetRunningTasks())
 		fmt.Printf("the task '%s' is executed only once\n", taskName)
-		DeleteTask(taskName)
-		fmt.Println("running task list:", GetRunningTasks())
+		t.Log("running task list:", GetRunningTasks())
 	}
 
-	tasks := []*Task{
-		{
-			Name:     "myTask",
-			Fn:       myTask,
-			TimeSpec: "@every 2s",
-		},
+	task := &Task{
+		Name:      "myTask",
+		Fn:        myTask,
+		TimeSpec:  "@every 2s",
+		IsRunOnce: true,
 	}
 
 	err := Init(WithLog(zap.NewNop()))
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = Run(tasks...)
+	err = Run(task)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	time.Sleep(time.Second * 5)
+	time.Sleep(time.Second * 3)
+	t.Log("running task list:", GetRunningTasks())
+
+	// err test
+	task = &Task{
+		Name:     "myTask2",
+		TimeSpec: "@every 2s",
+	}
+	err = Run(task)
+	if err != nil {
+		t.Log(err)
+	}
+
+	time.Sleep(time.Second)
+
 	Stop()
 }
 
