@@ -15,7 +15,7 @@ func GetMysqlTableInfo(dsn, tableName string) (string, error) {
 	}
 	defer db.Close() //nolint
 
-	rows, err := db.Query("SHOW CREATE TABLE " + tableName)
+	rows, err := db.Query("SHOW CREATE TABLE `" + tableName + "`")
 	if err != nil {
 		return "", fmt.Errorf("query show create table error, %v", err)
 	}

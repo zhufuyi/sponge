@@ -68,7 +68,7 @@ func ConvertToSQLByPgFields(tableName string, fields []*PGField) (string, map[st
 		fieldStr += fmt.Sprintf("    `%s` %s %s comment '%s',\n", field.Name, sqlType, notnullStr, field.Comment)
 	}
 	fieldStr = strings.TrimSuffix(fieldStr, ",\n")
-	sqlStr := fmt.Sprintf("CREATE TABLE %s (\n%s\n);", tableName, fieldStr)
+	sqlStr := fmt.Sprintf("CREATE TABLE `%s` (\n%s\n);", tableName, fieldStr)
 	return sqlStr, pgTypeMap
 }
 

@@ -271,7 +271,7 @@ func ConvertToSQLByMgoFields(tableName string, fields []*MgoField) (string, map[
 		srcMongoTypeMap[ProtoSubStructKey] = strings.Join(protoObjectStrs, "\n") + "\n"
 	}
 
-	return fmt.Sprintf("CREATE TABLE %s (\n%s\n);", tableName, fieldStr), srcMongoTypeMap
+	return fmt.Sprintf("CREATE TABLE `%s` (\n%s\n);", tableName, fieldStr), srcMongoTypeMap
 }
 
 // nolint
