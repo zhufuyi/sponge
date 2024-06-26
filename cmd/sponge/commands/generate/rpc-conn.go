@@ -115,18 +115,11 @@ func (g *grpcConnectionGenerator) generateCode() (string, error) {
 		return "", errors.New("replacer is nil")
 	}
 
-	// setting up template information
-	subDirs := []string{ // only the specified subdirectory is processed, if empty or no subdirectory is specified, it means all files
-		"internal/rpcclient",
-	}
-	ignoreDirs := []string{} // specify the directory in the subdirectory where processing is ignored
-	ignoreFiles := []string{ // specify the files in the subdirectory to be ignored for processing
-		"doc.go", "serverNameExample_test.go",
-	}
+	// specify the subdirectory and files
+	subDirs := []string{}
+	subFiles := []string{"internal/rpcclient/serverNameExample.go"}
 
-	r.SetSubDirsAndFiles(subDirs)
-	r.SetIgnoreSubDirs(ignoreDirs...)
-	r.SetIgnoreSubFiles(ignoreFiles...)
+	r.SetSubDirsAndFiles(subDirs, subFiles...)
 	_ = r.SetOutputDir(g.outPath, subTplName)
 	fields := g.addFields(r)
 	r.SetReplacementFields(fields)

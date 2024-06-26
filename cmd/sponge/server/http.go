@@ -75,8 +75,6 @@ func RunHTTPServer(spongeAddr string, port int, isLog bool) {
 	server := &http.Server{
 		Addr:           fmt.Sprintf(":%d", port),
 		Handler:        router,
-		ReadTimeout:    10 * time.Second,
-		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
 

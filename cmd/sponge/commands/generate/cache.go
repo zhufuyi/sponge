@@ -134,21 +134,11 @@ func (g *stringCacheGenerator) generateCode() (string, error) {
 		g.prefixKey += ":"
 	}
 
-	// setting up template information
-	subDirs := []string{ // only the specified subdirectory is processed, if empty or no subdirectory is specified, it means all files
-		"internal/cache",
-	}
-	ignoreDirs := []string{} // specify the directory in the subdirectory where processing is ignored
-	ignoreFiles := []string{ // specify the files in the subdirectory to be ignored for processing
-		"doc.go",
-		"userExample.go",
-		"userExample.go.mgo",
-		"userExample_test.go",
-	}
+	// specify the subdirectory and files
+	subDirs := []string{}
+	subFiles := []string{"internal/cache/cacheNameExample.go"}
 
-	r.SetSubDirsAndFiles(subDirs)
-	r.SetIgnoreSubDirs(ignoreDirs...)
-	r.SetIgnoreSubFiles(ignoreFiles...)
+	r.SetSubDirsAndFiles(subDirs, subFiles...)
 	_ = r.SetOutputDir(g.outPath, subTplName)
 	fields := g.addFields(r)
 	r.SetReplacementFields(fields)

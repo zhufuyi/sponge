@@ -152,7 +152,7 @@ func handleGenerateCode(c *gin.Context, outPath string, arg string) {
 	out = os.TempDir() + gofile.GetPathDelimiter() + "sponge-generate-code" + gofile.GetPathDelimiter() + out
 	args = append(args, fmt.Sprintf("--out=%s", out))
 
-	ctx, _ := context.WithTimeout(context.Background(), time.Second*10) // nolint
+	ctx, _ := context.WithTimeout(context.Background(), time.Minute*2) // nolint
 	result := gobash.Run(ctx, "sponge", args...)
 	for v := range result.StdOut {
 		_ = v

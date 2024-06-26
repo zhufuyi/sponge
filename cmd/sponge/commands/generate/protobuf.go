@@ -134,18 +134,11 @@ func (g *protobufGenerator) generateCode() (string, error) {
 		g.serverName = g.moduleName
 	}
 
-	// setting up template information
-	subDirs := []string{ // only the specified subdirectory is processed, if empty or no subdirectory is specified, it means all files
-		"api/serverNameExample",
-	}
-	ignoreDirs := []string{} // specify the directory in the subdirectory where processing is ignored
-	ignoreFiles := []string{ // specify the files in the subdirectory to be ignored for processing
-		"userExample.pb.go", "userExample.pb.validate.go",
-		"userExample_grpc.pb.go", "userExample_router.pb.go"}
+	// specify the subdirectory and files
+	subDirs := []string{}
+	subFiles := []string{"api/serverNameExample/v1/userExample.proto"}
 
-	r.SetSubDirsAndFiles(subDirs)
-	r.SetIgnoreSubDirs(ignoreDirs...)
-	r.SetIgnoreSubFiles(ignoreFiles...)
+	r.SetSubDirsAndFiles(subDirs, subFiles...)
 	fields := g.addFields(r)
 	r.SetReplacementFields(fields)
 	_ = r.SetOutputDir(g.outPath, subTplName)

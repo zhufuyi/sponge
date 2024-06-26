@@ -111,35 +111,50 @@ func (g *rpcGwPbGenerator) generateCode() error {
 		return errors.New("replacer is nil")
 	}
 
-	// setting up template information
-	subDirs := []string{ // processing-only subdirectories
-		"api/types", "cmd/serverNameExample_grpcGwPbExample",
-		"sponge/configs", "sponge/deployments", "sponge/docs", "sponge/scripts", "sponge/third_party",
-		"internal/config", "internal/ecode", "internal/routers", "internal/server",
+	// specify the subdirectory and files
+	subDirs := []string{
+		"cmd/serverNameExample_grpcGwPbExample",
+		"sponge/configs",
+		"sponge/deployments", "sponge/scripts", "sponge/third_party",
 	}
-	subFiles := []string{ // processing of sub-documents only
+	subFiles := []string{
 		"sponge/.gitignore", "sponge/.golangci.yml", "sponge/go.mod", "sponge/go.sum",
 		"sponge/Jenkinsfile", "sponge/Makefile", "sponge/README.md",
 	}
+
 	if g.suitedMonoRepo {
 		subFiles = removeElements(subFiles, "sponge/go.mod", "sponge/go.sum")
 	}
-	ignoreDirs := []string{"cmd/sponge"} // specify the directory in the subdirectory where processing is ignored
-	ignoreFiles := []string{             // specify the files in the subdirectory to be ignored for processing
-		"types.pb.validate.go", "types.pb.go", // api/types
-		"swagger.json", "swagger.yaml", "apis.swagger.json", "apis.html", "docs.go", // sponge/docs
-		"userExample_rpc.go", "systemCode_http.go", "userExample_http.go", // internal/ecode
-		"routers_pbExample_test.go", "routers.go", "routers_test.go", "userExample.go", "userExample_router.go", // internal/routers
-		"grpc.go", "grpc_option.go", "grpc_test.go", // internal/server
+	if isImportTypes {
+		subFiles = append(subFiles, "api/types/types.proto")
 	}
 
-	if !isImportTypes {
-		ignoreFiles = append(ignoreFiles, "types.proto")
+	selectFiles := map[string][]string{
+		"docs": {
+			"apis.go", "apis.swagger.json",
+		},
+		"internal/config": {
+			"serverNameExample.go", "serverNameExample_test.go", "serverNameExample_cc.go",
+		},
+		"internal/ecode": {
+			"systemCode_rpc.go",
+		},
+		"internal/routers": {
+			"routers_pbExample.go",
+		},
+		"internal/server": {
+			"http.go", "http_test.go", "http_option.go",
+		},
 	}
+	replaceFiles := make(map[string][]string)
+
+	subFiles = append(subFiles, getSubFiles(selectFiles, replaceFiles)...)
+
+	// ignore some directories
+	ignoreDirs := []string{"cmd/sponge"}
 
 	r.SetSubDirsAndFiles(subDirs, subFiles...)
 	r.SetIgnoreSubDirs(ignoreDirs...)
-	r.SetIgnoreSubFiles(ignoreFiles...)
 	_ = r.SetOutputDir(g.outPath, g.serverName+"_"+subTplName)
 	fields := g.addFields(r)
 	r.SetReplacementFields(fields)

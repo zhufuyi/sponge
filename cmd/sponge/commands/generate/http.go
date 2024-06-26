@@ -114,11 +114,11 @@ Examples:
 				}
 
 				hg := &handlerGenerator{
-					moduleName: moduleName,
-					dbDriver:   sqlArgs.DBDriver,
-					codes:      codes,
-					outPath:    outPath,
-
+					moduleName:     moduleName,
+					dbDriver:       sqlArgs.DBDriver,
+					codes:          codes,
+					outPath:        outPath,
+					isEmbed:        sqlArgs.IsEmbed,
 					serverName:     serverName,
 					suitedMonoRepo: suitedMonoRepo,
 				}
@@ -163,16 +163,18 @@ using help:
 }
 
 type httpGenerator struct {
-	moduleName  string
-	serverName  string
-	projectName string
-	repoAddr    string
-	dbDSN       string
-	dbDriver    string
-	codes       map[string]string
-	outPath     string
-
+	moduleName     string
+	serverName     string
+	projectName    string
+	repoAddr       string
+	dbDSN          string
+	dbDriver       string
+	codes          map[string]string
+	outPath        string
+	isEmbed        bool
 	suitedMonoRepo bool
+
+	fields []replacer.Field
 }
 
 func (g *httpGenerator) generateCode() (string, error) {
@@ -182,53 +184,83 @@ func (g *httpGenerator) generateCode() (string, error) {
 		return "", errors.New("replacer is nil")
 	}
 
-	// setting up template information
-	subDirs := []string{ // specify the subdirectory for processing
-		"cmd/serverNameExample_httpExample", "sponge/configs", "sponge/deployments",
-		"sponge/docs", "sponge/scripts", "sponge/internal",
+	// specify the subdirectory and files
+	subDirs := []string{
+		"cmd/serverNameExample_httpExample", "sponge/configs", "sponge/deployments", "sponge/scripts",
 	}
-	subFiles := []string{ // specify the sub-documents to be processed
+	subFiles := []string{
 		"sponge/.gitignore", "sponge/.golangci.yml", "sponge/go.mod", "sponge/go.sum",
 		"sponge/Jenkinsfile", "sponge/Makefile-for-http", "sponge/README.md",
 	}
 	if g.suitedMonoRepo {
 		subFiles = removeElements(subFiles, "sponge/go.mod", "sponge/go.sum")
 	}
-	ignoreDirs := []string{ // specify the directory in the subdirectory where processing is ignored
-		"internal/service", "internal/rpcclient", "cmd/sponge",
+
+	selectFiles := map[string][]string{
+		"docs": {
+			"docs.go",
+		},
+		"internal/cache": {
+			"userExample.go", "userExample_test.go",
+		},
+		"internal/config": {
+			"serverNameExample.go", "serverNameExample_test.go", "serverNameExample_cc.go",
+		},
+		"internal/dao": {
+			"userExample.go", "userExample_test.go",
+		},
+		"internal/ecode": {
+			"systemCode_http.go", "userExample_http.go",
+		},
+		"internal/handler": {
+			"userExample.go", "userExample_test.go",
+		},
+		"internal/model": {
+			"init.go", "userExample.go",
+		},
+		"internal/routers": {
+			"routers.go", "userExample.go",
+		},
+		"internal/server": {
+			"http.go", "http_test.go", "http_option.go",
+		},
+		"internal/types": {
+			"swagger_types.go", "userExample_types.go",
+		},
 	}
-	var ignoreFiles []string
+	replaceFiles := make(map[string][]string)
+
 	switch strings.ToLower(g.dbDriver) {
 	case DBDriverMysql, DBDriverPostgresql, DBDriverTidb, DBDriverSqlite:
-		ignoreFiles = []string{ // specify the files in the subdirectory to be ignored for processing
-			"swagger.json", "swagger.yaml", "apis.swagger.json", "apis.html", "apis.go", // sponge/docs
-			"userExample_rpc.go", "systemCode_rpc.go", // internal/ecode
-			"routers_pbExample.go", "routers_pbExample_test.go", "userExample_router.go", // internal/routers
-			"grpc.go", "grpc_option.go", "grpc_test.go", // internal/server
-			"scripts/image-rpc-test.sh", "scripts/patch.sh", "scripts/protoc.sh", "scripts/proto-doc.sh", // sponge/scripts
-			"init_test.go", "init.go.mgo", // model
-			"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", "cache/userExample.go.mgo", // internal/cache
-			"dao/userExample.go.mgo",                                                                                                              // internal/dao
-			"handler/userExample_logic.go", "handler/userExample_logic_test.go", "handler/userExample.go.mgo", "handler/userExample_logic.go.mgo", // internal/handler
-			"userExample_types.go.mgo", // internal/types
-		}
+		g.fields = append(g.fields, getExpectedSQLForDeletionField(g.isEmbed)...)
+
 	case DBDriverMongodb:
-		ignoreFiles = []string{ // specify the files in the subdirectory to be ignored for processing
-			"swagger.json", "swagger.yaml", "apis.swagger.json", "apis.html", "apis.go", // sponge/docs
-			"userExample_rpc.go", "systemCode_rpc.go", // internal/ecode
-			"routers_pbExample.go", "routers_pbExample_test.go", "userExample_router.go", // internal/routers
-			"grpc.go", "grpc_option.go", "grpc_test.go", // internal/server
-			"scripts/image-rpc-test.sh", "scripts/patch.sh", "scripts/protoc.sh", "scripts/proto-doc.sh", // sponge/scripts
-			"init_test.go", "init.go", // model
-			"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", "cache/userExample.go", "cache/userExample_test.go", // internal/cache
-			"dao/userExample_test.go", "dao/userExample.go", // internal/dao
-			"handler/userExample_logic.go", "handler/userExample_logic_test.go", "handler/userExample.go", "handler/userExample_test.go", "handler/userExample_logic.go.mgo", // internal/handler
-			"userExample_types.go", // internal/types
+		replaceFiles = map[string][]string{
+			"internal/cache": {
+				"userExample.go.mgo",
+			},
+			"internal/dao": {
+				"userExample.go.mgo",
+			},
+			"internal/handler": {
+				"userExample.go.mgo",
+			},
+			"internal/model": {
+				"init.go.mgo", "userExample.go",
+			},
+			"internal/types": {
+				"swagger_types.go", "userExample_types.go.mgo",
+			},
 		}
 	default:
 		return "", errors.New("unsupported db driver: " + g.dbDriver)
 	}
-	ignoreFiles = append(ignoreFiles, "handler/userExample.go.service")
+
+	subFiles = append(subFiles, getSubFiles(selectFiles, replaceFiles)...)
+
+	// ignore some directories and files
+	ignoreDirs := []string{"cmd/sponge"}
+	ignoreFiles := []string{"scripts/image-rpc-test.sh", "scripts/patch.sh", "scripts/protoc.sh", "scripts/proto-doc.sh"}
 
 	r.SetSubDirsAndFiles(subDirs, subFiles...)
 	r.SetIgnoreSubDirs(ignoreDirs...)
@@ -248,6 +280,10 @@ func (g *httpGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	var fields []replacer.Field
 
 	repoHost, _ := parseImageRepoAddr(g.repoAddr)
+
+	for _, field := range g.fields {
+		fields = append(fields, field)
+	}
 
 	fields = append(fields, deleteFieldsMark(r, modelFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, modelInitDBFile, startMark, endMark)...)

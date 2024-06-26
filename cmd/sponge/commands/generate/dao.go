@@ -94,9 +94,9 @@ Examples:
 					isIncludeInitDB: isIncludeInitDB,
 					codes:           codes,
 					outPath:         outPath,
-
-					serverName:     serverName,
-					suitedMonoRepo: suitedMonoRepo,
+					serverName:      serverName,
+					isEmbed:         sqlArgs.IsEmbed,
+					suitedMonoRepo:  suitedMonoRepo,
 				}
 				outPath, err = g.generateCode()
 				if err != nil {
@@ -138,9 +138,11 @@ type daoGenerator struct {
 	isIncludeInitDB bool
 	codes           map[string]string
 	outPath         string
+	isEmbed         bool
+	serverName      string
+	suitedMonoRepo  bool
 
-	serverName     string
-	suitedMonoRepo bool
+	fields []replacer.Field
 }
 
 func (g *daoGenerator) generateCode() (string, error) {
@@ -150,38 +152,43 @@ func (g *daoGenerator) generateCode() (string, error) {
 		return "", errors.New("r is nil")
 	}
 
-	// setting up template information
-	subDirs := []string{ // only the specified subdirectory is processed, if empty or no subdirectory is specified, it means all files
-		"internal/model", "internal/cache", "internal/dao",
+	// specify the subdirectory and files
+	subDirs := []string{}
+	subFiles := []string{}
+
+	selectFiles := map[string][]string{
+		"internal/cache": {
+			"userExample.go", "userExample_test.go",
+		},
+		"internal/dao": {
+			"userExample.go", "userExample_test.go",
+		},
+		"internal/model": {
+			"userExample.go",
+		},
 	}
-	ignoreDirs := []string{} // specify the directory in the subdirectory where processing is ignored
-	var ignoreFiles []string
+	replaceFiles := make(map[string][]string)
+
 	switch strings.ToLower(g.dbDriver) {
 	case DBDriverMysql, DBDriverPostgresql, DBDriverTidb, DBDriverSqlite:
-		ignoreFiles = []string{ // specify the files in the subdirectory to be ignored for processing
-			"init.go", "init_test.go", "init.go.mgo", // internal/model
-			"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", "cache/userExample.go.mgo", // internal/cache
-			"dao/userExample.go.mgo", // internal/dao
-		}
-		if g.isIncludeInitDB {
-			ignoreFiles = removeElement(ignoreFiles, "init.go")
-		}
+		g.fields = append(g.fields, getExpectedSQLForDeletionField(g.isEmbed)...)
+
 	case DBDriverMongodb:
-		ignoreFiles = []string{ // specify the files in the subdirectory to be ignored for processing
-			"init.go", "init_test.go", "init.go.mgo", // internal/model
-			"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", "cache/userExample.go", "cache/userExample_test.go", // internal/cache
-			"dao/userExample_test.go", "dao/userExample.go", // internal/dao
-		}
-		if g.isIncludeInitDB {
-			ignoreFiles = removeElement(ignoreFiles, "init.go.mgo")
+		replaceFiles = map[string][]string{
+			"internal/cache": {
+				"userExample.go.mgo",
+			},
+			"internal/dao": {
+				"userExample.go.mgo",
+			},
 		}
 	default:
 		return "", errors.New("unsupported db driver: " + g.dbDriver)
 	}
 
-	r.SetSubDirsAndFiles(subDirs)
-	r.SetIgnoreSubDirs(ignoreDirs...)
-	r.SetIgnoreSubFiles(ignoreFiles...)
+	subFiles = append(subFiles, getSubFiles(selectFiles, replaceFiles)...)
+
+	r.SetSubDirsAndFiles(subDirs, subFiles...)
 	_ = r.SetOutputDir(g.outPath, subTplName)
 	fields := g.addFields(r)
 	r.SetReplacementFields(fields)
@@ -195,6 +202,10 @@ func (g *daoGenerator) generateCode() (string, error) {
 // set fields
 func (g *daoGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	var fields []replacer.Field
+
+	for _, field := range g.fields {
+		fields = append(fields, field)
+	}
 
 	fields = append(fields, deleteFieldsMark(r, modelFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, daoFile, startMark, endMark)...)

@@ -374,7 +374,7 @@ func genNewNum(numMap map[int]struct{}) int {
 	count := 0
 	for {
 		count++
-		newNum := krand.Int(100)
+		newNum := krand.Int(99)
 		if _, ok := numMap[newNum]; !ok {
 			numMap[newNum] = struct{}{}
 			return newNum

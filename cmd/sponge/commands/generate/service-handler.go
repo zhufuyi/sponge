@@ -86,13 +86,12 @@ Examples:
 				}
 
 				g := &serviceAndHandlerGenerator{
-					moduleName: moduleName,
-					serverName: serverName,
-					dbDriver:   sqlArgs.DBDriver,
-					isEmbed:    sqlArgs.IsEmbed,
-					codes:      codes,
-					outPath:    outPath,
-
+					moduleName:     moduleName,
+					serverName:     serverName,
+					dbDriver:       sqlArgs.DBDriver,
+					isEmbed:        sqlArgs.IsEmbed,
+					codes:          codes,
+					outPath:        outPath,
 					suitedMonoRepo: suitedMonoRepo,
 				}
 				outPath, err = g.generateCode()
@@ -134,14 +133,15 @@ using help:
 }
 
 type serviceAndHandlerGenerator struct {
-	moduleName string
-	serverName string
-	dbDriver   string
-	isEmbed    bool
-	codes      map[string]string
-	outPath    string
-
+	moduleName     string
+	serverName     string
+	dbDriver       string
+	isEmbed        bool
+	codes          map[string]string
+	outPath        string
 	suitedMonoRepo bool
+
+	fields []replacer.Field
 }
 
 // nolint
@@ -156,37 +156,56 @@ func (g *serviceAndHandlerGenerator) generateCode() (string, error) {
 		g.serverName = g.moduleName
 	}
 
-	// setting up template information
-	subDirs := []string{"internal/model", "internal/cache", "internal/dao",
-		"internal/service", "internal/handler", "api/serverNameExample"} // only the specified subdirectory is processed, if empty or no subdirectory is specified, it means all files
-	ignoreDirs := []string{} // specify the directory in the subdirectory where processing is ignored
-	var ignoreFiles []string
+	// specify the subdirectory and files
+	subDirs := []string{}
+	subFiles := []string{}
+
+	selectFiles := map[string][]string{
+		"api/serverNameExample/v1": {
+			"userExample.proto",
+		},
+		"internal/cache": {
+			"userExample.go", "userExample_test.go",
+		},
+		"internal/dao": {
+			"userExample.go", "userExample_test.go",
+		},
+		"internal/handler": {
+			"userExample.go.service",
+		},
+		"internal/model": {
+			"userExample.go",
+		},
+		"internal/service": {
+			"userExample.go", "userExample_client_test.go",
+		},
+	}
+	replaceFiles := make(map[string][]string)
+
 	switch strings.ToLower(g.dbDriver) {
 	case DBDriverMysql, DBDriverPostgresql, DBDriverTidb, DBDriverSqlite:
-		ignoreFiles = []string{ // specify the files in the subdirectory to be ignored for processing
-			"userExample.pb.go", "userExample.pb.validate.go", "userExample_grpc.pb.go", "userExample_router.pb.go", // api/serverNameExample/v1
-			"init.go", "init_test.go", "init.go.mgo", // internal/model
-			"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", "cache/userExample.go.mgo", // internal/cache
-			"dao/userExample.go.mgo",                                                                                                                                                                            // internal/dao
-			"service.go", "service_test.go", "service/userExample_logic.go", "userExample_logic_test.go", "service/userExample_test.go", "service/userExample.go.mgo", "service/userExample_client_test.go.mgo", // internal/service
-			"handler/userExample.go", "handler/userExample.go.mgo", "handler/userExample_test.go", "handler/userExample_logic_test.go", "handler/userExample_logic.go", "handler/userExample_logic.go.mgo", // internal/handler
-		}
+		g.fields = append(g.fields, getExpectedSQLForDeletionField(g.isEmbed)...)
+
 	case DBDriverMongodb:
-		ignoreFiles = []string{ // specify the files in the subdirectory to be ignored for processing
-			"userExample.pb.go", "userExample.pb.validate.go", "userExample_grpc.pb.go", "userExample_router.pb.go", // api/serverNameExample/v1
-			"init.go", "init_test.go", "init.go.mgo", // internal/model
-			"doc.go", "cacheNameExample.go", "cacheNameExample_test.go", "cache/userExample.go", "cache/userExample_test.go", // internal/cache
-			"dao/userExample_test.go", "dao/userExample.go", // internal/dao
-			"service.go", "service_test.go", "service/userExample_logic.go", "userExample_logic_test.go", "service/userExample_test.go", "service/userExample.go", "service/userExample_client_test.go", // internal/service
-			"handler/userExample.go", "handler/userExample.go.mgo", "handler/userExample_test.go", "handler/userExample_logic_test.go", "handler/userExample_logic.go", "handler/userExample_logic.go.mgo", // internal/handler
+		replaceFiles = map[string][]string{
+			"internal/cache": {
+				"userExample.go.mgo",
+			},
+			"internal/dao": {
+				"userExample.go.mgo",
+			},
+			"internal/service": {
+				"userExample.go.mgo", "userExample_client_test.go.mgo",
+			},
 		}
+		serviceLogicFile += ".mgo"
 	default:
 		return "", errors.New("unsupported db driver: " + g.dbDriver)
 	}
 
-	r.SetSubDirsAndFiles(subDirs)
-	r.SetIgnoreSubDirs(ignoreDirs...)
-	r.SetIgnoreSubFiles(ignoreFiles...)
+	subFiles = append(subFiles, getSubFiles(selectFiles, replaceFiles)...)
+
+	r.SetSubDirsAndFiles(subDirs, subFiles...)
 	_ = r.SetOutputDir(g.outPath, subTplName)
 	fields := g.addFields(r)
 	r.SetReplacementFields(fields)
@@ -199,6 +218,10 @@ func (g *serviceAndHandlerGenerator) generateCode() (string, error) {
 
 func (g *serviceAndHandlerGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	var fields []replacer.Field
+
+	for _, field := range g.fields {
+		fields = append(fields, field)
+	}
 
 	fields = append(fields, deleteFieldsMark(r, modelFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, daoFile, startMark, endMark)...)

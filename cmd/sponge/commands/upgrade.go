@@ -129,6 +129,9 @@ func copyToTempDir(targetVersion string) (string, error) {
 		return "", err
 	}
 	_ = executeCommand("rm", "-rf", targetDir+"/cmd/sponge")
+	_ = executeCommand("rm", "-rf", targetDir+"/pkg")
+	_ = executeCommand("rm", "-rf", targetDir+"/test")
+	_ = executeCommand("rm", "-rf", targetDir+"/assets")
 
 	versionNum := strings.Replace(spongeDirName, "sponge@", "", 1)
 	err = os.WriteFile(versionFile, []byte(versionNum), 0644)

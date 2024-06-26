@@ -102,16 +102,11 @@ func (g *modelGenerator) generateCode() (string, error) {
 		return "", errors.New("replacer is nil")
 	}
 
-	// setting up template information
-	subDirs := []string{"internal/model"} // only the specified subdirectory is processed, if empty or no subdirectory is specified, it means all files
-	ignoreDirs := []string{}              // specify the directory in the subdirectory where processing is ignored
-	ignoreFiles := []string{              // specify the files in the subdirectory to be ignored for processing
-		"init.go", "init_test.go", "init.go.mgo",
-	}
+	// specify the subdirectory and files
+	subDirs := []string{}
+	subFiles := []string{"internal/model/userExample.go"}
 
-	r.SetSubDirsAndFiles(subDirs)
-	r.SetIgnoreSubDirs(ignoreDirs...)
-	r.SetIgnoreSubFiles(ignoreFiles...)
+	r.SetSubDirsAndFiles(subDirs, subFiles...)
 	fields := g.addFields(r)
 	r.SetReplacementFields(fields)
 	_ = r.SetOutputDir(g.outPath, subTplName)

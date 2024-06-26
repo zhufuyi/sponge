@@ -50,10 +50,11 @@ var (
 	daoFileMark = "// todo generate the update fields code to here"
 	daoTestFile = "dao/userExample_test.go"
 
-	handlerFile     = "types/userExample_types.go"
-	handlerMgoFile  = "types/userExample_types.go.mgo"
-	handlerFileMark = "// todo generate the request and response struct to here"
-	handlerTestFile = "handler/userExample_test.go"
+	handlerFile       = "types/userExample_types.go"
+	handlerMgoFile    = "types/userExample_types.go.mgo"
+	handlerFileMark   = "// todo generate the request and response struct to here"
+	handlerTestFile   = "handler/userExample_test.go"
+	handlerPbTestFile = "handler/userExample_logic_test.go"
 
 	handlerLogicFile = "handler/userExample_logic.go"
 	serviceLogicFile = "service/userExample.go"
@@ -97,6 +98,8 @@ var (
 	appConfigFile      = "configs/serverNameExample.yml"
 	appConfigFileMark  = "# todo generate http or rpc server configuration here"
 	appConfigFileMark2 = "# todo generate the database configuration here"
+
+	expectedSQLForDeletion = "expectedSQLForDeletion := \"UPDATE .*\""
 
 	//deploymentConfigFile     = "kubernetes/serverNameExample-configmap.yml"
 	//deploymentConfigFileMark = "# todo generate the database configuration for deployment here"
@@ -190,7 +193,7 @@ func deleteFieldsMark(r replacer.Replacer, filename string, startMark []byte, en
 
 	data, err := r.ReadFile(filename)
 	if err != nil {
-		fmt.Printf("readFile error: %v, please execute the \"sponge upgrade\" command to resolve\n ", err)
+		//fmt.Printf("readFile error: %v\n", err)
 		return fields
 	}
 	if subBytes := gofile.FindSubBytes(data, startMark, endMark); len(subBytes) > 0 {
@@ -215,7 +218,7 @@ func deleteAllFieldsMark(r replacer.Replacer, filename string, startMark []byte,
 
 	data, err := r.ReadFile(filename)
 	if err != nil {
-		fmt.Printf("readFile error: %v, please execute the \"sponge upgrade\" command to resolve\n ", err)
+		//fmt.Printf("readFile error: %v\n", err)
 		return fields
 	}
 	allSubBytes := gofile.FindAllSubBytes(data, startMark, endMark)
@@ -469,6 +472,40 @@ func getEmbedTimeCode(isEmbed bool) string {
 	return ""
 }
 
+func getExpectedSQLForDeletion(isEmbed bool) string {
+	if !isEmbed {
+		return strings.ReplaceAll(expectedSQLForDeletion, "UPDATE", "DELETE")
+	}
+
+	return expectedSQLForDeletion
+}
+
+func getExpectedSQLForDeletionField(isEmbed bool) []replacer.Field {
+	var fields []replacer.Field
+	esql := getExpectedSQLForDeletion(isEmbed)
+	if esql != expectedSQLForDeletion {
+		fields = append(fields, []replacer.Field{
+			{
+				Old: expectedSQLForDeletion,
+				New: getExpectedSQLForDeletion(isEmbed),
+			},
+			{
+				Old: "expectedArgsForDeletionTime := d.AnyTime",
+				New: "",
+			},
+			{
+				Old: "expectedArgsForDeletionTime := h.MockDao.AnyTime",
+				New: "",
+			},
+			{
+				Old: "WithArgs(expectedArgsForDeletionTime, testData.ID)",
+				New: "WithArgs(testData.ID)",
+			},
+		}...)
+	}
+	return fields
+}
+
 func convertYamlConfig(configFile string) (string, error) {
 	f, err := os.Open(configFile)
 	if err != nil {
@@ -615,4 +652,17 @@ func changeOutPath(outPath string, serverName string) string {
 		return serverName
 	}
 	return outPath + gofile.GetPathDelimiter() + serverName
+}
+
+func getSubFiles(selectFiles map[string][]string, replaceFiles map[string][]string) []string {
+	files := []string{}
+	for dir, filenames := range selectFiles {
+		if v, ok := replaceFiles[dir]; ok {
+			filenames = v
+		}
+		for _, filename := range filenames {
+			files = append(files, dir+"/"+filename)
+		}
+	}
+	return files
 }

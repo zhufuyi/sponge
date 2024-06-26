@@ -99,7 +99,6 @@ type httpAndGRPCPbGenerator struct {
 	suitedMonoRepo bool
 }
 
-// nolint
 func (g *httpAndGRPCPbGenerator) generateCode() error {
 	protobufFiles, isImportTypes, err := parseProtobufFiles(g.protobufFile)
 	if err != nil {
@@ -112,36 +111,50 @@ func (g *httpAndGRPCPbGenerator) generateCode() error {
 		return errors.New("replacer is nil")
 	}
 
-	// setting up template information
-	subDirs := []string{ // processing-only subdirectories
-		"api/types", "cmd/serverNameExample_grpcHttpPbExample",
-		"sponge/configs", "sponge/deployments", "sponge/docs", "sponge/scripts", "sponge/third_party",
-		"internal/config", "internal/ecode", "internal/server", "internal/service", "internal/routers",
+	// specify the subdirectory and files
+	subDirs := []string{
+		"cmd/serverNameExample_grpcHttpPbExample", "sponge/configs",
+		"sponge/deployments", "sponge/scripts", "sponge/third_party",
 	}
-	subFiles := []string{ // processing of sub-documents only
+	subFiles := []string{
 		"sponge/.gitignore", "sponge/.golangci.yml", "sponge/go.mod", "sponge/go.sum",
 		"sponge/Jenkinsfile", "sponge/Makefile", "sponge/README.md",
 	}
 	if g.suitedMonoRepo {
 		subFiles = removeElements(subFiles, "sponge/go.mod", "sponge/go.sum")
 	}
-	ignoreDirs := []string{"cmd/sponge"} // specify the directory in the subdirectory where processing is ignored
-	ignoreFiles := []string{             // specify the files in the subdirectory to be ignored for processing
-		"types.pb.validate.go", "types.pb.go", // api/types
-		"swagger.json", "swagger.yaml", "apis.swagger.json", "apis.html", "docs.go", // sponge/docs
-		"userExample_http.go", "userExample_rpc.go", // internal/ecode
-		"routers_pbExample_test.go", "routers.go", "routers_test.go", "userExample.go", "userExample_router.go", // internal/routers
-		"grpc_test.go", "http_test.go", // internal/server
-		"userExample.go", "userExample_client_test.go", "userExample_logic.go", "userExample_logic_test.go", "userExample_test.go", "userExample.go.mgo", "userExample_client_test.go.mgo", // internal/service
+	if isImportTypes {
+		subFiles = append(subFiles, "api/types/types.proto")
 	}
 
-	if !isImportTypes {
-		ignoreFiles = append(ignoreFiles, "types.proto")
+	selectFiles := map[string][]string{
+		"docs": {
+			"apis.go", "apis.swagger.json",
+		},
+		"internal/config": {
+			"serverNameExample.go", "serverNameExample_test.go", "serverNameExample_cc.go",
+		},
+		"internal/ecode": {
+			"systemCode_http.go", "systemCode_rpc.go",
+		},
+		"internal/routers": {
+			"routers_pbExample.go",
+		},
+		"internal/server": {
+			"http.go", "http_option.go", "grpc.go", "grpc_option.go",
+		},
+		"internal/service": {
+			"service.go", "service_test.go",
+		},
 	}
+	replaceFiles := make(map[string][]string)
+	subFiles = append(subFiles, getSubFiles(selectFiles, replaceFiles)...)
+
+	// ignore some directories
+	ignoreDirs := []string{"cmd/sponge"}
 
 	r.SetSubDirsAndFiles(subDirs, subFiles...)
 	r.SetIgnoreSubDirs(ignoreDirs...)
-	r.SetIgnoreSubFiles(ignoreFiles...)
 	_ = r.SetOutputDir(g.outPath, g.serverName+"_"+subTplName)
 	fields := g.addFields(r)
 	r.SetReplacementFields(fields)
@@ -155,7 +168,7 @@ func (g *httpAndGRPCPbGenerator) generateCode() error {
 	fmt.Printf(`
 using help:
   1. open a terminal and execute the command to generate code: make proto
-  2. open file internal/handler/xxx.go and internal/service/xxx.go, replace panic("implement me") according to template code example.
+  2. open file internal/handler/xxx.go, replace panic("implement me") according to template code example.
   3. compile and run service: make run
   4. visit http://localhost:8080/apis/swagger/index.html in your browser, and test the http api.
      open the file "internal/service/xxx_client_test.go" using Goland or VS Code, and test the grpc api.

@@ -112,30 +112,43 @@ func (g *rpcPbGenerator) generateCode() error {
 		return errors.New("replacer is nil")
 	}
 
-	// setting up template information
-	subDirs := []string{ // processing-only subdirectories
-		"api/types", "cmd/serverNameExample_grpcPbExample",
-		"sponge/configs", "sponge/deployments", "sponge/scripts", "sponge/third_party",
-		"internal/config", "internal/ecode", "internal/server", "internal/service",
+	// specify the subdirectory and files
+	subDirs := []string{
+		"cmd/serverNameExample_grpcPbExample", "sponge/configs",
+		"sponge/deployments", "sponge/scripts", "sponge/third_party",
 	}
-	subFiles := []string{ // processing of sub-documents only
+	subFiles := []string{
 		"sponge/.gitignore", "sponge/.golangci.yml", "sponge/go.mod", "sponge/go.sum",
 		"sponge/Jenkinsfile", "sponge/Makefile", "sponge/README.md",
 	}
+
 	if g.suitedMonoRepo {
 		subFiles = removeElements(subFiles, "sponge/go.mod", "sponge/go.sum")
 	}
-	ignoreDirs := []string{"cmd/sponge"} // specify the directory in the subdirectory where processing is ignored
-	ignoreFiles := []string{             // specify the files in the subdirectory to be ignored for processing
-		"types.pb.validate.go", "types.pb.go", // api/types
-		"userExample_rpc.go", "systemCode_http.go", "userExample_http.go", // internal/ecode
-		"http.go", "http_option.go", "http_test.go", // internal/server
-		"userExample.go", "userExample_client_test.go", "userExample_logic.go", "userExample_logic_test.go", "userExample_test.go", "userExample.go.mgo", "userExample_client_test.go.mgo", // internal/service
+	if isImportTypes {
+		subFiles = append(subFiles, "api/types/types.proto")
 	}
 
-	if !isImportTypes {
-		ignoreFiles = append(ignoreFiles, "types.proto")
+	selectFiles := map[string][]string{
+		"internal/config": {
+			"serverNameExample.go", "serverNameExample_test.go", "serverNameExample_cc.go",
+		},
+		"internal/ecode": {
+			"systemCode_rpc.go",
+		},
+		"internal/server": {
+			"grpc.go", "grpc_test.go", "grpc_option.go",
+		},
+		"internal/service": {
+			"service.go", "service_test.go",
+		},
 	}
+	replaceFiles := make(map[string][]string)
+	subFiles = append(subFiles, getSubFiles(selectFiles, replaceFiles)...)
+
+	// ignore some directories and files
+	ignoreDirs := []string{"cmd/sponge"}
+	ignoreFiles := []string{"scripts/swag-docs.sh"}
 
 	r.SetSubDirsAndFiles(subDirs, subFiles...)
 	r.SetIgnoreSubDirs(ignoreDirs...)
