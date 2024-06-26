@@ -24,11 +24,11 @@ import (
 )
 
 func newUserExamplePbHandler() *gotest.Handler {
-	// todo additional test field information
 	testData := &model.UserExample{}
 	testData.ID = 1
-	testData.CreatedAt = time.Now()
-	testData.UpdatedAt = testData.CreatedAt
+	// you can set the other fields of testData here, such as:
+	//testData.CreatedAt = time.Now()
+	//testData.UpdatedAt = testData.CreatedAt
 
 	// init mock cache
 	c := gotest.NewCache(map[string]interface{}{utils.Uint64ToStr(testData.ID): testData})
@@ -79,21 +79,6 @@ func newUserExamplePbHandler() *gotest.Handler {
 			},
 		},
 		{
-			FuncName: "DeleteByIDs",
-			Method:   http.MethodPost,
-			Path:     "/userExample/delete/ids",
-			HandlerFunc: func(c *gin.Context) {
-				req := &serverNameExampleV1.DeleteUserExampleByIDsRequest{}
-				_ = c.ShouldBindJSON(req)
-				_, err := iHandler.DeleteByIDs(c, req)
-				if err != nil {
-					response.Error(c, ecode.ErrDeleteByIDsUserExample)
-					return
-				}
-				response.Success(c)
-			},
-		},
-		{
 			FuncName: "UpdateByID",
 			Method:   http.MethodPut,
 			Path:     "/userExample/:id",
@@ -120,51 +105,6 @@ func newUserExamplePbHandler() *gotest.Handler {
 				_, err := iHandler.GetByID(c, req)
 				if err != nil {
 					response.Error(c, ecode.ErrGetByIDUserExample)
-					return
-				}
-				response.Success(c)
-			},
-		},
-		{
-			FuncName: "GetByCondition",
-			Method:   http.MethodPost,
-			Path:     "/userExample/condition",
-			HandlerFunc: func(c *gin.Context) {
-				req := &serverNameExampleV1.GetUserExampleByConditionRequest{}
-				_ = c.ShouldBindJSON(req)
-				_, err := iHandler.GetByCondition(c, req)
-				if err != nil {
-					response.Error(c, ecode.ErrGetByConditionUserExample)
-					return
-				}
-				response.Success(c)
-			},
-		},
-		{
-			FuncName: "ListByIDs",
-			Method:   http.MethodPost,
-			Path:     "/userExample/list/ids",
-			HandlerFunc: func(c *gin.Context) {
-				req := &serverNameExampleV1.ListUserExampleByIDsRequest{}
-				_ = c.ShouldBindJSON(req)
-				_, err := iHandler.ListByIDs(c, req)
-				if err != nil {
-					response.Error(c, ecode.ErrListByIDsUserExample)
-					return
-				}
-				response.Success(c)
-			},
-		},
-		{
-			FuncName: "ListByLastID",
-			Method:   http.MethodGet,
-			Path:     "/userExample/list",
-			HandlerFunc: func(c *gin.Context) {
-				req := &serverNameExampleV1.ListUserExampleByLastIDRequest{}
-				_ = c.ShouldBindQuery(req)
-				_, err := iHandler.ListByLastID(c, req)
-				if err != nil {
-					response.Error(c, ecode.ErrListByLastIDUserExample)
 					return
 				}
 				response.Success(c)
@@ -243,10 +183,12 @@ func Test_userExamplePbHandler_DeleteByID(t *testing.T) {
 	h := newUserExamplePbHandler()
 	defer h.Close()
 	testData := h.TestData.(*model.UserExample)
+	expectedSQLForDeletion := "UPDATE .*"
+	expectedArgsForDeletionTime := h.MockDao.AnyTime
 
 	h.MockDao.SQLMock.ExpectBegin()
-	h.MockDao.SQLMock.ExpectExec("UPDATE .*").
-		WithArgs(h.MockDao.AnyTime, testData.ID). // adjusted for the amount of test data
+	h.MockDao.SQLMock.ExpectExec(expectedSQLForDeletion).
+		WithArgs(expectedArgsForDeletionTime, testData.ID). // adjusted for the amount of test data
 		WillReturnResult(sqlmock.NewResult(int64(testData.ID), 1))
 	h.MockDao.SQLMock.ExpectCommit()
 
@@ -265,35 +207,6 @@ func Test_userExamplePbHandler_DeleteByID(t *testing.T) {
 
 	// delete error test
 	err = gohttp.Delete(result, h.GetRequestURL("DeleteByID", 111))
-	assert.NoError(t, err)
-}
-
-func Test_userExamplePbHandler_DeleteByIDs(t *testing.T) {
-	h := newUserExamplePbHandler()
-	defer h.Close()
-	testData := h.TestData.(*model.UserExample)
-
-	h.MockDao.SQLMock.ExpectBegin()
-	h.MockDao.SQLMock.ExpectExec("UPDATE .*").
-		WithArgs(h.MockDao.AnyTime, testData.ID). // adjusted for the amount of test data
-		WillReturnResult(sqlmock.NewResult(int64(testData.ID), 1))
-	h.MockDao.SQLMock.ExpectCommit()
-
-	result := &gohttp.StdResult{}
-	err := gohttp.Post(result, h.GetRequestURL("DeleteByIDs"), &serverNameExampleV1.DeleteUserExampleByIDsRequest{Ids: []uint64{testData.ID}})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result.Code != 0 {
-		t.Fatalf("%+v", result)
-	}
-
-	// zero id error test
-	err = gohttp.Post(result, h.GetRequestURL("DeleteByIDs"), &serverNameExampleV1.DeleteUserExampleByIDsRequest{})
-	assert.NoError(t, err)
-
-	// get error test
-	err = gohttp.Post(result, h.GetRequestURL("DeleteByIDs"), &serverNameExampleV1.DeleteUserExampleByIDsRequest{Ids: []uint64{111}})
 	assert.NoError(t, err)
 }
 
@@ -333,8 +246,9 @@ func Test_userExamplePbHandler_GetByID(t *testing.T) {
 	defer h.Close()
 	testData := h.TestData.(*model.UserExample)
 
-	rows := sqlmock.NewRows([]string{"id", "created_at", "updated_at"}).
-		AddRow(testData.ID, testData.CreatedAt, testData.UpdatedAt)
+	// column names and corresponding data
+	rows := sqlmock.NewRows([]string{"id"}).
+		AddRow(testData.ID)
 
 	h.MockDao.SQLMock.ExpectQuery("SELECT .*").
 		WithArgs(testData.ID).
@@ -358,124 +272,14 @@ func Test_userExamplePbHandler_GetByID(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func Test_userExamplePbHandler_GetByCondition(t *testing.T) {
-	h := newUserExamplePbHandler()
-	defer h.Close()
-	testData := h.TestData.(*model.UserExample)
-
-	rows := sqlmock.NewRows([]string{"id", "created_at", "updated_at"}).
-		AddRow(testData.ID, testData.CreatedAt, testData.UpdatedAt)
-
-	h.MockDao.SQLMock.ExpectQuery("SELECT .*").WillReturnRows(rows)
-
-	result := &gohttp.StdResult{}
-	err := gohttp.Post(result, h.GetRequestURL("GetByCondition"), &serverNameExampleV1.GetUserExampleByConditionRequest{
-		Conditions: &types.Conditions{
-			Columns: []*types.Column{
-				{
-					Name:  "id",
-					Value: utils.Uint64ToStr(testData.ID),
-				},
-			},
-		},
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result.Code != 0 {
-		t.Fatalf("%+v", result)
-	}
-
-	// zero error test
-	err = gohttp.Post(result, h.GetRequestURL("GetByCondition"), nil)
-	assert.NoError(t, err)
-
-	// valid error test
-	err = gohttp.Post(result, h.GetRequestURL("GetByCondition"), &serverNameExampleV1.GetUserExampleByConditionRequest{
-		Conditions: &types.Conditions{
-			Columns: []*types.Column{
-				{
-					Name:  "id",
-					Value: "111",
-					Exp:   "unknown",
-				},
-			},
-		},
-	})
-
-	// get error test
-	err = gohttp.Post(result, h.GetRequestURL("GetByCondition"), &serverNameExampleV1.GetUserExampleByConditionRequest{
-		Conditions: &types.Conditions{
-			Columns: []*types.Column{
-				{
-					Name:  "id",
-					Value: "111",
-				},
-			},
-		},
-	})
-	assert.NoError(t, err)
-}
-
-func Test_userExamplePbHandler_ListByIDs(t *testing.T) {
-	h := newUserExamplePbHandler()
-	defer h.Close()
-	testData := h.TestData.(*model.UserExample)
-
-	rows := sqlmock.NewRows([]string{"id", "created_at", "updated_at"}).
-		AddRow(testData.ID, testData.CreatedAt, testData.UpdatedAt)
-
-	h.MockDao.SQLMock.ExpectQuery("SELECT .*").WillReturnRows(rows)
-
-	result := &gohttp.StdResult{}
-	err := gohttp.Post(result, h.GetRequestURL("ListByIDs"), &serverNameExampleV1.ListUserExampleByIDsRequest{Ids: []uint64{testData.ID}})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result.Code != 0 {
-		t.Fatalf("%+v", result)
-	}
-
-	// zero id error test
-	err = gohttp.Post(result, h.GetRequestURL("ListByIDs"), &serverNameExampleV1.ListUserExampleByIDsRequest{})
-	assert.NoError(t, err)
-
-	// get error test
-	err = gohttp.Post(result, h.GetRequestURL("ListByIDs"), &serverNameExampleV1.ListUserExampleByIDsRequest{Ids: []uint64{111}})
-	assert.NoError(t, err)
-}
-
-func Test_userExamplePbHandler_ListByLastID(t *testing.T) {
-	h := newUserExamplePbHandler()
-	defer h.Close()
-	testData := h.TestData.(*model.UserExample)
-
-	rows := sqlmock.NewRows([]string{"id", "created_at", "updated_at"}).
-		AddRow(testData.ID, testData.CreatedAt, testData.UpdatedAt)
-
-	h.MockDao.SQLMock.ExpectQuery("SELECT .*").WillReturnRows(rows)
-
-	result := &gohttp.StdResult{}
-	err := gohttp.Get(result, h.GetRequestURL("ListByLastID"), gohttp.KV{"lastID": 0, "limit": 10})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result.Code != 0 {
-		t.Fatalf("%+v", result)
-	}
-
-	// get error test
-	err = gohttp.Get(result, h.GetRequestURL("ListByLastID"), gohttp.KV{"lastID": 0, "limit": 10, "sort": "unknown-column"})
-	assert.NoError(t, err)
-}
-
 func Test_userExamplePbHandler_List(t *testing.T) {
 	h := newUserExamplePbHandler()
 	defer h.Close()
 	testData := h.TestData.(*model.UserExample)
 
-	rows := sqlmock.NewRows([]string{"id", "created_at", "updated_at"}).
-		AddRow(testData.ID, testData.CreatedAt, testData.UpdatedAt)
+	// column names and corresponding data
+	rows := sqlmock.NewRows([]string{"id"}).
+		AddRow(testData.ID)
 
 	h.MockDao.SQLMock.ExpectQuery("SELECT .*").WillReturnRows(rows)
 

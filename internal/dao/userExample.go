@@ -4,8 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
-
 	"golang.org/x/sync/singleflight"
 	"gorm.io/gorm"
 
@@ -23,12 +21,8 @@ var _ UserExampleDao = (*userExampleDao)(nil)
 type UserExampleDao interface {
 	Create(ctx context.Context, table *model.UserExample) error
 	DeleteByID(ctx context.Context, id uint64) error
-	DeleteByIDs(ctx context.Context, ids []uint64) error
 	UpdateByID(ctx context.Context, table *model.UserExample) error
 	GetByID(ctx context.Context, id uint64) (*model.UserExample, error)
-	GetByCondition(ctx context.Context, condition *query.Conditions) (*model.UserExample, error)
-	GetByIDs(ctx context.Context, ids []uint64) (map[uint64]*model.UserExample, error)
-	GetByLastID(ctx context.Context, lastID uint64, limit int, sort string) ([]*model.UserExample, error)
 	GetByColumns(ctx context.Context, params *query.Params) ([]*model.UserExample, int64, error)
 
 	CreateByTx(ctx context.Context, tx *gorm.DB, table *model.UserExample) (uint64, error)
@@ -75,21 +69,6 @@ func (d *userExampleDao) DeleteByID(ctx context.Context, id uint64) error {
 
 	// delete cache
 	_ = d.deleteCache(ctx, id)
-
-	return nil
-}
-
-// DeleteByIDs delete records by batch id
-func (d *userExampleDao) DeleteByIDs(ctx context.Context, ids []uint64) error {
-	err := d.db.WithContext(ctx).Where("id IN (?)", ids).Delete(&model.UserExample{}).Error
-	if err != nil {
-		return err
-	}
-
-	// delete cache
-	for _, id := range ids {
-		_ = d.deleteCache(ctx, id)
-	}
 
 	return nil
 }
@@ -195,123 +174,6 @@ func (d *userExampleDao) GetByID(ctx context.Context, id uint64) (*model.UserExa
 	return nil, err
 }
 
-// GetByCondition get a record by condition
-// query conditions:
-//
-//	name: column name
-//	exp: expressions, which default is "=",  support =, !=, >, >=, <, <=, like, in
-//	value: column value, if exp=in, multiple values are separated by commas
-//	logic: logical type, defaults to and when value is null, only &(and), ||(or)
-//
-// example: find a male aged 20
-//
-//	condition = &query.Conditions{
-//	    Columns: []query.Column{
-//		{
-//			Name:    "age",
-//			Value:   20,
-//		},
-//		{
-//			Name:  "gender",
-//			Value: "male",
-//		},
-//	}
-func (d *userExampleDao) GetByCondition(ctx context.Context, c *query.Conditions) (*model.UserExample, error) {
-	queryStr, args, err := c.ConvertToGorm()
-	if err != nil {
-		return nil, err
-	}
-
-	table := &model.UserExample{}
-	err = d.db.WithContext(ctx).Where(queryStr, args...).First(table).Error
-	if err != nil {
-		return nil, err
-	}
-
-	return table, nil
-}
-
-// GetByIDs get records by batch id
-func (d *userExampleDao) GetByIDs(ctx context.Context, ids []uint64) (map[uint64]*model.UserExample, error) {
-	// no cache
-	if d.cache == nil {
-		var records []*model.UserExample
-		err := d.db.WithContext(ctx).Where("id IN (?)", ids).Find(&records).Error
-		if err != nil {
-			return nil, err
-		}
-		itemMap := make(map[uint64]*model.UserExample)
-		for _, record := range records {
-			itemMap[record.ID] = record
-		}
-		return itemMap, nil
-	}
-
-	// get form cache or database
-	itemMap, err := d.cache.MultiGet(ctx, ids)
-	if err != nil {
-		return nil, err
-	}
-
-	var missedIDs []uint64
-	for _, id := range ids {
-		_, ok := itemMap[id]
-		if !ok {
-			missedIDs = append(missedIDs, id)
-			continue
-		}
-	}
-
-	// get missed data
-	if len(missedIDs) > 0 {
-		// find the id of an active placeholder, i.e. an id that does not exist in database
-		var realMissedIDs []uint64
-		for _, id := range missedIDs {
-			_, err = d.cache.Get(ctx, id)
-			if errors.Is(err, cacheBase.ErrPlaceholder) {
-				continue
-			}
-			realMissedIDs = append(realMissedIDs, id)
-		}
-
-		if len(realMissedIDs) > 0 {
-			var missedData []*model.UserExample
-			err = d.db.WithContext(ctx).Where("id IN (?)", realMissedIDs).Find(&missedData).Error
-			if err != nil {
-				return nil, err
-			}
-
-			if len(missedData) > 0 {
-				for _, data := range missedData {
-					itemMap[data.ID] = data
-				}
-				err = d.cache.MultiSet(ctx, missedData, cache.UserExampleExpireTime)
-				if err != nil {
-					return nil, err
-				}
-			} else {
-				for _, id := range realMissedIDs {
-					_ = d.cache.SetCacheWithNotFound(ctx, id)
-				}
-			}
-		}
-	}
-
-	return itemMap, nil
-}
-
-// GetByLastID get paging records by last id and limit
-func (d *userExampleDao) GetByLastID(ctx context.Context, lastID uint64, limit int, sort string) ([]*model.UserExample, error) {
-	page := query.NewPage(0, limit, sort)
-
-	records := []*model.UserExample{}
-	err := d.db.WithContext(ctx).Order(page.Sort()).Limit(page.Size()).Where("id < ?", lastID).Find(&records).Error
-	if err != nil {
-		return nil, err
-	}
-	return records, nil
-}
-
 // GetByColumns get paging records by column information,
 // Note: query performance degrades when table rows are very large because of the use of offset.
 //
@@ -380,10 +242,7 @@ func (d *userExampleDao) CreateByTx(ctx context.Context, tx *gorm.DB, table *mod
 
 // DeleteByTx delete a record by id in the database using the provided transaction
 func (d *userExampleDao) DeleteByTx(ctx context.Context, tx *gorm.DB, id uint64) error {
-	update := map[string]interface{}{
-		"deleted_at": time.Now(),
-	}
-	err := tx.WithContext(ctx).Model(&model.UserExample{}).Where("id = ?", id).Updates(update).Error
+	err := tx.WithContext(ctx).Where("id = ?", id).Delete(&model.UserExample{}).Error
 	if err != nil {
 		return err
 	}

@@ -19,11 +19,11 @@ import (
 )
 
 func newUserExampleService() *gotest.Service {
-	// todo additional test field information
 	testData := &model.UserExample{}
 	testData.ID = 1
-	testData.CreatedAt = time.Now()
-	testData.UpdatedAt = testData.CreatedAt
+	// you can set the other fields of testData here, such as:
+	//testData.CreatedAt = time.Now()
+	//testData.UpdatedAt = testData.CreatedAt
 
 	// init mock cache
 	c := gotest.NewCache(map[string]interface{}{utils.Uint64ToStr(testData.ID): testData})
@@ -95,10 +95,12 @@ func Test_userExampleService_DeleteByID(t *testing.T) {
 	testData := &serverNameExampleV1.DeleteUserExampleByIDRequest{
 		Id: s.TestData.(*model.UserExample).ID,
 	}
+	expectedSQLForDeletion := "UPDATE .*"
+	expectedArgsForDeletionTime := s.MockDao.AnyTime
 
 	s.MockDao.SQLMock.ExpectBegin()
-	s.MockDao.SQLMock.ExpectExec("UPDATE .*").
-		WithArgs(s.MockDao.AnyTime, testData.Id). // Modified according to the actual number of parameters
+	s.MockDao.SQLMock.ExpectExec(expectedSQLForDeletion).
+		WithArgs(expectedArgsForDeletionTime, testData.Id). // Modified according to the actual number of parameters
 		WillReturnResult(sqlmock.NewResult(int64(testData.Id), 1))
 	s.MockDao.SQLMock.ExpectCommit()
 
@@ -114,35 +116,6 @@ func Test_userExampleService_DeleteByID(t *testing.T) {
 	// delete error test
 	testData.Id = 111
 	reply, err = s.IServiceClient.(serverNameExampleV1.UserExampleClient).DeleteByID(s.Ctx, testData)
-	assert.Error(t, err)
-}
-
-func Test_userExampleService_DeleteByIDs(t *testing.T) {
-	s := newUserExampleService()
-	defer s.Close()
-	data := s.TestData.(*model.UserExample)
-	testData := &serverNameExampleV1.DeleteUserExampleByIDsRequest{
-		Ids: []uint64{data.ID},
-	}
-
-	s.MockDao.SQLMock.ExpectBegin()
-	s.MockDao.SQLMock.ExpectExec("UPDATE .*").
-		WithArgs(s.MockDao.AnyTime, data.ID). // Modified according to the actual number of parameters
-		WillReturnResult(sqlmock.NewResult(int64(data.ID), 1))
-	s.MockDao.SQLMock.ExpectCommit()
-
-	reply, err := s.IServiceClient.(serverNameExampleV1.UserExampleClient).DeleteByIDs(s.Ctx, testData)
-	assert.NoError(t, err)
-	t.Log(reply.String())
-
-	// zero id error test
-	testData.Ids = []uint64{}
-	reply, err = s.IServiceClient.(serverNameExampleV1.UserExampleClient).DeleteByIDs(s.Ctx, testData)
-	assert.Error(t, err)
-
-	// delete error test
-	testData.Ids = []uint64{111}
-	reply, err = s.IServiceClient.(serverNameExampleV1.UserExampleClient).DeleteByIDs(s.Ctx, testData)
 	assert.Error(t, err)
 }
 
@@ -183,8 +156,9 @@ func Test_userExampleService_GetByID(t *testing.T) {
 		Id: data.ID,
 	}
 
-	rows := sqlmock.NewRows([]string{"id", "created_at", "updated_at"}).
-		AddRow(data.ID, data.CreatedAt, data.UpdatedAt)
+	// column names and corresponding data
+	rows := sqlmock.NewRows([]string{"id"}).
+		AddRow(data.ID)
 
 	s.MockDao.SQLMock.ExpectQuery("SELECT .*").
 		WithArgs(testData.Id).
@@ -205,66 +179,14 @@ func Test_userExampleService_GetByID(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func Test_userExampleService_GetByCondition(t *testing.T) {
-	s := newUserExampleService()
-	defer s.Close()
-	testData := s.TestData.(*model.UserExample)
-
-	rows := sqlmock.NewRows([]string{"id", "created_at", "updated_at"}).
-		AddRow(testData.ID, testData.CreatedAt, testData.UpdatedAt)
-
-	s.MockDao.SQLMock.ExpectQuery("SELECT .*").WillReturnRows(rows)
-
-	reply, err := s.IServiceClient.(serverNameExampleV1.UserExampleClient).GetByCondition(s.Ctx, &serverNameExampleV1.GetUserExampleByConditionRequest{
-		Conditions: &types.Conditions{
-			Columns: []*types.Column{{
-				Name:  "id",
-				Value: "1",
-			}},
-		},
-	})
-	assert.NoError(t, err)
-	t.Log(reply.String())
-
-	// get error test
-	reply, err = s.IServiceClient.(serverNameExampleV1.UserExampleClient).GetByCondition(s.Ctx, &serverNameExampleV1.GetUserExampleByConditionRequest{
-		Conditions: &types.Conditions{},
-	})
-	assert.Error(t, err)
-}
-
-func Test_userExampleService_ListByIDs(t *testing.T) {
-	s := newUserExampleService()
-	defer s.Close()
-	data := s.TestData.(*model.UserExample)
-	testData := &serverNameExampleV1.ListUserExampleByIDsRequest{
-		Ids: []uint64{data.ID},
-	}
-
-	rows := sqlmock.NewRows([]string{"id", "created_at", "updated_at"}).
-		AddRow(data.ID, data.CreatedAt, data.UpdatedAt)
-
-	s.MockDao.SQLMock.ExpectQuery("SELECT .*").
-		WithArgs(data.ID).
-		WillReturnRows(rows)
-
-	reply, err := s.IServiceClient.(serverNameExampleV1.UserExampleClient).ListByIDs(s.Ctx, testData)
-	assert.NoError(t, err)
-	t.Log(reply.String())
-
-	// get error test
-	testData.Ids = []uint64{111}
-	reply, err = s.IServiceClient.(serverNameExampleV1.UserExampleClient).ListByIDs(s.Ctx, testData)
-	assert.Error(t, err)
-}
-
 func Test_userExampleService_List(t *testing.T) {
 	s := newUserExampleService()
 	defer s.Close()
 	testData := s.TestData.(*model.UserExample)
 
-	rows := sqlmock.NewRows([]string{"id", "created_at", "updated_at"}).
-		AddRow(testData.ID, testData.CreatedAt, testData.UpdatedAt)
+	// column names and corresponding data
+	rows := sqlmock.NewRows([]string{"id"}).
+		AddRow(testData.ID)
 
 	s.MockDao.SQLMock.ExpectQuery("SELECT .*").WillReturnRows(rows)
 
@@ -288,38 +210,9 @@ func Test_userExampleService_List(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func Test_userExampleService_ListByLastID(t *testing.T) {
-	s := newUserExampleService()
-	defer s.Close()
-	testData := s.TestData.(*model.UserExample)
-
-	rows := sqlmock.NewRows([]string{"id", "created_at", "updated_at"}).
-		AddRow(testData.ID, testData.CreatedAt, testData.UpdatedAt)
-
-	s.MockDao.SQLMock.ExpectQuery("SELECT .*").WillReturnRows(rows)
-
-	reply, err := s.IServiceClient.(serverNameExampleV1.UserExampleClient).ListByLastID(s.Ctx, &serverNameExampleV1.ListUserExampleByLastIDRequest{
-		LastID: 0,
-		Limit:  10,
-		Sort:   "",
-	})
-	assert.NoError(t, err)
-	t.Log(reply.String())
-
-	// get error test
-	reply, err = s.IServiceClient.(serverNameExampleV1.UserExampleClient).ListByLastID(s.Ctx, &serverNameExampleV1.ListUserExampleByLastIDRequest{
-		LastID: 0,
-		Limit:  0,
-		Sort:   "unknown-column",
-	})
-	assert.Error(t, err)
-}
-
 func Test_convertUserExample(t *testing.T) {
 	testData := &model.UserExample{}
 	testData.ID = 1
-	testData.CreatedAt = time.Now()
-	testData.UpdatedAt = testData.CreatedAt
 
 	data, err := convertUserExample(testData)
 	assert.NoError(t, err)

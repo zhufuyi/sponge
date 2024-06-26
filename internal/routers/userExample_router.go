@@ -68,11 +68,7 @@ func userExampleMiddlewares(c *middlewareConfig) {
 	// set up single route middleware, just uncomment the code and fill in the middlewares, nothing else needs to be changed
 	//c.setSinglePath("POST", "/api/v1/userExample", middleware.Auth())
 	//c.setSinglePath("DELETE", "/api/v1/userExample/:id", middleware.Auth())
-	//c.setSinglePath("POST", "/api/v1/userExample/delete/ids", middleware.Auth())
 	//c.setSinglePath("PUT", "/api/v1/userExample/:id", middleware.Auth())
 	//c.setSinglePath("GET", "/api/v1/userExample/:id", middleware.Auth())
-	//c.setSinglePath("POST", "/api/v1/userExample/condition", middleware.Auth())
-	//c.setSinglePath("POST", "/api/v1/userExample/list/ids", middleware.Auth())
-	//c.setSinglePath("GET", "/api/v1/userExample/list", middleware.Auth())
 	//c.setSinglePath("POST", "/api/v1/userExample/list", middleware.Auth())
 }

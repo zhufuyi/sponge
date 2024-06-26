@@ -34,12 +34,6 @@ func (c *userExampleClient) DeleteByID(ctx context.Context, req *serverNameExamp
 	return c.userExampleCli.DeleteByID(ctx, req)
 }
 
-func (c *userExampleClient) DeleteByIDs(ctx context.Context, req *serverNameExampleV1.DeleteUserExampleByIDsRequest) (*serverNameExampleV1.DeleteUserExampleByIDsReply, error) {
-	// implement me
-	// If required, fill in the code to fetch data from other rpc servers here.
-	return c.userExampleCli.DeleteByIDs(ctx, req)
-}
-
 func (c *userExampleClient) UpdateByID(ctx context.Context, req *serverNameExampleV1.UpdateUserExampleByIDRequest) (*serverNameExampleV1.UpdateUserExampleByIDReply, error) {
 	// implement me
 	// If required, fill in the code to fetch data from other rpc servers here.
@@ -50,24 +44,6 @@ func (c *userExampleClient) GetByID(ctx context.Context, req *serverNameExampleV
 	// implement me
 	// If required, fill in the code to fetch data from other rpc servers here.
 	return c.userExampleCli.GetByID(ctx, req)
-}
-
-func (c *userExampleClient) GetByCondition(ctx context.Context, req *serverNameExampleV1.GetUserExampleByConditionRequest) (*serverNameExampleV1.GetUserExampleByConditionReply, error) {
-	// implement me
-	// If required, fill in the code to fetch data from other rpc servers here.
-	return c.userExampleCli.GetByCondition(ctx, req)
-}
-
-func (c *userExampleClient) ListByIDs(ctx context.Context, req *serverNameExampleV1.ListUserExampleByIDsRequest) (*serverNameExampleV1.ListUserExampleByIDsReply, error) {
-	// implement me
-	// If required, fill in the code to fetch data from other rpc servers here.
-	return c.userExampleCli.ListByIDs(ctx, req)
-}
-
-func (c *userExampleClient) ListByLastID(ctx context.Context, req *serverNameExampleV1.ListUserExampleByLastIDRequest) (*serverNameExampleV1.ListUserExampleByLastIDReply, error) {
-	// implement me
-	// If required, fill in the code to fetch data from other rpc servers here.
-	return c.userExampleCli.ListByLastID(ctx, req)
 }
 
 func (c *userExampleClient) List(ctx context.Context, req *serverNameExampleV1.ListUserExampleRequest) (*serverNameExampleV1.ListUserExampleReply, error) {

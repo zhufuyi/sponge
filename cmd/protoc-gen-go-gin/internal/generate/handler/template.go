@@ -313,7 +313,7 @@ import (
 {{- range .PbServices}}
 
 // {{.LowerName}} business-level http error codes.
-// the {{.LowerName}}NO value range is 1~100, if the same number appears, it will cause a failure to start the service.
+// the {{.LowerName}}NO value range is 1~100, if the same error code is used, it will cause panic.
 var (
 	{{.LowerName}}NO       = {{.RandNumber}}
 	{{.LowerName}}Name     = "{{.LowerName}}"
@@ -322,6 +322,7 @@ var (
 {{- range $i, $v := .Methods}}
 	{{if eq .InvokeType 0}}{{if .Path}}Err{{.MethodName}}{{.ServiceName}}   = errcode.NewError({{.LowerServiceName}}BaseCode+{{$v.AddOne $i}}, "failed to {{.MethodName}} "+{{.LowerServiceName}}Name){{end}}{{end}}
 {{- end}}
+
 	// error codes are globally unique, adding 1 to the previous error code
 )
 

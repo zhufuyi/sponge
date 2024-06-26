@@ -70,24 +70,6 @@ service userExample {
     };
   }
 
-  // delete userExample by batch id
-  rpc DeleteByIDs(DeleteUserExampleByIDsRequest) returns (DeleteUserExampleByIDsReply) {
-    option (google.api.http) = {
-      post: "/api/v1/userExample/delete/ids"
-      body: "*"
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "delete userExamples",
-      description: "delete userExamples by batch id",
-      //security: {
-      //  security_requirement: {
-      //    key: "BearerAuth";
-      //    value: {}
-      //  }
-      //}
-    };
-  }
-
   // update userExample by id
   rpc UpdateByID(UpdateUserExampleByIDRequest) returns (UpdateUserExampleByIDReply) {
     option (google.api.http) = {
@@ -114,59 +96,6 @@ service userExample {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "get userExample detail",
       description: "get userExample detail by id",
-      //security: {
-      //  security_requirement: {
-      //    key: "BearerAuth";
-      //    value: {}
-      //  }
-      //}
-    };
-  }
-
-  // get userExample by condition
-  rpc GetByCondition(GetUserExampleByConditionRequest) returns (GetUserExampleByConditionReply) {
-    option (google.api.http) = {
-      post: "/api/v1/userExample/condition"
-      body: "*"
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "get userExample by condition",
-      description: "get userExample by condition",
-      //security: {
-      //  security_requirement: {
-      //    key: "BearerAuth";
-      //    value: {}
-      //  }
-      //}
-    };
-  }
-
-  // list of userExample by batch id
-  rpc ListByIDs(ListUserExampleByIDsRequest) returns (ListUserExampleByIDsReply) {
-    option (google.api.http) = {
-      post: "/api/v1/userExample/list/ids"
-      body: "*"
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "list of userExamples by batch id",
-      description: "list of userExamples by by batch id",
-      //security: {
-      //  security_requirement: {
-      //    key: "BearerAuth";
-      //    value: {}
-      //  }
-      //}
-    };
-  }
-
-  // list userExample by last id
-  rpc ListByLastID(ListUserExampleByLastIDRequest) returns (ListUserExampleByLastIDReply) {
-    option (google.api.http) = {
-      get: "/api/v1/userExample/list"
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "list of userExamples by last id",
-      description: "list of userExamples by last id",
       //security: {
       //  security_requirement: {
       //    key: "BearerAuth";
@@ -236,14 +165,6 @@ message DeleteUserExampleByIDReply {
 
 }
 
-message DeleteUserExampleByIDsRequest {
-  repeated uint64 ids = 1;
-}
-
-message DeleteUserExampleByIDsReply {
-
-}
-
 message UpdateUserExampleByIDRequest {
   uint64   id = 1 [(validate.rules).uint64.gte  = 1 , (tagger.tags) = "uri:\"id\"" ];
   string name = 2;         // name
@@ -281,32 +202,6 @@ message GetUserExampleByIDRequest {
 
 message GetUserExampleByIDReply {
   UserExample userExample = 1;
-}
-
-message GetUserExampleByConditionRequest {
-  types.Conditions conditions = 1 [(validate.rules).message.required = true];
-}
-
-message GetUserExampleByConditionReply {
-  UserExample userExample = 1;
-}
-
-message ListUserExampleByIDsRequest {
-  repeated uint64 ids = 1;
-}
-
-message ListUserExampleByIDsReply {
-  repeated UserExample userExamples = 1;
-}
-
-message ListUserExampleByLastIDRequest {
-  uint64 lastID = 1 [(tagger.tags) = "form:\"lastID\""]; // last id
-  uint32 limit = 2 [(validate.rules).uint32.gt  = 0, (tagger.tags) = "form:\"limit\""]; // limit size per page
-  string sort = 3 [(tagger.tags) = "form:\"sort\""]; // sort by column name of table, default is -id, the - sign indicates descending order.
-}
-
-message ListUserExampleByLastIDReply {
-  repeated UserExample userExamples = 1;
 }
 
 message ListUserExampleRequest {

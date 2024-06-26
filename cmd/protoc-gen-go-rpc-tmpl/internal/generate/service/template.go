@@ -548,7 +548,7 @@ import (
 {{- range .PbServices}}
 
 // {{.LowerName}} business-level rpc error codes.
-// the _{{.LowerName}}NO value range is 1~100, if the same number appears, it will cause a failure to start the service.
+// the _{{.LowerName}}NO value range is 1~100, if the same error code is used, it will cause panic.
 var (
 	_{{.LowerName}}NO       = {{.RandNumber}}
 	_{{.LowerName}}Name     = "{{.LowerName}}"
@@ -557,6 +557,7 @@ var (
 {{- range $i, $v := .Methods}}
 	Status{{.MethodName}}{{.ServiceName}}   = errcode.NewRPCStatus(_{{.LowerServiceName}}BaseCode+{{$v.AddOne $i}}, "failed to {{.MethodName}} "+_{{.LowerServiceName}}Name)
 {{- end}}
+
 	// error codes are globally unique, adding 1 to the previous error code
 )
 

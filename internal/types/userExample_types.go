@@ -62,6 +62,11 @@ type CreateUserExampleRespond struct {
 	} `json:"data"` // return data
 }
 
+// DeleteUserExampleByIDRespond only for api docs
+type DeleteUserExampleByIDRespond struct {
+	Result
+}
+
 // UpdateUserExampleByIDRespond only for api docs
 type UpdateUserExampleByIDRespond struct {
 	Result
@@ -73,49 +78,6 @@ type GetUserExampleByIDRespond struct {
 	Msg  string `json:"msg"`  // return information description
 	Data struct {
 		UserExample UserExampleObjDetail `json:"userExample"`
-	} `json:"data"` // return data
-}
-
-// DeleteUserExampleByIDRespond only for api docs
-type DeleteUserExampleByIDRespond struct {
-	Result
-}
-
-// DeleteUserExamplesByIDsRequest request params
-type DeleteUserExamplesByIDsRequest struct {
-	IDs []uint64 `json:"ids" binding:"min=1"` // id list
-}
-
-// DeleteUserExamplesByIDsRespond only for api docs
-type DeleteUserExamplesByIDsRespond struct {
-	Result
-}
-
-// GetUserExampleByConditionRequest request params
-type GetUserExampleByConditionRequest struct {
-	query.Conditions
-}
-
-// GetUserExampleByConditionRespond only for api docs
-type GetUserExampleByConditionRespond struct {
-	Code int    `json:"code"` // return code
-	Msg  string `json:"msg"`  // return information description
-	Data struct {
-		UserExample UserExampleObjDetail `json:"userExample"`
-	} `json:"data"` // return data
-}
-
-// ListUserExamplesByIDsRequest request params
-type ListUserExamplesByIDsRequest struct {
-	IDs []uint64 `json:"ids" binding:"min=1"` // id list
-}
-
-// ListUserExamplesByIDsRespond only for api docs
-type ListUserExamplesByIDsRespond struct {
-	Code int    `json:"code"` // return code
-	Msg  string `json:"msg"`  // return information description
-	Data struct {
-		UserExamples []UserExampleObjDetail `json:"userExamples"`
 	} `json:"data"` // return data
 }
 

@@ -26,12 +26,8 @@ var _ UserExampleDao = (*userExampleDao)(nil)
 type UserExampleDao interface {
 	Create(ctx context.Context, record *model.UserExample) error
 	DeleteByID(ctx context.Context, id string) error
-	DeleteByIDs(ctx context.Context, ids []string) error
 	UpdateByID(ctx context.Context, record *model.UserExample) error
 	GetByID(ctx context.Context, id string) (*model.UserExample, error)
-	GetByCondition(ctx context.Context, condition *query.Conditions) (*model.UserExample, error)
-	GetByIDs(ctx context.Context, ids []string) (map[string]*model.UserExample, error)
-	GetByLastID(ctx context.Context, lastID string, limit int, sort string) ([]*model.UserExample, error)
 	GetByColumns(ctx context.Context, params *query.Params) ([]*model.UserExample, int64, error)
 }
 
@@ -85,23 +81,6 @@ func (d *userExampleDao) DeleteByID(ctx context.Context, id string) error {
 
 	// delete cache
 	_ = d.deleteCache(ctx, id)
-
-	return nil
-}
-
-// DeleteByIDs soft delete records by batch id
-func (d *userExampleDao) DeleteByIDs(ctx context.Context, ids []string) error {
-	oids := mgo.ConvertToObjectIDs(ids)
-	filter := bson.M{"_id": bson.M{"$in": oids}}
-	_, err := d.collection.UpdateMany(ctx, mgo.ExcludeDeleted(filter), mgo.EmbedDeletedAt(bson.M{}))
-	if err != nil {
-		return err
-	}
-
-	// delete cache
-	for _, id := range ids {
-		_ = d.deleteCache(ctx, id)
-	}
 
 	return nil
 }
@@ -212,144 +191,6 @@ func (d *userExampleDao) GetByID(ctx context.Context, id string) (*model.UserExa
 
 	// fail fast, if cache error return, don't request to db
 	return nil, err
-}
-
-// GetByCondition get a record by condition
-// query conditions:
-//
-//	name: column name, if value is of type objectId, the suffix :oid must be added, e.g. post_id:oid
-//	exp: expressions, which default is "=",  support =, !=, >, >=, <, <=, like, in
-//	value: column value, if exp=in, multiple values are separated by commas
-//	logic: logical type, defaults to and when value is null, only &(and), ||(or)
-//
-// example: query the id of the post under the user James
-//
-//	condition = &query.Conditions{
-//	    Columns: []query.Column{
-//		{
-//			Name: "user_name",
-//			Value: "James",
-//		},
-//		{
-//			Name:  "post_id:oid",
-//			Value: "65ce48483f11aff697e30d6d",
-//		},
-//	}
-func (d *userExampleDao) GetByCondition(ctx context.Context, c *query.Conditions) (*model.UserExample, error) {
-	filter, err := c.ConvertToMongo()
-	if err != nil {
-		return nil, err
-	}
-
-	record := &model.UserExample{}
-	err = d.collection.FindOne(ctx, mgo.ExcludeDeleted(filter)).Decode(record)
-	if err != nil {
-		return nil, err
-	}
-
-	return record, nil
-}
-
-// GetByIDs get records by batch id
-func (d *userExampleDao) GetByIDs(ctx context.Context, ids []string) (map[string]*model.UserExample, error) {
-	// no cache
-	if d.cache == nil {
-		records := []*model.UserExample{}
-		oids := mgo.ConvertToObjectIDs(ids)
-		filter := bson.M{"_id": bson.M{"$in": oids}}
-		cursor, err := d.collection.Find(ctx, mgo.ExcludeDeleted(filter))
-		if err != nil {
-			return nil, err
-		}
-		err = cursor.All(ctx, &records)
-		if err != nil {
-			return nil, err
-		}
-		itemMap := make(map[string]*model.UserExample)
-		for _, record := range records {
-			itemMap[record.ID.Hex()] = record
-		}
-		return itemMap, nil
-	}
-
-	// get form cache or mongodb
-	itemMap, err := d.cache.MultiGet(ctx, ids)
-	if err != nil {
-		return nil, err
-	}
-
-	var missedIDs []string
-	for _, id := range ids {
-		_, ok := itemMap[id]
-		if !ok {
-			missedIDs = append(missedIDs, id)
-			continue
-		}
-	}
-
-	// get missed data
-	if len(missedIDs) > 0 {
-		// find the id of an active placeholder, i.e. an id that does not exist in mongodb
-		var realMissedIDs []string
-		for _, id := range missedIDs {
-			_, err = d.cache.Get(ctx, id)
-			if errors.Is(err, cacheBase.ErrPlaceholder) {
-				continue
-			}
-			realMissedIDs = append(realMissedIDs, id)
-		}
-
-		if len(realMissedIDs) > 0 {
-			missedData := []*model.UserExample{}
-			oids := mgo.ConvertToObjectIDs(realMissedIDs)
-			filter := bson.M{"_id": bson.M{"$in": oids}}
-			cursor, err := d.collection.Find(ctx, mgo.ExcludeDeleted(filter))
-			if err != nil {
-				return nil, err
-			}
-			err = cursor.All(ctx, &missedData)
-			if err != nil {
-				return nil, err
-			}
-			if len(missedData) > 0 {
-				for _, data := range missedData {
-					itemMap[data.ID.Hex()] = data
-				}
-				err = d.cache.MultiSet(ctx, missedData, cache.UserExampleExpireTime)
-				if err != nil {
-					return nil, err
-				}
-			} else {
-				for _, id := range realMissedIDs {
-					_ = d.cache.SetCacheWithNotFound(ctx, id)
-				}
-			}
-		}
-	}
-
-	return itemMap, nil
-}
-
-// GetByLastID get paging records by last id and limit
-func (d *userExampleDao) GetByLastID(ctx context.Context, lastID string, limit int, sort string) ([]*model.UserExample, error) {
-	page := query.NewPage(0, limit, sort)
-
-	findOpts := new(options.FindOptions)
-	findOpts.SetLimit(int64(page.Size())).SetSkip(int64(page.Skip()))
-	findOpts.Sort = page.Sort()
-
-	records := []*model.UserExample{}
-	filter := bson.M{"_id": bson.M{"$lt": model.ToObjectID(lastID)}}
-
-	cursor, err := d.collection.Find(ctx, mgo.ExcludeDeleted(filter), findOpts)
-	if err != nil {
-		return nil, err
-	}
-	err = cursor.All(ctx, &records)
-	if err != nil {
-		return nil, err
-	}
-	return records, nil
 }
 
 // GetByColumns get paging records by column information,

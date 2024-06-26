@@ -74,18 +74,6 @@ func Test_service_userExample_methods(t *testing.T) {
 		},
 
 		{
-			name: "DeleteByIDs",
-			fn: func() (interface{}, error) {
-				// todo type in the parameters before testing
-				req := &serverNameExampleV1.DeleteUserExampleByIDsRequest{
-					Ids: []uint64{100},
-				}
-				return cli.DeleteByIDs(ctx, req)
-			},
-			wantErr: false,
-		},
-
-		{
 			name: "GetByID",
 			fn: func() (interface{}, error) {
 				// todo type in the parameters before testing
@@ -93,51 +81,6 @@ func Test_service_userExample_methods(t *testing.T) {
 					Id: 1,
 				}
 				return cli.GetByID(ctx, req)
-			},
-			wantErr: false,
-		},
-
-		{
-			name: "GetByCondition",
-			fn: func() (interface{}, error) {
-				// todo type in the parameters before testing
-				req := &serverNameExampleV1.GetUserExampleByConditionRequest{
-					Conditions: &types.Conditions{
-						Columns: []*types.Column{
-							{
-								Name:  "email",
-								Value: "foo@bar.com",
-							},
-						},
-					},
-				}
-				return cli.GetByCondition(ctx, req)
-			},
-			wantErr: false,
-		},
-
-		{
-			name: "ListByIDs",
-			fn: func() (interface{}, error) {
-				// todo type in the parameters before testing
-				req := &serverNameExampleV1.ListUserExampleByIDsRequest{
-					Ids: []uint64{1, 2, 3},
-				}
-				return cli.ListByIDs(ctx, req)
-			},
-			wantErr: false,
-		},
-
-		{
-			name: "ListByLastID",
-			fn: func() (interface{}, error) {
-				// todo type in the parameters before testing
-				req := &serverNameExampleV1.ListUserExampleByLastIDRequest{
-					LastID: 0,
-					Limit:  10,
-					Sort:   "",
-				}
-				return cli.ListByLastID(ctx, req)
 			},
 			wantErr: false,
 		},
@@ -215,44 +158,6 @@ func Test_service_userExample_benchmark(t *testing.T) {
 				total := 1000 // total number of requests
 
 				b, err := benchmark.New(host, protoFile, "GetByID", message, dependentProtoFilePath, total)
-				if err != nil {
-					return err
-				}
-				return b.Run()
-			},
-			wantErr: false,
-		},
-
-		{
-			name: "ListByIDs",
-			fn: func() error {
-				// todo type in the parameters before testing
-				message := &serverNameExampleV1.ListUserExampleByIDsRequest{
-					Ids: []uint64{1, 2, 3},
-				}
-				total := 1000 // total number of requests
-
-				b, err := benchmark.New(host, protoFile, "ListByIDs", message, dependentProtoFilePath, total)
-				if err != nil {
-					return err
-				}
-				return b.Run()
-			},
-			wantErr: false,
-		},
-
-		{
-			name: "ListByLastID",
-			fn: func() error {
-				// todo type in the parameters before testing
-				message := &serverNameExampleV1.ListUserExampleByLastIDRequest{
-					LastID: 0,
-					Limit:  5,
-					Sort:   "-id",
-				}
-				total := 1000 // total number of requests
-
-				b, err := benchmark.New(host, protoFile, "ListByLastID", message, dependentProtoFilePath, total)
 				if err != nil {
 					return err
 				}

@@ -30,11 +30,6 @@ func (h *userExampleHandler) DeleteByID(ctx context.Context, req *serverNameExam
 	return h.server.DeleteByID(ctx, req)
 }
 
-// DeleteByIDs delete records by batch id
-func (h *userExampleHandler) DeleteByIDs(ctx context.Context, req *serverNameExampleV1.DeleteUserExampleByIDsRequest) (*serverNameExampleV1.DeleteUserExampleByIDsReply, error) {
-	return h.server.DeleteByIDs(ctx, req)
-}
-
 // UpdateByID update a record by id
 func (h *userExampleHandler) UpdateByID(ctx context.Context, req *serverNameExampleV1.UpdateUserExampleByIDRequest) (*serverNameExampleV1.UpdateUserExampleByIDReply, error) {
 	return h.server.UpdateByID(ctx, req)
@@ -43,21 +38,6 @@ func (h *userExampleHandler) UpdateByID(ctx context.Context, req *serverNameExam
 // GetByID get a record by id
 func (h *userExampleHandler) GetByID(ctx context.Context, req *serverNameExampleV1.GetUserExampleByIDRequest) (*serverNameExampleV1.GetUserExampleByIDReply, error) {
 	return h.server.GetByID(ctx, req)
-}
-
-// GetByCondition get a record by condition
-func (h *userExampleHandler) GetByCondition(ctx context.Context, req *serverNameExampleV1.GetUserExampleByConditionRequest) (*serverNameExampleV1.GetUserExampleByConditionReply, error) {
-	return h.server.GetByCondition(ctx, req)
-}
-
-// ListByIDs list of records by batch id
-func (h *userExampleHandler) ListByIDs(ctx context.Context, req *serverNameExampleV1.ListUserExampleByIDsRequest) (*serverNameExampleV1.ListUserExampleByIDsReply, error) {
-	return h.server.ListByIDs(ctx, req)
-}
-
-// ListByLastID get records by last id
-func (h *userExampleHandler) ListByLastID(ctx context.Context, req *serverNameExampleV1.ListUserExampleByLastIDRequest) (*serverNameExampleV1.ListUserExampleByLastIDReply, error) {
-	return h.server.ListByLastID(ctx, req)
 }
 
 // List of records by query parameters

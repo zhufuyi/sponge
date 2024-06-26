@@ -67,27 +67,11 @@ func (m mockGw) DeleteByID(ctx context.Context, req *serverNameExampleV1.DeleteU
 	return nil, nil
 }
 
-func (m mockGw) DeleteByIDs(ctx context.Context, req *serverNameExampleV1.DeleteUserExampleByIDsRequest) (*serverNameExampleV1.DeleteUserExampleByIDsReply, error) {
-	return nil, nil
-}
-
 func (m mockGw) UpdateByID(ctx context.Context, req *serverNameExampleV1.UpdateUserExampleByIDRequest) (*serverNameExampleV1.UpdateUserExampleByIDReply, error) {
 	return nil, nil
 }
 
 func (m mockGw) GetByID(ctx context.Context, req *serverNameExampleV1.GetUserExampleByIDRequest) (*serverNameExampleV1.GetUserExampleByIDReply, error) {
-	return nil, nil
-}
-
-func (m mockGw) GetByCondition(ctx context.Context, req *serverNameExampleV1.GetUserExampleByConditionRequest) (*serverNameExampleV1.GetUserExampleByConditionReply, error) {
-	return nil, nil
-}
-
-func (m mockGw) ListByIDs(ctx context.Context, req *serverNameExampleV1.ListUserExampleByIDsRequest) (*serverNameExampleV1.ListUserExampleByIDsReply, error) {
-	return nil, nil
-}
-
-func (m mockGw) ListByLastID(ctx context.Context, req *serverNameExampleV1.ListUserExampleByLastIDRequest) (*serverNameExampleV1.ListUserExampleByLastIDReply, error) {
 	return nil, nil
 }
 
