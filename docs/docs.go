@@ -18,6 +18,11 @@ const docTemplate = `{
     "paths": {
         "/api/v1/userExample": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "submit information to create userExample",
                 "consumes": [
                     "application/json"
@@ -50,120 +55,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/userExample/condition": {
-            "post": {
-                "description": "get userExample by condition",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "userExample"
-                ],
-                "summary": "get userExample by condition",
-                "parameters": [
-                    {
-                        "description": "query condition",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/github_com_zhufuyi_sponge_internal_types.Conditions"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/types.GetUserExampleByConditionRespond"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/userExample/delete/ids": {
-            "post": {
-                "description": "delete userExamples by batch id",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "userExample"
-                ],
-                "summary": "delete userExamples",
-                "parameters": [
-                    {
-                        "description": "id array",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/types.DeleteUserExamplesByIDsRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/types.DeleteUserExamplesByIDsRespond"
-                        }
-                    }
-                }
-            }
-        },
         "/api/v1/userExample/list": {
-            "get": {
-                "description": "list of userExamples by last id and limit",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "userExample"
-                ],
-                "summary": "list of userExamples by last id and limit",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "last id, default is MaxInt32",
-                        "name": "lastID",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "default": 10,
-                        "description": "size in each page",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "default": "-id",
-                        "description": "sort by column name of table, and the ",
-                        "name": "sort",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/types.ListUserExamplesRespond"
-                        }
-                    }
-                }
-            },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "list of userExamples by paging and conditions",
                 "consumes": [
                     "application/json"
@@ -196,42 +94,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/userExample/list/ids": {
-            "post": {
-                "description": "list of userExamples by batch id",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "userExample"
-                ],
-                "summary": "list of userExamples by batch id",
-                "parameters": [
-                    {
-                        "description": "id array",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/types.ListUserExamplesByIDsRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/types.ListUserExamplesByIDsRespond"
-                        }
-                    }
-                }
-            }
-        },
         "/api/v1/userExample/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "get userExample detail by id",
                 "consumes": [
                     "application/json"
@@ -262,6 +131,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "update userExample information by id",
                 "consumes": [
                     "application/json"
@@ -301,6 +175,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "delete userExample by id",
                 "consumes": [
                     "application/json"
@@ -424,18 +303,6 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_zhufuyi_sponge_internal_types.Conditions": {
-            "type": "object",
-            "properties": {
-                "columns": {
-                    "description": "columns info",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/github_com_zhufuyi_sponge_internal_types.Column"
-                    }
-                }
-            }
-        },
         "github_com_zhufuyi_sponge_internal_types.Params": {
             "type": "object",
             "properties": {
@@ -547,57 +414,6 @@ const docTemplate = `{
                 }
             }
         },
-        "types.DeleteUserExamplesByIDsRequest": {
-            "type": "object",
-            "properties": {
-                "ids": {
-                    "description": "id list",
-                    "type": "array",
-                    "minItems": 1,
-                    "items": {
-                        "type": "integer"
-                    }
-                }
-            }
-        },
-        "types.DeleteUserExamplesByIDsRespond": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "description": "return code",
-                    "type": "integer"
-                },
-                "data": {
-                    "description": "return data"
-                },
-                "msg": {
-                    "description": "return information description",
-                    "type": "string"
-                }
-            }
-        },
-        "types.GetUserExampleByConditionRespond": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "description": "return code",
-                    "type": "integer"
-                },
-                "data": {
-                    "description": "return data",
-                    "type": "object",
-                    "properties": {
-                        "userExample": {
-                            "$ref": "#/definitions/types.UserExampleObjDetail"
-                        }
-                    }
-                },
-                "msg": {
-                    "description": "return information description",
-                    "type": "string"
-                }
-            }
-        },
         "types.GetUserExampleByIDRespond": {
             "type": "object",
             "properties": {
@@ -611,44 +427,6 @@ const docTemplate = `{
                     "properties": {
                         "userExample": {
                             "$ref": "#/definitions/types.UserExampleObjDetail"
-                        }
-                    }
-                },
-                "msg": {
-                    "description": "return information description",
-                    "type": "string"
-                }
-            }
-        },
-        "types.ListUserExamplesByIDsRequest": {
-            "type": "object",
-            "properties": {
-                "ids": {
-                    "description": "id list",
-                    "type": "array",
-                    "minItems": 1,
-                    "items": {
-                        "type": "integer"
-                    }
-                }
-            }
-        },
-        "types.ListUserExamplesByIDsRespond": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "description": "return code",
-                    "type": "integer"
-                },
-                "data": {
-                    "description": "return data",
-                    "type": "object",
-                    "properties": {
-                        "userExamples": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/types.UserExampleObjDetail"
-                            }
                         }
                     }
                 },
@@ -788,7 +566,7 @@ const docTemplate = `{
     },
     "securityDefinitions": {
         "BearerAuth": {
-            "description": "Type \"Bearer your-jwt-token\" to Value",
+            "description": "Type Bearer your-jwt-token to Value",
             "type": "apiKey",
             "name": "Authorization",
             "in": "header"

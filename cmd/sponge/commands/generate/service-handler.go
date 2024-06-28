@@ -38,13 +38,16 @@ func ServiceAndHandlerCRUDCommand() *cobra.Command {
 		Long: `generate both grpc service and http handler CRUD code based on sql.
 
 Examples:
-  # generate CRUD code.
+  # generate service and handler code.
   sponge micro service-handler --module-name=yourModuleName --server-name=yourServerName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
-  # generate CRUD code with multiple table names.
+  # generate service and handler code with multiple table names.
   sponge micro service-handler --module-name=yourModuleName --server-name=yourServerName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=t1,t2
 
-  # generate CRUD code and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
+  # generate service and handler code with extended api.
+  sponge micro service-handler --module-name=yourModuleName --server-name=yourServerName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --extended-api=true
+
+  # generate service and handler code and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge micro service-handler --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
 
   # if you want the generated code to suited to mono-repo, you need to specify the parameter --suited-mono-repo=true
@@ -90,6 +93,7 @@ Examples:
 					serverName:     serverName,
 					dbDriver:       sqlArgs.DBDriver,
 					isEmbed:        sqlArgs.IsEmbed,
+					isExtendedApi:  sqlArgs.IsExtendedApi,
 					codes:          codes,
 					outPath:        outPath,
 					suitedMonoRepo: suitedMonoRepo,
@@ -124,6 +128,7 @@ using help:
 	cmd.Flags().StringVarP(&dbTables, "db-table", "t", "", "table name, multiple names separated by commas")
 	_ = cmd.MarkFlagRequired("db-table")
 	cmd.Flags().BoolVarP(&sqlArgs.IsEmbed, "embed", "e", false, "whether to embed gorm.model struct")
+	cmd.Flags().BoolVarP(&sqlArgs.IsExtendedApi, "extended-api", "a", false, "whether to generate extended crud api, additional includes: DeleteByIDs, GetByCondition, ListByIDs, ListByLatestID")
 	cmd.Flags().BoolVarP(&suitedMonoRepo, "suited-mono-repo", "l", false, "whether the generated code is suitable for mono-repo")
 	cmd.Flags().IntVarP(&sqlArgs.JSONNamedType, "json-name-type", "j", 1, "json tags name type, 0:snake case, 1:camel case")
 	cmd.Flags().StringVarP(&outPath, "out", "o", "", "output directory, default is ./service_<time>,"+
@@ -137,6 +142,7 @@ type serviceAndHandlerGenerator struct {
 	serverName     string
 	dbDriver       string
 	isEmbed        bool
+	isExtendedApi  bool
 	codes          map[string]string
 	outPath        string
 	suitedMonoRepo bool
@@ -185,20 +191,32 @@ func (g *serviceAndHandlerGenerator) generateCode() (string, error) {
 	switch strings.ToLower(g.dbDriver) {
 	case DBDriverMysql, DBDriverPostgresql, DBDriverTidb, DBDriverSqlite:
 		g.fields = append(g.fields, getExpectedSQLForDeletionField(g.isEmbed)...)
+		if g.isExtendedApi {
+			var fields []replacer.Field
+			replaceFiles, fields = serviceHandlerExtendedApi(r)
+			g.fields = append(g.fields, fields...)
+		}
 
 	case DBDriverMongodb:
-		replaceFiles = map[string][]string{
-			"internal/cache": {
-				"userExample.go.mgo",
-			},
-			"internal/dao": {
-				"userExample.go.mgo",
-			},
-			"internal/service": {
-				"userExample.go.mgo", "userExample_client_test.go.mgo",
-			},
+		if g.isExtendedApi {
+			var fields []replacer.Field
+			replaceFiles, fields = serviceHandlerMongoDBExtendedApi(r)
+			g.fields = append(g.fields, fields...)
+		} else {
+			replaceFiles = map[string][]string{
+				"internal/cache": {
+					"userExample.go.mgo",
+				},
+				"internal/dao": {
+					"userExample.go.mgo",
+				},
+				"internal/service": {
+					"userExample.go.mgo", "userExample_client_test.go.mgo",
+				},
+			}
+			g.fields = append(g.fields, deleteFieldsMark(r, serviceLogicFile+".mgo", startMark, endMark)...)
 		}
-		serviceLogicFile += ".mgo"
+
 	default:
 		return "", errors.New("unsupported db driver: " + g.dbDriver)
 	}
@@ -329,4 +347,103 @@ func (g *serviceAndHandlerGenerator) addFields(r replacer.Replacer) []replacer.F
 	}
 
 	return fields
+}
+
+func serviceHandlerExtendedApi(r replacer.Replacer) (map[string][]string, []replacer.Field) {
+	replaceFiles := map[string][]string{
+		"internal/dao": {
+			"userExample.go.exp", "userExample_test.go.exp",
+		},
+		"internal/ecode": {
+			"userExample_rpc.go.exp",
+		},
+		"internal/handler": {
+			"userExample.go.service.exp",
+		},
+		"internal/service": {
+			"userExample.go.exp", "userExample_client_test.go.exp",
+		},
+	}
+
+	var fields []replacer.Field
+
+	fields = append(fields, deleteFieldsMark(r, daoFile+".exp", startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, daoTestFile+".exp", startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, serviceLogicFile+".exp", startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, serviceClientFile+".exp", startMark, endMark)...)
+
+	fields = append(fields, []replacer.Field{
+		{
+			Old: "userExample_rpc.go.exp",
+			New: "userExample_rpc.go",
+		},
+		{
+			Old: "userExample.go.exp",
+			New: "userExample.go",
+		},
+		{
+			Old: "userExample_test.go.exp",
+			New: "userExample_test.go",
+		},
+		{
+			Old: "userExample_client_test.go.exp",
+			New: "userExample_client_test.go",
+		},
+		{
+			Old: "userExample.go.service.exp",
+			New: "userExample.go",
+		},
+	}...)
+
+	return replaceFiles, fields
+}
+
+func serviceHandlerMongoDBExtendedApi(r replacer.Replacer) (map[string][]string, []replacer.Field) {
+	replaceFiles := map[string][]string{
+		"internal/cache": {
+			"userExample.go.mgo",
+		},
+		"internal/dao": {
+			"userExample.go.mgo.exp",
+		},
+		"internal/ecode": {
+			"userExample_rpc.go.exp",
+		},
+		"internal/handler": {
+			"userExample.go.service.exp",
+		},
+		"internal/model": {
+			"userExample.go",
+		},
+		"internal/service": {
+			"userExample.go.mgo.exp", "userExample_client_test.go.mgo.exp",
+		},
+	}
+
+	var fields []replacer.Field
+
+	fields = append(fields, deleteFieldsMark(r, daoMgoFile+".exp", startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, serviceLogicFile+".mgo.exp", startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, serviceClientMgoFile+".exp", startMark, endMark)...)
+
+	fields = append(fields, []replacer.Field{
+		{
+			Old: "userExample_rpc.go.exp",
+			New: "userExample_rpc.go",
+		},
+		{
+			Old: "userExample.go.mgo.exp",
+			New: "userExample.go",
+		},
+		{
+			Old: "userExample_client_test.go.mgo.exp",
+			New: "userExample_client_test.go",
+		},
+		{
+			Old: "userExample.go.service.exp",
+			New: "userExample.go",
+		},
+	}...)
+
+	return replaceFiles, fields
 }

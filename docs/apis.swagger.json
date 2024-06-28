@@ -55,119 +55,7 @@
         ]
       }
     },
-    "/api/v1/userExample/condition": {
-      "post": {
-        "summary": "get userExample by condition",
-        "description": "get userExample by condition",
-        "operationId": "userExample_GetByCondition",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1GetUserExampleByConditionReply"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1GetUserExampleByConditionRequest"
-            }
-          }
-        ],
-        "tags": [
-          "userExample"
-        ]
-      }
-    },
-    "/api/v1/userExample/delete/ids": {
-      "post": {
-        "summary": "delete userExamples",
-        "description": "delete userExamples by batch id",
-        "operationId": "userExample_DeleteByIDs",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1DeleteUserExampleByIDsReply"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1DeleteUserExampleByIDsRequest"
-            }
-          }
-        ],
-        "tags": [
-          "userExample"
-        ]
-      }
-    },
     "/api/v1/userExample/list": {
-      "get": {
-        "summary": "list of userExamples by last id",
-        "description": "list of userExamples by last id",
-        "operationId": "userExample_ListByLastID",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1ListUserExampleByLastIDReply"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "lastID",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "uint64"
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "sort",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "userExample"
-        ]
-      },
       "post": {
         "summary": "list of userExamples by query parameters",
         "description": "list of userExamples by paging and conditions",
@@ -193,40 +81,6 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/v1ListUserExampleRequest"
-            }
-          }
-        ],
-        "tags": [
-          "userExample"
-        ]
-      }
-    },
-    "/api/v1/userExample/list/ids": {
-      "post": {
-        "summary": "list of userExamples by batch id",
-        "description": "list of userExamples by by batch id",
-        "operationId": "userExample_ListByIDs",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1ListUserExampleByIDsReply"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1ListUserExampleByIDsRequest"
             }
           }
         ],
@@ -416,17 +270,6 @@
         }
       }
     },
-    "typesConditions": {
-      "type": "object",
-      "properties": {
-        "columns": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/typesColumn"
-          }
-        }
-      }
-    },
     "typesParams": {
       "type": "object",
       "properties": {
@@ -488,21 +331,6 @@
     "v1DeleteUserExampleByIDReply": {
       "type": "object"
     },
-    "v1DeleteUserExampleByIDsReply": {
-      "type": "object"
-    },
-    "v1DeleteUserExampleByIDsRequest": {
-      "type": "object",
-      "properties": {
-        "ids": {
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "uint64"
-          }
-        }
-      }
-    },
     "v1GenderType": {
       "type": "string",
       "enum": [
@@ -512,61 +340,11 @@
       ],
       "default": "UNKNOWN"
     },
-    "v1GetUserExampleByConditionReply": {
-      "type": "object",
-      "properties": {
-        "userExample": {
-          "$ref": "#/definitions/v1UserExample"
-        }
-      }
-    },
-    "v1GetUserExampleByConditionRequest": {
-      "type": "object",
-      "properties": {
-        "conditions": {
-          "$ref": "#/definitions/typesConditions"
-        }
-      }
-    },
     "v1GetUserExampleByIDReply": {
       "type": "object",
       "properties": {
         "userExample": {
           "$ref": "#/definitions/v1UserExample"
-        }
-      }
-    },
-    "v1ListUserExampleByIDsReply": {
-      "type": "object",
-      "properties": {
-        "userExamples": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v1UserExample"
-          }
-        }
-      }
-    },
-    "v1ListUserExampleByIDsRequest": {
-      "type": "object",
-      "properties": {
-        "ids": {
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "uint64"
-          }
-        }
-      }
-    },
-    "v1ListUserExampleByLastIDReply": {
-      "type": "object",
-      "properties": {
-        "userExamples": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v1UserExample"
-          }
         }
       }
     },

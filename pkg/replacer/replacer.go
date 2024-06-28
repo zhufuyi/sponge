@@ -108,10 +108,6 @@ func (r *replacerInfo) SetReplacementFields(fields []Field) {
 
 // SetSubDirsAndFiles set up processing of specified subdirectories, files in other directories are ignored
 func (r *replacerInfo) SetSubDirsAndFiles(subDirs []string, subFiles ...string) {
-	if len(subDirs) == 0 {
-		return
-	}
-
 	subDirs = r.convertPathsDelimiter(subDirs...)
 	subFiles = r.convertPathsDelimiter(subFiles...)
 

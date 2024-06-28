@@ -45,6 +45,9 @@ Examples:
   # generate web service code with multiple table names.
   sponge web http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=t1,t2
 
+  # generate web service code with extended api.
+  sponge web http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --extended-api=true
+
   # generate web service code and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge web http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
 
@@ -86,14 +89,15 @@ Examples:
 				return err
 			}
 			g := &httpGenerator{
-				moduleName:  moduleName,
-				serverName:  serverName,
-				projectName: projectName,
-				repoAddr:    repoAddr,
-				dbDSN:       sqlArgs.DBDsn,
-				dbDriver:    sqlArgs.DBDriver,
-				codes:       codes,
-				outPath:     outPath,
+				moduleName:    moduleName,
+				serverName:    serverName,
+				projectName:   projectName,
+				repoAddr:      repoAddr,
+				dbDSN:         sqlArgs.DBDsn,
+				dbDriver:      sqlArgs.DBDriver,
+				codes:         codes,
+				outPath:       outPath,
+				isExtendedApi: sqlArgs.IsExtendedApi,
 
 				suitedMonoRepo: suitedMonoRepo,
 			}
@@ -114,12 +118,14 @@ Examples:
 				}
 
 				hg := &handlerGenerator{
-					moduleName:     moduleName,
-					dbDriver:       sqlArgs.DBDriver,
-					codes:          codes,
-					outPath:        outPath,
-					isEmbed:        sqlArgs.IsEmbed,
-					serverName:     serverName,
+					moduleName:    moduleName,
+					dbDriver:      sqlArgs.DBDriver,
+					codes:         codes,
+					outPath:       outPath,
+					isEmbed:       sqlArgs.IsEmbed,
+					isExtendedApi: sqlArgs.IsExtendedApi,
+					serverName:    serverName,
+
 					suitedMonoRepo: suitedMonoRepo,
 				}
 				outPath, err = hg.generateCode()
@@ -154,6 +160,7 @@ using help:
 	cmd.Flags().StringVarP(&dbTables, "db-table", "t", "", "table name, multiple names separated by commas")
 	_ = cmd.MarkFlagRequired("db-table")
 	cmd.Flags().BoolVarP(&sqlArgs.IsEmbed, "embed", "e", false, "whether to embed gorm.model struct")
+	cmd.Flags().BoolVarP(&sqlArgs.IsExtendedApi, "extended-api", "a", false, "whether to generate extended crud api, additional includes: DeleteByIDs, GetByCondition, ListByIDs, ListByLatestID")
 	cmd.Flags().BoolVarP(&suitedMonoRepo, "suited-mono-repo", "l", false, "whether the generated code is suitable for mono-repo")
 	cmd.Flags().IntVarP(&sqlArgs.JSONNamedType, "json-name-type", "j", 1, "json tags name type, 0:snake case, 1:camel case")
 	cmd.Flags().StringVarP(&repoAddr, "repo-addr", "r", "", "docker image repository address, excluding http and repository names")
@@ -172,6 +179,7 @@ type httpGenerator struct {
 	codes          map[string]string
 	outPath        string
 	isEmbed        bool
+	isExtendedApi  bool
 	suitedMonoRepo bool
 
 	fields []replacer.Field
@@ -233,25 +241,37 @@ func (g *httpGenerator) generateCode() (string, error) {
 	switch strings.ToLower(g.dbDriver) {
 	case DBDriverMysql, DBDriverPostgresql, DBDriverTidb, DBDriverSqlite:
 		g.fields = append(g.fields, getExpectedSQLForDeletionField(g.isEmbed)...)
+		if g.isExtendedApi {
+			var fields []replacer.Field
+			replaceFiles, fields = handlerExtendedApi(r, codeNameHTTP)
+			g.fields = append(g.fields, fields...)
+		}
 
 	case DBDriverMongodb:
-		replaceFiles = map[string][]string{
-			"internal/cache": {
-				"userExample.go.mgo",
-			},
-			"internal/dao": {
-				"userExample.go.mgo",
-			},
-			"internal/handler": {
-				"userExample.go.mgo",
-			},
-			"internal/model": {
-				"init.go.mgo", "userExample.go",
-			},
-			"internal/types": {
-				"swagger_types.go", "userExample_types.go.mgo",
-			},
+		if g.isExtendedApi {
+			var fields []replacer.Field
+			replaceFiles, fields = handlerMongoDBExtendedApi(r, codeNameHTTP)
+			g.fields = append(g.fields, fields...)
+		} else {
+			replaceFiles = map[string][]string{
+				"internal/cache": {
+					"userExample.go.mgo",
+				},
+				"internal/dao": {
+					"userExample.go.mgo",
+				},
+				"internal/handler": {
+					"userExample.go.mgo",
+				},
+				"internal/model": {
+					"init.go.mgo", "userExample.go",
+				},
+				"internal/types": {
+					"swagger_types.go", "userExample_types.go.mgo",
+				},
+			}
 		}
+
 	default:
 		return "", errors.New("unsupported db driver: " + g.dbDriver)
 	}

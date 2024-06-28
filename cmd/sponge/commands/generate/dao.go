@@ -42,11 +42,14 @@ Examples:
   # generate dao code with multiple table names.
   sponge %s dao --module-name=yourModuleName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=t1,t2
 
+  # generate dao code with extened api.
+  sponge %s dao --module-name=yourModuleName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --extended-api=true
+
   # generate dao code and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge %s dao --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
 
   # if you want the generated code to suited to mono-repo, you need to specify the parameter --suited-mono-repo=true --serverName=yourServerName
-`, parentName, parentName, parentName),
+`, parentName, parentName, parentName, parentName),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -96,6 +99,7 @@ Examples:
 					outPath:         outPath,
 					serverName:      serverName,
 					isEmbed:         sqlArgs.IsEmbed,
+					isExtendedApi:   sqlArgs.IsExtendedApi,
 					suitedMonoRepo:  suitedMonoRepo,
 				}
 				outPath, err = g.generateCode()
@@ -122,6 +126,7 @@ using help:
 	cmd.Flags().StringVarP(&dbTables, "db-table", "t", "", "table name, multiple names separated by commas")
 	_ = cmd.MarkFlagRequired("db-table")
 	cmd.Flags().BoolVarP(&sqlArgs.IsEmbed, "embed", "e", false, "whether to embed gorm.model struct")
+	cmd.Flags().BoolVarP(&sqlArgs.IsExtendedApi, "extended-api", "a", false, "whether to generate extended crud api, additional includes: DeleteByIDs, GetByCondition, ListByIDs, ListByLatestID")
 	cmd.Flags().StringVarP(&serverName, "server-name", "s", "", "server name")
 	cmd.Flags().BoolVarP(&suitedMonoRepo, "suited-mono-repo", "l", false, "whether the generated code is suitable for mono-repo")
 	cmd.Flags().IntVarP(&sqlArgs.JSONNamedType, "json-name-type", "j", 1, "json tags name type, 0:snake case, 1:camel case")
@@ -139,6 +144,7 @@ type daoGenerator struct {
 	codes           map[string]string
 	outPath         string
 	isEmbed         bool
+	isExtendedApi   bool
 	serverName      string
 	suitedMonoRepo  bool
 
@@ -172,16 +178,28 @@ func (g *daoGenerator) generateCode() (string, error) {
 	switch strings.ToLower(g.dbDriver) {
 	case DBDriverMysql, DBDriverPostgresql, DBDriverTidb, DBDriverSqlite:
 		g.fields = append(g.fields, getExpectedSQLForDeletionField(g.isEmbed)...)
+		if g.isExtendedApi {
+			var fields []replacer.Field
+			replaceFiles, fields = daoExtendedApi(r)
+			g.fields = append(g.fields, fields...)
+		}
 
 	case DBDriverMongodb:
-		replaceFiles = map[string][]string{
-			"internal/cache": {
-				"userExample.go.mgo",
-			},
-			"internal/dao": {
-				"userExample.go.mgo",
-			},
+		if g.isExtendedApi {
+			var fields []replacer.Field
+			replaceFiles, fields = daoMongoDBExtendedApi(r)
+			g.fields = append(g.fields, fields...)
+		} else {
+			replaceFiles = map[string][]string{
+				"internal/cache": {
+					"userExample.go.mgo",
+				},
+				"internal/dao": {
+					"userExample.go.mgo",
+				},
+			}
 		}
+
 	default:
 		return "", errors.New("unsupported db driver: " + g.dbDriver)
 	}
@@ -253,4 +271,57 @@ func (g *daoGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	}
 
 	return fields
+}
+
+func daoExtendedApi(r replacer.Replacer) (map[string][]string, []replacer.Field) {
+	replaceFiles := map[string][]string{
+		"internal/dao": {
+			"userExample.go.exp", "userExample_test.go.exp",
+		},
+	}
+	var fields []replacer.Field
+
+	fields = append(fields, deleteFieldsMark(r, daoFile+".exp", startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, daoTestFile+".exp", startMark, endMark)...)
+
+	fields = append(fields, []replacer.Field{
+		{
+			Old: "userExample.go.exp",
+			New: "userExample.go",
+		},
+		{
+			Old: "userExample_test.go.exp",
+			New: "userExample_test.go",
+		},
+	}...)
+
+	return replaceFiles, fields
+}
+
+func daoMongoDBExtendedApi(r replacer.Replacer) (map[string][]string, []replacer.Field) {
+	replaceFiles := map[string][]string{
+		"internal/cache": {
+			"userExample.go.mgo",
+		},
+		"internal/dao": {
+			"userExample.go.mgo.exp",
+		},
+	}
+
+	var fields []replacer.Field
+
+	fields = append(fields, deleteFieldsMark(r, daoMgoFile+".exp", startMark, endMark)...)
+
+	fields = append(fields, []replacer.Field{
+		{
+			Old: "userExample.go.mgo.exp",
+			New: "userExample.go",
+		},
+		{
+			Old: "userExample.go.mgo",
+			New: "userExample.go",
+		},
+	}...)
+
+	return replaceFiles, fields
 }

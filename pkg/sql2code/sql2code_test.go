@@ -143,6 +143,8 @@ func Test_getOptions(t *testing.T) {
 		ColumnPrefix:   "ColumnPrefix",
 		NoNullType:     true,
 		NullStyle:      "sql",
+		IsWebProto:     true,
+		IsExtendedApi:  true,
 	}
 
 	o := setOptions(a)

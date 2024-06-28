@@ -29,6 +29,7 @@ type options struct {
 	ForceTableName bool
 	IsEmbed        bool // is gorm.Model embedded
 	IsWebProto     bool // true: proto file include router path and swagger info, false: normal proto file without router and swagger
+	IsExtendedApi  bool // true: extended api (9 api), false: basic api (5 api)
 }
 
 var defaultOptions = options{
@@ -138,6 +139,13 @@ func WithEmbed() Option {
 func WithWebProto() Option {
 	return func(o *options) {
 		o.IsWebProto = true
+	}
+}
+
+// WithExtendedApi set extended api
+func WithExtendedApi() Option {
+	return func(o *options) {
+		o.IsExtendedApi = true
 	}
 }
 

@@ -15,7 +15,7 @@
 // micro       Generate protobuf, model, cache, dao, service, grpc, grpc+http, grpc-gw, grpc-cli code
 // patch       Command set for patching service code
 // plugins     Managing sponge dependency plugins
-// run         Open the sponge UI interface
+// run         Run the sponge ui service
 // upgrade     Upgrade sponge version
 // web         Generate model, cache, dao, handler, http code
 //

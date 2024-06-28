@@ -42,6 +42,9 @@ Examples:
   # generate handler code with multiple table names.
   sponge web handler --module-name=yourModuleName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=t1,t2
 
+  # generate handler code with extended api.
+  sponge web handler --module-name=yourModuleName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --extended-api=true
+
   # generate handler code and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge web handler --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
 
@@ -88,6 +91,7 @@ Examples:
 					codes:          codes,
 					outPath:        outPath,
 					isEmbed:        sqlArgs.IsEmbed,
+					isExtendedApi:  sqlArgs.IsExtendedApi,
 					serverName:     serverName,
 					suitedMonoRepo: suitedMonoRepo,
 				}
@@ -119,6 +123,7 @@ using help:
 	cmd.Flags().StringVarP(&dbTables, "db-table", "t", "", "table name, multiple names separated by commas")
 	_ = cmd.MarkFlagRequired("db-table")
 	cmd.Flags().BoolVarP(&sqlArgs.IsEmbed, "embed", "e", false, "whether to embed gorm.model struct")
+	cmd.Flags().BoolVarP(&sqlArgs.IsExtendedApi, "extended-api", "a", false, "whether to generate extended crud api, additional includes: DeleteByIDs, GetByCondition, ListByIDs, ListByLatestID")
 	cmd.Flags().BoolVarP(&suitedMonoRepo, "suited-mono-repo", "l", false, "whether the generated code is suitable for mono-repo")
 	cmd.Flags().IntVarP(&sqlArgs.JSONNamedType, "json-name-type", "j", 1, "json tags name type, 0:snake case, 1:camel case")
 	cmd.Flags().StringVarP(&outPath, "out", "o", "", "output directory, default is ./handler_<time>, "+
@@ -134,6 +139,7 @@ type handlerGenerator struct {
 	outPath        string
 	serverName     string
 	isEmbed        bool
+	isExtendedApi  bool
 	suitedMonoRepo bool
 
 	fields []replacer.Field
@@ -178,22 +184,34 @@ func (g *handlerGenerator) generateCode() (string, error) {
 	switch strings.ToLower(g.dbDriver) {
 	case DBDriverMysql, DBDriverPostgresql, DBDriverTidb, DBDriverSqlite:
 		g.fields = append(g.fields, getExpectedSQLForDeletionField(g.isEmbed)...)
+		if g.isExtendedApi {
+			var fields []replacer.Field
+			replaceFiles, fields = handlerExtendedApi(r, codeNameHandler)
+			g.fields = append(g.fields, fields...)
+		}
 
 	case DBDriverMongodb:
-		replaceFiles = map[string][]string{
-			"internal/cache": {
-				"userExample.go.mgo",
-			},
-			"internal/dao": {
-				"userExample.go.mgo",
-			},
-			"internal/handler": {
-				"userExample.go.mgo",
-			},
-			"internal/types": {
-				"userExample_types.go.mgo",
-			},
+		if g.isExtendedApi {
+			var fields []replacer.Field
+			replaceFiles, fields = handlerMongoDBExtendedApi(r, codeNameHandler)
+			g.fields = append(g.fields, fields...)
+		} else {
+			replaceFiles = map[string][]string{
+				"internal/cache": {
+					"userExample.go.mgo",
+				},
+				"internal/dao": {
+					"userExample.go.mgo",
+				},
+				"internal/handler": {
+					"userExample.go.mgo",
+				},
+				"internal/types": {
+					"userExample_types.go.mgo",
+				},
+			}
 		}
+
 	default:
 		return "", errors.New("unsupported db driver: " + g.dbDriver)
 	}
@@ -275,4 +293,115 @@ func (g *handlerGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	}
 
 	return fields
+}
+
+func handlerExtendedApi(r replacer.Replacer, codeName string) (map[string][]string, []replacer.Field) {
+	replaceFiles := map[string][]string{
+		"internal/dao": {
+			"userExample.go.exp", "userExample_test.go.exp",
+		},
+		"internal/ecode": {
+			"systemCode_http.go", "userExample_http.go.exp",
+		},
+		"internal/handler": {
+			"userExample.go.exp", "userExample_test.go.exp",
+		},
+		"internal/routers": {
+			"routers.go", "userExample.go.exp",
+		},
+		"internal/types": {
+			"swagger_types.go", "userExample_types.go.exp",
+		},
+	}
+	if codeName == codeNameHandler {
+		replaceFiles["internal/ecode"] = []string{"userExample_http.go.exp"}
+		replaceFiles["internal/routers"] = []string{"userExample.go.exp"}
+		replaceFiles["internal/types"] = []string{"userExample_types.go.exp"}
+	}
+
+	var fields []replacer.Field
+
+	fields = append(fields, deleteFieldsMark(r, daoFile+".exp", startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, daoTestFile+".exp", startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, handlerFile+".exp", startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, handlerTestFile+".exp", startMark, endMark)...)
+
+	fields = append(fields, []replacer.Field{
+		{
+			Old: "userExample_types.go.exp",
+			New: "userExample_types.go",
+		},
+		{
+			Old: "userExample_http.go.exp",
+			New: "userExample_http.go",
+		},
+		{
+			Old: "userExample.go.exp",
+			New: "userExample.go",
+		},
+		{
+			Old: "userExample_test.go.exp",
+			New: "userExample_test.go",
+		},
+	}...)
+
+	return replaceFiles, fields
+}
+
+func handlerMongoDBExtendedApi(r replacer.Replacer, codeName string) (map[string][]string, []replacer.Field) {
+	replaceFiles := map[string][]string{
+		"internal/cache": {
+			"userExample.go.mgo",
+		},
+		"internal/dao": {
+			"userExample.go.mgo.exp",
+		},
+		"internal/ecode": {
+			"systemCode_http.go", "userExample_http.go.exp",
+		},
+		"internal/handler": {
+			"userExample.go.mgo.exp",
+		},
+		"internal/model": {
+			"init.go.mgo", "userExample.go",
+		},
+		"internal/routers": {
+			"routers.go", "userExample.go.exp",
+		},
+		"internal/types": {
+			"swagger_types.go", "userExample_types.go.mgo.exp",
+		},
+	}
+	if codeName == codeNameHandler {
+		replaceFiles["internal/ecode"] = []string{"userExample_http.go.exp"}
+		replaceFiles["internal/model"] = []string{"userExample.go"}
+		replaceFiles["internal/routers"] = []string{"userExample.go.exp"}
+		replaceFiles["internal/types"] = []string{"userExample_types.go.mgo.exp"}
+	}
+
+	var fields []replacer.Field
+
+	fields = append(fields, deleteFieldsMark(r, daoMgoFile+".exp", startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, handlerMgoFile+".exp", startMark, endMark)...)
+
+	fields = append(fields, []replacer.Field{
+		{
+			Old: "userExample_http.go.exp",
+			New: "userExample_http.go",
+		},
+		{
+			Old: "userExample_types.go.mgo.exp",
+			New: "userExample_types.go",
+		},
+		{
+			Old: "userExample.go.mgo.exp",
+			New: "userExample.go",
+		},
+		{
+			Old: "userExample.go.exp",
+			New: "userExample.go",
+		},
+	}...)
+
+	return replaceFiles, fields
 }

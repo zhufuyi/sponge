@@ -34,6 +34,23 @@ const (
 	DBDriverMongodb = "mongodb"
 
 	undeterminedDBDriver = "undetermined" // used in services created based on protobuf.
+
+	// code name
+	codeNameModel       = "model"
+	codeNameCache       = "cache"
+	codeNameDao         = "dao"
+	codeNameHandler     = "handler"
+	codeNameHandlerPb   = "handler-pb"
+	codeNameService     = "service"
+	codeNameServiceHTTP = "service-http"
+	codeNameHTTP        = "http"
+	codeNameHTTPPb      = "http-pb"
+	codeNameGRPC        = "grpc"
+	codeNameGRPCPb      = "grpc-pb"
+	codeNameGRPCGW      = "grpc-gw-pb"
+	codeNameGRPCHTTP    = "grpc-http-pb"
+	codeNameGRPCConn    = "grpc-conn"
+	codeNameProtobuf    = "protobuf"
 )
 
 var (

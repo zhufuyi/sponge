@@ -46,6 +46,9 @@ Examples:
   # generate grpc service code with multiple table names.
   sponge micro rpc --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=t1,t2
 
+  # generate grpc service code with extended api.
+  sponge micro rpc --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --extended-api=true
+
   # generate grpc service code and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge micro rpc --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
 
@@ -86,15 +89,16 @@ Examples:
 				return err
 			}
 			g := &rpcGenerator{
-				moduleName:  moduleName,
-				serverName:  serverName,
-				projectName: projectName,
-				repoAddr:    repoAddr,
-				dbDSN:       sqlArgs.DBDsn,
-				dbDriver:    sqlArgs.DBDriver,
-				isEmbed:     sqlArgs.IsEmbed,
-				codes:       codes,
-				outPath:     outPath,
+				moduleName:    moduleName,
+				serverName:    serverName,
+				projectName:   projectName,
+				repoAddr:      repoAddr,
+				dbDSN:         sqlArgs.DBDsn,
+				dbDriver:      sqlArgs.DBDriver,
+				isExtendedApi: sqlArgs.IsExtendedApi,
+				isEmbed:       sqlArgs.IsEmbed,
+				codes:         codes,
+				outPath:       outPath,
 
 				suitedMonoRepo: suitedMonoRepo,
 			}
@@ -118,6 +122,7 @@ Examples:
 					moduleName:     moduleName,
 					serverName:     serverName,
 					dbDriver:       sqlArgs.DBDriver,
+					isExtendedApi:  sqlArgs.IsExtendedApi,
 					isEmbed:        sqlArgs.IsEmbed,
 					codes:          codes,
 					outPath:        outPath,
@@ -155,6 +160,7 @@ using help:
 	cmd.Flags().StringVarP(&dbTables, "db-table", "t", "", "table name, multiple names separated by commas")
 	_ = cmd.MarkFlagRequired("db-table")
 	cmd.Flags().BoolVarP(&sqlArgs.IsEmbed, "embed", "e", false, "whether to embed gorm.model struct")
+	cmd.Flags().BoolVarP(&sqlArgs.IsExtendedApi, "extended-api", "a", false, "whether to generate extended crud api, additional includes: DeleteByIDs, GetByCondition, ListByIDs, ListByLatestID")
 	cmd.Flags().BoolVarP(&suitedMonoRepo, "suited-mono-repo", "l", false, "whether the generated code is suitable for mono-repo")
 	cmd.Flags().IntVarP(&sqlArgs.JSONNamedType, "json-name-type", "j", 1, "json tags name type, 0:snake case, 1:camel case")
 	cmd.Flags().StringVarP(&repoAddr, "repo-addr", "r", "", "docker image repository address, excluding http and repository names")
@@ -171,6 +177,7 @@ type rpcGenerator struct {
 	dbDSN          string
 	dbDriver       string
 	isEmbed        bool
+	isExtendedApi  bool
 	codes          map[string]string
 	outPath        string
 	suitedMonoRepo bool
@@ -233,23 +240,35 @@ func (g *rpcGenerator) generateCode() (string, error) {
 	switch strings.ToLower(g.dbDriver) {
 	case DBDriverMysql, DBDriverPostgresql, DBDriverTidb, DBDriverSqlite:
 		g.fields = append(g.fields, getExpectedSQLForDeletionField(g.isEmbed)...)
+		if g.isExtendedApi {
+			var fields []replacer.Field
+			replaceFiles, fields = serviceExtendedApi(r, codeNameGRPC)
+			g.fields = append(g.fields, fields...)
+		}
 
 	case DBDriverMongodb:
-		replaceFiles = map[string][]string{
-			"internal/cache": {
-				"userExample.go.mgo",
-			},
-			"internal/dao": {
-				"userExample.go.mgo",
-			},
-			"internal/model": {
-				"init.go.mgo", "userExample.go",
-			},
-			"internal/service": {
-				"service.go", "service_test.go", "userExample.go.mgo", "userExample_client_test.go.mgo",
-			},
+		if g.isExtendedApi {
+			var fields []replacer.Field
+			replaceFiles, fields = serviceMongoDBExtendedApi(r, codeNameHTTP)
+			g.fields = append(g.fields, fields...)
+		} else {
+			replaceFiles = map[string][]string{
+				"internal/cache": {
+					"userExample.go.mgo",
+				},
+				"internal/dao": {
+					"userExample.go.mgo",
+				},
+				"internal/model": {
+					"init.go.mgo", "userExample.go",
+				},
+				"internal/service": {
+					"service.go", "service_test.go", "userExample.go.mgo", "userExample_client_test.go.mgo",
+				},
+			}
+			g.fields = append(g.fields, deleteFieldsMark(r, serviceLogicFile+".mgo", startMark, endMark)...)
 		}
-		serviceLogicFile += ".mgo"
+
 	default:
 		return "", errors.New("unsupported db driver: " + g.dbDriver)
 	}

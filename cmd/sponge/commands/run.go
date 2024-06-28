@@ -14,7 +14,7 @@ import (
 	"github.com/zhufuyi/sponge/cmd/sponge/server"
 )
 
-// OpenUICommand open the sponge UI interface
+// OpenUICommand run the sponge ui service
 func OpenUICommand() *cobra.Command {
 	var (
 		port       int
@@ -24,8 +24,8 @@ func OpenUICommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "run",
-		Short: "Open the sponge UI interface",
-		Long: `open the sponge UI interface.
+		Short: "Run the sponge UI service",
+		Long: `run the sponge UI service.
 
 Examples:
   # running ui service, local browser access only.

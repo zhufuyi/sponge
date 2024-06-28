@@ -15,14 +15,6 @@ definitions:
       value:
         description: column value
     type: object
-  github_com_zhufuyi_sponge_internal_types.Conditions:
-    properties:
-      columns:
-        description: columns info
-        items:
-          $ref: '#/definitions/github_com_zhufuyi_sponge_internal_types.Column'
-        type: array
-    type: object
   github_com_zhufuyi_sponge_internal_types.Params:
     properties:
       columns:
@@ -102,41 +94,6 @@ definitions:
         description: return information description
         type: string
     type: object
-  types.DeleteUserExamplesByIDsRequest:
-    properties:
-      ids:
-        description: id list
-        items:
-          type: integer
-        minItems: 1
-        type: array
-    type: object
-  types.DeleteUserExamplesByIDsRespond:
-    properties:
-      code:
-        description: return code
-        type: integer
-      data:
-        description: return data
-      msg:
-        description: return information description
-        type: string
-    type: object
-  types.GetUserExampleByConditionRespond:
-    properties:
-      code:
-        description: return code
-        type: integer
-      data:
-        description: return data
-        properties:
-          userExample:
-            $ref: '#/definitions/types.UserExampleObjDetail'
-        type: object
-      msg:
-        description: return information description
-        type: string
-    type: object
   types.GetUserExampleByIDRespond:
     properties:
       code:
@@ -147,32 +104,6 @@ definitions:
         properties:
           userExample:
             $ref: '#/definitions/types.UserExampleObjDetail'
-        type: object
-      msg:
-        description: return information description
-        type: string
-    type: object
-  types.ListUserExamplesByIDsRequest:
-    properties:
-      ids:
-        description: id list
-        items:
-          type: integer
-        minItems: 1
-        type: array
-    type: object
-  types.ListUserExamplesByIDsRespond:
-    properties:
-      code:
-        description: return code
-        type: integer
-      data:
-        description: return data
-        properties:
-          userExamples:
-            items:
-              $ref: '#/definitions/types.UserExampleObjDetail'
-            type: array
         type: object
       msg:
         description: return information description
@@ -295,6 +226,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/types.CreateUserExampleRespond'
+      security:
+      - BearerAuth: []
       summary: create userExample
       tags:
       - userExample
@@ -316,6 +249,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/types.DeleteUserExampleByIDRespond'
+      security:
+      - BearerAuth: []
       summary: delete userExample
       tags:
       - userExample
@@ -336,6 +271,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/types.GetUserExampleByIDRespond'
+      security:
+      - BearerAuth: []
       summary: get userExample detail
       tags:
       - userExample
@@ -362,84 +299,12 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/types.UpdateUserExampleByIDRespond'
+      security:
+      - BearerAuth: []
       summary: update userExample
       tags:
       - userExample
-  /api/v1/userExample/condition:
-    post:
-      consumes:
-      - application/json
-      description: get userExample by condition
-      parameters:
-      - description: query condition
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/github_com_zhufuyi_sponge_internal_types.Conditions'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.GetUserExampleByConditionRespond'
-      summary: get userExample by condition
-      tags:
-      - userExample
-  /api/v1/userExample/delete/ids:
-    post:
-      consumes:
-      - application/json
-      description: delete userExamples by batch id
-      parameters:
-      - description: id array
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/types.DeleteUserExamplesByIDsRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.DeleteUserExamplesByIDsRespond'
-      summary: delete userExamples
-      tags:
-      - userExample
   /api/v1/userExample/list:
-    get:
-      consumes:
-      - application/json
-      description: list of userExamples by last id and limit
-      parameters:
-      - description: last id, default is MaxInt32
-        in: query
-        name: lastID
-        required: true
-        type: integer
-      - default: 10
-        description: size in each page
-        in: query
-        name: limit
-        type: integer
-      - default: -id
-        description: 'sort by column name of table, and the '
-        in: query
-        name: sort
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.ListUserExamplesRespond'
-      summary: list of userExamples by last id and limit
-      tags:
-      - userExample
     post:
       consumes:
       - application/json
@@ -458,29 +323,9 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/types.ListUserExamplesRespond'
+      security:
+      - BearerAuth: []
       summary: list of userExamples by query parameters
-      tags:
-      - userExample
-  /api/v1/userExample/list/ids:
-    post:
-      consumes:
-      - application/json
-      description: list of userExamples by batch id
-      parameters:
-      - description: id array
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/types.ListUserExamplesByIDsRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.ListUserExamplesByIDsRespond'
-      summary: list of userExamples by batch id
       tags:
       - userExample
   /codes:

@@ -43,6 +43,9 @@ Examples:
   # generate service code with multiple table names.
   sponge micro service --module-name=yourModuleName --server-name=yourServerName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=t1,t2
 
+  # generate service code with extended api.
+  sponge micro service --module-name=yourModuleName --server-name=yourServerName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --extended-api=true
+
   # generate service code and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge micro service --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
 
@@ -89,6 +92,7 @@ Examples:
 					serverName:     serverName,
 					dbDriver:       sqlArgs.DBDriver,
 					isEmbed:        sqlArgs.IsEmbed,
+					isExtendedApi:  sqlArgs.IsExtendedApi,
 					codes:          codes,
 					outPath:        outPath,
 					suitedMonoRepo: suitedMonoRepo,
@@ -122,6 +126,7 @@ using help:
 	cmd.Flags().StringVarP(&dbTables, "db-table", "t", "", "table name, multiple names separated by commas")
 	_ = cmd.MarkFlagRequired("db-table")
 	cmd.Flags().BoolVarP(&sqlArgs.IsEmbed, "embed", "e", false, "whether to embed gorm.model struct")
+	cmd.Flags().BoolVarP(&sqlArgs.IsExtendedApi, "extended-api", "a", false, "whether to generate extended crud api, additional includes: DeleteByIDs, GetByCondition, ListByIDs, ListByLatestID")
 	cmd.Flags().BoolVarP(&suitedMonoRepo, "suited-mono-repo", "l", false, "whether the generated code is suitable for mono-repo")
 	cmd.Flags().IntVarP(&sqlArgs.JSONNamedType, "json-name-type", "j", 1, "json tags name type, 0:snake case, 1:camel case")
 	cmd.Flags().StringVarP(&outPath, "out", "o", "", "output directory, default is ./service_<time>,"+
@@ -135,6 +140,7 @@ type serviceGenerator struct {
 	serverName     string
 	dbDriver       string
 	isEmbed        bool
+	isExtendedApi  bool
 	codes          map[string]string
 	outPath        string
 	suitedMonoRepo bool
@@ -183,20 +189,32 @@ func (g *serviceGenerator) generateCode() (string, error) {
 	switch strings.ToLower(g.dbDriver) {
 	case DBDriverMysql, DBDriverPostgresql, DBDriverTidb, DBDriverSqlite:
 		g.fields = append(g.fields, getExpectedSQLForDeletionField(g.isEmbed)...)
+		if g.isExtendedApi {
+			var fields []replacer.Field
+			replaceFiles, fields = serviceExtendedApi(r, codeNameService)
+			g.fields = append(g.fields, fields...)
+		}
 
 	case DBDriverMongodb:
-		replaceFiles = map[string][]string{
-			"internal/cache": {
-				"userExample.go.mgo",
-			},
-			"internal/dao": {
-				"userExample.go.mgo",
-			},
-			"internal/service": {
-				"userExample.go.mgo", "userExample_client_test.go.mgo",
-			},
+		if g.isExtendedApi {
+			var fields []replacer.Field
+			replaceFiles, fields = serviceMongoDBExtendedApi(r, codeNameService)
+			g.fields = append(g.fields, fields...)
+		} else {
+			replaceFiles = map[string][]string{
+				"internal/cache": {
+					"userExample.go.mgo",
+				},
+				"internal/dao": {
+					"userExample.go.mgo",
+				},
+				"internal/service": {
+					"userExample.go.mgo", "userExample_client_test.go.mgo",
+				},
+			}
+			g.fields = append(g.fields, deleteFieldsMark(r, serviceLogicFile+".mgo", startMark, endMark)...)
 		}
-		serviceLogicFile += ".mgo"
+
 	default:
 		return "", errors.New("unsupported db driver: " + g.dbDriver)
 	}
@@ -306,4 +324,98 @@ func (g *serviceGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	}
 
 	return fields
+}
+
+func serviceExtendedApi(r replacer.Replacer, codeName string) (map[string][]string, []replacer.Field) {
+	replaceFiles := map[string][]string{
+		"internal/dao": {
+			"userExample.go.exp", "userExample_test.go.exp",
+		},
+		"internal/ecode": {
+			"systemCode_rpc.go", "userExample_rpc.go.exp",
+		},
+		"internal/service": {
+			"service.go", "service_test.go", "userExample.go.exp", "userExample_client_test.go.exp",
+		},
+	}
+	if codeName == codeNameService {
+		replaceFiles["internal/ecode"] = []string{"userExample_rpc.go.exp"}
+		replaceFiles["internal/service"] = []string{"userExample.go.exp", "userExample_client_test.go.exp"}
+	}
+
+	var fields []replacer.Field
+
+	fields = append(fields, deleteFieldsMark(r, daoFile+".exp", startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, daoTestFile+".exp", startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, serviceLogicFile+".exp", startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, serviceClientFile+".exp", startMark, endMark)...)
+
+	fields = append(fields, []replacer.Field{
+		{
+			Old: "userExample_rpc.go.exp",
+			New: "userExample_rpc.go",
+		},
+		{
+			Old: "userExample.go.exp",
+			New: "userExample.go",
+		},
+		{
+			Old: "userExample_test.go.exp",
+			New: "userExample_test.go",
+		},
+		{
+			Old: "userExample_client_test.go.exp",
+			New: "userExample_client_test.go",
+		},
+	}...)
+
+	return replaceFiles, fields
+}
+
+func serviceMongoDBExtendedApi(r replacer.Replacer, codeName string) (map[string][]string, []replacer.Field) {
+	replaceFiles := map[string][]string{
+		"internal/cache": {
+			"userExample.go.mgo",
+		},
+		"internal/dao": {
+			"userExample.go.mgo.exp",
+		},
+		"internal/ecode": {
+			"systemCode_rpc.go", "userExample_rpc.go.exp",
+		},
+		"internal/model": {
+			"init.go.mgo", "userExample.go",
+		},
+		"internal/service": {
+			"service.go", "service_test.go", "userExample.go.mgo.exp", "userExample_client_test.go.mgo.exp",
+		},
+	}
+	if codeName == codeNameService {
+		replaceFiles["internal/ecode"] = []string{"userExample_rpc.go.exp"}
+		replaceFiles["internal/model"] = []string{"userExample.go"}
+		replaceFiles["internal/service"] = []string{"userExample.go.mgo.exp", "userExample_client_test.go.mgo.exp"}
+	}
+
+	var fields []replacer.Field
+
+	fields = append(fields, deleteFieldsMark(r, daoMgoFile+".exp", startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, serviceLogicFile+".mgo.exp", startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, serviceClientMgoFile+".exp", startMark, endMark)...)
+
+	fields = append(fields, []replacer.Field{
+		{
+			Old: "userExample_rpc.go.exp",
+			New: "userExample_rpc.go",
+		},
+		{
+			Old: "userExample.go.mgo.exp",
+			New: "userExample.go",
+		},
+		{
+			Old: "userExample_client_test.go.mgo.exp",
+			New: "userExample_client_test.go",
+		},
+	}...)
+
+	return replaceFiles, fields
 }

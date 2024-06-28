@@ -28,7 +28,7 @@ func TestParseSql(t *testing.T) {
 		assert.NotEmpty(t, v)
 	}
 	t.Log(codes[CodeTypeJSON])
-	return
+
 	//printCode(codes)
 
 	codes, err = ParseSQL(sql, WithTablePrefix("t_"), WithJSONTag(0), WithEmbed())
@@ -182,7 +182,9 @@ func Test_initTemplate(t *testing.T) {
 	handlerDetailStructTmplRaw = "{{if .foo}}"
 	modelJSONTmplRaw = "{{if .foo}}"
 	protoFileTmplRaw = "{{if .foo}}"
+	protoFileSimpleTmplRaw = "{{if .foo}}"
 	protoFileForWebTmplRaw = "{{if .foo}}"
+	protoFileForSimpleWebTmplRaw = "{{if .foo}}"
 	protoMessageCreateTmplRaw = "{{if .foo}}"
 	protoMessageUpdateTmplRaw = "{{if .foo}}"
 	protoMessageDetailTmplRaw = "{{if .foo}}"
@@ -394,6 +396,7 @@ func Test_getMongodbTableFields(t *testing.T) {
 		WithFieldTypes(fieldsMap),
 		WithJSONTag(1),
 		WithWebProto(),
+		WithExtendedApi(),
 	}
 	codes, err = ParseSQL(sql, opts...)
 	if err != nil {
