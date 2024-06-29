@@ -39,7 +39,7 @@ type Args struct {
 	ColumnPrefix   string
 	NoNullType     bool
 	NullStyle      string
-	IsExtendedApi  bool // true: generate extended api (9 api), false: generate basic api (5 api)
+	IsExtendedAPI  bool // true: generate extended api (9 api), false: generate basic api (5 api)
 }
 
 func (a *Args) checkValid() error {
@@ -178,8 +178,8 @@ func setOptions(args *Args) []parser.Option {
 	if args.ForceTableName {
 		opts = append(opts, parser.WithForceTableName())
 	}
-	if args.IsExtendedApi {
-		opts = append(opts, parser.WithExtendedApi())
+	if args.IsExtendedAPI {
+		opts = append(opts, parser.WithExtendedAPI())
 	}
 
 	return opts

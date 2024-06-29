@@ -569,16 +569,6 @@ func sqliteDSNAdaptation(dbDriver string, dsn string) string {
 	return dsn
 }
 
-func removeElement(slice []string, element string) []string {
-	result := make([]string, 0, len(slice)-1)
-	for _, s := range slice {
-		if s != element {
-			result = append(result, s)
-		}
-	}
-	return result
-}
-
 func removeElements(slice []string, elements ...string) []string {
 	if len(elements) == 0 {
 		return slice

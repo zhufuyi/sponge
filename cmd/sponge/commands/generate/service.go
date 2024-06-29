@@ -92,7 +92,7 @@ Examples:
 					serverName:     serverName,
 					dbDriver:       sqlArgs.DBDriver,
 					isEmbed:        sqlArgs.IsEmbed,
-					isExtendedApi:  sqlArgs.IsExtendedApi,
+					isExtendedAPI:  sqlArgs.IsExtendedAPI,
 					codes:          codes,
 					outPath:        outPath,
 					suitedMonoRepo: suitedMonoRepo,
@@ -126,7 +126,7 @@ using help:
 	cmd.Flags().StringVarP(&dbTables, "db-table", "t", "", "table name, multiple names separated by commas")
 	_ = cmd.MarkFlagRequired("db-table")
 	cmd.Flags().BoolVarP(&sqlArgs.IsEmbed, "embed", "e", false, "whether to embed gorm.model struct")
-	cmd.Flags().BoolVarP(&sqlArgs.IsExtendedApi, "extended-api", "a", false, "whether to generate extended crud api, additional includes: DeleteByIDs, GetByCondition, ListByIDs, ListByLatestID")
+	cmd.Flags().BoolVarP(&sqlArgs.IsExtendedAPI, "extended-api", "a", false, "whether to generate extended crud api, additional includes: DeleteByIDs, GetByCondition, ListByIDs, ListByLatestID")
 	cmd.Flags().BoolVarP(&suitedMonoRepo, "suited-mono-repo", "l", false, "whether the generated code is suitable for mono-repo")
 	cmd.Flags().IntVarP(&sqlArgs.JSONNamedType, "json-name-type", "j", 1, "json tags name type, 0:snake case, 1:camel case")
 	cmd.Flags().StringVarP(&outPath, "out", "o", "", "output directory, default is ./service_<time>,"+
@@ -140,7 +140,7 @@ type serviceGenerator struct {
 	serverName     string
 	dbDriver       string
 	isEmbed        bool
-	isExtendedApi  bool
+	isExtendedAPI  bool
 	codes          map[string]string
 	outPath        string
 	suitedMonoRepo bool
@@ -189,16 +189,16 @@ func (g *serviceGenerator) generateCode() (string, error) {
 	switch strings.ToLower(g.dbDriver) {
 	case DBDriverMysql, DBDriverPostgresql, DBDriverTidb, DBDriverSqlite:
 		g.fields = append(g.fields, getExpectedSQLForDeletionField(g.isEmbed)...)
-		if g.isExtendedApi {
+		if g.isExtendedAPI {
 			var fields []replacer.Field
-			replaceFiles, fields = serviceExtendedApi(r, codeNameService)
+			replaceFiles, fields = serviceExtendedAPI(r, codeNameService)
 			g.fields = append(g.fields, fields...)
 		}
 
 	case DBDriverMongodb:
-		if g.isExtendedApi {
+		if g.isExtendedAPI {
 			var fields []replacer.Field
-			replaceFiles, fields = serviceMongoDBExtendedApi(r, codeNameService)
+			replaceFiles, fields = serviceMongoDBExtendedAPI(r, codeNameService)
 			g.fields = append(g.fields, fields...)
 		} else {
 			replaceFiles = map[string][]string{
@@ -234,11 +234,7 @@ func (g *serviceGenerator) generateCode() (string, error) {
 
 func (g *serviceGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	var fields []replacer.Field
-
-	for _, field := range g.fields {
-		fields = append(fields, field)
-	}
-
+	fields = append(fields, g.fields...)
 	fields = append(fields, deleteFieldsMark(r, modelFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, daoFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, daoMgoFile, startMark, endMark)...)
@@ -326,7 +322,7 @@ func (g *serviceGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	return fields
 }
 
-func serviceExtendedApi(r replacer.Replacer, codeName string) (map[string][]string, []replacer.Field) {
+func serviceExtendedAPI(r replacer.Replacer, codeName string) (map[string][]string, []replacer.Field) {
 	replaceFiles := map[string][]string{
 		"internal/dao": {
 			"userExample.go.exp", "userExample_test.go.exp",
@@ -372,7 +368,7 @@ func serviceExtendedApi(r replacer.Replacer, codeName string) (map[string][]stri
 	return replaceFiles, fields
 }
 
-func serviceMongoDBExtendedApi(r replacer.Replacer, codeName string) (map[string][]string, []replacer.Field) {
+func serviceMongoDBExtendedAPI(r replacer.Replacer, codeName string) (map[string][]string, []replacer.Field) {
 	replaceFiles := map[string][]string{
 		"internal/cache": {
 			"userExample.go.mgo",

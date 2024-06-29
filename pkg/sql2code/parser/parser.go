@@ -499,7 +499,7 @@ func makeCode(stmt *ast.CreateTableStmt, opt options) (*codeText, error) {
 		return nil, err
 	}
 
-	protoFileCode, err := getProtoFileCode(data, opt.IsWebProto, opt.IsExtendedApi)
+	protoFileCode, err := getProtoFileCode(data, opt.IsWebProto, opt.IsExtendedAPI)
 	if err != nil {
 		return nil, err
 	}
@@ -751,13 +751,13 @@ func getModelJSONCode(data tmplData) (string, error) {
 	return modelJSONCode, nil
 }
 
-func getProtoFileCode(data tmplData, isWebProto bool, isExtendedApi bool) (string, error) {
+func getProtoFileCode(data tmplData, isWebProto bool, isExtendedAPI bool) (string, error) {
 	data.Fields = goTypeToProto(data.Fields)
 
 	var err error
 	builder := strings.Builder{}
 	if isWebProto {
-		if isExtendedApi {
+		if isExtendedAPI {
 			err = protoFileForWebTmpl.Execute(&builder, data)
 		} else {
 			err = protoFileForSimpleWebTmpl.Execute(&builder, data)
@@ -766,7 +766,7 @@ func getProtoFileCode(data tmplData, isWebProto bool, isExtendedApi bool) (strin
 			return "", err
 		}
 	} else {
-		if isExtendedApi {
+		if isExtendedAPI {
 			err = protoFileTmpl.Execute(&builder, data)
 		} else {
 			err = protoFileSimpleTmpl.Execute(&builder, data)

@@ -144,7 +144,7 @@ func Test_getOptions(t *testing.T) {
 		NoNullType:     true,
 		NullStyle:      "sql",
 		IsWebProto:     true,
-		IsExtendedApi:  true,
+		IsExtendedAPI:  true,
 	}
 
 	o := setOptions(a)

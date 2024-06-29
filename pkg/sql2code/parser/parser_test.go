@@ -396,7 +396,7 @@ func Test_getMongodbTableFields(t *testing.T) {
 		WithFieldTypes(fieldsMap),
 		WithJSONTag(1),
 		WithWebProto(),
-		WithExtendedApi(),
+		WithExtendedAPI(),
 	}
 	codes, err = ParseSQL(sql, opts...)
 	if err != nil {

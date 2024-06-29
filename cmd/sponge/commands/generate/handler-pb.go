@@ -91,7 +91,7 @@ Examples:
 					serverName:     serverName,
 					dbDriver:       sqlArgs.DBDriver,
 					isEmbed:        sqlArgs.IsEmbed,
-					isExtendedApi:  sqlArgs.IsExtendedApi,
+					isExtendedAPI:  sqlArgs.IsExtendedAPI,
 					codes:          codes,
 					outPath:        outPath,
 					suitedMonoRepo: suitedMonoRepo,
@@ -125,7 +125,7 @@ using help:
 	cmd.Flags().StringVarP(&dbTables, "db-table", "t", "", "table name, multiple names separated by commas")
 	_ = cmd.MarkFlagRequired("db-table")
 	cmd.Flags().BoolVarP(&sqlArgs.IsEmbed, "embed", "e", false, "whether to embed gorm.model struct")
-	cmd.Flags().BoolVarP(&sqlArgs.IsExtendedApi, "extended-api", "a", false, "whether to generate extended crud api, additional includes: DeleteByIDs, GetByCondition, ListByIDs, ListByLatestID")
+	cmd.Flags().BoolVarP(&sqlArgs.IsExtendedAPI, "extended-api", "a", false, "whether to generate extended crud api, additional includes: DeleteByIDs, GetByCondition, ListByIDs, ListByLatestID")
 	cmd.Flags().BoolVarP(&suitedMonoRepo, "suited-mono-repo", "l", false, "whether the generated code is suitable for mono-repo")
 	cmd.Flags().IntVarP(&sqlArgs.JSONNamedType, "json-name-type", "j", 1, "json tags name type, 0:snake case, 1:camel case")
 	cmd.Flags().StringVarP(&outPath, "out", "o", "", "output directory, default is ./handler-pb_<time>,"+
@@ -139,7 +139,7 @@ type handlerPbGenerator struct {
 	serverName     string
 	dbDriver       string
 	isEmbed        bool
-	isExtendedApi  bool
+	isExtendedAPI  bool
 	codes          map[string]string
 	outPath        string
 	suitedMonoRepo bool
@@ -187,15 +187,15 @@ func (g *handlerPbGenerator) generateCode() (string, error) {
 	switch strings.ToLower(g.dbDriver) {
 	case DBDriverMysql, DBDriverPostgresql, DBDriverTidb, DBDriverSqlite:
 		g.fields = append(g.fields, getExpectedSQLForDeletionField(g.isEmbed)...)
-		if g.isExtendedApi {
+		if g.isExtendedAPI {
 			var fields []replacer.Field
-			replaceFiles, fields = handlerPbExtendedApi(r)
+			replaceFiles, fields = handlerPbExtendedAPI(r)
 			g.fields = append(g.fields, fields...)
 		}
 	case DBDriverMongodb:
-		if g.isExtendedApi {
+		if g.isExtendedAPI {
 			var fields []replacer.Field
-			replaceFiles, fields = handlerPbMongoDBExtendedApi(r)
+			replaceFiles, fields = handlerPbMongoDBExtendedAPI(r)
 			g.fields = append(g.fields, fields...)
 		} else {
 			replaceFiles = map[string][]string{
@@ -231,11 +231,7 @@ func (g *handlerPbGenerator) generateCode() (string, error) {
 
 func (g *handlerPbGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	var fields []replacer.Field
-
-	for _, field := range g.fields {
-		fields = append(fields, field)
-	}
-
+	fields = append(fields, g.fields...)
 	fields = append(fields, deleteFieldsMark(r, modelFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, daoFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, daoMgoFile, startMark, endMark)...)
@@ -330,7 +326,7 @@ func (g *handlerPbGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	return fields
 }
 
-func handlerPbExtendedApi(r replacer.Replacer) (map[string][]string, []replacer.Field) {
+func handlerPbExtendedAPI(r replacer.Replacer) (map[string][]string, []replacer.Field) {
 	replaceFiles := map[string][]string{
 		"internal/dao": {
 			"userExample.go.exp", "userExample_test.go.exp",
@@ -375,7 +371,7 @@ func handlerPbExtendedApi(r replacer.Replacer) (map[string][]string, []replacer.
 	return replaceFiles, fields
 }
 
-func handlerPbMongoDBExtendedApi(r replacer.Replacer) (map[string][]string, []replacer.Field) {
+func handlerPbMongoDBExtendedAPI(r replacer.Replacer) (map[string][]string, []replacer.Field) {
 	replaceFiles := map[string][]string{
 		"internal/cache": {
 			"userExample.go.mgo",

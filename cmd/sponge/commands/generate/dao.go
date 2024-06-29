@@ -99,7 +99,7 @@ Examples:
 					outPath:         outPath,
 					serverName:      serverName,
 					isEmbed:         sqlArgs.IsEmbed,
-					isExtendedApi:   sqlArgs.IsExtendedApi,
+					isExtendedAPI:   sqlArgs.IsExtendedAPI,
 					suitedMonoRepo:  suitedMonoRepo,
 				}
 				outPath, err = g.generateCode()
@@ -126,7 +126,7 @@ using help:
 	cmd.Flags().StringVarP(&dbTables, "db-table", "t", "", "table name, multiple names separated by commas")
 	_ = cmd.MarkFlagRequired("db-table")
 	cmd.Flags().BoolVarP(&sqlArgs.IsEmbed, "embed", "e", false, "whether to embed gorm.model struct")
-	cmd.Flags().BoolVarP(&sqlArgs.IsExtendedApi, "extended-api", "a", false, "whether to generate extended crud api, additional includes: DeleteByIDs, GetByCondition, ListByIDs, ListByLatestID")
+	cmd.Flags().BoolVarP(&sqlArgs.IsExtendedAPI, "extended-api", "a", false, "whether to generate extended crud api, additional includes: DeleteByIDs, GetByCondition, ListByIDs, ListByLatestID")
 	cmd.Flags().StringVarP(&serverName, "server-name", "s", "", "server name")
 	cmd.Flags().BoolVarP(&suitedMonoRepo, "suited-mono-repo", "l", false, "whether the generated code is suitable for mono-repo")
 	cmd.Flags().IntVarP(&sqlArgs.JSONNamedType, "json-name-type", "j", 1, "json tags name type, 0:snake case, 1:camel case")
@@ -144,7 +144,7 @@ type daoGenerator struct {
 	codes           map[string]string
 	outPath         string
 	isEmbed         bool
-	isExtendedApi   bool
+	isExtendedAPI   bool
 	serverName      string
 	suitedMonoRepo  bool
 
@@ -178,16 +178,16 @@ func (g *daoGenerator) generateCode() (string, error) {
 	switch strings.ToLower(g.dbDriver) {
 	case DBDriverMysql, DBDriverPostgresql, DBDriverTidb, DBDriverSqlite:
 		g.fields = append(g.fields, getExpectedSQLForDeletionField(g.isEmbed)...)
-		if g.isExtendedApi {
+		if g.isExtendedAPI {
 			var fields []replacer.Field
-			replaceFiles, fields = daoExtendedApi(r)
+			replaceFiles, fields = daoExtendedAPI(r)
 			g.fields = append(g.fields, fields...)
 		}
 
 	case DBDriverMongodb:
-		if g.isExtendedApi {
+		if g.isExtendedAPI {
 			var fields []replacer.Field
-			replaceFiles, fields = daoMongoDBExtendedApi(r)
+			replaceFiles, fields = daoMongoDBExtendedAPI(r)
 			g.fields = append(g.fields, fields...)
 		} else {
 			replaceFiles = map[string][]string{
@@ -220,11 +220,7 @@ func (g *daoGenerator) generateCode() (string, error) {
 // set fields
 func (g *daoGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	var fields []replacer.Field
-
-	for _, field := range g.fields {
-		fields = append(fields, field)
-	}
-
+	fields = append(fields, g.fields...)
 	fields = append(fields, deleteFieldsMark(r, modelFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, daoFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, daoMgoFile, startMark, endMark)...)
@@ -273,7 +269,7 @@ func (g *daoGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	return fields
 }
 
-func daoExtendedApi(r replacer.Replacer) (map[string][]string, []replacer.Field) {
+func daoExtendedAPI(r replacer.Replacer) (map[string][]string, []replacer.Field) {
 	replaceFiles := map[string][]string{
 		"internal/dao": {
 			"userExample.go.exp", "userExample_test.go.exp",
@@ -298,7 +294,7 @@ func daoExtendedApi(r replacer.Replacer) (map[string][]string, []replacer.Field)
 	return replaceFiles, fields
 }
 
-func daoMongoDBExtendedApi(r replacer.Replacer) (map[string][]string, []replacer.Field) {
+func daoMongoDBExtendedAPI(r replacer.Replacer) (map[string][]string, []replacer.Field) {
 	replaceFiles := map[string][]string{
 		"internal/cache": {
 			"userExample.go.mgo",

@@ -95,7 +95,7 @@ Examples:
 				repoAddr:      repoAddr,
 				dbDSN:         sqlArgs.DBDsn,
 				dbDriver:      sqlArgs.DBDriver,
-				isExtendedApi: sqlArgs.IsExtendedApi,
+				isExtendedAPI: sqlArgs.IsExtendedAPI,
 				isEmbed:       sqlArgs.IsEmbed,
 				codes:         codes,
 				outPath:       outPath,
@@ -122,7 +122,7 @@ Examples:
 					moduleName:     moduleName,
 					serverName:     serverName,
 					dbDriver:       sqlArgs.DBDriver,
-					isExtendedApi:  sqlArgs.IsExtendedApi,
+					isExtendedAPI:  sqlArgs.IsExtendedAPI,
 					isEmbed:        sqlArgs.IsEmbed,
 					codes:          codes,
 					outPath:        outPath,
@@ -160,7 +160,7 @@ using help:
 	cmd.Flags().StringVarP(&dbTables, "db-table", "t", "", "table name, multiple names separated by commas")
 	_ = cmd.MarkFlagRequired("db-table")
 	cmd.Flags().BoolVarP(&sqlArgs.IsEmbed, "embed", "e", false, "whether to embed gorm.model struct")
-	cmd.Flags().BoolVarP(&sqlArgs.IsExtendedApi, "extended-api", "a", false, "whether to generate extended crud api, additional includes: DeleteByIDs, GetByCondition, ListByIDs, ListByLatestID")
+	cmd.Flags().BoolVarP(&sqlArgs.IsExtendedAPI, "extended-api", "a", false, "whether to generate extended crud api, additional includes: DeleteByIDs, GetByCondition, ListByIDs, ListByLatestID")
 	cmd.Flags().BoolVarP(&suitedMonoRepo, "suited-mono-repo", "l", false, "whether the generated code is suitable for mono-repo")
 	cmd.Flags().IntVarP(&sqlArgs.JSONNamedType, "json-name-type", "j", 1, "json tags name type, 0:snake case, 1:camel case")
 	cmd.Flags().StringVarP(&repoAddr, "repo-addr", "r", "", "docker image repository address, excluding http and repository names")
@@ -177,7 +177,7 @@ type rpcGenerator struct {
 	dbDSN          string
 	dbDriver       string
 	isEmbed        bool
-	isExtendedApi  bool
+	isExtendedAPI  bool
 	codes          map[string]string
 	outPath        string
 	suitedMonoRepo bool
@@ -240,16 +240,16 @@ func (g *rpcGenerator) generateCode() (string, error) {
 	switch strings.ToLower(g.dbDriver) {
 	case DBDriverMysql, DBDriverPostgresql, DBDriverTidb, DBDriverSqlite:
 		g.fields = append(g.fields, getExpectedSQLForDeletionField(g.isEmbed)...)
-		if g.isExtendedApi {
+		if g.isExtendedAPI {
 			var fields []replacer.Field
-			replaceFiles, fields = serviceExtendedApi(r, codeNameGRPC)
+			replaceFiles, fields = serviceExtendedAPI(r, codeNameGRPC)
 			g.fields = append(g.fields, fields...)
 		}
 
 	case DBDriverMongodb:
-		if g.isExtendedApi {
+		if g.isExtendedAPI {
 			var fields []replacer.Field
-			replaceFiles, fields = serviceMongoDBExtendedApi(r, codeNameHTTP)
+			replaceFiles, fields = serviceMongoDBExtendedAPI(r, codeNameHTTP)
 			g.fields = append(g.fields, fields...)
 		} else {
 			replaceFiles = map[string][]string{
@@ -294,14 +294,10 @@ func (g *rpcGenerator) generateCode() (string, error) {
 }
 
 func (g *rpcGenerator) addFields(r replacer.Replacer) []replacer.Field {
-	var fields []replacer.Field
-
 	repoHost, _ := parseImageRepoAddr(g.repoAddr)
 
-	for _, field := range g.fields {
-		fields = append(fields, field)
-	}
-
+	var fields []replacer.Field
+	fields = append(fields, g.fields...)
 	fields = append(fields, deleteFieldsMark(r, modelFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, modelInitDBFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, daoFile, startMark, endMark)...)
