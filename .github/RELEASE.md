@@ -1,8 +1,4 @@
 ## Change log
 
-- Compatible scheme mongodb+srv.
-- Add websocket sdk.
-- Supports dead letter queues for RabbitMQ.
-- Fix logger bug [#39](https://github.com/zhufuyi/sponge/issues/39).
-- Fix parse mysql Enum type bug [#41](https://github.com/zhufuyi/sponge/issues/41).
-- Fix parse postgresql json type bug.
+- Fix a bug in MySQL table name and keyword conflicts.
+- Change the original generation of 9 CRUD API codes for each table to the default generation of 5 commonly used ones, which can be switched to generate 9 through switches.
