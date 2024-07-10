@@ -67,7 +67,7 @@ sponge包含丰富的组件(按需使用)：
 - 鉴权 [jwt](https://github.com/golang-jwt/jwt)
 - 校验 [validator](https://github.com/go-playground/validator)
 - Websocket [gorilla/websocket](https://github.com/gorilla/websocket)
-- 消息队列组件 [rabbitmq](https://github.com/rabbitmq/amqp091-go)
+- 消息队列组件 [rabbitmq](https://github.com/rabbitmq/amqp091-go), [kafka](https://github.com/IBM/sarama)
 - 分布式事务管理器 [dtm](https://github.com/dtm-labs/dtm)
 - 自适应限流 [ratelimit](https://github.com/zhufuyi/sponge/tree/main/pkg/shield/ratelimit)
 - 自适应熔断 [circuitbreaker](https://github.com/zhufuyi/sponge/tree/main/pkg/shield/circuitbreaker)
@@ -163,7 +163,7 @@ sponge run
 
 ### 视频介绍
 
-> 视频教程演示使用sponge v1.3.12版本，后续的版本增加了一些自动化功能、调整了一些UI界面和菜单，建议结合[文档教程](https://go-sponge.com/zh-cn/)使用。
+> 视频教程演示使用sponge v1.3.12版本，新版本增加了一些自动化功能、调整了一些UI界面和菜单，建议结合[文档教程](https://go-sponge.com/zh-cn/)使用。
 
 - [01 sponge的形成过程](https://www.bilibili.com/video/BV1s14y1F7Fz/)
 - [02 sponge的框架介绍](https://www.bilibili.com/video/BV13u4y1F7EU/)

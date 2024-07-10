@@ -77,7 +77,7 @@ Click to view the [**test code**](https://github.com/zhufuyi/microservices_frame
 - Automated API documentation [swagger](https://github.com/swaggo/swag), [protoc-gen-openapiv2](https://github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2)
 - Authentication [jwt](https://github.com/golang-jwt/jwt)
 - Websocket [gorilla/websocket](https://github.com/gorilla/websocket)
-- Message Queue [rabbitmq](https://github.com/rabbitmq/amqp091-go)
+- Message Queue [rabbitmq](https://github.com/rabbitmq/amqp091-go), [kafka](https://github.com/IBM/sarama)
 - Distributed Transaction Manager [dtm](https://github.com/dtm-labs/dtm)
 - Parameter validation [validator](https://github.com/go-playground/validator)
 - Adaptive rate limiting [ratelimit](https://github.com/zhufuyi/sponge/tree/main/pkg/shield/ratelimit)
