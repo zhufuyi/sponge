@@ -175,3 +175,36 @@ func main() {
 	<-time.After(time.Minute) // wait exit
 }
 ```
+
+<br>
+
+### Topic Backlog
+
+Obtain the total backlog of the topic and the backlog of each partition.
+
+```go
+package main
+
+import (    
+	"fmt"
+	"github.com/zhufuyi/pkg/kafka"    
+)
+
+func main() {
+	m, err := kafka.InitClientManager(brokerList, groupID)
+	if err != nil {
+		panic(err)
+	}
+	defer m.Close()
+
+	total, backlogs, err := m.GetBacklog(topic)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("total backlog:", total)
+	for _, backlog := range backlogs {
+		fmt.Printf("partation=%d, backlog=%d, next_consume_offset=%d\n", backlog.Partition, backlog.Backlog, backlog.NextConsumeOffset)
+	}
+}
+```

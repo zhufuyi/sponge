@@ -21,9 +21,10 @@ type consumerOptions struct {
 	tlsConfig *tls.Config         // default nil
 
 	// consumer group options
-	offsetsInitial            int64         // default OffsetOldest
-	offsetsAutoCommitEnable   bool          // default true
-	offsetsAutoCommitInterval time.Duration // default 1s, when offsetsAutoCommitEnable is true
+	groupStrategies           []sarama.BalanceStrategy // default NewBalanceStrategyRange
+	offsetsInitial            int64                    // default OffsetOldest
+	offsetsAutoCommitEnable   bool                     // default true
+	offsetsAutoCommitInterval time.Duration            // default 1s, when offsetsAutoCommitEnable is true
 
 	// custom config, if not nil, it will override the default config, the above parameters are invalid
 	config *sarama.Config // default nil
@@ -41,6 +42,7 @@ func defaultConsumerOptions() *consumerOptions {
 	zapLogger, _ := zap.NewProduction()
 	return &consumerOptions{
 		version:                   sarama.V2_1_0_0,
+		groupStrategies:           []sarama.BalanceStrategy{sarama.NewBalanceStrategyRange()},
 		offsetsInitial:            sarama.OffsetOldest,
 		offsetsAutoCommitEnable:   true,
 		offsetsAutoCommitInterval: time.Second,
@@ -53,6 +55,15 @@ func defaultConsumerOptions() *consumerOptions {
 func ConsumerWithVersion(version sarama.KafkaVersion) ConsumerOption {
 	return func(o *consumerOptions) {
 		o.version = version
+	}
+}
+
+// ConsumerWithGroupStrategies set groupStrategies.
+func ConsumerWithGroupStrategies(groupStrategies ...sarama.BalanceStrategy) ConsumerOption {
+	return func(o *consumerOptions) {
+		if len(groupStrategies) > 0 {
+			o.groupStrategies = groupStrategies
+		}
 	}
 }
 

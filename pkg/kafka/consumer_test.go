@@ -58,6 +58,7 @@ func TestInitConsumerGroup(t *testing.T) {
 	cg, err = InitConsumerGroup(addrs, groupID,
 		ConsumerWithVersion(sarama.V3_6_0_0),
 		ConsumerWithClientID("my-client-id"),
+		ConsumerWithGroupStrategies(sarama.NewBalanceStrategySticky()),
 		ConsumerWithOffsetsInitial(sarama.OffsetOldest),
 		ConsumerWithOffsetsAutoCommitEnable(true),
 		ConsumerWithOffsetsAutoCommitInterval(time.Second),

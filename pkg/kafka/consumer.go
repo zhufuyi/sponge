@@ -28,6 +28,7 @@ func InitConsumerGroup(addrs []string, groupID string, opts ...ConsumerOption) (
 	} else {
 		config = sarama.NewConfig()
 		config.Version = o.version
+		config.Consumer.Group.Rebalance.GroupStrategies = o.groupStrategies
 		config.Consumer.Offsets.Initial = o.offsetsInitial
 		config.Consumer.Offsets.AutoCommit.Enable = o.offsetsAutoCommitEnable
 		config.Consumer.Offsets.AutoCommit.Interval = o.offsetsAutoCommitInterval
