@@ -183,6 +183,13 @@ func (p *AsyncProducer) SendData(topic string, multiData ...interface{}) error {
 
 // handleResponse handles the response of async producer, if producer message failed, you can handle it, e.g. add to other queue to handle later.
 func (p *AsyncProducer) handleResponse(handleFn AsyncSendFailedHandlerFn) {
+	defer func() {
+		if e := recover(); e != nil {
+			p.zapLogger.Error("panic occurred while processing async message", zap.Any("error", e))
+			p.handleResponse(handleFn)
+		}
+	}()
+
 	for {
 		select {
 		case pm := <-p.Producer.Successes():
