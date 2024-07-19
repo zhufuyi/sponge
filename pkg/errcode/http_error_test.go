@@ -16,9 +16,12 @@ func TestNewError(t *testing.T) {
 	e := NewError(code, msg)
 	assert.Equal(t, code, e.Code())
 	assert.Equal(t, msg, e.Msg())
+	assert.Equal(t, false, e.NeedHTTPCode())
 	assert.Contains(t, e.Err().Error(), msg)
+	assert.Contains(t, e.ErrToHTTP().Error(), ToHTTPCodeLabel)
 	details := []string{"a", "b", "c"}
 	assert.Contains(t, e.WithDetails(details...).Err().Error(), strings.Join(details, ", "))
+	assert.Contains(t, e.WithDetails(details...).ErrToHTTP().Error(), ToHTTPCodeLabel)
 
 	errorsCodes := []*Error{
 		Success,
@@ -44,6 +47,7 @@ func TestNewError(t *testing.T) {
 		Aborted,
 		OutOfRange,
 		Unimplemented,
+		StatusBadGateway,
 		DataLoss.WithDetails("foo", "bar"),
 		DataLoss.WithOutMsg("foobar"),
 		NewError(1010, "unknown"),
@@ -54,18 +58,6 @@ func TestNewError(t *testing.T) {
 		httpCodes = append(httpCodes, ec.ToHTTPCode())
 	}
 	t.Log(httpCodes)
-
-	var codes []int
-	for _, ec := range errorsCodes {
-		e := ParseError(ec.Err())
-		codes = append(codes, e.Code())
-	}
-	e = ParseError(errors.New("unknown error"))
-	codes = append(codes, e.Code())
-	t.Log(codes)
-
-	_ = ParseError(nil)
-	_ = e.Details()
 
 	defer func() {
 		if err := recover(); err != nil {
@@ -90,4 +82,30 @@ func TestListHTTPErrCodes(t *testing.T) {
 	for _, v := range errInfos {
 		fmt.Println(v.Code, v.Msg)
 	}
+}
+
+func TestParseError(t *testing.T) {
+	errorsCodes := []*Error{
+		Success,
+		InvalidParams,
+		Unauthorized,
+		InternalServerError,
+		NotFound,
+		AlreadyExists,
+		NewError(21102, "something is wrong"),
+		ParseError(errors.New("unknown error")),
+	}
+
+	var codes1 []int
+	var codes2 []int
+	for _, ec := range errorsCodes {
+		e1 := ParseError(ec.Err())
+		codes1 = append(codes1, e1.Code())
+		e2 := ParseError(ec.ErrToHTTP())
+		codes2 = append(codes2, e2.ToHTTPCode())
+	}
+	t.Log(codes1, codes2)
+
+	e := ParseError(nil)
+	t.Log(e)
 }

@@ -139,6 +139,15 @@ func WrapCtx(c *gin.Context) context.Context {
 	return context.WithValue(ctx, RequestHeaderKey, c.Request.Header)                                    //nolint
 }
 
+// AdaptCtx adapt context, if ctx is gin.Context, return gin.Context and context of the transformation
+func AdaptCtx(ctx context.Context) (*gin.Context, context.Context) {
+	c, ok := ctx.(*gin.Context)
+	if ok {
+		ctx = WrapCtx(c)
+	}
+	return c, ctx
+}
+
 // GetFromCtx get value from context
 func GetFromCtx(ctx context.Context, key string) interface{} {
 	return ctx.Value(key)

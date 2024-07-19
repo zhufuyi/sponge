@@ -16,14 +16,16 @@ func printInfo() {
 	}()
 
 	Debug("this is debug")
-	Debugf("this is debug %d", 2)
+	Debugf("this is debugf %d", 2)
 	Info("this is info")
-	Infof("this is info %d", 2)
+	Infof("this is infof %d", 2)
 	Warn("this is warn")
-	Warnf("this is warn %d", 2)
+	Warnf("this is warnf %d", 2)
 	Error("this is error")
-	Errorf("this is error %d", 2)
+	Errorf("this is errorf %d", 2)
 	WithFields(Int("key", 2)).Info("this is info")
+	//Fatal("this is fatal")
+	//Fatalf("this is fatal %d", 2)
 	_ = Sync()
 
 	type people struct {

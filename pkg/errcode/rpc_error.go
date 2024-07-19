@@ -44,7 +44,7 @@ type Detail struct {
 
 // String detail key-value
 func (d *Detail) String() string {
-	return fmt.Sprintf("%s: {%v}", d.key, d.val)
+	return fmt.Sprintf("%s: %v", d.key, d.val)
 }
 
 // Any type key value
@@ -56,36 +56,46 @@ func Any(key string, val interface{}) Detail {
 }
 
 // Err return error
-func (g *RPCStatus) Err(details ...Detail) error {
+func (s *RPCStatus) Err(details ...Detail) error {
 	var dts []string
 	for _, detail := range details {
 		dts = append(dts, detail.String())
 	}
 	if len(dts) == 0 {
-		return status.Errorf(g.status.Code(), "%s", g.status.Message())
+		return status.Errorf(s.status.Code(), "%s", s.status.Message())
 	}
-	return status.Errorf(g.status.Code(), "%s details = %s", g.status.Message(), dts)
+	return status.Errorf(s.status.Code(), "%s details = %s", s.status.Message(), dts)
+}
+
+// ErrToHTTP convert to standard error add ToHTTPCodeLabel to error message
+func (s *RPCStatus) ErrToHTTP() error {
+	return status.Errorf(s.status.Code(), "%s %s", s.status.Message(), ToHTTPCodeLabel)
 }
 
 // Code get code
-func (g *RPCStatus) Code() codes.Code {
-	return g.status.Code()
+func (s *RPCStatus) Code() codes.Code {
+	return s.status.Code()
 }
 
 // Msg get message
-func (g *RPCStatus) Msg() string {
-	return g.status.Message()
+func (s *RPCStatus) Msg() string {
+	return s.status.Message()
 }
 
 // ToRPCErr converted to standard RPC error
-func (g *RPCStatus) ToRPCErr(desc ...string) error {
-	switch g.status.Code() {
+func (s *RPCStatus) ToRPCErr(desc ...string) error {
+	switch s.status.Code() {
+	case StatusInvalidParams.status.Code():
+		return toRPCErr(codes.InvalidArgument, desc...)
+	case StatusInternalServerError.status.Code():
+		return toRPCErr(codes.Internal, desc...)
+	}
+
+	switch s.status.Code() {
 	case StatusCanceled.status.Code():
 		return toRPCErr(codes.Canceled, desc...)
 	case StatusUnknown.status.Code():
 		return toRPCErr(codes.Unknown, desc...)
-	case StatusInvalidParams.status.Code():
-		return toRPCErr(codes.InvalidArgument, desc...)
 	case StatusDeadlineExceeded.status.Code():
 		return toRPCErr(codes.DeadlineExceeded, desc...)
 	case StatusNotFound.status.Code():
@@ -104,15 +114,12 @@ func (g *RPCStatus) ToRPCErr(desc ...string) error {
 		return toRPCErr(codes.OutOfRange, desc...)
 	case StatusUnimplemented.status.Code():
 		return toRPCErr(codes.Unimplemented, desc...)
-	case StatusInternalServerError.status.Code():
-		return toRPCErr(codes.Internal, desc...)
 	case StatusServiceUnavailable.status.Code():
 		return toRPCErr(codes.Unavailable, desc...)
 	case StatusDataLoss.status.Code():
 		return toRPCErr(codes.DataLoss, desc...)
 	case StatusUnauthorized.status.Code():
 		return toRPCErr(codes.Unauthenticated, desc...)
-
 	case StatusAccessDenied.status.Code():
 		return toRPCErr(codes.PermissionDenied, desc...)
 	case StatusLimitExceed.status.Code():
@@ -121,7 +128,7 @@ func (g *RPCStatus) ToRPCErr(desc ...string) error {
 		return toRPCErr(codes.Unimplemented, desc...)
 	}
 
-	return g.status.Err()
+	return s.status.Err()
 }
 
 func toRPCErr(code codes.Code, descs ...string) error {
@@ -135,33 +142,29 @@ func toRPCErr(code codes.Code, descs ...string) error {
 }
 
 // ToRPCCode converted to standard RPC error code
-func (g *RPCStatus) ToRPCCode() codes.Code {
-	switch g.status.Code() {
+func (s *RPCStatus) ToRPCCode() codes.Code {
+	switch s.status.Code() {
 	case StatusInvalidParams.status.Code():
 		return codes.InvalidArgument
 	case StatusInternalServerError.status.Code():
 		return codes.Internal
 	case StatusUnimplemented.status.Code():
 		return codes.Unimplemented
-	case StatusPermissionDenied.status.Code():
-		return codes.PermissionDenied
 	}
 
-	switch g.status.Code() {
+	switch s.status.Code() {
+	case StatusPermissionDenied.status.Code():
+		return codes.PermissionDenied
 	case StatusCanceled.status.Code():
 		return codes.Canceled
 	case StatusUnknown.status.Code():
 		return codes.Unknown
-	//case StatusInvalidParams.status.Code():
-	//	return codes.InvalidArgument
 	case StatusDeadlineExceeded.status.Code():
 		return codes.DeadlineExceeded
 	case StatusNotFound.status.Code():
 		return codes.NotFound
 	case StatusAlreadyExists.status.Code():
 		return codes.AlreadyExists
-	//case StatusPermissionDenied.status.Code():
-	//	return codes.PermissionDenied
 	case StatusResourceExhausted.status.Code():
 		return codes.ResourceExhausted
 	case StatusFailedPrecondition.status.Code():
@@ -170,17 +173,12 @@ func (g *RPCStatus) ToRPCCode() codes.Code {
 		return codes.Aborted
 	case StatusOutOfRange.status.Code():
 		return codes.OutOfRange
-	//case StatusUnimplemented.status.Code():
-	//	return codes.Unimplemented
-	//case StatusInternalServerError.status.Code():
-	//	return codes.Internal
 	case StatusServiceUnavailable.status.Code():
 		return codes.Unavailable
 	case StatusDataLoss.status.Code():
 		return codes.DataLoss
 	case StatusUnauthorized.status.Code():
 		return codes.Unauthenticated
-
 	case StatusAccessDenied.status.Code():
 		return codes.PermissionDenied
 	case StatusLimitExceed.status.Code():
@@ -189,7 +187,46 @@ func (g *RPCStatus) ToRPCCode() codes.Code {
 		return codes.Unimplemented
 	}
 
-	return g.status.Code()
+	return s.status.Code()
+}
+
+// converted grpc code to http code
+func convertToHTTPCode(code codes.Code) int {
+	switch code {
+	case StatusSuccess.status.Code():
+		return http.StatusOK
+	case codes.InvalidArgument, StatusInvalidParams.status.Code():
+		return http.StatusBadRequest
+	case codes.Internal, StatusInternalServerError.status.Code():
+		return http.StatusInternalServerError
+	case codes.Unimplemented, StatusUnimplemented.status.Code():
+		return http.StatusNotImplemented
+	case codes.NotFound, StatusNotFound.status.Code():
+		return http.StatusNotFound
+	case StatusForbidden.status.Code(), StatusAccessDenied.status.Code():
+		return http.StatusForbidden
+	}
+
+	switch code {
+	case StatusTimeout.status.Code():
+		return http.StatusRequestTimeout
+	case StatusTooManyRequests.status.Code(), StatusLimitExceed.status.Code():
+		return http.StatusTooManyRequests
+	case codes.FailedPrecondition, StatusFailedPrecondition.status.Code():
+		return http.StatusPreconditionFailed
+	case codes.Unavailable, StatusServiceUnavailable.status.Code():
+		return http.StatusServiceUnavailable
+	case codes.Unauthenticated, StatusUnauthorized.status.Code():
+		return http.StatusUnauthorized
+	case codes.PermissionDenied, StatusPermissionDenied.status.Code():
+		return http.StatusUnauthorized
+	case StatusLimitExceed.status.Code():
+		return http.StatusTooManyRequests
+	case StatusMethodNotAllowed.status.Code():
+		return http.StatusMethodNotAllowed
+	}
+
+	return http.StatusInternalServerError
 }
 
 // ErrInfo error info

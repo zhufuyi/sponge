@@ -1,7 +1,6 @@
 package logger
 
 import (
-	"fmt"
 	"strings"
 
 	"go.uber.org/zap"
@@ -33,37 +32,38 @@ func Panic(msg string, fields ...Field) {
 }
 
 // Fatal level information
-//func Fatal(msg string, fields ...Field) {
-//	getLogger().Fatal(msg, fields...)
-//}
+func Fatal(msg string, fields ...Field) {
+	getLogger().Fatal(msg, fields...)
+}
 
 // Debugf format level information
 func Debugf(format string, a ...interface{}) {
-	getLogger().Debug(fmt.Sprintf(format, a...))
+	getSugaredLogger().Debugf(format, a...)
 }
 
 // Infof format level information
 func Infof(format string, a ...interface{}) {
-	getLogger().Info(fmt.Sprintf(format, a...))
+	getSugaredLogger().Infof(format, a...)
 }
 
 // Warnf format level information
 func Warnf(format string, a ...interface{}) {
-	getLogger().Warn(fmt.Sprintf(format, a...))
+	getSugaredLogger().Warnf(format, a...)
 }
 
 // Errorf format level information
 func Errorf(format string, a ...interface{}) {
-	getLogger().Error(fmt.Sprintf(format, a...))
+	getSugaredLogger().Errorf(format, a...)
 }
 
 // Fatalf format level information
-//func Fatalf(format string, a ...interface{}) {
-//	getLogger().Fatal(fmt.Sprintf(format, a...))
-//}
+func Fatalf(format string, a ...interface{}) {
+	getSugaredLogger().Fatalf(format, a...)
+}
 
 // Sync flushing any buffered log entries, applications should take care to call Sync before exiting.
 func Sync() error {
+	_ = getSugaredLogger().Sync()
 	err := getLogger().Sync()
 	if err != nil && !strings.Contains(err.Error(), "/dev/stdout") {
 		return err

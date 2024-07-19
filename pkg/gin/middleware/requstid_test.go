@@ -66,6 +66,11 @@ func TestFieldRequestIDFromContext(t *testing.T) {
 		t.Log(GetFromHeader(ctx, "not-exist"))
 		t.Log(GetFromHeaders(ctx, "Accept"))
 		t.Log(GetFromHeaders(ctx, "not-exist"))
+
+		cctx := c
+		c2, ctx2 := AdaptCtx(cctx)
+		t.Log(GCtxRequestID(c2))
+		t.Log(ctx2.Value(ContextRequestIDKey))
 	})
 
 	_, err := http.Get(requestAddr + "/ping")

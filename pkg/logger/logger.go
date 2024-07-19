@@ -28,10 +28,16 @@ const (
 )
 
 var defaultLogger *zap.Logger
+var defaultSugaredLogger *zap.SugaredLogger
 
 func getLogger() *zap.Logger {
 	checkNil()
 	return defaultLogger.WithOptions(zap.AddCallerSkip(1))
+}
+
+func getSugaredLogger() *zap.SugaredLogger {
+	checkNil()
+	return defaultSugaredLogger.WithOptions(zap.AddCallerSkip(1))
 }
 
 // Init initial log settings
@@ -78,6 +84,7 @@ func Init(opts ...Option) (*zap.Logger, error) {
 	}
 
 	defaultLogger = zapLog
+	defaultSugaredLogger = defaultLogger.Sugar()
 	Info(str)
 
 	return defaultLogger, err

@@ -17,12 +17,6 @@ type Responser interface {
 	Error(ctx *gin.Context, err error) bool
 }
 
-// NewResponse creates a new responser
-// Deprecated: NewResponse use NewResponser instead
-func NewResponse(isFromRPC bool) Responser {
-	return &defaultResponse{isFromRPC, make(map[int]*Error), make(map[int]*RPCStatus)}
-}
-
 // NewResponser creates a new responser, if isFromRPC=true, it means return from rpc, otherwise default return from http
 func NewResponser(isFromRPC bool, httpErrors []*Error, rpcStatus []*RPCStatus) Responser {
 	httpErrorsMap := make(map[int]*Error)
@@ -85,6 +79,7 @@ func (resp *defaultResponse) Error(c *gin.Context, err error) bool {
 	return resp.handleHTTPError(c, err)
 }
 
+// error from grpc
 func (resp *defaultResponse) handleRPCError(c *gin.Context, err error) bool {
 	st, _ := status.FromError(err)
 
@@ -111,14 +106,20 @@ func (resp *defaultResponse) handleRPCError(c *gin.Context, err error) bool {
 		return true
 	}
 
+	// check if you need to return the standard http code
+	if strings.Contains(st.Message(), ToHTTPCodeLabel) {
+		code := convertToHTTPCode(st.Code())
+		msg := strings.ReplaceAll(st.Message(), ToHTTPCodeLabel, "")
+		resp.response(c, code, int(st.Code()), msg, struct{}{})
+		return true
+	}
+
 	// user defined error code to http
 	if resp.isUserDefinedRPCErrorCode(c, int(st.Code())) {
 		return true
 	}
 
 	// response 200
-	//e := ToHTTPErr(st)
-	//resp.response(c, http.StatusOK, e.code, e.msg, struct{}{})
 	resp.response(c, http.StatusOK, int(st.Code()), st.Message(), struct{}{})
 
 	return false
@@ -135,6 +136,13 @@ func (resp *defaultResponse) handleHTTPError(c *gin.Context, err error) bool {
 		return true
 	case ServiceUnavailable.Code(), http.StatusServiceUnavailable:
 		resp.response(c, http.StatusServiceUnavailable, http.StatusServiceUnavailable, http.StatusText(http.StatusServiceUnavailable), struct{}{})
+		return true
+	}
+
+	// user requests to return standard HTTP code, if e.ToHTTPCode() not match, will return of 500
+	if e.needHTTPCode {
+		msg := strings.ReplaceAll(e.msg, ToHTTPCodeLabel, "")
+		resp.response(c, e.ToHTTPCode(), e.code, msg, struct{}{})
 		return true
 	}
 

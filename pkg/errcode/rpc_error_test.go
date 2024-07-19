@@ -80,6 +80,40 @@ func TestToRPCCode(t *testing.T) {
 	t.Log(codeInt)
 }
 
+func TestConvertToHTTPCode(t *testing.T) {
+	status := []*RPCStatus{
+		StatusSuccess,
+		StatusCanceled,
+		StatusUnknown,
+		StatusInvalidParams,
+		StatusDeadlineExceeded,
+		StatusNotFound,
+		StatusAlreadyExists,
+		StatusPermissionDenied,
+		StatusResourceExhausted,
+		StatusFailedPrecondition,
+		StatusAborted,
+		StatusOutOfRange,
+		StatusUnimplemented,
+		StatusInternalServerError,
+		StatusServiceUnavailable,
+		StatusDataLoss,
+		StatusUnauthorized,
+		StatusTimeout,
+		StatusTooManyRequests,
+		StatusForbidden,
+		StatusLimitExceed,
+		StatusMethodNotAllowed,
+		StatusAccessDenied,
+	}
+
+	var codes []int
+	for _, s := range status {
+		codes = append(codes, convertToHTTPCode(s.Code()))
+	}
+	t.Log(codes)
+}
+
 func TestRCode(t *testing.T) {
 	code := RCode(1)
 	t.Log("error code is", int(code))

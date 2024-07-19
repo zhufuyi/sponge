@@ -25,7 +25,7 @@
 
 ```go
 	addrs := []string{"127.0.0.1:6380", "127.0.0.1:6381", "127.0.0.1:6382"}
-	rdb := InitSentinel("master", addrs, "default", "123456", goredis.WithEnableTrace())
+	rdb := goredis.InitSentinel("master", addrs, "default", "123456", goredis.WithEnableTrace())
 ```
 
 <br>
@@ -34,7 +34,7 @@
 
 ```go
 	addrs := []string{"127.0.0.1:6380", "127.0.0.1:6381", "127.0.0.1:6382"}
-	clusterRdb := InitCluster(addrs, "default", "123456", goredis.WithEnableTrace())
+	clusterRdb := goredis.InitCluster(addrs, "default", "123456", goredis.WithEnableTrace())
 ```
 
 <br>

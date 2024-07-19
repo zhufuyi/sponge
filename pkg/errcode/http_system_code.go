@@ -26,4 +26,6 @@ var (
 	OutOfRange         = NewError(10020, "Out Of Range")
 	Unimplemented      = NewError(10021, "Unimplemented")
 	DataLoss           = NewError(10022, "Data Loss")
+
+	StatusBadGateway = NewError(10023, "Bad Gateway")
 )

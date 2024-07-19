@@ -56,6 +56,10 @@ func runHTTPServer(isFromRPC bool) string {
 			isIgnore := resp.Error(c, StatusPermissionDenied.Err())
 			fmt.Println("/rpc/userDefine/err2", isIgnore)
 		})
+		r.GET("/rpc/userDefine/err3", func(c *gin.Context) {
+			isIgnore := resp.Error(c, StatusInvalidParams.ErrToHTTP())
+			fmt.Println("/rpc/userDefine/err3", isIgnore)
+		})
 	} else {
 		r.GET("/err4", func(c *gin.Context) {
 			isIgnore := resp.Error(c, InternalServerError.Err())
@@ -73,6 +77,10 @@ func runHTTPServer(isFromRPC bool) string {
 			isIgnore := resp.Error(c, TooManyRequests.Err())
 			fmt.Println("/http/userDefine/err2", isIgnore)
 		})
+		r.GET("/http/userDefine/err3", func(c *gin.Context) {
+			isIgnore := resp.Error(c, InvalidParams.ErrToHTTP())
+			fmt.Println("/http/userDefine/err3", isIgnore)
+		})
 	}
 
 	go func() {
@@ -84,11 +92,6 @@ func runHTTPServer(isFromRPC bool) string {
 	time.Sleep(time.Millisecond * 200)
 
 	return requestAddr
-}
-
-func TestNewResponse(t *testing.T) {
-	resp := NewResponse(true)
-	assert.NotNil(t, resp)
 }
 
 func TestRPCResponse(t *testing.T) {
@@ -121,6 +124,10 @@ func TestRPCResponse(t *testing.T) {
 	result, err = http.Get(requestAddr + "/rpc/userDefine/err2")
 	assert.NoError(t, err)
 	t.Log(result.StatusCode)
+
+	result, err = http.Get(requestAddr + "/rpc/userDefine/err3")
+	assert.NoError(t, err)
+	t.Log(result.StatusCode, err)
 }
 
 func TestHTTPResponse(t *testing.T) {
@@ -147,6 +154,10 @@ func TestHTTPResponse(t *testing.T) {
 	t.Log(result.StatusCode)
 
 	result, err = http.Get(requestAddr + "/http/userDefine/err2")
+	assert.NoError(t, err)
+	t.Log(result.StatusCode)
+
+	result, err = http.Get(requestAddr + "/http/userDefine/err3")
 	assert.NoError(t, err)
 	t.Log(result.StatusCode)
 }
