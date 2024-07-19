@@ -1,3 +1,4 @@
 ## Change log
 
-- Add kafka client library.
+- Optimize error codes and logs.
+- Change protobuf demo.
