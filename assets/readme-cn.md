@@ -2,7 +2,7 @@
 
 <br>
 
-[sponge](https://github.com/zhufuyi/sponge) 是一个集成了 `自动生成代码`、`Gin和GRPC` 的强大的开发框架。sponge拥有丰富的生成代码命令，生成不同的功能代码可以组合成完整的服务(类似人为打散的海绵细胞可以自动重组成一个新的海绵)。从生成代码、开发、测试、api文档到部署一站式项目开发，大幅提高了开发效率和降低了开发难度，实现"低代码方式"进行开发项目。
+[sponge](https://github.com/zhufuyi/sponge) 是一个集成了 `自动生成代码`、`Gin和GRPC` 的强大的开发框架。sponge拥有丰富的生成代码命令，生成不同的功能代码可以组合成完整的服务(类似人为打散的海绵细胞可以自动重组成一个新的海绵)。sponge提供了一站式项目开发(生成代码、开发、测试、api文档、部署)，大幅提高了开发效率和降低了开发难度，以"低代码方式"开发高质量项目。
 
 <br>
 
@@ -163,7 +163,7 @@ sponge run
 
 ### 视频介绍
 
-> 视频教程演示使用sponge v1.3.12版本，新版本增加了一些自动化功能、调整了一些UI界面和菜单，建议结合[文档教程](https://go-sponge.com/zh-cn/)使用。
+> 视频演示使用sponge v1.3.12版本，而新版本的生成代码页面略有不同，建议结合[文档教程](https://go-sponge.com/zh-cn/)使用。
 
 - [01 sponge的形成过程](https://www.bilibili.com/video/BV1s14y1F7Fz/)
 - [02 sponge的框架介绍](https://www.bilibili.com/video/BV13u4y1F7EU/)
