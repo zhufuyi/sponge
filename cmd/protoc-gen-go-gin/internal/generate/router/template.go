@@ -119,8 +119,18 @@ type {{$.LowerName}}Router struct {
 	wrapCtxFn             func(c *gin.Context) context.Context
 }
 
+
 func (r *{{$.LowerName}}Router) register() {
-{{range .Methods}}{{if eq .InvokeType 0}}{{if .Path}}r.iRouter.Handle("{{.Method}}", "{{.Path}}", r.withMiddleware("{{.Method}}", "{{.Path}}", r.{{ .HandlerName }})...){{end}}{{end}}
+{{range .Methods}}
+{{if eq .InvokeType 0}}
+		{{if .Path}}
+			{{if eq .Method "FORM-DATA" }}
+			r.iRouter.Handle("POST", "{{.Path}}", r.withMiddleware("POST", "{{.Path}}", r.{{ .HandlerName }})...)
+			{{else}}
+			r.iRouter.Handle("{{.Method}}", "{{.Path}}", r.withMiddleware("{{.Method}}", "{{.Path}}", r.{{ .HandlerName }})...)
+			{{end}}
+		{{end}}
+{{end}}
 {{end}}
 }
 
@@ -164,6 +174,15 @@ var _ middleware.CtxKeyString
 		return
 	}
 {{end}}
+
+{{if eq .Method "FORM-DATA" }}
+	if err = c.ShouldBindWith(req, binding.FormMultipart); err != nil {
+		r.zapLog.Warn("ShouldBindWith error", zap.Error(err), middleware.GCtxRequestIDField(c))
+		r.iResponse.ParamError(c, err)
+		return
+	}
+{{end}}
+
 {{if eq .Method "GET" "DELETE" }}
 	if err = c.ShouldBindQuery(req); err != nil {
 		r.zapLog.Warn("ShouldBindQuery error", zap.Error(err), middleware.GCtxRequestIDField(c))
