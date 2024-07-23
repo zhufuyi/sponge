@@ -123,11 +123,12 @@ type {{$.LowerName}}Router struct {
 func (r *{{$.LowerName}}Router) register() {
 {{range .Methods}}
 {{if eq .InvokeType 0}}
-		{{if eq .Method "FORM-DATA" }}
-		r.iRouter.Handle("POST", "{{.Path}}", r.withMiddleware("POST", "{{.Path}}", r.{{ .HandlerName }})...)
-		{{end}}
 		{{if .Path}}
-		r.iRouter.Handle("{{.Method}}", "{{.Path}}", r.withMiddleware("{{.Method}}", "{{.Path}}", r.{{ .HandlerName }})...)
+			{{if eq .Method "FORM-DATA" }}
+			r.iRouter.Handle("POST", "{{.Path}}", r.withMiddleware("POST", "{{.Path}}", r.{{ .HandlerName }})...)
+			{{else}}
+			r.iRouter.Handle("{{.Method}}", "{{.Path}}", r.withMiddleware("{{.Method}}", "{{.Path}}", r.{{ .HandlerName }})...)
+			{{end}}
 		{{end}}
 {{end}}
 {{end}}
