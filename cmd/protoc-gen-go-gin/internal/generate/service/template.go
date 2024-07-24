@@ -63,6 +63,11 @@ func (c *{{.LowerServiceName}}Client) {{.MethodName}}(ctx context.Context, req *
 
 	// fill in the business logic code here
 	// example:
+	//	    {{if .IsIgnoreShouldBind}}gc, ctx := middleware.AdaptCtx(ctx)
+	//	    if err = gc.ShouldBindJSON(req); err != nil {
+	//	    	logger.Warn("ShouldBindJSON error", logger.Error(err), middleware.CtxRequestIDField(ctx))
+	//	    	return nil, ecode.StatusInvalidParams.Err()
+	//	    }{{else}}{{if .IsPassGinContext}}gc, ctx := middleware.AdaptCtx(ctx){{end}}{{end}}
 	//	    err := req.Validate()
 	//	    if err != nil {
 	//		    logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req), interceptor.CtxRequestIDField(ctx))

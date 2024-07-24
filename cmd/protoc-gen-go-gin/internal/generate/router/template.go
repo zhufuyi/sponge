@@ -16,7 +16,7 @@ var (
 	handlerTmpl    *template.Template
 	handlerTmplRaw = `
 type {{$.Name}}Logicer interface {
-{{- range $.Methods}}
+{{- range $.UniqueMethods}}
 {{if eq .InvokeType 0}}{{if .Path}}{{.Name}}(ctx context.Context, req *{{.Request}}) (*{{.Reply}}, error){{end}}{{end}}
 {{- end}}
 }
@@ -119,18 +119,8 @@ type {{$.LowerName}}Router struct {
 	wrapCtxFn             func(c *gin.Context) context.Context
 }
 
-
 func (r *{{$.LowerName}}Router) register() {
-{{range .Methods}}
-{{if eq .InvokeType 0}}
-		{{if .Path}}
-			{{if eq .Method "FORM-DATA" }}
-			r.iRouter.Handle("POST", "{{.Path}}", r.withMiddleware("POST", "{{.Path}}", r.{{ .HandlerName }})...)
-			{{else}}
-			r.iRouter.Handle("{{.Method}}", "{{.Path}}", r.withMiddleware("{{.Method}}", "{{.Path}}", r.{{ .HandlerName }})...)
-			{{end}}
-		{{end}}
-{{end}}
+{{range .Methods}}{{if eq .InvokeType 0}}{{if .Path}}r.iRouter.Handle("{{.Method}}", "{{.Path}}", r.withMiddleware("{{.Method}}", "{{.Path}}", r.{{ .HandlerName }})...){{end}}{{end}}
 {{end}}
 }
 
@@ -161,23 +151,13 @@ func (r *{{$.LowerName}}Router) withMiddleware(method string, path string, fn gi
 	return append(handlerFns, fn)
 }
 
-var _ middleware.CtxKeyString
-
 {{range .Methods}}
 {{if eq .InvokeType 0}}{{if .Path}}func (r *{{$.LowerName}}Router) {{ .HandlerName }} (c *gin.Context) {
 	req := &{{.Request}}{}
-	var err error
+{{if eq .IsIgnoreShouldBind false}}	var err error
 {{if .HasPathParams }}
 	if err = c.ShouldBindUri(req); err != nil {
 		r.zapLog.Warn("ShouldBindUri error", zap.Error(err), middleware.GCtxRequestIDField(c))
-		r.iResponse.ParamError(c, err)
-		return
-	}
-{{end}}
-
-{{if eq .Method "FORM-DATA" }}
-	if err = c.ShouldBindWith(req, binding.FormMultipart); err != nil {
-		r.zapLog.Warn("ShouldBindWith error", zap.Error(err), middleware.GCtxRequestIDField(c))
 		r.iResponse.ParamError(c, err)
 		return
 	}
@@ -189,7 +169,7 @@ var _ middleware.CtxKeyString
 		r.iResponse.ParamError(c, err)
 		return
 	}
-{{else if eq .Method "POST" "PUT" }}
+{{else if eq .Method "POST" "PUT" "PATCH"}}
 	if err = c.ShouldBindJSON(req); err != nil {
 		r.zapLog.Warn("ShouldBindJSON error", zap.Error(err), middleware.GCtxRequestIDField(c))
 		r.iResponse.ParamError(c, err)
@@ -202,12 +182,18 @@ var _ middleware.CtxKeyString
 		return
 	}
 {{end}}
+{{end}}
+
+{{if .IsPassGinContext}}
+	var ctx context.Context = c
+{{else}}
 	var ctx context.Context
 	if r.wrapCtxFn != nil {
 		ctx = r.wrapCtxFn(c)
 	} else {
 		ctx = middleware.WrapCtx(c)
 	}
+{{end}}
 
 	out, err := r.iLogic.{{.Name}}(ctx, req)
 	if err != nil {

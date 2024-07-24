@@ -51,6 +51,9 @@ type ServiceMethod struct {
 	Path   string // rule
 	Method string // HTTP Method
 	Body   string
+
+	IsPassGinContext   bool
+	IsIgnoreShouldBind bool
 }
 
 // AddOne counter
@@ -103,6 +106,9 @@ func parsePbService(s *protogen.Service) *PbService {
 			Path:   rpcMethod.Path,
 			Method: rpcMethod.Method,
 			Body:   rpcMethod.Body,
+
+			IsPassGinContext:   rpcMethod.IsPassGinContext,
+			IsIgnoreShouldBind: rpcMethod.IsIgnoreShouldBind,
 		})
 	}
 

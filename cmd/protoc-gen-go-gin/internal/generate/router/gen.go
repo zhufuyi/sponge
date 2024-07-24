@@ -72,13 +72,27 @@ type tmplField struct {
 	FullName  string // v1.Greeter
 	FilePath  string // api/v1/demo.proto
 
-	Methods []*parse.RPCMethod
+	Methods       []*parse.RPCMethod
+	UniqueMethods []*parse.RPCMethod
 }
 
 func (s *tmplField) execute() string {
 	buf := new(bytes.Buffer)
+	s.removeDuplicates()
 	if err := handlerTmpl.Execute(buf, s); err != nil {
 		panic(err)
 	}
 	return buf.String()
+}
+
+func (s *tmplField) removeDuplicates() {
+	var uniqueMethods []*parse.RPCMethod
+	methodMap := make(map[string]struct{})
+	for _, method := range s.Methods {
+		if _, ok := methodMap[method.Name]; !ok {
+			methodMap[method.Name] = struct{}{}
+			uniqueMethods = append(uniqueMethods, method)
+		}
+	}
+	s.UniqueMethods = uniqueMethods
 }

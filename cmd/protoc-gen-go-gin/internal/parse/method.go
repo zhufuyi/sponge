@@ -2,8 +2,6 @@ package parse
 
 import (
 	"fmt"
-	"net/http"
-	"regexp"
 	"strings"
 
 	"google.golang.org/genproto/googleapis/api/annotations"
@@ -27,56 +25,17 @@ func GetMethods(m *protogen.Method) []*RPCMethod {
 		return methods
 	}
 
-	// default http RPCMethod mapping
-	// if the http method and path is not set, set default value.
-	//methods = append(methods, defaultMethod(m))
 	return methods
-}
-
-// defaultMethodPath generates a http route based on the function name
-// If the first word of the RPCMethod name is not a http RPCMethod mapping, then POST is returned by default
-func defaultMethod(m *protogen.Method) *RPCMethod { //nolint
-	names := strings.Split(toSnakeCase(m.GoName), "_")
-	var (
-		paths      []string
-		httpMethod string
-		path       string
-	)
-
-	switch strings.ToUpper(names[0]) {
-	case http.MethodGet, "FIND", "QUERY", "LIST", "SEARCH":
-		httpMethod = http.MethodGet
-	case http.MethodPost, "CREATE":
-		httpMethod = http.MethodPost
-	case http.MethodPut, "UPDATE":
-		httpMethod = http.MethodPut
-	case http.MethodPatch:
-		httpMethod = http.MethodPatch
-	case http.MethodDelete:
-		httpMethod = http.MethodDelete
-	default:
-		httpMethod = "POST"
-		paths = names
-	}
-
-	if len(paths) > 0 {
-		path = strings.Join(paths, "/")
-	}
-
-	if len(names) > 1 {
-		path = strings.Join(names[1:], "/")
-	}
-
-	md := buildMethodDesc(m, httpMethod, path)
-	md.Body = "*"
-	return md
 }
 
 func buildHTTPRule(m *protogen.Method, rule *annotations.HttpRule) *RPCMethod {
 	var (
-		path   string
-		method string
+		path       string
+		method     string
+		customKind string
+		selector   = rule.Selector
 	)
+
 	switch pattern := rule.Pattern.(type) {
 	case *annotations.HttpRule_Get:
 		path = pattern.Get
@@ -95,13 +54,14 @@ func buildHTTPRule(m *protogen.Method, rule *annotations.HttpRule) *RPCMethod {
 		method = "PATCH"
 	case *annotations.HttpRule_Custom:
 		path = pattern.Custom.Path
-		method = pattern.Custom.Kind
+		customKind = strings.ToLower(pattern.Custom.Kind)
+		method = "POST" // default
 	}
-	md := buildMethodDesc(m, method, path)
+	md := buildMethodDesc(m, method, path, customKind, selector)
 	return md
 }
 
-func buildMethodDesc(m *protogen.Method, httpMethod, path string) *RPCMethod {
+func buildMethodDesc(m *protogen.Method, httpMethod, path string, customKind string, selector string) *RPCMethod {
 	defer func() {
 		methodSets[m.GoName]++
 	}()
@@ -112,20 +72,14 @@ func buildMethodDesc(m *protogen.Method, httpMethod, path string) *RPCMethod {
 		Reply:      m.Output.GoIdent.GoName,
 		Path:       path,
 		Method:     httpMethod,
+		Selector:   selector,
+		CustomKind: customKind,
 		InvokeType: getInvokeType(m.Desc.IsStreamingClient(), m.Desc.IsStreamingServer()),
 	}
+	md.checkCustomKind()
+	md.checkSelector()
 	md.InitPathParams()
 	return md
-}
-
-var matchFirstCap = regexp.MustCompile("([A-Z])([A-Z][a-z])") //nolint
-var matchAllCap = regexp.MustCompile("([a-z0-9])([A-Z])")     //nolint
-
-func toSnakeCase(input string) string { //nolint
-	output := matchFirstCap.ReplaceAllString(input, "${1}_${2}")
-	output = matchAllCap.ReplaceAllString(output, "${1}_${2}")
-	output = strings.ReplaceAll(output, "-", "_")
-	return strings.ToLower(output)
 }
 
 // RPCMethod describes a rpc method
@@ -141,6 +95,15 @@ type RPCMethod struct {
 	Method       string // HTTP Method
 	Body         string
 	ResponseBody string
+
+	CustomKind string
+	Selector   string
+	// if Selector is [ctx], and IsPassGinContext is true
+	// if true, pass gin.Context to the rpc method
+	IsPassGinContext bool
+	// if Selector is [no_bind], IsPassGinContext and IsPassGinContext are both true
+	// if true, ignore c.ShouldBindXXX for this method, you must use c.ShouldBindXXX() in rpc method
+	IsIgnoreShouldBind bool
 }
 
 // HandlerName for gin handler name
@@ -157,6 +120,70 @@ func (m *RPCMethod) HasPathParams() bool {
 		}
 	}
 	return false
+}
+
+// parse selector and set custom control variables
+func parseVariable(str string) (prefixStr string, isPassGinContext bool, isIgnoreShouldBind bool) {
+	str = strings.ReplaceAll(str, " ", "")
+	startIdx := strings.Index(str, "[")
+	endIdx := strings.LastIndex(str, "]")
+	if startIdx != -1 && endIdx != -1 {
+		options := str[startIdx+1 : endIdx]
+		ss := strings.Split(options, ",")
+		for _, s := range ss {
+			if s == "ctx" {
+				isPassGinContext = true
+			}
+			if s == "no_bind" {
+				isIgnoreShouldBind = true
+				isPassGinContext = true // pass gin.Context
+			}
+		}
+		prefixStr = str[:startIdx]
+	} else {
+		prefixStr = str
+	}
+
+	return prefixStr, isPassGinContext, isIgnoreShouldBind
+}
+
+func (m *RPCMethod) checkCustomKind() {
+	if m.CustomKind == "" {
+		return
+	}
+
+	customKindStr, isPassGinContext, isIgnoreShouldBind := parseVariable(m.CustomKind)
+	m.IsPassGinContext = isPassGinContext
+	m.IsIgnoreShouldBind = isIgnoreShouldBind
+
+	switch customKindStr {
+	case "get":
+		m.Method = "GET"
+	case "post":
+		m.Method = "POST"
+	case "put":
+		m.Method = "PUT"
+	case "delete":
+		m.Method = "DELETE"
+	case "patch":
+		m.Method = "PATCH"
+	case "options":
+		m.Method = "OPTIONS"
+	case "head":
+		m.Method = "HEAD"
+	case "trace":
+		m.Method = "TRACE"
+	case "connect":
+		m.Method = "CONNECT"
+	default:
+		m.Method = "POST"
+	}
+}
+
+func (m *RPCMethod) checkSelector() {
+	_, isPassGinContext, isIgnoreShouldBind := parseVariable(m.Selector)
+	m.IsPassGinContext = isPassGinContext
+	m.IsIgnoreShouldBind = isIgnoreShouldBind
 }
 
 // InitPathParams conversion parameter routing {xx} --> :xx

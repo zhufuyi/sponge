@@ -44,6 +44,48 @@ service GreeterService {
       body: "*"
     };
   }
+
+  // upload file
+  rpc Upload(UploadGreeterRequest) returns (UploadGreeterReply) {
+    option (google.api.http) = {
+      selector: "[no_bind]"
+      post: "/api/v1/greeter/upload"
+      additional_bindings {
+        selector: "[no_bind]"
+        put: "/api/v1/greeter/upload2"
+      }
+      body: "*"
+    };
+  }
+
+  // register
+  rpc Register(CreateGreeterRequest) returns (CreateGreeterReply) {
+    option (google.api.http) = {
+      selector: "[ctx]"
+      post: "/api/v1/greeter/register"
+      body: "*"
+    };
+  }
+
+  // login
+  rpc Login(CreateGreeterRequest) returns (CreateGreeterReply) {
+    option (google.api.http) = {
+      selector: "[no_bind]"
+      post: "/api/v1/greeter/login"
+      body: "*"
+    };
+  }
+
+  // head request
+  rpc Head(CreateGreeterRequest) returns (CreateGreeterReply) {
+    option (google.api.http) = {
+      selector: "[no_bind]"
+      custom: {
+        kind: "HEAD"
+        path: "/api/v1/greeter/head"
+      }
+    };
+  }
 }
 
 message CreateGreeterRequest {
@@ -94,7 +136,7 @@ message ListGreeterRequest {
 }
 
 message ListGreeterReply {
-  int64 total =1;
+  int64 total = 1;
   repeated GreeterInfo userExamples = 2;
 }
 
@@ -102,6 +144,17 @@ message Params {
   int32 page = 1;
   int32 limit = 2;
   string sort = 3;
+}
+
+message UploadGreeterRequest{
+  // file name with suffix
+  string file_suffix = 1;
+  // file data
+  bytes file_data = 2;
+
+}
+message UploadGreeterReply{
+  string  url = 1;
 }
 
 service Foo {

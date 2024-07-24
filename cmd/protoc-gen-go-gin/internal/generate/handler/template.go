@@ -75,6 +75,11 @@ func (h *{{.LowerServiceName}}Handler) {{.MethodName}}(ctx context.Context, req 
 
 	// fill in the business logic code here
 	// example:
+	//	    {{if .IsIgnoreShouldBind}}c, ctx := middleware.AdaptCtx(ctx)
+	//	    if err = c.ShouldBindJSON(req); err != nil {
+	//	    	logger.Warn("ShouldBindJSON error", logger.Error(err), middleware.CtxRequestIDField(ctx))
+	//	    	return nil, ecode.InvalidParams.Err()
+	//	    }{{else}}{{if .IsPassGinContext}}c, ctx := middleware.AdaptCtx(ctx){{end}}{{end}}
 	//	    err := req.Validate()
 	//	    if err != nil {
 	//		    logger.Warn("req.Validate error", logger.Err(err), logger.Any("req", req), middleware.CtxRequestIDField(ctx))
@@ -208,6 +213,7 @@ func New{{.Name}}Handler() serverNameExampleV1.{{.Name}}Logicer {
 
 {{if eq .InvokeType 0}}{{if .Path}}{{.Comment}}
 func (h *{{.LowerServiceName}}Handler) {{.MethodName}}(ctx context.Context, req *serverNameExampleV1.{{.Request}}) (*serverNameExampleV1.{{.Reply}}, error) {
+	{{if eq true .IsIgnoreShouldBind .IsPassGinContext}}_, ctx = middleware.AdaptCtx(ctx){{end}}
 	return h.server.{{.MethodName}}(ctx, req)
 }{{end}}{{end}}
 
