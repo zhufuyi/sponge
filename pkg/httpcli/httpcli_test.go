@@ -91,7 +91,7 @@ func runGoHTTPServer() string {
 func TestGetStandard(t *testing.T) {
 	requestAddr := runGoHTTPServer()
 
-	req := Request{}
+	req := New()
 	req.SetURL(requestAddr + "/get")
 	req.SetHeaders(map[string]string{
 		"Authorization": "Bearer token",
@@ -148,7 +148,7 @@ func TestPostStandard(t *testing.T) {
 	req.SetHeaders(map[string]string{
 		"Authorization": "Bearer token",
 	})
-	req.SetJSONBody(&myBody{
+	req.SetBody(&myBody{
 		Name:  "foo",
 		Email: "bar@gmail.com",
 	})
@@ -175,7 +175,7 @@ func TestPutStandard(t *testing.T) {
 	req.SetHeaders(map[string]string{
 		"Authorization": "Bearer token",
 	})
-	req.SetJSONBody(&myBody{
+	req.SetBody(&myBody{
 		Name:  "foo",
 		Email: "bar@gmail.com",
 	})
@@ -202,7 +202,7 @@ func TestPatchStandard(t *testing.T) {
 	req.SetHeaders(map[string]string{
 		"Authorization": "Bearer token",
 	})
-	req.SetJSONBody(&myBody{
+	req.SetBody(&myBody{
 		Name:  "foo",
 		Email: "bar@gmail.com",
 	})
@@ -227,9 +227,10 @@ func TestGet(t *testing.T) {
 	requestAddr := runGoHTTPServer()
 
 	type args struct {
-		result interface{}
-		url    string
-		params KV
+		result  interface{}
+		url     string
+		params  map[string]interface{}
+		headers map[string]string
 	}
 	tests := []struct {
 		name       string
@@ -243,6 +244,9 @@ func TestGet(t *testing.T) {
 				result: &StdResult{},
 				url:    requestAddr + "/get",
 				params: KV{"uid": 123},
+				headers: map[string]string{
+					"Authorization": "Bearer token",
+				},
 			},
 			wantErr: false,
 			wantResult: &StdResult{
@@ -270,7 +274,6 @@ func TestGet(t *testing.T) {
 			args: args{
 				result: &StdResult{},
 				url:    requestAddr + "/notfound",
-				params: KV{"uid": 123},
 			},
 			wantErr: true,
 			wantResult: &StdResult{
@@ -283,7 +286,8 @@ func TestGet(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := Get(tt.args.result, tt.args.url, tt.args.params); (err != nil) != tt.wantErr {
+			err := Get(tt.args.result, tt.args.url, WithParams(tt.args.params), WithHeaders(tt.args.headers))
+			if (err != nil) != tt.wantErr {
 				t.Errorf("Get() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
@@ -298,9 +302,10 @@ func TestDelete(t *testing.T) {
 	requestAddr := runGoHTTPServer()
 
 	type args struct {
-		result interface{}
-		url    string
-		params KV
+		result  interface{}
+		url     string
+		params  KV
+		headers map[string]string
 	}
 	tests := []struct {
 		name       string
@@ -314,6 +319,9 @@ func TestDelete(t *testing.T) {
 				result: &StdResult{},
 				url:    requestAddr + "/delete",
 				params: KV{"uid": 123},
+				headers: map[string]string{
+					"Authorization": "Bearer token",
+				},
 			},
 			wantErr: false,
 			wantResult: &StdResult{
@@ -341,7 +349,6 @@ func TestDelete(t *testing.T) {
 			args: args{
 				result: &StdResult{},
 				url:    requestAddr + "/notfound",
-				params: KV{"uid": 123},
 			},
 			wantErr: true,
 			wantResult: &StdResult{
@@ -354,7 +361,8 @@ func TestDelete(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := Delete(tt.args.result, tt.args.url, tt.args.params); (err != nil) != tt.wantErr {
+			err := Delete(tt.args.result, tt.args.url, WithParams(tt.args.params), WithHeaders(tt.args.headers))
+			if (err != nil) != tt.wantErr {
 				t.Errorf("Delete() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
@@ -369,9 +377,11 @@ func TestPost(t *testing.T) {
 	requestAddr := runGoHTTPServer()
 
 	type args struct {
-		result interface{}
-		url    string
-		body   interface{}
+		result  interface{}
+		url     string
+		body    interface{}
+		headers map[string]string
+		timeout time.Duration
 	}
 	tests := []struct {
 		name       string
@@ -388,6 +398,10 @@ func TestPost(t *testing.T) {
 					Name:  "foo",
 					Email: "bar@gmail.com",
 				},
+				headers: map[string]string{
+					"Authorization": "Bearer token",
+				},
+				timeout: time.Second,
 			},
 			wantResult: &StdResult{
 				Code: 0,
@@ -404,6 +418,9 @@ func TestPost(t *testing.T) {
 				body: &myBody{
 					Name:  "foo",
 					Email: "bar@gmail.com",
+				},
+				headers: map[string]string{
+					"Authorization": "Bearer token",
 				},
 			},
 			wantResult: &StdResult{
@@ -434,7 +451,8 @@ func TestPost(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := Post(tt.args.result, tt.args.url, tt.args.body); (err != nil) != tt.wantErr {
+			err := Post(tt.args.result, tt.args.url, tt.args.body, WithHeaders(tt.args.headers), WithTimeout(tt.args.timeout))
+			if (err != nil) != tt.wantErr {
 				t.Errorf("Post() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
@@ -449,9 +467,10 @@ func TestPut(t *testing.T) {
 	requestAddr := runGoHTTPServer()
 
 	type args struct {
-		result interface{}
-		url    string
-		body   interface{}
+		result  interface{}
+		url     string
+		body    interface{}
+		headers map[string]string
 	}
 	tests := []struct {
 		name       string
@@ -467,6 +486,9 @@ func TestPut(t *testing.T) {
 				body: &myBody{
 					Name:  "foo",
 					Email: "bar@gmail.com",
+				},
+				headers: map[string]string{
+					"Authorization": "Bearer token",
 				},
 			},
 			wantResult: &StdResult{
@@ -485,6 +507,9 @@ func TestPut(t *testing.T) {
 					Name:  "foo",
 					Email: "bar@gmail.com",
 				},
+				headers: map[string]string{
+					"Authorization": "Bearer token",
+				},
 			},
 			wantResult: &StdResult{
 				Code: 0,
@@ -514,7 +539,7 @@ func TestPut(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := Put(tt.args.result, tt.args.url, tt.args.body); (err != nil) != tt.wantErr {
+			if err := Put(tt.args.result, tt.args.url, tt.args.body, WithHeaders(tt.args.headers)); (err != nil) != tt.wantErr {
 				t.Errorf("Put() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
@@ -529,9 +554,10 @@ func TestPatch(t *testing.T) {
 	requestAddr := runGoHTTPServer()
 
 	type args struct {
-		result interface{}
-		url    string
-		body   interface{}
+		result  interface{}
+		url     string
+		body    interface{}
+		headers map[string]string
 	}
 	tests := []struct {
 		name       string
@@ -547,6 +573,9 @@ func TestPatch(t *testing.T) {
 				body: &myBody{
 					Name:  "foo",
 					Email: "bar@gmail.com",
+				},
+				headers: map[string]string{
+					"Authorization": "Bearer token",
 				},
 			},
 			wantResult: &StdResult{
@@ -565,6 +594,9 @@ func TestPatch(t *testing.T) {
 					Name:  "foo",
 					Email: "bar@gmail.com",
 				},
+				headers: map[string]string{
+					"Authorization": "Bearer token",
+				},
 			},
 			wantResult: &StdResult{
 				Code: 0,
@@ -594,7 +626,7 @@ func TestPatch(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := Patch(tt.args.result, tt.args.url, tt.args.body); (err != nil) != tt.wantErr {
+			if err := Patch(tt.args.result, tt.args.url, tt.args.body, WithHeaders(tt.args.headers)); (err != nil) != tt.wantErr {
 				t.Errorf("Put() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
@@ -661,7 +693,7 @@ func TestResponse_BodyString(t *testing.T) {
 }
 
 func TestError(t *testing.T) {
-	req := &Request{}
+	req := New()
 	req.SetParam("foo", "bar")
 	req.SetParam("foo3", make(chan string))
 	req.SetParams(map[string]interface{}{"foo2": "bar2"})
@@ -688,11 +720,11 @@ func TestError(t *testing.T) {
 	err = notOKErr(resp)
 	assert.Error(t, err)
 
-	err = do(http.MethodPost, nil, "", nil)
+	err = do(http.MethodPost, nil, "", nil, nil, nil, 0)
 	assert.Error(t, err)
-	err = do(http.MethodPost, &StdResult{}, "http://127.0.0.1:0", nil, KV{"foo": "bar"})
+	err = do(http.MethodPost, &StdResult{}, "http://127.0.0.1:0", nil, KV{"foo": "bar"}, nil, 0)
 	assert.Error(t, err)
 
-	err = gDo(http.MethodGet, nil, "http://127.0.0.1:0", nil)
+	err = gDo(http.MethodGet, nil, "http://127.0.0.1:0", nil, nil, 0)
 	assert.Error(t, err)
 }

@@ -209,7 +209,7 @@ message ListUserExampleRequest {
 }
 
 message ListUserExampleReply {
-  int64 total =1;
+  int64 total = 1;
   repeated UserExample userExamples = 2;
 }
 

@@ -21,15 +21,15 @@ Example 1: common fields jwt
 	name := "admin"
 
 	// generate token
-	token, err := jwt.GenerateToken(uid)
+	token, err := jwt.GenerateToken(uid, name)
 	// handle err
 
 	// parse token
 	claims, err := jwt.ParseToken(token)
 	// handle err
-	
+
 	// verify
-	if claims.Uid != "123" ||claims.Name != "admin" {
+	if claims.Uid != uid || claims.Name != name {
 		print("verify failed")
 	    return
 	}
@@ -51,7 +51,7 @@ Example 2: custom fields jwt
 	fields := jwt.KV{"id": 123, "foo": "bar"}
 
 	// generate token
-	token, err := jwt.GenerateCustomToken(uid)
+	token, err := jwt.GenerateCustomToken(fields)
 	// handle err
 
 	// parse token

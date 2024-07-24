@@ -1,5 +1,5 @@
-// Package gohttp is http request client, which only supports returning json format.
-package gohttp
+// Package httpcli is http request client, which only supports returning json format.
+package httpcli
 
 import (
 	"bytes"
@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-const defaultTimeout = 10 * time.Second
+const defaultTimeout = 30 * time.Second
 
 // Request HTTP request
 type Request struct {
@@ -37,7 +37,12 @@ type Response struct {
 	err error
 }
 
-// -----------------------------------  Request  -----------------------------------
+// -----------------------------------  Request way 1 -----------------------------------
+
+// New create a new Request
+func New() *Request {
+	return &Request{}
+}
 
 // Reset set all fields to default value, use at pool
 func (req *Request) Reset() {
@@ -81,12 +86,18 @@ func (req *Request) SetParam(k string, v interface{}) *Request {
 }
 
 // SetBody set body data
-func (req *Request) SetBody(body string) *Request {
-	req.body = body
+func (req *Request) SetBody(body interface{}) *Request {
+	switch body.(type) {
+	case string:
+		req.body = body.(string)
+	default:
+		req.bodyJSON = body
+	}
 	return req
 }
 
-// SetJSONBody set Body data, JSON format
+// SetJSONBody set body data
+// Deprecated: use SetBody() instead.
 func (req *Request) SetJSONBody(body interface{}) *Request {
 	req.bodyJSON = body
 	return req
@@ -317,41 +328,85 @@ func (resp *Response) BindJSON(v interface{}) error {
 	return json.Unmarshal(body, v)
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------  Request way 2 -----------------------------------
 
-// Simple crud function, no support for setting header, timeout, etc.
+// Option set options.
+type Option func(*options)
+
+type options struct {
+	params  map[string]interface{}
+	headers map[string]string
+	timeout time.Duration
+}
+
+func (o *options) apply(opts ...Option) {
+	for _, opt := range opts {
+		opt(o)
+	}
+}
+
+func defaultOptions() *options {
+	return &options{}
+}
+
+// WithParams set params
+func WithParams(params map[string]interface{}) Option {
+	return func(o *options) {
+		if o.params != nil {
+			o.params = params
+		}
+	}
+}
+
+// WithHeaders set headers
+func WithHeaders(headers map[string]string) Option {
+	return func(o *options) {
+		if o.headers != nil {
+			o.headers = headers
+		}
+	}
+}
+
+// WithTimeout set timeout
+func WithTimeout(t time.Duration) Option {
+	return func(o *options) {
+		o.timeout = t
+	}
+}
 
 // Get request, return custom json format
-func Get(result interface{}, urlStr string, params ...KV) error {
-	var pms KV
-	if len(params) > 0 {
-		pms = params[0]
-	}
-	return gDo("GET", result, urlStr, pms)
+func Get(result interface{}, urlStr string, opts ...Option) error {
+	o := defaultOptions()
+	o.apply(opts...)
+	return gDo("GET", result, urlStr, o.params, o.headers, o.timeout)
 }
 
 // Delete request, return custom json format
-func Delete(result interface{}, urlStr string, params ...KV) error {
-	var pms KV
-	if len(params) > 0 {
-		pms = params[0]
-	}
-	return gDo("DELETE", result, urlStr, pms)
+func Delete(result interface{}, urlStr string, opts ...Option) error {
+	o := defaultOptions()
+	o.apply(opts...)
+	return gDo("DELETE", result, urlStr, o.params, o.headers, o.timeout)
 }
 
 // Post request, return custom json format
-func Post(result interface{}, urlStr string, body interface{}) error {
-	return do("POST", result, urlStr, body)
+func Post(result interface{}, urlStr string, body interface{}, opts ...Option) error {
+	o := defaultOptions()
+	o.apply(opts...)
+	return do("POST", result, urlStr, body, o.params, o.headers, o.timeout)
 }
 
 // Put request, return custom json format
-func Put(result interface{}, urlStr string, body interface{}) error {
-	return do("PUT", result, urlStr, body)
+func Put(result interface{}, urlStr string, body interface{}, opts ...Option) error {
+	o := defaultOptions()
+	o.apply(opts...)
+	return do("PUT", result, urlStr, body, o.params, o.headers, o.timeout)
 }
 
 // Patch request, return custom json format
-func Patch(result interface{}, urlStr string, body interface{}) error {
-	return do("PATCH", result, urlStr, body)
+func Patch(result interface{}, urlStr string, body interface{}, opts ...Option) error {
+	o := defaultOptions()
+	o.apply(opts...)
+	return do("PATCH", result, urlStr, body, o.params, o.headers, o.timeout)
 }
 
 var requestErr = func(err error) error { return fmt.Errorf("request error, err=%v", err) }
@@ -367,18 +422,18 @@ var notOKErr = func(resp *Response) error {
 	return fmt.Errorf("statusCode=%d, body=%s", resp.StatusCode, body)
 }
 
-func do(method string, result interface{}, urlStr string, body interface{}, params ...KV) error {
+func do(method string, result interface{}, urlStr string, body interface{}, params KV, headers map[string]string, timeout time.Duration) error {
 	if result == nil {
-		return fmt.Errorf("params 'result' is nil")
+		return fmt.Errorf("'result' can not be nil")
 	}
 
 	req := &Request{}
 	req.SetURL(urlStr)
 	req.SetContentType("application/json")
-	if len(params) > 0 {
-		req.SetParams(params[0])
-	}
+	req.SetParams(params)
+	req.SetHeaders(headers)
 	req.SetJSONBody(body)
+	req.SetTimeout(timeout)
 
 	var resp *Response
 	var err error
@@ -407,10 +462,12 @@ func do(method string, result interface{}, urlStr string, body interface{}, para
 	return nil
 }
 
-func gDo(method string, result interface{}, urlStr string, params KV) error {
+func gDo(method string, result interface{}, urlStr string, params KV, headers map[string]string, timeout time.Duration) error {
 	req := &Request{}
 	req.SetURL(urlStr)
 	req.SetParams(params)
+	req.SetHeaders(headers)
+	req.SetTimeout(timeout)
 
 	var resp *Response
 	var err error
@@ -445,4 +502,4 @@ type StdResult struct {
 }
 
 // KV string:interface{}
-type KV map[string]interface{}
+type KV = map[string]interface{}
