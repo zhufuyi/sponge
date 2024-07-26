@@ -1,5 +1,6 @@
-// Package httpcli is http request client, which only supports return json format.
-package httpcli
+// Package gohttp is http request client, which only supports returning json format.
+// Deprecated: moved to pkg/httpcli, will remove in future version.
+package gohttp
 
 import (
 	"bytes"
@@ -16,6 +17,7 @@ import (
 const defaultTimeout = 30 * time.Second
 
 // Request HTTP request
+// Deprecated: moved to pkg/httpcli Request
 type Request struct {
 	customRequest func(req *http.Request, data *bytes.Buffer) // used to define HEADER, e.g. to add sign, etc.
 	url           string
@@ -37,14 +39,10 @@ type Response struct {
 	err error
 }
 
-// -----------------------------------  Request way 1 -----------------------------------
-
-// New create a new Request
-func New() *Request {
-	return &Request{}
-}
+// -----------------------------------  Request  -----------------------------------
 
 // Reset set all fields to default value, use at pool
+// Deprecated: moved to pkg/httpcli Reset
 func (req *Request) Reset() {
 	req.params = nil
 	req.body = ""
@@ -59,12 +57,14 @@ func (req *Request) Reset() {
 }
 
 // SetURL set URL
+// Deprecated: moved to pkg/httpcli SetURL
 func (req *Request) SetURL(path string) *Request {
 	req.url = path
 	return req
 }
 
 // SetParams parameters after setting the URL
+// Deprecated: moved to pkg/httpcli SetParams
 func (req *Request) SetParams(params map[string]interface{}) *Request {
 	if req.params == nil {
 		req.params = params
@@ -77,6 +77,7 @@ func (req *Request) SetParams(params map[string]interface{}) *Request {
 }
 
 // SetParam parameters after setting the URL
+// Deprecated: moved to pkg/httpcli SetParam
 func (req *Request) SetParam(k string, v interface{}) *Request {
 	if req.params == nil {
 		req.params = make(map[string]interface{})
@@ -85,32 +86,36 @@ func (req *Request) SetParam(k string, v interface{}) *Request {
 	return req
 }
 
-// SetBody set body data, support string and []byte, if it is not string, it will be json marshal.
-func (req *Request) SetBody(body interface{}) *Request {
-	switch v := body.(type) {
-	case string:
-		req.body = v
-	case []byte:
-		req.body = string(v)
-	default:
-		req.bodyJSON = body
-	}
+// SetBody set body data
+// Deprecated: moved to pkg/httpcli SetBody
+func (req *Request) SetBody(body string) *Request {
+	req.body = body
+	return req
+}
+
+// SetJSONBody set Body data, JSON format
+// Deprecated: moved to pkg/httpcli SetJSONBody
+func (req *Request) SetJSONBody(body interface{}) *Request {
+	req.bodyJSON = body
 	return req
 }
 
 // SetTimeout set timeout
+// Deprecated: moved to pkg/httpcli SetTimeout
 func (req *Request) SetTimeout(t time.Duration) *Request {
 	req.timeout = t
 	return req
 }
 
 // SetContentType set ContentType
+// Deprecated: moved to pkg/httpcli SetContentType
 func (req *Request) SetContentType(a string) *Request {
 	req.SetHeader("Content-Type", a)
 	return req
 }
 
 // SetHeader set the value of the request header
+// Deprecated: moved to pkg/httpcli SetHeader
 func (req *Request) SetHeader(k, v string) *Request {
 	if req.headers == nil {
 		req.headers = make(map[string]string)
@@ -120,6 +125,7 @@ func (req *Request) SetHeader(k, v string) *Request {
 }
 
 // SetHeaders set the value of Request Headers
+// Deprecated: moved to pkg/httpcli SetHeaders
 func (req *Request) SetHeaders(headers map[string]string) *Request {
 	if req.headers == nil {
 		req.headers = make(map[string]string)
@@ -131,42 +137,49 @@ func (req *Request) SetHeaders(headers map[string]string) *Request {
 }
 
 // CustomRequest customize request, e.g. add sign, set header, etc.
+// Deprecated: moved to pkg/httpcli CustomRequest
 func (req *Request) CustomRequest(f func(req *http.Request, data *bytes.Buffer)) *Request {
 	req.customRequest = f
 	return req
 }
 
 // GET send a GET request
+// Deprecated: moved to pkg/httpcli GET
 func (req *Request) GET() (*Response, error) {
 	req.method = http.MethodGet
 	return req.pull()
 }
 
 // DELETE send a DELETE request
+// Deprecated: moved to pkg/httpcli DELETE
 func (req *Request) DELETE() (*Response, error) {
 	req.method = http.MethodDelete
 	return req.pull()
 }
 
 // POST send a POST request
+// Deprecated: moved to pkg/httpcli POST
 func (req *Request) POST() (*Response, error) {
 	req.method = http.MethodPost
 	return req.push()
 }
 
 // PUT send a PUT request
+// Deprecated: moved to pkg/httpcli PUT
 func (req *Request) PUT() (*Response, error) {
 	req.method = http.MethodPut
 	return req.push()
 }
 
 // PATCH send PATCH requests
+// Deprecated: moved to pkg/httpcli PATCH
 func (req *Request) PATCH() (*Response, error) {
 	req.method = http.MethodPatch
 	return req.push()
 }
 
 // Do a request
+// Deprecated: moved to pkg/httpcli Do
 func (req *Request) Do(method string, data interface{}) (*Response, error) {
 	req.method = method
 
@@ -185,7 +198,7 @@ func (req *Request) Do(method string, data interface{}) (*Response, error) {
 
 	case http.MethodPost, http.MethodPut, http.MethodPatch:
 		if data != nil {
-			req.SetBody(data)
+			req.SetJSONBody(data)
 		}
 
 		return req.push()
@@ -269,6 +282,7 @@ func (req *Request) send(body io.Reader, buf *bytes.Buffer) (*Response, error) {
 }
 
 // Response return response
+// Deprecated: moved to pkg/httpcli Response
 func (req *Request) Response() (*Response, error) {
 	if req.err != nil {
 		return nil, req.err
@@ -279,11 +293,13 @@ func (req *Request) Response() (*Response, error) {
 // -----------------------------------  Response -----------------------------------
 
 // Error return err
+// Deprecated: moved to pkg/httpcli Error
 func (resp *Response) Error() error {
 	return resp.err
 }
 
 // BodyString returns the body data of the HttpResponse
+// Deprecated: moved to pkg/httpcli BodyString
 func (resp *Response) BodyString() (string, error) {
 	if resp.err != nil {
 		return "", resp.err
@@ -293,6 +309,7 @@ func (resp *Response) BodyString() (string, error) {
 }
 
 // ReadBody returns the body data of the HttpResponse
+// Deprecated: moved to pkg/httpcli ReadBody
 func (resp *Response) ReadBody() ([]byte, error) {
 	if resp.err != nil {
 		return []byte{}, resp.err
@@ -312,6 +329,7 @@ func (resp *Response) ReadBody() ([]byte, error) {
 }
 
 // BindJSON parses the response's body as JSON
+// Deprecated: moved to pkg/httpcli BindJSON
 func (resp *Response) BindJSON(v interface{}) error {
 	if resp.err != nil {
 		return resp.err
@@ -323,85 +341,46 @@ func (resp *Response) BindJSON(v interface{}) error {
 	return json.Unmarshal(body, v)
 }
 
-// -----------------------------------  Request way 2 -----------------------------------
+// -------------------------------------------------------------------------------------------------
 
-// Option set options.
-type Option func(*options)
-
-type options struct {
-	params  map[string]interface{}
-	headers map[string]string
-	timeout time.Duration
-}
-
-func (o *options) apply(opts ...Option) {
-	for _, opt := range opts {
-		opt(o)
-	}
-}
-
-func defaultOptions() *options {
-	return &options{}
-}
-
-// WithParams set params
-func WithParams(params map[string]interface{}) Option {
-	return func(o *options) {
-		if o.params != nil {
-			o.params = params
-		}
-	}
-}
-
-// WithHeaders set headers
-func WithHeaders(headers map[string]string) Option {
-	return func(o *options) {
-		if o.headers != nil {
-			o.headers = headers
-		}
-	}
-}
-
-// WithTimeout set timeout
-func WithTimeout(t time.Duration) Option {
-	return func(o *options) {
-		o.timeout = t
-	}
-}
+// Simple crud function, no support for setting header, timeout, etc.
 
 // Get request, return custom json format
-func Get(result interface{}, urlStr string, opts ...Option) error {
-	o := defaultOptions()
-	o.apply(opts...)
-	return gDo("GET", result, urlStr, o.params, o.headers, o.timeout)
+// Deprecated: moved to pkg/httpcli Get
+func Get(result interface{}, urlStr string, params ...KV) error {
+	var pms KV
+	if len(params) > 0 {
+		pms = params[0]
+	}
+	return gDo("GET", result, urlStr, pms)
 }
 
 // Delete request, return custom json format
-func Delete(result interface{}, urlStr string, opts ...Option) error {
-	o := defaultOptions()
-	o.apply(opts...)
-	return gDo("DELETE", result, urlStr, o.params, o.headers, o.timeout)
+// Deprecated: moved to pkg/httpcli Delete
+func Delete(result interface{}, urlStr string, params ...KV) error {
+	var pms KV
+	if len(params) > 0 {
+		pms = params[0]
+	}
+	return gDo("DELETE", result, urlStr, pms)
 }
 
 // Post request, return custom json format
-func Post(result interface{}, urlStr string, body interface{}, opts ...Option) error {
-	o := defaultOptions()
-	o.apply(opts...)
-	return do("POST", result, urlStr, body, o.params, o.headers, o.timeout)
+// Deprecated: moved to pkg/httpcli Post
+func Post(result interface{}, urlStr string, body interface{}) error {
+	return do("POST", result, urlStr, body)
 }
 
 // Put request, return custom json format
-func Put(result interface{}, urlStr string, body interface{}, opts ...Option) error {
-	o := defaultOptions()
-	o.apply(opts...)
-	return do("PUT", result, urlStr, body, o.params, o.headers, o.timeout)
+// Deprecated: moved to pkg/httpcli Put
+func Put(result interface{}, urlStr string, body interface{}) error {
+	return do("PUT", result, urlStr, body)
 }
 
 // Patch request, return custom json format
-func Patch(result interface{}, urlStr string, body interface{}, opts ...Option) error {
-	o := defaultOptions()
-	o.apply(opts...)
-	return do("PATCH", result, urlStr, body, o.params, o.headers, o.timeout)
+// Deprecated: moved to pkg/httpcli Patch
+func Patch(result interface{}, urlStr string, body interface{}) error {
+	return do("PATCH", result, urlStr, body)
 }
 
 var requestErr = func(err error) error { return fmt.Errorf("request error, err=%v", err) }
@@ -417,18 +396,18 @@ var notOKErr = func(resp *Response) error {
 	return fmt.Errorf("statusCode=%d, body=%s", resp.StatusCode, body)
 }
 
-func do(method string, result interface{}, urlStr string, body interface{}, params KV, headers map[string]string, timeout time.Duration) error {
+func do(method string, result interface{}, urlStr string, body interface{}, params ...KV) error {
 	if result == nil {
-		return fmt.Errorf("'result' can not be nil")
+		return fmt.Errorf("params 'result' is nil")
 	}
 
 	req := &Request{}
 	req.SetURL(urlStr)
 	req.SetContentType("application/json")
-	req.SetParams(params)
-	req.SetHeaders(headers)
-	req.SetBody(body)
-	req.SetTimeout(timeout)
+	if len(params) > 0 {
+		req.SetParams(params[0])
+	}
+	req.SetJSONBody(body)
 
 	var resp *Response
 	var err error
@@ -457,12 +436,10 @@ func do(method string, result interface{}, urlStr string, body interface{}, para
 	return nil
 }
 
-func gDo(method string, result interface{}, urlStr string, params KV, headers map[string]string, timeout time.Duration) error {
+func gDo(method string, result interface{}, urlStr string, params KV) error {
 	req := &Request{}
 	req.SetURL(urlStr)
 	req.SetParams(params)
-	req.SetHeaders(headers)
-	req.SetTimeout(timeout)
 
 	var resp *Response
 	var err error
@@ -490,6 +467,7 @@ func gDo(method string, result interface{}, urlStr string, params KV, headers ma
 }
 
 // StdResult standard return data
+// Deprecated: moved to pkg/httpcli StdResult
 type StdResult struct {
 	Code int         `json:"code"`
 	Msg  string      `json:"msg"`
@@ -497,4 +475,5 @@ type StdResult struct {
 }
 
 // KV string:interface{}
+// Deprecated: moved to pkg/httpcli KV
 type KV = map[string]interface{}
