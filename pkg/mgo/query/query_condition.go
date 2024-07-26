@@ -75,11 +75,14 @@ var logicMap = map[string]string{
 
 // Params query parameters
 type Params struct {
-	Page int    `json:"page" form:"page" binding:"gte=0"`
-	Size int    `json:"size" form:"size" binding:"gt=0"`
-	Sort string `json:"sort,omitempty" form:"sort" binding:""`
+	Page  int    `json:"page" form:"page" binding:"gte=0"`
+	Limit int    `json:"limit" form:"limit" binding:"gte=1"`
+	Sort  string `json:"sort,omitempty" form:"sort" binding:""`
 
 	Columns []Column `json:"columns,omitempty" form:"columns"` // not required
+
+	// Deprecated: use Limit instead, will remove in the future
+	Size int `json:"size" form:"size"`
 }
 
 // Column query info
@@ -168,12 +171,12 @@ func (c *Column) convert() error {
 	return c.convertLogic()
 }
 
-// ConvertToPage converted to conform to mongo rules based on the page size sort parameter
+// ConvertToPage converted to page
 func (p *Params) ConvertToPage() (sort bson.D, limit int, skip int) { //nolint
-	page := NewPage(p.Page, p.Size, p.Sort)
+	page := NewPage(p.Page, p.Limit, p.Sort)
 	sort = page.sort
-	limit = page.size
-	skip = page.page * page.size
+	limit = page.limit
+	skip = page.page * page.limit
 	return //nolint
 }
 

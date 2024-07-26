@@ -13,7 +13,7 @@ import (
 
 	"github.com/zhufuyi/sponge/pkg/container/group"
 	"github.com/zhufuyi/sponge/pkg/gin/response"
-	"github.com/zhufuyi/sponge/pkg/gohttp"
+	"github.com/zhufuyi/sponge/pkg/httpcli"
 	"github.com/zhufuyi/sponge/pkg/shield/circuitbreaker"
 	"github.com/zhufuyi/sponge/pkg/utils"
 )
@@ -58,8 +58,8 @@ func TestCircuitBreaker(t *testing.T) {
 		go func() {
 			defer wg.Done()
 			for i := 0; i < 100; i++ {
-				result := &gohttp.StdResult{}
-				if err := gohttp.Get(result, requestAddr+"/hello"); err != nil {
+				result := &httpcli.StdResult{}
+				if err := httpcli.Get(result, requestAddr+"/hello"); err != nil {
 					if strings.Contains(err.Error(), ErrNotAllowed.Error()) {
 						atomic.AddInt32(&countBreaker, 1)
 					}

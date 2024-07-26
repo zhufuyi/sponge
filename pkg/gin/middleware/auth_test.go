@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/zhufuyi/sponge/pkg/gin/response"
-	"github.com/zhufuyi/sponge/pkg/gohttp"
+	"github.com/zhufuyi/sponge/pkg/httpcli"
 	"github.com/zhufuyi/sponge/pkg/jwt"
 	"github.com/zhufuyi/sponge/pkg/utils"
 )
@@ -101,8 +101,8 @@ func TestAuth(t *testing.T) {
 	requestAddr := runAuthHTTPServer()
 
 	// get token
-	result := &gohttp.StdResult{}
-	err := gohttp.Get(result, requestAddr+"/token")
+	result := &httpcli.StdResult{}
+	err := httpcli.Get(result, requestAddr+"/token")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -149,8 +149,8 @@ func TestAuthCustom(t *testing.T) {
 	requestAddr := runAuthHTTPServer()
 
 	// get token
-	result := &gohttp.StdResult{}
-	err := gohttp.Get(result, requestAddr+"/token/custom")
+	result := &httpcli.StdResult{}
+	err := httpcli.Get(result, requestAddr+"/token/custom")
 	if err != nil {
 		t.Fatal(err)
 	}

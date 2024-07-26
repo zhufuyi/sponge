@@ -9,6 +9,7 @@ import (
 )
 
 // Option set the mysql options.
+// Deprecated: moved to package pkg/ggorm Option
 type Option func(*options)
 
 type options struct {
@@ -66,6 +67,7 @@ func WithLog() Option {
 }
 
 // WithLogging set log sql, If l=nil, the gorm log library will be used
+// Deprecated: moved to package pkg/ggorm WithLogging
 func WithLogging(l *zap.Logger, level ...logger.LogLevel) Option {
 	return func(o *options) {
 		o.isLog = true
@@ -78,6 +80,7 @@ func WithLogging(l *zap.Logger, level ...logger.LogLevel) Option {
 }
 
 // WithSlowThreshold Set sql values greater than the threshold
+// Deprecated: moved to package pkg/ggorm WithSlowThreshold
 func WithSlowThreshold(d time.Duration) Option {
 	return func(o *options) {
 		o.slowThreshold = d
@@ -85,6 +88,7 @@ func WithSlowThreshold(d time.Duration) Option {
 }
 
 // WithMaxIdleConns set max idle conns
+// Deprecated: moved to package pkg/ggorm WithMaxIdleConns
 func WithMaxIdleConns(size int) Option {
 	return func(o *options) {
 		o.maxIdleConns = size
@@ -92,6 +96,7 @@ func WithMaxIdleConns(size int) Option {
 }
 
 // WithMaxOpenConns set max open conns
+// Deprecated: moved to package pkg/ggorm WithMaxOpenConns
 func WithMaxOpenConns(size int) Option {
 	return func(o *options) {
 		o.maxOpenConns = size
@@ -99,6 +104,7 @@ func WithMaxOpenConns(size int) Option {
 }
 
 // WithConnMaxLifetime set conn max lifetime
+// Deprecated: moved to package pkg/ggorm WithConnMaxLifetime
 func WithConnMaxLifetime(t time.Duration) Option {
 	return func(o *options) {
 		o.connMaxLifetime = t
@@ -106,6 +112,7 @@ func WithConnMaxLifetime(t time.Duration) Option {
 }
 
 // WithEnableForeignKey use foreign keys
+// Deprecated: moved to package pkg/ggorm WithEnableForeignKey
 func WithEnableForeignKey() Option {
 	return func(o *options) {
 		o.disableForeignKey = false
@@ -113,6 +120,7 @@ func WithEnableForeignKey() Option {
 }
 
 // WithEnableTrace use trace
+// Deprecated: moved to package pkg/ggorm WithEnableTrace
 func WithEnableTrace() Option {
 	return func(o *options) {
 		o.enableTrace = true
@@ -120,6 +128,7 @@ func WithEnableTrace() Option {
 }
 
 // WithLogRequestIDKey log request id
+// Deprecated: moved to package pkg/ggorm WithLogRequestIDKey
 func WithLogRequestIDKey(key string) Option {
 	return func(o *options) {
 		if key == "" {
@@ -130,6 +139,7 @@ func WithLogRequestIDKey(key string) Option {
 }
 
 // WithRWSeparation setting read-write separation
+// Deprecated: moved to package pkg/ggorm WithRWSeparation
 func WithRWSeparation(slavesDsn []string, mastersDsn ...string) Option {
 	return func(o *options) {
 		o.slavesDsn = slavesDsn
@@ -138,6 +148,7 @@ func WithRWSeparation(slavesDsn []string, mastersDsn ...string) Option {
 }
 
 // WithGormPlugin setting gorm plugin
+// Deprecated: moved to package pkg/ggorm WithGormPlugin
 func WithGormPlugin(plugins ...gorm.Plugin) Option {
 	return func(o *options) {
 		o.plugins = plugins

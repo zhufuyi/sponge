@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/zhufuyi/sponge/pkg/gin/response"
-	"github.com/zhufuyi/sponge/pkg/gohttp"
+	"github.com/zhufuyi/sponge/pkg/httpcli"
 	"github.com/zhufuyi/sponge/pkg/logger"
 	"github.com/zhufuyi/sponge/pkg/utils"
 )
@@ -73,13 +73,13 @@ func TestRequest(t *testing.T) {
 	requestAddr := runLogHTTPServer()
 
 	wantHello := "hello world"
-	result := &gohttp.StdResult{}
+	result := &httpcli.StdResult{}
 	type User struct {
 		Name string `json:"name"`
 	}
 
 	t.Run("get ping", func(t *testing.T) {
-		err := gohttp.Get(result, requestAddr+"/ping")
+		err := httpcli.Get(result, requestAddr+"/ping")
 		if err != nil {
 			t.Error(err)
 			return
@@ -91,7 +91,7 @@ func TestRequest(t *testing.T) {
 	})
 
 	t.Run("get hello", func(t *testing.T) {
-		err := gohttp.Get(result, requestAddr+"/hello", gohttp.KV{"id": "100"})
+		err := httpcli.Get(result, requestAddr+"/hello", httpcli.WithParams(map[string]interface{}{"id": "100"}))
 		if err != nil {
 			t.Error(err)
 			return
@@ -103,7 +103,7 @@ func TestRequest(t *testing.T) {
 	})
 
 	t.Run("delete hello", func(t *testing.T) {
-		err := gohttp.Delete(result, requestAddr+"/hello", gohttp.KV{"id": "100"})
+		err := httpcli.Delete(result, requestAddr+"/hello", httpcli.WithParams(map[string]interface{}{"id": "100"}))
 		if err != nil {
 			t.Error(err)
 			return
@@ -115,7 +115,7 @@ func TestRequest(t *testing.T) {
 	})
 
 	t.Run("post hello", func(t *testing.T) {
-		err := gohttp.Post(result, requestAddr+"/hello", &User{"foo"})
+		err := httpcli.Post(result, requestAddr+"/hello", &User{"foo"})
 		if err != nil {
 			t.Error(err)
 			return
@@ -127,7 +127,7 @@ func TestRequest(t *testing.T) {
 	})
 
 	t.Run("put hello", func(t *testing.T) {
-		err := gohttp.Put(result, requestAddr+"/hello", &User{"foo"})
+		err := httpcli.Put(result, requestAddr+"/hello", &User{"foo"})
 		if err != nil {
 			t.Error(err)
 			return
@@ -139,7 +139,7 @@ func TestRequest(t *testing.T) {
 	})
 
 	t.Run("patch hello", func(t *testing.T) {
-		err := gohttp.Patch(result, requestAddr+"/hello", &User{"foo"})
+		err := httpcli.Patch(result, requestAddr+"/hello", &User{"foo"})
 		if err != nil {
 			t.Error(err)
 			return
@@ -184,9 +184,9 @@ func runLogHTTPServer2() string {
 
 func TestRequest2(t *testing.T) {
 	requestAddr := runLogHTTPServer2()
-	result := &gohttp.StdResult{}
+	result := &httpcli.StdResult{}
 	t.Run("get ping", func(t *testing.T) {
-		err := gohttp.Get(result, requestAddr+"/ping")
+		err := httpcli.Get(result, requestAddr+"/ping")
 		if err != nil {
 			t.Error(err)
 			return

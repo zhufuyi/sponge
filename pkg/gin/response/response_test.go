@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zhufuyi/sponge/pkg/errcode"
-	"github.com/zhufuyi/sponge/pkg/gohttp"
+	"github.com/zhufuyi/sponge/pkg/httpcli"
 	"github.com/zhufuyi/sponge/pkg/utils"
 )
 
@@ -56,20 +56,20 @@ func runResponseHTTPServer() string {
 func TestRespond(t *testing.T) {
 	requestAddr := runResponseHTTPServer()
 
-	result := &gohttp.StdResult{}
-	err := gohttp.Get(result, requestAddr+"/success")
+	result := &httpcli.StdResult{}
+	err := httpcli.Get(result, requestAddr+"/success")
 	assert.NoError(t, err)
 	assert.NotEmpty(t, result.Data)
 
-	result = &gohttp.StdResult{}
-	err = gohttp.Get(result, requestAddr+"/error")
+	result = &httpcli.StdResult{}
+	err = httpcli.Get(result, requestAddr+"/error")
 	assert.NoError(t, err)
 	assert.NotEqual(t, 0, result.Code)
 
 	for _, code := range httpResponseCodes {
-		result := &gohttp.StdResult{}
+		result := &httpcli.StdResult{}
 		url := fmt.Sprintf("%s/code/%d", requestAddr, code)
-		err := gohttp.Get(result, url)
+		err := httpcli.Get(result, url)
 		if code == http.StatusOK {
 			assert.NoError(t, err)
 			assert.Equal(t, http.StatusOK, result.Code)
@@ -78,9 +78,9 @@ func TestRespond(t *testing.T) {
 		assert.Error(t, err)
 	}
 	for _, out := range outs {
-		result := &gohttp.StdResult{}
+		result := &httpcli.StdResult{}
 		url := fmt.Sprintf("%s/out/code/%d", requestAddr, out.ToHTTPCode())
-		err := gohttp.Get(result, url)
+		err := httpcli.Get(result, url)
 		if out.ToHTTPCode() == http.StatusOK {
 			assert.NoError(t, err)
 			assert.Equal(t, http.StatusOK, result.Code)

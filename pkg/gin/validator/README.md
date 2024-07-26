@@ -44,7 +44,7 @@ func CreateUser(c *gin.Context) {
 
 type getUserRequest struct {
 	Page int    `json:"page" form:"page" binding:"gte=0"`
-	Size int    `json:"size" form:"size" binding:"gt=0"`
+	Limit int    `json:"limit" form:"limit" binding:"gte=1"`
 	Sort string `json:"sort" form:"sort" binding:"-"`
 }
 

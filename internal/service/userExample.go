@@ -157,7 +157,7 @@ func (s *userExample) List(ctx context.Context, req *serverNameExampleV1.ListUse
 		return nil, ecode.StatusListUserExample.Err()
 	}
 	// Note: if copier.Copy cannot assign a value to a field, add it here
-	params.Size = int(req.Params.Limit)
+	params.Limit = int(req.Params.Limit)
 
 	records, total, err := s.iDao.GetByColumns(ctx, params)
 	if err != nil {

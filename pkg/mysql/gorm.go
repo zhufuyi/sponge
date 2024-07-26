@@ -1,4 +1,5 @@
 // Package mysql is a library wrapped on top of gorm.io/gorm, with added features such as link tracing, paging queries, etc.
+// Deprecated: moved to package pkg/ggorm, will be deleted in the future
 package mysql
 
 import (
@@ -16,7 +17,7 @@ import (
 )
 
 // Init mysql
-// Deprecated: will be moved to package pkg/gorm InitMysql
+// Deprecated: moved to package pkg/ggorm InitMysql
 func Init(dns string, opts ...Option) (*gorm.DB, error) {
 	o := defaultOptions()
 	o.apply(opts...)

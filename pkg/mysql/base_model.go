@@ -11,6 +11,7 @@ import (
 //type Model = gorm.Model
 
 // Model embedded structs, add `gorm: "embedded"` when defining table structs
+// Deprecated: moved to package pkg/ggorm Model
 type Model struct {
 	ID        uint64         `gorm:"column:id;AUTO_INCREMENT;primary_key" json:"id"`
 	CreatedAt time.Time      `gorm:"column:created_at" json:"createdAt"`
@@ -19,6 +20,7 @@ type Model struct {
 }
 
 // Model2 embedded structs, json tag named is snake case
+// Deprecated: moved to package pkg/ggorm Model2
 type Model2 struct {
 	ID        uint64         `gorm:"column:id;AUTO_INCREMENT;primary_key" json:"id"`
 	CreatedAt time.Time      `gorm:"column:created_at" json:"created_at"`
@@ -27,9 +29,11 @@ type Model2 struct {
 }
 
 // KV map type
+// Deprecated: moved to package pkg/ggorm KV
 type KV = map[string]interface{}
 
 // GetTableName get table name
+// Deprecated: moved to package pkg/ggorm GetTableName
 func GetTableName(object interface{}) string {
 	tableName := ""
 

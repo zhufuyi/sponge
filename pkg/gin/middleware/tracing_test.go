@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/zhufuyi/sponge/pkg/gin/response"
-	"github.com/zhufuyi/sponge/pkg/gohttp"
+	"github.com/zhufuyi/sponge/pkg/httpcli"
 	"github.com/zhufuyi/sponge/pkg/utils"
 
 	"github.com/gin-gonic/gin"
@@ -35,8 +35,8 @@ func TestTracing(t *testing.T) {
 	}()
 
 	time.Sleep(time.Millisecond * 200)
-	result := &gohttp.StdResult{}
-	err := gohttp.Get(result, requestAddr+"/hello")
+	result := &httpcli.StdResult{}
+	err := httpcli.Get(result, requestAddr+"/hello")
 	assert.NoError(t, err)
 	t.Log(result)
 }

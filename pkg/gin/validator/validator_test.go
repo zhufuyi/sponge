@@ -123,9 +123,9 @@ func getHello(c *gin.Context) {
 }
 
 type getsForm struct {
-	Page int    `form:"page" binding:"gte=0"`
-	Size int    `form:"size" binding:"gt=0"`
-	Sort string `form:"sort" binding:"required,min=2"`
+	Page  int    `form:"page" binding:"gte=0"`
+	Limit int    `form:"limit" binding:"gte=1"`
+	Sort  string `form:"sort" binding:"required,min=2"`
 }
 
 func getHellos(c *gin.Context) {
@@ -343,7 +343,7 @@ func TestGetsValidate(t *testing.T) {
 	requestAddr := runValidatorHTTPServer()
 
 	t.Run("success", func(t *testing.T) {
-		got, err := do(http.MethodGet, requestAddr+"/hellos?page=0&size=10&sort=-id", nil)
+		got, err := do(http.MethodGet, requestAddr+"/hellos?page=0&limit=10&sort=-id", nil)
 		if err != nil {
 			t.Error(err)
 			return
@@ -354,7 +354,7 @@ func TestGetsValidate(t *testing.T) {
 	})
 
 	t.Run("missing field error", func(t *testing.T) {
-		got, err := do(http.MethodGet, requestAddr+"/hellos?page=0&size=10", nil)
+		got, err := do(http.MethodGet, requestAddr+"/hellos?page=0&limit=10", nil)
 		if err != nil {
 			t.Error(err)
 			return
@@ -365,7 +365,7 @@ func TestGetsValidate(t *testing.T) {
 	})
 
 	t.Run("size error", func(t *testing.T) {
-		got, err := do(http.MethodGet, requestAddr+"/hellos?page=0&size=0&sort=-id", nil)
+		got, err := do(http.MethodGet, requestAddr+"/hellos?page=0&limit=0&sort=-id", nil)
 		if err != nil {
 			t.Error(err)
 			return

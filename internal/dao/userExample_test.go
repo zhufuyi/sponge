@@ -162,9 +162,9 @@ func Test_userExampleDao_GetByColumns(t *testing.T) {
 	d.SQLMock.ExpectQuery("SELECT .*").WillReturnRows(rows)
 
 	_, _, err := d.IDao.(UserExampleDao).GetByColumns(d.Ctx, &query.Params{
-		Page: 0,
-		Size: 10,
-		Sort: "ignore count", // ignore test count(*)
+		Page:  0,
+		Limit: 10,
+		Sort:  "ignore count", // ignore test count(*)
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -177,8 +177,8 @@ func Test_userExampleDao_GetByColumns(t *testing.T) {
 
 	// err test
 	_, _, err = d.IDao.(UserExampleDao).GetByColumns(d.Ctx, &query.Params{
-		Page: 0,
-		Size: 10,
+		Page:  0,
+		Limit: 10,
 		Columns: []query.Column{
 			{
 				Name:  "id",

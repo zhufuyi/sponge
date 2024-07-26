@@ -162,7 +162,7 @@ func Test_userExampleDao_GetByColumns(t *testing.T) {
 
 	_, _, err := d.IDao.(UserExampleDao).GetByColumns(d.Ctx, &query.Params{
 		Page: 0,
-		Size: 10,
+		Limit: 10,
 		Sort: "ignore count", // ignore test count(*)
 	})
 	if err != nil {
@@ -177,7 +177,7 @@ func Test_userExampleDao_GetByColumns(t *testing.T) {
 	// err test
 	_, _, err = d.IDao.(UserExampleDao).GetByColumns(d.Ctx, &query.Params{
 		Page: 0,
-		Size: 10,
+		Limit: 10,
 		Columns: []query.Column{
 			{
 				Name:  "id",

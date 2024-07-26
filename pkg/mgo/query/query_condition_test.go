@@ -11,20 +11,20 @@ import (
 
 func TestPage(t *testing.T) {
 	page := DefaultPage(-1)
-	t.Log(page.Page(), page.Size(), page.Sort(), page.Skip())
+	t.Log(page.Page(), page.Limit(), page.Sort(), page.Skip())
 	page = NewPage(0, 20, "")
-	t.Log(page.Page(), page.Size(), page.Sort(), page.Skip())
+	t.Log(page.Page(), page.Limit(), page.Sort(), page.Skip())
 
 	SetMaxSize(1)
 	page = NewPage(0, 20, "_id")
-	t.Log(page.Page(), page.Size(), page.Sort(), page.Skip())
+	t.Log(page.Page(), page.Limit(), page.Sort(), page.Skip())
 }
 
 func TestParams_ConvertToPage(t *testing.T) {
 	p := &Params{
-		Page: 0,
-		Size: 20,
-		Sort: "age,-name",
+		Page:  0,
+		Limit: 20,
+		Sort:  "age,-name",
 	}
 	order, limit, offset := p.ConvertToPage()
 	t.Logf("order=%v, limit=%d, skip=%d", order, limit, offset)

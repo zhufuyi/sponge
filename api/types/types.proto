@@ -6,7 +6,7 @@ option go_package = "github.com/zhufuyi/sponge/api/types;types";
 
 message Params {
   int32 page = 1; // page number, starting from 0
-  int32 limit = 2; // lines per page
+  int32 limit = 2; // number per page
   string sort = 3; // sorted fields, multi-column sorting separated by commas
   repeated Column columns = 4; // query conditions
 }

@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/zhufuyi/sponge/pkg/gohttp"
+	"github.com/zhufuyi/sponge/pkg/httpcli"
 	"github.com/zhufuyi/sponge/pkg/utils"
 )
 
@@ -55,7 +55,7 @@ func TestBrowserRefresh(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
 
-	req := &gohttp.Request{}
+	req := httpcli.New()
 	req.SetURL(requestAddr + "/notfound")
 	req.SetHeader("Accept", "text/html")
 	_, err = req.GET()
@@ -75,7 +75,7 @@ func TestBrowserRefresh2(t *testing.T) {
 
 	time.Sleep(time.Millisecond * 200)
 
-	req := &gohttp.Request{}
+	req := httpcli.New()
 	req.SetURL(requestAddr + "/notfound")
 	req.SetHeader("Accept", "text/html")
 	_, err := req.GET()
@@ -101,7 +101,7 @@ func TestBrowserRefreshFS(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
 
-	req := &gohttp.Request{}
+	req := httpcli.New()
 	req.SetURL(requestAddr + "/notfound")
 	req.SetHeader("Accept", "text/html")
 	_, err = req.GET()
@@ -121,7 +121,7 @@ func TestBrowserRefreshFS2(t *testing.T) {
 
 	time.Sleep(time.Millisecond * 200)
 
-	req := &gohttp.Request{}
+	req := httpcli.New()
 	req.SetURL(requestAddr + "/notfound")
 	req.SetHeader("Accept", "text/html")
 	_, err := req.GET()

@@ -17,6 +17,7 @@ type gormLogger struct {
 }
 
 // NewCustomGormLogger custom gorm logger
+// Deprecated: moved to package pkg/ggorm NewCustomGormLogger
 func NewCustomGormLogger(o *options) logger.Interface {
 	return &gormLogger{
 		gLog:         o.gLog,

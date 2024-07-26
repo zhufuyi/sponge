@@ -313,12 +313,12 @@ const docTemplate = `{
                         "$ref": "#/definitions/github_com_zhufuyi_sponge_internal_types.Column"
                     }
                 },
-                "page": {
-                    "description": "page number, starting from page 0",
+                "limit": {
+                    "description": "lines per page",
                     "type": "integer"
                 },
-                "size": {
-                    "description": "lines per page",
+                "page": {
+                    "description": "page number, starting from page 0",
                     "type": "integer"
                 },
                 "sort": {

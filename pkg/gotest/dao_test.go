@@ -238,9 +238,9 @@ func TestUserDao_GetByColumns(t *testing.T) {
 	d.SQLMock.ExpectQuery("SELECT .*").WillReturnRows(rows)
 
 	_, _, err := d.IDao.(*userDao).GetByColumns(d.Ctx, &query.Params{
-		Page: 0,
-		Size: 10,
-		Sort: "ignore count",
+		Page:  0,
+		Limit: 10,
+		Sort:  "ignore count",
 	})
 	if err != nil {
 		t.Fatal(err)

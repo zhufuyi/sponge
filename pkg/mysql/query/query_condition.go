@@ -1,4 +1,5 @@
 // Package query is a library for mysql query, support for complex conditional paging queries.
+// Deprecated: has been moved to package pkg/ggorm
 package query
 
 import (
@@ -61,15 +62,17 @@ var logicMap = map[string]string{
 }
 
 // Params query parameters
+// Deprecated: moved to package pkg/gorm/query Params
 type Params struct {
 	Page int    `json:"page" form:"page" binding:"gte=0"`
-	Size int    `json:"size" form:"size" binding:"gt=0"`
+	Size int    `json:"size" form:"size" binding:"gte=1"`
 	Sort string `json:"sort,omitempty" form:"sort" binding:""`
 
 	Columns []Column `json:"columns,omitempty" form:"columns"` // not required
 }
 
 // Column query info
+// Deprecated: moved to package pkg/gorm/query Column
 type Column struct {
 	Name  string      `json:"name" form:"name"`   // column name
 	Exp   string      `json:"exp" form:"exp"`     // expressions, which default to = when the value is null, have =, !=, >, >=, <, <=, like, in

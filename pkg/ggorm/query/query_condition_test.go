@@ -10,19 +10,19 @@ import (
 
 func TestPage(t *testing.T) {
 	page := DefaultPage(-1)
-	t.Log(page.Page(), page.Size(), page.Sort(), page.Offset())
+	t.Log(page.Page(), page.Limit(), page.Sort(), page.Offset())
 
 	SetMaxSize(1)
 
 	page = NewPage(-1, 100, "id")
-	t.Log(page.Page(), page.Size(), page.Sort(), page.Offset())
+	t.Log(page.Page(), page.Limit(), page.Sort(), page.Offset())
 }
 
 func TestParams_ConvertToPage(t *testing.T) {
 	p := &Params{
-		Page: 1,
-		Size: 50,
-		Sort: "age,-name",
+		Page:  1,
+		Limit: 50,
+		Sort:  "age,-name",
 	}
 	order, limit, offset := p.ConvertToPage()
 	t.Logf("order=%s, limit=%d, offset=%d", order, limit, offset)

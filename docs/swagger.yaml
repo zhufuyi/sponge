@@ -22,11 +22,11 @@ definitions:
         items:
           $ref: '#/definitions/github_com_zhufuyi_sponge_internal_types.Column'
         type: array
+      limit:
+        description: lines per page
+        type: integer
       page:
         description: page number, starting from page 0
-        type: integer
-      size:
-        description: lines per page
         type: integer
       sort:
         description: sorted fields, multi-column sorting separated by commas

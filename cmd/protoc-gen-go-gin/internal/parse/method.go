@@ -2,6 +2,7 @@ package parse
 
 import (
 	"fmt"
+	"net/http"
 	"strings"
 
 	"google.golang.org/genproto/googleapis/api/annotations"
@@ -39,23 +40,23 @@ func buildHTTPRule(m *protogen.Method, rule *annotations.HttpRule) *RPCMethod {
 	switch pattern := rule.Pattern.(type) {
 	case *annotations.HttpRule_Get:
 		path = pattern.Get
-		method = "GET"
+		method = http.MethodGet
 	case *annotations.HttpRule_Put:
 		path = pattern.Put
-		method = "PUT"
+		method = http.MethodPut
 	case *annotations.HttpRule_Post:
 		path = pattern.Post
-		method = "POST"
+		method = http.MethodPost
 	case *annotations.HttpRule_Delete:
 		path = pattern.Delete
-		method = "DELETE"
+		method = http.MethodDelete
 	case *annotations.HttpRule_Patch:
 		path = pattern.Patch
-		method = "PATCH"
+		method = http.MethodPatch
 	case *annotations.HttpRule_Custom:
 		path = pattern.Custom.Path
 		customKind = strings.ToLower(pattern.Custom.Kind)
-		method = "POST" // default
+		method = http.MethodPost // default
 	}
 	md := buildMethodDesc(m, method, path, customKind, selector)
 	return md
@@ -158,25 +159,25 @@ func (m *RPCMethod) checkCustomKind() {
 
 	switch customKindStr {
 	case "get":
-		m.Method = "GET"
+		m.Method = http.MethodGet
 	case "post":
-		m.Method = "POST"
+		m.Method = http.MethodPost
 	case "put":
-		m.Method = "PUT"
+		m.Method = http.MethodPut
 	case "delete":
-		m.Method = "DELETE"
+		m.Method = http.MethodDelete
 	case "patch":
-		m.Method = "PATCH"
+		m.Method = http.MethodPatch
 	case "options":
-		m.Method = "OPTIONS"
+		m.Method = http.MethodOptions
 	case "head":
-		m.Method = "HEAD"
+		m.Method = http.MethodHead
 	case "trace":
-		m.Method = "TRACE"
+		m.Method = http.MethodTrace
 	case "connect":
-		m.Method = "CONNECT"
+		m.Method = http.MethodConnect
 	default:
-		m.Method = "POST"
+		m.Method = http.MethodPost
 	}
 }
 

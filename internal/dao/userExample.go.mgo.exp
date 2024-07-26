@@ -205,7 +205,7 @@ func (d *userExampleDao) GetByID(ctx context.Context, id string) (*model.UserExa
 // paging parameters (required):
 //
 //	page: page number, starting from 0
-//	size: lines per page
+//	limit: lines per page
 //	sort: sort fields, default is id backwards, you can add - sign before the field to indicate reverse order, no - sign to indicate ascending order, multiple fields separated by comma
 //
 // query parameters (not required):
@@ -219,7 +219,7 @@ func (d *userExampleDao) GetByID(ctx context.Context, id string) (*model.UserExa
 //
 //	params = &query.Params{
 //	    Page: 0,
-//	    Size: 20,
+//	    Limit: 20,
 //	    Columns: []query.Column{
 //		{
 //			Name:    "age",
@@ -401,7 +401,7 @@ func (d *userExampleDao) GetByLastID(ctx context.Context, lastID string, limit i
 	page := query.NewPage(0, limit, sort)
 
 	findOpts := new(options.FindOptions)
-	findOpts.SetLimit(int64(page.Size())).SetSkip(int64(page.Skip()))
+	findOpts.SetLimit(int64(page.Limit())).SetSkip(int64(page.Skip()))
 	findOpts.Sort = page.Sort()
 
 	records := []*model.UserExample{}

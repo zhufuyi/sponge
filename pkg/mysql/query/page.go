@@ -5,6 +5,7 @@ import "strings"
 var defaultMaxSize = 1000
 
 // SetMaxSize change the default maximum number of pages per page
+// Deprecated: moved to package pkg/gorm/query SetMaxSize
 func SetMaxSize(max int) {
 	if max < 10 {
 		max = 10
@@ -13,6 +14,7 @@ func SetMaxSize(max int) {
 }
 
 // Page info
+// Deprecated: moved to package pkg/gorm/query Page
 type Page struct {
 	page int    // page number, starting from page 0
 	size int    // number per page
@@ -20,26 +22,31 @@ type Page struct {
 }
 
 // Page get page value
+// Deprecated: moved to package pkg/gorm/query Page
 func (p *Page) Page() int {
 	return p.page
 }
 
 // Size number per page
+// Deprecated: moved to package pkg/gorm/query Size
 func (p *Page) Size() int {
 	return p.size
 }
 
 // Sort get sort field
+// Deprecated: moved to package pkg/gorm/query Sort
 func (p *Page) Sort() string {
 	return p.sort
 }
 
 // Offset get offset value
+// Deprecated: moved to package pkg/gorm/query Offset
 func (p *Page) Offset() int {
 	return p.page * p.size
 }
 
 // DefaultPage default page, number 20 per page, sorted by id backwards
+// Deprecated: moved to package pkg/gorm/query DefaultPage
 func DefaultPage(page int) *Page {
 	if page < 0 {
 		page = 0
@@ -54,6 +61,7 @@ func DefaultPage(page int) *Page {
 // NewPage custom page, starting from page 0.
 // the parameter columnNames indicates a sort field, if empty means id descending, if there are multiple column names, separated by a comma,
 // a '-' sign in front of each column name indicates descending order, otherwise ascending order.
+// Deprecated: moved to package pkg/gorm/query NewPage
 func NewPage(page int, size int, columnNames string) *Page {
 	if page < 0 {
 		page = 0

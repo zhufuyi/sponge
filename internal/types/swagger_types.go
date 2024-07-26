@@ -14,9 +14,9 @@ type Result struct {
 
 // Params query parameters
 type Params struct {
-	Page int    `json:"page"`           // page number, starting from page 0
-	Size int    `json:"size"`           // lines per page
-	Sort string `json:"sort,omitempty"` // sorted fields, multi-column sorting separated by commas
+	Page  int    `json:"page"`           // page number, starting from page 0
+	Limit int    `json:"limit"`          // lines per page
+	Sort  string `json:"sort,omitempty"` // sorted fields, multi-column sorting separated by commas
 
 	Columns []Column `json:"columns,omitempty"` // query conditions
 }
