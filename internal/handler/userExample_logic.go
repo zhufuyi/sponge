@@ -179,8 +179,8 @@ func convertUserExamplePb(record *model.UserExample) (*serverNameExampleV1.UserE
 	if err != nil {
 		return nil, err
 	}
+	// Note: if copier.Copy cannot assign a value to a field, add it here, e.g. CreatedAt, UpdatedAt
 	value.Id = record.ID
-	// todo if copier.Copy cannot assign a value to a field, add it here, e.g. CreatedAt, UpdatedAt
 	// todo generate the conversion createdAt and updatedAt code here
 	// delete the templates code start
 	value.CreatedAt = record.CreatedAt.Format(time.RFC3339)
