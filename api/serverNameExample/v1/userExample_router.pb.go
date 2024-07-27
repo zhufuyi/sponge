@@ -4,6 +4,7 @@ package v1
 
 import (
 	context "context"
+	errors "errors"
 	gin "github.com/gin-gonic/gin"
 	errcode "github.com/zhufuyi/sponge/pkg/errcode"
 	middleware "github.com/zhufuyi/sponge/pkg/gin/middleware"
@@ -176,6 +177,9 @@ func (r *userExampleRouter) Create_0(c *gin.Context) {
 
 	out, err := r.iLogic.Create(ctx, req)
 	if err != nil {
+		if errors.Is(err, errcode.SkipResponse) {
+			return
+		}
 		r.iResponse.Error(c, err)
 		return
 	}
@@ -208,6 +212,9 @@ func (r *userExampleRouter) DeleteByID_0(c *gin.Context) {
 
 	out, err := r.iLogic.DeleteByID(ctx, req)
 	if err != nil {
+		if errors.Is(err, errcode.SkipResponse) {
+			return
+		}
 		r.iResponse.Error(c, err)
 		return
 	}
@@ -240,6 +247,9 @@ func (r *userExampleRouter) UpdateByID_0(c *gin.Context) {
 
 	out, err := r.iLogic.UpdateByID(ctx, req)
 	if err != nil {
+		if errors.Is(err, errcode.SkipResponse) {
+			return
+		}
 		r.iResponse.Error(c, err)
 		return
 	}
@@ -272,6 +282,9 @@ func (r *userExampleRouter) GetByID_0(c *gin.Context) {
 
 	out, err := r.iLogic.GetByID(ctx, req)
 	if err != nil {
+		if errors.Is(err, errcode.SkipResponse) {
+			return
+		}
 		r.iResponse.Error(c, err)
 		return
 	}
@@ -298,6 +311,9 @@ func (r *userExampleRouter) List_0(c *gin.Context) {
 
 	out, err := r.iLogic.List(ctx, req)
 	if err != nil {
+		if errors.Is(err, errcode.SkipResponse) {
+			return
+		}
 		r.iResponse.Error(c, err)
 		return
 	}

@@ -34,3 +34,5 @@ var (
 	Unimplemented      = errcode.Unimplemented
 	DataLoss           = errcode.DataLoss
 )
+
+var SkipResponse = errcode.SkipResponse

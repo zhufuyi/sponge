@@ -1,6 +1,7 @@
 package errcode
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 	"strings"
@@ -9,6 +10,9 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
+
+// SkipResponse skip response
+var SkipResponse = errors.New("skip response") //nolint
 
 // Responser response interface
 type Responser interface {

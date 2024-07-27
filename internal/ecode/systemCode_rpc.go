@@ -37,3 +37,6 @@ var (
 func Any(key string, val interface{}) errcode.Detail {
 	return errcode.Any(key, val)
 }
+
+// StatusSkipResponse is only use for grpc-gateway
+var StatusSkipResponse = errcode.SkipResponse

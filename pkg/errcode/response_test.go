@@ -172,6 +172,9 @@ func TestParseCodeAndMsgError(t *testing.T) {
 	}
 	code, msg := parseCodeAndMsg2(st.String())
 	t.Log("strings: ", code, msg)
+
+	st, _ = status.FromError(SkipResponse)
+	t.Log(st.Code(), st.Message())
 }
 
 var mcReg = regexp.MustCompile(`code\s*=\s*(\d+),\s*msg\s*=\s*(.+)`)

@@ -14,6 +14,7 @@ import (
 const (
 	stringsPkg         = protogen.GoImportPath("strings")
 	contextPkg         = protogen.GoImportPath("context")
+	errorsPkg          = protogen.GoImportPath("errors")
 	errcodePkg         = protogen.GoImportPath("github.com/zhufuyi/sponge/pkg/errcode")
 	middlewarePkg      = protogen.GoImportPath("github.com/zhufuyi/sponge/pkg/gin/middleware")
 	zapPkg             = protogen.GoImportPath("go.uber.org/zap")
@@ -35,8 +36,8 @@ func GenerateFile(gen *protogen.Plugin, file *protogen.File) *protogen.Generated
 	g.P("package ", file.GoPackageName)
 	g.P()
 
-	g.P("// import packages: ", stringsPkg.Ident(" "), contextPkg.Ident(" "), errcodePkg.Ident(" "),
-		middlewarePkg.Ident(" "), zapPkg.Ident(" "), ginPkg.Ident(" "))
+	g.P("// import packages: ", stringsPkg.Ident(" "), contextPkg.Ident(" "), errorsPkg.Ident(" "),
+		errcodePkg.Ident(" "), middlewarePkg.Ident(" "), zapPkg.Ident(" "), ginPkg.Ident(" "))
 	g.P()
 
 	for _, s := range file.Services {

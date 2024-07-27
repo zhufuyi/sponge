@@ -197,6 +197,9 @@ func (r *{{$.LowerName}}Router) withMiddleware(method string, path string, fn gi
 
 	out, err := r.iLogic.{{.Name}}(ctx, req)
 	if err != nil {
+		if errors.Is(err, errcode.SkipResponse) {
+			return
+		}
 		r.iResponse.Error(c, err)
 		return
 	}
