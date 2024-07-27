@@ -18,6 +18,7 @@ const (
 	middlewarePkg      = protogen.GoImportPath("github.com/zhufuyi/sponge/pkg/gin/middleware")
 	zapPkg             = protogen.GoImportPath("go.uber.org/zap")
 	ginPkg             = protogen.GoImportPath("github.com/gin-gonic/gin")
+	ginBindingPkg      = protogen.GoImportPath("github.com/gin-gonic/gin/binding")
 	deprecationComment = "// Deprecated: Do not use."
 )
 
@@ -36,7 +37,7 @@ func GenerateFile(gen *protogen.Plugin, file *protogen.File) *protogen.Generated
 	g.P()
 
 	g.P("// import packages: ", stringsPkg.Ident(" "), contextPkg.Ident(" "), errcodePkg.Ident(" "),
-		middlewarePkg.Ident(" "), zapPkg.Ident(" "), ginPkg.Ident(" "))
+		middlewarePkg.Ident(" "), zapPkg.Ident(" "), ginPkg.Ident(" "), ginBindingPkg.Ident(" "))
 	g.P()
 
 	for _, s := range file.Services {
