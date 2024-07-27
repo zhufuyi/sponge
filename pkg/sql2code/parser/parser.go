@@ -1046,7 +1046,7 @@ func goTypeToProto(fields []tmplField) []tmplField {
 				field.GoType = "uint64"
 			}
 		}
-
+		field.JSONName = customToCamel(field.ColName)
 		newFields = append(newFields, field)
 	}
 	return newFields
@@ -1080,9 +1080,8 @@ func getDefaultValue(expr ast.ExprNode) (value string) {
 }
 
 var acronym = map[string]struct{}{
-	"ID":  {},
-	"IP":  {},
-	"RPC": {},
+	"ID": {},
+	"IP": {},
 }
 
 func toCamel(s string) string {
@@ -1138,4 +1137,11 @@ func firstLetterToLow(str string) string {
 	}
 
 	return str
+}
+
+func customToCamel(str string) string {
+	if strings.ToLower(str) == "id" {
+		return str
+	}
+	return firstLetterToLow(toCamel(str))
 }

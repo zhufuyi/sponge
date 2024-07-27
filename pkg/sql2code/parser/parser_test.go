@@ -116,8 +116,15 @@ func TestParseSQLs(t *testing.T) {
 }
 
 func Test_toCamel(t *testing.T) {
-	str := "user_example"
-	t.Log(toCamel(str))
+	names := []string{"id", "user_id", "productId", "orderId", "user_name", "host_ip", "teacherId"}
+	var convertNames []string
+	var convertNames2 []string
+	for _, name := range names {
+		convertNames = append(convertNames, toCamel(name))
+		convertNames2 = append(convertNames2, customToCamel(name))
+	}
+	t.Log(convertNames)
+	t.Log(convertNames2)
 }
 
 func Test_parseOption(t *testing.T) {

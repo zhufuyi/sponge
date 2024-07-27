@@ -161,7 +161,7 @@ message List{{.TableName}}Request {
 }
 
 message List{{.TableName}}Reply {
-  int64 total =1;
+  int64 total = 1;
   repeated {{.TableName}} {{.TName}}s = 2;
 }
 
@@ -265,7 +265,7 @@ message List{{.TableName}}Request {
 }
 
 message List{{.TableName}}Reply {
-  int64 total =1;
+  int64 total = 1;
   repeated {{.TableName}} {{.TName}}s = 2;
 }
 `
@@ -320,6 +320,12 @@ service {{.TName}} {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "create {{.TName}}",
       description: "submit information to create {{.TName}}",
+      //security: {
+      //  security_requirement: {
+      //    key: "BearerAuth";
+      //    value: {}
+      //  }
+      //}
     };
   }
 
@@ -465,17 +471,20 @@ service {{.TName}} {
   }
 }
 
+
 // Some notes on defining fields under message:
 // (1) Fill in the validate rules https://github.com/envoyproxy/protoc-gen-validate#constraint-rules
-// (2) When using the protoc-gen-openapiv2 plugin, if the defined fields are snake case,
-//      you must add annotations for snake case names, such as string foo_bar = 1 [json_name = "foo_bar"],
+// (2) Suggest using camel hump naming for message field names, and for names ending in 'id',
+//      use xxxID naming format, such as userID, orderID, etc.
+// (3) When using the protoc-gen-openapiv2 plugin, if the defined fields are snake case,
+//      you must add annotations for snake case names, such as string fieldName = 1 [json_name = "field_name"],
 //      to ensure that the front end and back end JSON naming is consistent.
-// (3) If the route contains the path parameter, such as /api/v1/userExample/{id}, the defined
+// (4) If the route contains the path parameter, such as /api/v1/userExample/{id}, the defined
 //      message  must contain the name of the path parameter and the name should be
 //      added with a new tag, such as int64 id = 1 [(tagger.tags) = "uri:\"id\""];
-// (4) If the request url is followed by a query parameter, such as /api/v1/getUserExample?name=Tom,
+// (5) If the request url is followed by a query parameter, such as /api/v1/getUserExample?name=Tom,
 //      a form tag must be added when defining the query parameter in the message,
-//      such as string name = 1 [(tagger.tags) = "form:\"name\""];
+//      such as string name = 1 [(tagger.tags) = "form:\"name\""].
 
 
 // protoMessageCreateCode
@@ -513,7 +522,7 @@ message List{{.TableName}}Request {
 }
 
 message List{{.TableName}}Reply {
-  int64 total =1;
+  int64 total = 1;
   repeated {{.TableName}} {{.TName}}s = 2;
 }
 
@@ -602,6 +611,12 @@ service {{.TName}} {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "create {{.TName}}",
       description: "submit information to create {{.TName}}",
+      //security: {
+      //  security_requirement: {
+      //    key: "BearerAuth";
+      //    value: {}
+      //  }
+      //}
     };
   }
 
@@ -676,17 +691,20 @@ service {{.TName}} {
   }
 }
 
+
 // Some notes on defining fields under message:
 // (1) Fill in the validate rules https://github.com/envoyproxy/protoc-gen-validate#constraint-rules
-// (2) When using the protoc-gen-openapiv2 plugin, if the defined fields are snake case,
-//      you must add annotations for snake case names, such as string foo_bar = 1 [json_name = "foo_bar"],
+// (2) Suggest using camel hump naming for message field names, and for names ending in 'id',
+//      use xxxID naming format, such as userID, orderID, etc.
+// (3) When using the protoc-gen-openapiv2 plugin, if the defined fields are snake case,
+//      you must add annotations for snake case names, such as string fieldName = 1 [json_name = "field_name"],
 //      to ensure that the front end and back end JSON naming is consistent.
-// (3) If the route contains the path parameter, such as /api/v1/userExample/{id}, the defined
+// (4) If the route contains the path parameter, such as /api/v1/userExample/{id}, the defined
 //      message  must contain the name of the path parameter and the name should be
 //      added with a new tag, such as int64 id = 1 [(tagger.tags) = "uri:\"id\""];
-// (4) If the request url is followed by a query parameter, such as /api/v1/getUserExample?name=Tom,
+// (5) If the request url is followed by a query parameter, such as /api/v1/getUserExample?name=Tom,
 //      a form tag must be added when defining the query parameter in the message,
-//      such as string name = 1 [(tagger.tags) = "form:\"name\""];
+//      such as string name = 1 [(tagger.tags) = "form:\"name\""].
 
 
 // protoMessageCreateCode
@@ -724,7 +742,7 @@ message List{{.TableName}}Request {
 }
 
 message List{{.TableName}}Reply {
-  int64 total =1;
+  int64 total = 1;
   repeated {{.TableName}} {{.TName}}s = 2;
 }
 `
