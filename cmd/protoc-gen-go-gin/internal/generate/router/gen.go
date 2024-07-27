@@ -36,8 +36,30 @@ func GenerateFile(gen *protogen.Plugin, file *protogen.File) *protogen.Generated
 	g.P("package ", file.GoPackageName)
 	g.P()
 
-	g.P("// import packages: ", stringsPkg.Ident(" "), contextPkg.Ident(" "), errcodePkg.Ident(" "),
-		middlewarePkg.Ident(" "), zapPkg.Ident(" "), ginPkg.Ident(" "), ginBindingPkg.Ident(" "))
+	// check whether the service method contains the form-data parameter
+	needGinBindingPkg := false
+	for _, s := range file.Services {
+		for _, m := range s.Methods {
+			for _, rpcm := range parse.GetMethods(m) {
+				if rpcm.Method == "FORM-DATA" {
+					needGinBindingPkg = true
+					break
+				}
+			}
+			if needGinBindingPkg {
+				break
+			}
+		}
+
+	}
+	if needGinBindingPkg {
+		g.P("// import packages: ", stringsPkg.Ident(" "), contextPkg.Ident(" "), errcodePkg.Ident(" "),
+			middlewarePkg.Ident(" "), zapPkg.Ident(" "), ginPkg.Ident(" "), ginBindingPkg.Ident(" "))
+	} else {
+		g.P("// import packages: ", stringsPkg.Ident(" "), contextPkg.Ident(" "), errcodePkg.Ident(" "),
+			middlewarePkg.Ident(" "), zapPkg.Ident(" "), ginPkg.Ident(" "))
+	}
+
 	g.P()
 
 	for _, s := range file.Services {
