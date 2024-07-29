@@ -687,6 +687,7 @@ func getHandlerStructCodes(data tmplData) (string, error) {
 				field.GoType = "[]*model." + strings.ReplaceAll(field.GoType, "[]*", "")
 			}
 		}
+		field.JSONName = customToCamel(field.ColName)
 		newFields = append(newFields, field)
 	}
 	data.Fields = newFields

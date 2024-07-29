@@ -178,7 +178,7 @@ func adjustmentOfIDType(handlerCodes string, dbDriver string) string {
 	if dbDriver == DBDriverMongodb {
 		return idTypeToStr(handlerCodes)
 	}
-	return idTypeToStr(idTypeFixToUint64(handlerCodes))
+	return idTypeToUint64(idTypeFixToUint64(handlerCodes))
 }
 
 func idTypeFixToUint64(handlerCodes string) string {
@@ -187,6 +187,18 @@ func idTypeFixToUint64(handlerCodes string) string {
 	if subBytes := gofile.FindSubBytesNotIn([]byte(handlerCodes), []byte(subStart), []byte(subEnd)); len(subBytes) > 0 {
 		old := subStart + string(subBytes) + subEnd
 		newStr := subStart + "\n\tID uint64 " + subEnd + " // uint64 id\n"
+		handlerCodes = strings.ReplaceAll(handlerCodes, old, newStr)
+	}
+
+	return handlerCodes
+}
+
+func idTypeToUint64(handlerCodes string) string {
+	subStart := "ObjDetail struct {"
+	subEnd := "`" + `json:"id"` + "`"
+	if subBytes := gofile.FindSubBytesNotIn([]byte(handlerCodes), []byte(subStart), []byte(subEnd)); len(subBytes) > 0 {
+		old := subStart + string(subBytes) + subEnd
+		newStr := subStart + "\n\tID uint64 " + subEnd + " // convert to uint64 id\n"
 		handlerCodes = strings.ReplaceAll(handlerCodes, old, newStr)
 	}
 

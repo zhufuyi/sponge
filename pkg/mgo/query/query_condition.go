@@ -81,7 +81,7 @@ type Params struct {
 
 	Columns []Column `json:"columns,omitempty" form:"columns"` // not required
 
-	// Deprecated: use Limit instead, will remove in the future
+	// Deprecated: use Limit instead in sponge version v1.8.6, will remove in the future
 	Size int `json:"size" form:"size"`
 }
 

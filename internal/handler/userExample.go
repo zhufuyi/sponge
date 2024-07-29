@@ -166,7 +166,7 @@ func (h *userExampleHandler) UpdateByID(c *gin.Context) {
 // @Router /api/v1/userExample/{id} [get]
 // @Security BearerAuth
 func (h *userExampleHandler) GetByID(c *gin.Context) {
-	idStr, id, isAbort := getUserExampleIDFromPath(c)
+	_, id, isAbort := getUserExampleIDFromPath(c)
 	if isAbort {
 		response.Error(c, ecode.InvalidParams)
 		return
@@ -192,7 +192,6 @@ func (h *userExampleHandler) GetByID(c *gin.Context) {
 		return
 	}
 	// Note: if copier.Copy cannot assign a value to a field, add it here
-	data.ID = idStr
 
 	response.Success(c, gin.H{"userExample": data})
 }
@@ -254,7 +253,6 @@ func convertUserExample(userExample *model.UserExample) (*types.UserExampleObjDe
 		return nil, err
 	}
 	// Note: if copier.Copy cannot assign a value to a field, add it here
-	data.ID = utils.Uint64ToStr(userExample.ID)
 
 	return data, nil
 }

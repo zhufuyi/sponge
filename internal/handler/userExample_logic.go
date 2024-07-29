@@ -145,7 +145,6 @@ func (h *userExamplePbHandler) List(ctx context.Context, req *serverNameExampleV
 		return nil, ecode.ErrListUserExample.Err()
 	}
 	// Note: if copier.Copy cannot assign a value to a field, add it here
-	params.Limit = int(req.Params.Limit)
 
 	records, total, err := h.userExampleDao.GetByColumns(ctx, params)
 	if err != nil {

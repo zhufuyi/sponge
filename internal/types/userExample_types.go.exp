@@ -38,7 +38,7 @@ type UpdateUserExampleByIDRequest struct {
 
 // UserExampleObjDetail detail
 type UserExampleObjDetail struct {
-	ID        string    `json:"id"`        // id
+	ID        uint64    `json:"id"`        // id
 	Name      string    `json:"name"`      // username
 	Email     string    `json:"email"`     // email
 	Phone     string    `json:"phone"`     // phone number
