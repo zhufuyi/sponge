@@ -205,6 +205,7 @@ func GenerateOne(args *Args) (string, error) {
 
 // Generate model, json, dao, handler, proto codes
 func Generate(args *Args) (map[string]string, error) {
+	args.FormatDsn()
 	if err := args.checkValid(); err != nil {
 		return nil, err
 	}
@@ -223,4 +224,17 @@ func Generate(args *Args) (map[string]string, error) {
 	opt := setOptions(args)
 
 	return parser.ParseSQL(sql, opt...)
+}
+
+func (a *Args) FormatDsn() {
+	dbParams := strings.Split(a.DBDsn, ";")
+	a.DBDsn = dbParams[0]
+	newParams := dbParams[1:]
+	for _, v := range newParams {
+		ss := strings.SplitN(v, "=", 2)
+		switch ss[0] {
+		case "prefix":
+			a.TablePrefix = ss[1]
+		}
+	}
 }

@@ -6,6 +6,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/zhufuyi/sponge/cmd/sponge/global"
 	"os"
 
 	"github.com/zhufuyi/sponge/pkg/gofile"
@@ -20,6 +21,13 @@ func main() {
 		fmt.Printf("\n    %v\n\n", err)
 		return
 	}
+
+	dir, err := os.Getwd()
+	if err != nil {
+		fmt.Println("Error:" + err.Error())
+		os.Exit(1)
+	}
+	global.Path = dir
 
 	rootCMD := commands.NewRootCMD()
 	if err = rootCMD.Execute(); err != nil {

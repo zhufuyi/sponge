@@ -97,9 +97,12 @@ func NewRouter() *gin.Engine {
 	r.GET("/config", gin.WrapF(errcode.ShowConfig([]byte(config.Show()))))
 
 	// register swagger routes, generate code via swag init
-	docs.SwaggerInfo.BasePath = ""
-	// access path /swagger/index.html
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	if config.Get().App.Env != "prod" {
+		// register swagger routes, generate code via swag init
+		docs.SwaggerInfo.BasePath = ""
+		// access path /swagger/index.html
+		r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	}
 
 	// register routers, middleware support
 	registerRouters(r, "/api/v1", apiV1RouterFns)

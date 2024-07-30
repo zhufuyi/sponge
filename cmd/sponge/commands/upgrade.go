@@ -74,7 +74,8 @@ func runUpgrade(targetVersion string) (string, error) {
 
 func runUpgradeCommand(targetVersion string) error {
 	ctx, _ := context.WithTimeout(context.Background(), time.Minute*3) //nolint
-	result := gobash.Run(ctx, "go", "install", "github.com/zhufuyi/sponge/cmd/sponge@"+targetVersion)
+	//result := gobash.Run(ctx, "go", "install", "github.com/zhufuyi/sponge/cmd/sponge@"+targetVersion)
+	result := gobash.Run(ctx, "go", "install")
 	for v := range result.StdOut {
 		_ = v
 	}
