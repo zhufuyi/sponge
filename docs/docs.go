@@ -539,7 +539,7 @@ const docTemplate = `{
                 },
                 "id": {
                     "description": "id",
-                    "type": "string"
+                    "type": "integer"
                 },
                 "loginAt": {
                     "description": "login timestamp",

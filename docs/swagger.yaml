@@ -183,7 +183,7 @@ definitions:
         type: integer
       id:
         description: id
-        type: string
+        type: integer
       loginAt:
         description: login timestamp
         type: integer

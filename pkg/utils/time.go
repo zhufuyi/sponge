@@ -9,6 +9,9 @@ const (
 	// DateTimeLayoutWithMS is the layout string for datetime format with milliseconds.
 	DateTimeLayoutWithMS = "2006-01-02 15:04:05.000"
 
+	// RFC3339 is the layout string for RFC3339 format.
+	RFC3339 = "2006-01-02T15:04:05Z07:00"
+
 	// DateTimeLayoutWithMSAndTZ is the layout string for datetime format with milliseconds and timezone.
 	DateTimeLayoutWithMSAndTZ = "2006-01-02T15:04:05.000Z"
 
@@ -19,34 +22,42 @@ const (
 	DateLayout = "2006-01-02"
 )
 
-// FormatDateTime formats the given time to string
-func FormatDateTime(t time.Time, format string) string {
-	switch format {
-	case DateTimeLayoutWithMS:
-		return t.Format(DateTimeLayoutWithMS)
-	case DateTimeLayoutWithMSAndTZ:
-		return t.UTC().Format(DateTimeLayoutWithMSAndTZ)
-	case TimeLayout:
-		return t.Format(TimeLayout)
-	case DateLayout:
-		return t.Format(DateLayout)
-	default:
-		return t.Format(DateTimeLayout)
-	}
+// FormatDateTimeLayout formats the given time to the layout string "2006-01-02 15:04:05".
+func FormatDateTimeLayout(t time.Time) string {
+	return t.Format(DateTimeLayout)
 }
 
-// ParseDateTime parses the given string to time
-func ParseDateTime(s string, format string) (time.Time, error) {
-	switch format {
-	case DateTimeLayoutWithMS:
-		return time.Parse(DateTimeLayoutWithMS, s)
-	case DateTimeLayoutWithMSAndTZ:
-		return time.Parse(DateTimeLayoutWithMSAndTZ, s)
-	case TimeLayout:
-		return time.Parse(TimeLayout, s)
-	case DateLayout:
-		return time.Parse(DateLayout, s)
-	default:
-		return time.Parse(DateTimeLayout, s)
-	}
+// ParseDateTimeLayout parses the given string to time with layout string "2006-01-02 15:04:05".
+func ParseDateTimeLayout(s string) (time.Time, error) {
+	return time.Parse(DateTimeLayout, s)
+}
+
+// FormatDateTimeLayoutWithMS formats the given time to the layout string "2006-01-02 15:04:05.000".
+func FormatDateTimeLayoutWithMS(t time.Time) string {
+	return t.Format(DateTimeLayoutWithMS)
+}
+
+// ParseDateTimeLayoutWithMS parses the given string to time with layout string "2006-01-02 15:04:05.000".
+func ParseDateTimeLayoutWithMS(s string) (time.Time, error) {
+	return time.Parse(DateTimeLayoutWithMS, s)
+}
+
+// FormatDateTimeRFC3339 formats the given time to the layout string "2006-01-02T15:04:05Z07:00".
+func FormatDateTimeRFC3339(t time.Time) string {
+	return t.Format(RFC3339)
+}
+
+// ParseDateTimeRFC3339 parses the given string to time with layout string "2006-01-02T15:04:05Z07:00".
+func ParseDateTimeRFC3339(s string) (time.Time, error) {
+	return time.Parse(RFC3339, s)
+}
+
+// FormatDateTimeLayoutWithMSAndTZ formats the given time to the layout string "2006-01-02T15:04:05.000Z".
+func FormatDateTimeLayoutWithMSAndTZ(t time.Time) string {
+	return t.Format(DateTimeLayoutWithMSAndTZ)
+}
+
+// ParseDateTimeLayoutWithMSAndTZ parses the given string to time with layout string "2006-01-02T15:04:05.000Z".
+func ParseDateTimeLayoutWithMSAndTZ(s string) (time.Time, error) {
+	return time.Parse(DateTimeLayoutWithMSAndTZ, s)
 }

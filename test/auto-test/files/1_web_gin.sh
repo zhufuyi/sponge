@@ -79,8 +79,8 @@ function testRequest() {
   checkErrCount $?
 
   echo -e "\n\n"
-  echo -e "${colorCyan}curl -X POST http://localhost:8080/api/v1/${mysqlTable}/list -H \"X-Request-Id: qaz12wx3ed4\" -H \"Content-Type: application/json\" -d {\"columns\":[{\"exp\":\">\",\"name\":\"id\",\"value\":1}],\"page\":0,\"size\":10} ${markEnd}"
-  curl -X POST http://localhost:8080/api/v1/${mysqlTable}/list -H "X-Request-Id: qaz12wx3ed4" -H "Content-Type: application/json" -d "{\"columns\":[{\"exp\":\">\",\"name\":\"id\",\"value\":1}],\"page\":0,\"size\":10}"
+  echo -e "${colorCyan}curl -X POST http://localhost:8080/api/v1/${mysqlTable}/list -H \"X-Request-Id: qaz12wx3ed4\" -H \"Content-Type: application/json\" -d {\"columns\":[{\"exp\":\">\",\"name\":\"id\",\"value\":1}],\"page\":0,\"limit\":10} ${markEnd}"
+  curl -X POST http://localhost:8080/api/v1/${mysqlTable}/list -H "X-Request-Id: qaz12wx3ed4" -H "Content-Type: application/json" -d "{\"columns\":[{\"exp\":\">\",\"name\":\"id\",\"value\":1}],\"page\":0,\"limit\":10}"
   checkErrCount $?
 
   echo -e "\n--------------------- the test is over, error result: $errCount ---------------------\n"
@@ -91,8 +91,8 @@ if [ -d "${webDir}" ]; then
   echo "service ${webDir} already exists"
 else
   echo "create service ${webDir}"
-  echo -e "${colorCyan}sponge web http --module-name=${webServiceName} --server-name=${webServiceName} --project-name=webdemo --db-dsn=${mysqlDSN} --db-table=${mysqlTable} --out=./${webDir} ${markEnd}"
-  sponge web http --module-name=${webServiceName} --server-name=${webServiceName} --project-name=webdemo --db-dsn=${mysqlDSN} --db-table=${mysqlTable} --out=./${webDir}
+  echo -e "${colorCyan}sponge web http --module-name=${webServiceName} --server-name=${webServiceName} --project-name=webdemo --extended-api=true --db-dsn=${mysqlDSN} --db-table=${mysqlTable} --out=./${webDir} ${markEnd}"
+  sponge web http --module-name=${webServiceName} --server-name=${webServiceName} --project-name=webdemo --extended-api=true --db-dsn=${mysqlDSN} --db-table=${mysqlTable} --out=./${webDir}
   checkResult $?
 fi
 

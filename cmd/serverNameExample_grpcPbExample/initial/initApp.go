@@ -49,12 +49,15 @@ func InitApp() {
 		panic(err)
 	}
 	logger.Debug(config.Show())
-	logger.Info("init logger succeeded")
+	logger.Info("[logger] was initialized")
 
 	// initializing database
 	//model.InitDB()
-	//logger.Infof("init %s succeeded", cfg.Database.Driver)
+	//logger.Infof("[%s] was initialized", cfg.Database.Driver)
 	//model.InitCache(cfg.App.CacheType)
+	//if cfg.App.CacheType != "" {
+	//	logger.Infof("[%s] was initialized", cfg.App.CacheType)
+	//}
 
 	// initializing tracing
 	if cfg.App.EnableTrace {
@@ -66,7 +69,7 @@ func InitApp() {
 			strconv.Itoa(cfg.Jaeger.AgentPort),
 			cfg.App.TracingSamplingRate,
 		)
-		logger.Info("init tracer succeeded")
+		logger.Info("[tracer] was initialized")
 	}
 
 	// initializing the print system and process resources
@@ -75,7 +78,7 @@ func InitApp() {
 			stat.WithLog(logger.Get()),
 			stat.WithAlarm(), // invalid if it is windows, the default threshold for cpu and memory is 0.8, you can modify them
 		)
-		logger.Info("init statistics succeeded")
+		logger.Info("[resource statistics] was initialized")
 	}
 }
 
