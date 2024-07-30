@@ -67,7 +67,7 @@ wrk -t2 -c10 -d10s http://192.168.3.27:8080/api/v1/course/1
 
 监控界面如下图所示：
 
-![http-grafana](https://go-sponge.com/assets/images/http-grafana.jpg)
+![http-grafana](https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/http-grafana.jpg)
 
 <br>
 
@@ -103,7 +103,7 @@ wrk -t2 -c10 -d10s http://192.168.3.27:8080/api/v1/course/1
 使用`Goland` IDE打开`internal/service/teacher_client_test.go`文件，对**Test_teacherService_methods** 或 **Test_teacherService_benchmark** 下各个方法进行测试。
 
 监控界面如下图所示。
-![rpc-grafana](https://go-sponge.com/assets/images/rpc-grafana.jpg)
+![rpc-grafana](https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/rpc-grafana.jpg)
 
 <br>
 

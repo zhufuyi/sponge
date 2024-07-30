@@ -49,7 +49,7 @@ func InitApp() {
 		panic(err)
 	}
 	logger.Debug(config.Show())
-	logger.Info("init logger succeeded")
+	logger.Info("[logger] was initialized")
 
 	// initializing tracing
 	if cfg.App.EnableTrace {
@@ -61,7 +61,7 @@ func InitApp() {
 			strconv.Itoa(cfg.Jaeger.AgentPort),
 			cfg.App.TracingSamplingRate,
 		)
-		logger.Info("init tracer succeeded")
+		logger.Info("[tracer] was initialized")
 	}
 
 	// initializing the rpc server connection
@@ -74,7 +74,7 @@ func InitApp() {
 			stat.WithLog(logger.Get()),
 			stat.WithAlarm(), // invalid if it is windows, the default threshold for cpu and memory is 0.8, you can modify them
 		)
-		logger.Info("init statistics succeeded")
+		logger.Info("[resource statistics] was initialized")
 	}
 }
 

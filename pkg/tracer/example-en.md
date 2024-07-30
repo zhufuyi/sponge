@@ -35,7 +35,7 @@ make run
 
 Copy [http://localhost:8080/swagger/index.html](http://localhost:8080/apis/swagger/index.html) into your browser to access the Swagger homepage. As an example, for a GET request, make two consecutive requests with the same ID. The distributed tracing results are shown in the following image:
 
-![one-server-trace](https://go-sponge.com/assets/images/one-server-trace.jpg)
+![one-server-trace](https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/one-server-trace.jpg)
 
 From the image, you can see that the first request consists of 4 spans:
 
@@ -73,7 +73,7 @@ In the **product**, **inventory**, and **comment** services, locate the template
 
 Start the **shopgw**, **product**, **inventory**, and **comment** services. Access [http://localhost:8080/apis/swagger/index.html](http://localhost:8080/apis/swagger/index.html) in your browser and execute a GET request. The distributed tracing interface will look like the image below:
 
-![multi-servers-trace](https://go-sponge.com/assets/images/multi-servers-trace.jpg)
+![multi-servers-trace](https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/multi-servers-trace.jpg)
 
 From the image, you can see a total of 10 spans in the primary trace:
 

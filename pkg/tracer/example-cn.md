@@ -36,7 +36,7 @@ make run
 
 复制 [http://localhost:8080/swagger/index.html](http://localhost:8080/apis/swagger/index.html) 到浏览器访问swagger主页，以请求get查询为例，连续请求同一个id两次，链路跟踪如下图所示。
 
-![one-server-trace](https://go-sponge.com/assets/images/one-server-trace.jpg)
+![one-server-trace](https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/one-server-trace.jpg)
 
 <br>
 
@@ -76,7 +76,7 @@ defer span.End()
 
 启动 **shopgw**、**product**、**inventory**、**comment** 四个服务，在浏览器访问 [http://localhost:8080/apis/swagger/index.html](http://localhost:8080/apis/swagger/index.html) ，执行get请求，链路跟踪界面如下图所示。
 
-![multi-servers-trace](https://go-sponge.com/assets/images/multi-servers-trace.jpg)
+![multi-servers-trace](https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/multi-servers-trace.jpg)
 
 <br>
 
