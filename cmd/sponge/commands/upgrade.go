@@ -74,8 +74,16 @@ func runUpgrade(targetVersion string) (string, error) {
 
 func runUpgradeCommand(targetVersion string) error {
 	ctx, _ := context.WithTimeout(context.Background(), time.Minute*3) //nolint
-	//result := gobash.Run(ctx, "go", "install", "github.com/zhufuyi/sponge/cmd/sponge@"+targetVersion)
-	result := gobash.Run(ctx, "go", "install")
+	result := gobash.Run(ctx, "go", "install", "github.com/zhufuyi/sponge/cmd/sponge@"+targetVersion)
+	for v := range result.StdOut {
+		_ = v
+	}
+	if result.Err != nil {
+		return result.Err
+	}
+
+	// 本地安装 替换远程安装
+	result = gobash.Run(ctx, "go", "install")
 	for v := range result.StdOut {
 		_ = v
 	}
