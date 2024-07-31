@@ -3,7 +3,9 @@ package generate
 import (
 	"errors"
 	"fmt"
+	"github.com/zhufuyi/sponge/cmd/sponge/global"
 	"math/rand"
+	"os"
 	"strings"
 
 	"github.com/huandu/xstrings"
@@ -283,6 +285,36 @@ func (g *httpGenerator) generateCode() (string, error) {
 	ignoreDirs := []string{"cmd/sponge"}
 	ignoreFiles := []string{"scripts/image-rpc-test.sh", "scripts/patch.sh", "scripts/protoc.sh", "scripts/proto-doc.sh"}
 
+	if g.isInit() {
+		ignoreDirs = append(ignoreDirs, []string{
+			"cmd",
+			"configs",
+			"deployments",
+			"docs",
+			"scripts",
+			"internal/service",
+			"internal/rpcclient",
+			"internal/config",
+		}...)
+		ignoreFiles = append(ignoreFiles, []string{
+			".gitignore",
+			".golangci.yml",
+			"Jenkinsfile",
+			"Makefile",
+			"README.md",
+			"Makefile-for-http",
+			"go.mod",
+			"go.sum",
+			"internal/ecode/systemCode_http.go",
+			"internal/model/init.go",
+			"internal/routers/routers.go",
+			"internal/server/http.go",
+			"internal/server/http_option.go",
+			"internal/server/http_test.go",
+			"internal/types/swagger_types.go",
+		}...)
+	}
+
 	r.SetSubDirsAndFiles(subDirs, subFiles...)
 	r.SetIgnoreSubDirs(ignoreDirs...)
 	r.SetIgnoreSubFiles(ignoreFiles...)
@@ -500,4 +532,18 @@ func (g *httpGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	}
 
 	return fields
+}
+
+func (g *httpGenerator) isInit() bool {
+	path := global.Path + "/go.mod"
+	fmt.Println(path)
+	_, err := os.Stat(path)
+	if err == nil {
+		return true // File exists
+	}
+	if os.IsNotExist(err) {
+		return false // File does not exist
+	}
+	// Another error occurred
+	return false
 }
