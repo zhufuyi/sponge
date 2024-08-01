@@ -536,7 +536,6 @@ func (g *httpGenerator) addFields(r replacer.Replacer) []replacer.Field {
 
 func (g *httpGenerator) isInit() bool {
 	path := global.Path + "/go.mod"
-	fmt.Println(path)
 	_, err := os.Stat(path)
 	if err == nil {
 		return true // File exists

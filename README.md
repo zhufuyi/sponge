@@ -13,7 +13,7 @@
 
 </div>
 
-## 当前版本为魔改版本，具体用法请看 [官方文档](https://github.com/zhufuyi/sponge) 
+## 当前版本为魔改原版本，具体用法请看 [官方文档](https://github.com/zhufuyi/sponge) 
 
 ### 源码安装 使用说明
 ```go
