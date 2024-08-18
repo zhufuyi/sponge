@@ -45,7 +45,7 @@ Examples:
 			}
 
 			if moduleName == "" {
-				return errors.New("'module-name' is required.")
+				return errors.New("'module-name' is required")
 			}
 
 			protoFiles, err := gofile.ListFiles(dir, gofile.WithSuffix(".proto"), gofile.WithNoAbsolutePath())
@@ -85,8 +85,7 @@ Examples:
 	return cmd
 }
 
-func getPackageName(ss []string, moduleName string) (string, string) {
-	var packageName, goPackageName string
+func getPackageName(ss []string, moduleName string) (packageName string, goPackageName string) {
 	l := len(ss)
 	switch l {
 	case 0:
