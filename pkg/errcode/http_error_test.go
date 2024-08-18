@@ -29,6 +29,7 @@ func TestNewError(t *testing.T) {
 		Unauthorized,
 		InternalServerError,
 		NotFound,
+		Conflict,
 		AlreadyExists,
 		Timeout,
 		TooManyRequests,
@@ -38,6 +39,7 @@ func TestNewError(t *testing.T) {
 		AccessDenied,
 		MethodNotAllowed,
 		ServiceUnavailable,
+		TooEarly,
 
 		Canceled,
 		Unknown,
@@ -108,4 +110,22 @@ func TestParseError(t *testing.T) {
 
 	e := ParseError(nil)
 	t.Log(e)
+}
+
+func TestError_WithOutMsgI18n(t *testing.T) {
+	var langMsg = map[int]map[string]string{
+		20011: {
+			"en-US": "login failed",
+			"zh-CN": "登录失败",
+		},
+	}
+
+	e := NewError(20011, "login failed")
+	e1 := e.WithOutMsgI18n(langMsg, "zh-CN")
+	assert.Equal(t, "登录失败", e1.Msg())
+
+	e2 := e.WithOutMsgI18n(langMsg, "zh")
+	assert.NotEqual(t, "登录失败", e2.Msg())
+
+	t.Log(e1.Msg(), e2.Msg())
 }

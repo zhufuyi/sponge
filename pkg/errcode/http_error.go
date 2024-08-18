@@ -88,6 +88,27 @@ func (e *Error) WithOutMsg(msg string) *Error {
 	return &Error{code: e.code, msg: msg}
 }
 
+// WithOutMsgI18n out error message i18n
+// langMsg example:
+//
+//	map[int]map[string]string{
+//			20010: {
+//				"en-US": "login failed",
+//				"zh-CN": "登录失败",
+//			},
+//		}
+//
+// lang BCP 47 code https://learn.microsoft.com/en-us/openspecs/office_standards/ms-oe376/6c085406-a698-4e12-9d4d-c3b0ee3dbc4a
+func (e *Error) WithOutMsgI18n(langMsg map[int]map[string]string, lang string) *Error {
+	if i18nMsg, ok := langMsg[e.Code()]; ok {
+		if msg, ok2 := i18nMsg[lang]; ok2 {
+			return &Error{code: e.code, msg: msg}
+		}
+	}
+
+	return &Error{code: e.code, msg: e.msg}
+}
+
 // ToHTTPCode convert to http error code
 func (e *Error) ToHTTPCode() int {
 	switch e.Code() {
@@ -108,8 +129,10 @@ func (e *Error) ToHTTPCode() int {
 		return http.StatusForbidden
 	case NotFound.Code():
 		return http.StatusNotFound
-	case AlreadyExists.Code():
+	case Conflict.Code(), AlreadyExists.Code():
 		return http.StatusConflict
+	case TooEarly.Code():
+		return http.StatusTooEarly
 	case Timeout.Code(), DeadlineExceeded.Code():
 		return http.StatusRequestTimeout
 	case MethodNotAllowed.Code():

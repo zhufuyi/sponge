@@ -33,7 +33,12 @@ func GetFilename(filePath string) string {
 	return name
 }
 
-// GetFileDir get dir
+// GetDir get dir, not include the last separator
+func GetDir(filePath string) string {
+	return filepath.Dir(filePath)
+}
+
+// GetFileDir get dir, include the last separator
 func GetFileDir(filePath string) string {
 	dir, _ := filepath.Split(filePath)
 	return dir
@@ -85,13 +90,15 @@ func ListFiles(dirPath string, opts ...Option) ([]string, error) {
 	files := []string{}
 	err := error(nil)
 
-	dirPath, err = filepath.Abs(dirPath)
-	if err != nil {
-		return files, err
-	}
-
 	o := defaultOptions()
 	o.apply(opts...)
+
+	if !o.noAbsolutePath {
+		dirPath, err = filepath.Abs(dirPath)
+		if err != nil {
+			return files, err
+		}
+	}
 
 	switch o.filter {
 	case prefix:

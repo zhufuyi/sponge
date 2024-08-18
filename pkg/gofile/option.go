@@ -13,6 +13,8 @@ var (
 type options struct {
 	filter string
 	name   string
+
+	noAbsolutePath bool
 }
 
 func defaultOptions() *options {
@@ -51,5 +53,12 @@ func WithContain(name string) Option {
 	return func(o *options) {
 		o.filter = contain
 		o.name = name
+	}
+}
+
+// WithNoAbsolutePath set no absolute path
+func WithNoAbsolutePath() Option {
+	return func(o *options) {
+		o.noAbsolutePath = true
 	}
 }

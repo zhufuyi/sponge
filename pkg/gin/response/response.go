@@ -78,7 +78,7 @@ func Output(c *gin.Context, code int, msg ...interface{}) {
 	case http.StatusRequestTimeout:
 		respJSONWithStatusCode(c, http.StatusRequestTimeout, errcode.Timeout.Msg(), msg...)
 	case http.StatusConflict:
-		respJSONWithStatusCode(c, http.StatusConflict, errcode.AlreadyExists.Msg(), msg...)
+		respJSONWithStatusCode(c, http.StatusConflict, errcode.Conflict.Msg(), msg...)
 	case http.StatusInternalServerError:
 		respJSONWithStatusCode(c, http.StatusInternalServerError, errcode.InternalServerError.Msg(), msg...)
 	case http.StatusTooManyRequests:

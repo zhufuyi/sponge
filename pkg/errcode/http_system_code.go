@@ -7,7 +7,6 @@ var (
 	Unauthorized        = NewError(10002, "Unauthorized")
 	InternalServerError = NewError(10003, "Internal Server Error")
 	NotFound            = NewError(10004, "Not Found")
-	AlreadyExists       = NewError(10005, "Conflict")
 	Timeout             = NewError(10006, "Request Timeout")
 	TooManyRequests     = NewError(10007, "Too Many Requests")
 	Forbidden           = NewError(10008, "Forbidden")
@@ -28,4 +27,9 @@ var (
 	DataLoss           = NewError(10022, "Data Loss")
 
 	StatusBadGateway = NewError(10023, "Bad Gateway")
+
+	// Deprecated: use Conflict instead
+	AlreadyExists = NewError(10005, "Already Exists")
+	Conflict      = NewError(10409, "Conflict")
+	TooEarly      = NewError(10425, "Too Early")
 )

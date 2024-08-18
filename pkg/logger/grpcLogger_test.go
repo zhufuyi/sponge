@@ -2,13 +2,15 @@ package logger
 
 import (
 	"testing"
+
+	"go.uber.org/zap"
 )
 
 func TestReplaceGRPCLoggerV2(t *testing.T) {
 	ReplaceGRPCLoggerV2(Get())
 
 	l := &grpcLogger{
-		zLog:      Get(),
+		zLog:      Get().WithOptions(zap.AddCallerSkip(1)),
 		verbosity: 0,
 	}
 
