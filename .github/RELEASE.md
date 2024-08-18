@@ -1,5 +1,8 @@
 ## Change log
 
-1. Modify the returned ID type, it will affect the ID types of GetByID and List for `⓵Create web service based on sql`, which are consistent with the ID types in the database.
-
-> Warning: If you are using code for `⓵Create web service based on sql` before v1.8.6, do not modify the sponge version under go.mod and upgrade to v1.8.6 or above. Otherwise, the List interface will return empty data because the original `size` field has become invalid (replaced by `limit` field).
+1. Support automatic import of proto file dependency packages.
+2. Add the new command modify-proto-package.
+3. Update some dependency library versions:
+   - crypto [v0.22.0](https://pkg.go.dev/golang.org/x/crypto@v0.22.0) --> [v0.26.0](https://pkg.go.dev/golang.org/x/crypto@v0.26.0)
+   - protobuf [v1.32.0](https://pkg.go.dev/google.golang.org/protobuf@v1.32.0) --> [v1.34.2](https://pkg.go.dev/google.golang.org/protobuf@v1.34.2)
+   - pgx [v5.4.3](https://github.com/jackc/pgx/tree/v5.4.3) --> [v5.6.0](https://github.com/jackc/pgx/tree/v5.6.0)
