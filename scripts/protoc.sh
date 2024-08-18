@@ -200,9 +200,6 @@ generateByAllProto
 # generate pb.go by specified proto files
 generateBySpecifiedProto
 
-# check and add the special_types.go file
-sponge patch add-special-types
-
 # delete unused packages in pb.go
 handlePbGoFiles $protoBasePath
 

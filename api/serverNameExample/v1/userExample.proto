@@ -208,7 +208,7 @@ message GetUserExampleByIDReply {
 }
 
 message ListUserExampleRequest {
-  types.Params params = 1 [(validate.rules).message.required = true];
+  api.types.Params params = 1 [(validate.rules).message.required = true];
 }
 
 message ListUserExampleReply {

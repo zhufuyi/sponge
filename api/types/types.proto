@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package types;
+package api.types;
 
 option go_package = "github.com/zhufuyi/sponge/api/types;types";
 

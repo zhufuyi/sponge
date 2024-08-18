@@ -157,7 +157,7 @@ message Get{{.TableName}}ByIDReply {
 }
 
 message List{{.TableName}}Request {
-  types.Params params = 1;
+  api.types.Params params = 1;
 }
 
 message List{{.TableName}}Reply {
@@ -261,7 +261,7 @@ message Get{{.TableName}}ByIDReply {
 }
 
 message List{{.TableName}}Request {
-  types.Params params = 1;
+  api.types.Params params = 1;
 }
 
 message List{{.TableName}}Reply {
@@ -518,7 +518,7 @@ message Get{{.TableName}}ByIDReply {
 }
 
 message List{{.TableName}}Request {
-  types.Params params = 1;
+  api.types.Params params = 1;
 }
 
 message List{{.TableName}}Reply {
@@ -738,7 +738,7 @@ message Get{{.TableName}}ByIDReply {
 }
 
 message List{{.TableName}}Request {
-  types.Params params = 1;
+  api.types.Params params = 1;
 }
 
 message List{{.TableName}}Reply {
