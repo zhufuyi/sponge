@@ -1,14 +1,17 @@
 #!/bin/bash
 
-webServiceName="user"
-webDir="1_web_gin_${webServiceName}"
+testServerName="user"
+testServerDir="1_web_http_${testServerName}"
 
 mysqlDSN="root:123456@(192.168.3.37:3306)/school"
 mysqlTable="teacher"
 
-colorCyan='\033[1;36m'
-markEnd='\033[0m'
+colorCyan='\e[1;36m'
+colorGreen='\e[1;32m'
+colorRed='\e[1;31m'
+markEnd='\e[0m'
 errCount=0
+
 
 function checkResult() {
   result=$1
@@ -21,6 +24,14 @@ function checkErrCount() {
   result=$1
   if [ ${result} -ne 0 ]; then
       ((errCount++))
+  fi
+}
+
+function printTestResult() {
+  if [ ${errCount} -eq 0 ]; then
+    echo -e "\n\n${colorGreen}--------------------- [${testServerDir}] test result: passed ---------------------${markEnd}\n"
+  else
+    echo -e "\n\n${colorRed}--------------------- [${testServerDir}] test result: failed ${errCount} ---------------------${markEnd}\n"
   fi
 }
 
@@ -63,12 +74,10 @@ function checkServiceStarted() {
 }
 
 function testRequest() {
-  checkServiceStarted $webServiceName
+  checkServiceStarted $testServerName
   sleep 1
 
-  echo "--------------------- start testing ---------------------"
-
-  echo -e "\n\n"
+  echo -e "start testing [${testServerName}] api:\n\n"
   echo -e "${colorCyan}curl -X GET http://localhost:8080/api/v1/${mysqlTable}/1 ${markEnd}"
   curl -X GET http://localhost:8080/api/v1/${mysqlTable}/1
   checkErrCount $?
@@ -83,20 +92,22 @@ function testRequest() {
   curl -X POST http://localhost:8080/api/v1/${mysqlTable}/list -H "X-Request-Id: qaz12wx3ed4" -H "Content-Type: application/json" -d "{\"columns\":[{\"exp\":\">\",\"name\":\"id\",\"value\":1}],\"page\":0,\"limit\":10}"
   checkErrCount $?
 
-  echo -e "\n--------------------- the test is over, error result: $errCount ---------------------\n"
-  stopService $webServiceName
+  printTestResult
+  stopService $testServerName
 }
 
-if [ -d "${webDir}" ]; then
-  echo "service ${webDir} already exists"
+echo -e "\n\n"
+
+if [ -d "${testServerDir}" ]; then
+  echo "service ${testServerDir} already exists"
 else
-  echo "create service ${webDir}"
-  echo -e "${colorCyan}sponge web http --module-name=${webServiceName} --server-name=${webServiceName} --project-name=webdemo --extended-api=true --db-dsn=${mysqlDSN} --db-table=${mysqlTable} --out=./${webDir} ${markEnd}"
-  sponge web http --module-name=${webServiceName} --server-name=${webServiceName} --project-name=webdemo --extended-api=true --db-dsn=${mysqlDSN} --db-table=${mysqlTable} --out=./${webDir}
+  echo "create service ${testServerDir}"
+  echo -e "${colorCyan}sponge web http --module-name=${testServerName} --server-name=${testServerName} --project-name=webdemo --extended-api=true --db-dsn=${mysqlDSN} --db-table=${mysqlTable} --out=./${testServerDir} ${markEnd}"
+  sponge web http --module-name=${testServerName} --server-name=${testServerName} --project-name=webdemo --extended-api=true --db-dsn=${mysqlDSN} --db-table=${mysqlTable} --out=./${testServerDir}
   checkResult $?
 fi
 
-cd ${webDir}
+cd ${testServerDir}
 
 echo "make docs"
 make docs

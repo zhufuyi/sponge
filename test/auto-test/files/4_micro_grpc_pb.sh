@@ -1,10 +1,12 @@
 #!/bin/bash
 
-grpcServiceName="user"
-grpcDir="4_micro_grpc_pb_${grpcServiceName}"
+testServerName="user"
+testServerDir="4_micro_grpc_pb_${testServerName}"
 
-colorCyan='\033[1;36m'
-markEnd='\033[0m'
+colorCyan='\e[1;36m'
+colorGreen='\e[1;32m'
+colorRed='\e[1;31m'
+markEnd='\e[0m'
 errCount=0
 
 function checkResult() {
@@ -18,6 +20,14 @@ function checkErrCount() {
   result=$1
   if [ ${result} -ne 0 ]; then
       ((errCount++))
+  fi
+}
+
+function printTestResult() {
+  if [ ${errCount} -eq 0 ]; then
+    echo -e "\n\n${colorGreen}--------------------- [${testServerDir}] test result: passed ---------------------${markEnd}\n"
+  else
+    echo -e "\n\n${colorRed}--------------------- [${testServerDir}] test result: failed ${errCount} ---------------------${markEnd}\n"
   fi
 }
 
@@ -60,37 +70,42 @@ function checkServiceStarted() {
 }
 
 function testRequest() {
-  checkServiceStarted $grpcServiceName
+  checkServiceStarted $testServerName
   sleep 1
-  echo "--------------------- start testing ---------------------"
 
   cd internal/service
-
-  echo -e "\n\n"
+  echo -e "start testing [${testServerName}] api:\n\n"
   echo -e "${colorCyan}go test -run Test_service_user_methods/Register ${markEnd}"
   go test -run Test_service_user_methods/Register
   checkErrCount $?
 
   cd -
-  echo -e "\n--------------------- the test is over, error result: $errCount ---------------------\n"
-  stopService $grpcServiceName
+  printTestResult
+  stopService $testServerName
 }
 
-if [ -d "${grpcDir}" ]; then
-  echo "service ${grpcDir} already exists"
+echo -e "\n\n"
+
+if [ -d "${testServerDir}" ]; then
+  echo "service ${testServerDir} already exists"
 else
-  echo "create service ${grpcDir}"
-  echo -e "${colorCyan}sponge micro rpc-pb --module-name=${grpcServiceName} --server-name=${grpcServiceName} --project-name=grpcpbdemo --protobuf-file=./files/user2.proto --out=./${grpcDir} ${markEnd}"
-  sponge micro rpc-pb --module-name=${grpcServiceName} --server-name=${grpcServiceName} --project-name=grpcpbdemo --protobuf-file=./files/user2.proto --out=./${grpcDir}
+  echo "create service ${testServerDir}"
+  echo -e "${colorCyan}sponge micro rpc-pb --module-name=${testServerName} --server-name=${testServerName} --project-name=grpcpbdemo --protobuf-file=./files/user2.proto --out=./${testServerDir} ${markEnd}"
+  sponge micro rpc-pb --module-name=${testServerName} --server-name=${testServerName} --project-name=grpcpbdemo --protobuf-file=./files/user2.proto --out=./${testServerDir}
   checkResult $?
 fi
 
-cd ${grpcDir}
+cd ${testServerDir}
 checkResult $?
 
 echo "make proto"
 make proto
 checkResult $?
+
+#cp -r ../pkg .
+#checkResult $?
+#sed -i "s/github.com\/zhufuyi\/sponge\/pkg\/grpc\/benchmark/${testServerName}\/pkg\/grpc\/benchmark/g" internal/service/${mysqlTable}_client_test.go
+#checkResult $?
 
 echo "replace the sample template code"
 replaceCode ../files/micro_grpc_pb_content ./internal/service/user2.go

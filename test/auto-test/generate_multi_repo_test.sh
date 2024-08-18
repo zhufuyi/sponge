@@ -3,6 +3,7 @@
 mysqlDsn="root:123456@(192.168.3.37:3306)/account"
 mysqlTable1="user_example"
 mysqlTable2="user"
+mysqlTable3="user_account"
 
 postgresqlDsn="root:123456@(192.168.3.37:5432)/account"
 postgresqlTable1="user_example"
@@ -15,17 +16,38 @@ sqliteTable2="user"
 mongodbDsn="root:123456@(192.168.3.37:27017)/account"
 mongodbCollection1="user_example"
 mongodbCollection2="user"
+mongodbCollection3="userInfo"
+
+colorCyan='\e[1;36m'
+colorGreen='\e[1;32m'
+colorRed='\e[1;31m'
+markEnd='\e[0m'
 
 isOnlyGenerateCode="false"
 
-colorCyan='\033[1;36m'
-markEnd='\033[0m'
+isExtended="false"
+if [ "$1" == "true" ]; then
+  isExtended="true"
+else
+  isExtended="false"
+fi
+
 
 function checkResult() {
     result=$1
     if [ ${result} -ne 0 ]; then
         exit ${result}
     fi
+}
+
+function printTestResult() {
+  local errCount=$1
+  local serverDir=$2
+  if [ ${errCount} -eq 0 ]; then
+    echo -e "\n\n${colorGreen}--------------------- [${serverDir}] test result: passed ---------------------${markEnd}\n"
+  else
+    echo -e "\n\n${colorRed}--------------------- [${serverDir}] test result: failed ---------------------${markEnd}\n"
+  fi
 }
 
 function stopService() {
@@ -47,6 +69,7 @@ function stopService() {
 
 function checkServiceStarted() {
   local name=$1
+  local serverDir=$2
   if [ "$name" == "" ]; then
     echo "name cannot be empty"
     return 1
@@ -59,11 +82,12 @@ function checkServiceStarted() {
     sleep 1
     pid=$(ps -ef | grep "${processMark}" | grep -v grep | awk '{print $2}')
     if [ "${pid}" != "" ]; then
+        printTestResult 0 $serverDir
         break
     fi
     (( timeCount++ ))
-    if (( timeCount >= 30 )); then
-      echo "service startup timeout"
+    if (( timeCount >= 20 )); then
+      printTestResult 1 $serverDir
       return 1
     fi
   done
@@ -71,6 +95,7 @@ function checkServiceStarted() {
 
 function runningHTTPService() {
   local name=$1
+  local serverDir=$2
   if [ "$name"x = x ];then
     echo "server name cannot be empty"
     return 1
@@ -80,7 +105,7 @@ function runningHTTPService() {
   checkResult $?
   echo "startup service $name"
   make run &
-  checkServiceStarted $name
+  checkServiceStarted $name $serverDir
   checkResult $?
   sleep 1
   stopService $name
@@ -89,6 +114,7 @@ function runningHTTPService() {
 
 function runningProtoService() {
   local name=$1
+  local serverDir=$2
   if [ "$name"x = x ];then
     echo "server name cannot be empty"
     return 1
@@ -98,7 +124,7 @@ function runningProtoService() {
   checkResult $?
   echo -e "startup service $name"
   make run &
-  checkServiceStarted $name
+  checkServiceStarted $name $serverDir
   checkResult $?
   sleep 1
   stopService $name
@@ -109,17 +135,22 @@ function runningProtoService() {
 
 function generate_http_mysql() {
   local serverName="user"
-  local outDir="./http-mysql"
-  echo "start generating http-mysql service code"
+  local outDir="multi-01-http-mysql"
+  echo -e "\n\n"
+  echo -e "create service code to directory $outDir"
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
-    echo -e "\n${colorCyan}sponge web http --server-name=$serverName --module-name=user --project-name=edusys --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --embed=true --out=$outDir ${markEnd}"
-    sponge web http --server-name=$serverName --module-name=user --project-name=edusys --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --embed=true --out=$outDir
+    echo -e "\n${colorCyan}sponge web http --server-name=$serverName --module-name=$serverName --project-name=edusys --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --embed=true --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge web http --server-name=$serverName --module-name=$serverName --project-name=edusys --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --embed=true --extended-api=$isExtended --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge web handler --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable2 --embed=true --out=$outDir ${markEnd}"
-    sponge web handler --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable2 --embed=true --out=$outDir
+    echo -e "\n${colorCyan}sponge web handler --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable2 --embed=true --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge web handler --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable2 --embed=true --extended-api=$isExtended --out=$outDir
+    checkResult $?
+
+    echo -e "\n${colorCyan}sponge web handler --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable3 --out=$outDir ${markEnd}"
+    sponge web handler --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable3 --out=$outDir
     checkResult $?
   fi
 
@@ -129,27 +160,26 @@ function generate_http_mysql() {
   fi
 
   cd $outDir
-  runningHTTPService $serverName
+  runningHTTPService $serverName $outDir
   checkResult $?
   sleep 1
   cd -
-
-  echo -e "\n\n--------------------- $outDir test passed ---------------------\n\n"
 }
 
 function generate_http_postgresql() {
   local serverName="user"
-  local outDir="./http-postgresql"
-  echo "start generating http-postgresql service code"
+  local outDir="multi-02-http-postgresql"
+  echo -e "\n\n"
+  echo -e "create service code to directory $outDir"
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
-    echo -e "\n${colorCyan}sponge web http --server-name=$serverName --module-name=user --project-name=edusys --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable1 --out=$outDir ${markEnd}"
-    sponge web http --server-name=$serverName --module-name=user --project-name=edusys --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable1 --out=$outDir
+    echo -e "\n${colorCyan}sponge web http --server-name=$serverName --module-name=$serverName --project-name=edusys --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable1 --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge web http --server-name=$serverName --module-name=$serverName --project-name=edusys --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable1 --extended-api=$isExtended --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge web handler --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable2 --out=$outDir ${markEnd}"
-    sponge web handler --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable2 --out=$outDir
+    echo -e "\n${colorCyan}sponge web handler --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable2 --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge web handler --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable2 --extended-api=$isExtended --out=$outDir
     checkResult $?
   fi
 
@@ -159,27 +189,26 @@ function generate_http_postgresql() {
   fi
 
   cd $outDir
-  runningHTTPService $serverName
+  runningHTTPService $serverName $outDir
   checkResult $?
   sleep 1
   cd -
-
-  echo -e "\n\n--------------------- $outDir test passed ---------------------\n\n"
 }
 
 function generate_http_sqlite() {
   local serverName="user"
-  local outDir="./http-sqlite"
-  echo "start generating http-sqlite service code"
+  local outDir="multi-03-http-sqlite"
+  echo -e "\n\n"
+  echo -e "create service code to directory $outDir"
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
-    echo -e "\n${colorCyan}sponge web http --server-name=$serverName --module-name=user --project-name=edusys --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable1 --out=$outDir ${markEnd}"
-    sponge web http --server-name=$serverName --module-name=user --project-name=edusys --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable1 --out=$outDir
+    echo -e "\n${colorCyan}sponge web http --server-name=$serverName --module-name=$serverName --project-name=edusys --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable1 --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge web http --server-name=$serverName --module-name=$serverName --project-name=edusys --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable1 --extended-api=$isExtended --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge web handler --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable2 --out=$outDir ${markEnd}"
-    sponge web handler --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable2 --out=$outDir
+    echo -e "\n${colorCyan}sponge web handler --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable2 --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge web handler --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable2 --extended-api=$isExtended --out=$outDir
     checkResult $?
 
     sed -E -i 's/\\\\sql\\\\/\\\\\.\.\\\\\sql\\\\/g' ${outDir}/configs/${serverName}.yml
@@ -191,27 +220,30 @@ function generate_http_sqlite() {
   fi
 
   cd $outDir
-  runningHTTPService $serverName
+  runningHTTPService $serverName $outDir
   checkResult $?
   sleep 1
   cd -
-
-  echo -e "\n\n--------------------- $outDir test passed ---------------------\n\n"
 }
 
 function generate_http_mongodb() {
   local serverName="user"
-  local outDir="./http-mongodb"
-  echo "start generating http-mongodb service code"
+  local outDir="multi-04-http-mongodb"
+  echo -e "\n\n"
+  echo -e "create service code to directory $outDir"
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
-    echo -e "\n${colorCyan}sponge web http --server-name=$serverName --module-name=user --project-name=edusys --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection1 --out=$outDir ${markEnd}"
-    sponge web http --server-name=$serverName --module-name=user --project-name=edusys --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection1 --out=$outDir
+    echo -e "\n${colorCyan}sponge web http --server-name=$serverName --module-name=$serverName --project-name=edusys --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection1 --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge web http --server-name=$serverName --module-name=$serverName --project-name=edusys --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection1 --extended-api=$isExtended --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge web handler --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection2 --out=$outDir ${markEnd}"
-    sponge web handler --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection2 --out=$outDir
+    echo -e "\n${colorCyan}sponge web handler --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection2 --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge web handler --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection2 --extended-api=$isExtended --out=$outDir
+    checkResult $?
+
+    echo -e "\n${colorCyan}sponge web handler --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection3 --out=$outDir ${markEnd}"
+    sponge web handler --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection3 --out=$outDir
     checkResult $?
   fi
 
@@ -221,29 +253,32 @@ function generate_http_mongodb() {
   fi
 
   cd $outDir
-  runningHTTPService $serverName
+  runningHTTPService $serverName $outDir
   checkResult $?
   sleep 1
   cd -
-
-  echo -e "\n\n--------------------- $outDir test passed ---------------------\n\n"
 }
 
 # ---------------------------------------------------------------
 
 function generate_grpc_mysql() {
   local serverName="user"
-  local outDir="./grpc-mysql"
-  echo "start generating grpc-mysql service code"
+  local outDir="multi-05-grpc-mysql"
+  echo -e "\n\n"
+  echo -e "create service code to directory $outDir"
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
-    echo -e "\n${colorCyan}sponge micro rpc --server-name=$serverName --module-name=user --project-name=edusys --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --out=$outDir ${markEnd}"
-    sponge micro rpc --server-name=$serverName --module-name=user --project-name=edusys --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --out=$outDir
+    echo -e "\n${colorCyan}sponge micro rpc --server-name=$serverName --module-name=$serverName --project-name=edusys --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge micro rpc --server-name=$serverName --module-name=$serverName --project-name=edusys --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --extended-api=$isExtended --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge micro service --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable2 --out=$outDir ${markEnd}"
-    sponge micro service --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable2 --out=$outDir
+    echo -e "\n${colorCyan}sponge micro service --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable2 --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge micro service --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable2 --extended-api=$isExtended --out=$outDir
+    checkResult $?
+
+    echo -e "\n${colorCyan}sponge micro service --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable3 --out=$outDir ${markEnd}"
+    sponge micro service --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable3 --out=$outDir
     checkResult $?
   fi
 
@@ -253,27 +288,26 @@ function generate_grpc_mysql() {
   fi
 
   cd $outDir
-  runningProtoService $serverName
+  runningProtoService $serverName $outDir
   checkResult $?
   sleep 1
   cd -
-
-  echo -e "\n\n--------------------- $outDir test passed ---------------------\n\n"
 }
 
 function generate_grpc_postgresql() {
   local serverName="user"
-  local outDir="./grpc-postgresql"
-  echo "start generating grpc-postgresql service code"
+  local outDir="multi-06-grpc-postgresql"
+  echo -e "\n\n"
+  echo -e "create service code to directory $outDir"
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
-    echo -e "\n${colorCyan}sponge micro rpc --server-name=$serverName --module-name=user --project-name=edusys --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable1 --out=$outDir ${markEnd}"
-    sponge micro rpc --server-name=$serverName --module-name=user --project-name=edusys --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable1 --out=$outDir
+    echo -e "\n${colorCyan}sponge micro rpc --server-name=$serverName --module-name=$serverName --project-name=edusys --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable1 --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge micro rpc --server-name=$serverName --module-name=$serverName --project-name=edusys --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable1 --extended-api=$isExtended --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge micro service --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable2 --out=$outDir ${markEnd}"
-    sponge micro service --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable2 --out=$outDir
+    echo -e "\n${colorCyan}sponge micro service --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable2 --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge micro service --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable2 --extended-api=$isExtended --out=$outDir
     checkResult $?
   fi
 
@@ -283,27 +317,26 @@ function generate_grpc_postgresql() {
   fi
 
   cd $outDir
-  runningProtoService $serverName
+  runningProtoService $serverName $outDir
   checkResult $?
   sleep 1
   cd -
-
-  echo -e "\n\n--------------------- $outDir test passed ---------------------\n\n"
 }
 
 function generate_grpc_sqlite() {
   local serverName="user"
-  local outDir="./grpc-sqlite"
-  echo "start generating grpc-sqlite service code"
+  local outDir="multi-07-grpc-sqlite"
+  echo -e "\n\n"
+  echo -e "create service code to directory $outDir"
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
-    echo -e "\n${colorCyan}sponge micro rpc --server-name=$serverName --module-name=user --project-name=edusys --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable1 --out=$outDir ${markEnd}"
-    sponge micro rpc --server-name=$serverName --module-name=user --project-name=edusys --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable1 --out=$outDir
+    echo -e "\n${colorCyan}sponge micro rpc --server-name=$serverName --module-name=$serverName --project-name=edusys --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable1 --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge micro rpc --server-name=$serverName --module-name=$serverName --project-name=edusys --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable1 --extended-api=$isExtended --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge micro service --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable2 --out=$outDir ${markEnd}"
-    sponge micro service --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable2 --out=$outDir
+    echo -e "\n${colorCyan}sponge micro service --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable2 --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge micro service --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable2 --extended-api=$isExtended --out=$outDir
     checkResult $?
 
     sed -E -i 's/\\\\sql\\\\/\\\\\.\.\\\\\sql\\\\/g' ${outDir}/configs/${serverName}.yml
@@ -315,27 +348,30 @@ function generate_grpc_sqlite() {
   fi
 
   cd $outDir
-  runningProtoService $serverName
+  runningProtoService $serverName $outDir
   checkResult $?
   sleep 1
   cd -
-
-  echo -e "\n\n--------------------- $outDir test passed ---------------------\n\n"
 }
 
 function generate_grpc_mongodb() {
   local serverName="user"
-  local outDir="./grpc-mongodb"
-  echo "start generating grpc-mongodb service code"
+  local outDir="multi-08-grpc-mongodb"
+  echo -e "\n\n"
+  echo -e "create service code to directory $outDir"
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
-    echo -e "\n${colorCyan}sponge micro rpc --server-name=$serverName --module-name=user --project-name=edusys --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection1 --out=$outDir ${markEnd}"
-    sponge micro rpc --server-name=$serverName --module-name=user --project-name=edusys --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection1 --out=$outDir
+    echo -e "\n${colorCyan}sponge micro rpc --server-name=$serverName --module-name=$serverName --project-name=edusys --extended-api=$isExtended --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection1 --out=$outDir ${markEnd}"
+    sponge micro rpc --server-name=$serverName --module-name=$serverName --project-name=edusys --extended-api=$isExtended --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection1 --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge micro service --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection2 --out=$outDir ${markEnd}"
-    sponge micro service --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection2 --out=$outDir
+    echo -e "\n${colorCyan}sponge micro service --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection2 --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge micro service --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection2 --extended-api=$isExtended --out=$outDir
+    checkResult $?
+
+    echo -e "\n${colorCyan}sponge micro service --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection3 --out=$outDir ${markEnd}"
+    sponge micro service --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection3 --out=$outDir
     checkResult $?
   fi
 
@@ -345,29 +381,32 @@ function generate_grpc_mongodb() {
   fi
 
   cd $outDir
-  runningProtoService $serverName
+  runningProtoService $serverName $outDir
   checkResult $?
   sleep 1
   cd -
-
-  echo -e "\n\n--------------------- $outDir test passed ---------------------\n\n"
 }
 
 # ---------------------------------------------------------------
 
 function generate_http_pb_mysql() {
   local serverName="user"
-  local outDir="./http-pb-mysql"
-  echo "start generating http-pb-mysql service code"
+  local outDir="multi-09-http-pb-mysql"
+  echo -e "\n\n"
+  echo -e "create service code to directory $outDir"
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
-    echo -e "\n${colorCyan}sponge web http-pb --server-name=$serverName --module-name=user --project-name=edusys --protobuf-file=./files/user.proto --out=$outDir ${markEnd}"
-    sponge web http-pb --server-name=$serverName --module-name=user --project-name=edusys --protobuf-file=./files/user.proto --out=$outDir
+    echo -e "\n${colorCyan}sponge web http-pb --server-name=$serverName --module-name=$serverName --project-name=edusys --protobuf-file=./files/user.proto --out=$outDir ${markEnd}"
+    sponge web http-pb --server-name=$serverName --module-name=$serverName --project-name=edusys --protobuf-file=./files/user.proto --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge web handler-pb --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --out=$outDir ${markEnd}"
-    sponge web handler-pb --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --out=$outDir
+    echo -e "\n${colorCyan}sponge web handler-pb --extended-api=$isExtended --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --out=$outDir ${markEnd}"
+    sponge web handler-pb --extended-api=$isExtended --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --out=$outDir
+    checkResult $?
+
+    echo -e "\n${colorCyan}sponge web handler-pb --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable3 --out=$outDir ${markEnd}"
+    sponge web handler-pb --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable3 --out=$outDir
     checkResult $?
 
     mysqlDsnTmp=$(echo "$mysqlDsn" | sed -E 's/\(/\\\(/g' | sed -E 's/\)/\\\)/g' | sed -E 's/\//\\\//g')
@@ -382,27 +421,30 @@ function generate_http_pb_mysql() {
   cd $outDir
   make patch TYPE=types-pb
   make patch TYPE=init-mysql
-  runningProtoService $serverName
+  runningProtoService $serverName $outDir
   checkResult $?
   sleep 1
   cd -
-
-  echo -e "\n\n--------------------- $outDir test passed ---------------------\n\n"
 }
 
 function generate_http_pb_mongodb() {
   local serverName="user"
-  local outDir="./http-pb-mongodb"
-  echo "start generating http-pb-mongodb service code"
+  local outDir="multi-10-http-pb-mongodb"
+  echo -e "\n\n"
+  echo -e "create service code to directory $outDir"
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
-    echo -e "\n${colorCyan}sponge web http-pb --server-name=$serverName --module-name=user --project-name=edusys --protobuf-file=./files/user.proto --out=$outDir ${markEnd}"
-    sponge web http-pb --server-name=$serverName --module-name=user --project-name=edusys --protobuf-file=./files/user.proto --out=$outDir
+    echo -e "\n${colorCyan}sponge web http-pb --server-name=$serverName --module-name=$serverName --project-name=edusys --protobuf-file=./files/user.proto --out=$outDir ${markEnd}"
+    sponge web http-pb --server-name=$serverName --module-name=$serverName --project-name=edusys --protobuf-file=./files/user.proto --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge web handler-pb --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection1 --out=$outDir ${markEnd}"
-    sponge web handler-pb --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection1 --out=$outDir
+    echo -e "\n${colorCyan}sponge web handler-pb --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection1 --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge web handler-pb --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection1 --extended-api=$isExtended --out=$outDir
+    checkResult $?
+
+    echo -e "\n${colorCyan}sponge web handler-pb --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection3 --out=$outDir ${markEnd}"
+    sponge web handler-pb --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection3 --out=$outDir
     checkResult $?
 
     sed -E -i 's/\"mysql\"/\"mongodb\"/g' ${outDir}/configs/${serverName}.yml
@@ -419,29 +461,32 @@ function generate_http_pb_mongodb() {
   cd $outDir
   make patch TYPE=types-pb
   make patch TYPE=init-mongodb
-  runningProtoService $serverName
+  runningProtoService $serverName $outDir
   checkResult $?
   sleep 1
   cd -
-
-  echo -e "\n\n--------------------- $outDir test passed ---------------------\n\n"
 }
 
 # ---------------------------------------------------------------
 
 function generate_grpc_pb_mysql() {
   local serverName="user"
-  local outDir="./grpc-pb-mysql"
-  echo "start generating grpc-pb-mysql service code"
+  local outDir="multi-11-grpc-pb-mysql"
+  echo -e "\n\n"
+  echo -e "create service code to directory $outDir"
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
-    echo -e "\n${colorCyan}sponge micro rpc-pb --server-name=$serverName --module-name=user --project-name=edusys --protobuf-file=./files/user2.proto --out=$outDir ${markEnd}"
-    sponge micro rpc-pb --server-name=$serverName --module-name=user --project-name=edusys --protobuf-file=./files/user2.proto --out=$outDir
+    echo -e "\n${colorCyan}sponge micro rpc-pb --server-name=$serverName --module-name=$serverName --project-name=edusys --protobuf-file=./files/user2.proto --out=$outDir ${markEnd}"
+    sponge micro rpc-pb --server-name=$serverName --module-name=$serverName --project-name=edusys --protobuf-file=./files/user2.proto --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge micro service --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --out=$outDir ${markEnd}"
-    sponge micro service --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --out=$outDir
+    echo -e "\n${colorCyan}sponge micro service --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge micro service --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --extended-api=$isExtended --out=$outDir
+    checkResult $?
+
+    echo -e "\n${colorCyan}sponge micro service --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable3 --out=$outDir ${markEnd}"
+    sponge micro service --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable3 --out=$outDir
     checkResult $?
 
     mysqlDsnTmp=$(echo "$mysqlDsn" | sed -E 's/\(/\\\(/g' | sed -E 's/\)/\\\)/g' | sed -E 's/\//\\\//g')
@@ -456,27 +501,30 @@ function generate_grpc_pb_mysql() {
   cd $outDir
   make patch TYPE=types-pb
   make patch TYPE=init-mysql
-  runningProtoService $serverName
+  runningProtoService $serverName $outDir
   checkResult $?
   sleep 1
   cd -
-
-  echo -e "\n\n--------------------- $outDir test passed ---------------------\n\n"
 }
 
 function generate_grpc_pb_mongodb() {
   local serverName="user"
-  local outDir="./grpc-pb-mongodb"
-  echo "start generating grpc-pb-mongodb service code"
+  local outDir="multi-12-grpc-pb-mongodb"
+  echo -e "\n\n"
+  echo -e "create service code to directory $outDir"
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
-    echo -e "\n${colorCyan}sponge micro rpc-pb --server-name=$serverName --module-name=user --project-name=edusys --protobuf-file=./files/user2.proto --out=$outDir ${markEnd}"
-    sponge micro rpc-pb --server-name=$serverName --module-name=user --project-name=edusys --protobuf-file=./files/user2.proto --out=$outDir
+    echo -e "\n${colorCyan}sponge micro rpc-pb --server-name=$serverName --module-name=$serverName --project-name=edusys --protobuf-file=./files/user2.proto --out=$outDir ${markEnd}"
+    sponge micro rpc-pb --server-name=$serverName --module-name=$serverName --project-name=edusys --protobuf-file=./files/user2.proto --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge micro service --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=user_example --out=$outDir ${markEnd}"
-    sponge micro service --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=user_example --out=$outDir
+    echo -e "\n${colorCyan}sponge micro service --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection1 --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge micro service --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection1 --extended-api=$isExtended --out=$outDir
+    checkResult $?
+
+    echo -e "\n${colorCyan}sponge micro service --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection3 --out=$outDir ${markEnd}"
+    sponge micro service --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection3 --out=$outDir
     checkResult $?
 
     sed -E -i 's/\"mysql\"/\"mongodb\"/g' ${outDir}/configs/${serverName}.yml
@@ -493,29 +541,32 @@ function generate_grpc_pb_mongodb() {
   cd $outDir
   make patch TYPE=types-pb
   make patch TYPE=init-mongodb
-  runningProtoService $serverName
+  runningProtoService $serverName $outDir
   checkResult $?
   sleep 1
   cd -
-
-  echo -e "\n\n--------------------- $outDir test passed ---------------------\n\n"
 }
 
 # ---------------------------------------------------------------
 
 function generate_grpc_http_pb_mysql() {
   local serverName="user"
-  local outDir="./grpc-http-pb-mysql"
-  echo "start generating grpc-http-pb-mysql service code"
+  local outDir="multi-13-grpc-http-pb-mysql"
+  echo -e "\n\n"
+  echo -e "create service code to directory $outDir"
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
-    echo -e "\n${colorCyan}sponge micro grpc-http-pb --server-name=$serverName --module-name=user --project-name=edusys --protobuf-file=./files/user.proto --out=$outDir ${markEnd}"
-    sponge micro grpc-http-pb --server-name=$serverName --module-name=user --project-name=edusys --protobuf-file=./files/user.proto --out=$outDir
+    echo -e "\n${colorCyan}sponge micro grpc-http-pb --server-name=$serverName --module-name=$serverName --project-name=edusys --protobuf-file=./files/user.proto --out=$outDir ${markEnd}"
+    sponge micro grpc-http-pb --server-name=$serverName --module-name=$serverName --project-name=edusys --protobuf-file=./files/user.proto --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge micro service-handler --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --out=$outDir ${markEnd}"
-    sponge micro service-handler  --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --out=$outDir
+    echo -e "\n${colorCyan}sponge micro service-handler --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge micro service-handler --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --extended-api=$isExtended --out=$outDir
+    checkResult $?
+
+    echo -e "\n${colorCyan}sponge micro service-handler --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable3 --out=$outDir ${markEnd}"
+    sponge micro service-handler  --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable3 --out=$outDir
     checkResult $?
 
     mysqlDsnTmp=$(echo "$mysqlDsn" | sed -E 's/\(/\\\(/g' | sed -E 's/\)/\\\)/g' | sed -E 's/\//\\\//g')
@@ -530,27 +581,30 @@ function generate_grpc_http_pb_mysql() {
   cd $outDir
   make patch TYPE=types-pb
   make patch TYPE=init-mysql
-  runningProtoService $serverName
+  runningProtoService $serverName $outDir
   checkResult $?
   sleep 1
   cd -
-
-  echo -e "\n\n--------------------- $outDir test passed ---------------------\n\n"
 }
 
 function generate_grpc_http_pb_mongodb() {
   local serverName="user"
-  local outDir="./grpc-http-pb-mongodb"
-  echo "start generating grpc-http-pb-mongodb service code"
+  local outDir="multi-14-grpc-http-pb-mongodb"
+  echo -e "\n\n"
+  echo -e "create service code to directory $outDir"
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
-    echo -e "\n${colorCyan}sponge micro grpc-http-pb --server-name=$serverName --module-name=user --project-name=edusys --protobuf-file=./files/user.proto --out=$outDir ${markEnd}"
-    sponge micro grpc-http-pb --server-name=$serverName --module-name=user --project-name=edusys --protobuf-file=./files/user.proto --out=$outDir
+    echo -e "\n${colorCyan}sponge micro grpc-http-pb --server-name=$serverName --module-name=$serverName --project-name=edusys --protobuf-file=./files/user.proto --out=$outDir ${markEnd}"
+    sponge micro grpc-http-pb --server-name=$serverName --module-name=$serverName --project-name=edusys --protobuf-file=./files/user.proto --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge micro service-handler --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=user_example --out=$outDir ${markEnd}"
-    sponge micro service-handler --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=user_example --out=$outDir
+    echo -e "\n${colorCyan}sponge micro service-handler --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection1 --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge micro service-handler --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection1 --extended-api=$isExtended --out=$outDir
+    checkResult $?
+
+    echo -e "\n${colorCyan}sponge micro service-handler --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection3 --out=$outDir ${markEnd}"
+    sponge micro service-handler --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection3 --out=$outDir
     checkResult $?
 
     sed -E -i 's/\"mysql\"/\"mongodb\"/g' ${outDir}/configs/${serverName}.yml
@@ -567,24 +621,23 @@ function generate_grpc_http_pb_mongodb() {
   cd $outDir
   make patch TYPE=types-pb
   make patch TYPE=init-mongodb
-  runningProtoService $serverName
+  runningProtoService $serverName $outDir
   checkResult $?
   sleep 1
   cd -
-
-  echo -e "\n\n--------------------- $outDir test passed ---------------------\n\n"
 }
 # ---------------------------------------------------------------
 
 function generate_http_pb_mixed() {
   local serverName="user"
-  local outDir="./http-pb-mixed"
-  echo "start generating http-pb-mixed service code"
+  local outDir="multi-15-http-pb-mixed"
+  echo -e "\n\n"
+  echo -e "create service code to directory $outDir"
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
-    echo -e "\n${colorCyan}sponge web http-pb --server-name=$serverName --module-name=user --project-name=edusys --protobuf-file=./files/mixed.proto --out=$outDir ${markEnd}"
-    sponge web http-pb --server-name=$serverName --module-name=user --project-name=edusys --protobuf-file=./files/mixed.proto --out=$outDir
+    echo -e "\n${colorCyan}sponge web http-pb --server-name=$serverName --module-name=$serverName --project-name=edusys --protobuf-file=./files/mixed.proto --out=$outDir ${markEnd}"
+    sponge web http-pb --server-name=$serverName --module-name=$serverName --project-name=edusys --protobuf-file=./files/mixed.proto --out=$outDir
     checkResult $?
   fi
 
@@ -594,23 +647,22 @@ function generate_http_pb_mixed() {
   fi
 
   cd $outDir
-  runningProtoService $serverName
+  runningProtoService $serverName $outDir
   checkResult $?
   sleep 1
   cd -
-
-  echo -e "\n\n--------------------- $outDir test passed ---------------------\n\n"
 }
 
 function generate_grpc_pb_mixed() {
   local serverName="user"
-  local outDir="./grpc-pb-mixed"
-  echo "start generating grpc-pb-mixed service code"
+  local outDir="multi-16-grpc-pb-mixed"
+  echo -e "\n\n"
+  echo -e "create service code to directory $outDir"
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
-    echo -e "\n${colorCyan}sponge micro rpc-pb --server-name=$serverName --module-name=user --project-name=edusys --protobuf-file=./files/mixed.proto --out=$outDir ${markEnd}"
-    sponge micro rpc-pb --server-name=$serverName --module-name=user --project-name=edusys --protobuf-file=./files/mixed.proto --out=$outDir
+    echo -e "\n${colorCyan}sponge micro rpc-pb --server-name=$serverName --module-name=$serverName --project-name=edusys --protobuf-file=./files/mixed.proto --out=$outDir ${markEnd}"
+    sponge micro rpc-pb --server-name=$serverName --module-name=$serverName --project-name=edusys --protobuf-file=./files/mixed.proto --out=$outDir
     checkResult $?
   fi
 
@@ -620,20 +672,19 @@ function generate_grpc_pb_mixed() {
   fi
 
   cd $outDir
-  runningProtoService $serverName
+  runningProtoService $serverName $outDir
   checkResult $?
   sleep 1
   cd -
-
-  echo -e "\n\n--------------------- $outDir test passed ---------------------\n\n"
 }
 
 # ---------------------------------------------------------------
 
 function generate_grpc_gw_pb_mixed() {
   local serverName="user_gw"
-  local outDir="./grpc-gw-pb-mixed"
-  echo "start generating grpc-gw-pb-mixed service code"
+  local outDir="multi-17-grpc-gw-pb-mixed"
+  echo -e "\n\n"
+  echo -e "create service code to directory $outDir"
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
@@ -648,18 +699,17 @@ function generate_grpc_gw_pb_mixed() {
   fi
 
   cd $outDir
-  runningProtoService $serverName
+  runningProtoService $serverName $outDir
   checkResult $?
   sleep 1
   cd -
-
-  echo -e "\n\n--------------------- $outDir test passed ---------------------\n\n"
 }
 
 function generate_grpc_gw_pb() {
   local serverName="user_gw"
-  local outDir="./grpc-gw-pb"
-  echo "start generating grpc-gw-pb service code"
+  local outDir="multi-18-grpc-gw-pb"
+  echo -e "\n\n"
+  echo -e "create service code to directory $outDir"
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
@@ -678,14 +728,12 @@ function generate_grpc_gw_pb() {
   fi
 
   cd $outDir
-  make copy-proto SERVER=../grpc-mysql
+  make copy-proto SERVER=../multi-05-grpc-mysql
   checkResult $?
-  runningProtoService $serverName
+  runningProtoService $serverName $outDir
   checkResult $?
   sleep 1
   cd -
-
-  echo -e "\n\n--------------------- $outDir test passed ---------------------\n\n"
 }
 
 function main() {

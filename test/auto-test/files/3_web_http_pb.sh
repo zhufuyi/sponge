@@ -1,10 +1,7 @@
 #!/bin/bash
 
 testServerName="user"
-testServerDir="2_micro_grpc_${testServerName}"
-
-mysqlDSN="root:123456@(192.168.3.37:3306)/school"
-mysqlTable="teacher"
+testServerDir="3_web_http_pb_${testServerName}"
 
 colorCyan='\e[1;36m'
 colorGreen='\e[1;32m'
@@ -76,20 +73,16 @@ function testRequest() {
   checkServiceStarted $testServerName
   sleep 1
 
-  cd internal/service
   echo -e "start testing [${testServerName}] api:\n\n"
-  echo -e "${colorCyan}go test -run Test_service_${mysqlTable}_methods/GetByID ${markEnd}"
-  sed -i "s/Id: 0,/Id: 1,/g" ${mysqlTable}_client_test.go
-  go test -run Test_service_${mysqlTable}_methods/GetByID
+  echo -e "${colorCyan}curl -X POST http://localhost:8080/api/v1/auth/register -H \"Content-Type: application/json\" -d {\"email\":\"foo@bar.com\",\"password\":\"123456\"} ${markEnd}"
+  curl -X POST http://localhost:8080/api/v1/auth/register -H "Content-Type: application/json" -d "{\"email\":\"foo@bar.com\",\"password\":\"123456\"}"
   checkErrCount $?
 
   echo -e "\n\n"
-  echo -e "${colorCyan}go test -run Test_service_${mysqlTable}_methods/ListByLastID ${markEnd}"
-  sed -i "s/Limit:  0,/Limit:  3,/g" ${mysqlTable}_client_test.go
-  go test -run Test_service_${mysqlTable}_methods/ListByLastID
+  echo -e "${colorCyan}curl -X POST http://localhost:8080/api/v1/auth/register  -H "Content-Type: application/json" -H \"X-Request-Id: qaz12wx3ed4\" -d {\"email\":\"foo@bar.com\",\"password\":\"123456\"} ${markEnd}"
+  curl -X POST http://localhost:8080/api/v1/auth/register -H "Content-Type: application/json" -H "X-Request-Id: qaz12wx3ed4" -d "{\"email\":\"foo@bar.com\",\"password\":\"123456\"}"
   checkErrCount $?
 
-  cd -
   printTestResult
   stopService $testServerName
 }
@@ -100,11 +93,10 @@ if [ -d "${testServerDir}" ]; then
   echo "service ${testServerDir} already exists"
 else
   echo "create service ${testServerDir}"
-  echo -e "\n${colorCyan}sponge micro rpc --module-name=${testServerName} --server-name=${testServerName} --project-name=grpcdemo --db-dsn=${mysqlDSN} --db-table=${mysqlTable} --out=./${testServerDir} ${markEnd}"
-  sponge micro rpc --module-name=${testServerName} --server-name=${testServerName} --project-name=grpcdemo --db-dsn=${mysqlDSN} --db-table=${mysqlTable} --out=./${testServerDir}
+  echo -e "${colorCyan}sponge web http-pb --module-name=${testServerName} --server-name=${testServerName} --project-name=ginpbdemo --protobuf-file=./files/user.proto --out=./${testServerDir} ${markEnd}"
+  sponge web http-pb --module-name=${testServerName} --server-name=${testServerName} --project-name=ginpbdemo --protobuf-file=./files/user.proto --out=./${testServerDir}
   checkResult $?
 fi
-
 
 cd ${testServerDir}
 checkResult $?
@@ -113,10 +105,9 @@ echo "make proto"
 make proto
 checkResult $?
 
-#cp -r ../pkg .
-#checkResult $?
-#sed -i "s/github.com\/zhufuyi\/sponge\/pkg\/grpc\/benchmark/${testServerName}\/pkg\/grpc\/benchmark/g" internal/service/${mysqlTable}_client_test.go
-#checkResult $?
+echo "replace the sample template code"
+replaceCode ../files/web_http_pb_content ./internal/handler/user.go
+checkResult $?
 
 testRequest &
 

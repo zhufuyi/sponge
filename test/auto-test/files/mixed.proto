@@ -5,7 +5,7 @@ package v1;
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 
-option go_package = "./v1;v1";
+option go_package = "v1;v1";
 
 service mixed {
   // create a record
@@ -24,7 +24,11 @@ service mixed {
   }
 
   // delete a record by id
-  rpc DeleteByID(DeleteMixedByIDRequest) returns (google.protobuf.Empty) {}
+  rpc DeleteByID(DeleteMixedByIDRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/api/v1/mixed/{id}"
+    };
+  }
 
   // client side streaming
   rpc ClientStream (stream GetMixedByIDRequest) returns (MixedInfo){};
