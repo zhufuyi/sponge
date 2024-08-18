@@ -97,7 +97,7 @@ func saveRPCTmplFiles(f *protogen.File, moduleName string, serverName string, tm
 		return fmt.Errorf(`the proto file name (%s) suffix "_test" is not supported for code generation, please delete suffix "_test" or change it to another name. `, checkFilename)
 	}
 
-	tmplFileContent, testTmplFileContent, ecodeFileContent := service.GenerateFiles(filenamePrefix, f)
+	tmplFileContent, testTmplFileContent, ecodeFileContent := service.GenerateFiles(f, moduleName)
 
 	filePath := filenamePrefix + ".go"
 	err := saveFile(moduleName, serverName, tmplOut, filePath, tmplFileContent, false, suitedMonoRepo)

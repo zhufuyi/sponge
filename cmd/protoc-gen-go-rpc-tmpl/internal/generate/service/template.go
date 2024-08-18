@@ -38,8 +38,7 @@ import (
 	//"github.com/zhufuyi/sponge/pkg/grpc/interceptor"
 	//"github.com/zhufuyi/sponge/pkg/logger"
 
-	serverNameExampleV1 "moduleNameExample/api/serverNameExample/v1"
-
+	// import api service package here
 	//"moduleNameExample/internal/cache"
 	//"moduleNameExample/internal/dao"
 	//"moduleNameExample/internal/ecode"
@@ -49,24 +48,24 @@ import (
 func init() {
 	registerFns = append(registerFns, func(server *grpc.Server) {
 		{{- range .PbServices}}
-		serverNameExampleV1.Register{{.Name}}Server(server, New{{.Name}}Server())
+		{{.ProtoPkgName}}.Register{{.Name}}Server(server, New{{.Name}}Server())
 		{{- end}}
 	})
 }
 
 {{- range .PbServices}}
 
-var _ serverNameExampleV1.{{.Name}}Server = (*{{.LowerName}})(nil)
+var _ {{.ProtoPkgName}}.{{.Name}}Server = (*{{.LowerName}})(nil)
 
 type {{.LowerName}} struct {
-	serverNameExampleV1.Unimplemented{{.Name}}Server
+	{{.ProtoPkgName}}.Unimplemented{{.Name}}Server
 
 	// example:
 	//		iDao dao.{{.Name}}Dao
 }
 
 // New{{.Name}}Server create a server
-func New{{.Name}}Server() serverNameExampleV1.{{.Name}}Server {
+func New{{.Name}}Server() {{.ProtoPkgName}}.{{.Name}}Server {
 	return &{{.LowerName}}{
 		// example:
 		//		iDao: dao.New{{.Name}}Dao(
@@ -79,7 +78,7 @@ func New{{.Name}}Server() serverNameExampleV1.{{.Name}}Server {
 {{- range .Methods}}
 {{if eq .InvokeType 1}}
 {{.Comment}}
-func (s *{{.LowerServiceName}}) {{.MethodName}}(stream serverNameExampleV1.{{.ServiceName}}_{{.MethodName}}Server) error {
+func (s *{{.LowerServiceName}}) {{.MethodName}}(stream {{.RequestImportPkgName}}.{{.ServiceName}}_{{.MethodName}}Server) error {
 	panic("implement me")
 
 	// fill in the business logic code here
@@ -89,7 +88,7 @@ func (s *{{.LowerServiceName}}) {{.MethodName}}(stream serverNameExampleV1.{{.Se
 	//	        req, err := stream.Recv()
 	//	        if err != nil {
 	//	    	    if err == io.EOF {
-	//	    	        return stream.SendAndClose(&serverNameExampleV1.{{.Reply}}{
+	//	    	        return stream.SendAndClose(&{{.ReplyImportPkgName}}.{{.Reply}}{
 		    	            {{- range .ReplyFields}}
 	//	    	            {{.Name}}: reply.{{.Name}},
 		    	            {{- end}}
@@ -117,7 +116,7 @@ func (s *{{.LowerServiceName}}) {{.MethodName}}(stream serverNameExampleV1.{{.Se
 }
 {{else if eq .InvokeType 2}}
 {{.Comment}}
-func (s *{{.LowerServiceName}}) {{.MethodName}}(req *serverNameExampleV1.{{.Request}}, stream serverNameExampleV1.{{.ServiceName}}_{{.MethodName}}Server) error {
+func (s *{{.LowerServiceName}}) {{.MethodName}}(req *{{.RequestImportPkgName}}.{{.Request}}, stream {{.ReplyImportPkgName}}.{{.ServiceName}}_{{.MethodName}}Server) error {
 	panic("implement me")
 
 	// fill in the business logic code here
@@ -140,7 +139,7 @@ func (s *{{.LowerServiceName}}) {{.MethodName}}(req *serverNameExampleV1.{{.Requ
 	//			    return ecode.StatusInternalServerError.Err()
 	//		    }
 	//
-	//	        err = stream.Send(&serverNameExampleV1.{{.Reply}}{
+	//	        err = stream.Send(&{{.ReplyImportPkgName}}.{{.Reply}}{
 				    {{- range .ReplyFields}}
 	//	            {{.Name}}: reply.{{.Name}},
 				    {{- end}}
@@ -154,7 +153,7 @@ func (s *{{.LowerServiceName}}) {{.MethodName}}(req *serverNameExampleV1.{{.Requ
 }
 {{else if eq .InvokeType 3}}
 {{.Comment}}
-func (s *{{.LowerServiceName}}) {{.MethodName}}(stream serverNameExampleV1.{{.ServiceName}}_{{.MethodName}}Server) error {
+func (s *{{.LowerServiceName}}) {{.MethodName}}(stream {{.RequestImportPkgName}}.{{.ServiceName}}_{{.MethodName}}Server) error {
 	panic("implement me")
 
 	// fill in the business logic code here
@@ -185,7 +184,7 @@ func (s *{{.LowerServiceName}}) {{.MethodName}}(stream serverNameExampleV1.{{.Se
 	//			    return ecode.StatusInternalServerError.Err()
 	//		    }
 	//
-	//	    	err = stream.Send(&serverNameExampleV1.{{.Reply}}{
+	//	    	err = stream.Send(&{{.ReplyImportPkgName}}.{{.Reply}}{
 				    {{- range .ReplyFields}}
 	//			    {{.Name}}: reply.{{.Name}},
 				    {{- end}}
@@ -198,7 +197,7 @@ func (s *{{.LowerServiceName}}) {{.MethodName}}(stream serverNameExampleV1.{{.Se
 }
 {{else}}
 {{.Comment}}
-func (s *{{.LowerServiceName}}) {{.MethodName}}(ctx context.Context, req *serverNameExampleV1.{{.Request}}) (*serverNameExampleV1.{{.Reply}}, error) {
+func (s *{{.LowerServiceName}}) {{.MethodName}}(ctx context.Context, req *{{.RequestImportPkgName}}.{{.Request}}) (*{{.ReplyImportPkgName}}.{{.Reply}}, error) {
 	panic("implement me")
 
 	// fill in the business logic code here
@@ -220,7 +219,7 @@ func (s *{{.LowerServiceName}}) {{.MethodName}}(ctx context.Context, req *server
 	//			return nil, ecode.StatusInternalServerError.Err()
 	//		}
 	//
-	//     return &serverNameExampleV1.{{.Reply}}{
+	//     return &{{.ReplyImportPkgName}}.{{.Reply}}{
 				{{- range .ReplyFields}}
 	//     	{{.Name}}: reply.{{.Name}},
 				{{- end}}
@@ -252,7 +251,7 @@ import (
 
 	"github.com/zhufuyi/sponge/pkg/grpc/benchmark"
 
-	serverNameExampleV1 "moduleNameExample/api/serverNameExample/v1"
+	// import api service package here
 	"moduleNameExample/configs"
 	"moduleNameExample/internal/config"
 )
@@ -262,7 +261,7 @@ import (
 // Test service {{.LowerName}} api via grpc client
 func Test_service_{{.LowerName}}_methods(t *testing.T) {
 	conn := getRPCClientConnForTest()
-	cli := serverNameExampleV1.New{{.Name}}Client(conn)
+	cli := {{.ProtoPkgName}}.New{{.Name}}Client(conn)
 	ctx, _ := context.WithTimeout(context.Background(), time.Second*30)
 
 	tests := []struct {
@@ -276,7 +275,7 @@ func Test_service_{{.LowerName}}_methods(t *testing.T) {
 			name: "{{.MethodName}}",
 			fn: func() (interface{}, error) {
 				// todo type in the parameters before testing
-				req := &serverNameExampleV1.{{.Request}}{
+				req := &{{.RequestImportPkgName}}.{{.Request}}{
 					{{- range .RequestFields}}
 					{{.Name}}: {{.GoTypeZero}}, {{if .Comment}} {{.Comment}}{{end}}
 					{{- end}}
@@ -301,7 +300,7 @@ func Test_service_{{.LowerName}}_methods(t *testing.T) {
 			name: "{{.MethodName}}",
 			fn: func() (interface{}, error) {
 				// todo type in the parameters before testing
-				req := &serverNameExampleV1.{{.Request}}{
+				req := &{{.RequestImportPkgName}}.{{.Request}}{
 					{{- range .RequestFields}}
 					{{.Name}}: {{.GoTypeZero}}, {{if .Comment}} {{.Comment}}{{end}}
 					{{- end}}
@@ -312,7 +311,7 @@ func Test_service_{{.LowerName}}_methods(t *testing.T) {
 				if err != nil {
 					return nil, err
 				}
-				result := &serverNameExampleV1.{{.Reply}}{}
+				result := &{{.ReplyImportPkgName}}.{{.Reply}}{}
 				for {
 					select {
 					case <-ctx.Done():
@@ -336,7 +335,7 @@ func Test_service_{{.LowerName}}_methods(t *testing.T) {
 			name: "{{.MethodName}}",
 			fn: func() (interface{}, error) {
 				// todo type in the parameters before testing
-				req := &serverNameExampleV1.{{.Request}}{
+				req := &{{.RequestImportPkgName}}.{{.Request}}{
 					{{- range .RequestFields}}
 					{{.Name}}: {{.GoTypeZero}}, {{if .Comment}} {{.Comment}}{{end}}
 					{{- end}}
@@ -346,7 +345,7 @@ func Test_service_{{.LowerName}}_methods(t *testing.T) {
 				if err != nil {
 					return nil, err
 				}
-				reply := &serverNameExampleV1.{{.Reply}}{}
+				reply := &{{.ReplyImportPkgName}}.{{.Reply}}{}
 				for i:=0; i<3; i++ {
 					err = stream.Send(req)
 					if err != nil {
@@ -354,7 +353,7 @@ func Test_service_{{.LowerName}}_methods(t *testing.T) {
 					}
 					reply, err = stream.Recv()
 					if err == ioEOF {
-						return &serverNameExampleV1.{{.Reply}}{
+						return &{{.ReplyImportPkgName}}.{{.Reply}}{
 							{{- range .ReplyFields}}
 							{{.Name}}: reply.{{.Name}},
 							{{- end}}
@@ -373,7 +372,7 @@ func Test_service_{{.LowerName}}_methods(t *testing.T) {
 			name: "{{.MethodName}}",
 			fn: func() (interface{}, error) {
 				// todo type in the parameters before testing
-				req := &serverNameExampleV1.{{.Request}}{
+				req := &{{.RequestImportPkgName}}.{{.Request}}{
 					{{- range .RequestFields}}
 					{{.Name}}: {{.GoTypeZero}}, {{if .Comment}} {{.Comment}}{{end}}
 					{{- end}}
@@ -412,7 +411,7 @@ func Test_service_{{.LowerName}}_benchmark(t *testing.T) {
 		return
 	}
 	host := fmt.Sprintf("%s:%d", config.Get().GrpcClient[0].Host, config.Get().GrpcClient[0].Port)
-	protoFile := configs.Path("../api/serverNameExample/v1/{{.ProtoName}}")
+	protoFile := configs.Path("../{{.ProtoFileDir}}/{{.ProtoName}}")
 	// If third-party dependencies are missing during the press test,
 	// copy them to the project's third_party directory.
 	dependentProtoFilePath := []string{
@@ -431,7 +430,7 @@ func Test_service_{{.LowerName}}_benchmark(t *testing.T) {
 			name: "{{.MethodName}}",
 			fn: func() error {
 				// todo type in the parameters before benchmark testing
-				message := &serverNameExampleV1.{{.Request}}{
+				message := &{{.RequestImportPkgName}}.{{.Request}}{
 					{{- range .RequestFields}}
 					{{.Name}}: {{.GoTypeZero}}, {{if .Comment}} {{.Comment}}{{end}}
 					{{- end}}
@@ -455,7 +454,7 @@ func Test_service_{{.LowerName}}_benchmark(t *testing.T) {
 			name: "{{.MethodName}}",
 			fn: func() error {
 				// todo type in the parameters before benchmark testing
-				message := &serverNameExampleV1.{{.Request}}{
+				message := &{{.RequestImportPkgName}}.{{.Request}}{
 					{{- range .RequestFields}}
 					{{.Name}}: {{.GoTypeZero}}, {{if .Comment}} {{.Comment}}{{end}}
 					{{- end}}
@@ -479,7 +478,7 @@ func Test_service_{{.LowerName}}_benchmark(t *testing.T) {
 			name: "{{.MethodName}}",
 			fn: func() error {
 				// todo type in the parameters before benchmark testing
-				message := &serverNameExampleV1.{{.Request}}{
+				message := &{{.RequestImportPkgName}}.{{.Request}}{
 					{{- range .RequestFields}}
 					{{.Name}}: {{.GoTypeZero}}, {{if .Comment}} {{.Comment}}{{end}}
 					{{- end}}
@@ -503,7 +502,7 @@ func Test_service_{{.LowerName}}_benchmark(t *testing.T) {
 			name: "{{.MethodName}}",
 			fn: func() error {
 				// todo type in the parameters before benchmark testing
-				message := &serverNameExampleV1.{{.Request}}{
+				message := &{{.RequestImportPkgName}}.{{.Request}}{
 					{{- range .RequestFields}}
 					{{.Name}}: {{.GoTypeZero}}, {{if .Comment}} {{.Comment}}{{end}}
 					{{- end}}

@@ -4,7 +4,7 @@ package v1;
 
 import "google/api/annotations.proto";
 
-option go_package = "./v1;v1";
+option go_package = "yourModuleName333/api/v1";
 
 service mixed {
   // create a record

@@ -138,7 +138,9 @@ func main() {
 				return fmt.Errorf(`the proto file name (%s) suffix "_test" is not supported for code generation, please delete suffix "_test" or change it to another name. `, checkFilename)
 			}
 
-			router.GenerateFile(gen, f)
+			if err := saveGinRouterFiles(f); err != nil {
+				return err
+			}
 
 			if handlerFlag {
 				err := saveHandlerAndRouterFiles(f, moduleName, serverName, logicOut, routerOut, ecodeOut, suitedMonoRepo, mixFlag)
@@ -156,10 +158,16 @@ func main() {
 	})
 }
 
+func saveGinRouterFiles(f *protogen.File) error {
+	ginRouterFileContent := router.GenerateFiles(f)
+	filePath := f.GeneratedFilenamePrefix + "_router.pb.go"
+	return os.WriteFile(filePath, ginRouterFileContent, 0666)
+}
+
 func saveHandlerAndRouterFiles(f *protogen.File, moduleName string, serverName string,
 	logicOut string, routerOut string, ecodeOut string, suitedMonoRepo bool, isMixType bool) error {
 	filenamePrefix := f.GeneratedFilenamePrefix
-	handlerLogicContent, routerContent, errCodeFileContent := handler.GenerateFiles(f, isMixType)
+	handlerLogicContent, routerContent, errCodeFileContent := handler.GenerateFiles(f, isMixType, moduleName)
 
 	filePath := filenamePrefix + ".go"
 	err := saveFile(moduleName, serverName, logicOut, filePath, handlerLogicContent, false, handlerPlugin, suitedMonoRepo)
@@ -187,7 +195,7 @@ func saveHandlerAndRouterFiles(f *protogen.File, moduleName string, serverName s
 func saveServiceAndRouterFiles(f *protogen.File, moduleName string, serverName string,
 	logicOut string, routerOut string, ecodeOut string, suitedMonoRepo bool) error {
 	filenamePrefix := f.GeneratedFilenamePrefix
-	serviceLogicContent, routerContent, errCodeFileContent := service.GenerateFiles(f)
+	serviceLogicContent, routerContent, errCodeFileContent := service.GenerateFiles(f, moduleName)
 
 	filePath := filenamePrefix + ".go"
 	err := saveFile(moduleName, serverName, logicOut, filePath, serviceLogicContent, false, servicePlugin, suitedMonoRepo)

@@ -10,12 +10,12 @@ import (
 )
 
 // GenerateFiles generate handler logic, router, error code files.
-func GenerateFiles(file *protogen.File, isMixType bool) ([]byte, []byte, []byte) {
+func GenerateFiles(file *protogen.File, isMixType bool, moduleName string) ([]byte, []byte, []byte) {
 	if len(file.Services) == 0 {
 		return nil, nil, nil
 	}
 
-	pss := parse.GetServices(file)
+	pss := parse.GetServices(file, moduleName)
 
 	var logicContent, routerFileContent, errCodeFileContent []byte
 
@@ -32,8 +32,8 @@ func GenerateFiles(file *protogen.File, isMixType bool) ([]byte, []byte, []byte)
 }
 
 func genHandlerLogicFile(fields []*parse.PbService) []byte {
-	lf := &handlerLogicFields{PbServices: fields}
-	return lf.execute()
+	hlf := &handlerLogicFields{PbServices: fields}
+	return hlf.execute()
 }
 
 func genRouterFile(fields []*parse.PbService) []byte {
@@ -65,7 +65,8 @@ func (f *handlerLogicFields) execute() []byte {
 	if err := handlerLogicTmpl.Execute(buf, f); err != nil {
 		panic(err)
 	}
-	return handleSplitLineMark(buf.Bytes())
+	content := handleSplitLineMark(buf.Bytes())
+	return bytes.ReplaceAll(content, []byte(importPkgPathMark), parse.GetImportPkg(f.PbServices))
 }
 
 type routerFields struct {
@@ -77,7 +78,8 @@ func (f *routerFields) execute() []byte {
 	if err := routerTmpl.Execute(buf, f); err != nil {
 		panic(err)
 	}
-	return handleSplitLineMark(buf.Bytes())
+	content := handleSplitLineMark(buf.Bytes())
+	return bytes.ReplaceAll(content, []byte(importPkgPathMark), parse.GetSourceImportPkg(f.PbServices))
 }
 
 type errCodeFields struct {
@@ -102,7 +104,8 @@ func (f *mixLogicFields) execute() []byte {
 	if err := mixLogicTmpl.Execute(buf, f); err != nil {
 		panic(err)
 	}
-	return handleSplitLineMark(buf.Bytes())
+	content := handleSplitLineMark(buf.Bytes())
+	return bytes.ReplaceAll(content, []byte(importPkgPathMark), parse.GetImportPkg(f.PbServices))
 }
 
 type mixRouterFields struct {
@@ -114,8 +117,11 @@ func (f *mixRouterFields) execute() []byte {
 	if err := mixRouterTmpl.Execute(buf, f); err != nil {
 		panic(err)
 	}
-	return handleSplitLineMark(buf.Bytes())
+	content := handleSplitLineMark(buf.Bytes())
+	return bytes.ReplaceAll(content, []byte(importPkgPathMark), parse.GetSourceImportPkg(f.PbServices))
 }
+
+const importPkgPathMark = "// import api service package here"
 
 var splitLineMark = []byte(`// ---------- Do not delete or move this split line, this is the merge code marker ----------`)
 

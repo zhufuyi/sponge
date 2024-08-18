@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package v1;
+package api.v1;
 
-option go_package = "./v1;v1";
+option go_package = "yourModuleName/api/v1";
 
 service Greeter {
   // create a record

@@ -2,7 +2,10 @@
 package parse
 
 import (
+	"fmt"
 	"math/rand"
+	"regexp"
+	"runtime"
 	"strings"
 
 	"google.golang.org/protobuf/compiler/protogen"
@@ -20,6 +23,10 @@ type ServiceMethod struct {
 
 	ServiceName      string // Greeter
 	LowerServiceName string // greeter first character to lower
+
+	RequestImportPkgName string // e.g. userV1
+	ReplyImportPkgName   string // e.g. userV1
+	ProtoPkgName         string // e.g. userV1
 }
 
 // Field request fields
@@ -56,6 +63,12 @@ type PbService struct {
 	LowerName string           // greeter first character to lower
 	ProtoName string           // proto file name greeter.proto
 	Methods   []*ServiceMethod // service methods
+
+	ImportPkgMap map[string]string // e.g. [userV1]:[userV1 "user/api/user/v1"]
+
+	ProtoFileDir string // e.g. api/user/v1
+	ProtoPkgName string // e.g. userV1
+	ModuleName   string
 }
 
 // RandNumber rand number 1~100
@@ -63,9 +76,21 @@ func (s *PbService) RandNumber() int {
 	return rand.Intn(99) + 1
 }
 
-func parsePbService(s *protogen.Service) *PbService {
+func parsePbService(s *protogen.Service, protoFileDir string, moduleName string) *PbService {
+	protoPkgName := convertToPkgName(protoFileDir)
+	importPkgMap := map[string]string{}
+
 	var methods []*ServiceMethod
 	for _, m := range s.Methods {
+		requestImportPkgName := convertToPkgName(m.Input.GoIdent.GoImportPath.String())
+		replyImportPkgName := convertToPkgName(m.Output.GoIdent.GoImportPath.String())
+		if requestImportPkgName != "" {
+			importPkgMap[requestImportPkgName] = requestImportPkgName + " " + m.Input.GoIdent.GoImportPath.String()
+		}
+		if replyImportPkgName != "" {
+			importPkgMap[replyImportPkgName] = replyImportPkgName + " " + m.Output.GoIdent.GoImportPath.String()
+		}
+
 		methods = append(methods, &ServiceMethod{
 			MethodName:    m.GoName,
 			Request:       m.Input.GoIdent.GoName,
@@ -77,13 +102,21 @@ func parsePbService(s *protogen.Service) *PbService {
 
 			ServiceName:      s.GoName,
 			LowerServiceName: strings.ToLower(s.GoName[:1]) + s.GoName[1:],
+
+			RequestImportPkgName: requestImportPkgName,
+			ReplyImportPkgName:   replyImportPkgName,
+			ProtoPkgName:         protoPkgName,
 		})
 	}
 
 	return &PbService{
-		Name:      s.GoName,
-		LowerName: strings.ToLower(s.GoName[:1]) + s.GoName[1:],
-		Methods:   methods,
+		Name:         s.GoName,
+		LowerName:    strings.ToLower(s.GoName[:1]) + s.GoName[1:],
+		Methods:      methods,
+		ImportPkgMap: importPkgMap,
+		ProtoFileDir: protoFileDir,
+		ProtoPkgName: protoPkgName,
+		ModuleName:   moduleName,
 	}
 }
 
@@ -146,10 +179,13 @@ func getCommentStr(comment string) string {
 }
 
 // GetServices parse protobuf services
-func GetServices(protoName string, file *protogen.File) []*PbService {
+func GetServices(file *protogen.File, moduleName string) []*PbService {
+	protoFileDir := getProtoFileDir(file.GeneratedFilenamePrefix)
+	protoName := getProtoFilename(file.GeneratedFilenamePrefix)
+
 	var pss []*PbService
 	for _, s := range file.Services {
-		ps := parsePbService(s)
+		ps := parsePbService(s, protoFileDir, moduleName)
 		ps.ProtoName = protoName
 		pss = append(pss, ps)
 	}
@@ -169,4 +205,111 @@ func getInvokeType(isStreamingClient bool, isStreamingServer bool) int {
 	}
 
 	return 0 // unary
+}
+
+func getProtoFileDir(protoPath string) string {
+	ss := strings.Split(protoPath, "/")
+	if len(ss) > 1 {
+		return strings.Join(ss[:len(ss)-1], "/")
+	}
+	return ""
+}
+
+func convertToPkgName(importPath string) string {
+	importPath = strings.ReplaceAll(importPath, `"`, "")
+	ss := strings.Split(importPath, "/")
+	l := len(ss)
+	if l > 1 {
+		pkgName := strings.ToLower(ss[l-1])
+		if isVersionNum(pkgName) || pkgName == "pb" || len(pkgName) < 2 {
+			return removeMiddleLine(ss[l-2]) + strings.ToUpper(pkgName[:1]) + pkgName[1:]
+		}
+		return removeMiddleLine(ss[l-1])
+	}
+	return ""
+}
+
+func isVersionNum(pkgName string) bool {
+	pattern := `^v\d+$`
+	matched, err := regexp.MatchString(pattern, pkgName)
+	if err != nil {
+		return false
+	}
+	return matched
+}
+
+func removeMiddleLine(str string) string {
+	return strings.ReplaceAll(str, "-", "")
+}
+
+func getProtoFilename(filenamePrefix string) string {
+	filenamePrefix = strings.ReplaceAll(filenamePrefix, ".proto", "")
+	filenamePrefix = strings.ReplaceAll(filenamePrefix, getPathDelimiter(), "/")
+	ss := strings.Split(filenamePrefix, "/")
+
+	if len(ss) == 0 {
+		return ""
+	} else if len(ss) == 1 {
+		return ss[0] + ".proto"
+	}
+
+	return ss[len(ss)-1] + ".proto"
+}
+
+func getPathDelimiter() string {
+	delimiter := "/"
+	if runtime.GOOS == "windows" {
+		delimiter = "\\"
+	}
+
+	return delimiter
+}
+
+// GetImportPkg get import package
+func GetImportPkg(services []*PbService) []byte {
+	pkgMap := make(map[string]string)
+	protoFileDir := ""
+	moduleName := ""
+
+	for _, service := range services {
+		for key, val := range service.ImportPkgMap {
+			pkgMap[key] = val
+			protoFileDir = service.ProtoFileDir
+			moduleName = service.ModuleName
+		}
+	}
+
+	pkgName := convertToPkgName(protoFileDir)
+	if _, ok := pkgMap[pkgName]; !ok {
+		pkgMap[pkgName] = fmt.Sprintf(`%s "%s"`, pkgName, moduleName+"/"+protoFileDir)
+	}
+
+	var importPkg []string
+	for _, v := range pkgMap {
+		importPkg = append(importPkg, v)
+	}
+
+	return []byte(strings.Join(importPkg, "\n\t"))
+}
+
+// GetSourceImportPkg get source import package
+func GetSourceImportPkg(services []*PbService) []byte {
+	pkgMap := make(map[string]string)
+	protoFileDir := ""
+	moduleName := ""
+
+	for _, service := range services {
+		for key, val := range service.ImportPkgMap {
+			pkgMap[key] = val
+			protoFileDir = service.ProtoFileDir
+			moduleName = service.ModuleName
+		}
+	}
+
+	pkgName := convertToPkgName(protoFileDir)
+	if v, ok := pkgMap[pkgName]; ok {
+		return []byte(v)
+	}
+
+	return []byte(fmt.Sprintf(`%s "%s"`, pkgName, moduleName+"/"+protoFileDir))
 }

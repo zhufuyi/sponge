@@ -1,27 +1,14 @@
 syntax = "proto3";
 
-package v1;
+package api.v1;
 
-import "google/api/annotations.proto";
-
-option go_package = "./v1;v1";
+option go_package = "yourModuleName/api/v1";
 
 service mixed {
   // create a record
-  rpc Create(CreateMixedRequest) returns (CreateMixedReply) {
-    option (google.api.http) = {
-      post: "/api/v1/mixed"
-      body: "*"
-    };
-  }
-
+  rpc Create(CreateMixedRequest) returns (CreateMixedReply) {}
   // get a record by id
-  rpc GetByID(GetMixedByIDRequest) returns (GetMixedByIDReply) {
-    option (google.api.http) = {
-      get: "/api/v1/mixed/{id}"
-    };
-  }
-
+  rpc GetByID(GetMixedByIDRequest) returns (GetMixedByIDReply) {}
   // delete a record by id
   rpc DeleteByID(DeleteMixedByIDRequest) returns (DeleteMixedByIDReply) {}
 
