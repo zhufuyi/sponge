@@ -56,7 +56,7 @@ func NewUserExampleHandler() UserExampleHandler {
 // @accept json
 // @Produce json
 // @Param data body types.CreateUserExampleRequest true "userExample information"
-// @Success 200 {object} types.CreateUserExampleRespond{}
+// @Success 200 {object} types.CreateUserExampleReply{}
 // @Router /api/v1/userExample [post]
 // @Security BearerAuth
 func (h *userExampleHandler) Create(c *gin.Context) {
@@ -94,7 +94,7 @@ func (h *userExampleHandler) Create(c *gin.Context) {
 // @accept json
 // @Produce json
 // @Param id path string true "id"
-// @Success 200 {object} types.DeleteUserExampleByIDRespond{}
+// @Success 200 {object} types.DeleteUserExampleByIDReply{}
 // @Router /api/v1/userExample/{id} [delete]
 // @Security BearerAuth
 func (h *userExampleHandler) DeleteByID(c *gin.Context) {
@@ -118,7 +118,7 @@ func (h *userExampleHandler) DeleteByID(c *gin.Context) {
 // @Produce json
 // @Param id path string true "id"
 // @Param data body types.UpdateUserExampleByIDRequest true "userExample information"
-// @Success 200 {object} types.UpdateUserExampleByIDRespond{}
+// @Success 200 {object} types.UpdateUserExampleByIDReply{}
 // @Router /api/v1/userExample/{id} [put]
 // @Security BearerAuth
 func (h *userExampleHandler) UpdateByID(c *gin.Context) {
@@ -163,7 +163,7 @@ func (h *userExampleHandler) UpdateByID(c *gin.Context) {
 // @Param id path string true "id"
 // @Accept json
 // @Produce json
-// @Success 200 {object} types.GetUserExampleByIDRespond{}
+// @Success 200 {object} types.GetUserExampleByIDReply{}
 // @Router /api/v1/userExample/{id} [get]
 // @Security BearerAuth
 func (h *userExampleHandler) GetByID(c *gin.Context) {
@@ -200,7 +200,7 @@ func (h *userExampleHandler) GetByID(c *gin.Context) {
 // @accept json
 // @Produce json
 // @Param data body types.Params true "query parameters"
-// @Success 200 {object} types.ListUserExamplesRespond{}
+// @Success 200 {object} types.ListUserExamplesReply{}
 // @Router /api/v1/userExample/list [post]
 // @Security BearerAuth
 func (h *userExampleHandler) List(c *gin.Context) {
@@ -239,7 +239,7 @@ func (h *userExampleHandler) List(c *gin.Context) {
 // @Param data body types.DeleteUserExamplesByIDsRequest true "id array"
 // @Accept json
 // @Produce json
-// @Success 200 {object} types.DeleteUserExamplesByIDsRespond{}
+// @Success 200 {object} types.DeleteUserExamplesByIDsReply{}
 // @Router /api/v1/userExample/delete/ids [post]
 // @Security BearerAuth
 func (h *userExampleHandler) DeleteByIDs(c *gin.Context) {
@@ -269,7 +269,7 @@ func (h *userExampleHandler) DeleteByIDs(c *gin.Context) {
 // @Param data body types.Conditions true "query condition"
 // @Accept json
 // @Produce json
-// @Success 200 {object} types.GetUserExampleByConditionRespond{}
+// @Success 200 {object} types.GetUserExampleByConditionReply{}
 // @Router /api/v1/userExample/condition [post]
 // @Security BearerAuth
 func (h *userExampleHandler) GetByCondition(c *gin.Context) {
@@ -319,7 +319,7 @@ func (h *userExampleHandler) GetByCondition(c *gin.Context) {
 // @Param data body types.ListUserExamplesByIDsRequest true "id array"
 // @Accept json
 // @Produce json
-// @Success 200 {object} types.ListUserExamplesByIDsRespond{}
+// @Success 200 {object} types.ListUserExamplesByIDsReply{}
 // @Router /api/v1/userExample/list/ids [post]
 // @Security BearerAuth
 func (h *userExampleHandler) ListByIDs(c *gin.Context) {
@@ -365,7 +365,7 @@ func (h *userExampleHandler) ListByIDs(c *gin.Context) {
 // @Param lastID query string false "last id, default()"
 // @Param limit query int false "size per page" default(10)
 // @Param sort query string false "sort by column name of table, and the "-" sign before column name indicates reverse order" default(-id)
-// @Success 200 {object} types.ListUserExamplesRespond{}
+// @Success 200 {object} types.ListUserExamplesReply{}
 // @Router /api/v1/userExample/list [get]
 // @Security BearerAuth
 func (h *userExampleHandler) ListByLastID(c *gin.Context) {

@@ -32,11 +32,27 @@ definitions:
         description: sorted fields, multi-column sorting separated by commas
         type: string
     type: object
-  handlerfunc.checkHealthResponse:
+  handlerfunc.CheckHealthReply:
     properties:
       hostname:
         type: string
       status:
+        type: string
+    type: object
+  types.CreateUserExampleReply:
+    properties:
+      code:
+        description: return code
+        type: integer
+      data:
+        description: return data
+        properties:
+          id:
+            description: id
+            type: integer
+        type: object
+      msg:
+        description: return information description
         type: string
     type: object
   types.CreateUserExampleRequest:
@@ -67,23 +83,7 @@ definitions:
         description: phone number, e164 rules, e.g. +8612345678901
         type: string
     type: object
-  types.CreateUserExampleRespond:
-    properties:
-      code:
-        description: return code
-        type: integer
-      data:
-        description: return data
-        properties:
-          id:
-            description: id
-            type: integer
-        type: object
-      msg:
-        description: return information description
-        type: string
-    type: object
-  types.DeleteUserExampleByIDRespond:
+  types.DeleteUserExampleByIDReply:
     properties:
       code:
         description: return code
@@ -94,7 +94,7 @@ definitions:
         description: return information description
         type: string
     type: object
-  types.GetUserExampleByIDRespond:
+  types.GetUserExampleByIDReply:
     properties:
       code:
         description: return code
@@ -109,7 +109,7 @@ definitions:
         description: return information description
         type: string
     type: object
-  types.ListUserExamplesRespond:
+  types.ListUserExamplesReply:
     properties:
       code:
         description: return code
@@ -122,6 +122,17 @@ definitions:
               $ref: '#/definitions/types.UserExampleObjDetail'
             type: array
         type: object
+      msg:
+        description: return information description
+        type: string
+    type: object
+  types.UpdateUserExampleByIDReply:
+    properties:
+      code:
+        description: return code
+        type: integer
+      data:
+        description: return data
       msg:
         description: return information description
         type: string
@@ -151,17 +162,6 @@ definitions:
         type: string
       phone:
         description: phone number
-        type: string
-    type: object
-  types.UpdateUserExampleByIDRespond:
-    properties:
-      code:
-        description: return code
-        type: integer
-      data:
-        description: return data
-      msg:
-        description: return information description
         type: string
     type: object
   types.UserExampleObjDetail:
@@ -225,7 +225,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/types.CreateUserExampleRespond'
+            $ref: '#/definitions/types.CreateUserExampleReply'
       security:
       - BearerAuth: []
       summary: create userExample
@@ -248,7 +248,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/types.DeleteUserExampleByIDRespond'
+            $ref: '#/definitions/types.DeleteUserExampleByIDReply'
       security:
       - BearerAuth: []
       summary: delete userExample
@@ -270,7 +270,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/types.GetUserExampleByIDRespond'
+            $ref: '#/definitions/types.GetUserExampleByIDReply'
       security:
       - BearerAuth: []
       summary: get userExample detail
@@ -298,7 +298,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/types.UpdateUserExampleByIDRespond'
+            $ref: '#/definitions/types.UpdateUserExampleByIDReply'
       security:
       - BearerAuth: []
       summary: update userExample
@@ -322,7 +322,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/types.ListUserExamplesRespond'
+            $ref: '#/definitions/types.ListUserExamplesReply'
       security:
       - BearerAuth: []
       summary: list of userExamples by query parameters
@@ -361,7 +361,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handlerfunc.checkHealthResponse'
+            $ref: '#/definitions/handlerfunc.CheckHealthReply'
       summary: check health
       tags:
       - system

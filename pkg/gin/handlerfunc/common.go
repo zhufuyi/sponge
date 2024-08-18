@@ -13,8 +13,8 @@ import (
 	"github.com/zhufuyi/sponge/pkg/utils"
 )
 
-// checkHealthResponse check health result
-type checkHealthResponse struct {
+// CheckHealthReply check health result
+type CheckHealthReply struct {
 	Status   string `json:"status"`
 	Hostname string `json:"hostname"`
 }
@@ -25,10 +25,10 @@ type checkHealthResponse struct {
 // @Tags system
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} checkHealthResponse{}
+// @Success 200 {object} CheckHealthReply{}
 // @Router /health [get]
 func CheckHealth(c *gin.Context) {
-	c.JSON(http.StatusOK, checkHealthResponse{Status: "UP", Hostname: utils.GetHostname()})
+	c.JSON(http.StatusOK, CheckHealthReply{Status: "UP", Hostname: utils.GetHostname()})
 }
 
 // Ping ping

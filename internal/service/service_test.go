@@ -43,25 +43,33 @@ func getRPCClientConnForTest(grpcClient ...config.GrpcClient) *grpc.ClientConn {
 	}
 	var grpcClientCfg config.GrpcClient
 
-	if len(grpcClient) == 0 {
-		// the default priority is to use the GrpcClient's 0th grpc server address
+	// custom config
+	if len(grpcClient) > 0 {
+		// parameter config, highest priority
+		grpcClientCfg = grpcClient[0]
+	} else {
+		// grpcClient config in the yml file, second priority
 		if len(config.Get().GrpcClient) > 0 {
-			grpcClientCfg = config.Get().GrpcClient[0]
-		} else {
-			grpcClientCfg = config.GrpcClient{
-				Host: config.Get().App.Host,
-				Port: config.Get().Grpc.Port,
-				// If RegistryDiscoveryType is not empty, service discovery is used, and Host and Port values are invalid
-				RegistryDiscoveryType: config.Get().App.RegistryDiscoveryType, // supports consul, etcd and nacos
-				Name:                  config.Get().App.Name,
-			}
-			if grpcClientCfg.RegistryDiscoveryType != "" {
-				grpcClientCfg.EnableLoadBalance = true
+			for _, v := range config.Get().GrpcClient {
+				if v.Name == config.Get().App.Name { // match the current app name
+					grpcClientCfg = v
+					break
+				}
 			}
 		}
-	} else {
-		// custom config
-		grpcClientCfg = grpcClient[0]
+	}
+	// if no custom config found, use the default config
+	if grpcClientCfg.Name == "" {
+		grpcClientCfg = config.GrpcClient{
+			Host: config.Get().App.Host,
+			Port: config.Get().Grpc.Port,
+			// If RegistryDiscoveryType is not empty, service discovery is used, and Host and Port values are invalid
+			RegistryDiscoveryType: config.Get().App.RegistryDiscoveryType, // supports consul, etcd and nacos
+			Name:                  config.Get().App.Name,
+		}
+		if grpcClientCfg.RegistryDiscoveryType != "" {
+			grpcClientCfg.EnableLoadBalance = true
+		}
 	}
 
 	var cliOptions []grpccli.Option
