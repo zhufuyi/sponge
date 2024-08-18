@@ -14,11 +14,14 @@ import (
 
 	"github.com/huandu/xstrings"
 
+	"github.com/zhufuyi/sponge/pkg/gobash"
 	"github.com/zhufuyi/sponge/pkg/gofile"
 	"github.com/zhufuyi/sponge/pkg/replacer"
 )
 
 const (
+	defaultGoModVersion = "go 1.19"
+
 	// TplNameSponge name of the template
 	TplNameSponge = "sponge"
 
@@ -684,4 +687,29 @@ func getSubFiles(selectFiles map[string][]string, replaceFiles map[string][]stri
 		}
 	}
 	return files
+}
+
+func getLocalGoVersion() string {
+	result, err := gobash.Exec("go", "version")
+	if err != nil {
+		return defaultGoModVersion
+	}
+
+	pattern := `go(\d+\.\d+)`
+	re := regexp.MustCompile(pattern)
+	matches := re.FindStringSubmatch(string(result))
+	if len(matches) < 2 {
+		return defaultGoModVersion
+	}
+
+	localGoVersion := "go " + matches[1]
+	if localGoVersion < defaultGoModVersion {
+		return defaultGoModVersion
+	}
+
+	if len(localGoVersion) != 6 && len(localGoVersion) != 7 {
+		return defaultGoModVersion
+	}
+
+	return localGoVersion
 }

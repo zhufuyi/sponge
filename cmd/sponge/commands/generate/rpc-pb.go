@@ -263,8 +263,8 @@ func (g *rpcPbGenerator) addFields(r replacer.Replacer) []replacer.Field {
 			New: g.serverName + " api docs",
 		},
 		{
-			Old: "go 1.19",
-			New: "go 1.20",
+			Old: defaultGoModVersion,
+			New: getLocalGoVersion(),
 		},
 		{
 			Old: "serverNameExample",
