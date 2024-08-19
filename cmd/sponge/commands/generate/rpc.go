@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/huandu/xstrings"
 	"github.com/spf13/cobra"
 
@@ -37,7 +38,7 @@ func RPCCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "rpc",
 		Short: "Generate grpc service code based on sql",
-		Long: `generate grpc service code based on sql.
+		Long: color.HiBlackString(`generate grpc service code based on sql.
 
 Examples:
   # generate grpc service code.
@@ -56,7 +57,7 @@ Examples:
   sponge micro rpc --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
   # if you want the generated code to suited to mono-repo, you need to specify the parameter --suited-mono-repo=true
-`,
+`),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -266,11 +267,11 @@ func (g *rpcGenerator) generateCode() (string, error) {
 					"service.go", "service_test.go", "userExample.go.mgo", "userExample_client_test.go.mgo",
 				},
 			}
-			g.fields = append(g.fields, deleteFieldsMark(r, serviceLogicFile+".mgo", startMark, endMark)...)
+			g.fields = append(g.fields, deleteFieldsMark(r, serviceLogicFile+mgoSuffix, startMark, endMark)...)
 		}
 
 	default:
-		return "", errors.New("unsupported db driver: " + g.dbDriver)
+		return "", dbDriverErr(g.dbDriver)
 	}
 
 	subFiles = append(subFiles, getSubFiles(selectFiles, replaceFiles)...)
@@ -320,7 +321,7 @@ func (g *rpcGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	fields = append(fields, deleteAllFieldsMark(r, protoShellFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteAllFieldsMark(r, appConfigFile, wellStartMark, wellEndMark)...)
 	//fields = append(fields, deleteFieldsMark(r, deploymentConfigFile, wellStartMark, wellEndMark)...)
-	fields = append(fields, replaceFileContentMark(r, readmeFile, "## "+g.serverName)...)
+	fields = append(fields, replaceFileContentMark(r, readmeFile, wellPrefix+g.serverName)...)
 	fields = append(fields, []replacer.Field{
 		{ // replace the configuration of the *.yml file
 			Old: appConfigFileMark,
@@ -408,7 +409,7 @@ func (g *rpcGenerator) addFields(r replacer.Replacer) []replacer.Field {
 			New: g.moduleName,
 		},
 		{
-			Old: g.moduleName + "/pkg",
+			Old: g.moduleName + pkgPathSuffix,
 			New: "github.com/zhufuyi/sponge/pkg",
 		},
 		{ // replace the sponge version of the go.mod file
@@ -425,7 +426,7 @@ func (g *rpcGenerator) addFields(r replacer.Replacer) []replacer.Field {
 		},
 		{
 			Old: "sponge api docs",
-			New: g.serverName + " api docs",
+			New: g.serverName + apiDocsSuffix,
 		},
 		{
 			Old: defaultGoModVersion,

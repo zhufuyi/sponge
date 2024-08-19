@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 
 	"github.com/zhufuyi/sponge/pkg/gofile"
@@ -29,7 +30,7 @@ func ConfigCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "config",
 		Short: "Generate go config code from yaml file",
-		Long: `generate go config code from yaml file.
+		Long: color.HiBlackString(`generate go config code from yaml file.
 
 Examples:
   # generate config code in server directory, the yaml configuration file must be in <yourServerDir>/configs directory.
@@ -37,7 +38,7 @@ Examples:
 
   # generate config code from yaml file.
   sponge config --yaml-file=yourConfig.yml
-`,
+`),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {

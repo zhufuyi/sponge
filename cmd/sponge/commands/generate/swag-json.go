@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 
 	"github.com/zhufuyi/sponge/pkg/gofile"
@@ -23,7 +24,7 @@ func ConvertSwagJSONCommand(parentName string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "swagger",
 		Short: "Convert 64-bit fields type string to integer",
-		Long: fmt.Sprintf(`convert 64-bit fields type string to integer
+		Long: color.HiBlackString(fmt.Sprintf(`convert 64-bit fields type string to integer
 
 Examples:
   # convent file docs/apis.swagger.json.
@@ -34,7 +35,7 @@ Examples:
 
   # convent file docs/apis.swagger.json and sort json key.
   sponge %s swagger --is-sort
-`, parentName, parentName, parentName),
+`, parentName, parentName, parentName)),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {

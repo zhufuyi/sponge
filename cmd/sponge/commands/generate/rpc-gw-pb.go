@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/fatih/color"
 	"github.com/huandu/xstrings"
 	"github.com/spf13/cobra"
 
@@ -26,7 +27,7 @@ func RPCGwPbCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "rpc-gw-pb",
 		Short: "Generate grpc gateway service code based on protobuf file",
-		Long: `generate grpc gateway service code based on protobuf file.
+		Long: color.HiBlackString(`generate grpc gateway service code based on protobuf file.
 
 Examples:
   # generate grpc gateway service code.
@@ -39,7 +40,7 @@ Examples:
   sponge micro rpc-gw-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --protobuf-file=./demo.proto
 
   # if you want the generated code to suited to mono-repo, you need to specify the parameter --suited-mono-repo=true
-`,
+`),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -197,7 +198,7 @@ func (g *rpcGwPbGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	fields = append(fields, deleteAllFieldsMark(r, protoShellFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteAllFieldsMark(r, appConfigFile, wellStartMark, wellEndMark)...)
 	//fields = append(fields, deleteFieldsMark(r, deploymentConfigFile, wellStartMark, wellEndMark)...)
-	fields = append(fields, replaceFileContentMark(r, readmeFile, "## "+g.serverName)...)
+	fields = append(fields, replaceFileContentMark(r, readmeFile, wellPrefix+g.serverName)...)
 	fields = append(fields, []replacer.Field{
 		{ // replace the configuration of the *.yml file
 			Old: appConfigFileMark,
@@ -260,7 +261,7 @@ func (g *rpcGwPbGenerator) addFields(r replacer.Replacer) []replacer.Field {
 			New: g.moduleName,
 		},
 		{
-			Old: g.moduleName + "/pkg",
+			Old: g.moduleName + pkgPathSuffix,
 			New: "github.com/zhufuyi/sponge/pkg",
 		},
 		{ // replace the sponge version of the go.mod file

@@ -8,6 +8,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 
 	"github.com/zhufuyi/sponge/pkg/gobash"
@@ -59,7 +60,7 @@ func PluginsCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "plugins",
 		Short: "Managing sponge dependency plugins",
-		Long: `managing sponge dependency plugins.
+		Long: color.HiBlackString(`managing sponge dependency plugins.
 
 Examples:
   # show all dependency plugins.
@@ -70,7 +71,7 @@ Examples:
 
   # skip installing dependency plugins, multiple plugin names separated by commas
   sponge plugins --install --skip=go-callvis
-`,
+`),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
