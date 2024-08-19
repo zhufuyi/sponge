@@ -20,7 +20,7 @@ var (
 )
 
 func init() {
-	rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano()) //nolint
 }
 
 // String generate random strings of any length of multiple types, default length is 6 if size is empty

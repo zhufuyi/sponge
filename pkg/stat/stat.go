@@ -125,6 +125,7 @@ func printUsageInfo() *statData {
 		TotalAlloc: mProc.TotalAlloc,
 		Sys:        mProc.Sys,
 		NumGc:      mProc.NumGc,
+		Goroutines: runtime.NumGoroutine(),
 	}
 
 	zapLog.Info("statistics",
@@ -154,6 +155,7 @@ type process struct {
 	TotalAlloc uint64  `json:"total_alloc"` // cumulative allocated memory capacity, unit(M)
 	Sys        uint64  `json:"sys"`         // requesting memory capacity from the system, unit(M)
 	NumGc      uint32  `json:"num_gc"`      // number of GC cycles
+	Goroutines int     `json:"goroutines"`  // number of goroutines
 }
 
 type statData struct {

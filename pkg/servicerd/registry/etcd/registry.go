@@ -168,7 +168,7 @@ func (r *Registry) heartBeat(ctx context.Context, leaseID clientv3.LeaseID, key 
 	if err != nil {
 		curLeaseID = 0
 	}
-	rand.Seed(time.Now().Unix())
+	rand.Seed(time.Now().Unix()) //nolint
 
 	for {
 		if curLeaseID == 0 {
