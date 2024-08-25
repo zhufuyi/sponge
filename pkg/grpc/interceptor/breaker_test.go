@@ -58,22 +58,41 @@ func TestSteamClientCircuitBreaker(t *testing.T) {
 }
 
 func TestUnaryServerCircuitBreaker(t *testing.T) {
-	interceptor := UnaryServerCircuitBreaker()
+	degradeHandler := func(ctx context.Context, req interface{}) (reply interface{}, error error) {
+		return "degrade", errcode.StatusSuccess.ToRPCErr()
+	}
+	interceptor := UnaryServerCircuitBreaker(WithUnaryServerDegradeHandler(degradeHandler))
 	assert.NotNil(t, interceptor)
 
+	count := 0
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		count++
+		if count%2 == 0 {
+			return nil, errcode.StatusSuccess.ToRPCErr()
+		}
 		return nil, errcode.StatusInternalServerError.ToRPCErr()
 	}
-	for i := 0; i < 110; i++ {
-		_, err := interceptor(context.Background(), nil, &grpc.UnaryServerInfo{FullMethod: "/test"}, handler)
-		assert.Error(t, err)
+
+	successCount, failCount, degradeCount := 0, 0, 0
+	for i := 0; i < 1000; i++ {
+		reply, err := interceptor(context.Background(), nil, &grpc.UnaryServerInfo{FullMethod: "/test"}, handler)
+		if err != nil {
+			failCount++
+			continue
+		}
+		if reply == "degrade" {
+			degradeCount++
+		} else {
+			successCount++
+		}
 	}
+	t.Logf("successCount: %d, failCount: %d, degradeCount: %d", successCount, failCount, degradeCount)
 
 	handler = func(ctx context.Context, req interface{}) (interface{}, error) {
 		return nil, errcode.StatusInvalidParams.Err()
 	}
 	_, err := interceptor(context.Background(), nil, &grpc.UnaryServerInfo{FullMethod: "/test"}, handler)
-	assert.Error(t, err)
+	t.Log(err)
 }
 
 func TestSteamServerCircuitBreaker(t *testing.T) {

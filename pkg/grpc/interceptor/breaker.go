@@ -23,6 +23,9 @@ type circuitBreakerOptions struct {
 	group *group.Group
 	// rpc code for circuit breaker, default already includes codes.Internal and codes.Unavailable
 	validCodes map[codes.Code]struct{}
+
+	// degrade handler for unary server
+	unaryServerDegradeHandler func(ctx context.Context, req interface{}) (reply interface{}, error error)
 }
 
 func defaultCircuitBreakerOptions() *circuitBreakerOptions {
@@ -59,6 +62,13 @@ func WithValidCode(code ...codes.Code) CircuitBreakerOption {
 		for _, c := range code {
 			o.validCodes[c] = struct{}{}
 		}
+	}
+}
+
+// WithUnaryServerDegradeHandler unary server degrade handler function
+func WithUnaryServerDegradeHandler(handler func(ctx context.Context, req interface{}) (reply interface{}, error error)) CircuitBreakerOption {
+	return func(o *circuitBreakerOptions) {
+		o.unaryServerDegradeHandler = handler
 	}
 }
 
@@ -130,6 +140,10 @@ func UnaryServerCircuitBreaker(opts ...CircuitBreakerOption) grpc.UnaryServerInt
 		if err := breaker.Allow(); err != nil {
 			// NOTE: when client reject request locally, keep adding let the drop ratio higher.
 			breaker.MarkFailed()
+
+			if o.unaryServerDegradeHandler != nil {
+				return o.unaryServerDegradeHandler(ctx, req)
+			}
 			return nil, errcode.StatusServiceUnavailable.ToRPCErr(err.Error())
 		}
 
