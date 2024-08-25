@@ -64,10 +64,6 @@ func InitApp() {
 		logger.Info("[tracer] was initialized")
 	}
 
-	// initializing the rpc server connection
-	// example:
-	//rpcclient.NewServerNameExampleRPCConn()
-
 	// initializing the print system and process resources
 	if cfg.App.EnableStat {
 		stat.Init(
@@ -76,6 +72,10 @@ func InitApp() {
 		)
 		logger.Info("[resource statistics] was initialized")
 	}
+
+	// initializing the rpc server connection
+	// example:
+	//rpcclient.NewServerNameExampleRPCConn()
 }
 
 func initConfig() {

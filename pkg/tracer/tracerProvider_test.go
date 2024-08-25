@@ -23,6 +23,7 @@ func TestClose(t *testing.T) {
 	assert.NoError(t, err)
 	resource := NewResource()
 	Init(exporter, resource)
+	GetProvider()
 	_ = Close(context.Background())
 
 	tp = nil

@@ -2,10 +2,12 @@
 package goredis
 
 import (
+	"context"
 	"strings"
+	"time"
 
-	"github.com/go-redis/redis/extra/redisotel"
-	"github.com/go-redis/redis/v8"
+	"github.com/redis/go-redis/extra/redisotel/v9"
+	"github.com/redis/go-redis/v9"
 )
 
 const (
@@ -30,13 +32,132 @@ func Init(dsn string, opts ...Option) (*redis.Client, error) {
 		return nil, err
 	}
 
-	rdb := redis.NewClient(opt)
-
-	if o.enableTrace {
-		rdb.AddHook(redisotel.TracingHook{})
+	// replace single options if provided
+	if o.singleOptions != nil {
+		opt = o.singleOptions
 	}
 
-	return rdb, nil
+	rdb := redis.NewClient(opt)
+
+	if o.tracerProvider != nil {
+		err = redisotel.InstrumentTracing(rdb, redisotel.WithTracerProvider(o.tracerProvider))
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	ctx, _ := context.WithTimeout(context.Background(), 15*time.Second) //nolint
+	err = rdb.Ping(ctx).Err()
+
+	return rdb, err
+}
+
+// InitSingle connecting to single redis instance
+func InitSingle(addr string, password string, db int, opts ...Option) (*redis.Client, error) {
+	o := defaultOptions()
+	o.apply(opts...)
+
+	opt := &redis.Options{
+		Addr:         addr,
+		Password:     password,
+		DB:           db,
+		DialTimeout:  o.dialTimeout,
+		ReadTimeout:  o.readTimeout,
+		WriteTimeout: o.writeTimeout,
+		TLSConfig:    o.tlsConfig,
+	}
+
+	// replace single options if provided
+	if o.singleOptions != nil {
+		opt = o.singleOptions
+	}
+
+	rdb := redis.NewClient(opt)
+
+	if o.tracerProvider != nil {
+		err := redisotel.InstrumentTracing(rdb, redisotel.WithTracerProvider(o.tracerProvider))
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	ctx, _ := context.WithTimeout(context.Background(), 15*time.Second) //nolint
+	err := rdb.Ping(ctx).Err()
+
+	return rdb, err
+}
+
+// InitSentinel connecting to redis for sentinel, all redis username and password are the same
+func InitSentinel(masterName string, addrs []string, username string, password string, opts ...Option) (*redis.Client, error) {
+	o := defaultOptions()
+	o.apply(opts...)
+
+	opt := &redis.FailoverOptions{
+		MasterName:    masterName,
+		SentinelAddrs: addrs,
+		Username:      username,
+		Password:      password,
+		DialTimeout:   o.dialTimeout,
+		ReadTimeout:   o.readTimeout,
+		WriteTimeout:  o.writeTimeout,
+		TLSConfig:     o.tlsConfig,
+	}
+
+	// replace sentinel options if provided
+	if o.sentinelOptions != nil {
+		opt = o.sentinelOptions
+	}
+
+	rdb := redis.NewFailoverClient(opt)
+
+	if o.tracerProvider != nil {
+		err := redisotel.InstrumentTracing(rdb, redisotel.WithTracerProvider(o.tracerProvider))
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	ctx, _ := context.WithTimeout(context.Background(), 15*time.Second) //nolint
+	err := rdb.Ping(ctx).Err()
+
+	return rdb, err
+}
+
+// InitCluster connecting to redis for cluster, all redis username and password are the same
+func InitCluster(addrs []string, username string, password string, opts ...Option) (*redis.ClusterClient, error) {
+	o := defaultOptions()
+	o.apply(opts...)
+
+	opt := &redis.ClusterOptions{
+		Addrs:        addrs,
+		Username:     username,
+		Password:     password,
+		DialTimeout:  o.dialTimeout,
+		ReadTimeout:  o.readTimeout,
+		WriteTimeout: o.writeTimeout,
+		TLSConfig:    o.tlsConfig,
+	}
+
+	// replace cluster options if provided
+	if o.clusterOptions != nil {
+		opt = o.clusterOptions
+	}
+
+	clusterRdb := redis.NewClusterClient(opt)
+
+	if o.tracerProvider != nil {
+		err := redisotel.InstrumentTracing(clusterRdb, redisotel.WithTracerProvider(o.tracerProvider))
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	ctx, _ := context.WithTimeout(context.Background(), 15*time.Second) //nolint
+	err := clusterRdb.ForEachMaster(ctx, func(ctx context.Context, client *redis.Client) error {
+		return client.Ping(ctx).Err()
+	})
+
+	return clusterRdb, err
 }
 
 func getRedisOpt(dsn string, opts *options) (*redis.Options, error) {
@@ -70,71 +191,4 @@ func getRedisOpt(dsn string, opts *options) (*redis.Options, error) {
 	}
 
 	return redisOpts, nil
-}
-
-// Init2 connecting to redis
-func Init2(addr string, password string, db int, opts ...Option) *redis.Client {
-	o := defaultOptions()
-	o.apply(opts...)
-
-	rdb := redis.NewClient(&redis.Options{
-		Addr:         addr,
-		Password:     password,
-		DB:           db,
-		DialTimeout:  o.dialTimeout,
-		ReadTimeout:  o.readTimeout,
-		WriteTimeout: o.writeTimeout,
-		TLSConfig:    o.tlsConfig,
-	})
-
-	if o.enableTrace {
-		rdb.AddHook(redisotel.TracingHook{})
-	}
-
-	return rdb
-}
-
-// InitSentinel connecting to redis for sentinel, all redis username and password are the same
-func InitSentinel(masterName string, addrs []string, username string, password string, opts ...Option) *redis.Client {
-	o := defaultOptions()
-	o.apply(opts...)
-
-	rdb := redis.NewFailoverClient(&redis.FailoverOptions{
-		MasterName:    masterName,
-		SentinelAddrs: addrs,
-		Username:      username,
-		Password:      password,
-		DialTimeout:   o.dialTimeout,
-		ReadTimeout:   o.readTimeout,
-		WriteTimeout:  o.writeTimeout,
-		TLSConfig:     o.tlsConfig,
-	})
-
-	if o.enableTrace {
-		rdb.AddHook(redisotel.TracingHook{})
-	}
-
-	return rdb
-}
-
-// InitCluster connecting to redis for cluster, all redis username and password are the same
-func InitCluster(addrs []string, username string, password string, opts ...Option) *redis.ClusterClient {
-	o := defaultOptions()
-	o.apply(opts...)
-
-	clusterRdb := redis.NewClusterClient(&redis.ClusterOptions{
-		Addrs:        addrs,
-		Username:     username,
-		Password:     password,
-		DialTimeout:  o.dialTimeout,
-		ReadTimeout:  o.readTimeout,
-		WriteTimeout: o.writeTimeout,
-		TLSConfig:    o.tlsConfig,
-	})
-
-	if o.enableTrace {
-		clusterRdb.AddHook(redisotel.TracingHook{})
-	}
-
-	return clusterRdb
 }

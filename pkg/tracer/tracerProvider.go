@@ -63,3 +63,11 @@ func InitWithConfig(appName string, appEnv string, appVersion string,
 
 	SetTraceName(appName)
 }
+
+// GetProvider get tracer provider
+func GetProvider() *trace.TracerProvider {
+	if tp == nil {
+		panic("tracer provider is nil, initialize it first with InitWithConfig(...)")
+	}
+	return tp
+}

@@ -140,7 +140,7 @@ func (b *Breaker) Allow() error {
 	return nil
 }
 
-// MarkSuccess mark requeest is success.
+// MarkSuccess mark request is success.
 func (b *Breaker) MarkSuccess() {
 	b.stat.Add(1)
 }

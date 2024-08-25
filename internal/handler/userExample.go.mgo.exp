@@ -142,8 +142,8 @@ func (h *userExampleHandler) UpdateByID(c *gin.Context) {
 		response.Error(c, ecode.ErrUpdateByIDUserExample)
 		return
 	}
-	userExample.ID = oid
 	// Note: if copier.Copy cannot assign a value to a field, add it here
+	userExample.ID = oid
 
 	ctx := middleware.WrapCtx(c)
 	err = h.iDao.UpdateByID(ctx, userExample)

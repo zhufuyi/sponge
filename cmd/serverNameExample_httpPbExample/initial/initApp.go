@@ -51,14 +51,6 @@ func InitApp() {
 	logger.Debug(config.Show())
 	logger.Info("[logger] was initialized")
 
-	// initializing database
-	//model.InitDB()
-	//logger.Infof("[%s] was initialized", cfg.Database.Driver)
-	//model.InitCache(cfg.App.CacheType)
-	//if cfg.App.CacheType != "" {
-	//	logger.Infof("[%s] was initialized", cfg.App.CacheType)
-	//}
-
 	// initializing tracing
 	if cfg.App.EnableTrace {
 		tracer.InitWithConfig(
@@ -80,6 +72,14 @@ func InitApp() {
 		)
 		logger.Info("[resource statistics] was initialized")
 	}
+
+	// initializing database
+	//model.InitDB()
+	//logger.Infof("[%s] was initialized", cfg.Database.Driver)
+	//model.InitCache(cfg.App.CacheType)
+	//if cfg.App.CacheType != "" {
+	//	logger.Infof("[%s] was initialized", cfg.App.CacheType)
+	//}
 }
 
 func initConfig() {
