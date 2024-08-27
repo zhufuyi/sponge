@@ -6,7 +6,7 @@ PKG_LIST := $(shell go list ${PKG}/... | grep -v /vendor/ | grep -v /api/)
 
 # delete the templates code start
 .PHONY: install
-# installation of dependent plugins
+# Installation of dependent plugins
 install:
 	go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
@@ -24,27 +24,27 @@ install:
 
 
 .PHONY: ci-lint
-# check code formatting, naming conventions, security, maintainability, etc. the rules in the .golangci.yml file
+# Check code formatting, naming conventions, security, maintainability, etc. the rules in the .golangci.yml file
 ci-lint:
 	@gofmt -s -w .
 	golangci-lint run ./...
 
 
 .PHONY: test
-# go test *_test.go files, the parameter -count=1 means that caching is disabled
+# Test *_test.go files, the parameter -count=1 means that caching is disabled
 test:
 	go test -count=1 -short ${PKG_LIST}
 
 
 .PHONY: cover
-# generate test coverage
+# Generate test coverage
 cover:
 	go test -short -coverprofile=cover.out -covermode=atomic ${PKG_LIST}
 	go tool cover -html=cover.out
 
 
 .PHONY: graph
-# generate interactive visual function dependency graphs
+# Generate interactive visual function dependency graphs
 graph:
 	@echo "generating graph ......"
 	@cp -f cmd/serverNameExample_mixExample/main.go .
@@ -53,7 +53,7 @@ graph:
 
 # delete the templates code start
 .PHONY: docs
-# generate swagger docs, only for ⓵ Web services created based on sql
+# Generate swagger docs, only for ⓵ Web services created based on sql
 docs:
 	go mod tidy
 	@gofmt -s -w .
@@ -61,7 +61,7 @@ docs:
 # delete the templates code end
 
 .PHONY: proto
-# generate *.go and template code by proto files, the default is all the proto files in the api directory. you can specify the proto file, multiple files are separated by commas, e.g. make proto FILES=api/user/v1/user.proto
+# Generate *.go and template code by proto files, the default is all the proto files in the api directory. you can specify the proto file, multiple files are separated by commas, e.g. make proto FILES=api/user/v1/user.proto
 proto:
 	@bash scripts/protoc.sh $(FILES)
 	go mod tidy
@@ -69,13 +69,13 @@ proto:
 
 
 .PHONY: proto-doc
-# generate doc from *.proto files
+# Generate doc from *.proto files
 proto-doc:
 	@bash scripts/proto-doc.sh
 
 
 .PHONY: build
-# build serverNameExample_mixExample for linux amd64 binary
+# Build serverNameExample_mixExample for linux amd64 binary
 build:
 	@echo "building 'serverNameExample_mixExample', linux binary file will output to 'cmd/serverNameExample_mixExample'"
 	@cd cmd/serverNameExample_mixExample && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build
@@ -83,13 +83,13 @@ build:
 # delete the templates code start
 
 .PHONY: build-sponge
-# build sponge for linux amd64 binary
+# Build sponge for linux amd64 binary
 build-sponge:
 	@echo "building 'sponge', linux binary file will output to 'cmd/sponge'"
 	@cd cmd/sponge && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "all=-s -w"
 
 .PHONY: image-build-sponge
-# build a sponge docker image, e.g. make image-build-sponge TAG=v1.5.8
+# Build a sponge docker image, e.g. make image-build-sponge TAG=v1.5.8
 image-build-sponge:
 	@echo "build a sponge docker image'"
 	@cd cmd/sponge/scripts && bash build-sponge-image.sh  $(TAG)
@@ -97,91 +97,97 @@ image-build-sponge:
 # delete the templates code end
 
 .PHONY: run
-# build and run service
+# Build and run service
 run:
 	@bash scripts/run.sh
 
 
 .PHONY: run-nohup
-# run service with nohup in local, if you want to stop the server, pass the parameter stop, e.g. make run-nohup CMD=stop
+# Run service with nohup in local, if you want to stop the server, pass the parameter stop, e.g. make run-nohup CMD=stop
 run-nohup:
 	@bash scripts/run-nohup.sh $(CMD)
 
 
 .PHONY: run-docker
-# run service in local docker, if you want to update the service, run the make run-docker command again.
+# Run service in local docker, if you want to update the service, run the make run-docker command again
 run-docker: image-build-local
 	@bash scripts/deploy-docker.sh
 
 
 .PHONY: binary-package
-# packaged binary files
+# Packaged binary files
 binary-package: build
 	@bash scripts/binary-package.sh
 
 
 .PHONY: deploy-binary
-# deploy binary to remote linux server, e.g. make deploy-binary USER=root PWD=123456 IP=192.168.1.10
+# Deploy binary to remote linux server, e.g. make deploy-binary USER=root PWD=123456 IP=192.168.1.10
 deploy-binary: binary-package
 	@expect scripts/deploy-binary.sh $(USER) $(PWD) $(IP)
 
 
 .PHONY: image-build-local
-# build image for local docker, tag=latest, use binary files to build
+# Build image for local docker, tag=latest, use binary files to build
 image-build-local: build
 	@bash scripts/image-build-local.sh
 
 
 .PHONY: image-build
-# build image for remote repositories, use binary files to build, e.g. make image-build REPO_HOST=addr TAG=latest
+# Build image for remote repositories, use binary files to build, e.g. make image-build REPO_HOST=addr TAG=latest
 image-build:
 	@bash scripts/image-build.sh $(REPO_HOST) $(TAG)
 
 
 .PHONY: image-build2
-# build image for remote repositories, phase II build, e.g. make image-build2 REPO_HOST=addr TAG=latest
+# Build image for remote repositories, phase II build, e.g. make image-build2 REPO_HOST=addr TAG=latest
 image-build2:
 	@bash scripts/image-build2.sh $(REPO_HOST) $(TAG)
 
 
 .PHONY: image-push
-# push docker image to remote repositories, e.g. make image-push REPO_HOST=addr TAG=latest
+# Push docker image to remote repositories, e.g. make image-push REPO_HOST=addr TAG=latest
 image-push:
 	@bash scripts/image-push.sh $(REPO_HOST) $(TAG)
 
 
 .PHONY: deploy-k8s
-# deploy service to k8s
+# Deploy service to k8s
 deploy-k8s:
 	@bash scripts/deploy-k8s.sh
 
 
 .PHONY: image-build-rpc-test
-# build grpc test image for remote repositories, e.g. make image-build-rpc-test REPO_HOST=addr TAG=latest
+# Build grpc test image for remote repositories, e.g. make image-build-rpc-test REPO_HOST=addr TAG=latest
 image-build-rpc-test:
 	@bash scripts/image-rpc-test.sh $(REPO_HOST) $(TAG)
 
 
 .PHONY: patch
-# patch some dependent code, e.g. make patch TYPE=types-pb , make patch TYPE=init-your_db_driver, replace "your_db_driver" with mysql, mongodb, postgresql, tidb, sqlite
+# Patch some dependent code, e.g. make patch TYPE=types-pb , make patch TYPE=init-<your_db_driver>, your_db_driver is mysql, mongodb, postgresql, tidb, sqlite, for example: make patch TYPE=init-mysql
 patch:
 	@bash scripts/patch.sh $(TYPE)
 
 
 .PHONY: copy-proto
-# copy proto file from the grpc server directory, multiple directories or proto files separated by commas. default is to copy all proto files, e.g. make copy-proto SERVER=yourServerDir, copy specified proto files, e.g. make copy-proto SERVER=yourServerDir PROTO_FILE=yourProtoFile1,yourProtoFile2
+# Copy proto file from the grpc server directory, multiple directories or proto files separated by commas. default is to copy all proto files, e.g. make copy-proto SERVER=yourServerDir, copy specified proto files, e.g. make copy-proto SERVER=yourServerDir PROTO_FILE=yourProtoFile1,yourProtoFile2
 copy-proto:
 	@sponge patch copy-proto --server-dir=$(SERVER) --proto-file=$(PROTO_FILE)
 
 
+.PHONY: modify-proto-pkg-name
+# Modify the 'package' and 'go_package' names of all proto files in the 'api' directory
+modify-proto-pkg-name:
+	@sponge patch modify-proto-package --dir=api --server-dir=.
+
+
 .PHONY: update-config
-# update internal/config code base on yaml file
+# Update internal/config code base on yaml file
 update-config:
 	@sponge config --server-dir=.
 
 
 .PHONY: clean
-# clean binary file, cover.out, template file
+# Clean binary file, cover.out, template file
 clean:
 	@rm -vrf cmd/serverNameExample_mixExample/serverNameExample_mixExample*
 	@rm -vrf cover.out
@@ -194,7 +200,7 @@ clean:
 	@echo "clean finished"
 
 
-# show help
+# Show help
 help:
 	@echo ''
 	@echo 'Usage:'

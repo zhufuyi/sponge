@@ -7,27 +7,27 @@ PKG_LIST := $(shell go list ${PKG}/... | grep -v /vendor/ | grep -v /api/)
 
 
 .PHONY: ci-lint
-# check the code specification against the rules in the .golangci.yml file
+# Check the code specification against the rules in the .golangci.yml file
 ci-lint:
 	@gofmt -s -w .
 	golangci-lint run ./...
 
 
 .PHONY: test
-# go test *_test.go files, the parameter -count=1 means that caching is disabled
+# Test *_test.go files, the parameter -count=1 means that caching is disabled
 test:
 	go test -count=1 -short ${PKG_LIST}
 
 
 .PHONY: cover
-# generate test coverage
+# Generate test coverage
 cover:
 	go test -short -coverprofile=cover.out -covermode=atomic ${PKG_LIST}
 	go tool cover -html=cover.out
 
 
 .PHONY: graph
-# generate interactive visual function dependency graphs
+# Generate interactive visual function dependency graphs
 graph:
 	@echo "generating graph ......"
 	@cp -f cmd/serverNameExample_mixExample/main.go .
@@ -36,7 +36,7 @@ graph:
 
 
 .PHONY: docs
-# generate swagger docs, , only for ⓵ Web services created based on
+# Generate swagger docs, , only for ⓵ Web services created based on sql
 docs:
 	go mod tidy
 	@gofmt -s -w .
@@ -44,80 +44,80 @@ docs:
 
 
 .PHONY: build
-# build serverNameExample_mixExample for linux amd64 binary
+# Build serverNameExample_mixExample for linux amd64 binary
 build:
 	@echo "building 'serverNameExample_mixExample', linux binary file will output to 'cmd/serverNameExample_mixExample'"
 	@cd cmd/serverNameExample_mixExample && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build
 
 
 .PHONY: run
-# build and run service
+# Build and run service
 run:
 	@bash scripts/run.sh
 
 
 .PHONY: run-nohup
-# run service with nohup in local, if you want to stop the server, pass the parameter stop, e.g. make run-nohup CMD=stop
+# Run service with nohup in local, if you want to stop the server, pass the parameter stop, e.g. make run-nohup CMD=stop
 run-nohup:
 	@bash scripts/run-nohup.sh $(CMD)
 
 
 .PHONY: run-docker
-# deploy service in local docker, if you want to update the service, run the make run-docker command again.
+# Deploy service in local docker, if you want to update the service, run the make run-docker command again
 run-docker: image-build-local
 	@bash scripts/deploy-docker.sh
 
 
 .PHONY: binary-package
-# packaged binary files
+# Packaged binary files
 binary-package: build
 	@bash scripts/binary-package.sh
 
 
 .PHONY: deploy-binary
-# deploy binary to remote linux server, e.g. make deploy-binary USER=root PWD=123456 IP=192.168.1.10
+# Deploy binary to remote linux server, e.g. make deploy-binary USER=root PWD=123456 IP=192.168.1.10
 deploy-binary: binary-package
 	@expect scripts/deploy-binary.sh $(USER) $(PWD) $(IP)
 
 
 .PHONY: image-build-local
-# build image for local docker, tag=latest, use binary files to build
+# Build image for local docker, tag=latest, use binary files to build
 image-build-local: build
 	@bash scripts/image-build-local.sh
 
 
 .PHONY: image-build
-# build image for remote repositories, use binary files to build, e.g. make image-build REPO_HOST=addr TAG=latest
+# Build image for remote repositories, use binary files to build, e.g. make image-build REPO_HOST=addr TAG=latest
 image-build:
 	@bash scripts/image-build.sh $(REPO_HOST) $(TAG)
 
 
 .PHONY: image-build2
-# build image for remote repositories, phase II build, e.g. make image-build2 REPO_HOST=addr TAG=latest
+# Build image for remote repositories, phase II build, e.g. make image-build2 REPO_HOST=addr TAG=latest
 image-build2:
 	@bash scripts/image-build2.sh $(REPO_HOST) $(TAG)
 
 
 .PHONY: image-push
-# push docker image to remote repositories, e.g. make image-push REPO_HOST=addr TAG=latest
+# Push docker image to remote repositories, e.g. make image-push REPO_HOST=addr TAG=latest
 image-push:
 	@bash scripts/image-push.sh $(REPO_HOST) $(TAG)
 
 
 .PHONY: deploy-k8s
-# deploy service to k8s
+# Deploy service to k8s
 deploy-k8s:
 	@bash scripts/deploy-k8s.sh
 
 
 .PHONY: update-config
-# update internal/config code base on yaml file
+# Update internal/config code base on yaml file
 update-config:
 	@sponge config --server-dir=.
 
 
 .PHONY: clean
-# clean binary file, cover.out, template file
+# Clean binary file, cover.out, template file
 clean:
 	@rm -vrf cmd/serverNameExample_mixExample/serverNameExample_mixExample*
 	@rm -vrf cover.out
@@ -130,7 +130,7 @@ clean:
 	@echo "clean finished"
 
 
-# show help
+# Show help
 help:
 	@echo ''
 	@echo 'Usage:'

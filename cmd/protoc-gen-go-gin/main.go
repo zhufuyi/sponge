@@ -1,4 +1,4 @@
-// Package main is to generate *.go(tmpl), *_router.go, *_http.go, *_router.pb.go,files.
+// Package main generate *.go(tmpl), *_router.go, *_http.go, *_router.pb.go code based on proto files.
 package main
 
 import (
@@ -123,9 +123,8 @@ func main() {
 			if routerOut == "" {
 				routerOut = dirName + "/routers"
 			}
-		case "":
 		default:
-			return fmt.Errorf("protoc-gen-go-gin: unknown plugin %q, only 'service' and 'handler' are supported", plugin)
+			return fmt.Errorf("protoc-gen-go-gin: unknown plugin name '%q', only 'service', 'handler' and 'mix' are supported", plugin)
 		}
 
 		gen.SupportedFeatures = uint64(pluginpb.CodeGeneratorResponse_FEATURE_PROTO3_OPTIONAL)

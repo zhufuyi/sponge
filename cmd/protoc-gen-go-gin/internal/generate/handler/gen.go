@@ -105,7 +105,13 @@ func (f *mixLogicFields) execute() []byte {
 		panic(err)
 	}
 	content := handleSplitLineMark(buf.Bytes())
-	return bytes.ReplaceAll(content, []byte(importPkgPathMark), parse.GetImportPkg(f.PbServices))
+	importPkgs := parse.GetImportPkg(f.PbServices)
+	mark := []byte("ctx = middleware.AdaptCtx(ctx)")
+	if bytes.Contains(content, mark) {
+		importPkgs = append(importPkgs, []byte("\n\t")...)
+		importPkgs = append(importPkgs, []byte(`"github.com/zhufuyi/sponge/pkg/gin/middleware"`)...)
+	}
+	return bytes.ReplaceAll(content, []byte(importPkgPathMark), importPkgs)
 }
 
 type mixRouterFields struct {

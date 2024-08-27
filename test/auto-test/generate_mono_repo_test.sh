@@ -708,8 +708,8 @@ function generate_grpc_gw_pb() {
     sponge micro rpc-gw-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=./files/user_gw.proto --suited-mono-repo=true --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge micro rpc-conn --rpc-server-name=$rpcServerName --suited-mono-repo=true --out=$outDir ${markEnd}"
-    sponge micro rpc-conn --rpc-server-name=$rpcServerName --suited-mono-repo=true --out=$outDir
+    echo -e "\n${colorCyan}sponge micro rpc-conn --rpc-server-name=user --suited-mono-repo=true --out=$outDir ${markEnd}"
+    sponge micro rpc-conn --rpc-server-name=user --suited-mono-repo=true --out=$outDir
     checkResult $?
 
     checkGoModule
