@@ -27,4 +27,5 @@ var (
 	StatusLimitExceed      = NewRPCStatus(30020, "Limit Exceed")
 	StatusMethodNotAllowed = NewRPCStatus(30021, "Method Not Allowed")
 	StatusAccessDenied     = NewRPCStatus(30022, "Access Denied")
+	StatusConflict         = NewRPCStatus(30023, "Conflict")
 )

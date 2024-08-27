@@ -31,6 +31,7 @@ var (
 	StatusLimitExceed      = errcode.StatusLimitExceed
 	StatusMethodNotAllowed = errcode.StatusMethodNotAllowed
 	StatusAccessDenied     = errcode.StatusAccessDenied
+	StatusConflict         = errcode.StatusConflict
 )
 
 // Any kev-value

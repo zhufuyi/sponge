@@ -40,20 +40,33 @@ msg2 = %s
 	return e
 }
 
-// Err convert to standard error
-func (e *Error) Err() error {
-	if len(e.details) == 0 {
-		return fmt.Errorf("code = %d, msg = %s", e.code, e.msg)
+// Err convert to standard error,
+// if there is a parameter 'msg', it will replace the original message.
+func (e *Error) Err(msg ...string) error {
+	message := e.msg
+	if len(msg) > 0 {
+		message = strings.Join(msg, ", ")
 	}
-	return fmt.Errorf("code = %d, msg = %s, details = %v", e.code, e.msg, e.details)
+
+	if len(e.details) == 0 {
+		return fmt.Errorf("code = %d, msg = %s", e.code, message)
+	}
+	return fmt.Errorf("code = %d, msg = %s, details = %v", e.code, message, e.details)
 }
 
-// ErrToHTTP convert to standard error add ToHTTPCodeLabel to error message
-func (e *Error) ErrToHTTP() error {
-	if len(e.details) == 0 {
-		return fmt.Errorf("code = %d, msg = %s, details = %v", e.code, e.msg, ToHTTPCodeLabel)
+// ErrToHTTP convert to standard error add ToHTTPCodeLabel to error message,
+// use it if you need to convert to standard HTTP status code,
+// if there is a parameter 'msg', it will replace the original message.
+func (e *Error) ErrToHTTP(msg ...string) error {
+	message := e.msg
+	if len(msg) > 0 {
+		message = strings.Join(msg, ", ")
 	}
-	return fmt.Errorf("code = %d, msg = %s, details = %v, %s", e.code, e.msg, e.details, ToHTTPCodeLabel)
+
+	if len(e.details) == 0 {
+		return fmt.Errorf("code = %d, msg = %s%s", e.code, message, ToHTTPCodeLabel)
+	}
+	return fmt.Errorf("code = %d, msg = %s, details = %v%s", e.code, message, strings.Join(e.details, ", "), ToHTTPCodeLabel)
 }
 
 // Code get error code
@@ -84,6 +97,7 @@ func (e *Error) WithDetails(details ...string) *Error {
 }
 
 // WithOutMsg out error message
+// Deprecated: in Err or ErrToHTTP parameter msg can be used to replace the original message.
 func (e *Error) WithOutMsg(msg string) *Error {
 	return &Error{code: e.code, msg: msg}
 }

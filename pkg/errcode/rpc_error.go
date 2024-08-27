@@ -55,23 +55,6 @@ func Any(key string, val interface{}) Detail {
 	}
 }
 
-// Err return error
-func (s *RPCStatus) Err(details ...Detail) error {
-	var dts []string
-	for _, detail := range details {
-		dts = append(dts, detail.String())
-	}
-	if len(dts) == 0 {
-		return status.Errorf(s.status.Code(), "%s", s.status.Message())
-	}
-	return status.Errorf(s.status.Code(), "%s details = %s", s.status.Message(), dts)
-}
-
-// ErrToHTTP convert to standard error add ToHTTPCodeLabel to error message
-func (s *RPCStatus) ErrToHTTP() error {
-	return status.Errorf(s.status.Code(), "%s %s", s.status.Message(), ToHTTPCodeLabel)
-}
-
 // Code get code
 func (s *RPCStatus) Code() codes.Code {
 	return s.status.Code()
@@ -82,7 +65,29 @@ func (s *RPCStatus) Msg() string {
 	return s.status.Message()
 }
 
-// ToRPCErr converted to standard RPC error
+// Err return error
+// if there is a parameter 'desc', it will replace the original message
+func (s *RPCStatus) Err(desc ...string) error {
+	if len(desc) > 0 {
+		return status.Errorf(s.status.Code(), "%s", strings.Join(desc, ", "))
+	}
+	return status.Errorf(s.status.Code(), "%s", s.status.Message())
+}
+
+// ErrToHTTP convert to standard error add ToHTTPCodeLabel to error message,
+// usually used when HTTP calls the GRPC API,
+// if there is a parameter 'desc', it will replace the original message.
+func (s *RPCStatus) ErrToHTTP(desc ...string) error {
+	message := s.status.Message()
+	if len(desc) > 0 {
+		message = strings.Join(desc, ", ")
+	}
+	return status.Errorf(s.status.Code(), "%s%s", message, ToHTTPCodeLabel)
+}
+
+// ToRPCErr converted to standard RPC error,
+// use it if you need to convert to standard RPC errors,
+// if there is a parameter 'desc', it will replace the original message.
 func (s *RPCStatus) ToRPCErr(desc ...string) error {
 	switch s.status.Code() {
 	case StatusInvalidParams.status.Code():
@@ -100,7 +105,7 @@ func (s *RPCStatus) ToRPCErr(desc ...string) error {
 		return toRPCErr(codes.DeadlineExceeded, desc...)
 	case StatusNotFound.status.Code():
 		return toRPCErr(codes.NotFound, desc...)
-	case StatusAlreadyExists.status.Code():
+	case StatusAlreadyExists.status.Code(), StatusConflict.status.Code():
 		return toRPCErr(codes.AlreadyExists, desc...)
 	case StatusPermissionDenied.status.Code():
 		return toRPCErr(codes.PermissionDenied, desc...)
@@ -163,7 +168,7 @@ func (s *RPCStatus) ToRPCCode() codes.Code {
 		return codes.DeadlineExceeded
 	case StatusNotFound.status.Code():
 		return codes.NotFound
-	case StatusAlreadyExists.status.Code():
+	case StatusAlreadyExists.status.Code(), StatusConflict.status.Code():
 		return codes.AlreadyExists
 	case StatusResourceExhausted.status.Code():
 		return codes.ResourceExhausted
@@ -224,6 +229,8 @@ func convertToHTTPCode(code codes.Code) int {
 		return http.StatusTooManyRequests
 	case StatusMethodNotAllowed.status.Code():
 		return http.StatusMethodNotAllowed
+	case StatusConflict.status.Code():
+		return http.StatusConflict
 	}
 
 	return http.StatusInternalServerError

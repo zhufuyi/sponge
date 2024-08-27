@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/grpc/status"
 
 	"github.com/zhufuyi/sponge/pkg/utils"
 )
@@ -15,8 +16,13 @@ func TestRPCStatus(t *testing.T) {
 	st := NewRPCStatus(41101, "something is wrong")
 	err := st.Err()
 	assert.Error(t, err)
-	err = st.Err(Any("foo", "bar"))
-	assert.Error(t, err)
+	err = st.Err("another thing is wrong")
+
+	s, ok := status.FromError(err)
+	assert.True(t, ok)
+	assert.Equal(t, s.Code(), st.Code())
+	assert.Equal(t, s.Message(), "another thing is wrong")
+
 	code := st.Code()
 	assert.Equal(t, int(code), 41101)
 	msg := st.Msg()
@@ -27,11 +33,11 @@ func TestRPCStatus(t *testing.T) {
 			t.Log(e)
 		}
 	}()
-	NewRPCStatus(41101, "something is wrong")
+	NewRPCStatus(41101, "something is wrong 2")
 }
 
 func TestToRPCCode(t *testing.T) {
-	status := []*RPCStatus{
+	rpcStatus := []*RPCStatus{
 		StatusSuccess,
 		StatusCanceled,
 		StatusUnknown,
@@ -58,13 +64,13 @@ func TestToRPCCode(t *testing.T) {
 	}
 
 	var codes []string
-	for _, s := range status {
+	for _, s := range rpcStatus {
 		codes = append(codes, s.ToRPCCode().String())
 	}
 	t.Log(codes)
 
 	var errors []error
-	for i, s := range status {
+	for i, s := range rpcStatus {
 		if i%2 == 0 {
 			errors = append(errors, s.ToRPCErr())
 			continue
@@ -74,14 +80,14 @@ func TestToRPCCode(t *testing.T) {
 	t.Log(errors)
 
 	codeInt := []int{}
-	for _, s := range status {
+	for _, s := range rpcStatus {
 		codeInt = append(codeInt, ToHTTPErr(s.status).code)
 	}
 	t.Log(codeInt)
 }
 
 func TestConvertToHTTPCode(t *testing.T) {
-	status := []*RPCStatus{
+	rpcStatus := []*RPCStatus{
 		StatusSuccess,
 		StatusCanceled,
 		StatusUnknown,
@@ -108,7 +114,7 @@ func TestConvertToHTTPCode(t *testing.T) {
 	}
 
 	var codes []int
-	for _, s := range status {
+	for _, s := range rpcStatus {
 		codes = append(codes, convertToHTTPCode(s.Code()))
 	}
 	t.Log(codes)
