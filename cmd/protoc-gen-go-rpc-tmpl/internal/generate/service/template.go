@@ -406,11 +406,9 @@ func Test_service_{{.LowerName}}_benchmark(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	if len(config.Get().GrpcClient) == 0 {
-		t.Error("grpcClient is not set in serverNameExample.yml")
-		return
-	}
-	host := fmt.Sprintf("%s:%d", config.Get().GrpcClient[0].Host, config.Get().GrpcClient[0].Port)
+
+	grpcClientCfg := getGRPCClientCfg()
+	host := fmt.Sprintf("%s:%d", grpcClientCfg.Host, grpcClientCfg.Port)
 	protoFile := configs.Path("../{{.ProtoFileDir}}/{{.ProtoName}}")
 	// If third-party dependencies are missing during the press test,
 	// copy them to the project's third_party directory.

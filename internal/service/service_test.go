@@ -41,36 +41,7 @@ func getRPCClientConnForTest(grpcClient ...config.GrpcClient) *grpc.ClientConn {
 	if err != nil {
 		panic(err)
 	}
-	var grpcClientCfg config.GrpcClient
-
-	// custom config
-	if len(grpcClient) > 0 {
-		// parameter config, highest priority
-		grpcClientCfg = grpcClient[0]
-	} else {
-		// grpcClient config in the yml file, second priority
-		if len(config.Get().GrpcClient) > 0 {
-			for _, v := range config.Get().GrpcClient {
-				if v.Name == config.Get().App.Name { // match the current app name
-					grpcClientCfg = v
-					break
-				}
-			}
-		}
-	}
-	// if no custom config found, use the default config
-	if grpcClientCfg.Name == "" {
-		grpcClientCfg = config.GrpcClient{
-			Host: config.Get().App.Host,
-			Port: config.Get().Grpc.Port,
-			// If RegistryDiscoveryType is not empty, service discovery is used, and Host and Port values are invalid
-			RegistryDiscoveryType: config.Get().App.RegistryDiscoveryType, // supports consul, etcd and nacos
-			Name:                  config.Get().App.Name,
-		}
-		if grpcClientCfg.RegistryDiscoveryType != "" {
-			grpcClientCfg.EnableLoadBalance = true
-		}
-	}
+	grpcClientCfg := getGRPCClientCfg(grpcClient...)
 
 	var cliOptions []grpccli.Option
 
@@ -163,4 +134,40 @@ func getRPCClientConnForTest(grpcClient ...config.GrpcClient) *grpc.ClientConn {
 	}
 
 	return conn
+}
+
+func getGRPCClientCfg(grpcClient ...config.GrpcClient) config.GrpcClient {
+	var grpcClientCfg config.GrpcClient
+
+	// custom config
+	if len(grpcClient) > 0 {
+		// parameter config, highest priority
+		grpcClientCfg = grpcClient[0]
+	} else {
+		// grpcClient config in the yaml file, second priority
+		if len(config.Get().GrpcClient) > 0 {
+			for _, v := range config.Get().GrpcClient {
+				if v.Name == config.Get().App.Name { // match the current app name
+					grpcClientCfg = v
+					break
+				}
+			}
+		}
+	}
+
+	// if there is no custom configuration, use the default configuration
+	if grpcClientCfg.Name == "" {
+		grpcClientCfg = config.GrpcClient{
+			Host: config.Get().App.Host,
+			Port: config.Get().Grpc.Port,
+			// If RegistryDiscoveryType is not empty, service discovery is used, and Host and Port values are invalid
+			RegistryDiscoveryType: config.Get().App.RegistryDiscoveryType, // supports consul, etcd and nacos
+			Name:                  config.Get().App.Name,
+		}
+		if grpcClientCfg.RegistryDiscoveryType != "" {
+			grpcClientCfg.EnableLoadBalance = true
+		}
+	}
+
+	return grpcClientCfg
 }

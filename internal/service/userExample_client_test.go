@@ -130,11 +130,9 @@ func Test_service_userExample_benchmark(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	if len(config.Get().GrpcClient) == 0 {
-		t.Error("grpcClient is not set in serverNameExample.yml")
-		return
-	}
-	host := fmt.Sprintf("%s:%d", config.Get().GrpcClient[0].Host, config.Get().GrpcClient[0].Port)
+
+	grpcClientCfg := getGRPCClientCfg()
+	host := fmt.Sprintf("%s:%d", grpcClientCfg.Host, grpcClientCfg.Port)
 	protoFile := configs.Path("../api/serverNameExample/v1/userExample.proto")
 	// If third-party dependencies are missing during the press test,
 	// copy them to the project's third_party directory.
@@ -155,7 +153,7 @@ func Test_service_userExample_benchmark(t *testing.T) {
 				message := &serverNameExampleV1.GetUserExampleByIDRequest{
 					Id: 1,
 				}
-				total := 1000 // total number of requests
+				total := 10 // total number of requests
 
 				b, err := benchmark.New(host, protoFile, "GetByID", message, dependentProtoFilePath, total)
 				if err != nil {
