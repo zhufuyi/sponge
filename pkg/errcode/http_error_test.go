@@ -9,6 +9,35 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+var errorsCodes = []*Error{
+	Success,
+	InvalidParams,
+	Unauthorized,
+	InternalServerError,
+	NotFound,
+	Conflict,
+	AlreadyExists,
+	Timeout,
+	TooManyRequests,
+	Forbidden,
+	LimitExceed,
+	DeadlineExceeded,
+	AccessDenied,
+	MethodNotAllowed,
+	ServiceUnavailable,
+	TooEarly,
+
+	Canceled,
+	Unknown,
+	PermissionDenied,
+	ResourceExhausted,
+	FailedPrecondition,
+	Aborted,
+	OutOfRange,
+	Unimplemented,
+	StatusBadGateway,
+}
+
 func TestNewError(t *testing.T) {
 	code := 21101
 	msg := "something is wrong"
@@ -23,37 +52,11 @@ func TestNewError(t *testing.T) {
 	assert.Contains(t, e.WithDetails(details...).Err().Error(), strings.Join(details, ", "))
 	assert.Contains(t, e.WithDetails(details...).ErrToHTTP().Error(), ToHTTPCodeLabel)
 
-	errorsCodes := []*Error{
-		Success,
-		InvalidParams,
-		Unauthorized,
-		InternalServerError,
-		NotFound,
-		Conflict,
-		AlreadyExists,
-		Timeout,
-		TooManyRequests,
-		Forbidden,
-		LimitExceed,
-		DeadlineExceeded,
-		AccessDenied,
-		MethodNotAllowed,
-		ServiceUnavailable,
-		TooEarly,
-
-		Canceled,
-		Unknown,
-		PermissionDenied,
-		ResourceExhausted,
-		FailedPrecondition,
-		Aborted,
-		OutOfRange,
-		Unimplemented,
-		StatusBadGateway,
+	errorsCodes = append(errorsCodes,
 		DataLoss.WithDetails("foo", "bar"),
 		DataLoss.WithOutMsg("foobar"),
 		NewError(1010, "unknown"),
-	}
+	)
 
 	var httpCodes []int
 	for _, ec := range errorsCodes {
@@ -87,29 +90,33 @@ func TestListHTTPErrCodes(t *testing.T) {
 }
 
 func TestParseError(t *testing.T) {
-	errorsCodes := []*Error{
-		Success,
-		InvalidParams,
-		Unauthorized,
-		InternalServerError,
-		NotFound,
-		AlreadyExists,
+	errorsCodes = append(errorsCodes,
 		NewError(21102, "something is wrong"),
 		ParseError(errors.New("unknown error")),
-	}
+	)
 
-	var codes1 []int
-	var codes2 []int
+	var relationshipCodes []string
 	for _, ec := range errorsCodes {
 		e1 := ParseError(ec.Err())
-		codes1 = append(codes1, e1.Code())
 		e2 := ParseError(ec.ErrToHTTP())
-		codes2 = append(codes2, e2.ToHTTPCode())
+		relationshipCodes = append(relationshipCodes, fmt.Sprintf("%d:%d", e1.Code(), e2.ToHTTPCode()))
 	}
-	t.Log(codes1, codes2)
+	t.Log(relationshipCodes)
 
 	e := ParseError(nil)
 	t.Log(e)
+}
+
+func TestGetErrorCode(t *testing.T) {
+	for _, e := range errorsCodes {
+		t.Log(e.Code(), "|",
+			GetErrorCode(e.Err()),
+			GetErrorCode(e.Err("reason for error")), "|",
+
+			GetErrorCode(e.ErrToHTTP()),
+			GetErrorCode(e.ErrToHTTP("reason for error")),
+		)
+	}
 }
 
 func TestError_WithOutMsgI18n(t *testing.T) {

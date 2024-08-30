@@ -236,6 +236,12 @@ func convertToHTTPCode(code codes.Code) int {
 	return http.StatusInternalServerError
 }
 
+// GetStatusCode get status code from error returned by RPC invoke
+func GetStatusCode(err error) codes.Code {
+	st, _ := status.FromError(err)
+	return st.Code()
+}
+
 // ErrInfo error info
 type ErrInfo struct {
 	Code int    `json:"code"`

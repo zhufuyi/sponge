@@ -1,6 +1,7 @@
 package errcode
 
 import (
+	"fmt"
 	"net/http"
 	"testing"
 	"time"
@@ -11,6 +12,33 @@ import (
 
 	"github.com/zhufuyi/sponge/pkg/utils"
 )
+
+var rpcStatus = []*RPCStatus{
+	StatusSuccess,
+	StatusCanceled,
+	StatusUnknown,
+	StatusInvalidParams,
+	StatusDeadlineExceeded,
+	StatusNotFound,
+	StatusAlreadyExists,
+	StatusPermissionDenied,
+	StatusResourceExhausted,
+	StatusFailedPrecondition,
+	StatusAborted,
+	StatusOutOfRange,
+	StatusUnimplemented,
+	StatusInternalServerError,
+	StatusServiceUnavailable,
+	StatusDataLoss,
+	StatusUnauthorized,
+	StatusTimeout,
+	StatusTooManyRequests,
+	StatusForbidden,
+	StatusLimitExceed,
+	StatusMethodNotAllowed,
+	StatusAccessDenied,
+	StatusConflict,
+}
 
 func TestRPCStatus(t *testing.T) {
 	st := NewRPCStatus(41101, "something is wrong")
@@ -37,32 +65,6 @@ func TestRPCStatus(t *testing.T) {
 }
 
 func TestToRPCCode(t *testing.T) {
-	rpcStatus := []*RPCStatus{
-		StatusSuccess,
-		StatusCanceled,
-		StatusUnknown,
-		StatusInvalidParams,
-		StatusDeadlineExceeded,
-		StatusNotFound,
-		StatusAlreadyExists,
-		StatusPermissionDenied,
-		StatusResourceExhausted,
-		StatusFailedPrecondition,
-		StatusAborted,
-		StatusOutOfRange,
-		StatusUnimplemented,
-		StatusInternalServerError,
-		StatusServiceUnavailable,
-		StatusDataLoss,
-		StatusUnauthorized,
-		StatusTimeout,
-		StatusTooManyRequests,
-		StatusForbidden,
-		StatusLimitExceed,
-		StatusMethodNotAllowed,
-		StatusAccessDenied,
-	}
-
 	var codes []string
 	for _, s := range rpcStatus {
 		codes = append(codes, s.ToRPCCode().String())
@@ -87,37 +89,29 @@ func TestToRPCCode(t *testing.T) {
 }
 
 func TestConvertToHTTPCode(t *testing.T) {
-	rpcStatus := []*RPCStatus{
-		StatusSuccess,
-		StatusCanceled,
-		StatusUnknown,
-		StatusInvalidParams,
-		StatusDeadlineExceeded,
-		StatusNotFound,
-		StatusAlreadyExists,
-		StatusPermissionDenied,
-		StatusResourceExhausted,
-		StatusFailedPrecondition,
-		StatusAborted,
-		StatusOutOfRange,
-		StatusUnimplemented,
-		StatusInternalServerError,
-		StatusServiceUnavailable,
-		StatusDataLoss,
-		StatusUnauthorized,
-		StatusTimeout,
-		StatusTooManyRequests,
-		StatusForbidden,
-		StatusLimitExceed,
-		StatusMethodNotAllowed,
-		StatusAccessDenied,
-	}
-
 	var codes []int
 	for _, s := range rpcStatus {
 		codes = append(codes, convertToHTTPCode(s.Code()))
 	}
 	t.Log(codes)
+
+}
+
+func TestGetStatusCode(t *testing.T) {
+	t.Log(GetStatusCode(fmt.Errorf("reason for error")))
+
+	for _, s := range rpcStatus {
+		t.Log(s.Code(), "|",
+			GetStatusCode(s.Err()),
+			GetStatusCode(s.Err("reason for error")), "|",
+
+			GetStatusCode(s.ToRPCErr()),
+			GetStatusCode(s.ToRPCErr("reason for error")), "|",
+
+			GetStatusCode(s.ErrToHTTP()),
+			GetStatusCode(s.ErrToHTTP("reason for error")),
+		)
+	}
 }
 
 func TestRCode(t *testing.T) {

@@ -24,6 +24,7 @@ type Option func(*options)
 
 type options struct {
 	enableAlarm bool
+	zapFields   []zap.Field
 }
 
 func (o *options) apply(opts ...Option) {
@@ -49,6 +50,13 @@ func WithLog(l *zap.Logger) Option {
 			return
 		}
 		zapLog = l
+	}
+}
+
+// WithPrintField set print field
+func WithPrintField(fields ...zap.Field) Option {
+	return func(o *options) {
+		o.zapFields = fields
 	}
 }
 
@@ -78,7 +86,7 @@ func Init(opts ...Option) {
 		for {
 			select {
 			case <-printTick.C:
-				data := printUsageInfo()
+				data := printUsageInfo(o.zapFields...)
 				if o.enableAlarm {
 					if sg.check(data) {
 						sendSystemSignForLinux()
@@ -97,7 +105,7 @@ func sendSystemSignForLinux() {
 	}
 }
 
-func printUsageInfo() *statData {
+func printUsageInfo(fields ...zap.Field) *statData {
 	defer func() { _ = recover() }()
 
 	mSys := mem.GetSystemMemory()
@@ -128,10 +136,8 @@ func printUsageInfo() *statData {
 		Goroutines: runtime.NumGoroutine(),
 	}
 
-	zapLog.Info("statistics",
-		zap.Any("system", sys),
-		zap.Any("process", proc),
-	)
+	fields = append(fields, zap.Any("system", sys), zap.Any("process", proc))
+	zapLog.Info("statistics", fields...)
 
 	return &statData{
 		sys:  sys,

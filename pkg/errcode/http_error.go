@@ -57,6 +57,7 @@ func (e *Error) Err(msg ...string) error {
 // ErrToHTTP convert to standard error add ToHTTPCodeLabel to error message,
 // use it if you need to convert to standard HTTP status code,
 // if there is a parameter 'msg', it will replace the original message.
+// Tips: you can call the GetErrorCode function to get the standard HTTP status code.
 func (e *Error) ErrToHTTP(msg ...string) error {
 	message := e.msg
 	if len(msg) > 0 {
@@ -191,6 +192,15 @@ func ParseError(err error) *Error {
 	}
 
 	return outError
+}
+
+// GetErrorCode get Error code from error returned by http invoke
+func GetErrorCode(err error) int {
+	e := ParseError(err)
+	if e.needHTTPCode {
+		return e.ToHTTPCode()
+	}
+	return e.Code()
 }
 
 // ListHTTPErrCodes list http error codes

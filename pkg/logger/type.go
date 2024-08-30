@@ -16,6 +16,11 @@ func Int(key string, val int) Field {
 	return zap.Int(key, val)
 }
 
+// Int32 type
+func Int32(key string, val int32) Field {
+	return zap.Int32(key, val)
+}
+
 // Int64 type
 func Int64(key string, val int64) Field {
 	return zap.Int64(key, val)
@@ -24,6 +29,11 @@ func Int64(key string, val int64) Field {
 // Uint type
 func Uint(key string, val uint) Field {
 	return zap.Uint(key, val)
+}
+
+// Uint32 type
+func Uint32(key string, val uint32) Field {
+	return zap.Uint32(key, val)
 }
 
 // Uint64 type
