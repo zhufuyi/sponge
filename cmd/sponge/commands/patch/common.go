@@ -2,6 +2,7 @@ package patch
 
 import (
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -23,4 +24,16 @@ func getNamesFromOutDir(dir string) (moduleName string, serverName string, suite
 	}
 
 	return "", "", false
+}
+
+func cutPath(srcProtoFile string) string {
+	dirPath, _ := filepath.Abs("..")
+	srcProtoFile = strings.ReplaceAll(srcProtoFile, dirPath, "..")
+	return strings.ReplaceAll(srcProtoFile, "\\", "/")
+}
+
+func cutPathPrefix(srcProtoFile string) string {
+	dirPath, _ := filepath.Abs(".")
+	srcProtoFile = strings.ReplaceAll(srcProtoFile, dirPath, ".")
+	return strings.ReplaceAll(srcProtoFile, "\\", "/")
 }

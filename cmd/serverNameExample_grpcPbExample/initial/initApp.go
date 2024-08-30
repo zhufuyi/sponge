@@ -69,6 +69,7 @@ func InitApp() {
 		stat.Init(
 			stat.WithLog(logger.Get()),
 			stat.WithAlarm(), // invalid if it is windows, the default threshold for cpu and memory is 0.8, you can modify them
+			stat.WithPrintField(logger.String("service_name", cfg.App.Name), logger.String("host", cfg.App.Host)),
 		)
 		logger.Info("[resource statistics] was initialized")
 	}

@@ -9,15 +9,6 @@ option go_package = "yourModuleName222/api/v1";
 
 service GreeterService {
   // create a record
-  rpc Create01(google.api.HttpRule) returns (google.api.CustomHttpPattern) {
-    option (google.api.http) = {
-      post: "/api/v1/greeter"
-      body: "*"
-    };
-  }
-
-
-  // create a record
   rpc Create(CreateGreeterRequest) returns (CreateGreeterReply) {
     option (google.api.http) = {
       post: "/api/v1/greeter"

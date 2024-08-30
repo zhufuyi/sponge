@@ -86,7 +86,7 @@ using help:
 			} else {
 				targetFile = "/" + targetFile
 			}
-			fmt.Printf("generate \"init-%s\" codes successfully, out = %s\n", dbDriver, outPath+targetFile)
+			fmt.Printf("generate \"init-%s\" codes successfully, out = %s\n", dbDriver, cutPathPrefix(outPath+targetFile))
 			return nil
 		},
 	}

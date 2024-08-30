@@ -173,7 +173,7 @@ func {{.LowerName}}Middlewares(c *middlewareConfig) {
 
 	// set up single route middleware, just uncomment the code and fill in the middlewares, nothing else needs to be changed
 {{- range .Methods}}
-	{{if eq .InvokeType 0}}{{if .Path}}//c.setSinglePath("{{.Method}}", "{{.Path}}", middleware.Auth()){{end}}{{end}}
+	{{if eq .InvokeType 0}}{{if .Path}}//c.setSinglePath("{{.Method}}", "{{.Path}}", middleware.Auth())    {{.Comment}}{{end}}{{end}}
 {{- end}}
 }
 
@@ -297,7 +297,7 @@ func {{.LowerName}}Middlewares(c *middlewareConfig) {
 
 	// set up single route middleware, just uncomment the code and fill in the middlewares, nothing else needs to be changed
 {{- range .Methods}}
-	{{if eq .InvokeType 0}}{{if .Path}}//c.setSinglePath("{{.Method}}", "{{.Path}}", middleware.Auth()){{end}}{{end}}
+	{{if eq .InvokeType 0}}{{if .Path}}//c.setSinglePath("{{.Method}}", "{{.Path}}", middleware.Auth())    {{.Comment}}{{end}}{{end}}
 {{- end}}
 }
 

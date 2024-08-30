@@ -71,7 +71,7 @@ using help:
 			} else {
 				targetFile = "/" + targetFile
 			}
-			fmt.Printf("generate \"types-pb\" code successfully, out = %s\n", outPath+targetFile)
+			fmt.Printf("generate \"types-pb\" code successfully, out = %s\n", cutPathPrefix(outPath+targetFile))
 			return nil
 		},
 	}

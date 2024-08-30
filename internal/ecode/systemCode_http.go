@@ -37,3 +37,6 @@ var (
 )
 
 var SkipResponse = errcode.SkipResponse
+
+// GetErrorCode get error code from error
+var GetErrorCode = errcode.GetErrorCode

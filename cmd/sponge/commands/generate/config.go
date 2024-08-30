@@ -55,6 +55,10 @@ Examples:
 				return err
 			}
 
+			if len(files) == 0 {
+				return fmt.Errorf("not found yaml configuration files in server directory %s/configs", serverDir)
+			}
+
 			err = runGenConfigCommand(files, ysArgs)
 			if err != nil {
 				return err
@@ -156,7 +160,8 @@ func saveFile(inputFile string, outputFile string, code string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("update \"%s\"  -->  \"%s\"\n", inputFile, outputFile)
+
+	fmt.Printf("    %s  -->  %s\n", cutPath(inputFile), cutPath(outputFile))
 	return nil
 }
 
@@ -192,7 +197,7 @@ func convertToGoFile(ysArgs jy2struct.Args, outPath string) error {
 		return err
 	}
 
-	fmt.Printf("convert yaml to go struct successfully, out=%s\n", outPath)
+	fmt.Printf("convert yaml to go struct successfully, out=%s\n", cutPath(outPath))
 
 	return nil
 }

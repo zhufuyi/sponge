@@ -102,7 +102,7 @@ Examples:
 	cmd.Flags().StringVarP(&protoFile, "proto-file", "p", "", "proto files, multiple names separated by commas")
 	cmd.Flags().StringVarP(&targetModule, "target-module", "t", "", "target module name, same module name as the target project's go.mod")
 	cmd.Flags().StringVarP(&versionFolder, "version-folder", "v", "v1", "proto file version folder")
-	cmd.Flags().StringVarP(&outPath, "out", "o", "./api", "output directory, if the proto file already exists, it will be overwritten directly")
+	cmd.Flags().StringVarP(&outPath, "out", "o", "api", "output directory, if the proto file already exists, it will be overwritten directly")
 	return cmd
 }
 
@@ -248,7 +248,7 @@ func (c *protoCopier) copyProtoFile(srcProtoFile string, targetProtoFile string,
 		return err
 	}
 
-	fmt.Printf("copy  \"%s\"  -->  \"%s\"\n", srcProtoFile, targetProtoFile)
+	fmt.Printf("    %s  -->  %s\n", cutPath(srcProtoFile), targetProtoFile)
 	_, err = gobash.Exec("mv", "-f", tmpFile, targetProtoFile)
 	if err != nil {
 		return err

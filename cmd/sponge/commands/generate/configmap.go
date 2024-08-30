@@ -49,7 +49,7 @@ Examples:
 			if err != nil {
 				return err
 			}
-			fmt.Printf("\ngenerate \"configmap\" code successfully, out = %s\n", outPath)
+			fmt.Printf("\ngenerate \"configmap\" code successfully, out = %s\n", cutPath(outPath))
 			return nil
 		},
 	}
