@@ -20,4 +20,6 @@ example:
     ecode.StatusInvalidParams.ErrToHTTP("custom error message")
 ```
 
-2. Adjust some code.
+2. Optimize print log, grpc support custom marshal data.
+
+3. Adjust some code.

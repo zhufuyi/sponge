@@ -12,6 +12,8 @@ import (
 	zapLog "github.com/zhufuyi/sponge/pkg/logger"
 )
 
+var contentMark = []byte(" ...... ")
+
 // ---------------------------------- client interceptor ----------------------------------
 
 // UnaryClientLog client log unary interceptor
@@ -91,27 +93,45 @@ func StreamClientLog(logger *zap.Logger, opts ...LogOption) grpc.StreamClientInt
 
 // ---------------------------------- server interceptor ----------------------------------
 
+var defaultMaxLength = 300                   // max length of response data to print
 var ignoreLogMethods = map[string]struct{}{} // ignore printing methods
+var defaultMarshalFn = func(reply interface{}) []byte {
+	data, _ := json.Marshal(reply)
+	return data
+}
 
 // LogOption log settings
 type LogOption func(*logOptions)
 
 type logOptions struct {
+	maxLength           int
 	fields              map[string]interface{}
 	ignoreMethods       map[string]struct{}
 	isReplaceGRPCLogger bool
+	marshalFn           func(reply interface{}) []byte // default json.Marshal
 }
 
 func defaultLogOptions() *logOptions {
 	return &logOptions{
+		maxLength:     defaultMaxLength,
 		fields:        make(map[string]interface{}),
 		ignoreMethods: make(map[string]struct{}),
+		marshalFn:     defaultMarshalFn,
 	}
 }
 
 func (o *logOptions) apply(opts ...LogOption) {
 	for _, opt := range opts {
 		opt(o)
+	}
+}
+
+// WithMaxLen logger content max length
+func WithMaxLen(maxLen int) LogOption {
+	return func(o *logOptions) {
+		if maxLen > 0 {
+			o.maxLength = maxLen
+		}
 	}
 }
 
@@ -129,6 +149,15 @@ func WithLogFields(kvs map[string]interface{}) LogOption {
 			return
 		}
 		o.fields = kvs
+	}
+}
+
+// WithMarshalFn custom response data marshal function
+func WithMarshalFn(fn func(reply interface{}) []byte) LogOption {
+	return func(o *logOptions) {
+		if fn != nil {
+			o.marshalFn = fn
+		}
 	}
 }
 
@@ -177,9 +206,9 @@ func UnaryServerLog(logger *zap.Logger, opts ...LogOption) grpc.UnaryServerInter
 
 		resp, err := handler(ctx, req)
 
-		data, _ := json.Marshal(resp)
-		if len(data) > 300 {
-			data = append(data[:300], []byte("......")...)
+		data := o.marshalFn(resp)
+		if len(data) > o.maxLength {
+			data = append(data[:o.maxLength], contentMark...)
 		}
 
 		fields = []zap.Field{
@@ -187,7 +216,7 @@ func UnaryServerLog(logger *zap.Logger, opts ...LogOption) grpc.UnaryServerInter
 			zap.Error(err),
 			zap.String("type", "unary"),
 			zap.String("method", info.FullMethod),
-			zap.String("response", string(data)),
+			zap.ByteString("data", data),
 			zap.Int64("time_us", time.Since(startTime).Microseconds()),
 		}
 		if requestID != "" {
@@ -233,7 +262,7 @@ func UnaryServerSimpleLog(logger *zap.Logger, opts ...LogOption) grpc.UnaryServe
 		if requestID != "" {
 			fields = append(fields, zap.String(ContextRequestIDKey, requestID))
 		}
-		logger.Info("[GRPC]", fields...)
+		logger.Info("[GRPC] response", fields...)
 
 		return resp, err
 	}
@@ -320,7 +349,7 @@ func StreamServerSimpleLog(logger *zap.Logger, opts ...LogOption) grpc.StreamSer
 		if requestID != "" {
 			fields = append(fields, zap.String(ContextRequestIDKey, requestID))
 		}
-		logger.Info("[GRPC]", fields...)
+		logger.Info("[GRPC] response", fields...)
 
 		return err
 	}

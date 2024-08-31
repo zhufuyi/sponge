@@ -53,6 +53,11 @@ func TestString(t *testing.T) {
 	assert.NotNil(t, field)
 }
 
+func TestByteString(t *testing.T) {
+	field := ByteString("key", []byte("bar"))
+	assert.NotNil(t, field)
+}
+
 func TestStringer(t *testing.T) {
 	field := Stringer("key", new(st))
 	assert.NotNil(t, field)

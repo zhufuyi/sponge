@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"io"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
+
+var contentMark = []byte(" ...... ")
 
 var (
 	// Print body max length
@@ -102,17 +103,15 @@ func (w bodyLogWriter) Write(b []byte) (int, error) {
 	return w.ResponseWriter.Write(b)
 }
 
-func getBodyData(buf *bytes.Buffer, maxLen int) string {
-	var body string
-
-	if buf.Len() > maxLen {
-		body = string(buf.Bytes()[:maxLen]) + " ...... "
-		// If there is sensitive data that needs to be filtered out, such as plaintext passwords
-	} else {
-		body = buf.String()
+// If there is sensitive information in the body, you can use WithIgnoreRoutes set the route to ignore logging
+func getBodyData(buf *bytes.Buffer, maxLen int) []byte {
+	l := buf.Len()
+	if l == 0 {
+		return []byte("")
+	} else if l <= maxLen {
+		return buf.Bytes()[:l-1]
 	}
-
-	return body
+	return append(buf.Bytes()[:maxLen], contentMark...)
 }
 
 // Logging print request and response info
@@ -140,7 +139,7 @@ func Logging(opts ...Option) gin.HandlerFunc {
 		if c.Request.Method == http.MethodPost || c.Request.Method == http.MethodPut || c.Request.Method == http.MethodPatch || c.Request.Method == http.MethodDelete {
 			fields = append(fields,
 				zap.Int("size", buf.Len()),
-				zap.String("body", getBodyData(&buf, o.maxLength)),
+				zap.ByteString("body", getBodyData(&buf, o.maxLength)),
 			)
 		}
 
@@ -174,7 +173,7 @@ func Logging(opts ...Option) gin.HandlerFunc {
 			zap.String("url", c.Request.URL.Path),
 			zap.Int64("time_us", time.Since(start).Microseconds()),
 			zap.Int("size", newWriter.body.Len()),
-			zap.String("response", strings.TrimRight(getBodyData(newWriter.body, o.maxLength), "\n")),
+			zap.ByteString("body", getBodyData(newWriter.body, o.maxLength)),
 		}
 		if reqID != "" {
 			fields = append(fields, zap.String(ContextRequestIDKey, reqID))

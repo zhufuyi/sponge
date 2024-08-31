@@ -15,38 +15,47 @@ import "github.com/zhufuyi/sponge/pkg/grpc/interceptor"
 **grpc server-side**
 
 ```go
-var logger *zap.Logger
-
+// set unary server logging
 func getServerOptions() []grpc.ServerOption {
 	var options []grpc.ServerOption
 	
 	options = append(options, grpc_middleware.WithUnaryServerChain(
-		interceptor.UnaryClientLog(
-			logger.Get(), // zap
-			// middleware.WithLogFields(map[string]interface{}{"serverName": "userExample"}), // additional print fields
-			middleware.WithLogIgnoreMethods("/proto.userExampleService/GetByID"), // ignore the specified method print, you can specify more than one
+		// if you don't want to log reply data, you can use interceptor.StreamServerSimpleLog instead of interceptor.UnaryServerLog,
+		interceptor.UnaryServerLog(
+			logger.Get(),
+			interceptor.WithReplaceGRPCLogger(),
+			//interceptor.WithMarshalFn(fn), // customised marshal function, default is jsonpb.Marshal
+			//interceptor.WithLogIgnoreMethods(fullMethodNames), // ignore methods logging
+			//interceptor.WithMaxLen(400), // logging max length, default 300
 		),
 	))
 
 	return options
 }
+
+
+// you can also set stream server logging
 ```
 
 **grpc client-side**
 
 ```go
+// set unary client logging
 func getDialOptions() []grpc.DialOption {
 	var options []grpc.DialOption
 
 	option := grpc.WithUnaryInterceptor(
 		grpc_middleware.ChainUnaryClient(
 			interceptor.UnaryClientLog(logger.Get()),
+			interceptor.WithReplaceGRPCLogger(),
 		),
 	)
 	options = append(options, option)
 
 	return options
 }
+
+// you can also set stream client logging
 ```
 
 <br>

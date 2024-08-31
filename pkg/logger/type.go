@@ -61,6 +61,11 @@ func String(key string, val string) Field {
 	return zap.String(key, val)
 }
 
+// ByteString type
+func ByteString(key string, val []byte) Field {
+	return zap.ByteString(key, val)
+}
+
 // Stringer type
 func Stringer(key string, val fmt.Stringer) Field {
 	return zap.Stringer(key, val)
