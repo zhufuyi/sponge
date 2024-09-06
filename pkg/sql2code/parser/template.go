@@ -123,8 +123,15 @@ service {{.TName}} {
   rpc ListByLastID(List{{.TableName}}ByLastIDRequest) returns (List{{.TableName}}ByLastIDReply) {}
 }
 
-// Some notes on defining fields under message:
-// Fill in the validate rules https://github.com/envoyproxy/protoc-gen-validate#constraint-rules
+
+/*
+Notes for defining message fields:
+    1. Suggest using camel case style naming for message field names, such as firstName, lastName, etc.
+    2. If the message field name ending in 'id', it is recommended to use xxxID naming format, such as userID, orderID, etc.
+    3. Add validate rules https://github.com/envoyproxy/protoc-gen-validate#constraint-rules, such as:
+        uint64 id = 1 [(validate.rules).uint64.gte  = 1];
+*/
+
 
 // protoMessageCreateCode
 
@@ -227,8 +234,15 @@ service {{.TName}} {
   rpc List(List{{.TableName}}Request) returns (List{{.TableName}}Reply) {}
 }
 
-// Some notes on defining fields under message:
-// Fill in the validate rules https://github.com/envoyproxy/protoc-gen-validate#constraint-rules
+
+/*
+Notes for defining message fields:
+    1. Suggest using camel case style naming for message field names, such as firstName, lastName, etc.
+    2. If the message field name ending in 'id', it is recommended to use xxxID naming format, such as userID, orderID, etc.
+    3. Add validate rules https://github.com/envoyproxy/protoc-gen-validate#constraint-rules, such as:
+        uint64 id = 1 [(validate.rules).uint64.gte  = 1];
+*/
+
 
 // protoMessageCreateCode
 
@@ -472,19 +486,26 @@ service {{.TName}} {
 }
 
 
-// Some notes on defining fields under message:
-// (1) Fill in the validate rules https://github.com/envoyproxy/protoc-gen-validate#constraint-rules
-// (2) Suggest using camel hump naming for message field names, and for names ending in 'id',
-//      use xxxID naming format, such as userID, orderID, etc.
-// (3) When using the protoc-gen-openapiv2 plugin, if the defined fields are snake case,
-//      you must add annotations for snake case names, such as string fieldName = 1 [json_name = "field_name"],
-//      to ensure that the front end and back end JSON naming is consistent.
-// (4) If the route contains the path parameter, such as /api/v1/userExample/{id}, the defined
-//      message  must contain the name of the path parameter and the name should be
-//      added with a new tag, such as int64 id = 1 [(tagger.tags) = "uri:\"id\""];
-// (5) If the request url is followed by a query parameter, such as /api/v1/getUserExample?name=Tom,
-//      a form tag must be added when defining the query parameter in the message,
-//      such as string name = 1 [(tagger.tags) = "form:\"name\""].
+/*
+Notes for defining message fields:
+    1. Suggest using camel case style naming for message field names, such as firstName, lastName, etc.
+    2. If the message field name ending in 'id', it is recommended to use xxxID naming format, such as userID, orderID, etc.
+    3. Add validate rules https://github.com/envoyproxy/protoc-gen-validate#constraint-rules, such as:
+        uint64 id = 1 [(validate.rules).uint64.gte  = 1];
+
+If used to generate code that supports the HTTP protocol, notes for defining message fields:
+    1. If the route contains the path parameter, such as /api/v1/userExample/{id}, the defined
+        message must contain the name of the path parameter and the name should be added
+        with a new tag, such as int64 id = 1 [(tagger.tags) = "uri:\"id\""];
+    2. If the request url is followed by a query parameter, such as /api/v1/getUserExample?name=Tom,
+        a form tag must be added when defining the query parameter in the message, such as:
+        string name = 1 [(tagger.tags) = "form:\"name\""].
+    3. If the message field name contain underscores(such as 'field_name'), it will cause a problem
+        where the JSON field names of the Swagger request parameters are different from those of the
+        GRPC JSON tag names. There are two solutions: Solution 1, remove the underline from the
+         message field name. Option 2, use the tool 'protoc-go-inject-tag' to modify the JSON tag name,
+         such as: string first_name = 1 ; // @gotags: json:"firstName"
+*/
 
 
 // protoMessageCreateCode
@@ -692,19 +713,26 @@ service {{.TName}} {
 }
 
 
-// Some notes on defining fields under message:
-// (1) Fill in the validate rules https://github.com/envoyproxy/protoc-gen-validate#constraint-rules
-// (2) Suggest using camel hump naming for message field names, and for names ending in 'id',
-//      use xxxID naming format, such as userID, orderID, etc.
-// (3) When using the protoc-gen-openapiv2 plugin, if the defined fields are snake case,
-//      you must add annotations for snake case names, such as string fieldName = 1 [json_name = "field_name"],
-//      to ensure that the front end and back end JSON naming is consistent.
-// (4) If the route contains the path parameter, such as /api/v1/userExample/{id}, the defined
-//      message  must contain the name of the path parameter and the name should be
-//      added with a new tag, such as int64 id = 1 [(tagger.tags) = "uri:\"id\""];
-// (5) If the request url is followed by a query parameter, such as /api/v1/getUserExample?name=Tom,
-//      a form tag must be added when defining the query parameter in the message,
-//      such as string name = 1 [(tagger.tags) = "form:\"name\""].
+/*
+Notes for defining message fields:
+    1. Suggest using camel case style naming for message field names, such as firstName, lastName, etc.
+    2. If the message field name ending in 'id', it is recommended to use xxxID naming format, such as userID, orderID, etc.
+    3. Add validate rules https://github.com/envoyproxy/protoc-gen-validate#constraint-rules, such as:
+        uint64 id = 1 [(validate.rules).uint64.gte  = 1];
+
+If used to generate code that supports the HTTP protocol, notes for defining message fields:
+    1. If the route contains the path parameter, such as /api/v1/userExample/{id}, the defined
+        message must contain the name of the path parameter and the name should be added
+        with a new tag, such as int64 id = 1 [(tagger.tags) = "uri:\"id\""];
+    2. If the request url is followed by a query parameter, such as /api/v1/getUserExample?name=Tom,
+        a form tag must be added when defining the query parameter in the message, such as:
+        string name = 1 [(tagger.tags) = "form:\"name\""].
+    3. If the message field name contain underscores(such as 'field_name'), it will cause a problem
+        where the JSON field names of the Swagger request parameters are different from those of the
+        GRPC JSON tag names. There are two solutions: Solution 1, remove the underline from the
+         message field name. Option 2, use the tool 'protoc-go-inject-tag' to modify the JSON tag name,
+         such as: string first_name = 1 ; // @gotags: json:"firstName"
+*/
 
 
 // protoMessageCreateCode

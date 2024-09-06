@@ -46,23 +46,14 @@ func Parse(configFile string, obj interface{}, reloads ...func()) error {
 }
 
 // ParseConfigData parse data to struct
-func ParseConfigData(data []byte, format string, obj interface{}, reloads ...func()) error {
+func ParseConfigData(data []byte, format string, obj interface{}) error {
 	viper.SetConfigType(format)
 	err := viper.ReadConfig(bytes.NewBuffer(data))
 	if err != nil {
 		return err
 	}
 
-	err = viper.Unmarshal(obj)
-	if err != nil {
-		return err
-	}
-
-	if len(reloads) > 0 {
-		watchConfig(obj, reloads...)
-	}
-
-	return nil
+	return viper.Unmarshal(obj)
 }
 
 // listening for profile updates

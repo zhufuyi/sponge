@@ -97,8 +97,13 @@ func (e *Error) WithDetails(details ...string) *Error {
 	return newError
 }
 
+// RewriteMsg rewrite error message
+func (e *Error) RewriteMsg(msg string) *Error {
+	return &Error{code: e.code, msg: msg}
+}
+
 // WithOutMsg out error message
-// Deprecated: in Err or ErrToHTTP parameter msg can be used to replace the original message.
+// Deprecated: use RewriteMsg instead
 func (e *Error) WithOutMsg(msg string) *Error {
 	return &Error{code: e.code, msg: msg}
 }

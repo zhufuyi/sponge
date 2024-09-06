@@ -12,7 +12,7 @@ import (
 
 var (
 	// Print body max length
-	defaultMaxLength = 40
+	defaultMaxLength = 300
 
 	// default zap log
 	defaultLogger, _ = zap.NewProduction()
