@@ -19,14 +19,14 @@ func Init(opts ...Option) {
 	opt = o
 }
 
-// Claims my custom claims
+// Claims standard claims, include uid, name, and RegisteredClaims
 type Claims struct {
 	UID  string `json:"uid"`
 	Name string `json:"name"`
 	jwt.RegisteredClaims
 }
 
-// GenerateToken generate token by uid and name
+// GenerateToken generate token by uid and name, use universal Claims
 func GenerateToken(uid string, name ...string) (string, error) {
 	if opt == nil {
 		return "", errInit
@@ -50,7 +50,7 @@ func GenerateToken(uid string, name ...string) (string, error) {
 	return token.SignedString(opt.signingKey)
 }
 
-// ParseToken parse token
+// ParseToken parse token, return universal Claims
 func ParseToken(tokenString string) (*Claims, error) {
 	if opt == nil {
 		return nil, errInit
@@ -102,7 +102,45 @@ func (c *CustomClaims) Get(key string) (val interface{}, isExist bool) {
 	return val, isExist
 }
 
-// GenerateCustomToken generate token by custom fields
+// GetString custom field value by key, if not found, return false
+func (c *CustomClaims) GetString(key string) (string, bool) {
+	val, isExist := c.Get(key)
+	if isExist {
+		str, ok := val.(string)
+		return str, ok
+	}
+	return "", false
+}
+
+// GetInt custom field value by key, if not found, return false
+func (c *CustomClaims) GetInt(key string) (int, bool) {
+	val, isExist := c.Get(key)
+	if isExist {
+		if v, ok := val.(float64); ok {
+			return int(v), true
+		}
+		if v, ok := val.(int); ok {
+			return v, true
+		}
+	}
+	return 0, false
+}
+
+// GetUint64 custom field value by key, if not found, return false
+func (c *CustomClaims) GetUint64(key string) (uint64, bool) {
+	val, isExist := c.Get(key)
+	if isExist {
+		if v, ok := val.(float64); ok {
+			return uint64(v), true
+		}
+		if v, ok := val.(uint64); ok {
+			return v, true
+		}
+	}
+	return 0, false
+}
+
+// GenerateCustomToken generate token by custom fields, use CustomClaims
 func GenerateCustomToken(kv map[string]interface{}) (string, error) {
 	if opt == nil {
 		return "", errInit
@@ -121,7 +159,7 @@ func GenerateCustomToken(kv map[string]interface{}) (string, error) {
 	return token.SignedString(opt.signingKey)
 }
 
-// ParseCustomToken parse token
+// ParseCustomToken parse token, return CustomClaims
 func ParseCustomToken(tokenString string) (*CustomClaims, error) {
 	if opt == nil {
 		return nil, errInit

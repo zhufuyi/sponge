@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/zhufuyi/sponge/pkg/gin/response"
 	"github.com/zhufuyi/sponge/pkg/httpcli"
 	"github.com/zhufuyi/sponge/pkg/jwt"
@@ -17,9 +19,12 @@ import (
 )
 
 var (
-	uid    = "123"
-	name   = "admin"
-	fields = jwt.KV{"id": 1, "foo": "bar"}
+	uid  = "100"
+	name = "tom"
+
+	fields = jwt.KV{"id": utils.StrToUint64(uid), "name": name, "age": 10, "foo": "bar"}
+
+	errMsg = http.StatusText(http.StatusUnauthorized)
 )
 
 func verify(claims *jwt.Claims, tokenTail10 string, c *gin.Context) error {
@@ -39,16 +44,18 @@ func verifyCustom(claims *jwt.CustomClaims, tokenTail10 string, c *gin.Context) 
 	//token, fields := getToken(id)
 	// if  token[len(token)-10:] != tokenTail10 { return err }
 
-	id, exist := claims.Get("id")
-	if !exist {
+	id, exist := claims.GetUint64("id")
+	if !exist || id != fields["id"] {
 		return err
 	}
-	foo, exist := claims.Get("foo")
-	if !exist {
+
+	name, exist := claims.GetString("name")
+	if !exist || name != fields["name"] {
 		return err
 	}
-	if int(id.(float64)) != fields["id"].(int) ||
-		foo.(string) != fields["foo"].(string) {
+
+	age, exist := claims.GetInt("age")
+	if !exist || age != fields["age"] {
 		return err
 	}
 
@@ -64,27 +71,28 @@ func runAuthHTTPServer() string {
 	r := gin.Default()
 	r.Use(Cors())
 
-	tokenFun := func(c *gin.Context) {
+	getUserByIDHandler := func(c *gin.Context) {
+		id := c.Param("id")
+		response.Success(c, id)
+	}
+
+	loginHandler := func(c *gin.Context) {
 		token, _ := jwt.GenerateToken(uid, name)
 		fmt.Println("token =", token)
 		response.Success(c, token)
 	}
-	customTokenFun := func(c *gin.Context) {
+	r.GET("/auth/login", loginHandler)
+	r.GET("/user/:id", Auth(), getUserByIDHandler)
+	r.GET("/user/toHTTPCode/:id", Auth(WithVerify(verify), WithSwitchHTTPCode()), getUserByIDHandler)
+
+	loginCustomHandler := func(c *gin.Context) {
 		token, _ := jwt.GenerateCustomToken(fields)
-		fmt.Println("token custom =", token)
+		fmt.Println("custom token =", token)
 		response.Success(c, token)
 	}
-
-	userFun := func(c *gin.Context) {
-		response.Success(c, "hello "+uid)
-	}
-
-	r.GET("/token", tokenFun)
-	r.GET("/user/:id", Auth(), userFun)
-	r.GET("/user2/:id", Auth(WithVerify(verify), WithSwitchHTTPCode()), userFun)
-
-	r.GET("/token/custom", customTokenFun)
-	r.GET("/user/custom", AuthCustom(verifyCustom), userFun)
+	r.GET("/auth/customLogin", loginCustomHandler)
+	r.GET("/user/custom/:id", AuthCustom(verifyCustom), getUserByIDHandler)
+	r.GET("/user/custom/toHTTPCode/:id", AuthCustom(verifyCustom, WithSwitchHTTPCode()), getUserByIDHandler)
 
 	go func() {
 		err := r.Run(serverAddr)
@@ -102,47 +110,33 @@ func TestAuth(t *testing.T) {
 
 	// get token
 	result := &httpcli.StdResult{}
-	err := httpcli.Get(result, requestAddr+"/token")
+	err := httpcli.Get(result, requestAddr+"/auth/login")
 	if err != nil {
 		t.Fatal(err)
 	}
 	token := result.Data.(string)
-
-	// the right request
 	authorization := fmt.Sprintf("Bearer %s", token)
+
+	// success
 	val, err := getUser(requestAddr+"/user/"+uid, authorization)
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Log(val)
+	assert.Equal(t, val["data"], uid)
 
-	val, err = getUser(requestAddr+"/user2/"+uid, authorization)
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Log(val)
+	// success
+	val, err = getUser(requestAddr+"/user/toHTTPCode/"+uid, authorization)
+	assert.Equal(t, val["data"], uid)
 
-	// verify error
-	name = "foobar"
-	val, err = getUser(requestAddr+"/user2/"+uid, authorization)
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Log(val)
+	// verify name failed, return 401
+	name = "notfound"
+	val, err = getUser(requestAddr+"/user/toHTTPCode/"+uid, authorization)
+	assert.Equal(t, val["msg"], errMsg)
 
-	// wrong authorization
+	// authorization format error, missing token, return 200
 	val, err = getUser(requestAddr+"/user/"+uid, "Bearer ")
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Log(val)
+	assert.Equal(t, val["msg"], errMsg)
 
-	// wrong authorization
+	// authorization format error, missing Bearer, return 200
 	val, err = getUser(requestAddr+"/user/"+uid, token)
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Log(val)
+	assert.Equal(t, val["msg"], errMsg)
 }
 
 func TestAuthCustom(t *testing.T) {
@@ -150,77 +144,75 @@ func TestAuthCustom(t *testing.T) {
 
 	// get token
 	result := &httpcli.StdResult{}
-	err := httpcli.Get(result, requestAddr+"/token/custom")
+	err := httpcli.Get(result, requestAddr+"/auth/customLogin")
 	if err != nil {
 		t.Fatal(err)
 	}
 	token := result.Data.(string)
-
-	url := requestAddr + "/user/custom"
-
-	// the right request
 	authorization := fmt.Sprintf("Bearer %s", token)
-	val, err := getUserCustom(url, authorization)
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Log(val)
 
-	// verify error
-	fields["foo"] = "bar2"
-	val, err = getUser(url, authorization)
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Log(val)
+	// success
+	val, _ := getUserCustom(requestAddr+"/user/custom/"+uid, authorization)
+	assert.Equal(t, val["data"], uid)
 
-	// wrong authorization
-	val, err = getUserCustom(url, "Bearer ")
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Log(val)
+	// success
+	val, _ = getUserCustom(requestAddr+"/user/custom/toHTTPCode/"+uid, authorization)
+	assert.Equal(t, val["data"], uid)
 
-	// wrong authorization
-	val, err = getUserCustom(url, token)
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Log(val)
+	// verify name error, return 401
+	fields["name"] = "john"
+	val, _ = getUser(requestAddr+"/user/custom/toHTTPCode/"+uid, authorization)
+	assert.Equal(t, val["msg"], errMsg)
+
+	// authorization format error, missing token, return 200
+	val, _ = getUserCustom(requestAddr+"/user/custom/"+uid, "Bearer ")
+	assert.Equal(t, val["msg"], errMsg)
+
+	// authorization format error, missing Bearer, return 200
+	val, _ = getUserCustom(requestAddr+"/user/custom/"+uid, token)
+	assert.Equal(t, val["msg"], errMsg)
 }
 
-func getUser(url string, authorization string) (string, error) {
+func getUser(url string, authorization string) (gin.H, error) {
+	var result = gin.H{}
+
 	client := &http.Client{}
 	request, err := http.NewRequest("GET", url, nil)
 	request.Header.Add("Authorization", authorization)
 	if err != nil {
-		return "", err
+		return result, err
 	}
 	resp, _ := client.Do(request)
 	defer resp.Body.Close()
 
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", err
+		return result, err
 	}
 
-	return string(data), nil
+	err = json.Unmarshal(data, &result)
+
+	return result, err
 }
 
-func getUserCustom(url string, authorization string) (string, error) {
+func getUserCustom(url string, authorization string) (gin.H, error) {
+	var result = gin.H{}
+
 	client := &http.Client{}
 	request, err := http.NewRequest("GET", url, nil)
 	request.Header.Add("Authorization", authorization)
 	if err != nil {
-		return "", err
+		return result, err
 	}
 	resp, _ := client.Do(request)
 	defer resp.Body.Close()
 
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", err
+		return result, err
 	}
 
-	return string(data), nil
+	err = json.Unmarshal(data, &result)
+
+	return result, err
 }

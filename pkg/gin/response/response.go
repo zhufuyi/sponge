@@ -62,7 +62,7 @@ func respJSONWithStatusCode(c *gin.Context, code int, msg string, data ...interf
 	writeJSON(c, code, resp)
 }
 
-// Output standard HTTP status codes and data
+// Output return standard HTTP status codes and message, parameter code is HTTP status code
 func Output(c *gin.Context, code int, data ...interface{}) {
 	switch code {
 	case http.StatusOK:
@@ -91,7 +91,7 @@ func Output(c *gin.Context, code int, data ...interface{}) {
 	}
 }
 
-// Out HTTP standard status code which is converted from errcode.Error
+// Out returns the standard HTTP status code and message, parameter err is errcode.Error
 func Out(c *gin.Context, err *errcode.Error, data ...interface{}) {
 	code := err.ToHTTPCode()
 	switch code {

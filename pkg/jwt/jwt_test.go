@@ -79,21 +79,34 @@ func TestParseToken(t *testing.T) {
 }
 
 func TestGenerateCustomToken(t *testing.T) {
-	fields := KV{"id": 123, "foo": "bar"}
+	var (
+		id     uint64 = 20
+		name   string = "admin"
+		age    int    = 10
+		fields        = KV{"id": id, "name": name, "age": age}
+	)
+
 	Init()
 	token, err := GenerateCustomToken(fields)
 	assert.NoError(t, err)
 
 	claims, err := ParseCustomToken(token)
 	assert.NoError(t, err)
-	uid, _ := claims.Get("id")
-	assert.NotNil(t, uid)
-	foo, _ := claims.Get("foo")
-	assert.NotNil(t, foo)
-	t.Log(uid, foo)
+
+	idValue, _ := claims.GetUint64("id")
+	assert.Equal(t, idValue, fields["id"])
+
+	nameValue, _ := claims.GetString("name")
+	assert.Equal(t, nameValue, fields["name"])
+
+	ageValue, _ := claims.GetInt("age")
+	assert.Equal(t, ageValue, fields["age"])
+
+	_, ok := claims.Get("foo")
+	assert.Equal(t, ok, false)
 
 	claims.Fields = nil
-	foo, _ = claims.Get("foo")
+	foo, _ := claims.Get("foo")
 	assert.Nil(t, foo)
 
 	time.Sleep(time.Second)
