@@ -10,11 +10,9 @@ import (
 	"go.uber.org/zap"
 )
 
-var contentMark = []byte(" ...... ")
-
 var (
 	// Print body max length
-	defaultMaxLength = 300
+	defaultMaxLength = 40
 
 	// default zap log
 	defaultLogger, _ = zap.NewProduction()
@@ -25,6 +23,9 @@ var (
 		"/pong":   {},
 		"/health": {},
 	}
+
+	emptyBody   = []byte("")
+	contentMark = []byte(" ...... ")
 )
 
 // Option set the gin logger options.
@@ -55,6 +56,9 @@ func (o *options) apply(opts ...Option) {
 // WithMaxLen logger content max length
 func WithMaxLen(maxLen int) Option {
 	return func(o *options) {
+		if maxLen < len(contentMark) {
+			panic("maxLen should be greater than or equal to 8")
+		}
 		o.maxLength = maxLen
 	}
 }
@@ -104,14 +108,36 @@ func (w bodyLogWriter) Write(b []byte) (int, error) {
 }
 
 // If there is sensitive information in the body, you can use WithIgnoreRoutes set the route to ignore logging
-func getBodyData(buf *bytes.Buffer, maxLen int) []byte {
+func getResponseBody(buf *bytes.Buffer, maxLen int) []byte {
 	l := buf.Len()
 	if l == 0 {
 		return []byte("")
-	} else if l <= maxLen {
-		return buf.Bytes()[:l-1]
+	} else if l > maxLen {
+		l = maxLen
 	}
-	return append(bytes.Clone(buf.Bytes()[:maxLen]), contentMark...)
+
+	body := make([]byte, l)
+	n, _ := buf.Read(body)
+	if n == 0 {
+		return emptyBody
+	} else if n < maxLen {
+		return body[:n-1]
+	}
+	return append(body[:maxLen-len(contentMark)], contentMark...)
+}
+
+// If there is sensitive information in the body, you can use WithIgnoreRoutes set the route to ignore logging
+func getRequestBody(buf *bytes.Buffer, maxLen int) []byte {
+	l := buf.Len()
+	if l == 0 {
+		return []byte("")
+	} else if l < maxLen {
+		return buf.Bytes()
+	}
+
+	body := make([]byte, maxLen)
+	copy(body, buf.Bytes())
+	return append(body[:maxLen-len(contentMark)], contentMark...)
 }
 
 // Logging print request and response info
@@ -139,7 +165,7 @@ func Logging(opts ...Option) gin.HandlerFunc {
 		if c.Request.Method == http.MethodPost || c.Request.Method == http.MethodPut || c.Request.Method == http.MethodPatch || c.Request.Method == http.MethodDelete {
 			fields = append(fields,
 				zap.Int("size", buf.Len()),
-				zap.ByteString("body", getBodyData(&buf, o.maxLength)),
+				zap.ByteString("body", getRequestBody(&buf, o.maxLength)),
 			)
 		}
 
@@ -173,7 +199,7 @@ func Logging(opts ...Option) gin.HandlerFunc {
 			zap.String("url", c.Request.URL.Path),
 			zap.Int64("time_us", time.Since(start).Microseconds()),
 			zap.Int("size", newWriter.body.Len()),
-			zap.ByteString("body", getBodyData(newWriter.body, o.maxLength)),
+			zap.ByteString("body", getResponseBody(newWriter.body, o.maxLength)),
 		}
 		if reqID != "" {
 			fields = append(fields, zap.String(ContextRequestIDKey, reqID))
@@ -221,6 +247,6 @@ func SimpleLog(opts ...Option) gin.HandlerFunc {
 		if reqID != "" {
 			fields = append(fields, zap.String(ContextRequestIDKey, reqID))
 		}
-		o.log.Info("[GIN]", fields...)
+		o.log.Info("[GIN] message", fields...)
 	}
 }
