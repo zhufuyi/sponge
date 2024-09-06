@@ -111,7 +111,7 @@ func getBodyData(buf *bytes.Buffer, maxLen int) []byte {
 	} else if l <= maxLen {
 		return buf.Bytes()[:l-1]
 	}
-	return append(buf.Bytes()[:maxLen], contentMark...)
+	return append(bytes.Clone(buf.Bytes()[:maxLen]), contentMark...)
 }
 
 // Logging print request and response info
