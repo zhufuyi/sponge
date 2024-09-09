@@ -365,8 +365,10 @@ func makeCode(stmt *ast.CreateTableStmt, opt options) (*codeText, error) {
 			goFieldName = goFieldName[len(columnPrefix):]
 		}
 		jsonName := colName
-		if opt.JSONNamedType != 0 {
-			jsonName = xstrings.FirstRuneToLower(xstrings.ToCamelCase(colName)) // name type use camel case
+		if opt.JSONNamedType == 0 { // snake case
+			jsonName = customToSnake(jsonName)
+		} else {
+			jsonName = customToCamel(jsonName) // camel case (default)
 		}
 		field := tmplField{
 			Name:     toCamel(goFieldName),
@@ -484,12 +486,12 @@ func makeCode(stmt *ast.CreateTableStmt, opt options) (*codeText, error) {
 		return nil, err
 	}
 
-	handlerStructCode, err := getHandlerStructCodes(data)
+	handlerStructCode, err := getHandlerStructCodes(data, opt.JSONNamedType)
 	if err != nil {
 		return nil, err
 	}
 
-	modelStructCode, importPaths, err := getModelStructCode(data, importPath, opt.IsEmbed)
+	modelStructCode, importPaths, err := getModelStructCode(data, importPath, opt.IsEmbed, opt.JSONNamedType)
 	if err != nil {
 		return nil, err
 	}
@@ -499,7 +501,7 @@ func makeCode(stmt *ast.CreateTableStmt, opt options) (*codeText, error) {
 		return nil, err
 	}
 
-	protoFileCode, err := getProtoFileCode(data, opt.IsWebProto, opt.IsExtendedAPI)
+	protoFileCode, err := getProtoFileCode(data, opt.JSONNamedType, opt.IsWebProto, opt.IsExtendedAPI)
 	if err != nil {
 		return nil, err
 	}
@@ -521,7 +523,7 @@ func makeCode(stmt *ast.CreateTableStmt, opt options) (*codeText, error) {
 }
 
 // nolint
-func getModelStructCode(data tmplData, importPaths []string, isEmbed bool) (string, []string, error) {
+func getModelStructCode(data tmplData, importPaths []string, isEmbed bool, jsonNamedType int) (string, []string, error) {
 	// filter to ignore field fields
 	var newFields = []tmplField{}
 	var newImportPaths = []string{}
@@ -611,7 +613,11 @@ func getModelStructCode(data tmplData, importPaths []string, isEmbed bool) (stri
 	structCode := string(code)
 	// restore the real embedded fields
 	if isEmbed {
-		structCode = strings.ReplaceAll(structCode, __mysqlModel__, replaceFields[__mysqlModel__])
+		gormEmbed := replaceFields[__mysqlModel__]
+		if jsonNamedType == 0 { // snake case
+			gormEmbed += "2" // ggorm.Model2
+		}
+		structCode = strings.ReplaceAll(structCode, __mysqlModel__, gormEmbed)
 		structCode = strings.ReplaceAll(structCode, __type__, replaceFields[__type__])
 	}
 
@@ -673,7 +679,7 @@ func getUpdateFieldsCode(data tmplData, isEmbed bool) (string, error) {
 	return buf.String(), nil
 }
 
-func getHandlerStructCodes(data tmplData) (string, error) {
+func getHandlerStructCodes(data tmplData, jsonNamedType int) (string, error) {
 	newFields := []tmplField{}
 	for _, field := range data.Fields {
 		if field.DBDriver == DBDriverMongodb { // mongodb
@@ -687,7 +693,11 @@ func getHandlerStructCodes(data tmplData) (string, error) {
 				field.GoType = "[]*model." + strings.ReplaceAll(field.GoType, "[]*", "")
 			}
 		}
-		field.JSONName = customToCamel(field.ColName)
+		if jsonNamedType == 0 { // snake case
+			field.JSONName = customToSnake(field.ColName)
+		} else {
+			field.JSONName = customToCamel(field.ColName) // camel case (default)
+		}
 		newFields = append(newFields, field)
 	}
 	data.Fields = newFields
@@ -752,8 +762,8 @@ func getModelJSONCode(data tmplData) (string, error) {
 	return modelJSONCode, nil
 }
 
-func getProtoFileCode(data tmplData, isWebProto bool, isExtendedAPI bool) (string, error) {
-	data.Fields = goTypeToProto(data.Fields)
+func getProtoFileCode(data tmplData, jsonNamedType int, isWebProto bool, isExtendedAPI bool) (string, error) {
+	data.Fields = goTypeToProto(data.Fields, jsonNamedType)
 
 	var err error
 	builder := strings.Builder{}
@@ -1007,7 +1017,7 @@ func mysqlToGoType(colTp *types.FieldType, style NullStyle) (name string, path s
 }
 
 // nolint
-func goTypeToProto(fields []tmplField) []tmplField {
+func goTypeToProto(fields []tmplField, jsonNameType int) []tmplField {
 	var newFields []tmplField
 	for _, field := range fields {
 		switch field.GoType {
@@ -1047,7 +1057,13 @@ func goTypeToProto(fields []tmplField) []tmplField {
 				field.GoType = "uint64"
 			}
 		}
-		field.JSONName = customToCamel(field.ColName)
+
+		if jsonNameType == 0 { // snake case
+			field.JSONName = customToSnake(field.ColName)
+		} else {
+			field.JSONName = customToCamel(field.ColName) // camel case (default)
+		}
+
 		newFields = append(newFields, field)
 	}
 	return newFields
@@ -1085,6 +1101,7 @@ var acronym = map[string]struct{}{
 	"IP": {},
 }
 
+// nolint
 func toCamel(s string) string {
 	s = strings.TrimSpace(s)
 	if s == "" {
@@ -1125,7 +1142,16 @@ func toCamel(s string) string {
 			}
 		}
 	}
-	return n.String()
+	str := n.String()
+
+	if len(str) > 2 {
+		if str[len(str)-2:] == "Id" {
+			str = str[:len(str)-2] + "ID"
+		} else if str[len(str)-2:] == "Ip" {
+			str = str[:len(str)-2] + "IP"
+		}
+	}
+	return str
 }
 
 func firstLetterToLow(str string) string {
@@ -1141,8 +1167,42 @@ func firstLetterToLow(str string) string {
 }
 
 func customToCamel(str string) string {
-	if strings.ToLower(str) == "id" {
+	str = firstLetterToLow(toCamel(str))
+
+	if len(str) == 2 {
+		if str == "iD" {
+			str = "id"
+		} else if str == "iP" {
+			str = "ip"
+		}
+	}
+
+	return str
+}
+
+func customToSnake(str string) string {
+	if len(str) == 0 {
 		return str
 	}
-	return firstLetterToLow(toCamel(str))
+
+	index := 0
+	for _, c := range str {
+		if c != '_' {
+			break
+		}
+		index++
+	}
+	if index != 0 {
+		str = str[index:]
+	}
+
+	if len(str) == 2 {
+		if str == "iD" {
+			str = "id"
+		} else if str == "iP" {
+			str = "ip"
+		}
+	}
+
+	return xstrings.ToSnakeCase(str)
 }

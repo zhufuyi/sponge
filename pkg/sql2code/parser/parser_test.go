@@ -115,16 +115,20 @@ func TestParseSQLs(t *testing.T) {
 	}
 }
 
-func Test_toCamel(t *testing.T) {
-	names := []string{"id", "user_id", "productId", "orderId", "user_name", "host_ip", "teacherId"}
+func TestConvertNames(t *testing.T) {
+	names := []string{"_id", "id", "iD", "user_id", "productId", "orderID", "user_name", "ip", "iP", "host_ip", "myIP"}
 	var convertNames []string
 	var convertNames2 []string
+	var convertNames3 []string
 	for _, name := range names {
 		convertNames = append(convertNames, toCamel(name))
 		convertNames2 = append(convertNames2, customToCamel(name))
+		convertNames3 = append(convertNames3, customToSnake(name))
 	}
-	t.Log(convertNames)
-	t.Log(convertNames2)
+	t.Log("source:             ", names)
+	t.Log("toCamel:           ", convertNames)
+	t.Log("customToCamel:", convertNames2)
+	t.Log("customToSnake:", convertNames3)
 }
 
 func Test_parseOption(t *testing.T) {
@@ -173,7 +177,7 @@ func Test_goTypeToProto(t *testing.T) {
 		{GoType: "uint"},
 		{GoType: "time.Time"},
 	}
-	v := goTypeToProto(fields)
+	v := goTypeToProto(fields, 1)
 	assert.NotNil(t, v)
 }
 
