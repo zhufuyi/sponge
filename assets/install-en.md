@@ -9,9 +9,20 @@ Recommended to use go version 1.20 or above, [https://go.dev/doc/install](https:
 
 ### Windows Environment
 
-> Because sponge depends on some linux commands, git bash and make need to be installed in windows to support the linux command environment.
+Make sure the go locale is installed before installing sponge, and add `GOBIN` to the system environment variable **path**. If it is already set, skip this step:
+
+ ```bash 
+     #Check if GOBIN directory exists 
+     go env GOBIN 
+    
+     #If empty, GOBIN needs to be set (e.g. D:\go\bin), administrator privileges may be required 
+     go env -w GOBIN=D:\go\bin 
+     #Then add GOBIN directory to system path environment variable 
+ ``` 
 
 <br>
+
+> Because sponge depends on some linux commands, git bash and make need to be installed in windows to support the linux command environment.
 
 For installation convenience, sponge and its dependent programs have been packaged together, download address: [sponge-install.zip](https://drive.google.com/drive/folders/1T55lLXDBIQCnL5IQ-i1hWJovgLI2l0k1?usp=sharing)
 
