@@ -6,6 +6,8 @@ import (
 
 // GRPCServiceCode merge the grpc service code
 func GRPCServiceCode() *cobra.Command {
+	var dir string
+
 	cmd := &cobra.Command{
 		Use:   "rpc-pb",
 		Short: "Merge the generated grpc related code into the template file",
@@ -17,11 +19,14 @@ Examples:
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			mergeGRPCECode()
-			mergeGRPCServiceTmpl()
+			dir = adaptDir(dir)
+			mergeGRPCECode(dir)
+			mergeGRPCServiceTmpl(dir)
 			return nil
 		},
 	}
+
+	cmd.Flags().StringVarP(&dir, "dir", "d", ".", "input directory")
 
 	return cmd
 }

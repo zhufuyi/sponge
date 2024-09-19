@@ -6,6 +6,8 @@ import (
 
 // GinServiceCode merge the gin service code
 func GinServiceCode() *cobra.Command {
+	var dir string
+
 	cmd := &cobra.Command{
 		Use:   "rpc-gw-pb",
 		Short: "Merge the generated grpc gateway related code into the template file",
@@ -13,16 +15,20 @@ func GinServiceCode() *cobra.Command {
 
 Examples:
   sponge merge rpc-gw-pb
+  sponge merge rpc-gw-pb --dir=yourServerDir
 `,
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			mergeGRPCECode()
-			mergeGinRouters()
-			mergeGRPCServiceClientTmpl()
+			dir = adaptDir(dir)
+			mergeGRPCECode(dir)
+			mergeGinRouters(dir)
+			mergeGRPCServiceClientTmpl(dir)
 			return nil
 		},
 	}
+
+	cmd.Flags().StringVarP(&dir, "dir", "d", ".", "input directory")
 
 	return cmd
 }

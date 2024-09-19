@@ -106,6 +106,11 @@ func (m *mergeParam) runMergeCode(file string) (string, error) {
 
 	count1 := bytes.Count(data1, m.splitLineMark)
 	count2 := bytes.Count(data2, m.splitLineMark)
+	//if count2 > count1 {
+	//	// 判断新增加的service，把新的service代码合并到原来的文件中
+	//} else if count2 < count1 {
+	//
+	//}
 	if count1 != count2 {
 		return "", fmt.Errorf("merge code mark mismatch, please merge codes manually, file = %s", file)
 	}
@@ -178,13 +183,15 @@ func compareCode(oldCode []code, newCode []code) ([]byte, []byte) {
 		for _, code2 := range oldCode {
 			if code1.key == code2.key {
 				isEqual = true
-				position = []byte(code2.value)
 				break
 			}
 		}
 		if !isEqual {
 			addCode = append(addCode, []byte(code1.value)...)
 		}
+	}
+	if len(oldCode) > 0 {
+		position = []byte(oldCode[len(oldCode)-1].value) // last position
 	}
 
 	return addCode, position
@@ -199,7 +206,6 @@ func compareCode2(oldCode []code, newCode []code, data []byte) ([]byte, []byte) 
 		for _, code2 := range oldCode {
 			if code1.key == code2.key {
 				isEqual = true
-				position = []byte(code2.value)
 				break
 			}
 		}
@@ -208,6 +214,10 @@ func compareCode2(oldCode []code, newCode []code, data []byte) ([]byte, []byte) 
 			comment := getComment(name, string(data))
 			addCode = append(addCode, []byte("\n\n"+comment+"\n"+code1.value)...)
 		}
+	}
+
+	if len(oldCode) > 0 {
+		position = []byte(oldCode[len(oldCode)-1].value) // last position
 	}
 
 	return addCode, position
@@ -229,6 +239,8 @@ func mergeCode(oldCode []byte, addCode []byte, position []byte) []byte {
 	if len(ss) != 2 {
 		return oldCode
 	}
+	fmt.Println("------ position = ", string(position))
+	fmt.Println("------ addCode = ", string(addCode))
 	data = append(ss[0], position...)
 	data = append(data, addCode...)
 	data = append(data, ss[1]...)
@@ -354,11 +366,25 @@ func getComment(name string, str string) string {
 	return strings.ReplaceAll(match[0], "\nfunc", "")
 }
 
+func adaptDir(dir string) string {
+	if dir == "." || dir == "./" || dir == ".\\" {
+		return ""
+	}
+	l := len(dir)
+	if dir[l-1] == '/' {
+		return dir
+	}
+	if dir[l-1] == '\\' {
+		return dir[:l-1] + "/"
+	}
+	return dir + "/"
+}
+
 // ------------------------------------------------------------------------------------------
 
-func mergeHTTPECode() {
+func mergeHTTPECode(dir string) {
 	m := newMergeParam(
-		"internal/ecode",
+		dir+"internal/ecode",
 		"errcode.NewError(",
 		true,
 		parseFromECode,
@@ -366,9 +392,9 @@ func mergeHTTPECode() {
 	m.runMerge()
 }
 
-func mergeGRPCECode() {
+func mergeGRPCECode(dir string) {
 	m := newMergeParam(
-		"internal/ecode",
+		dir+"internal/ecode",
 		"errcode.NewRPCStatus(",
 		true,
 		parseFromECode,
@@ -376,9 +402,9 @@ func mergeGRPCECode() {
 	m.runMerge()
 }
 
-func mergeGinRouters() {
+func mergeGinRouters(dir string) {
 	m := newMergeParam(
-		"internal/routers",
+		dir+"internal/routers",
 		"c.setSinglePath(",
 		true,
 		parseFromRouters,
@@ -386,9 +412,9 @@ func mergeGinRouters() {
 	m.runMerge()
 }
 
-func mergeHTTPHandlerTmpl() {
+func mergeHTTPHandlerTmpl(dir string) {
 	m := newMergeParam(
-		"internal/handler",
+		dir+"internal/handler",
 		`func \(h[\w\W]*?\n}`,
 		false,
 		parseFromTmplCode,
@@ -396,9 +422,9 @@ func mergeHTTPHandlerTmpl() {
 	m.runMerge()
 }
 
-func mergeGRPCServiceClientTmpl() {
+func mergeGRPCServiceClientTmpl(dir string) {
 	m := newMergeParam(
-		"internal/service",
+		dir+"internal/service",
 		`func \(c[\w\W]*?\n}`,
 		false,
 		parseFromTmplCode,
@@ -406,9 +432,9 @@ func mergeGRPCServiceClientTmpl() {
 	m.runMerge()
 }
 
-func mergeGRPCServiceTmpl() {
+func mergeGRPCServiceTmpl(dir string) {
 	m := newMergeParam(
-		"internal/service",
+		dir+"internal/service",
 		`func \(s[\w\W]*?\n}`,
 		false,
 		parseFromTmplCode,
