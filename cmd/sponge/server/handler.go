@@ -67,7 +67,7 @@ func ListTables(c *gin.Context) {
 	form := &dbInfoForm{}
 	err := c.ShouldBindJSON(form)
 	if err != nil {
-		response.Error(c, errcode.InvalidParams.WithDetails(err.Error()))
+		response.Error(c, errcode.InvalidParams.RewriteMsg(err.Error()))
 		return
 	}
 
@@ -82,14 +82,14 @@ func ListTables(c *gin.Context) {
 	case mgo.DBDriverName:
 		tables, err = getMongodbTables(form.Dsn)
 	case "":
-		response.Error(c, errcode.InternalServerError.WithDetails("database type is empty"))
+		response.Error(c, errcode.InvalidParams.RewriteMsg("database type cannot be empty"))
 		return
 	default:
-		response.Error(c, errcode.InternalServerError.WithDetails("unsupported database driver: "+form.DbDriver))
+		response.Error(c, errcode.InvalidParams.RewriteMsg("unsupported database type: "+form.DbDriver))
 		return
 	}
 	if err != nil {
-		response.Error(c, errcode.InternalServerError.WithDetails(err.Error()))
+		response.Error(c, errcode.InternalServerError.RewriteMsg(err.Error()))
 		return
 	}
 
@@ -219,7 +219,7 @@ func handleGenerateCode(c *gin.Context, outPath string, arg string) {
 func GetRecord(c *gin.Context) {
 	pathParam := c.Param("path")
 	if pathParam == "" {
-		response.Out(c, errcode.InvalidParams.WithDetails("path param is empty"))
+		response.Out(c, errcode.InvalidParams.RewriteMsg("path param is empty"))
 		return
 	}
 
@@ -233,7 +233,7 @@ func GetRecord(c *gin.Context) {
 
 func responseErr(c *gin.Context, err error, ec *errcode.Error) {
 	k := "err-msg"
-	e := ec.WithDetails(err.Error())
+	e := ec.RewriteMsg(err.Error())
 	c.Writer.Header().Set(k, e.Msg())
 	response.Out(c, e)
 }
@@ -242,18 +242,18 @@ func responseErr(c *gin.Context, err error, ec *errcode.Error) {
 func UploadFiles(c *gin.Context) {
 	form, err := c.MultipartForm()
 	if err != nil {
-		response.Error(c, errcode.InvalidParams.WithDetails(err.Error()))
+		response.Error(c, errcode.InvalidParams.RewriteMsg(err.Error()))
 		return
 	}
 
 	if len(form.File) == 0 {
-		response.Error(c, errcode.InvalidParams.WithDetails("upload file is empty"))
+		response.Error(c, errcode.InvalidParams.RewriteMsg("upload file is empty"))
 		return
 	}
 
 	//spongeArg, err := getFormValue(form.Value, "spongeArg")
 	//if err != nil {
-	//	response.Error(c, errcode.InvalidParams.WithDetails("the field 'spongeArg' cannot be empty"))
+	//	response.Error(c, errcode.InvalidParams.RewriteMsg("the field 'spongeArg' cannot be empty"))
 	//	return
 	//}
 
@@ -266,7 +266,7 @@ func UploadFiles(c *gin.Context) {
 			filename := filepath.Base(file.Filename)
 			fileType = path.Ext(filename)
 			if !checkFileType(fileType) {
-				response.Error(c, errcode.InvalidParams.WithDetails("only .proto or yaml files are allowed to be uploaded"))
+				response.Error(c, errcode.InvalidParams.RewriteMsg("only .proto or yaml files are allowed to be uploaded"))
 				return
 			}
 
@@ -275,7 +275,7 @@ func UploadFiles(c *gin.Context) {
 				continue
 			}
 			if err = c.SaveUploadedFile(file, filePath); err != nil {
-				response.Error(c, errcode.InternalServerError.WithDetails(err.Error()))
+				response.Error(c, errcode.InternalServerError.RewriteMsg(err.Error()))
 				return
 			}
 
