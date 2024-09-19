@@ -247,6 +247,6 @@ func SimpleLog(opts ...Option) gin.HandlerFunc {
 		if reqID != "" {
 			fields = append(fields, zap.String(ContextRequestIDKey, reqID))
 		}
-		o.log.Info("[GIN] message", fields...)
+		o.log.Info("Gin msg", fields...)
 	}
 }

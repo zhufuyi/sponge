@@ -46,3 +46,16 @@ Generate random strings, integers, floating point numbers.
     krand.Float64(1, 200)            // floating point number with 1 decimal point, range 0~200
     krand.Float64(2, 100,1000)            // floating point number with 2 decimal places, range 100~1000
 ```
+
+<br>
+
+### Generate id
+
+```go
+    import "github.com/zhufuyi/sponge/pkg/krand"
+
+    krand.NewID()  // generate a id, example: 1701234567890397409
+    krand.NewStringID()  // generate a string id, example: 179bffd372b8e8e1
+
+    krand.NewSeriesID()  // generate a string id, example: 20060102150405000000123456
+```

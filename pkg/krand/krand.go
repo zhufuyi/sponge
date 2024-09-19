@@ -3,6 +3,7 @@ package krand
 
 import (
 	"math/rand"
+	"strconv"
 	"time"
 )
 
@@ -83,13 +84,34 @@ func Float64(dpLength int, rangeSize ...int) float64 {
 
 	switch len(rangeSize) {
 	case 0:
-		return float64(rand.Intn(101)) + dp // default 0~100
+		return float64(rand.Intn(100)) + dp // default 0~100
 	case 1:
-		return float64(rand.Intn(rangeSize[0]+1)) + dp
+		return float64(rand.Intn(rangeSize[0])) + dp
 	default:
 		if rangeSize[0] > rangeSize[1] {
 			rangeSize[0], rangeSize[1] = rangeSize[1], rangeSize[0]
 		}
-		return float64(rand.Intn(rangeSize[1]-rangeSize[0]+1)+rangeSize[0]) + dp
+		return float64(rand.Intn(rangeSize[1]-rangeSize[0])+rangeSize[0]) + dp
 	}
+}
+
+// NewID Generate a milliseconds+random number ID.
+func NewID() int64 {
+	ns := time.Now().UnixMilli() * 1000000
+	return ns + rand.Int63n(1000000)
+}
+
+// NewStringID Generate a string ID, the hexadecimal form of NewID(), total 16 bytes.
+func NewStringID() string {
+	return strconv.FormatInt(NewID(), 16)
+}
+
+var datetimeUsLayout = "20060102150405.000000"
+
+// NewSeriesID Generate a datetime+random string ID,
+// datetime is microsecond precision, 20  bytes, random is 6 bytes, total 26 bytes.
+// example: 20060102150405000000123456
+func NewSeriesID() string {
+	dt := time.Now().Format(datetimeUsLayout)
+	return dt[:14] + dt[15:] + String(R_NUM)
 }
