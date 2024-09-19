@@ -49,7 +49,7 @@ Examples:
   # generate handler code and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge web handler --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
 
-  # if you want the generated code to suited to mono-repo, you need to specify the parameter --suited-mono-repo=true --serverName=yourServerName
+  # if you want the generated code to suited to mono-repo, you need to set the parameter --suited-mono-repo=true --server-name=yourServerName
 `),
 		SilenceErrors: true,
 		SilenceUsage:  true,
@@ -146,7 +146,7 @@ type handlerGenerator struct {
 }
 
 func (g *handlerGenerator) generateCode() (string, error) {
-	subTplName := "handler"
+	subTplName := codeNameHandler
 	r := Replacers[TplNameSponge]
 	if r == nil {
 		return "", errors.New("replacer is nil")
@@ -284,7 +284,7 @@ func (g *handlerGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	}...)
 
 	if g.suitedMonoRepo {
-		fs := SubServerCodeFields(r.GetOutputDir(), g.moduleName, g.serverName)
+		fs := SubServerCodeFields(g.moduleName, g.serverName)
 		fields = append(fields, fs...)
 	}
 

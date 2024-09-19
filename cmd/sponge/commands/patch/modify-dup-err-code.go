@@ -1,6 +1,7 @@
 package patch
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"os"
@@ -8,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
@@ -20,13 +22,12 @@ func ModifyDuplicateErrCodeCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "modify-dup-err-code",
 		Short: "Modify duplicate error codes",
-		Long: `modify duplicate error codes 
+		Long: color.HiBlackString(`modify duplicate error codes 
 
 Examples:
   # modify duplicate error codes
   sponge patch modify-dup-err-code --dir=internal/ecode
-
-`,
+`),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -35,27 +36,16 @@ Examples:
 				return err
 			}
 
+			var total int
 			for _, file := range files {
-				ecsis, err := parseErrCodeInfo(file)
+				count, err := checkAndModifyDuplicateErrCode(file)
 				if err != nil {
 					return err
 				}
-				for _, ecsi := range ecsis {
-					msg, err := ecsi.modifyHTTPDuplicateNum()
-					if err != nil {
-						return err
-					}
-					if msg != "" {
-						fmt.Println("modify http duplicate error codes: ", msg)
-					}
-					msg, err = ecsi.modifyGRPCDuplicateNum()
-					if err != nil {
-						return err
-					}
-					if msg != "" {
-						fmt.Println("modify grpc duplicate error codes: ", msg)
-					}
-				}
+				total += count
+			}
+			if total > 0 {
+				fmt.Println("modify duplicate error codes successfully.")
 			}
 			return nil
 		},
@@ -67,228 +57,121 @@ Examples:
 }
 
 type eCodeInfo struct {
-	Name string
-	Num  int
-	Str  string
+	Name   string
+	Num    int
+	Str    string
+	DstStr string
 }
 
-type errCodesInfo struct {
-	file string
+var (
+	serviceGroupSeparatorMark = "// ---------- Do not delete or move this split line, this is the merge code marker ----------"
+	defineHTTPErrCodeMark     = "errcode.NewError("
+	defineGRPCErrCodeMark     = "errcode.NewRPCStatus("
+)
 
-	httpErrCodeInfo     map[string]eCodeInfo // map[name]eCodeInfo
-	httpDuplicationNums map[int][]string
-	httpMaxNum          int
+func parseErrCodeInfo(line string) eCodeInfo {
+	ci := eCodeInfo{}
 
-	grpcErrCodeInfo     map[string]eCodeInfo // map[name]eCodeInfo
-	grpcDuplicationNums map[int][]string
-	grpcMaxNum          int
+	pattern := `(\w+)\s*=\s*\w+\.(.*?)\((.*?),`
+	re := regexp.MustCompile(pattern)
+	match := re.FindStringSubmatch(line)
+	if len(match) < 4 {
+		return ci
+	}
+	baseCodeStr := match[3]
+
+	index := strings.Index(line, baseCodeStr)
+	if index < 0 {
+		return ci
+	}
+	srcStr := line[:index] + baseCodeStr
+
+	ss := strings.Split(baseCodeStr, "+")
+	if len(ss) != 2 {
+		return ci
+	}
+	num, _ := strconv.Atoi(strings.TrimSpace(ss[1]))
+
+	ci.Name = match[1]
+	ci.Num = num
+	ci.Str = srcStr
+	ci.DstStr = line[:index] + ss[0] + "+"
+
+	return ci
 }
 
-func (e *errCodesInfo) getHTTPMaxNum() int {
-	maxNum := 0
-	for num := range e.httpDuplicationNums {
-		if num > maxNum {
-			maxNum = num
+func getModifyCodeInfos(codes []eCodeInfo) ([]eCodeInfo, int) {
+	maxCode := 0
+	m := map[int][]eCodeInfo{}
+
+	for _, ci := range codes {
+		if ci.Num > maxCode {
+			maxCode = ci.Num
+		}
+
+		if cis, ok := m[ci.Num]; ok {
+			m[ci.Num] = append(cis, ci)
+		} else {
+			m[ci.Num] = []eCodeInfo{ci}
 		}
 	}
-	return maxNum
-}
 
-func (e *errCodesInfo) getGRPCMaxNum() int {
-	maxNum := 0
-	for num := range e.grpcDuplicationNums {
-		if num > maxNum {
-			maxNum = num
+	needModify := []eCodeInfo{}
+	for _, infos := range m {
+		if len(infos) > 1 {
+			needModify = append(needModify, infos[1:]...)
 		}
 	}
-	return maxNum
+
+	return needModify, maxCode
 }
 
-func (e *errCodesInfo) modifyHTTPDuplicateNum() (string, error) {
-	msg := ""
-	duplicateNums := []string{}
-
-	if len(e.httpDuplicationNums) == 0 {
-		return msg, nil
+func modifyErrCode(data []byte, infos []eCodeInfo, maxCode int) []byte {
+	for _, info := range infos {
+		maxCode++
+		data = bytes.ReplaceAll(data, []byte(info.Str), []byte(info.DstStr+strconv.Itoa(maxCode)))
 	}
+	return data
+}
 
-	numMap := map[int]struct{}{}
-	for num := range e.httpDuplicationNums {
-		numMap[num] = struct{}{}
-	}
+func getDuplicateErrCodeInfo(data []byte) ([]eCodeInfo, int) {
+	cis := []eCodeInfo{}
 
-	e.httpMaxNum = e.getHTTPMaxNum()
-	for _, names := range e.httpDuplicationNums {
-		if len(names) <= 1 {
+	buf := bufio.NewReader(bytes.NewReader(data))
+	for {
+		line, err := buf.ReadString('\n')
+		if err != nil {
+			break
+		}
+		if !strings.Contains(line, defineHTTPErrCodeMark) && !strings.Contains(line, defineGRPCErrCodeMark) {
 			continue
 		}
 
-		for i, name := range names {
-			if i == 0 {
-				continue
-			}
-
-			eci := e.httpErrCodeInfo[name]
-			e.httpMaxNum++
-			newNum := e.httpMaxNum
-
-			_, err := updateErrCodeFile(e.file, newNum, eci)
-			if err != nil {
-				return msg, err
-			}
-			duplicateNums = append(duplicateNums, fmt.Sprintf("%d --> %d", eci.Num, newNum))
+		ci := parseErrCodeInfo(line)
+		if ci.Name != "" {
+			cis = append(cis, ci)
 		}
 	}
 
-	if len(duplicateNums) == 0 {
-		return msg, nil
-	}
-	return strings.Join(duplicateNums, ", "), nil
+	return getModifyCodeInfos(cis)
 }
 
-func (e *errCodesInfo) modifyGRPCDuplicateNum() (string, error) {
-	msg := ""
-	duplicateNums := []string{}
-
-	if len(e.grpcDuplicationNums) == 0 {
-		return msg, nil
-	}
-
-	numMap := map[int]struct{}{}
-	for num := range e.grpcDuplicationNums {
-		numMap[num] = struct{}{}
-	}
-
-	e.grpcMaxNum = e.getGRPCMaxNum()
-	for _, names := range e.grpcDuplicationNums {
-		if len(names) <= 1 {
-			continue
-		}
-
-		for i, name := range names {
-			if i == 0 {
-				continue
-			}
-
-			eci := e.grpcErrCodeInfo[name]
-			e.grpcMaxNum++
-			newNum := e.grpcMaxNum
-
-			_, err := updateErrCodeFile(e.file, newNum, eci)
-			if err != nil {
-				return msg, err
-			}
-			duplicateNums = append(duplicateNums, fmt.Sprintf("%d --> %d", eci.Num, newNum))
-		}
-	}
-
-	if len(duplicateNums) == 0 {
-		return msg, nil
-	}
-	return strings.Join(duplicateNums, ", "), nil
-}
-
-func parseErrCodeInfo(file string) ([]*errCodesInfo, error) {
-	errCodeType := ""
-	ecsis := []*errCodesInfo{}
-
+func checkAndModifyDuplicateErrCode(file string) (int, error) {
 	data, err := os.ReadFile(file)
 	if err != nil {
-		return ecsis, err
-	}
-	dataStr := string(data)
-	if strings.Contains(dataStr, "errcode.NewError") {
-		errCodeType = httpType
-	} else if strings.Contains(dataStr, "errcode.NewRPCStatus") {
-		errCodeType = grpcType
+		return 0, err
 	}
 
-	if errCodeType == "" {
-		return ecsis, nil
+	serviceGroupData := bytes.Split(data, []byte(serviceGroupSeparatorMark))
+	var fileContent [][]byte
+	var count int
+	for _, groupData := range serviceGroupData {
+		ecis, maxCode := getDuplicateErrCodeInfo(groupData)
+		fileContent = append(fileContent, modifyErrCode(groupData, ecis, maxCode))
+		count += len(ecis)
 	}
 
-	var regStr string
-	if errCodeType == httpType {
-		regStr = `(Err[\w\W]*?)[ ]*?=[ ]*?errcode.NewError\(([\w\W]*?)BaseCode\+(\d),`
-	} else if errCodeType == grpcType {
-		regStr = `(Status[\w\W]*?)[ ]*?=[ ]*?errcode.NewRPCStatus\(([\w\W]*?)BaseCode\+(\d),`
-	}
-
-	reg := regexp.MustCompile(regStr)
-	allSubMatch := reg.FindAllStringSubmatch(dataStr, -1)
-	if len(allSubMatch) == 0 {
-		return ecsis, nil
-	}
-
-	groupNames := make(map[string][][]string)
-	for _, match := range allSubMatch {
-		if len(match) == 4 {
-			gns, ok := groupNames[match[2]]
-			if ok {
-				gns = append(gns, match)
-			} else {
-				gns = [][]string{match}
-			}
-			groupNames[match[2]] = gns
-		}
-		continue
-	}
-
-	for _, gn := range groupNames {
-		ecsi := &errCodesInfo{}
-		eci := make(map[string]eCodeInfo)
-		duplicationNums := make(map[int][]string)
-		for _, match := range gn {
-			if len(match) == 4 {
-				num, _ := strconv.Atoi(match[3])
-				if num == 0 {
-					continue
-				}
-
-				if names, ok := duplicationNums[num]; ok {
-					duplicationNums[num] = append(names, match[1])
-				} else {
-					duplicationNums[num] = []string{match[1]}
-				}
-
-				eci[match[1]] = eCodeInfo{Name: match[1], Num: num, Str: match[0]}
-			}
-		}
-		if errCodeType == httpType {
-			ecsi.httpDuplicationNums = duplicationNums
-			ecsi.httpErrCodeInfo = eci
-		} else if errCodeType == grpcType {
-			ecsi.grpcDuplicationNums = duplicationNums
-			ecsi.grpcErrCodeInfo = eci
-		}
-		ecsi.file = file
-		ecsis = append(ecsis, ecsi)
-	}
-
-	return ecsis, nil
-}
-
-func updateErrCodeFile(file string, newNum int, eci eCodeInfo) (eCodeInfo, error) {
-	strTmp := eci.Str
-	oldNum := eci.Num
-	eci.Str = replaceNumStr(strTmp, oldNum, newNum)
-	eci.Num = newNum
-
-	data, err := os.ReadFile(file)
-	if err != nil {
-		return eci, err
-	}
-	data = bytes.ReplaceAll(data, []byte(strTmp), []byte(eci.Str))
-
-	err = os.WriteFile(file, data, 0766)
-	if err != nil {
-		return eci, err
-	}
-	return eci, nil
-}
-
-func replaceNumStr(str string, oldNum int, newNum int) string {
-	oldNumStr := fmt.Sprintf("+%d", oldNum)
-	newNumStr := fmt.Sprintf("+%d", newNum)
-	return strings.ReplaceAll(str, oldNumStr, newNumStr)
+	data = bytes.Join(fileContent, []byte(serviceGroupSeparatorMark))
+	err = os.WriteFile(file, data, 0666)
+	return count, err
 }

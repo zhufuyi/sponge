@@ -3,9 +3,8 @@ syntax = "proto3";
 package api.greeter.v1;
 
 import "google/api/annotations.proto";
-import "google/api/http.proto";
 
-option go_package = "yourModuleName222/api/v1";
+option go_package = "yourModuleName/api/v1";
 
 service GreeterService {
   // create a record
@@ -20,6 +19,12 @@ service GreeterService {
   rpc DeleteByID(DeleteGreeterByIDRequest) returns (DeleteGreeterByIDReply) {
     option (google.api.http) = {
       delete: "/api/v1/greeter/{id}"
+    };
+  }
+
+  rpc DeleteByID2(DeleteGreeterByIDRequest) returns (DeleteGreeterByIDReply) {
+    option (google.api.http) = {
+      delete: "/api/v1/greeter2/{id}"
     };
   }
 

@@ -51,7 +51,7 @@ Examples:
   # generate service and handler code and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge micro service-handler --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
 
-  # if you want the generated code to suited to mono-repo, you need to specify the parameter --suited-mono-repo=true
+  # if you want the generated code to suited to mono-repo, you need to set the parameter --suited-mono-repo=true
 `),
 		SilenceErrors: true,
 		SilenceUsage:  true,
@@ -152,7 +152,7 @@ type serviceAndHandlerGenerator struct {
 
 // nolint
 func (g *serviceAndHandlerGenerator) generateCode() (string, error) {
-	subTplName := "service-handler"
+	subTplName := codeNameServiceHTTP
 	r := Replacers[TplNameSponge]
 	if r == nil {
 		return "", errors.New("replacer is nil")
@@ -229,6 +229,12 @@ func (g *serviceAndHandlerGenerator) generateCode() (string, error) {
 	r.SetReplacementFields(fields)
 	if err := r.SaveFiles(); err != nil {
 		return "", err
+	}
+
+	if g.suitedMonoRepo {
+		if err := moveProtoFileToAPIDir(g.moduleName, g.serverName, g.suitedMonoRepo, r.GetOutputDir()); err != nil {
+			return "", err
+		}
 	}
 
 	return r.GetOutputDir(), nil
@@ -338,7 +344,7 @@ func (g *serviceAndHandlerGenerator) addFields(r replacer.Replacer) []replacer.F
 	}...)
 
 	if g.suitedMonoRepo {
-		fs := SubServerCodeFields(r.GetOutputDir(), g.moduleName, g.serverName)
+		fs := SubServerCodeFields(g.moduleName, g.serverName)
 		fields = append(fields, fs...)
 	}
 

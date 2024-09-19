@@ -1,6 +1,7 @@
 #!/bin/bash
 
-rm -rf \
+rm -rf go.mod go.sum \
+third_party \
 mono_01_http_mysql \
 mono_02_http_postgresql \
 mono_03_http_sqlite \

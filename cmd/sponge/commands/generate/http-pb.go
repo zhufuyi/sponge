@@ -39,7 +39,7 @@ Examples:
   # generate web service code and specify the docker image repository address.
   sponge web http-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --protobuf-file=./test.proto
 
-  # if you want the generated code to suited to mono-repo, you need to specify the parameter --suited-mono-repo=true
+  # if you want the generated code to suited to mono-repo, you need to set the parameter --suited-mono-repo=true
 `),
 		SilenceErrors: true,
 		SilenceUsage:  true,
@@ -106,7 +106,7 @@ func (g *httpPbGenerator) generateCode() (string, error) {
 		return "", err
 	}
 
-	subTplName := "http-pb"
+	subTplName := codeNameHTTPPb
 	r := Replacers[TplNameSponge]
 	if r == nil {
 		return "", errors.New("replacer is nil")
@@ -121,9 +121,7 @@ func (g *httpPbGenerator) generateCode() (string, error) {
 		"sponge/.gitignore", "sponge/.golangci.yml", "sponge/go.mod", "sponge/go.sum",
 		"sponge/Jenkinsfile", "sponge/Makefile", "sponge/README.md",
 	}
-	if g.suitedMonoRepo {
-		subFiles = removeElements(subFiles, "sponge/go.mod", "sponge/go.sum")
-	}
+
 	if isImportTypes {
 		subFiles = append(subFiles, "api/types/types.proto")
 	}
@@ -145,8 +143,13 @@ func (g *httpPbGenerator) generateCode() (string, error) {
 			"http.go", "http_test.go", "http_option.go",
 		},
 	}
-	replaceFiles := make(map[string][]string)
 
+	if g.suitedMonoRepo {
+		subDirs = removeElements(subDirs, "sponge/third_party")
+		subFiles = removeElements(subFiles, "sponge/go.mod", "sponge/go.sum", "api/types/types.proto")
+	}
+
+	replaceFiles := make(map[string][]string)
 	subFiles = append(subFiles, getSubFiles(selectFiles, replaceFiles)...)
 
 	// ignore some directories
@@ -161,7 +164,9 @@ func (g *httpPbGenerator) generateCode() (string, error) {
 		return "", err
 	}
 
-	_ = saveProtobufFiles(g.moduleName, g.serverName, r.GetOutputDir(), protobufFiles)
+	if err = saveProtobufFiles(g.moduleName, g.serverName, g.suitedMonoRepo, r.GetOutputDir(), protobufFiles); err != nil {
+		return "", err
+	}
 	_ = saveGenInfo(g.moduleName, g.serverName, g.suitedMonoRepo, r.GetOutputDir())
 	_ = saveEmptySwaggerJSON(r.GetOutputDir())
 
@@ -196,7 +201,8 @@ func (g *httpPbGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	fields = append(fields, deleteAllFieldsMark(r, protoShellFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteAllFieldsMark(r, appConfigFile, wellStartMark, wellEndMark)...)
 	//fields = append(fields, deleteFieldsMark(r, deploymentConfigFile, wellStartMark, wellEndMark)...)
-	fields = append(fields, replaceFileContentMark(r, readmeFile, wellPrefix+g.serverName)...)
+	fields = append(fields, replaceFileContentMark(r, readmeFile,
+		setReadmeTitle(g.moduleName, g.serverName, codeNameHTTPPb, g.suitedMonoRepo))...)
 	fields = append(fields, []replacer.Field{
 		{ // replace the configuration of the *.yml file
 			Old: appConfigFileMark,

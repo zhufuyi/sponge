@@ -56,7 +56,7 @@ Examples:
   # generate grpc service code and specify the docker image repository address.
   sponge micro rpc --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
-  # if you want the generated code to suited to mono-repo, you need to specify the parameter --suited-mono-repo=true
+  # if you want the generated code to suited to mono-repo, you need to set the parameter --suited-mono-repo=true
 `),
 		SilenceErrors: true,
 		SilenceUsage:  true,
@@ -187,7 +187,7 @@ type rpcGenerator struct {
 }
 
 func (g *rpcGenerator) generateCode() (string, error) {
-	subTplName := "rpc"
+	subTplName := codeNameGRPC
 	r := Replacers[TplNameSponge]
 	if r == nil {
 		return "", errors.New("replacer is nil")
@@ -201,10 +201,6 @@ func (g *rpcGenerator) generateCode() (string, error) {
 	subFiles := []string{
 		"sponge/.gitignore", "sponge/.golangci.yml", "sponge/go.mod", "sponge/go.sum",
 		"sponge/Jenkinsfile", "sponge/Makefile", "sponge/README.md",
-	}
-
-	if g.suitedMonoRepo {
-		subFiles = removeElements(subFiles, "sponge/go.mod", "sponge/go.sum")
 	}
 
 	selectFiles := map[string][]string{
@@ -236,8 +232,14 @@ func (g *rpcGenerator) generateCode() (string, error) {
 			"service.go", "service_test.go", "userExample.go", "userExample_client_test.go",
 		},
 	}
-	replaceFiles := make(map[string][]string)
 
+	if g.suitedMonoRepo {
+		subDirs = removeElements(subDirs, "sponge/third_party")
+		subFiles = removeElements(subFiles, "sponge/go.mod", "sponge/go.sum")
+		delete(selectFiles, "api/types")
+	}
+
+	replaceFiles := make(map[string][]string)
 	switch strings.ToLower(g.dbDriver) {
 	case DBDriverMysql, DBDriverPostgresql, DBDriverTidb, DBDriverSqlite:
 		g.fields = append(g.fields, getExpectedSQLForDeletionField(g.isEmbed)...)
@@ -289,6 +291,18 @@ func (g *rpcGenerator) generateCode() (string, error) {
 	if err := r.SaveFiles(); err != nil {
 		return "", err
 	}
+
+	if g.suitedMonoRepo {
+		if err := moveProtoFileToAPIDir(g.moduleName, g.serverName, g.suitedMonoRepo, r.GetOutputDir()); err != nil {
+			return "", err
+		}
+		//apiDir := g.serverName + gofile.GetPathDelimiter() + "api"
+		//protoFiles, _ := gofile.ListFiles(apiDir, gofile.WithNoAbsolutePath(), gofile.WithSuffix(".proto"))
+		//if err := saveProtobufFiles(g.moduleName, g.serverName, g.suitedMonoRepo, r.GetOutputDir(), protoFiles); err != nil {
+		//	return "", err
+		//}
+		//_ = os.RemoveAll(apiDir)
+	}
 	_ = saveGenInfo(g.moduleName, g.serverName, g.suitedMonoRepo, r.GetOutputDir())
 
 	return r.GetOutputDir(), nil
@@ -321,7 +335,8 @@ func (g *rpcGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	fields = append(fields, deleteAllFieldsMark(r, protoShellFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteAllFieldsMark(r, appConfigFile, wellStartMark, wellEndMark)...)
 	//fields = append(fields, deleteFieldsMark(r, deploymentConfigFile, wellStartMark, wellEndMark)...)
-	fields = append(fields, replaceFileContentMark(r, readmeFile, wellPrefix+g.serverName)...)
+	fields = append(fields, replaceFileContentMark(r, readmeFile,
+		setReadmeTitle(g.moduleName, g.serverName, codeNameGRPC, g.suitedMonoRepo))...)
 	fields = append(fields, []replacer.Field{
 		{ // replace the configuration of the *.yml file
 			Old: appConfigFileMark,
@@ -343,7 +358,7 @@ func (g *rpcGenerator) addFields(r replacer.Replacer) []replacer.Field {
 			Old: daoFileMark,
 			New: g.codes[parser.CodeTypeDAO],
 		},
-		{ // replace the contents of the handler/userExample_logic.go file
+		{ // replace the contents of the service/userExample.go file
 			Old: embedTimeMark,
 			New: getEmbedTimeCode(g.isEmbed),
 		},

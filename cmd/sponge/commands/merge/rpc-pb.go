@@ -1,6 +1,7 @@
 package merge
 
 import (
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
@@ -11,11 +12,15 @@ func GRPCServiceCode() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "rpc-pb",
 		Short: "Merge the generated grpc related code into the template file",
-		Long: `merge the generated grpc related code into the template file.
+		Long: color.HiBlackString(`merge the generated grpc related code into the template file.
 
 Examples:
+  # merge go template file in local server directory
   sponge merge rpc-pb
-`,
+
+  # merge go template file in specified directory
+  sponge merge rpc-pb --dir=/path/to/server/directory
+`),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {

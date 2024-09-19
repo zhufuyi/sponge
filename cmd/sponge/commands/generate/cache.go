@@ -3,6 +3,7 @@ package generate
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
@@ -33,12 +34,12 @@ func CacheCommand(parentName string) *cobra.Command {
 
 Examples:
   # generate kv cache code
-  sponge %s cache --module-name=yourModuleName --cache-name=userToken --prefix-key=user:token: --key-name=id --key-type=uint64 --value-name=token --value-type=string
+  sponge %s cache --module-name=yourModuleName --cache-name=userToken --key-name=id --key-type=uint64 --value-name=token --value-type=string
 
   # generate kv cache code and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
-  sponge %s cache --module-name=yourModuleName --cache-name=token --prefix-key=user:token: --key-name=id --key-type=uint64 --value-name=token --value-type=string --out=./yourServerDir
+  sponge %s cache --module-name=yourModuleName --cache-name=token --prefix-key=user:token --key-name=id --key-type=uint64 --value-name=token --value-type=string --out=./yourServerDir
 
-  # if you want the generated code to suited to mono-repo, you need to specify the parameter --suited-mono-repo=true --serverName=yourServerName
+  # if you want the generated code to suited to mono-repo, you need to set the parameter --suited-mono-repo=true --server-name=yourServerName
 `, parentName, parentName)),
 		SilenceErrors: true,
 		SilenceUsage:  true,
@@ -57,6 +58,13 @@ Examples:
 				}
 				serverName = convertServerName(serverName)
 				outPath = changeOutPath(outPath, serverName)
+			}
+			cacheName = strings.ReplaceAll(cacheName, ":", "")
+
+			if prefixKey == "" || prefixKey == ":" {
+				prefixKey = cacheName + ":"
+			} else if prefixKey[len(prefixKey)-1] != ':' {
+				prefixKey += ":"
 			}
 
 			var err error
@@ -91,14 +99,14 @@ using help:
 	cmd.Flags().StringVarP(&moduleName, "module-name", "m", "", "module-name is the name of the module in the go.mod file")
 	cmd.Flags().StringVarP(&cacheName, "cache-name", "c", "", "cache name, e.g. userToken")
 	_ = cmd.MarkFlagRequired("cache-name")
-	cmd.Flags().StringVarP(&prefixKey, "prefix-key", "p", "", "cache prefix key, must end with a colon, e.g. user:token:")
-	cmd.Flags().StringVarP(&keyName, "key-name", "", "", "key name, e.g. id")
+	cmd.Flags().StringVarP(&prefixKey, "prefix-key", "p", "", "cache prefix key, e.g. user:token")
+	cmd.Flags().StringVarP(&keyName, "key-name", "k", "", "key name, e.g. id")
 	_ = cmd.MarkFlagRequired("key-name")
-	cmd.Flags().StringVarP(&keyType, "key-type", "", "", "key go type, e.g. uint64")
+	cmd.Flags().StringVarP(&keyType, "key-type", "t", "", "key go type, e.g. uint64")
 	_ = cmd.MarkFlagRequired("key-type")
-	cmd.Flags().StringVarP(&valueName, "value-name", "", "", "value name, e.g. token")
+	cmd.Flags().StringVarP(&valueName, "value-name", "v", "", "value name, e.g. token")
 	_ = cmd.MarkFlagRequired("value-name")
-	cmd.Flags().StringVarP(&valueType, "value-type", "", "", "value go type, e.g. string")
+	cmd.Flags().StringVarP(&valueType, "value-type", "w", "", "value go type, e.g. string")
 	_ = cmd.MarkFlagRequired("value-type")
 	cmd.Flags().StringVarP(&serverName, "server-name", "s", "", "server name")
 	cmd.Flags().BoolVarP(&suitedMonoRepo, "suited-mono-repo", "l", false, "whether the generated code is suitable for mono-repo")
@@ -122,16 +130,10 @@ type stringCacheGenerator struct {
 }
 
 func (g *stringCacheGenerator) generateCode() (string, error) {
-	subTplName := "cache"
+	subTplName := codeNameCache
 	r := Replacers[TplNameSponge]
 	if r == nil {
 		return "", errors.New("replacer is nil")
-	}
-
-	if g.prefixKey == "" || g.prefixKey == ":" {
-		g.prefixKey = g.cacheName + ":"
-	} else if g.prefixKey[len(g.prefixKey)-1] != ':' {
-		g.prefixKey += ":"
 	}
 
 	// specify the subdirectory and files
@@ -207,7 +209,7 @@ func (g *stringCacheGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	}...)
 
 	if g.suitedMonoRepo {
-		fs := SubServerCodeFields(r.GetOutputDir(), g.moduleName, g.serverName)
+		fs := SubServerCodeFields(g.moduleName, g.serverName)
 		fields = append(fields, fs...)
 	}
 

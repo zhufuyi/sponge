@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 
 	"github.com/zhufuyi/sponge/cmd/sponge/commands/generate"
@@ -24,7 +25,7 @@ func GenerateDBInitCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "gen-db-init",
 		Short: "Generate database initialization code",
-		Long: `generate database initialization code.
+		Long: color.HiBlackString(`generate database initialization code.
 
 Examples:
   # generate mysql initialization code.
@@ -32,7 +33,7 @@ Examples:
 
   # generate mysql initialization code, and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge patch gen-db-init --db-driver=mysql --out=./yourServerDir
-`,
+`),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -46,7 +47,6 @@ Examples:
 				if serverName == "" {
 					return fmt.Errorf(`serverName is empty`)
 				}
-				targetFile = strings.ReplaceAll(targetFile, "internal", "Internal")
 			}
 
 			var isEmpty bool
@@ -171,7 +171,7 @@ func (g *dbInitGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	}...)
 
 	if g.suitedMonoRepo {
-		fs := generate.SubServerCodeFields(r.GetOutputDir(), g.moduleName, g.serverName)
+		fs := generate.SubServerCodeFields(g.moduleName, g.serverName)
 		fields = append(fields, fs...)
 	}
 

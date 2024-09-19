@@ -11,6 +11,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/huandu/xstrings"
 
@@ -45,7 +46,7 @@ const (
 	codeNameHandler     = "handler"
 	codeNameHandlerPb   = "handler-pb"
 	codeNameService     = "service"
-	codeNameServiceHTTP = "service-http"
+	codeNameServiceHTTP = "service-handler"
 	codeNameHTTP        = "http"
 	codeNameHTTPPb      = "http-pb"
 	codeNameGRPC        = "grpc"
@@ -376,7 +377,12 @@ func getNamesFromOutDir(dir string) (moduleName string, serverName string, suite
 	return "", "", false
 }
 
-func saveProtobufFiles(moduleName string, serverName string, outputDir string, protobufFiles []string) error {
+func saveProtobufFiles(moduleName string, serverName string, suitedMonoRepo bool, outputDir string, protobufFiles []string) error {
+	if suitedMonoRepo {
+		outputDir = strings.TrimSuffix(outputDir, serverName)
+		outputDir = strings.TrimSuffix(outputDir, gofile.GetPathDelimiter())
+	}
+
 	for _, pbFile := range protobufFiles {
 		pbContent, err := os.ReadFile(pbFile)
 		if err != nil {
@@ -390,6 +396,9 @@ func saveProtobufFiles(moduleName string, serverName string, outputDir string, p
 
 		_, name := filepath.Split(pbFile)
 		file := dir + "/" + name
+		if gofile.IsExists(file) {
+			return fmt.Errorf("file %s already exists", file)
+		}
 		err = os.WriteFile(file, pbContent, 0666)
 		if err != nil {
 			return fmt.Errorf("save file %s error, %v", file, err)
@@ -607,21 +616,51 @@ func removeElements(slice []string, elements ...string) []string {
 	return result
 }
 
-func serverCodeFields(outDir string, moduleName string, serverName string) []replacer.Field {
-	parts := strings.Split(outDir, gofile.GetPathDelimiter())
+func moveProtoFileToAPIDir(moduleName string, serverName string, suitedMonoRepo bool, outputDir string) error {
+	apiDir := outputDir + gofile.GetPathDelimiter() + "api"
+	protoFiles, _ := gofile.ListFiles(apiDir, gofile.WithNoAbsolutePath(), gofile.WithSuffix(".proto"))
+	if err := saveProtobufFiles(moduleName, serverName, suitedMonoRepo, outputDir, protoFiles); err != nil {
+		return err
+	}
+	time.Sleep(time.Millisecond * 100)
+	_ = os.RemoveAll(apiDir)
+	return nil
+}
 
+var (
+	// for protoc.sh and protoc-doc.sh
+	monoRepoAPIPath = `bash scripts/init.sh
+cd ..
+protoBasePath="api"`
+	// for patch.sh
+	typePbShellCode = `    if [ ! -d "../api/types" ]; then
+        sponge patch gen-types-pb --out=./
+        checkResult $?
+        mv -f api/types ../api
+        rmdir api
+    fi`
+	dupCodeMark  = "--dir=internal/ecode"
+	adaptDupCode = func(serverType string, serverName string) string {
+		if serverType == codeNameHTTP {
+			return dupCodeMark
+		}
+		return fmt.Sprintf("--dir=%s/internal/ecode", serverName)
+	}
+)
+
+func serverCodeFields(serverType string, moduleName string, serverName string) []replacer.Field {
 	return []replacer.Field{
-		{ // internal initial capital means exportable, external code can be referenced
+		{
 			Old: fmt.Sprintf("\"%s/internal/", moduleName),
-			New: fmt.Sprintf("\"%s/Internal/", moduleName+"/"+serverName),
+			New: fmt.Sprintf("\"%s/internal/", moduleName+"/"+serverName),
 		},
 		{
-			Old: parts[len(parts)-1] + gofile.GetPathDelimiter() + "internal",
-			New: parts[len(parts)-1] + gofile.GetPathDelimiter() + "Internal",
+			Old: "=$(cat docs/gen.info",
+			New: fmt.Sprintf("=$(cat %s/docs/gen.info", serverName),
 		},
 		{
-			Old: "--dir=internal/ecode",
-			New: "--dir=Internal/ecode",
+			Old: dupCodeMark,
+			New: adaptDupCode(serverType, serverName),
 		},
 		{
 			Old: fmt.Sprintf("\"%s/cmd/", moduleName),
@@ -640,24 +679,50 @@ func serverCodeFields(outDir string, moduleName string, serverName string) []rep
 			New: fmt.Sprintf("\"%s/api", moduleName+"/"+serverName),
 		},
 		{
-			Old: "vrf internal",
-			New: "vrf Internal",
+			Old: "merge_file_name=docs/apis.json",
+			New: fmt.Sprintf("merge_file_name=%s/docs/apis.json", serverName),
+		},
+		{
+			Old: "--file=docs/apis.swagger.json",
+			New: fmt.Sprintf("--file=%s/docs/apis.swagger.json", serverName),
+		},
+		{
+			Old: "sponge merge http-pb",
+			New: fmt.Sprintf("sponge merge http-pb --dir=%s", serverName),
+		},
+		{
+			Old: "sponge merge rpc-pb",
+			New: fmt.Sprintf("sponge merge rpc-pb --dir=%s", serverName),
+		},
+		{
+			Old: "sponge merge rpc-gw-pb",
+			New: fmt.Sprintf("sponge merge rpc-gw-pb --dir=%s", serverName),
+		},
+		{
+			Old: "docs/apis.html",
+			New: fmt.Sprintf("%s/docs/apis.html", serverName),
+		},
+		{
+			Old: `sponge patch gen-types-pb --out=./`,
+			New: typePbShellCode,
+		},
+		{
+			Old: `protoBasePath="api"`,
+			New: monoRepoAPIPath,
+		},
+		{
+			Old: fmt.Sprintf("go get %s@", moduleName),
+			New: fmt.Sprintf("go get %s@", "github.com/zhufuyi/sponge"),
 		},
 	}
 }
 
 // SubServerCodeFields sub server code fields
-func SubServerCodeFields(outDir string, moduleName string, serverName string) []replacer.Field {
-	parts := strings.Split(outDir, gofile.GetPathDelimiter())
-
+func SubServerCodeFields(moduleName string, serverName string) []replacer.Field {
 	return []replacer.Field{
-		{ // internal initial capital means exportable, external code can be referenced
-			Old: fmt.Sprintf("\"%s/internal/", moduleName),
-			New: fmt.Sprintf("\"%s/Internal/", moduleName+"/"+serverName),
-		},
 		{
-			Old: parts[len(parts)-1] + gofile.GetPathDelimiter() + "internal",
-			New: parts[len(parts)-1] + gofile.GetPathDelimiter() + "Internal",
+			Old: fmt.Sprintf("\"%s/internal/", moduleName),
+			New: fmt.Sprintf("\"%s/internal/", moduleName+"/"+serverName),
 		},
 		{
 			Old: fmt.Sprintf("\"%s/configs", moduleName),
@@ -666,10 +731,6 @@ func SubServerCodeFields(outDir string, moduleName string, serverName string) []
 		{
 			Old: fmt.Sprintf("\"%s/api", moduleName),
 			New: fmt.Sprintf("\"%s/api", moduleName+"/"+serverName),
-		},
-		{
-			Old: "vrf internal",
-			New: "vrf Internal",
 		},
 	}
 }
@@ -735,4 +796,50 @@ func cutPath(srcFilePath string) string {
 	dirPath, _ := filepath.Abs(".")
 	srcFilePath = strings.ReplaceAll(srcFilePath, dirPath, ".")
 	return strings.ReplaceAll(srcFilePath, "\\", "/")
+}
+
+func wrapPoint(s string) string {
+	return "`" + s + "`"
+}
+
+func setReadmeTitle(moduleName string, serverName string, serverType string, suitedMonoRepo bool) string {
+	var repoType string
+	if suitedMonoRepo {
+		repoType = "mono-repo"
+	} else {
+		if serverType == codeNameHTTP {
+			repoType = "monolith"
+		} else {
+			repoType = "multi-repo"
+		}
+	}
+
+	return wellPrefix + serverName + fmt.Sprintf(`
+
+| Feature             | Value          |
+| :----------------: | :-----------: |
+| Server name      |  %s   |
+| Server type        |  %s   |
+| Go module name |  %s  |
+| Repository type   |  %s  |
+
+`, wrapPoint(serverName), wrapPoint(serverType), wrapPoint(moduleName), wrapPoint(repoType))
+}
+
+// GetGoModFields get go mod fields
+func GetGoModFields(moduleName string) []replacer.Field {
+	return []replacer.Field{
+		{
+			Old: "github.com/zhufuyi/sponge",
+			New: moduleName,
+		},
+		{
+			Old: defaultGoModVersion,
+			New: getLocalGoVersion(),
+		},
+		{
+			Old: spongeTemplateVersionMark,
+			New: getLocalSpongeTemplateVersion(),
+		},
+	}
 }

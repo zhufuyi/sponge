@@ -22,10 +22,11 @@ func PatchCommand() *cobra.Command {
 		patch.GenMysqlInitCommand(),
 		patch.GenTypesPbCommand(),
 		patch.CopyProtoCommand(),
+		patch.CopyThirdPartyProtoCommand(),
+		patch.CopyGOModCommand(),
 		patch.ModifyDuplicateNumCommand(),
 		patch.ModifyDuplicateErrCodeCommand(),
 		patch.AdaptMonoRepoCommand(),
-		patch.AddSpecialTypesCommand(),
 		patch.ModifyProtoPackageCommand(),
 	)
 

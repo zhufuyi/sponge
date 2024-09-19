@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 
 	"github.com/zhufuyi/sponge/pkg/gobash"
@@ -32,7 +33,7 @@ func CopyProtoCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "copy-proto",
 		Short: "Copy proto file from the grpc service directory",
-		Long: `copy proto file from the grpc service, if the proto file exists, it will be forced to overwrite it,
+		Long: color.HiBlackString(`copy proto file from the grpc service, if the proto file exists, it will be forced to overwrite it,
 don't worry about losing the proto file after overwriting it, before copying proto it will be backed up to 
 the directory /tmp/sponge_copy_backup_proto_files.
 
@@ -45,7 +46,7 @@ Examples:
 
   # copy the specified proto files in the grpc service directory
   sponge patch copy-proto --server-dir=../grpc-server --proto-file=name1.proto,name2.proto
-`,
+`),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {

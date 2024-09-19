@@ -55,7 +55,7 @@ Examples:
   # generate web service code and specify the docker image repository address.
   sponge web http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
-  # if you want the generated code to suited to mono-repo, you need to specify the parameter --suited-mono-repo=true
+  # if you want the generated code to suited to mono-repo, you need to set the parameter --suited-mono-repo=true
 `),
 		SilenceErrors: true,
 		SilenceUsage:  true,
@@ -99,6 +99,7 @@ Examples:
 				codes:         codes,
 				outPath:       outPath,
 				isExtendedAPI: sqlArgs.IsExtendedAPI,
+				serverType:    codeNameHTTP,
 
 				suitedMonoRepo: suitedMonoRepo,
 			}
@@ -182,12 +183,13 @@ type httpGenerator struct {
 	isEmbed        bool
 	isExtendedAPI  bool
 	suitedMonoRepo bool
+	serverType     string
 
 	fields []replacer.Field
 }
 
 func (g *httpGenerator) generateCode() (string, error) {
-	subTplName := "http"
+	subTplName := codeNameHTTP
 	r := Replacers[TplNameSponge]
 	if r == nil {
 		return "", errors.New("replacer is nil")
@@ -323,7 +325,8 @@ func (g *httpGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	fields = append(fields, deleteAllFieldsMark(r, protoShellFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteAllFieldsMark(r, appConfigFile, wellStartMark, wellEndMark)...)
 	//fields = append(fields, deleteFieldsMark(r, deploymentConfigFile, wellStartMark, wellEndMark)...)
-	fields = append(fields, replaceFileContentMark(r, readmeFile, wellPrefix+g.serverName)...)
+	fields = append(fields, replaceFileContentMark(r, readmeFile,
+		setReadmeTitle(g.moduleName, g.serverName, codeNameHTTP, g.suitedMonoRepo))...)
 	fields = append(fields, []replacer.Field{
 		{ // replace the configuration of the *.yml file
 			Old: appConfigFileMark,
@@ -495,7 +498,7 @@ func (g *httpGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	}...)
 
 	if g.suitedMonoRepo {
-		fs := serverCodeFields(r.GetOutputDir(), g.moduleName, g.serverName)
+		fs := serverCodeFields(g.serverType, g.moduleName, g.serverName)
 		fields = append(fields, fs...)
 	}
 

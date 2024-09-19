@@ -11,8 +11,12 @@ import (
 	"path"
 	"path/filepath"
 	"regexp"
+	"sort"
+	"strconv"
 	"strings"
 	"time"
+
+	"github.com/fatih/color"
 
 	"github.com/zhufuyi/sponge/pkg/gobash"
 	"github.com/zhufuyi/sponge/pkg/gofile"
@@ -64,6 +68,7 @@ func (m *mergeParam) SetSplitLineMark(lineMark string) {
 
 func (m *mergeParam) runMerge() {
 	files := gofile.FuzzyMatchFiles(m.dir + "/" + m.fuzzyFilename)
+	files = filterAndRemoveOldFiles(files)
 	for _, file := range files {
 		successFile, err := m.runMergeCode(file)
 		if err != nil {
@@ -106,13 +111,10 @@ func (m *mergeParam) runMergeCode(file string) (string, error) {
 
 	count1 := bytes.Count(data1, m.splitLineMark)
 	count2 := bytes.Count(data2, m.splitLineMark)
-	//if count2 > count1 {
-	//	// 判断新增加的service，把新的service代码合并到原来的文件中
-	//} else if count2 < count1 {
-	//
-	//}
 	if count1 != count2 {
-		return "", fmt.Errorf("merge code mark mismatch, please merge codes manually, file = %s", file)
+		return "", fmt.Errorf(color.RedString("merge code failed (%s --> %s), manually merge code"+
+			" reference document https://github.com/zhufuyi/sponge/tree/main/cmd/sponge/commands/merge",
+			cutPathPrefix(file), getTargetFilename(file)))
 	}
 
 	var data []byte
@@ -133,7 +135,9 @@ func (m *mergeParam) runMergeCode(file string) (string, error) {
 	}
 
 	if len(data1) > len(data) {
-		return "", fmt.Errorf("to avoid replacing logical code, please merge codes manually, file = %s", file)
+		return "", fmt.Errorf(color.RedString("merge code failed (%s --> %s), to avoid replacing logical code, "+
+			"manually merge code reference document https://github.com/zhufuyi/sponge/tree/main/cmd/sponge/commands/merge",
+			cutPathPrefix(file), getTargetFilename(file)))
 	}
 
 	if len(data1) == len(data) {
@@ -175,8 +179,8 @@ func getOldFile(file string) string {
 }
 
 func compareCode(oldCode []code, newCode []code) ([]byte, []byte) {
-	var addCode []byte
-	var position []byte
+	var addCode []string
+	var position string
 
 	for _, code1 := range newCode {
 		isEqual := false
@@ -187,14 +191,18 @@ func compareCode(oldCode []code, newCode []code) ([]byte, []byte) {
 			}
 		}
 		if !isEqual {
-			addCode = append(addCode, []byte(code1.value)...)
+			addCode = append(addCode, code1.value)
 		}
 	}
-	if len(oldCode) > 0 {
-		position = []byte(oldCode[len(oldCode)-1].value) // last position
+
+	l := len(oldCode)
+	if l > 0 {
+		position = oldCode[l-1].value // last position
 	}
 
-	return addCode, position
+	addData := checkAndAdjustErrorCode(addCode, position, l)
+
+	return addData, []byte(position)
 }
 
 func compareCode2(oldCode []code, newCode []code, data []byte) ([]byte, []byte) {
@@ -239,8 +247,6 @@ func mergeCode(oldCode []byte, addCode []byte, position []byte) []byte {
 	if len(ss) != 2 {
 		return oldCode
 	}
-	fmt.Println("------ position = ", string(position))
-	fmt.Println("------ addCode = ", string(addCode))
 	data = append(ss[0], position...)
 	data = append(data, addCode...)
 	data = append(data, ss[1]...)
@@ -366,6 +372,8 @@ func getComment(name string, str string) string {
 	return strings.ReplaceAll(match[0], "\nfunc", "")
 }
 
+// ------------------------------------------------------------------------------------------
+
 func adaptDir(dir string) string {
 	if dir == "." || dir == "./" || dir == ".\\" {
 		return ""
@@ -378,6 +386,124 @@ func adaptDir(dir string) string {
 		return dir[:l-1] + "/"
 	}
 	return dir + "/"
+}
+
+func cutPathPrefix(srcFile string) string {
+	dirPath, _ := filepath.Abs(".")
+	return strings.ReplaceAll(srcFile, dirPath+gofile.GetPathDelimiter(), "")
+}
+
+func getTargetFilename(file string) string {
+	filename := gofile.GetFilename(file)
+	ss := strings.Split(filename, ".go.gen")
+	if len(ss) != 2 {
+		return file
+	}
+	return ss[0] + ".go"
+}
+
+func filterAndRemoveOldFiles(files []string) []string {
+	if len(files) < 2 {
+		return files
+	}
+
+	var groupFiles = make(map[string][]string)
+	for _, file := range files {
+		filePrefix := strings.Split(file, ".go.gen")
+		if len(filePrefix) != 2 {
+			continue
+		}
+		if _, ok := groupFiles[filePrefix[0]]; !ok {
+			groupFiles[filePrefix[0]] = []string{file}
+		} else {
+			groupFiles[filePrefix[0]] = append(groupFiles[filePrefix[0]], file)
+		}
+	}
+
+	var newFiles, removeFiles []string
+	for _, fs := range groupFiles {
+		l := len(fs)
+		if l == 1 {
+			newFiles = append(newFiles, fs[0])
+		} else if l > 1 {
+			sort.Strings(fs)
+			newFiles = append(newFiles, fs[l-1])
+			removeFiles = append(removeFiles, fs[:l-1]...)
+		}
+	}
+
+	// remove old files
+	for _, file := range removeFiles {
+		_ = os.Remove(file)
+	}
+
+	return newFiles
+}
+
+var (
+	errCodeStrMark1 = "errcode.NewError("
+	errCodeStrMark2 = "errcode.NewRPCStatus("
+)
+
+func checkAndGetErrorCodeStr(str string) string {
+	if !strings.Contains(str, errCodeStrMark1) && !strings.Contains(str, errCodeStrMark2) {
+		return ""
+	}
+
+	// match strings between left parentheses and commas using regular expressions
+	// string format: ErrLoginUser = errcode.NewError(userBaseCode+2, "failed to Login "+userName)
+	pattern := `\(([^)]+?),`
+	re := regexp.MustCompile(pattern)
+
+	match := re.FindStringSubmatch(str)
+	if len(match) < 2 {
+		return ""
+	}
+
+	return match[1]
+}
+
+func parseErrorCode(str string) (string, int) {
+	ss := strings.Split(str, "+")
+	if len(ss) != 2 {
+		return "", 0
+	}
+	num, _ := strconv.Atoi(strings.TrimSpace(ss[1]))
+	return ss[0], num
+}
+
+func checkAndAdjustErrorCode(addCode []string, position string, l int) []byte {
+	data := []byte(strings.Join(addCode, ""))
+
+	str := checkAndGetErrorCodeStr(position)
+	if str == "" {
+		return data
+	}
+	referenceStr, maxNum := parseErrorCode(str)
+	if referenceStr == "" || maxNum == 0 {
+		return data
+	}
+	if maxNum < l {
+		maxNum = l
+	}
+
+	// adjust error code
+	var newCode []byte
+	for _, line := range addCode {
+		codeStr := checkAndGetErrorCodeStr(line)
+		if codeStr == "" {
+			return data
+		}
+		baseStr, num := parseErrorCode(codeStr)
+		if baseStr == "" || num == 0 {
+			return data
+		}
+		maxNum++
+		newLine := strings.ReplaceAll(line, codeStr, fmt.Sprintf("%s+%d", referenceStr, maxNum))
+		newCode = append(newCode, []byte(newLine)...)
+	}
+
+	return newCode
 }
 
 // ------------------------------------------------------------------------------------------

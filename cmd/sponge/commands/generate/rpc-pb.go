@@ -39,7 +39,7 @@ Examples:
   # generate grpc service code and specify the docker image repository address.
   sponge micro rpc-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --protobuf-file=./demo.proto
 
-  # if you want the generated code to suited to mono-repo, you need to specify the parameter --suited-mono-repo=true
+  # if you want the generated code to suited to mono-repo, you need to set the parameter --suited-mono-repo=true
 `),
 		SilenceErrors: true,
 		SilenceUsage:  true,
@@ -107,7 +107,7 @@ func (g *rpcPbGenerator) generateCode() error {
 		return err
 	}
 
-	subTplName := "rpc-pb"
+	subTplName := codeNameGRPCPb
 	r := Replacers[TplNameSponge]
 	if r == nil {
 		return errors.New("replacer is nil")
@@ -123,9 +123,6 @@ func (g *rpcPbGenerator) generateCode() error {
 		"sponge/Jenkinsfile", "sponge/Makefile", "sponge/README.md",
 	}
 
-	if g.suitedMonoRepo {
-		subFiles = removeElements(subFiles, "sponge/go.mod", "sponge/go.sum")
-	}
 	if isImportTypes {
 		subFiles = append(subFiles, "api/types/types.proto")
 	}
@@ -144,6 +141,12 @@ func (g *rpcPbGenerator) generateCode() error {
 			"service.go", "service_test.go",
 		},
 	}
+
+	if g.suitedMonoRepo {
+		subDirs = removeElements(subDirs, "sponge/third_party")
+		subFiles = removeElements(subFiles, "sponge/go.mod", "sponge/go.sum", "api/types/types.proto")
+	}
+
 	replaceFiles := make(map[string][]string)
 	subFiles = append(subFiles, getSubFiles(selectFiles, replaceFiles)...)
 
@@ -161,7 +164,9 @@ func (g *rpcPbGenerator) generateCode() error {
 		return err
 	}
 
-	_ = saveProtobufFiles(g.moduleName, g.serverName, r.GetOutputDir(), protobufFiles)
+	if err = saveProtobufFiles(g.moduleName, g.serverName, g.suitedMonoRepo, r.GetOutputDir(), protobufFiles); err != nil {
+		return err
+	}
 	_ = saveGenInfo(g.moduleName, g.serverName, g.suitedMonoRepo, r.GetOutputDir())
 
 	fmt.Printf(`
@@ -193,7 +198,8 @@ func (g *rpcPbGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	fields = append(fields, deleteAllFieldsMark(r, protoShellFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteAllFieldsMark(r, appConfigFile, wellStartMark, wellEndMark)...)
 	//fields = append(fields, deleteFieldsMark(r, deploymentConfigFile, wellStartMark, wellEndMark)...)
-	fields = append(fields, replaceFileContentMark(r, readmeFile, wellPrefix+g.serverName)...)
+	fields = append(fields, replaceFileContentMark(r, readmeFile,
+		setReadmeTitle(g.moduleName, g.serverName, codeNameGRPCPb, g.suitedMonoRepo))...)
 	fields = append(fields, []replacer.Field{
 		{ // replace the configuration of the *.yml file
 			Old: appConfigFileMark,

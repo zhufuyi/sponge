@@ -267,13 +267,8 @@ func NewCenter(configFile string) (*Center, error) {
   sponge merge rpc-pb
   checkResult $?
 
-  colorCyan='\033[1;36m'
-  highBright='\033[1m'
-  markEnd='\033[0m'
-
-  echo ""
-  echo -e "${highBright}Tip:${markEnd} execute the command ${colorCyan}make run${markEnd} and then test grpc api in the file ${colorCyan}internal/service/xxx_client_test.go${markEnd}."
-  echo ""`
+  tipMsg="${highBright}Tip:${markEnd} execute the command ${colorCyan}make run${markEnd} and then test grpc api in the file ${colorCyan}internal/service/xxx_client_test.go${markEnd}."
+`
 
 	// for http-pb
 	protoShellHandlerCode = `
@@ -301,13 +296,8 @@ func NewCenter(configFile string) (*Center, error) {
   sponge merge http-pb
   checkResult $?
 
-  colorCyan='\033[1;36m'
-  highBright='\033[1m'
-  markEnd='\033[0m'
-
-  echo ""
-  echo -e "${highBright}Tip:${markEnd} execute the command ${colorCyan}make run${markEnd} and then visit ${colorCyan}http://localhost:8080/apis/swagger/index.html${markEnd} in your browser. "
-  echo ""`
+  tipMsg="${highBright}Tip:${markEnd} execute the command ${colorCyan}make run${markEnd} and then visit ${colorCyan}http://localhost:8080/apis/swagger/index.html${markEnd} in your browser. "
+`
 
 	// for rpc-gw
 	protoShellServiceCode = `
@@ -335,15 +325,10 @@ func NewCenter(configFile string) (*Center, error) {
   sponge merge rpc-gw-pb
   checkResult $?
 
-  colorCyan='\033[1;36m'
-  highBright='\033[1m'
-  markEnd='\033[0m'
+  tipMsg="${highBright}Tip:${markEnd} execute the command ${colorCyan}make run${markEnd} and then visit ${colorCyan}http://localhost:8080/apis/swagger/index.html${markEnd} in your browser."
+`
 
-  echo ""
-  echo -e "${highBright}Tip:${markEnd} execute the command ${colorCyan}make run${markEnd} and then visit ${colorCyan}http://localhost:8080/apis/swagger/index.html${markEnd} in your browser."
-  echo ""`
-
-	// for grpc-http
+	//nolint for grpc-http
 	protoShellServiceAndHandlerCode = `
   # generate the swagger document and merge all files into docs/apis.swagger.json
   protoc --proto_path=. --proto_path=./third_party \
@@ -379,15 +364,8 @@ func NewCenter(configFile string) (*Center, error) {
   sponge merge http-pb
   checkResult $?
 
-  colorCyan='\033[1;36m'
-  highBright='\033[1m'
-  markEnd='\033[0m'
-
-  echo ""
-  echo -e "${highBright}Tip:${markEnd} execute the command ${colorCyan}make run${markEnd} and then"
-  echo -e "    1. test http api in your browser ${colorCyan}http://localhost:8080/apis/swagger/index.html${markEnd}"
-  echo -e "    2. test grpc api in the file ${colorCyan}internal/service/xxx_client_test.go${markEnd}"
-  echo ""`
+  tipMsg="${highBright}Tip:${markEnd} execute the command ${colorCyan}make run${markEnd} and then\n      1. test http api in your browser ${colorCyan}http://localhost:8080/apis/swagger/index.html${markEnd}\n      2. test grpc api in the file ${colorCyan}internal/service/xxx_client_test.go${markEnd}"
+`
 
 	httpServerConfigCode = `# http server settings
 http:

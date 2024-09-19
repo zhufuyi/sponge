@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 
 	"github.com/zhufuyi/sponge/pkg/gofile"
@@ -24,7 +25,7 @@ func ModifyProtoPackageCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "modify-proto-package",
 		Short: "Modifies the package and go_package names of proto files",
-		Long: `modifies the package and go_package names of proto files.
+		Long: color.HiBlackString(`modifies the package and go_package names of proto files.
 
 Examples:
   # modify the package and go_package names of all proto files in the api directory.
@@ -32,8 +33,7 @@ Examples:
 
   # modify the package and go_package names of all proto files in the api directory, get module name from docs/gen.
   sponge patch modify-proto-package --dir=api --server-dir=server
-
-`,
+`),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -129,43 +129,25 @@ func replaceProtoPackages(protoFilePath, packageName, goPackage string) error {
 		data = bytes.ReplaceAll(data, []byte("\r\n"), []byte("\n"))
 	}
 
-	regStr := `\npackage [\w\W]*?;`
-	reg := regexp.MustCompile(regStr)
-	srcPackageName := reg.Find(data)
-
 	regStr2 := `go_package [\w\W]*?;\n`
 	reg2 := regexp.MustCompile(regStr2)
 	srcGoPackageName := reg2.Find(data)
-
-	if len(srcPackageName) > 0 {
-		newPackage := fmt.Sprintf("\npackage %s;", packageName)
-		data = bytes.Replace(data, srcPackageName, []byte(newPackage), 1)
+	newGoPackage := fmt.Sprintf("go_package = %s;\n", goPackage)
+	if len(srcGoPackageName) > 0 {
+		data = bytes.Replace(data, srcGoPackageName, []byte(newGoPackage), 1)
+	} else {
+		data = bytes.Replace(data, []byte("\n\n"), []byte("\n\n"+newGoPackage+"\n\n"), 1)
 	}
 
-	if len(srcGoPackageName) > 0 {
-		newGoPackage := fmt.Sprintf("go_package = %s;\n", goPackage)
-		data = bytes.Replace(data, srcGoPackageName, []byte(newGoPackage), 1)
+	regStr := `\npackage [\w\W]*?;`
+	reg := regexp.MustCompile(regStr)
+	srcPackageName := reg.Find(data)
+	newPackage := fmt.Sprintf("\npackage %s;", packageName)
+	if len(srcPackageName) > 0 {
+		data = bytes.Replace(data, srcPackageName, []byte(newPackage), 1)
+	} else {
+		data = bytes.Replace(data, []byte("\n\n"), []byte("\n\n"+newPackage+"\n\n"), 1)
 	}
 
 	return os.WriteFile(protoFilePath, data, 0666)
-}
-
-// AddSpecialTypesCommand add common special types that proto files depend on
-// Deprecated: This command has been discarded
-func AddSpecialTypesCommand() *cobra.Command {
-	var dir string
-	cmd := &cobra.Command{
-		Use:   "add-special-types",
-		Short: "Add common special types that proto files depend on, [Deprecated]",
-		Long: `add common special types that proto files depend on, this command has been deprecated.
-
-`,
-		SilenceErrors: true,
-		SilenceUsage:  true,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return nil
-		},
-	}
-	cmd.Flags().StringVarP(&dir, "dir", "d", "", "input specified directory")
-	return cmd
 }

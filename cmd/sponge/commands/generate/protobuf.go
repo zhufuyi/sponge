@@ -128,7 +128,7 @@ type protobufGenerator struct {
 }
 
 func (g *protobufGenerator) generateCode() (string, error) {
-	subTplName := "protobuf"
+	subTplName := codeNameProtobuf
 	r := Replacers[TplNameSponge]
 	if r == nil {
 		return "", errors.New("replacer is nil")

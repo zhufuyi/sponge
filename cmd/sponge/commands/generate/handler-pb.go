@@ -50,6 +50,8 @@ Examples:
 
   # generate handler and protobuf code and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge web handler-pb --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
+
+  # if you want the generated code to suited to mono-repo, you need to set the parameter --suited-mono-repo=true
 `),
 		SilenceErrors: true,
 		SilenceUsage:  true,
@@ -148,7 +150,7 @@ type handlerPbGenerator struct {
 }
 
 func (g *handlerPbGenerator) generateCode() (string, error) {
-	subTplName := "handler-pb"
+	subTplName := codeNameHandlerPb
 	r := Replacers[TplNameSponge]
 	if r == nil {
 		return "", errors.New("replacer is nil")
@@ -224,6 +226,12 @@ func (g *handlerPbGenerator) generateCode() (string, error) {
 	r.SetReplacementFields(fields)
 	if err := r.SaveFiles(); err != nil {
 		return "", err
+	}
+
+	if g.suitedMonoRepo {
+		if err := moveProtoFileToAPIDir(g.moduleName, g.serverName, g.suitedMonoRepo, r.GetOutputDir()); err != nil {
+			return "", err
+		}
 	}
 
 	return r.GetOutputDir(), nil
@@ -319,7 +327,7 @@ func (g *handlerPbGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	}...)
 
 	if g.suitedMonoRepo {
-		fs := SubServerCodeFields(r.GetOutputDir(), g.moduleName, g.serverName)
+		fs := SubServerCodeFields(g.moduleName, g.serverName)
 		fields = append(fields, fs...)
 	}
 

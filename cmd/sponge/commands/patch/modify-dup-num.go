@@ -2,23 +2,14 @@ package patch
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"os"
 	"regexp"
-	"sort"
 	"strconv"
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
-
-	"github.com/zhufuyi/sponge/pkg/gofile"
-	"github.com/zhufuyi/sponge/pkg/krand"
-)
-
-const (
-	httpType = "http"
-	grpcType = "grpc"
 )
 
 // ModifyDuplicateNumCommand modify duplicate numbers
@@ -30,13 +21,12 @@ func ModifyDuplicateNumCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "modify-dup-num",
 		Short: "Modify duplicate numbers",
-		Long: `modify duplicate numbers 
+		Long: color.HiBlackString(`modify duplicate numbers 
 
 Examples:
   # modify duplicate numbers
   sponge patch modify-dup-num --dir=internal/ecode
-
-`,
+`),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -45,25 +35,14 @@ Examples:
 				return err
 			}
 
-			nsi, err := parseFiles(files)
+			count, err := checkAndModifyDuplicateNum(files)
 			if err != nil {
 				return err
+			}
+			if count > 0 {
+				fmt.Println("modify duplicate num successfully.")
 			}
 
-			msg, err := nsi.modifyHTTPDuplicateNum()
-			if err != nil {
-				return err
-			}
-			if msg != "" {
-				fmt.Println("modify http duplicate numbers: ", msg)
-			}
-			msg, err = nsi.modifyGRPCDuplicateNum()
-			if err != nil {
-				return err
-			}
-			if msg != "" {
-				fmt.Println("modify grpc duplicate numbers: ", msg)
-			}
 			return nil
 		},
 	}
@@ -73,315 +52,161 @@ Examples:
 	return cmd
 }
 
-func listErrCodeFiles(dir string) ([]string, error) {
-	files, err := gofile.ListFiles(dir)
+type coreInfo struct {
+	name   string
+	num    int
+	srcStr string
+	dstStr string
+	file   string
+}
+
+var (
+	httpNumMark = "errcode.HCode"
+	grpcNumMark = "errcode.RCode"
+	httpPattern = `errcode\.HCode\(([^)]+)\)`
+	grpcPattern = `errcode\.RCode\(([^)]+)\)`
+)
+
+func getVariableName(data []byte, pattern string) string {
+	re := regexp.MustCompile(pattern)
+	match := re.FindStringSubmatch(string(data))
+	if len(match) < 2 {
+		return ""
+	}
+
+	return strings.ReplaceAll(match[1], " ", "")
+}
+
+func parseNumInfo(data []byte, variableName string) coreInfo {
+	var info coreInfo
+	pattern := variableName + `\s*=\s*(\d+)`
+	re := regexp.MustCompile(pattern)
+	match := re.FindStringSubmatch(string(data))
+	if len(match) < 2 {
+		return info
+	}
+
+	num, err := strconv.Atoi(match[1])
 	if err != nil {
-		return nil, err
+		return info
 	}
 
-	if len(files) == 0 {
-		return nil, errors.New("not found files")
+	ss := strings.Split(match[0], "=")
+	if len(ss) != 2 {
+		return info
 	}
 
-	filterFiles := []string{}
-	for _, file := range files {
-		if strings.Contains(file, "systemCode.go") ||
-			strings.Contains(file, "systemCode_http.go") ||
-			strings.Contains(file, "systemCode_rpc.go") {
-			continue
-		}
-		filterFiles = append(filterFiles, file)
-	}
+	info.name = variableName
+	info.num = num
+	info.srcStr = match[0]
+	info.dstStr = ss[0] + "= "
 
-	return filterFiles, nil
+	return info
 }
 
-type numInfo struct {
-	Name string
-	Num  int
-	Str  string
-}
-
-type numbersInfo struct {
-	httpNumInfo         map[string]map[string]numInfo // map[file]map[code]numInfo
-	httpDuplicationNums map[int][]string
-
-	grpcNumInfo         map[string]map[string]numInfo // map[file]map[code]numInfo
-	grpcDuplicationNums map[int][]string
-}
-
-func (r *numbersInfo) modifyHTTPDuplicateNum() (string, error) {
-	msg := ""
-	duplicateNums := []string{}
-
-	if len(r.httpDuplicationNums) == 0 {
-		return msg, nil
-	}
-
-	numMap := map[int]struct{}{}
-	for num := range r.httpDuplicationNums {
-		numMap[num] = struct{}{}
-	}
-
-	for num, fs := range r.httpDuplicationNums {
-		if len(fs) <= 1 {
-			continue
-		}
-
-		fs = sortFiles(fs)
-		for i, file := range fs {
-			if i == 0 {
-				continue
-			}
-			for _, ni := range r.httpNumInfo[file] {
-				newNum := genNewNum(numMap)
-				if ni.Num == num {
-					_, err := updateFile(file, newNum, ni)
-					if err != nil {
-						return msg, err
-					}
-					duplicateNums = append(duplicateNums, fmt.Sprintf("%d --> %d", ni.Num, newNum))
-				}
-			}
-		}
-	}
-
-	if len(duplicateNums) == 0 {
-		return msg, nil
-	}
-	return strings.Join(duplicateNums, ", "), nil
-}
-
-func (r *numbersInfo) modifyGRPCDuplicateNum() (string, error) {
-	msg := ""
-	duplicateNums := []string{}
-
-	if len(r.grpcDuplicationNums) == 0 {
-		return msg, nil
-	}
-
-	numMap := map[int]struct{}{}
-	for num := range r.grpcDuplicationNums {
-		numMap[num] = struct{}{}
-	}
-
-	for num, fs := range r.grpcDuplicationNums {
-		if len(fs) <= 1 {
-			continue
-		}
-
-		fs = sortFiles(fs)
-		for i, file := range fs {
-			if i == 0 {
-				continue
-			}
-			for _, ni := range r.grpcNumInfo[file] {
-				newNum := genNewNum(numMap)
-				if ni.Num == num {
-					_, err := updateFile(file, newNum, ni)
-					if err != nil {
-						return msg, err
-					}
-					duplicateNums = append(duplicateNums, fmt.Sprintf("%d --> %d", ni.Num, newNum))
-				}
-			}
-		}
-	}
-
-	if len(duplicateNums) == 0 {
-		return msg, nil
-	}
-	return strings.Join(duplicateNums, ", "), nil
-}
-
-func parseFiles(files []string) (*numbersInfo, error) {
-	nsi := &numbersInfo{
-		httpNumInfo:         map[string]map[string]numInfo{},
-		httpDuplicationNums: map[int][]string{},
-		grpcNumInfo:         map[string]map[string]numInfo{},
-		grpcDuplicationNums: map[int][]string{},
-	}
-
-	for _, file := range files {
-		result, err := parseNumberInfo(file)
-		if err != nil {
-			return nsi, err
-		}
-		if result == nil {
-			continue
-		}
-		if result.errCodeType == httpType {
-			for _, num := range result.nums {
-				if fs, ok := nsi.httpDuplicationNums[num]; ok {
-					fs = append(fs, file)
-					nsi.httpDuplicationNums[num] = fs
-				} else {
-					nsi.httpDuplicationNums[num] = []string{file}
-				}
-			}
-			nsi.httpNumInfo[file] = result.ni
-		} else if result.errCodeType == grpcType {
-			for _, num := range result.nums {
-				if fs, ok := nsi.grpcDuplicationNums[num]; ok {
-					fs = append(fs, file)
-					nsi.grpcDuplicationNums[num] = fs
-				} else {
-					nsi.grpcDuplicationNums[num] = []string{file}
-				}
-			}
-			nsi.grpcNumInfo[file] = result.ni
-		}
-	}
-
-	return nsi, nil
-}
-
-type parseResult struct {
-	ni          map[string]numInfo
-	nums        []int
-	errCodeType string
-}
-
-func parseNumberInfo(file string) (*parseResult, error) {
-	errCodeType := ""
-	ni := map[string]numInfo{}
-	nums := []int{}
-
+func getNumberInfos(file string) []coreInfo {
+	var infos []coreInfo
 	data, err := os.ReadFile(file)
 	if err != nil {
-		return nil, err
-	}
-	dataStr := string(data)
-	if strings.Contains(dataStr, "errcode.NewError") {
-		errCodeType = httpType
-	} else if strings.Contains(dataStr, "errcode.NewRPCStatus") {
-		errCodeType = grpcType
+		return infos
 	}
 
-	if errCodeType == "" {
-		return nil, nil
-	}
-
-	var regStr string
-	if errCodeType == httpType {
-		regStr = `=[ ]*?errcode.HCode\(([\w\W]*?)\)\n`
-	} else if errCodeType == grpcType {
-		regStr = `=[ ]*?errcode.RCode\(([\w\W]*?)\)\n`
-	}
-
-	reg := regexp.MustCompile(regStr)
-	allSubMatch := reg.FindAllStringSubmatch(dataStr, -1)
-	if len(allSubMatch) == 0 {
-		return nil, nil
-	}
-	names := []string{}
-
-	for _, match := range allSubMatch {
-		for i, v := range match {
-			if i == 1 {
-				names = append(names, v)
+	serviceGroupData := bytes.Split(data, []byte(serviceGroupSeparatorMark))
+	for _, groupData := range serviceGroupData {
+		pattern := ""
+		if bytes.Contains(groupData, []byte(httpNumMark)) {
+			pattern = httpPattern
+		} else if bytes.Contains(groupData, []byte(grpcNumMark)) {
+			pattern = grpcPattern
+		}
+		if pattern != "" {
+			variableName := getVariableName(groupData, pattern)
+			if variableName != "" {
+				info := parseNumInfo(groupData, variableName)
+				if info.name != "" {
+					info.file = file
+					infos = append(infos, info)
+				}
 			}
 		}
 	}
 
-	for _, name := range names {
-		regStr = name + `[ ]*?=[ ]*?([\d]+)`
-		reg = regexp.MustCompile(regStr)
-		allSubMatch = reg.FindAllStringSubmatch(dataStr, -1)
-		for _, match := range allSubMatch {
-			if len(match) == 2 {
-				num, _ := strconv.Atoi(match[1])
-				nums = append(nums, num)
-				ni[name] = numInfo{Name: name, Num: num, Str: match[0]}
+	return infos
+}
+
+func getModifyNumInfos(infos []coreInfo) ([]coreInfo, map[int]struct{}) {
+	m := map[int][]coreInfo{}
+	allNum := map[int]struct{}{}
+	for _, info := range infos {
+		allNum[info.num] = struct{}{}
+		if cis, ok := m[info.num]; ok {
+			m[info.num] = append(cis, info)
+		} else {
+			m[info.num] = []coreInfo{info}
+		}
+	}
+
+	needModify := []coreInfo{}
+	for _, numInfos := range m {
+		if len(numInfos) > 1 {
+			needModify = append(needModify, numInfos[1:]...)
+		}
+	}
+
+	return needModify, allNum
+}
+
+func modifyNumberInfos(infos []coreInfo, allNum map[int]struct{}) (int, error) {
+	l := len(infos)
+	if l == 0 {
+		return 0, nil
+	}
+
+	var nums []int
+	for i := 1; i < 100; i++ {
+		if _, ok := allNum[i]; !ok {
+			nums = append(nums, i)
+			if len(nums) == len(infos) {
+				break
 			}
 		}
 	}
 
-	return &parseResult{
-		ni:          ni,
-		nums:        nums,
-		errCodeType: errCodeType,
-	}, nil
-}
-
-func getFileCreateTime(file string) int64 {
-	fi, err := os.Stat(file)
-	if err != nil {
-		return 0
-	}
-
-	return fi.ModTime().Unix()
-}
-
-func updateFile(file string, newNum int, ni numInfo) (numInfo, error) {
-	strTmp := ni.Str
-	ni.Num = newNum
-	ni.Str = replaceNum(strTmp, ni.Num)
-
-	data, err := os.ReadFile(file)
-	if err != nil {
-		return ni, err
-	}
-	data = bytes.ReplaceAll(data, []byte(strTmp), []byte(ni.Str))
-
-	err = os.WriteFile(file, data, 0766)
-	if err != nil {
-		return ni, err
-	}
-	return ni, nil
-}
-
-func replaceNum(str string, newNum int) string {
-	regStr := `([\w\W]*?=[ ]*?)[\d]+`
-	reg := regexp.MustCompile(regStr)
-	allSubMatch := reg.FindAllStringSubmatch(str, -1)
-	for _, match := range allSubMatch {
-		if len(match) == 2 {
-			str = match[1] + fmt.Sprintf("%d", newNum)
+	if len(nums) < l {
+		for i := 0; i < l-len(nums); i++ {
+			nums = append(nums, 99) // 99 is the largest number
 		}
 	}
-	return str
-}
 
-type fileInfo struct {
-	file        string
-	createdTime int64
-}
-
-func sortFiles(files []string) []string {
-	fis := []*fileInfo{}
-
-	for _, file := range files {
-		fis = append(fis, &fileInfo{
-			file:        file,
-			createdTime: getFileCreateTime(file),
-		})
-	}
-
-	sort.Slice(fis, func(i, j int) bool {
-		return fis[i].createdTime < fis[j].createdTime
-	})
-
-	var sFiles []string
-	for _, fi := range fis {
-		sFiles = append(sFiles, fi.file)
-	}
-	return sFiles
-}
-
-func genNewNum(numMap map[int]struct{}) int {
-	max := 1000000
 	count := 0
-	for {
-		count++
-		newNum := krand.Int(99)
-		if _, ok := numMap[newNum]; !ok {
-			numMap[newNum] = struct{}{}
-			return newNum
+	for i, info := range infos {
+		data, err := os.ReadFile(info.file)
+		if err != nil {
+			return 0, err
 		}
-		if count > max {
-			break
+
+		newData := bytes.ReplaceAll(data, []byte(info.srcStr), []byte(info.dstStr+strconv.Itoa(nums[i])))
+
+		err = os.WriteFile(info.file, newData, 0666)
+		if err != nil {
+			return 0, err
+		}
+		count++
+	}
+
+	return count, nil
+}
+
+func checkAndModifyDuplicateNum(files []string) (int, error) {
+	var allInfos []coreInfo
+	for _, file := range files {
+		infos := getNumberInfos(file)
+		if len(infos) > 0 {
+			allInfos = append(allInfos, infos...)
 		}
 	}
-	return 1
+
+	needModify, allNum := getModifyNumInfos(allInfos)
+
+	return modifyNumberInfos(needModify, allNum)
 }

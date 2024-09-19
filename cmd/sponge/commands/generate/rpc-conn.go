@@ -37,7 +37,7 @@ Examples:
   # generate grpc connection code and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge micro rpc-conn --rpc-server-name=user --out=./yourServerDir
 
-  # if you want the generated code to suited to mono-repo, you need to specify the parameter --suited-mono-repo=true --serverName=yourServerName
+  # if you want the generated code to suited to mono-repo, you need to set the parameter --suited-mono-repo=true --server-name=yourServerName
 `),
 		SilenceErrors: true,
 		SilenceUsage:  true,
@@ -109,7 +109,7 @@ type grpcConnectionGenerator struct {
 }
 
 func (g *grpcConnectionGenerator) generateCode() (string, error) {
-	subTplName := "rpc-conn"
+	subTplName := codeNameGRPCConn
 	r := Replacers[TplNameSponge]
 	if r == nil {
 		return "", errors.New("replacer is nil")
@@ -121,7 +121,7 @@ func (g *grpcConnectionGenerator) generateCode() (string, error) {
 
 	r.SetSubDirsAndFiles(subDirs, subFiles...)
 	_ = r.SetOutputDir(g.outPath, subTplName)
-	fields := g.addFields(r)
+	fields := g.addFields()
 	r.SetReplacementFields(fields)
 	if err := r.SaveFiles(); err != nil {
 		return "", err
@@ -130,7 +130,7 @@ func (g *grpcConnectionGenerator) generateCode() (string, error) {
 	return r.GetOutputDir(), nil
 }
 
-func (g *grpcConnectionGenerator) addFields(r replacer.Replacer) []replacer.Field {
+func (g *grpcConnectionGenerator) addFields() []replacer.Field {
 	var fields []replacer.Field
 
 	fields = append(fields, []replacer.Field{
@@ -150,7 +150,7 @@ func (g *grpcConnectionGenerator) addFields(r replacer.Replacer) []replacer.Fiel
 	}...)
 
 	if g.suitedMonoRepo {
-		fs := SubServerCodeFields(r.GetOutputDir(), g.moduleName, g.serverName)
+		fs := SubServerCodeFields(g.moduleName, g.serverName)
 		fields = append(fields, fs...)
 	}
 
