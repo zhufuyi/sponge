@@ -296,12 +296,6 @@ func (g *rpcGenerator) generateCode() (string, error) {
 		if err := moveProtoFileToAPIDir(g.moduleName, g.serverName, g.suitedMonoRepo, r.GetOutputDir()); err != nil {
 			return "", err
 		}
-		//apiDir := g.serverName + gofile.GetPathDelimiter() + "api"
-		//protoFiles, _ := gofile.ListFiles(apiDir, gofile.WithNoAbsolutePath(), gofile.WithSuffix(".proto"))
-		//if err := saveProtobufFiles(g.moduleName, g.serverName, g.suitedMonoRepo, r.GetOutputDir(), protoFiles); err != nil {
-		//	return "", err
-		//}
-		//_ = os.RemoveAll(apiDir)
 	}
 	_ = saveGenInfo(g.moduleName, g.serverName, g.suitedMonoRepo, r.GetOutputDir())
 
@@ -521,7 +515,7 @@ func (g *rpcGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	}...)
 
 	if g.suitedMonoRepo {
-		fs := serverCodeFields(r.GetOutputDir(), g.moduleName, g.serverName)
+		fs := serverCodeFields(codeNameGRPC, g.moduleName, g.serverName)
 		fields = append(fields, fs...)
 	}
 

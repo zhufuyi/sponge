@@ -339,7 +339,7 @@ func (g *httpAndGRPCPbGenerator) addFields(r replacer.Replacer) []replacer.Field
 	}...)
 
 	if g.suitedMonoRepo {
-		fs := serverCodeFields(r.GetOutputDir(), g.moduleName, g.serverName)
+		fs := serverCodeFields(codeNameGRPCHTTP, g.moduleName, g.serverName)
 		fields = append(fields, fs...)
 	}
 

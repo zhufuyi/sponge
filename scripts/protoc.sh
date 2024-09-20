@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# the directory where the proto files are located
 protoBasePath="api"
 allProtoFiles=""
 

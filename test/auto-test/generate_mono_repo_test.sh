@@ -42,14 +42,6 @@ function checkResult() {
     fi
 }
 
-function checkGoModule() {
-    if [ -f "go.mod" ]; then
-      return
-    else
-      go mod init edusys
-    fi
-}
-
 function printTestResult() {
   local errCount=$1
   local serverDir=$2
@@ -159,8 +151,6 @@ function generate_http_mysql() {
     echo -e "\n${colorCyan}sponge web handler --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable2 --embed=true --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
     sponge web handler --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable2 --embed=true --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
     checkResult $?
-
-    checkGoModule
   fi
 
   if [ "$isOnlyGenerateCode" == "true" ]; then
@@ -190,7 +180,6 @@ function generate_http_postgresql() {
     echo -e "\n${colorCyan}sponge web handler --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable2 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
     sponge web handler --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable2 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
     checkResult $?
-    checkGoModule
   fi
 
   if [ "$isOnlyGenerateCode" == "true" ]; then
@@ -222,7 +211,6 @@ function generate_http_sqlite() {
     checkResult $?
 
     sed -E -i 's/\\\\sql\\\\/\\\\\.\.\\\\\sql\\\\/g' ${outDir}/configs/${serverName}.yml
-    checkGoModule
   fi
 
   if [ "$isOnlyGenerateCode" == "true" ]; then
@@ -252,7 +240,6 @@ function generate_http_mongodb() {
     echo -e "\n${colorCyan}sponge web handler --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection2 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
     sponge web handler --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection2 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
     checkResult $?
-    checkGoModule
   fi
 
   if [ "$isOnlyGenerateCode" == "true" ]; then
@@ -284,8 +271,6 @@ function generate_grpc_mysql() {
     echo -e "\n${colorCyan}sponge micro service --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable2 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
     sponge micro service --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable2 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
     checkResult $?
-
-    checkGoModule
   fi
 
   if [ "$isOnlyGenerateCode" == "true" ]; then
@@ -315,8 +300,6 @@ function generate_grpc_postgresql() {
     echo -e "\n${colorCyan}sponge micro service --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable2 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
     sponge micro service --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable2 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
     checkResult $?
-
-    checkGoModule
   fi
 
   if [ "$isOnlyGenerateCode" == "true" ]; then
@@ -348,7 +331,6 @@ function generate_grpc_sqlite() {
     checkResult $?
 
     sed -E -i 's/\\\\sql\\\\/\\\\\.\.\\\\\sql\\\\/g' ${outDir}/configs/${serverName}.yml
-    checkGoModule
   fi
 
   if [ "$isOnlyGenerateCode" == "true" ]; then
@@ -378,8 +360,6 @@ function generate_grpc_mongodb() {
     echo -e "\n${colorCyan}sponge micro service --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection2 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
     sponge micro service --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection2 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
     checkResult $?
-
-    checkGoModule
   fi
 
   if [ "$isOnlyGenerateCode" == "true" ]; then
@@ -414,7 +394,6 @@ function generate_http_pb_mysql() {
 
     mysqlDsnTmp=$(echo "$mysqlDsn" | sed -E 's/\(/\\\(/g' | sed -E 's/\)/\\\)/g' | sed -E 's/\//\\\//g')
     sed -E -i "s/root:123456@\(192.168.3.37:3306\)\/account/${mysqlDsnTmp}/g" ${outDir}/configs/${serverName}.yml
-    checkGoModule
   fi
 
   if [ "$isOnlyGenerateCode" == "true" ]; then
@@ -451,7 +430,6 @@ function generate_http_pb_mongodb() {
     sed -E -i 's/mysql:/mongodb:/g' ${outDir}/configs/${serverName}.yml
     mongodbDsnTmp=$(echo "$mongodbDsn" | sed -E 's/\(/\\\(/g' | sed -E 's/\)/\\\)/g' | sed -E 's/\//\\\//g')
     sed -E -i "s/root:123456@\(192.168.3.37:3306\)\/account/${mongodbDsnTmp}/g" ${outDir}/configs/${serverName}.yml
-    checkGoModule
   fi
 
   if [ "$isOnlyGenerateCode" == "true" ]; then
@@ -488,7 +466,6 @@ function generate_grpc_pb_mysql() {
 
     mysqlDsnTmp=$(echo "$mysqlDsn" | sed -E 's/\(/\\\(/g' | sed -E 's/\)/\\\)/g' | sed -E 's/\//\\\//g')
     sed -E -i "s/root:123456@\(192.168.3.37:3306\)\/account/${mysqlDsnTmp}/g" ${outDir}/configs/${serverName}.yml
-    checkGoModule
   fi
 
   if [ "$isOnlyGenerateCode" == "true" ]; then
@@ -525,7 +502,6 @@ function generate_grpc_pb_mongodb() {
     sed -E -i 's/mysql:/mongodb:/g' ${outDir}/configs/${serverName}.yml
     mongodbDsnTmp=$(echo "$mongodbDsn" | sed -E 's/\(/\\\(/g' | sed -E 's/\)/\\\)/g' | sed -E 's/\//\\\//g')
     sed -E -i "s/root:123456@\(192.168.3.37:3306\)\/account/${mongodbDsnTmp}/g" ${outDir}/configs/${serverName}.yml
-    checkGoModule
   fi
 
   if [ "$isOnlyGenerateCode" == "true" ]; then
@@ -562,7 +538,6 @@ function generate_grpc_http_pb_mysql() {
 
     mysqlDsnTmp=$(echo "$mysqlDsn" | sed -E 's/\(/\\\(/g' | sed -E 's/\)/\\\)/g' | sed -E 's/\//\\\//g')
     sed -E -i "s/root:123456@\(192.168.3.37:3306\)\/account/${mysqlDsnTmp}/g" ${outDir}/configs/${serverName}.yml
-    checkGoModule
   fi
 
   if [ "$isOnlyGenerateCode" == "true" ]; then
@@ -599,7 +574,6 @@ function generate_grpc_http_pb_mongodb() {
     sed -E -i 's/mysql:/mongodb:/g' ${outDir}/configs/${serverName}.yml
     mongodbDsnTmp=$(echo "$mongodbDsn" | sed -E 's/\(/\\\(/g' | sed -E 's/\)/\\\)/g' | sed -E 's/\//\\\//g')
     sed -E -i "s/root:123456@\(192.168.3.37:3306\)\/account/${mongodbDsnTmp}/g" ${outDir}/configs/${serverName}.yml
-    checkGoModule
   fi
 
   if [ "$isOnlyGenerateCode" == "true" ]; then
@@ -628,7 +602,6 @@ function generate_http_pb_mixed() {
     echo -e "\n${colorCyan}sponge web http-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=./files/mixed.proto --suited-mono-repo=true --out=$outDir ${markEnd}"
     sponge web http-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=./files/mixed.proto --suited-mono-repo=true --out=$outDir
     checkResult $?
-    checkGoModule
   fi
 
   if [ "$isOnlyGenerateCode" == "true" ]; then
@@ -654,7 +627,6 @@ function generate_grpc_pb_mixed() {
     echo -e "\n${colorCyan}sponge micro rpc-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=./files/mixed.proto --suited-mono-repo=true --out=$outDir ${markEnd}"
     sponge micro rpc-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=./files/mixed.proto --suited-mono-repo=true --out=$outDir
     checkResult $?
-    checkGoModule
   fi
 
   if [ "$isOnlyGenerateCode" == "true" ]; then
@@ -682,7 +654,6 @@ function generate_grpc_gw_pb_mixed() {
     echo -e "\n${colorCyan}sponge micro rpc-gw-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=./files/mixed.proto --suited-mono-repo=true --out=$outDir ${markEnd}"
     sponge micro rpc-gw-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=./files/mixed.proto --suited-mono-repo=true --out=$outDir
     checkResult $?
-    checkGoModule
   fi
 
   if [ "$isOnlyGenerateCode" == "true" ]; then
@@ -712,8 +683,6 @@ function generate_grpc_gw_pb() {
     echo -e "\n${colorCyan}sponge micro rpc-conn --rpc-server-name=user --suited-mono-repo=true --out=$outDir ${markEnd}"
     sponge micro rpc-conn --rpc-server-name=user --suited-mono-repo=true --out=$outDir
     checkResult $?
-
-    checkGoModule
   fi
 
   if [ "$isOnlyGenerateCode" == "true" ]; then

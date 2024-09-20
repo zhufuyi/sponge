@@ -99,7 +99,6 @@ Examples:
 				codes:         codes,
 				outPath:       outPath,
 				isExtendedAPI: sqlArgs.IsExtendedAPI,
-				serverType:    codeNameHTTP,
 
 				suitedMonoRepo: suitedMonoRepo,
 			}
@@ -183,7 +182,6 @@ type httpGenerator struct {
 	isEmbed        bool
 	isExtendedAPI  bool
 	suitedMonoRepo bool
-	serverType     string
 
 	fields []replacer.Field
 }
@@ -498,7 +496,7 @@ func (g *httpGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	}...)
 
 	if g.suitedMonoRepo {
-		fs := serverCodeFields(g.serverType, g.moduleName, g.serverName)
+		fs := serverCodeFields(codeNameHTTP, g.moduleName, g.serverName)
 		fields = append(fields, fs...)
 	}
 

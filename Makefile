@@ -55,8 +55,6 @@ graph:
 .PHONY: docs
 # Generate swagger docs, only for ⓵ Web services created based on sql
 docs:
-	go mod tidy
-	@gofmt -s -w .
 	@bash scripts/swag-docs.sh $(HOST)
 # delete the templates code end
 

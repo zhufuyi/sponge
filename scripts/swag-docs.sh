@@ -9,6 +9,11 @@ function checkResult() {
     fi
 }
 
+echo "go mod tidy"
+go mod tidy
+checkResult $?
+gofmt -s -w .
+
 # change host addr
 if [ "X${HOST_ADDR}" = "X" ];then
   HOST_ADDR=$(cat cmd/serverNameExample_mixExample/main.go | grep "@host" | awk '{print $3}')

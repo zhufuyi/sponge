@@ -40,21 +40,21 @@ const (
 	undeterminedDBDriver = "undetermined" // used in services created based on protobuf.
 
 	// code name
-	codeNameModel       = "model"
-	codeNameCache       = "cache"
-	codeNameDao         = "dao"
+	codeNameHTTP        = "http"
+	codeNameGRPC        = "grpc"
+	codeNameHTTPPb      = "http-pb"
+	codeNameGRPCPb      = "grpc-pb"
+	codeNameGRPCGW      = "grpc-gw-pb"
+	codeNameGRPCHTTP    = "grpc-http-pb"
 	codeNameHandler     = "handler"
 	codeNameHandlerPb   = "handler-pb"
 	codeNameService     = "service"
 	codeNameServiceHTTP = "service-handler"
-	codeNameHTTP        = "http"
-	codeNameHTTPPb      = "http-pb"
-	codeNameGRPC        = "grpc"
-	codeNameGRPCPb      = "grpc-pb"
-	codeNameGRPCGW      = "grpc-gw-pb"
-	codeNameGRPCHTTP    = "grpc-http-pb"
-	codeNameGRPCConn    = "grpc-conn"
+	codeNameDao         = "dao"
 	codeNameProtobuf    = "protobuf"
+	codeNameModel       = "model"
+	codeNameGRPCConn    = "grpc-conn"
+	codeNameCache       = "cache"
 
 	wellPrefix    = "## "
 	mgoSuffix     = ".mgo"
@@ -629,17 +629,27 @@ func moveProtoFileToAPIDir(moduleName string, serverName string, suitedMonoRepo 
 
 var (
 	// for protoc.sh and protoc-doc.sh
-	monoRepoAPIPath = `bash scripts/init.sh
+	monoRepoAPIPath = `bash scripts/patch-mono.sh
 cd ..
+
 protoBasePath="api"`
+
+	// for patch-mono.sh
+	monoRepoHTTPPatch = `bash scripts/patch-mono.sh
+
+HOST_ADDR=$1`
+
 	// for patch.sh
-	typePbShellCode = `    if [ ! -d "../api/types" ]; then
+	typePbShellCode = `
+    if [ ! -d "../api/types" ]; then
         sponge patch gen-types-pb --out=./
         checkResult $?
         mv -f api/types ../api
         rmdir api
     fi`
-	dupCodeMark  = "--dir=internal/ecode"
+
+	dupCodeMark = "--dir=internal/ecode"
+
 	adaptDupCode = func(serverType string, serverName string) string {
 		if serverType == codeNameHTTP {
 			return dupCodeMark
@@ -709,6 +719,14 @@ func serverCodeFields(serverType string, moduleName string, serverName string) [
 		{
 			Old: `protoBasePath="api"`,
 			New: monoRepoAPIPath,
+		},
+		{
+			Old: `HOST_ADDR=$1`,
+			New: monoRepoHTTPPatch,
+		},
+		{
+			Old: `genServerType=$1`,
+			New: fmt.Sprintf(`genServerType="%s"`, serverType),
 		},
 		{
 			Old: fmt.Sprintf("go get %s@", moduleName),
