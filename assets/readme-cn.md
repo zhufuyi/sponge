@@ -186,6 +186,8 @@ sponge run
 #### 分布式事务示例
 
 - [简单的分布式订单系统](https://github.com/zhufuyi/sponge_examples/tree/main/9_order-grpc-distributed-transaction)
+- [秒杀抢购活动](https://github.com/zhufuyi/sponge_examples/tree/main/_12_sponge-dtm-flashSale)
+- [电商系统](https://github.com/zhufuyi/sponge_examples/tree/main/_14_eshop)
 
 <br>
 <br>

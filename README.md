@@ -199,6 +199,8 @@ Detailed step-by-step, configuration, deployment instructions for developing pro
 #### Distributed transaction examples
 
 - [Simple distributed order system](https://github.com/zhufuyi/sponge_examples/tree/main/9_order-grpc-distributed-transaction)
+- [Flash sale](https://github.com/zhufuyi/sponge_examples/tree/main/_12_sponge-dtm-flashSale)
+- [E-Commerce system](https://github.com/zhufuyi/sponge_examples/tree/main/_14_eshop)
 
 <br>
 <br>

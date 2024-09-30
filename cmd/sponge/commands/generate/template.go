@@ -573,12 +573,11 @@ func InitMysql() {
 		opts = append(opts, ggorm.WithEnableTrace())
 	}
 
-	// setting mysql slave and master dsn addresses,
-	// if there is no read/write separation, you can comment out the following piece of code
-	opts = append(opts, ggorm.WithRWSeparation(
-		config.Get().Database.Mysql.SlavesDsn,
-		config.Get().Database.Mysql.MastersDsn...,
-	))
+	// setting mysql slave and master dsn addresses
+	//opts = append(opts, ggorm.WithRWSeparation(
+	//	config.Get().Database.Mysql.SlavesDsn,
+	//	config.Get().Database.Mysql.MastersDsn...,
+	//))
 
 	// add custom gorm plugin
 	//opts = append(opts, ggorm.WithGormPlugin(yourPlugin))
