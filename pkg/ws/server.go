@@ -1,22 +1,25 @@
-// Package ws provides a WebSocket server implementation.
+// Package ws provides a websocket server implementation.
 package ws
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/gorilla/websocket"
+	"go.uber.org/zap"
 )
 
 // ServerOption is a functional option for the Server.
 type ServerOption func(*serverOptions)
 
 type serverOptions struct {
-	responseHeader       http.Header
-	upgrader             *websocket.Upgrader
-	maxMessageWaitPeriod time.Duration
+	responseHeader      http.Header
+	upgrader            *websocket.Upgrader
+	noClientPingTimeout time.Duration
+	zapLogger           *zap.Logger
 }
 
 func defaultServerOptions() *serverOptions {
@@ -50,9 +53,26 @@ func WithUpgrader(upgrader *websocket.Upgrader) ServerOption {
 }
 
 // WithMaxMessageWaitPeriod sets the maximum waiting period for a message before closing the connection.
+// Deprecated: use WithNoClientPingTimeout instead.
 func WithMaxMessageWaitPeriod(period time.Duration) ServerOption {
 	return func(o *serverOptions) {
-		o.maxMessageWaitPeriod = period
+		o.noClientPingTimeout = period
+	}
+}
+
+// WithNoClientPingTimeout sets the timeout for the client to send a ping message, if timeout, the connection will be closed.
+func WithNoClientPingTimeout(timeout time.Duration) ServerOption {
+	return func(o *serverOptions) {
+		o.noClientPingTimeout = timeout
+	}
+}
+
+// WithServerLogger sets the logger for the server.
+func WithServerLogger(l *zap.Logger) ServerOption {
+	return func(o *serverOptions) {
+		if l != nil {
+			o.zapLogger = l
+		}
 	}
 }
 
@@ -75,24 +95,30 @@ type Server struct {
 	// If it is greater than 0, it means that the message waiting timeout mechanism is enabled
 	//and the connection will be closed after the timeout, if it is 0, it means that the message
 	// waiting timeout mechanism is not enabled.
-	maxMessageWaitPeriod time.Duration
+	noClientPingTimeout time.Duration
 
 	loopFn LoopFn
+
+	zapLogger *zap.Logger
 }
 
 // NewServer creates a new WebSocket server.
 func NewServer(w http.ResponseWriter, r *http.Request, loopFn LoopFn, opts ...ServerOption) *Server {
 	o := defaultServerOptions()
 	o.apply(opts...)
+	if o.zapLogger == nil {
+		o.zapLogger, _ = zap.NewProduction()
+	}
 
 	return &Server{
 		w:      w,
 		r:      r,
 		loopFn: loopFn,
 
-		upgrader:             o.upgrader,
-		responseHeader:       o.responseHeader,
-		maxMessageWaitPeriod: o.maxMessageWaitPeriod,
+		upgrader:            o.upgrader,
+		responseHeader:      o.responseHeader,
+		noClientPingTimeout: o.noClientPingTimeout,
+		zapLogger:           o.zapLogger,
 	}
 }
 
@@ -104,20 +130,22 @@ func (s *Server) Run(ctx context.Context) error {
 	}
 	defer conn.Close() //nolint
 
-	if s.maxMessageWaitPeriod > 0 {
+	fields := []zap.Field{zap.String("client", conn.RemoteAddr().String())}
+	if s.noClientPingTimeout > 0 {
 		// Set initial read deadline
-		err = conn.SetReadDeadline(time.Now().Add(s.maxMessageWaitPeriod))
-		if err != nil {
+		if err = conn.SetReadDeadline(time.Now().Add(s.noClientPingTimeout)); err != nil {
 			return err
 		}
 
 		// Set up Ping handling for the connection,
 		// when the client sends a ping message, the server side triggers this callback function
 		conn.SetPingHandler(func(string) error {
-			_ = conn.SetReadDeadline(time.Now().Add(s.maxMessageWaitPeriod))
-			return nil
+			return conn.SetReadDeadline(time.Now().Add(s.noClientPingTimeout))
 		})
+		fields = append(fields, zap.String("no_ping_timeout", fmt.Sprintf("%vs", s.noClientPingTimeout.Seconds())))
 	}
+
+	s.zapLogger.Info("new websocket connection established", fields...)
 
 	s.loopFn(ctx, conn)
 

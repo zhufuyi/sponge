@@ -19,6 +19,8 @@ import (
 	"gorm.io/plugin/dbresolver"
 )
 
+type DB = gorm.DB
+
 const (
 	// DBDriverMysql mysql driver
 	DBDriverMysql = "mysql"

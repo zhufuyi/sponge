@@ -9,6 +9,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.uber.org/zap"
 )
 
 const (
@@ -64,4 +65,42 @@ func Init2(uri string, dbName string, opts ...*options.ClientOptions) (*mongo.Da
 // Close mongodb
 func Close(db *mongo.Database) error {
 	return db.Client().Disconnect(context.Background())
+}
+
+// WithOption set option for mongodb
+func WithOption() *options.ClientOptions {
+	return options.Client()
+}
+
+type customLogger struct {
+	zapLogger *zap.Logger
+}
+
+func (l *customLogger) Info(_ int, msg string, kvs ...interface{}) {
+	l.zapLogger.Info(msg, zap.String("msg", msg), zap.Any("kv", kvs))
+}
+
+func (l *customLogger) Error(err error, msg string, kvs ...interface{}) {
+	l.zapLogger.Warn(msg, zap.Error(err), zap.String("msg", msg), zap.Any("kv", kvs))
+}
+
+// NewCustomLogger create a custom logger for mongodb, debug level is used by default.
+// example: WithOption().SetLoggerOptions(NewCustomLogger(logger.Get(), true))
+func NewCustomLogger(l *zap.Logger, isDebugLevel bool) *options.LoggerOptions {
+	if l == nil {
+		l, _ = zap.NewProduction()
+	}
+	sink := &customLogger{zapLogger: l}
+
+	level := options.LogLevelInfo
+	if isDebugLevel {
+		level = options.LogLevelDebug
+	}
+
+	// Create a client with our logger options.
+	return options.
+		Logger().
+		SetSink(sink).
+		SetMaxDocumentLength(300).
+		SetComponentLevel(options.LogComponentCommand, level)
 }

@@ -21,7 +21,7 @@ func AdaptivePostgresqlDsn(dsn string) string {
 		dsn = "postgres://" + dsn
 	}
 
-	dsn = deleteBrackets(dsn)
+	dsn = DeleteBrackets(dsn)
 
 	u, err := url.Parse(dsn)
 	if err != nil {
@@ -54,10 +54,11 @@ func AdaptiveMongodbDsn(dsn string) string {
 		dsn = "mongodb://" + dsn // default scheme
 	}
 
-	return deleteBrackets(dsn)
+	return DeleteBrackets(dsn)
 }
 
-func deleteBrackets(str string) string {
+// DeleteBrackets delete brackets in dsn
+func DeleteBrackets(str string) string {
 	start := strings.Index(str, "@(")
 	end := strings.LastIndex(str, ")/")
 

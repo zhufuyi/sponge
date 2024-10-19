@@ -192,12 +192,12 @@ func (c *Consumer) ConsumePartition(ctx context.Context, topic string, partition
 	for {
 		select {
 		case msg := <-pc.Messages():
-			err = handleFn(msg)
+			err := handleFn(msg)
 			if err != nil {
 				c.zapLogger.Warn("failed to handle message", zap.Error(err), zap.String("topic", topic), zap.Int32("partition", partition), zap.Int64("offset", msg.Offset))
 			}
 		case err := <-pc.Errors():
-			c.zapLogger.Error("partition consumer error", zap.Any("err", err))
+			c.zapLogger.Error("partition consumer error", zap.Error(err))
 		case <-ctx.Done():
 			return
 		}

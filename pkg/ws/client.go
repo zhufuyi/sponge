@@ -2,13 +2,12 @@ package ws
 
 import (
 	"context"
-	"log"
+	"fmt"
 	"net/http"
-	"strings"
-	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
+	"go.uber.org/zap"
 )
 
 var (
@@ -22,6 +21,8 @@ type clientOptions struct {
 	dialer           *websocket.Dialer
 	requestHeader    http.Header
 	pingDialInterval time.Duration
+
+	zapLogger *zap.Logger
 }
 
 func defaultClientOptions() *clientOptions {
@@ -57,6 +58,15 @@ func WithPing(interval time.Duration) ClientOption {
 	}
 }
 
+// WithClientLogger sets the logger for the client.
+func WithClientLogger(l *zap.Logger) ClientOption {
+	return func(o *clientOptions) {
+		if l != nil {
+			o.zapLogger = l
+		}
+	}
+}
+
 // ----------------------------------------------------------------------------------
 
 // Client is a wrapper of gorilla/websocket.
@@ -66,45 +76,57 @@ type Client struct {
 	url           string
 	conn          *websocket.Conn
 
-	pingDialInterval time.Duration
-	ctx              context.Context
-	cancel           context.CancelFunc
-
-	once sync.Once
+	pingInterval time.Duration
+	ctx          context.Context
+	cancel       context.CancelFunc
+	zapLogger    *zap.Logger
 }
 
 // NewClient creates a new client.
 func NewClient(url string, opts ...ClientOption) (*Client, error) {
 	o := defaultClientOptions()
 	o.apply(opts...)
+	if o.zapLogger == nil {
+		o.zapLogger, _ = zap.NewProduction()
+	}
 
 	ctx, cancel := context.WithCancel(context.Background())
 
 	c := &Client{
-		url:              url,
-		dialer:           o.dialer,
-		requestHeader:    o.requestHeader,
-		pingDialInterval: o.pingDialInterval,
-		ctx:              ctx,
-		cancel:           cancel,
+		url:           url,
+		dialer:        o.dialer,
+		requestHeader: o.requestHeader,
+		pingInterval:  o.pingDialInterval,
+		ctx:           ctx,
+		cancel:        cancel,
+		zapLogger:     o.zapLogger,
 	}
 
-	err := c.Reconnect()
+	err := c.connect()
 	if err != nil {
 		return nil, err
 	}
 
+	fields := []zap.Field{zap.String("server", c.url)}
+	if c.pingInterval > 0 {
+		c.ping()
+		fields = append(fields, zap.String("auto ping interval", fmt.Sprintf("%vs", c.pingInterval.Seconds())))
+	}
+
+	c.zapLogger.Info("connect websocket server success", fields...)
+
 	return c, nil
 }
 
+// GetConn returns the connection of the client.
 func (c *Client) GetConn() *websocket.Conn {
 	if c.conn == nil {
 		defer func() {
-			if err := recover(); err != nil {
-				log.Printf("get conn panic, %v\n", err)
+			if e := recover(); e != nil {
+				c.zapLogger.Warn("connect websocket server error", zap.Any("err", e))
 			}
 		}()
-		err := c.Reconnect()
+		err := c.connect()
 		if err != nil {
 			panic(err)
 		}
@@ -113,58 +135,78 @@ func (c *Client) GetConn() *websocket.Conn {
 	return c.conn
 }
 
-// Reconnect the websocket server.
-func (c *Client) Reconnect() error {
+// connect the websocket server.
+func (c *Client) connect() error {
 	conn, _, err := c.dialer.Dial(c.url, c.requestHeader)
 	if err != nil {
 		return err
 	}
 	c.conn = conn
-
-	if c.pingDialInterval > 0 {
-		c.once.Do(func() {
-			log.Println("start ping server")
-			c.ping()
-		})
-	}
-
 	return nil
 }
 
-// timed ping server
+// TryReconnect tries to reconnect the websocket server.
+func (c *Client) TryReconnect() error {
+	delay := 1 * time.Second
+	maxDelay := 32 * time.Second
+	for {
+		select {
+		case <-c.ctx.Done():
+			return c.ctx.Err()
+		case <-time.After(delay):
+			if err := c.connect(); err != nil {
+				if delay >= maxDelay {
+					delay = maxDelay
+					c.zapLogger.Warn("reconnect websocket server error", zap.Error(err), zap.String("server", c.url))
+					continue
+				}
+				delay *= 2
+				continue
+			}
+			c.zapLogger.Warn("reconnect websocket server success", zap.String("server", c.url))
+			return nil
+		}
+	}
+}
+
+// ping websocket server, try to reconnect if connection failed.
 func (c *Client) ping() {
 	go func() {
 		isExit := false
 		defer func() {
-			if err := recover(); err != nil {
-				log.Printf("ping server panic, %v\n", err)
+			if e := recover(); e != nil {
+				c.zapLogger.Warn("ping server panic", zap.Any("err", e))
 			}
 
 			if !isExit {
-				time.Sleep(15 * time.Second)
-				c.ping()
+				if err := c.TryReconnect(); err == nil {
+					c.ping()
+				}
 			}
-
-			log.Printf("ping server exit\n")
 		}()
 
-		ticker := time.NewTicker(c.pingDialInterval)
+		ticker := time.NewTicker(c.pingInterval)
 		defer ticker.Stop()
 
 		for {
 			select {
 			case <-ticker.C:
 				if err := c.conn.WriteControl(websocket.PingMessage, pingData, time.Now().Add(5*time.Second)); err != nil {
-					log.Printf("ping server err, %v\n", err)
-					continue
+					c.zapLogger.Warn("ping server error", zap.Error(err))
+					return
 				}
 
-			case <-c.ctx.Done():
+			case <-c.ctx.Done(): // exit
 				isExit = true
 				return
 			}
 		}
 	}()
+}
+
+// GetCtx returns the context of the client.
+func (c *Client) GetCtx() context.Context {
+	return c.ctx
 }
 
 // Close closes the connection.
@@ -178,9 +220,4 @@ func (c *Client) Close() error {
 	}
 
 	return nil
-}
-
-// IsServerClose returns true if the error is caused by server close.
-func IsServerClose(err error) bool {
-	return strings.Contains(err.Error(), "use of closed network")
 }

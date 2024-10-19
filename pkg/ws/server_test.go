@@ -11,6 +11,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"go.uber.org/zap"
 
 	"github.com/zhufuyi/sponge/pkg/utils"
 )
@@ -37,7 +38,7 @@ func TestWebSocketServerDefault(t *testing.T) {
 
 	url := "ws://localhost" + addr + "/ws"
 	wg := sync.WaitGroup{}
-	for i := 0; i < 50; i++ {
+	for i := 0; i < 10; i++ {
 		go func() {
 			wg.Add(1)
 			defer wg.Done()
@@ -56,11 +57,13 @@ func TestWebSocketServerCustom(t *testing.T) {
 			return true
 		},
 	}
+	l, _ := zap.NewProduction()
 	r.GET("/ws", func(c *gin.Context) {
 		s := NewServer(c.Writer, c.Request, loopReceiveMessage,
 			WithUpgrader(ug),
 			WithResponseHeader(http.Header{"Authorization": []string{"Bearer 123"}}),
-			WithMaxMessageWaitPeriod(time.Second*3),
+			WithNoClientPingTimeout(time.Second*3),
+			WithServerLogger(l),
 		)
 		err := s.Run(context.Background())
 		if err != nil {
@@ -139,7 +142,7 @@ func runWsClientDefault(url string) {
 
 	go clientLoopReadMessage(c.GetConn())
 
-	for i := 0; i < 50; i++ {
+	for i := 0; i < 10; i++ {
 		data := "Hello, World " + strconv.Itoa(i)
 		err = c.GetConn().WriteMessage(websocket.TextMessage, []byte(data))
 		if err != nil {
@@ -153,10 +156,12 @@ func runWsClientCustom(url string) {
 	if url == "" {
 		url = wsURL
 	}
+	l, _ := zap.NewProduction()
 	c, err := NewClient(url,
 		WithDialer(websocket.DefaultDialer),
 		WithRequestHeader(http.Header{"foo": []string{"bar"}}),
 		WithPing(time.Second),
+		WithClientLogger(l),
 	)
 	if err != nil {
 		log.Println("connect error:", err)

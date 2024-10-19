@@ -9,7 +9,7 @@ func TestAdaptivePostgresqlDsn(t *testing.T) {
 		"postgres://root:123456@192.168.3.37:5432/account",
 		"postgres://root:123456@192.168.3.37:5432/account?sslmode=disable",
 		"postgres://root:123456@192.168.3.37:5432/account?TimeZone=Asia/Shanghai",
-		"root:123456@192.168.3.37:5432/account",
+		"root:123456@192.168.3.37:5432/account?search_path=public",
 		"host=192.168.3.37 port=5432 user=root password=123456 dbname=account sslmode=disable",
 
 		"root:123456@(192.168.3.37:5432)/account",

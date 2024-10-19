@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/zhufuyi/sponge/pkg/app"
+	"github.com/zhufuyi/sponge/pkg/logger"
 	"github.com/zhufuyi/sponge/pkg/tracer"
 
 	"github.com/zhufuyi/sponge/internal/config"
@@ -39,6 +40,11 @@ func Close(servers []app.IServer) []app.Close {
 			return tracer.Close(ctx)
 		})
 	}
+
+	// close logger
+	closes = append(closes, func() error {
+		return logger.Sync()
+	})
 
 	return closes
 }
