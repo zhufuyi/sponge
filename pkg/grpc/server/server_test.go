@@ -2,11 +2,16 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+
+	"github.com/zhufuyi/sponge/pkg/grpc/metrics"
+	"github.com/zhufuyi/sponge/pkg/logger"
+	"github.com/zhufuyi/sponge/pkg/utils"
 )
 
 var fn = func(s *grpc.Server) {
@@ -26,13 +31,23 @@ var streamInterceptors = []grpc.StreamServerInterceptor{
 }
 
 func TestRun(t *testing.T) {
-	port := 50082
+	port, _ := utils.GetAvailablePort()
 	Run(port, fn,
 		WithSecure(insecure.NewCredentials()),
 		WithUnaryInterceptor(unaryInterceptors...),
 		WithStreamInterceptor(streamInterceptors...),
 		WithServiceRegister(func() {}),
+		WithStatConnections(metrics.WithConnectionsLogger(logger.Get()), metrics.WithConnectionsGauge()),
 	)
 	t.Log("grpc server started", port)
-	time.Sleep(time.Second * 5)
+	time.Sleep(time.Second * 2)
+
+	conn, err := grpc.Dial(fmt.Sprintf("localhost:%d", port), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	time.Sleep(time.Second * 2)
+	_ = conn.Close()
+	time.Sleep(time.Second * 1)
 }

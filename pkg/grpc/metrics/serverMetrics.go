@@ -32,6 +32,12 @@ var (
 	customizedSummaryMetrics   = []*prometheus.SummaryVec{}
 	customizedGaugeMetrics     = []*prometheus.GaugeVec{}
 	customizedHistogramMetrics = []*prometheus.HistogramVec{}
+	grpcConnectionGauge        = prometheus.NewGauge(
+		prometheus.GaugeOpts{
+			Name: "grpc_server_active_connections",
+			Help: "Current number of active gRPC client connections",
+		},
+	)
 
 	srvOnce sync.Once
 )
@@ -103,6 +109,7 @@ func srvRegisterMetrics() {
 		for _, metric := range customizedHistogramMetrics {
 			srvReg.MustRegister(metric)
 		}
+		srvReg.MustRegister(grpcConnectionGauge)
 	})
 }
 

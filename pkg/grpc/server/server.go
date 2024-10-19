@@ -8,6 +8,8 @@ import (
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+
+	"github.com/zhufuyi/sponge/pkg/grpc/metrics"
 )
 
 // RegisterFn register object
@@ -24,6 +26,9 @@ type options struct {
 	unaryInterceptors  []grpc.UnaryServerInterceptor
 	streamInterceptors []grpc.StreamServerInterceptor
 	serviceRegisterFn  ServiceRegisterFn
+
+	isShowConnections bool
+	connectionOptions []metrics.ConnectionOption
 }
 
 func defaultServerOptions() *options {
@@ -64,6 +69,14 @@ func WithServiceRegister(fn ServiceRegisterFn) Option {
 	}
 }
 
+// WithStatConnections enable stat connections
+func WithStatConnections(opts ...metrics.ConnectionOption) Option {
+	return func(o *options) {
+		o.isShowConnections = true
+		o.connectionOptions = opts
+	}
+}
+
 func customInterceptorOptions(o *options) []grpc.ServerOption {
 	var opts []grpc.ServerOption
 
@@ -96,6 +109,10 @@ func Run(port int, registerFn RegisterFn, options ...Option) {
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
 		panic(err)
+	}
+
+	if o.isShowConnections {
+		listener = metrics.NewCustomListener(listener, o.connectionOptions...)
 	}
 
 	// create a grpc server where interceptors can be injected

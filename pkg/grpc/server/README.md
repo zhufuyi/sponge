@@ -17,6 +17,7 @@ Generic grpc server.
 		//server.WithUnaryInterceptor(unaryInterceptors...),
 		//server.WithStreamInterceptor(streamInterceptors...),
 		//server.WithServiceRegister(func() {}),
+		//server.WithStatConnections(metrics.WithConnectionsLogger(logger.Get()), metrics.WithConnectionsGauge()),  // show connections or set prometheus metrics
 	)
 
 	select{}

@@ -78,7 +78,8 @@ func (s *grpcServer) Start() error {
 		}()
 	}
 
-	if err := s.server.Serve(s.listen); err != nil { // block
+	listen := metrics.NewCustomListener(s.listen, metrics.WithConnectionsLogger(logger.Get()), metrics.WithConnectionsGauge())
+	if err := s.server.Serve(listen); err != nil { // block
 		return err
 	}
 
