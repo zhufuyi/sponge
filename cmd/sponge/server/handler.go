@@ -428,13 +428,66 @@ func getPostgresqlTables(dsn string) ([]string, error) {
 	}
 	defer ggorm.CloseSQLDB(db)
 
-	var tables []string
-	err = db.Raw("SELECT table_name FROM information_schema.tables WHERE table_schema = ?", "public").Scan(&tables).Error
+	schemas, err := getSchemas(db, dsn)
 	if err != nil {
 		return nil, err
 	}
 
-	return tables, nil
+	return getSchemaTables(db, schemas)
+}
+
+type pgSchema struct {
+	SchemaName string
+}
+
+type pgTable struct {
+	TableName string
+}
+
+func getSchemas(db *ggorm.DB, dsn string) ([]pgSchema, error) {
+	var schemas []pgSchema
+
+	if strings.Contains(dsn, "search_path=") {
+		ss := strings.Split(dsn, " ")
+		for _, s := range ss {
+			if strings.Contains(s, "search_path=") {
+				schemaName := strings.Split(s, "=")[1]
+				if schemaName != "" {
+					schemas = append(schemas, pgSchema{SchemaName: schemaName})
+				}
+			}
+		}
+	}
+
+	if len(schemas) != 0 {
+		return schemas, nil
+	}
+
+	err := db.Raw("SELECT schema_name FROM information_schema.schemata").Scan(&schemas).Error
+	if err != nil {
+		return nil, err
+	}
+	return schemas, nil
+}
+
+func getSchemaTables(db *ggorm.DB, schemas []pgSchema) ([]string, error) {
+	var schemaTables []string
+	for _, schema := range schemas {
+		if schema.SchemaName == "information_schema" || schema.SchemaName == "pg_catalog" || schema.SchemaName == "pg_toast" {
+			continue
+		}
+
+		var tables []pgTable
+		err := db.Raw("SELECT table_name FROM information_schema.tables WHERE table_schema = ?", schema.SchemaName).Scan(&tables).Error
+		if err != nil {
+			return nil, err
+		}
+
+		for _, table := range tables {
+			schemaTables = append(schemaTables, table.TableName)
+		}
+	}
+	return schemaTables, nil
 }
 
 func getSqliteTables(dbFile string) ([]string, error) {

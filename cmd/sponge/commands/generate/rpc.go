@@ -488,8 +488,8 @@ func (g *rpcGenerator) addFields(r replacer.Replacer) []replacer.Field {
 			New: g.dbDSN,
 		},
 		{
-			Old: "root:123456@192.168.3.37:5432/account",
-			New: g.dbDSN,
+			Old: "root:123456@192.168.3.37:5432/account?sslmode=disable",
+			New: adaptPgDsn(g.dbDSN),
 		},
 		{
 			Old: "test/sql/sqlite/sponge.db",
