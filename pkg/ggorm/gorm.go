@@ -5,10 +5,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"log"
-	"os"
-	"time"
-
 	"github.com/uptrace/opentelemetry-go-extra/otelgorm"
 	mysqlDriver "gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
@@ -17,6 +13,9 @@ import (
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
 	"gorm.io/plugin/dbresolver"
+	"log"
+	"os"
+	"time"
 )
 
 const (
@@ -77,13 +76,21 @@ func InitMysql(dsn string, opts ...Option) (*gorm.DB, error) {
 }
 
 // InitPostgresql init postgresql
-func InitPostgresql(dsn string, opts ...Option) (*gorm.DB, error) {
+func InitPostgresql(dsn string, schemaName string, opts ...Option) (*gorm.DB, error) {
 	o := defaultOptions()
 	o.apply(opts...)
 
 	db, err := gorm.Open(postgres.Open(dsn), gormConfig(o))
 	if err != nil {
 		return nil, err
+	}
+
+	// Set schema search path if a schema is provided
+	if schemaName != "" {
+		err = db.Exec(fmt.Sprintf("SET search_path TO %s", schemaName)).Error
+		if err != nil {
+			return nil, fmt.Errorf("setting search path to schema %s, err: %v", schemaName, err)
+		}
 	}
 
 	// register trace plugin

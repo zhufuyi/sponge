@@ -76,7 +76,9 @@ func ListTables(c *gin.Context) {
 	case ggorm.DBDriverMysql, ggorm.DBDriverTidb:
 		tables, err = getMysqlTables(form.Dsn)
 	case ggorm.DBDriverPostgresql:
-		tables, err = getPostgresqlTables(form.Dsn)
+		// Assuming the schema is sent via the `Dsn` in this example
+		schemaName := extractSchemaFromDsn(form.Dsn)
+		tables, err = getPostgresqlTables(form.Dsn, schemaName)
 	case ggorm.DBDriverSqlite:
 		tables, err = getSqliteTables(form.Dsn)
 	case mgo.DBDriverName:
@@ -308,6 +310,16 @@ func checkFileType(typeName string) bool {
 	return false
 }
 
+// extractSchemaFromDsn extracts schema name from the DSN
+func extractSchemaFromDsn(dsn string) string {
+	// Implement logic to extract schema from DSN if provided, otherwise default to "public"
+	parsedUrl, err := url.Parse(dsn)
+	if err != nil || parsedUrl.Query().Get("search_path") == "" {
+		return "public"
+	}
+	return parsedUrl.Query().Get("search_path")
+}
+
 func checkSameFile(files []string, file string) bool {
 	for _, v := range files {
 		if v == file {
@@ -420,7 +432,7 @@ func getMysqlTables(dsn string) ([]string, error) {
 	return tables, nil
 }
 
-func getPostgresqlTables(dsn string) ([]string, error) {
+func getPostgresqlTables(dsn string, schemaName string) ([]string, error) {
 	dsn = utils.AdaptivePostgresqlDsn(dsn)
 	db, err := ggorm.InitPostgresql(dsn)
 	if err != nil {
@@ -429,7 +441,8 @@ func getPostgresqlTables(dsn string) ([]string, error) {
 	defer ggorm.CloseSQLDB(db)
 
 	var tables []string
-	err = db.Raw("SELECT table_name FROM information_schema.tables WHERE table_schema = ?", "public").Scan(&tables).Error
+	query := "SELECT table_name FROM information_schema.tables WHERE table_schema = ?"
+	err = db.Raw(query, schemaName).Scan(&tables).Error
 	if err != nil {
 		return nil, err
 	}
