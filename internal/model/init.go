@@ -6,12 +6,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/go-redis/redis/v8"
+	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 
 	"github.com/zhufuyi/sponge/pkg/ggorm"
 	"github.com/zhufuyi/sponge/pkg/goredis"
 	"github.com/zhufuyi/sponge/pkg/logger"
+	"github.com/zhufuyi/sponge/pkg/tracer"
 	"github.com/zhufuyi/sponge/pkg/utils"
 
 	"github.com/zhufuyi/sponge/internal/config"
@@ -72,7 +73,7 @@ func InitRedis() {
 		goredis.WithWriteTimeout(time.Duration(config.Get().Redis.WriteTimeout) * time.Second),
 	}
 	if config.Get().App.EnableTrace {
-		opts = append(opts, goredis.WithEnableTrace())
+		opts = append(opts, goredis.WithTracing(tracer.GetProvider()))
 	}
 
 	var err error
@@ -144,12 +145,11 @@ func InitMysql() {
 		opts = append(opts, ggorm.WithEnableTrace())
 	}
 
-	// setting mysql slave and master dsn addresses,
-	// if there is no read/write separation, you can comment out the following piece of code
-	opts = append(opts, ggorm.WithRWSeparation(
-		config.Get().Database.Mysql.SlavesDsn,
-		config.Get().Database.Mysql.MastersDsn...,
-	))
+	// setting mysql slave and master dsn addresses
+	//opts = append(opts, ggorm.WithRWSeparation(
+	//	config.Get().Database.Mysql.SlavesDsn,
+	//	config.Get().Database.Mysql.MastersDsn...,
+	//))
 
 	// add custom gorm plugin
 	//opts = append(opts, ggorm.WithGormPlugin(yourPlugin))

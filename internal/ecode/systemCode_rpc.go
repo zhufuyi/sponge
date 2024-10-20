@@ -31,6 +31,7 @@ var (
 	StatusLimitExceed      = errcode.StatusLimitExceed
 	StatusMethodNotAllowed = errcode.StatusMethodNotAllowed
 	StatusAccessDenied     = errcode.StatusAccessDenied
+	StatusConflict         = errcode.StatusConflict
 )
 
 // Any kev-value
@@ -40,3 +41,6 @@ func Any(key string, val interface{}) errcode.Detail {
 
 // StatusSkipResponse is only use for grpc-gateway
 var StatusSkipResponse = errcode.SkipResponse
+
+// GetStatusCode get status code from error returned by RPC invoke
+var GetStatusCode = errcode.GetStatusCode

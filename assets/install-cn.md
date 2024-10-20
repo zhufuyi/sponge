@@ -11,6 +11,19 @@
 
 ### Windows环境
 
+安装sponge之前确保已安装go语言环境，并把`GOBIN`添加到系统环境变量**path**，如果已经设置过可以跳过此步骤：
+
+```bash
+    # 检查GOBIN目录是否存在
+    go env GOBIN
+    
+    # 如果为空，设置GOBIN(例如：D:\go\bin)，可能需要管理员权限
+    go env -w GOBIN=D:\go\bin
+    # 然后并把GOBIN目录添加到系统path环境变量
+```
+
+<br>
+
 > 因为sponge依赖一些linux命令，因此在windows环境中需要安装git bash、make来支持linux命令环境。
 
 为了安装方便，已经把sponge及其依赖的程序打包在一起，下载地址(选择一个下载即可)：
@@ -25,7 +38,7 @@
 (2) 在任意文件夹下右键(显示更多选项)，选择【Open Git Bash here】打开git bash终端：
 
 ```bash
-# 初始化sponge，自动安装sponge依赖插件
+# 初始化sponge
 sponge init
 
 # 查看sponge版本

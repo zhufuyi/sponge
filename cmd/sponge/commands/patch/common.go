@@ -1,8 +1,12 @@
 package patch
 
 import (
+	"errors"
 	"os"
+	"path/filepath"
 	"strings"
+
+	"github.com/zhufuyi/sponge/pkg/gofile"
 )
 
 // get moduleName and serverName from directory
@@ -23,4 +27,39 @@ func getNamesFromOutDir(dir string) (moduleName string, serverName string, suite
 	}
 
 	return "", "", false
+}
+
+func cutPath(srcProtoFile string) string {
+	dirPath, _ := filepath.Abs("..")
+	srcProtoFile = strings.ReplaceAll(srcProtoFile, dirPath, "..")
+	return strings.ReplaceAll(srcProtoFile, "\\", "/")
+}
+
+func cutPathPrefix(srcProtoFile string) string {
+	dirPath, _ := filepath.Abs(".")
+	srcProtoFile = strings.ReplaceAll(srcProtoFile, dirPath, ".")
+	return strings.ReplaceAll(srcProtoFile, "\\", "/")
+}
+
+func listErrCodeFiles(dir string) ([]string, error) {
+	files, err := gofile.ListFiles(dir)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(files) == 0 {
+		return nil, errors.New("not found files")
+	}
+
+	filterFiles := []string{}
+	for _, file := range files {
+		if strings.Contains(file, "systemCode_http.go") || strings.Contains(file, "systemCode_rpc.go") {
+			continue
+		}
+		if strings.Contains(file, "_http.go") || strings.Contains(file, "_rpc.go") {
+			filterFiles = append(filterFiles, file)
+		}
+	}
+
+	return filterFiles, nil
 }

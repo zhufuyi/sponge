@@ -210,8 +210,8 @@ func ToHTTPErr(st *status.Status) *Error { //nolint
 		return DeadlineExceeded
 	case StatusNotFound.status.Code(), codes.NotFound:
 		return NotFound
-	case StatusAlreadyExists.status.Code(), codes.AlreadyExists:
-		return AlreadyExists
+	case StatusAlreadyExists.status.Code(), codes.AlreadyExists, StatusConflict.status.Code():
+		return Conflict
 	case StatusResourceExhausted.status.Code(), codes.ResourceExhausted:
 		return ResourceExhausted
 	case StatusFailedPrecondition.status.Code(), codes.FailedPrecondition:

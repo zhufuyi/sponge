@@ -24,6 +24,7 @@ type Option func(*options)
 
 type options struct {
 	enableAlarm bool
+	zapFields   []zap.Field
 }
 
 func (o *options) apply(opts ...Option) {
@@ -49,6 +50,13 @@ func WithLog(l *zap.Logger) Option {
 			return
 		}
 		zapLog = l
+	}
+}
+
+// WithPrintField set print field
+func WithPrintField(fields ...zap.Field) Option {
+	return func(o *options) {
+		o.zapFields = fields
 	}
 }
 
@@ -78,7 +86,7 @@ func Init(opts ...Option) {
 		for {
 			select {
 			case <-printTick.C:
-				data := printUsageInfo()
+				data := printUsageInfo(o.zapFields...)
 				if o.enableAlarm {
 					if sg.check(data) {
 						sendSystemSignForLinux()
@@ -97,7 +105,7 @@ func sendSystemSignForLinux() {
 	}
 }
 
-func printUsageInfo() *statData {
+func printUsageInfo(fields ...zap.Field) *statData {
 	defer func() { _ = recover() }()
 
 	mSys := mem.GetSystemMemory()
@@ -125,12 +133,11 @@ func printUsageInfo() *statData {
 		TotalAlloc: mProc.TotalAlloc,
 		Sys:        mProc.Sys,
 		NumGc:      mProc.NumGc,
+		Goroutines: runtime.NumGoroutine(),
 	}
 
-	zapLog.Info("statistics",
-		zap.Any("system", sys),
-		zap.Any("process", proc),
-	)
+	fields = append(fields, zap.Any("system", sys), zap.Any("process", proc))
+	zapLog.Info("statistics", fields...)
 
 	return &statData{
 		sys:  sys,
@@ -154,6 +161,7 @@ type process struct {
 	TotalAlloc uint64  `json:"total_alloc"` // cumulative allocated memory capacity, unit(M)
 	Sys        uint64  `json:"sys"`         // requesting memory capacity from the system, unit(M)
 	NumGc      uint32  `json:"num_gc"`      // number of GC cycles
+	Goroutines int     `json:"goroutines"`  // number of goroutines
 }
 
 type statData struct {

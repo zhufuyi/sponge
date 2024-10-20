@@ -49,7 +49,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/types.CreateUserExampleRespond"
+                            "$ref": "#/definitions/types.CreateUserExampleReply"
                         }
                     }
                 }
@@ -88,7 +88,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/types.ListUserExamplesRespond"
+                            "$ref": "#/definitions/types.ListUserExamplesReply"
                         }
                     }
                 }
@@ -125,7 +125,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/types.GetUserExampleByIDRespond"
+                            "$ref": "#/definitions/types.GetUserExampleByIDReply"
                         }
                     }
                 }
@@ -169,7 +169,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/types.UpdateUserExampleByIDRespond"
+                            "$ref": "#/definitions/types.UpdateUserExampleByIDReply"
                         }
                     }
                 }
@@ -204,7 +204,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/types.DeleteUserExampleByIDRespond"
+                            "$ref": "#/definitions/types.DeleteUserExampleByIDReply"
                         }
                     }
                 }
@@ -259,7 +259,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handlerfunc.checkHealthResponse"
+                            "$ref": "#/definitions/handlerfunc.CheckHealthReply"
                         }
                     }
                 }
@@ -327,13 +327,36 @@ const docTemplate = `{
                 }
             }
         },
-        "handlerfunc.checkHealthResponse": {
+        "handlerfunc.CheckHealthReply": {
             "type": "object",
             "properties": {
                 "hostname": {
                     "type": "string"
                 },
                 "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.CreateUserExampleReply": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "description": "id",
+                            "type": "integer"
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
                     "type": "string"
                 }
             }
@@ -375,30 +398,7 @@ const docTemplate = `{
                 }
             }
         },
-        "types.CreateUserExampleRespond": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "description": "return code",
-                    "type": "integer"
-                },
-                "data": {
-                    "description": "return data",
-                    "type": "object",
-                    "properties": {
-                        "id": {
-                            "description": "id",
-                            "type": "integer"
-                        }
-                    }
-                },
-                "msg": {
-                    "description": "return information description",
-                    "type": "string"
-                }
-            }
-        },
-        "types.DeleteUserExampleByIDRespond": {
+        "types.DeleteUserExampleByIDReply": {
             "type": "object",
             "properties": {
                 "code": {
@@ -414,7 +414,7 @@ const docTemplate = `{
                 }
             }
         },
-        "types.GetUserExampleByIDRespond": {
+        "types.GetUserExampleByIDReply": {
             "type": "object",
             "properties": {
                 "code": {
@@ -436,7 +436,7 @@ const docTemplate = `{
                 }
             }
         },
-        "types.ListUserExamplesRespond": {
+        "types.ListUserExamplesReply": {
             "type": "object",
             "properties": {
                 "code": {
@@ -454,6 +454,22 @@ const docTemplate = `{
                             }
                         }
                     }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.UpdateUserExampleByIDReply": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data"
                 },
                 "msg": {
                     "description": "return information description",
@@ -494,22 +510,6 @@ const docTemplate = `{
                 },
                 "phone": {
                     "description": "phone number",
-                    "type": "string"
-                }
-            }
-        },
-        "types.UpdateUserExampleByIDRespond": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "description": "return code",
-                    "type": "integer"
-                },
-                "data": {
-                    "description": "return data"
-                },
-                "msg": {
-                    "description": "return information description",
                     "type": "string"
                 }
             }

@@ -3,8 +3,6 @@ package service
 
 import (
 	"bytes"
-	"runtime"
-	"strings"
 
 	"google.golang.org/protobuf/compiler/protogen"
 
@@ -12,13 +10,12 @@ import (
 )
 
 // GenerateFiles generate service template code and error codes
-func GenerateFiles(filenamePrefix string, file *protogen.File) ([]byte, []byte, []byte) {
+func GenerateFiles(file *protogen.File, moduleName string) ([]byte, []byte, []byte) {
 	if len(file.Services) == 0 {
 		return nil, nil, nil
 	}
 
-	protoName := getProtoFilename(filenamePrefix)
-	pss := parse.GetServices(protoName, file)
+	pss := parse.GetServices(file, moduleName)
 	serviceTmplContent := genServiceTmplFile(pss)
 	serviceTestTmplContent := genServiceTestTmplFile(pss)
 	errCodeFileContent := genErrCodeFile(pss)
@@ -27,13 +24,13 @@ func GenerateFiles(filenamePrefix string, file *protogen.File) ([]byte, []byte, 
 }
 
 func genServiceTmplFile(fields []*parse.PbService) []byte {
-	lf := &serviceTmplFields{PbServices: fields}
-	return lf.execute()
+	stf := &serviceTmplFields{PbServices: fields}
+	return stf.execute()
 }
 
 func genServiceTestTmplFile(pbs []*parse.PbService) []byte {
-	lf := &serviceTestTmplFields{PbServices: pbs}
-	return lf.execute()
+	sttf := &serviceTestTmplFields{PbServices: pbs}
+	return sttf.execute()
 }
 
 func genErrCodeFile(fields []*parse.PbService) []byte {
@@ -50,7 +47,8 @@ func (f *serviceTmplFields) execute() []byte {
 	if err := serviceLogicTmpl.Execute(buf, f); err != nil {
 		panic(err)
 	}
-	return handleSplitLineMark(buf.Bytes())
+	content := handleSplitLineMark(buf.Bytes())
+	return bytes.ReplaceAll(content, []byte(importPkgPathMark), parse.GetImportPkg(f.PbServices))
 }
 
 type serviceTestTmplFields struct {
@@ -62,7 +60,8 @@ func (f *serviceTestTmplFields) execute() []byte {
 	if err := serviceLogicTestTmpl.Execute(buf, f); err != nil {
 		panic(err)
 	}
-	return buf.Bytes()
+	content := buf.Bytes()
+	return bytes.ReplaceAll(content, []byte(importPkgPathMark), parse.GetImportPkg(f.PbServices))
 }
 
 type errCodeFields struct {
@@ -78,19 +77,7 @@ func (f *errCodeFields) execute() []byte {
 	return handleSplitLineMark(data)
 }
 
-func getProtoFilename(filenamePrefix string) string {
-	filenamePrefix = strings.ReplaceAll(filenamePrefix, ".proto", "")
-	filenamePrefix = strings.ReplaceAll(filenamePrefix, getPathDelimiter(), "/")
-	ss := strings.Split(filenamePrefix, "/")
-
-	if len(ss) == 0 {
-		return ""
-	} else if len(ss) == 1 {
-		return ss[0] + ".proto"
-	}
-
-	return ss[len(ss)-1] + ".proto"
-}
+const importPkgPathMark = "// import api service package here"
 
 var splitLineMark = []byte(`// ---------- Do not delete or move this split line, this is the merge code marker ----------`)
 
@@ -108,13 +95,4 @@ func handleSplitLineMark(data []byte) []byte {
 		}
 	}
 	return out
-}
-
-func getPathDelimiter() string {
-	delimiter := "/"
-	if runtime.GOOS == "windows" {
-		delimiter = "\\"
-	}
-
-	return delimiter
 }

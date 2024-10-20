@@ -16,6 +16,7 @@ var (
 	defaultMaxBackups    = 100       // maximum number of old files
 	defaultMaxAge        = 30        // maximum number of days for old documents
 	defaultIsCompression = false     // whether to compress and archive old files
+	defaultIsLocalTime   = true      // whether to use local time
 )
 
 type options struct {
@@ -94,6 +95,7 @@ type fileOptions struct {
 	maxBackups    int
 	maxAge        int
 	isCompression bool
+	isLocalTime   bool
 }
 
 func defaultFileOptions() *fileOptions {
@@ -103,6 +105,7 @@ func defaultFileOptions() *fileOptions {
 		maxBackups:    defaultMaxBackups,
 		maxAge:        defaultMaxAge,
 		isCompression: defaultIsCompression,
+		isLocalTime:   defaultIsLocalTime,
 	}
 }
 
@@ -155,5 +158,12 @@ func WithFileMaxAge(maxAge int) FileOption {
 func WithFileIsCompression(isCompression bool) FileOption {
 	return func(f *fileOptions) {
 		f.isCompression = isCompression
+	}
+}
+
+// WithLocalTime set whether to use local time
+func WithLocalTime(isLocalTime bool) FileOption {
+	return func(f *fileOptions) {
+		f.isLocalTime = isLocalTime
 	}
 }

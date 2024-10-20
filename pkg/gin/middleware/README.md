@@ -74,14 +74,17 @@ Adaptive flow limitation based on hardware resources.
     import "github.com/zhufuyi/sponge/pkg/gin/middleware"
 
     r := gin.Default()
-    r.Use(middleware.CircuitBreaker())
+    r.Use(middleware.CircuitBreaker(
+        //middleware.WithValidCode(http.StatusRequestTimeout), // add error code 408 for circuit breaker
+        //middleware.WithDegradeHandler(handler), // add custom degrade handler
+    ))
 ```
 
 <br>
 
 ### jwt authorization middleware
 
-#### common authorization
+#### standard authorization
 
 ```go
 import "github.com/zhufuyi/sponge/pkg/jwt"
@@ -91,8 +94,8 @@ func main() {
     r := gin.Default()
 
     r.POST("/user/login", Login)
-    r.GET("/user/:id", middleware.Auth(), h.GetByID) // no verify field
-    // r.GET("/user/:id", middleware.Auth(middleware.WithVerify(adminVerify)), h.GetByID) // with verify field
+    r.GET("/user/:id", middleware.Auth(), h.GetByID) // do not get claims
+    // r.GET("/user/:id", middleware.Auth(middleware.WithVerify(adminVerify)), h.GetByID) // get claims and check
 
     r.Run(serverAddr)
 }
@@ -127,38 +130,35 @@ func main() {
     r := gin.Default()
 
     r.POST("/user/login", Login)
-    r.GET("/user/:id", middleware.AuthCustom(verify), h.GetByID)
+    r.GET("/user/:id", middleware.AuthCustom(verify), h.GetByID) // get claims and check
 
     r.Run(serverAddr)
 }
 
+// custom verify example
 func verify(claims *jwt.CustomClaims, tokenTail10 string, c *gin.Context) error {
     err := errors.New("verify failed")
 
-    // token, fields := getToken(id) // from cache or database
+    token, fields := getToken(id) // from cache or database
     // if tokenTail10 != token[len(token)-10:] { return err }
-	
-    id, exist := claims.Get("id")
-    if !exist {
-        return err
-    }
-    foo, exist := claims.Get("foo")
-    if !exist {
-        return err
-    }
-    if int(id.(float64)) != fields["id"].(int) ||
-        foo.(string) != fields["foo"].(string) {
-        return err
-    }
+
+    id, exist := claims.GetUint64("id")
+    if !exist || id != fields["id"].(uint64) { return err }
+
+    name, exist := claims.GetString("name")
+    if !exist || name != fields["name"].(string) { return err }
+
+    age, exist := claims.GetInt("age")
+    if !exist || age != fields["age"].(int) { return err }
 
     return nil
 }
 
 func Login(c *gin.Context) {
     // generate token
-    fields := jwt.KV{"id": 123, "foo": "bar"}
+    fields := jwt.KV{"id": uint64(123), "name": "tom", "age": 10}
     token, err := jwt.GenerateCustomToken(fields)
-    // save token end fields
+    // save token and fields
 }
 ```
 

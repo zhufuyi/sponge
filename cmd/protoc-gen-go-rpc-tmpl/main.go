@@ -22,7 +22,7 @@ const (
 protoc --proto_path=. --proto_path=./third_party --go-rpc-tmpl_out=. --go-rpc-tmpl_opt=paths=source_relative \
   --go-rpc-tmpl_opt=moduleName=yourModuleName --go-rpc-tmpl_opt=serverName=yourServerName *.proto
 
-# if you want the generated code to suited to mono-repo, you need to specify the parameter --go-gin_opt=suitedMonoRepo=true
+# if you want the generated code to suited to mono-repo, you need to set the parameter --go-gin_opt=suitedMonoRepo=true
 
 Tip:
     If you want to merge the code, after generating the code, execute the command "sponge merge rpc-pb",
@@ -72,7 +72,7 @@ func main() {
 
 			dirName := "internal"
 			if suitedMonoRepo {
-				dirName = "Internal"
+				dirName = serverName + "/internal"
 			}
 			if tmplDir == "" {
 				tmplDir = dirName + "/service"
@@ -97,7 +97,7 @@ func saveRPCTmplFiles(f *protogen.File, moduleName string, serverName string, tm
 		return fmt.Errorf(`the proto file name (%s) suffix "_test" is not supported for code generation, please delete suffix "_test" or change it to another name. `, checkFilename)
 	}
 
-	tmplFileContent, testTmplFileContent, ecodeFileContent := service.GenerateFiles(filenamePrefix, f)
+	tmplFileContent, testTmplFileContent, ecodeFileContent := service.GenerateFiles(f, moduleName)
 
 	filePath := filenamePrefix + ".go"
 	err := saveFile(moduleName, serverName, tmplOut, filePath, tmplFileContent, false, suitedMonoRepo)
@@ -182,7 +182,7 @@ func firstLetterToUpper(s string) []byte {
 
 func adaptMonoRepo(moduleName string, serverName string, data []byte) []byte {
 	matchStr := map[string]string{
-		fmt.Sprintf("\"%s/internal/", moduleName): fmt.Sprintf("\"%s/Internal/", moduleName+"/"+serverName),
+		fmt.Sprintf("\"%s/internal/", moduleName): fmt.Sprintf("\"%s/internal/", moduleName+"/"+serverName),
 		fmt.Sprintf("\"%s/configs", moduleName):   fmt.Sprintf("\"%s/configs", moduleName+"/"+serverName),
 		fmt.Sprintf("\"%s/api", moduleName):       fmt.Sprintf("\"%s/api", moduleName+"/"+serverName),
 	}

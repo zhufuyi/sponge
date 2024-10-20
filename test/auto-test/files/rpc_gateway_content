@@ -22,3 +22,4 @@
 
 	"github.com/zhufuyi/sponge/pkg/grpc/interceptor"
 	"github.com/zhufuyi/sponge/pkg/logger"
+|-|-|-|-|-|//	    userCli: user_gwV1.NewUserClient(rpcclient.GetUserRPCConn()),|-|-|-|-|-|teacherCli: userV1.NewTeacherClient(rpcclient.GetUserRPCConn()),

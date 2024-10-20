@@ -1,10 +1,12 @@
 #!/bin/bash
 
-webServiceName="user"
-webDir="3_web_gin_pb_${webServiceName}"
+testServerName="user"
+testServerDir="6_micro_grpc_http_pb_${testServerName}"
 
-colorCyan='\033[1;36m'
-markEnd='\033[0m'
+colorCyan='\e[1;36m'
+colorGreen='\e[1;32m'
+colorRed='\e[1;31m'
+markEnd='\e[0m'
 errCount=0
 
 function checkResult() {
@@ -18,6 +20,14 @@ function checkErrCount() {
   result=$1
   if [ ${result} -ne 0 ]; then
       ((errCount++))
+  fi
+}
+
+function printTestResult() {
+  if [ ${errCount} -eq 0 ]; then
+    echo -e "\n\n${colorGreen}--------------------- [${testServerDir}] test result: passed ---------------------${markEnd}\n"
+  else
+    echo -e "\n\n${colorRed}--------------------- [${testServerDir}] test result: failed ${errCount} ---------------------${markEnd}\n"
   fi
 }
 
@@ -60,34 +70,38 @@ function checkServiceStarted() {
 }
 
 function testRequest() {
-  checkServiceStarted $webServiceName
+  checkServiceStarted $testServerName
   sleep 1
-  echo "--------------------- start testing ---------------------"
 
-  echo -e "\n\n"
+  echo -e "start testing [${testServerName}] api:\n\n"
   echo -e "${colorCyan}curl -X POST http://localhost:8080/api/v1/auth/register -H \"Content-Type: application/json\" -d {\"email\":\"foo@bar.com\",\"password\":\"123456\"} ${markEnd}"
   curl -X POST http://localhost:8080/api/v1/auth/register -H "Content-Type: application/json" -d "{\"email\":\"foo@bar.com\",\"password\":\"123456\"}"
   checkErrCount $?
 
+  cd internal/service
+
   echo -e "\n\n"
-  echo -e "${colorCyan}curl -X POST http://localhost:8080/api/v1/auth/register  -H "Content-Type: application/json" -H \"X-Request-Id: qaz12wx3ed4\" -d {\"email\":\"foo@bar.com\",\"password\":\"123456\"} ${markEnd}"
-  curl -X POST http://localhost:8080/api/v1/auth/register -H "Content-Type: application/json" -H "X-Request-Id: qaz12wx3ed4" -d "{\"email\":\"foo@bar.com\",\"password\":\"123456\"}"
+  echo -e "${colorCyan}go test -run Test_service_user_methods/Register ${markEnd}"
+  go test -run Test_service_user_methods/Register
   checkErrCount $?
 
-  echo -e "\n--------------------- the test is over, error result: $errCount ---------------------\n"
-  stopService $webServiceName
+  cd -
+  printTestResult
+  stopService $testServerName
 }
 
-if [ -d "${webDir}" ]; then
-  echo "service ${webDir} already exists"
+echo -e "\n\n"
+
+if [ -d "${testServerDir}" ]; then
+  echo "service ${testServerDir} already exists"
 else
-  echo "create service ${webDir}"
-  echo -e "${colorCyan}sponge web http-pb --module-name=${webServiceName} --server-name=${webServiceName} --project-name=ginpbdemo --protobuf-file=./files/user.proto --out=./${webDir} ${markEnd}"
-  sponge web http-pb --module-name=${webServiceName} --server-name=${webServiceName} --project-name=ginpbdemo --protobuf-file=./files/user.proto --out=./${webDir}
+  echo "create service ${testServerDir}"
+  echo -e "${colorCyan}sponge micro grpc-http-pb --module-name=${testServerName} --server-name=${testServerName} --project-name=grpchttppbdemo --protobuf-file=./files/user.proto --out=./${testServerDir} ${markEnd}"
+  sponge micro grpc-http-pb --module-name=${testServerName} --server-name=${testServerName} --project-name=grpchttppbdemo --protobuf-file=./files/user.proto --out=./${testServerDir}
   checkResult $?
 fi
 
-cd ${webDir}
+cd ${testServerDir}
 checkResult $?
 
 echo "make proto"
@@ -95,7 +109,9 @@ make proto
 checkResult $?
 
 echo "replace the sample template code"
-replaceCode ../files/web_gin_pb_content ./internal/handler/user.go
+replaceCode ../files/micro_grpc_pb_content ./internal/service/user.go
+checkResult $?
+replaceCode ../files/micro_grpc_pb_content ./internal/service/user_client_test.go
 checkResult $?
 
 testRequest &

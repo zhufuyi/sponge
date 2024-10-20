@@ -58,6 +58,15 @@ func TestListFiles(t *testing.T) {
 		}
 		t.Log(strings.Join(files, "\n"))
 	})
+
+	t.Run("no filepath abs", func(t *testing.T) {
+		files, err := ListFiles(dir, WithSuffix(".go"), WithNoAbsolutePath())
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		t.Log(strings.Join(files, "\n"))
+	})
 }
 
 func TestListDirsAndFiles(t *testing.T) {
@@ -73,6 +82,9 @@ func TestListDirsAndFiles(t *testing.T) {
 func TestGetFilename(t *testing.T) {
 	name := GetFilename("./README.md")
 	assert.Equal(t, "README.md", name)
+
+	name = GetDir("gofile/README.md")
+	assert.Equal(t, "gofile", name)
 
 	name = GetFileDir("gofile/README.md")
 	assert.Equal(t, "gofile/", name)

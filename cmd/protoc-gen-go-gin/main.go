@@ -1,4 +1,4 @@
-// Package main is to generate *.go(tmpl), *_router.go, *_http.go, *_router.pb.go,files.
+// Package main generate *.go(tmpl), *_router.go, *_http.go, *_router.pb.go code based on proto files.
 package main
 
 import (
@@ -39,7 +39,7 @@ protoc --proto_path=. --proto_path=./third_party --go-gin_out=. --go-gin_opt=pat
 protoc --proto_path=. --proto_path=./third_party --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=mix \
   --go-gin_opt=moduleName=yourModuleName --go-gin_opt=serverName=yourServerName *.proto
 
-# if you want the generated code to suited to mono-repo, you need to specify the parameter --go-gin_opt=suitedMonoRepo=true
+# if you want the generated code to suited to mono-repo, you need to set the parameter --go-gin_opt=suitedMonoRepo=true
 
 Tip:
     If you want to merge the code, after generating the code, execute the command "sponge merge http-pb" or
@@ -89,7 +89,7 @@ func main() {
 		pluginName := strings.ReplaceAll(plugin, " ", "")
 		dirName := "internal"
 		if suitedMonoRepo {
-			dirName = "Internal"
+			dirName = serverName + "/internal"
 		}
 		switch pluginName {
 		case handlerPlugin:
@@ -123,9 +123,8 @@ func main() {
 			if routerOut == "" {
 				routerOut = dirName + "/routers"
 			}
-		case "":
 		default:
-			return fmt.Errorf("protoc-gen-go-gin: unknown plugin %q, only 'service' and 'handler' are supported", plugin)
+			return fmt.Errorf("protoc-gen-go-gin: unknown plugin name '%q', only 'service', 'handler' and 'mix' are supported", plugin)
 		}
 
 		gen.SupportedFeatures = uint64(pluginpb.CodeGeneratorResponse_FEATURE_PROTO3_OPTIONAL)
@@ -138,7 +137,9 @@ func main() {
 				return fmt.Errorf(`the proto file name (%s) suffix "_test" is not supported for code generation, please delete suffix "_test" or change it to another name. `, checkFilename)
 			}
 
-			router.GenerateFile(gen, f)
+			if err := saveGinRouterFiles(f); err != nil {
+				return err
+			}
 
 			if handlerFlag {
 				err := saveHandlerAndRouterFiles(f, moduleName, serverName, logicOut, routerOut, ecodeOut, suitedMonoRepo, mixFlag)
@@ -156,10 +157,16 @@ func main() {
 	})
 }
 
+func saveGinRouterFiles(f *protogen.File) error {
+	ginRouterFileContent := router.GenerateFiles(f)
+	filePath := f.GeneratedFilenamePrefix + "_router.pb.go"
+	return os.WriteFile(filePath, ginRouterFileContent, 0666)
+}
+
 func saveHandlerAndRouterFiles(f *protogen.File, moduleName string, serverName string,
 	logicOut string, routerOut string, ecodeOut string, suitedMonoRepo bool, isMixType bool) error {
 	filenamePrefix := f.GeneratedFilenamePrefix
-	handlerLogicContent, routerContent, errCodeFileContent := handler.GenerateFiles(f, isMixType)
+	handlerLogicContent, routerContent, errCodeFileContent := handler.GenerateFiles(f, isMixType, moduleName)
 
 	filePath := filenamePrefix + ".go"
 	err := saveFile(moduleName, serverName, logicOut, filePath, handlerLogicContent, false, handlerPlugin, suitedMonoRepo)
@@ -187,7 +194,7 @@ func saveHandlerAndRouterFiles(f *protogen.File, moduleName string, serverName s
 func saveServiceAndRouterFiles(f *protogen.File, moduleName string, serverName string,
 	logicOut string, routerOut string, ecodeOut string, suitedMonoRepo bool) error {
 	filenamePrefix := f.GeneratedFilenamePrefix
-	serviceLogicContent, routerContent, errCodeFileContent := service.GenerateFiles(f)
+	serviceLogicContent, routerContent, errCodeFileContent := service.GenerateFiles(f, moduleName)
 
 	filePath := filenamePrefix + ".go"
 	err := saveFile(moduleName, serverName, logicOut, filePath, serviceLogicContent, false, servicePlugin, suitedMonoRepo)
@@ -272,7 +279,7 @@ func firstLetterToUpper(s string) []byte {
 
 func adaptMonoRepo(moduleName string, serverName string, data []byte) []byte {
 	matchStr := map[string]string{
-		fmt.Sprintf("\"%s/internal/", moduleName): fmt.Sprintf("\"%s/Internal/", moduleName+"/"+serverName),
+		fmt.Sprintf("\"%s/internal/", moduleName): fmt.Sprintf("\"%s/internal/", moduleName+"/"+serverName),
 		fmt.Sprintf("\"%s/configs", moduleName):   fmt.Sprintf("\"%s/configs", moduleName+"/"+serverName),
 		fmt.Sprintf("\"%s/api", moduleName):       fmt.Sprintf("\"%s/api", moduleName+"/"+serverName),
 	}

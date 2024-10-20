@@ -93,6 +93,7 @@ func TestInit(t *testing.T) {
 					WithFileMaxBackups(5),
 					WithFileMaxAge(10),
 					WithFileIsCompression(true),
+					WithLocalTime(true),
 				),
 			}},
 			wantErr: false,

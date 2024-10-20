@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 
 	"github.com/zhufuyi/sponge/pkg/gofile"
@@ -20,7 +21,7 @@ func DeleteJSONOmitemptyCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "del-omitempty",
 		Short: "Delete json tag omitempty",
-		Long: `delete json tag omitempty
+		Long: color.HiBlackString(`delete json tag omitempty
 
 Examples:
   # delete all files that include the omitempty character
@@ -29,7 +30,7 @@ Examples:
   # delete the specified suffix file including the omitempty character
   sponge patch del-omitempty --dir=./api --suffix-name=pb.go
 
-`,
+`),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {

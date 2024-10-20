@@ -3,6 +3,7 @@ package krand
 
 import (
 	"math/rand"
+	"strconv"
 	"time"
 )
 
@@ -20,7 +21,7 @@ var (
 )
 
 func init() {
-	rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano()) //nolint
 }
 
 // String generate random strings of any length of multiple types, default length is 6 if size is empty
@@ -83,13 +84,48 @@ func Float64(dpLength int, rangeSize ...int) float64 {
 
 	switch len(rangeSize) {
 	case 0:
-		return float64(rand.Intn(101)) + dp // default 0~100
+		return float64(rand.Intn(100)) + dp // default 0~100
 	case 1:
-		return float64(rand.Intn(rangeSize[0]+1)) + dp
+		return float64(rand.Intn(rangeSize[0])) + dp
 	default:
 		if rangeSize[0] > rangeSize[1] {
 			rangeSize[0], rangeSize[1] = rangeSize[1], rangeSize[0]
 		}
-		return float64(rand.Intn(rangeSize[1]-rangeSize[0]+1)+rangeSize[0]) + dp
+		return float64(rand.Intn(rangeSize[1]-rangeSize[0])+rangeSize[0]) + dp
 	}
+}
+
+// NewID Generate a milliseconds+random number ID.
+func NewID() int64 {
+	ns := time.Now().UnixMilli() * 1000000
+	return ns + rand.Int63n(1000000)
+}
+
+// NewStringID Generate a string ID, the hexadecimal form of NewID(), total 16 bytes.
+func NewStringID() string {
+	return strconv.FormatInt(NewID(), 16)
+}
+
+// NewSeriesID Generate a datetime+random string ID,
+// datetime is microsecond precision, 20  bytes, random is 6 bytes, total 26 bytes.
+// example: 20060102150405000000123456
+func NewSeriesID() string {
+	// Declare a buffer, only 26 bytes are needed
+	var buf [27]byte
+	t := time.Now()
+
+	// Format datetime with microsecond precision, and store in the buffer
+	copy(buf[:], t.Format("20060102150405.000000"))
+
+	// Generate a 6-digit random number and append it to the buffer
+	random := rand.Intn(1000000)
+	buf[21] = '0' + byte(random/100000%10)
+	buf[22] = '0' + byte(random/10000%10)
+	buf[23] = '0' + byte(random/1000%10)
+	buf[24] = '0' + byte(random/100%10)
+	buf[25] = '0' + byte(random/10%10)
+	buf[26] = '0' + byte(random%10)
+
+	// Return the final string without the dot
+	return string(buf[:14]) + string(buf[15:])
 }

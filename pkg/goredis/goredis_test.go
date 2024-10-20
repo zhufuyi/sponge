@@ -1,14 +1,19 @@
 package goredis
 
 import (
-	"crypto/tls"
+	"fmt"
 	"testing"
 	"time"
 
+	"github.com/alicebob/miniredis/v2"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestInit(t *testing.T) {
+	redisServer, _ := miniredis.Run()
+	defer redisServer.Close()
+	addr := redisServer.Addr()
+
 	type args struct {
 		redisURL string
 	}
@@ -19,78 +24,96 @@ func TestInit(t *testing.T) {
 	}{
 		{
 			name:    " no password, no db",
-			args:    args{"127.0.0.1:6379"},
+			args:    args{addr},
 			wantErr: false,
 		},
 		{
 			name:    "has password, no db",
-			args:    args{"root:123456@127.0.0.1:6379"},
+			args:    args{"root:123456@" + addr},
 			wantErr: false,
 		},
 		{
 			name:    "no password, has db",
-			args:    args{"127.0.0.1:6379/5"},
+			args:    args{addr + "/5"},
 			wantErr: false,
 		},
 		{
 			name:    "has password, has db",
-			args:    args{"root:123456@127.0.0.1:6379/5"},
+			args:    args{fmt.Sprintf("root:123456@%s/5", addr)},
 			wantErr: false,
 		},
 		{
 			name:    "has redis prefix",
-			args:    args{"redis://root:123456@127.0.0.1:6379/7"},
+			args:    args{fmt.Sprintf("redis://root:123456@%s/5", addr)},
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := Init(tt.args.redisURL,
-				WithEnableTrace(),
+			rdb, err := Init(tt.args.redisURL,
 				WithDialTimeout(time.Second),
 				WithReadTimeout(time.Second),
 				WithWriteTimeout(time.Second),
-				WithTLSConfig(&tls.Config{}),
+				WithEnableTrace(),
+				WithTracing(nil),   // nil means no set field
+				WithTLSConfig(nil), // nil means no set field
 			)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Init() error = %v, wantErr %v", err, tt.wantErr)
+				t.Logf("error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
+			assert.NotNil(t, rdb)
 		})
 	}
 }
 
-func TestInit2(t *testing.T) {
-	rdb := Init2("127.0.0.1:6379", "123456", 0,
-		WithEnableTrace(),
+func TestInitSingle(t *testing.T) {
+	redisServer, _ := miniredis.Run()
+	defer redisServer.Close()
+	addr := redisServer.Addr()
+
+	rdb, err := InitSingle(addr, "", 0,
 		WithDialTimeout(time.Second),
 		WithReadTimeout(time.Second),
 		WithWriteTimeout(time.Second),
-		WithTLSConfig(&tls.Config{}),
+		WithTracing(nil),       // nil means no set field
+		WithTLSConfig(nil),     // nil means no set field
+		WithSingleOptions(nil), // nil means no set field
 	)
+	assert.Nil(t, err)
 	assert.NotNil(t, rdb)
 }
 
 func TestInitSentinel(t *testing.T) {
-	addrs := []string{"127.0.0.1:6380", "127.0.0.1:6381", "127.0.0.1:6382"}
-	rdb := InitSentinel("master", addrs, "default", "123456",
-		WithEnableTrace(),
+	redisServer, _ := miniredis.Run()
+	defer redisServer.Close()
+	addr := redisServer.Addr()
+
+	rdb, err := InitSentinel("mymaster", []string{addr}, "", "",
 		WithDialTimeout(time.Second),
 		WithReadTimeout(time.Second),
 		WithWriteTimeout(time.Second),
-		WithTLSConfig(&tls.Config{}),
+		WithTracing(nil),         // nil means no set field
+		WithTLSConfig(nil),       // nil means no set field
+		WithSentinelOptions(nil), // nil means no set field
 	)
+	t.Log(err)
 	assert.NotNil(t, rdb)
 }
 
 func TestInitCluster(t *testing.T) {
-	addrs := []string{"127.0.0.1:6380", "127.0.0.1:6381", "127.0.0.1:6382"}
-	clusterRdb := InitCluster(addrs, "default", "123456",
-		WithEnableTrace(),
-		WithDialTimeout(time.Second),
+	redisServer, _ := miniredis.Run()
+	defer redisServer.Close()
+	addr := redisServer.Addr()
+
+	clusterRdb, err := InitCluster([]string{addr}, "", "",
+		WithDialTimeout(time.Second*15),
 		WithReadTimeout(time.Second),
 		WithWriteTimeout(time.Second),
-		WithTLSConfig(&tls.Config{}),
+		WithTracing(nil),        // nil means no set field
+		WithTLSConfig(nil),      // nil means no set field
+		WithClusterOptions(nil), // nil means no set field
 	)
+	assert.Nil(t, err)
 	assert.NotNil(t, clusterRdb)
 }

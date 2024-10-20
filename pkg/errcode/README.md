@@ -17,14 +17,34 @@ Error codes usually include system-level error codes and business-level error co
 
 ### Example of http error code usage
 
-```go
-    import "github.com/zhufuyi/sponge/pkg/errcode"
+Web services created based on **SQL**, use the following error code:
 
-    // defining error codes
-    var ErrLogin = errcode.NewError(20101, "incorrect username or password")
+```go
+    import "github.com/zhufuyi/sponge/pkg/gin/response"
 
     // return error
-    response.Error(c, errcode.LoginErr)
+    response.Error(c, ecode.InvalidParams)
+    // rewrite error messages
+    response.Error(c, ecode.InvalidParams.RewriteMsg("custom error message"))
+
+    // convert error code to standard http status code
+    response.Out(c, ecode.InvalidParams)
+    // convert error code to standard http status code, and rewrite error messages
+    response.Out(c, ecode.InvalidParams.RewriteMsg("custom error message"))
+```
+
+Web services created based on **Protobuf**, use the following error code:
+
+```go
+    // return error
+    return nil, ecode.InvalidParams.Err()
+    // rewrite error messages
+    return nil, ecode.InvalidParams.Err("custom error message")
+
+    // convert error code to standard http status code
+    return nil, ecode.InvalidParams.ErrToHTTP()
+    // convert error code to standard http status code, and rewrite error messages
+    return nil, ecode.InvalidParams.ErrToHTTP("custom error message")
 ```
 
 <br>
@@ -32,13 +52,18 @@ Error codes usually include system-level error codes and business-level error co
 ### Example of grpc error code usage
 
 ```go
-    import "github.com/zhufuyi/sponge/pkg/errcode"
-
-    // defining error codes
-    var ErrLogin = errcode.NewRPCStatus(40101, "incorrect username or password")
-
     // return error
-    errcode.ErrLogin.Err()
-    // return with error details
-    errcode.ErrLogin.Err(errcode.Any("err", err))
+    return nil, ecode.StatusInvalidParams.Err()
+    // rewrite error messages
+    return nil, ecode.StatusInvalidParams.Err("custom error message")
+
+    // convert error code to standard grpc status code
+    return nil, ecode.StatusInvalidParams.ToRPCErr()
+    // convert error code to standard grpc status code, and rewrite error messages
+    return nil, ecode.StatusInvalidParams.ToRPCErr("custom error message")
+
+    // convert error code to standard http status code
+    return nil, ecode.StatusInvalidParams.ErrToHTTP()
+    // convert error code to standard http status code, and rewrite error messages
+    return nil, ecode.StatusInvalidParams.ErrToHTTP("custom error message")
 ```

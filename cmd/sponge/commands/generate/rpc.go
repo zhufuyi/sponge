@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/huandu/xstrings"
 	"github.com/spf13/cobra"
 
@@ -37,7 +38,7 @@ func RPCCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "rpc",
 		Short: "Generate grpc service code based on sql",
-		Long: `generate grpc service code based on sql.
+		Long: color.HiBlackString(`generate grpc service code based on sql.
 
 Examples:
   # generate grpc service code.
@@ -55,8 +56,8 @@ Examples:
   # generate grpc service code and specify the docker image repository address.
   sponge micro rpc --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
-  # if you want the generated code to suited to mono-repo, you need to specify the parameter --suited-mono-repo=true
-`,
+  # if you want the generated code to suited to mono-repo, you need to set the parameter --suited-mono-repo=true
+`),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -186,7 +187,7 @@ type rpcGenerator struct {
 }
 
 func (g *rpcGenerator) generateCode() (string, error) {
-	subTplName := "rpc"
+	subTplName := codeNameGRPC
 	r := Replacers[TplNameSponge]
 	if r == nil {
 		return "", errors.New("replacer is nil")
@@ -200,10 +201,6 @@ func (g *rpcGenerator) generateCode() (string, error) {
 	subFiles := []string{
 		"sponge/.gitignore", "sponge/.golangci.yml", "sponge/go.mod", "sponge/go.sum",
 		"sponge/Jenkinsfile", "sponge/Makefile", "sponge/README.md",
-	}
-
-	if g.suitedMonoRepo {
-		subFiles = removeElements(subFiles, "sponge/go.mod", "sponge/go.sum")
 	}
 
 	selectFiles := map[string][]string{
@@ -235,8 +232,14 @@ func (g *rpcGenerator) generateCode() (string, error) {
 			"service.go", "service_test.go", "userExample.go", "userExample_client_test.go",
 		},
 	}
-	replaceFiles := make(map[string][]string)
 
+	if g.suitedMonoRepo {
+		subDirs = removeElements(subDirs, "sponge/third_party")
+		subFiles = removeElements(subFiles, "sponge/go.mod", "sponge/go.sum")
+		delete(selectFiles, "api/types")
+	}
+
+	replaceFiles := make(map[string][]string)
 	switch strings.ToLower(g.dbDriver) {
 	case DBDriverMysql, DBDriverPostgresql, DBDriverTidb, DBDriverSqlite:
 		g.fields = append(g.fields, getExpectedSQLForDeletionField(g.isEmbed)...)
@@ -266,11 +269,11 @@ func (g *rpcGenerator) generateCode() (string, error) {
 					"service.go", "service_test.go", "userExample.go.mgo", "userExample_client_test.go.mgo",
 				},
 			}
-			g.fields = append(g.fields, deleteFieldsMark(r, serviceLogicFile+".mgo", startMark, endMark)...)
+			g.fields = append(g.fields, deleteFieldsMark(r, serviceLogicFile+mgoSuffix, startMark, endMark)...)
 		}
 
 	default:
-		return "", errors.New("unsupported db driver: " + g.dbDriver)
+		return "", dbDriverErr(g.dbDriver)
 	}
 
 	subFiles = append(subFiles, getSubFiles(selectFiles, replaceFiles)...)
@@ -287,6 +290,12 @@ func (g *rpcGenerator) generateCode() (string, error) {
 	r.SetReplacementFields(fields)
 	if err := r.SaveFiles(); err != nil {
 		return "", err
+	}
+
+	if g.suitedMonoRepo {
+		if err := moveProtoFileToAPIDir(g.moduleName, g.serverName, g.suitedMonoRepo, r.GetOutputDir()); err != nil {
+			return "", err
+		}
 	}
 	_ = saveGenInfo(g.moduleName, g.serverName, g.suitedMonoRepo, r.GetOutputDir())
 
@@ -320,7 +329,8 @@ func (g *rpcGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	fields = append(fields, deleteAllFieldsMark(r, protoShellFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteAllFieldsMark(r, appConfigFile, wellStartMark, wellEndMark)...)
 	//fields = append(fields, deleteFieldsMark(r, deploymentConfigFile, wellStartMark, wellEndMark)...)
-	fields = append(fields, replaceFileContentMark(r, readmeFile, "## "+g.serverName)...)
+	fields = append(fields, replaceFileContentMark(r, readmeFile,
+		setReadmeTitle(g.moduleName, g.serverName, codeNameGRPC, g.suitedMonoRepo))...)
 	fields = append(fields, []replacer.Field{
 		{ // replace the configuration of the *.yml file
 			Old: appConfigFileMark,
@@ -342,7 +352,7 @@ func (g *rpcGenerator) addFields(r replacer.Replacer) []replacer.Field {
 			Old: daoFileMark,
 			New: g.codes[parser.CodeTypeDAO],
 		},
-		{ // replace the contents of the handler/userExample_logic.go file
+		{ // replace the contents of the service/userExample.go file
 			Old: embedTimeMark,
 			New: getEmbedTimeCode(g.isEmbed),
 		},
@@ -408,7 +418,7 @@ func (g *rpcGenerator) addFields(r replacer.Replacer) []replacer.Field {
 			New: g.moduleName,
 		},
 		{
-			Old: g.moduleName + "/pkg",
+			Old: g.moduleName + pkgPathSuffix,
 			New: "github.com/zhufuyi/sponge/pkg",
 		},
 		{ // replace the sponge version of the go.mod file
@@ -425,11 +435,11 @@ func (g *rpcGenerator) addFields(r replacer.Replacer) []replacer.Field {
 		},
 		{
 			Old: "sponge api docs",
-			New: g.serverName + " api docs",
+			New: g.serverName + apiDocsSuffix,
 		},
 		{
-			Old: "go 1.19",
-			New: "go 1.20",
+			Old: defaultGoModVersion,
+			New: getLocalGoVersion(),
 		},
 		{
 			Old: "_userExampleNO       = 2",
@@ -505,7 +515,7 @@ func (g *rpcGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	}...)
 
 	if g.suitedMonoRepo {
-		fs := serverCodeFields(r.GetOutputDir(), g.moduleName, g.serverName)
+		fs := serverCodeFields(codeNameGRPC, g.moduleName, g.serverName)
 		fields = append(fields, fs...)
 	}
 

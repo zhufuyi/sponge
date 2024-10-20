@@ -17,20 +17,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Set up Go
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4
         with:
-          go-version: 1.19
-          cache: true
+          go-version: 1.20.14
 
       - name: Lint Go Code
         run: |
           export PATH=$PATH:$(go env GOPATH)/bin
-          go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.49.0
+          go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.55.2
           make ci-lint
 
 
@@ -39,15 +38,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Set up Go
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4
         with:
-          go-version: 1.19
-          cache: true
+          go-version: 1.20.14
 
       - name: Run Unit tests
         run: make test
@@ -68,15 +66,14 @@ jobs:
     needs: [lint, test]
     steps:
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Set up Go
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4
         with:
-          go-version: 1.19
-          cache: true
+          go-version: 1.20.14
 
       - name: Build
         run: make build && make build-sponge

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 
 	"github.com/zhufuyi/sponge/cmd/sponge/commands/generate"
@@ -23,7 +24,7 @@ func GenMysqlInitCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "gen-mysql-init",
 		Short: "Generate mysql initialization code",
-		Long: `generate mysql initialization code
+		Long: color.HiBlackString(`generate mysql initialization code
 
 Examples:
   # generate mysql initialization code.
@@ -31,7 +32,7 @@ Examples:
 
   # generate mysql initialization code, and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge patch gen-mysql-init --out=./yourServerDir
-`,
+`),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -71,7 +72,7 @@ using help:
 			} else {
 				targetFile = "/" + targetFile
 			}
-			fmt.Printf("generate \"mysql-init\" codes successfully, out = %s\n", outPath+targetFile)
+			fmt.Printf("generate \"mysql-init\" codes successfully, out = %s\n", cutPathPrefix(outPath+targetFile))
 			return nil
 		},
 	}

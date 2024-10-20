@@ -13,11 +13,12 @@ var (
 	Unauthorized        = errcode.Unauthorized
 	InternalServerError = errcode.InternalServerError
 	NotFound            = errcode.NotFound
-	AlreadyExists       = errcode.AlreadyExists
 	Timeout             = errcode.Timeout
 	TooManyRequests     = errcode.TooManyRequests
 	Forbidden           = errcode.Forbidden
 	LimitExceed         = errcode.LimitExceed
+	Conflict            = errcode.Conflict
+	TooEarly            = errcode.TooEarly
 
 	DeadlineExceeded   = errcode.DeadlineExceeded
 	AccessDenied       = errcode.AccessDenied
@@ -36,3 +37,6 @@ var (
 )
 
 var SkipResponse = errcode.SkipResponse
+
+// GetErrorCode get error code from error
+var GetErrorCode = errcode.GetErrorCode

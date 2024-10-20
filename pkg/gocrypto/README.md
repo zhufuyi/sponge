@@ -30,7 +30,7 @@ Commonly used `one-way encryption`, `symmetric encryption and decryption`, `asym
 
 <br>
 
-###Password hash and checksum with salt
+### Password hash and checksum with salt
 
 The password registered by the user is stored in the database through hash, and the password registered is compared with the hash value to judge whether the password is correct all the time, so as to ensure that only the user knows the plaintext of the password.
 

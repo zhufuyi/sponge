@@ -40,20 +40,34 @@ msg2 = %s
 	return e
 }
 
-// Err convert to standard error
-func (e *Error) Err() error {
-	if len(e.details) == 0 {
-		return fmt.Errorf("code = %d, msg = %s", e.code, e.msg)
+// Err convert to standard error,
+// if there is a parameter 'msg', it will replace the original message.
+func (e *Error) Err(msg ...string) error {
+	message := e.msg
+	if len(msg) > 0 {
+		message = strings.Join(msg, ", ")
 	}
-	return fmt.Errorf("code = %d, msg = %s, details = %v", e.code, e.msg, e.details)
+
+	if len(e.details) == 0 {
+		return fmt.Errorf("code = %d, msg = %s", e.code, message)
+	}
+	return fmt.Errorf("code = %d, msg = %s, details = %v", e.code, message, e.details)
 }
 
-// ErrToHTTP convert to standard error add ToHTTPCodeLabel to error message
-func (e *Error) ErrToHTTP() error {
-	if len(e.details) == 0 {
-		return fmt.Errorf("code = %d, msg = %s, details = %v", e.code, e.msg, ToHTTPCodeLabel)
+// ErrToHTTP convert to standard error add ToHTTPCodeLabel to error message,
+// use it if you need to convert to standard HTTP status code,
+// if there is a parameter 'msg', it will replace the original message.
+// Tips: you can call the GetErrorCode function to get the standard HTTP status code.
+func (e *Error) ErrToHTTP(msg ...string) error {
+	message := e.msg
+	if len(msg) > 0 {
+		message = strings.Join(msg, ", ")
 	}
-	return fmt.Errorf("code = %d, msg = %s, details = %v, %s", e.code, e.msg, e.details, ToHTTPCodeLabel)
+
+	if len(e.details) == 0 {
+		return fmt.Errorf("code = %d, msg = %s%s", e.code, message, ToHTTPCodeLabel)
+	}
+	return fmt.Errorf("code = %d, msg = %s, details = %v%s", e.code, message, strings.Join(e.details, ", "), ToHTTPCodeLabel)
 }
 
 // Code get error code
@@ -83,9 +97,36 @@ func (e *Error) WithDetails(details ...string) *Error {
 	return newError
 }
 
+// RewriteMsg rewrite error message
+func (e *Error) RewriteMsg(msg string) *Error {
+	return &Error{code: e.code, msg: msg}
+}
+
 // WithOutMsg out error message
+// Deprecated: use RewriteMsg instead
 func (e *Error) WithOutMsg(msg string) *Error {
 	return &Error{code: e.code, msg: msg}
+}
+
+// WithOutMsgI18n out error message i18n
+// langMsg example:
+//
+//	map[int]map[string]string{
+//			20010: {
+//				"en-US": "login failed",
+//				"zh-CN": "登录失败",
+//			},
+//		}
+//
+// lang BCP 47 code https://learn.microsoft.com/en-us/openspecs/office_standards/ms-oe376/6c085406-a698-4e12-9d4d-c3b0ee3dbc4a
+func (e *Error) WithOutMsgI18n(langMsg map[int]map[string]string, lang string) *Error {
+	if i18nMsg, ok := langMsg[e.Code()]; ok {
+		if msg, ok2 := i18nMsg[lang]; ok2 {
+			return &Error{code: e.code, msg: msg}
+		}
+	}
+
+	return &Error{code: e.code, msg: e.msg}
 }
 
 // ToHTTPCode convert to http error code
@@ -108,8 +149,10 @@ func (e *Error) ToHTTPCode() int {
 		return http.StatusForbidden
 	case NotFound.Code():
 		return http.StatusNotFound
-	case AlreadyExists.Code():
+	case Conflict.Code(), AlreadyExists.Code():
 		return http.StatusConflict
+	case TooEarly.Code():
+		return http.StatusTooEarly
 	case Timeout.Code(), DeadlineExceeded.Code():
 		return http.StatusRequestTimeout
 	case MethodNotAllowed.Code():
@@ -154,6 +197,15 @@ func ParseError(err error) *Error {
 	}
 
 	return outError
+}
+
+// GetErrorCode get Error code from error returned by http invoke
+func GetErrorCode(err error) int {
+	e := ParseError(err)
+	if e.needHTTPCode {
+		return e.ToHTTPCode()
+	}
+	return e.Code()
 }
 
 // ListHTTPErrCodes list http error codes

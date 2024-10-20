@@ -3,6 +3,7 @@ package commands
 import (
 	"fmt"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
@@ -13,12 +14,12 @@ func InitCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "init",
 		Short: "Initialize sponge",
-		Long: `initialize sponge.
+		Long: color.HiBlackString(`initialize sponge.
 
 Examples:
   # run init, download code and install plugins.
   sponge init
-`,
+`),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {

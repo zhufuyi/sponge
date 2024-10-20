@@ -1,22 +1,56 @@
 package errcode
 
 import (
+	"fmt"
 	"net/http"
 	"testing"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/grpc/status"
 
 	"github.com/zhufuyi/sponge/pkg/utils"
 )
+
+var rpcStatus = []*RPCStatus{
+	StatusSuccess,
+	StatusCanceled,
+	StatusUnknown,
+	StatusInvalidParams,
+	StatusDeadlineExceeded,
+	StatusNotFound,
+	StatusAlreadyExists,
+	StatusPermissionDenied,
+	StatusResourceExhausted,
+	StatusFailedPrecondition,
+	StatusAborted,
+	StatusOutOfRange,
+	StatusUnimplemented,
+	StatusInternalServerError,
+	StatusServiceUnavailable,
+	StatusDataLoss,
+	StatusUnauthorized,
+	StatusTimeout,
+	StatusTooManyRequests,
+	StatusForbidden,
+	StatusLimitExceed,
+	StatusMethodNotAllowed,
+	StatusAccessDenied,
+	StatusConflict,
+}
 
 func TestRPCStatus(t *testing.T) {
 	st := NewRPCStatus(41101, "something is wrong")
 	err := st.Err()
 	assert.Error(t, err)
-	err = st.Err(Any("foo", "bar"))
-	assert.Error(t, err)
+	err = st.Err("another thing is wrong")
+
+	s, ok := status.FromError(err)
+	assert.True(t, ok)
+	assert.Equal(t, s.Code(), st.Code())
+	assert.Equal(t, s.Message(), "another thing is wrong")
+
 	code := st.Code()
 	assert.Equal(t, int(code), 41101)
 	msg := st.Msg()
@@ -27,44 +61,18 @@ func TestRPCStatus(t *testing.T) {
 			t.Log(e)
 		}
 	}()
-	NewRPCStatus(41101, "something is wrong")
+	NewRPCStatus(41101, "something is wrong 2")
 }
 
 func TestToRPCCode(t *testing.T) {
-	status := []*RPCStatus{
-		StatusSuccess,
-		StatusCanceled,
-		StatusUnknown,
-		StatusInvalidParams,
-		StatusDeadlineExceeded,
-		StatusNotFound,
-		StatusAlreadyExists,
-		StatusPermissionDenied,
-		StatusResourceExhausted,
-		StatusFailedPrecondition,
-		StatusAborted,
-		StatusOutOfRange,
-		StatusUnimplemented,
-		StatusInternalServerError,
-		StatusServiceUnavailable,
-		StatusDataLoss,
-		StatusUnauthorized,
-		StatusTimeout,
-		StatusTooManyRequests,
-		StatusForbidden,
-		StatusLimitExceed,
-		StatusMethodNotAllowed,
-		StatusAccessDenied,
-	}
-
 	var codes []string
-	for _, s := range status {
+	for _, s := range rpcStatus {
 		codes = append(codes, s.ToRPCCode().String())
 	}
 	t.Log(codes)
 
 	var errors []error
-	for i, s := range status {
+	for i, s := range rpcStatus {
 		if i%2 == 0 {
 			errors = append(errors, s.ToRPCErr())
 			continue
@@ -74,44 +82,36 @@ func TestToRPCCode(t *testing.T) {
 	t.Log(errors)
 
 	codeInt := []int{}
-	for _, s := range status {
+	for _, s := range rpcStatus {
 		codeInt = append(codeInt, ToHTTPErr(s.status).code)
 	}
 	t.Log(codeInt)
 }
 
 func TestConvertToHTTPCode(t *testing.T) {
-	status := []*RPCStatus{
-		StatusSuccess,
-		StatusCanceled,
-		StatusUnknown,
-		StatusInvalidParams,
-		StatusDeadlineExceeded,
-		StatusNotFound,
-		StatusAlreadyExists,
-		StatusPermissionDenied,
-		StatusResourceExhausted,
-		StatusFailedPrecondition,
-		StatusAborted,
-		StatusOutOfRange,
-		StatusUnimplemented,
-		StatusInternalServerError,
-		StatusServiceUnavailable,
-		StatusDataLoss,
-		StatusUnauthorized,
-		StatusTimeout,
-		StatusTooManyRequests,
-		StatusForbidden,
-		StatusLimitExceed,
-		StatusMethodNotAllowed,
-		StatusAccessDenied,
-	}
-
 	var codes []int
-	for _, s := range status {
+	for _, s := range rpcStatus {
 		codes = append(codes, convertToHTTPCode(s.Code()))
 	}
 	t.Log(codes)
+
+}
+
+func TestGetStatusCode(t *testing.T) {
+	t.Log(GetStatusCode(fmt.Errorf("reason for error")))
+
+	for _, s := range rpcStatus {
+		t.Log(s.Code(), "|",
+			GetStatusCode(s.Err()),
+			GetStatusCode(s.Err("reason for error")), "|",
+
+			GetStatusCode(s.ToRPCErr()),
+			GetStatusCode(s.ToRPCErr("reason for error")), "|",
+
+			GetStatusCode(s.ErrToHTTP()),
+			GetStatusCode(s.ErrToHTTP("reason for error")),
+		)
+	}
 }
 
 func TestRCode(t *testing.T) {

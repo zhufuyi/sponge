@@ -2,7 +2,7 @@ package errcode
 
 import (
 	"errors"
-	"fmt"
+	"io"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -30,56 +30,111 @@ func runHTTPServer(isFromRPC bool) string {
 	r.GET("/ping", func(c *gin.Context) {
 		resp.Success(c, "ping")
 	})
-	r.GET("/err", func(c *gin.Context) {
-		isIgnore := resp.Error(c, errors.New("unknown error"))
-		fmt.Println("/err", isIgnore)
+	r.GET("/unknown", func(c *gin.Context) {
+		resp.Error(c, errors.New("unknown error"))
 	})
 
 	if isFromRPC {
-		r.GET("/err1", func(c *gin.Context) {
-			isIgnore := resp.Error(c, StatusServiceUnavailable.ToRPCErr())
-			fmt.Println("/err1", isIgnore)
+		r.GET("/grpc/params", func(c *gin.Context) {
+			resp.Error(c, StatusInvalidParams.Err("email is required"))
 		})
-		r.GET("/err2", func(c *gin.Context) {
-			isIgnore := resp.Error(c, StatusInternalServerError.ToRPCErr())
-			fmt.Println("/err2", isIgnore)
+		r.GET("/grpc/src_params", func(c *gin.Context) {
+			resp.Error(c, StatusInvalidParams.ToRPCErr("name is required"))
 		})
-		r.GET("/err3", func(c *gin.Context) {
-			isIgnore := resp.Error(c, StatusNotFound.Err())
-			fmt.Println("/err3", isIgnore)
+		r.GET("/grpc/mark_params", func(c *gin.Context) {
+			resp.Error(c, StatusInvalidParams.ErrToHTTP("id must be a number"))
 		})
-		r.GET("/rpc/userDefine/err1", func(c *gin.Context) {
-			isIgnore := resp.Error(c, StatusDeadlineExceeded.Err())
-			fmt.Println("/rpc/userDefine/err1", isIgnore)
+
+		r.GET("/grpc/internal", func(c *gin.Context) {
+			resp.Error(c, StatusInternalServerError.Err())
 		})
-		r.GET("/rpc/userDefine/err2", func(c *gin.Context) {
-			isIgnore := resp.Error(c, StatusPermissionDenied.Err())
-			fmt.Println("/rpc/userDefine/err2", isIgnore)
+		r.GET("/grpc/src_internal", func(c *gin.Context) {
+			resp.Error(c, StatusInternalServerError.ToRPCErr())
 		})
-		r.GET("/rpc/userDefine/err3", func(c *gin.Context) {
-			isIgnore := resp.Error(c, StatusInvalidParams.ErrToHTTP())
-			fmt.Println("/rpc/userDefine/err3", isIgnore)
+		r.GET("/grpc/mark_internal", func(c *gin.Context) {
+			resp.Error(c, StatusInternalServerError.ErrToHTTP())
+		})
+
+		r.GET("/grpc/unavailable", func(c *gin.Context) {
+			resp.Error(c, StatusServiceUnavailable.Err())
+		})
+		r.GET("/grpc/src_unavailable", func(c *gin.Context) {
+			resp.Error(c, StatusServiceUnavailable.ToRPCErr())
+		})
+		r.GET("/grpc/mark_unavailable", func(c *gin.Context) {
+			resp.Error(c, StatusServiceUnavailable.ErrToHTTP())
+		})
+
+		r.GET("/grpc/notfound", func(c *gin.Context) {
+			resp.Error(c, StatusNotFound.Err())
+		})
+		r.GET("/grpc/src_notfound", func(c *gin.Context) {
+			resp.Error(c, StatusNotFound.ToRPCErr())
+		})
+		r.GET("/grpc/mark_notfound", func(c *gin.Context) {
+			resp.Error(c, StatusNotFound.ErrToHTTP())
+		})
+
+		r.GET("/grpc/permission", func(c *gin.Context) {
+			resp.Error(c, StatusPermissionDenied.Err())
+		})
+		r.GET("/grpc/src_permission", func(c *gin.Context) {
+			resp.Error(c, StatusPermissionDenied.ToRPCErr())
+		})
+		r.GET("/grpc/mark_permission", func(c *gin.Context) {
+			resp.Error(c, StatusPermissionDenied.ErrToHTTP())
+		})
+
+		r.GET("/grpc/conflict", func(c *gin.Context) {
+			resp.Error(c, StatusConflict.Err())
+		})
+		r.GET("/grpc/src_conflict", func(c *gin.Context) {
+			resp.Error(c, StatusConflict.ToRPCErr())
+		})
+		r.GET("/grpc/mark_conflict", func(c *gin.Context) {
+			resp.Error(c, StatusConflict.ErrToHTTP())
 		})
 	} else {
-		r.GET("/err4", func(c *gin.Context) {
-			isIgnore := resp.Error(c, InternalServerError.Err())
-			fmt.Println("/err4", isIgnore)
+		r.GET("/http/params", func(c *gin.Context) {
+			resp.Error(c, InvalidParams.Err("name is required"))
 		})
-		r.GET("/err5", func(c *gin.Context) {
-			isIgnore := resp.Error(c, NotFound.Err())
-			fmt.Println("/err5", isIgnore)
+		r.GET("/http/mark_params", func(c *gin.Context) {
+			resp.Error(c, InvalidParams.ErrToHTTP("id must be a number"))
 		})
-		r.GET("/http/userDefine/err1", func(c *gin.Context) {
-			isIgnore := resp.Error(c, Forbidden.Err())
-			fmt.Println("/http/userDefine/err1", isIgnore)
+
+		r.GET("/http/internal", func(c *gin.Context) {
+			resp.Error(c, InternalServerError.Err())
 		})
-		r.GET("/http/userDefine/err2", func(c *gin.Context) {
-			isIgnore := resp.Error(c, TooManyRequests.Err())
-			fmt.Println("/http/userDefine/err2", isIgnore)
+		r.GET("/http/mark_internal", func(c *gin.Context) {
+			resp.Error(c, InternalServerError.ErrToHTTP())
 		})
-		r.GET("/http/userDefine/err3", func(c *gin.Context) {
-			isIgnore := resp.Error(c, InvalidParams.ErrToHTTP())
-			fmt.Println("/http/userDefine/err3", isIgnore)
+
+		r.GET("/http/notfound", func(c *gin.Context) {
+			resp.Error(c, NotFound.Err())
+		})
+		r.GET("/http/mark_notfound", func(c *gin.Context) {
+			resp.Error(c, NotFound.ErrToHTTP())
+		})
+
+		r.GET("/http/forbidden", func(c *gin.Context) {
+			resp.Error(c, Forbidden.Err())
+		})
+		r.GET("/http/mark_forbidden", func(c *gin.Context) {
+			resp.Error(c, Forbidden.ErrToHTTP())
+		})
+
+		r.GET("/http/too_many", func(c *gin.Context) {
+			resp.Error(c, TooManyRequests.Err())
+		})
+		r.GET("/http/mark_too_many", func(c *gin.Context) {
+			resp.Error(c, TooManyRequests.ErrToHTTP())
+		})
+
+		r.GET("/http/conflict", func(c *gin.Context) {
+			resp.Error(c, Conflict.Err())
+		})
+		r.GET("/http/mark_conflict", func(c *gin.Context) {
+			resp.Error(c, Conflict.ErrToHTTP())
 		})
 	}
 
@@ -99,35 +154,77 @@ func TestRPCResponse(t *testing.T) {
 
 	result, err := http.Get(requestAddr + "/ping")
 	assert.NoError(t, err)
-	t.Log(result.StatusCode)
+	assert.Equal(t, result.StatusCode, http.StatusOK)
 
-	result, err = http.Get(requestAddr + "/err")
+	result, err = http.Get(requestAddr + "/unknown")
 	assert.NoError(t, err)
-	t.Log(result.StatusCode)
+	assert.Equal(t, result.StatusCode, http.StatusOK)
 
-	result, err = http.Get(requestAddr + "/err1")
+	result, err = http.Get(requestAddr + "/grpc/params")
 	assert.NoError(t, err)
-	t.Log(result.StatusCode)
+	assert.Equal(t, result.StatusCode, http.StatusOK)
+	data, e := io.ReadAll(result.Body)
+	t.Log(string(data), e)
+	result, err = http.Get(requestAddr + "/grpc/src_params")
+	assert.NoError(t, err)
+	assert.Equal(t, result.StatusCode, http.StatusOK)
+	data, e = io.ReadAll(result.Body)
+	t.Log(string(data), e)
+	result, err = http.Get(requestAddr + "/grpc/mark_params")
+	assert.NoError(t, err)
+	assert.Equal(t, result.StatusCode, http.StatusBadRequest)
+	data, e = io.ReadAll(result.Body)
+	t.Log(string(data), e)
 
-	result, err = http.Get(requestAddr + "/err2")
+	result, err = http.Get(requestAddr + "/grpc/internal")
 	assert.NoError(t, err)
-	t.Log(result.StatusCode)
+	assert.Equal(t, result.StatusCode, http.StatusInternalServerError)
+	result, err = http.Get(requestAddr + "/grpc/src_internal")
+	assert.NoError(t, err)
+	assert.Equal(t, result.StatusCode, http.StatusInternalServerError)
+	result, err = http.Get(requestAddr + "/grpc/mark_internal")
+	assert.NoError(t, err)
+	assert.Equal(t, result.StatusCode, http.StatusInternalServerError)
 
-	result, err = http.Get(requestAddr + "/err3")
+	result, err = http.Get(requestAddr + "/grpc/unavailable")
 	assert.NoError(t, err)
-	t.Log(result.StatusCode)
+	assert.Equal(t, result.StatusCode, http.StatusServiceUnavailable)
+	result, err = http.Get(requestAddr + "/grpc/src_unavailable")
+	assert.NoError(t, err)
+	assert.Equal(t, result.StatusCode, http.StatusServiceUnavailable)
+	result, err = http.Get(requestAddr + "/grpc/mark_unavailable")
+	assert.NoError(t, err)
+	assert.Equal(t, result.StatusCode, http.StatusServiceUnavailable)
 
-	result, err = http.Get(requestAddr + "/rpc/userDefine/err1")
+	result, err = http.Get(requestAddr + "/grpc/notfound")
 	assert.NoError(t, err)
-	t.Log(result.StatusCode)
+	assert.Equal(t, result.StatusCode, http.StatusOK)
+	result, err = http.Get(requestAddr + "/grpc/src_notfound")
+	assert.NoError(t, err)
+	assert.Equal(t, result.StatusCode, http.StatusOK)
+	result, err = http.Get(requestAddr + "/grpc/mark_notfound")
+	assert.NoError(t, err)
+	assert.Equal(t, result.StatusCode, http.StatusNotFound)
 
-	result, err = http.Get(requestAddr + "/rpc/userDefine/err2")
+	result, err = http.Get(requestAddr + "/grpc/permission")
 	assert.NoError(t, err)
-	t.Log(result.StatusCode)
+	assert.Equal(t, result.StatusCode, http.StatusUnauthorized)
+	result, err = http.Get(requestAddr + "/grpc/src_permission")
+	assert.NoError(t, err)
+	assert.Equal(t, result.StatusCode, http.StatusUnauthorized)
+	result, err = http.Get(requestAddr + "/grpc/mark_permission")
+	assert.NoError(t, err)
+	assert.Equal(t, result.StatusCode, http.StatusUnauthorized)
 
-	result, err = http.Get(requestAddr + "/rpc/userDefine/err3")
+	result, err = http.Get(requestAddr + "/grpc/conflict")
 	assert.NoError(t, err)
-	t.Log(result.StatusCode, err)
+	assert.Equal(t, result.StatusCode, http.StatusOK)
+	result, err = http.Get(requestAddr + "/grpc/src_conflict")
+	assert.NoError(t, err)
+	assert.Equal(t, result.StatusCode, http.StatusConflict)
+	result, err = http.Get(requestAddr + "/grpc/mark_conflict")
+	assert.NoError(t, err)
+	assert.Equal(t, result.StatusCode, http.StatusConflict)
 }
 
 func TestHTTPResponse(t *testing.T) {
@@ -135,31 +232,57 @@ func TestHTTPResponse(t *testing.T) {
 
 	result, err := http.Get(requestAddr + "/ping")
 	assert.NoError(t, err)
-	t.Log(result.StatusCode)
+	assert.Equal(t, result.StatusCode, http.StatusOK)
 
-	result, err = http.Get(requestAddr + "/err")
+	result, err = http.Get(requestAddr + "/unknown")
 	assert.NoError(t, err)
-	t.Log(result.StatusCode)
+	assert.Equal(t, result.StatusCode, http.StatusOK)
 
-	result, err = http.Get(requestAddr + "/err4")
+	result, err = http.Get(requestAddr + "/http/params")
 	assert.NoError(t, err)
-	t.Log(result.StatusCode)
+	assert.Equal(t, result.StatusCode, http.StatusOK)
+	data, e := io.ReadAll(result.Body)
+	t.Log(string(data), e)
+	result, err = http.Get(requestAddr + "/http/mark_params")
+	assert.NoError(t, err)
+	assert.Equal(t, result.StatusCode, http.StatusBadRequest)
+	data, e = io.ReadAll(result.Body)
+	t.Log(string(data), e)
 
-	result, err = http.Get(requestAddr + "/err5")
+	result, err = http.Get(requestAddr + "/http/internal")
 	assert.NoError(t, err)
-	t.Log(result.StatusCode)
+	assert.Equal(t, result.StatusCode, http.StatusInternalServerError)
+	result, err = http.Get(requestAddr + "/http/mark_internal")
+	assert.NoError(t, err)
+	assert.Equal(t, result.StatusCode, http.StatusInternalServerError)
 
-	result, err = http.Get(requestAddr + "/http/userDefine/err1")
+	result, err = http.Get(requestAddr + "/http/notfound")
 	assert.NoError(t, err)
-	t.Log(result.StatusCode)
+	assert.Equal(t, result.StatusCode, http.StatusOK)
+	result, err = http.Get(requestAddr + "/http/mark_notfound")
+	assert.NoError(t, err)
+	assert.Equal(t, result.StatusCode, http.StatusNotFound)
 
-	result, err = http.Get(requestAddr + "/http/userDefine/err2")
+	result, err = http.Get(requestAddr + "/http/forbidden")
 	assert.NoError(t, err)
-	t.Log(result.StatusCode)
+	assert.Equal(t, result.StatusCode, http.StatusForbidden)
+	result, err = http.Get(requestAddr + "/http/mark_forbidden")
+	assert.NoError(t, err)
+	assert.Equal(t, result.StatusCode, http.StatusForbidden)
 
-	result, err = http.Get(requestAddr + "/http/userDefine/err3")
+	result, err = http.Get(requestAddr + "/http/too_many")
 	assert.NoError(t, err)
-	t.Log(result.StatusCode)
+	assert.Equal(t, result.StatusCode, http.StatusTooManyRequests)
+	result, err = http.Get(requestAddr + "/http/mark_too_many")
+	assert.NoError(t, err)
+	assert.Equal(t, result.StatusCode, http.StatusTooManyRequests)
+
+	result, err = http.Get(requestAddr + "/http/conflict")
+	assert.NoError(t, err)
+	assert.Equal(t, result.StatusCode, http.StatusOK)
+	result, err = http.Get(requestAddr + "/http/mark_conflict")
+	assert.NoError(t, err)
+	assert.Equal(t, result.StatusCode, http.StatusConflict)
 }
 
 func TestParseCodeAndMsgError(t *testing.T) {

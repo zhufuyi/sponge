@@ -35,13 +35,15 @@ func Init(opts ...Option) error {
 	o := defaultOptions()
 	o.apply(opts...)
 
-	log := &zapLog{zapLog: o.zapLog}
+	log := &zapLog{zapLog: o.zapLog, isOnlyPrintError: o.isOnlyPrintError}
 	cronOpts := []cron.Option{
-		cron.WithSeconds(), // second-level granularity, default is minute-level granularity
 		cron.WithLogger(log),
 		cron.WithChain(
 			cron.Recover(log),
 		),
+	}
+	if o.granularity == SecondType {
+		cronOpts = append(cronOpts, cron.WithSeconds()) // second-level granularity, default is minute-level granularity
 	}
 
 	c = cron.New(cronOpts...)

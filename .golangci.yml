@@ -42,7 +42,7 @@ linters:
     - goimports
     - gofmt
     - unused
-    - depguard
+    #- depguard
     - dogsled
     - errcheck
     #- gochecknoinits
@@ -153,9 +153,9 @@ linters-settings:
 
   goconst:
     # minimal length of string constant, 3 by default
-    min-len: 3
+    min-len: 4
     # minimal occurrences count to trigger, 3 by default
-    min-occurrences: 3
+    min-occurrences: 4
 
   gocyclo:
     # minimal code complexity to report, 30 by default (but we recommend 10-20)

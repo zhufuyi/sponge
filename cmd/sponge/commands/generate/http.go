@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/huandu/xstrings"
 	"github.com/spf13/cobra"
 
@@ -38,7 +39,7 @@ func HTTPCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "http",
 		Short: "Generate web service code based on sql",
-		Long: `generate web service code based on sql.
+		Long: color.HiBlackString(`generate web service code based on sql.
 
 Examples:
   # generate web service code.
@@ -56,8 +57,8 @@ Examples:
   # generate web service code and specify the docker image repository address.
   sponge web http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
-  # if you want the generated code to suited to mono-repo, you need to specify the parameter --suited-mono-repo=true
-`,
+  # if you want the generated code to suited to mono-repo, you need to set the parameter --suited-mono-repo=true
+`),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -189,7 +190,7 @@ type httpGenerator struct {
 }
 
 func (g *httpGenerator) generateCode() (string, error) {
-	subTplName := "http"
+	subTplName := codeNameHTTP
 	r := Replacers[TplNameSponge]
 	if r == nil {
 		return "", errors.New("replacer is nil")
@@ -276,7 +277,7 @@ func (g *httpGenerator) generateCode() (string, error) {
 		}
 
 	default:
-		return "", errors.New("unsupported db driver: " + g.dbDriver)
+		return "", dbDriverErr(g.dbDriver)
 	}
 
 	subFiles = append(subFiles, getSubFiles(selectFiles, replaceFiles)...)
@@ -355,7 +356,8 @@ func (g *httpGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	fields = append(fields, deleteAllFieldsMark(r, protoShellFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteAllFieldsMark(r, appConfigFile, wellStartMark, wellEndMark)...)
 	//fields = append(fields, deleteFieldsMark(r, deploymentConfigFile, wellStartMark, wellEndMark)...)
-	fields = append(fields, replaceFileContentMark(r, readmeFile, "## "+g.serverName)...)
+	fields = append(fields, replaceFileContentMark(r, readmeFile,
+		setReadmeTitle(g.moduleName, g.serverName, codeNameHTTP, g.suitedMonoRepo))...)
 	fields = append(fields, []replacer.Field{
 		{ // replace the configuration of the *.yml file
 			Old: appConfigFileMark,
@@ -430,7 +432,7 @@ func (g *httpGenerator) addFields(r replacer.Replacer) []replacer.Field {
 			New: g.moduleName,
 		},
 		{
-			Old: g.moduleName + "/pkg",
+			Old: g.moduleName + pkgPathSuffix,
 			New: "github.com/zhufuyi/sponge/pkg",
 		},
 		{ // replace the sponge version of the go.mod file
@@ -439,11 +441,11 @@ func (g *httpGenerator) addFields(r replacer.Replacer) []replacer.Field {
 		},
 		{
 			Old: "sponge api docs",
-			New: g.serverName + " api docs",
+			New: g.serverName + apiDocsSuffix,
 		},
 		{
-			Old: "go 1.19",
-			New: "go 1.20",
+			Old: defaultGoModVersion,
+			New: getLocalGoVersion(),
 		},
 		{
 			Old: "userExampleNO       = 1",
@@ -527,7 +529,7 @@ func (g *httpGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	}...)
 
 	if g.suitedMonoRepo {
-		fs := serverCodeFields(r.GetOutputDir(), g.moduleName, g.serverName)
+		fs := serverCodeFields(codeNameHTTP, g.moduleName, g.serverName)
 		fields = append(fields, fs...)
 	}
 

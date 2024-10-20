@@ -56,8 +56,8 @@ type UserExampleObjDetail struct {
 
 // delete the templates code end
 
-// CreateUserExampleRespond only for api docs
-type CreateUserExampleRespond struct {
+// CreateUserExampleReply only for api docs
+type CreateUserExampleReply struct {
 	Code int    `json:"code"` // return code
 	Msg  string `json:"msg"`  // return information description
 	Data struct {
@@ -65,18 +65,18 @@ type CreateUserExampleRespond struct {
 	} `json:"data"` // return data
 }
 
-// DeleteUserExampleByIDRespond only for api docs
-type DeleteUserExampleByIDRespond struct {
+// DeleteUserExampleByIDReply only for api docs
+type DeleteUserExampleByIDReply struct {
 	Result
 }
 
-// UpdateUserExampleByIDRespond only for api docs
-type UpdateUserExampleByIDRespond struct {
+// UpdateUserExampleByIDReply only for api docs
+type UpdateUserExampleByIDReply struct {
 	Result
 }
 
-// GetUserExampleByIDRespond only for api docs
-type GetUserExampleByIDRespond struct {
+// GetUserExampleByIDReply only for api docs
+type GetUserExampleByIDReply struct {
 	Code int    `json:"code"` // return code
 	Msg  string `json:"msg"`  // return information description
 	Data struct {
@@ -89,8 +89,8 @@ type ListUserExamplesRequest struct {
 	query.Params
 }
 
-// ListUserExamplesRespond only for api docs
-type ListUserExamplesRespond struct {
+// ListUserExamplesReply only for api docs
+type ListUserExamplesReply struct {
 	Code int    `json:"code"` // return code
 	Msg  string `json:"msg"`  // return information description
 	Data struct {
@@ -103,8 +103,8 @@ type DeleteUserExamplesByIDsRequest struct {
 	IDs []string `json:"ids" binding:"min=1"` // id list
 }
 
-// DeleteUserExamplesByIDsRespond only for api docs
-type DeleteUserExamplesByIDsRespond struct {
+// DeleteUserExamplesByIDsReply only for api docs
+type DeleteUserExamplesByIDsReply struct {
 	Result
 }
 
@@ -113,8 +113,8 @@ type GetUserExampleByConditionRequest struct {
 	query.Conditions
 }
 
-// GetUserExampleByConditionRespond only for api docs
-type GetUserExampleByConditionRespond struct {
+// GetUserExampleByConditionReply only for api docs
+type GetUserExampleByConditionReply struct {
 	Code int    `json:"code"` // return code
 	Msg  string `json:"msg"`  // return information description
 	Data struct {
@@ -127,8 +127,8 @@ type ListUserExamplesByIDsRequest struct {
 	IDs []string `json:"ids" binding:"min=1"` // id list
 }
 
-// ListUserExamplesByIDsRespond only for api docs
-type ListUserExamplesByIDsRespond struct {
+// ListUserExamplesByIDsReply only for api docs
+type ListUserExamplesByIDsReply struct {
 	Code int    `json:"code"` // return code
 	Msg  string `json:"msg"`  // return information description
 	Data struct {

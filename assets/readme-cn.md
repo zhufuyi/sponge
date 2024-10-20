@@ -6,17 +6,18 @@
 
 <br>
 
-如果开发只有CRUD api的web或gRPC服务，不需要编写任何go代码就可以编译并部署到linux服务器、docker、k8s上，只需要连接到数据库(mysql、mongodb、postgresql、tidb、sqlite)就可以一键自动生成完整的后端服务go代码。
+### sponge 核心设计理念
 
-如果开发通用的web或gRPC务，只需聚焦`在数据库定义表`、`在proto文件定义api描述信息`、`在生成的模板文件填写业务逻辑代码`三个核心部分，其他go代码都由sponge自动生成。
+sponge 的核心设计理念是通过 `SQL` 或 `Protobuf` 文件逆向生成模块化的代码，这些代码可以灵活、无缝地组合成多种类型的后端服务，从而大大提升开发效率，简化后端服务开发，sponge 的主要目标如下：
+
+- 如果开发只有 CRUD api 的 web 或 gRPC 服务，不需要编写任何 go 代码就可以编译并部署到 linux 服务器、docker、k8s 上，只需要连接到数据库就可以一键自动生成完整的后端服务 go 代码。
+- 如果开发通用的 web、gRPC、http+gRPC、gRPC 网关等服务，只需聚焦`在数据库定义表`、`在protobuf文件定义api描述信息`、`在生成的模板文件填写业务逻辑代码`三个核心部分，其他 go 代码(包括CRUD api)都由 sponge 来生成。
 
 <br>
 
-### 生成代码框架
-
-sponge主要基于`SQL`和`Protobuf`两种方式生成代码，每种方式生成不同用途的代码。其中`SQL`支持数据库**mysql**、**mongodb**、**postgresql**、**tidb**、**sqlite**。
-
 #### 生成代码的框架图
+
+sponge 生成代码主要基于 `SQL` 和 `Protobuf`文件，其中 `SQL` 支持数据库 **mysql**、**mongodb**、**postgresql**、**tidb**、**sqlite**。
 
 <p align="center">
 <img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/sponge-framework.png">
@@ -34,7 +35,7 @@ sponge主要基于`SQL`和`Protobuf`两种方式生成代码，每种方式生�
 
 ### 微服务框架
 
-sponge也是一个微服务框架，框架图如下图所示，这是典型的微服务分层结构，具有高性能，高扩展性，包含了常用的服务治理功能，可以很方便替换或添加自己的服务治理功能。
+sponge 生成的服务代码本身是一个微服务，框架图如下图所示，这是典型的微服务分层结构，具有高性能，高扩展性，包含了常用的服务治理功能。
 
 <p align="center">
 <img width="1000px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/microservices-framework.png">
@@ -67,8 +68,10 @@ sponge包含丰富的组件(按需使用)：
 - 鉴权 [jwt](https://github.com/golang-jwt/jwt)
 - 校验 [validator](https://github.com/go-playground/validator)
 - Websocket [gorilla/websocket](https://github.com/gorilla/websocket)
+- 定时任务 [cron](https://github.com/robfig/cron)
 - 消息队列组件 [rabbitmq](https://github.com/rabbitmq/amqp091-go), [kafka](https://github.com/IBM/sarama)
 - 分布式事务管理器 [dtm](https://github.com/dtm-labs/dtm)
+- 分布式锁 [dlock](https://github.com/zhufuyi/sponge/tree/main/pkg/dlock)
 - 自适应限流 [ratelimit](https://github.com/zhufuyi/sponge/tree/main/pkg/shield/ratelimit)
 - 自适应熔断 [circuitbreaker](https://github.com/zhufuyi/sponge/tree/main/pkg/shield/circuitbreaker)
 - 链路跟踪 [opentelemetry](https://github.com/open-telemetry/opentelemetry-go)
@@ -83,17 +86,19 @@ sponge包含丰富的组件(按需使用)：
 
 ### 目录结构
 
-生成的服务代码目录结构遵循 [project-layout](https://github.com/golang-standards/project-layout)，代码目录结构如下所示。支持的仓库类型有`单体应用单体仓库(monolith)`、`微服务多仓库(multi-repo)`、`微服务单体仓库(mono-repo)`。
+生成的服务代码目录结构遵循 [project-layout](https://github.com/golang-standards/project-layout)。
+
+这是生成的`单体应用单体仓库(monolith)`或`微服务多仓库(multi-repo)`代码目录结构：
 
 ```bash
 .
-├── api            # proto文件和生成的*pb.go目录
+├── api            # protobuf文件和生成的*pb.go目录
 ├── assets         # 其他与资源库一起使用的资产(图片、logo等)目录
 ├── cmd            # 程序入口目录
 ├── configs        # 配置文件的目录
-├── deployments    # IaaS、PaaS、系统和容器协调部署的配置和模板目录
+├── deployments    # 裸机、docker、k8s部署脚本目录
 ├── docs           # 设计文档和界面文档目录
-├── i(I)nternal       # 业务逻辑代码目录，如果首字母是小写(internal)，表示私有代码，如果首字母大写(Internal)表示可以被其他代码复用。
+├── internal       # 业务逻辑代码目录
 │    ├── cache        # 基于业务包装的缓存目录
 │    ├── config       # Go结构的配置文件目录
 │    ├── dao          # 数据访问目录
@@ -106,9 +111,32 @@ sponge包含丰富的组件(按需使用)：
 │    ├── service      # grpc的业务功能实现目录
 │    └── types        # http的请求和响应类型目录
 ├── pkg            # 外部应用程序可以使用的库目录
-├── scripts        # 用于执行各种构建、安装、分析等操作的脚本目录
+├── scripts        # 执行脚本目录
 ├── test           # 额外的外部测试程序和测试数据
-└── third_party    # 外部帮助程序、分叉代码和其他第三方工具
+├── third_party    # 依赖第三方protobuf文件或其他工具的目录
+├── Makefile       # 开发、测试、部署相关的命令集合
+├── go.mod         # go 模块依赖关系和版本控制文件
+└── go.sum         # go 模块依赖项的密钥和校验文件
+```
+
+<br>
+
+这是生成的`微服务单体仓库(mono-repo)`代码目录结构(也就是大仓库代码目录结构)：
+
+```bash
+.
+├── api
+│    ├── server1       # 服务1的protobuf文件和生成的*pb.go目录
+│    ├── server2       # 服务2的protobuf文件和生成的*pb.go目录
+│    ├── server3       # 服务3的protobuf文件和生成的*pb.go目录
+│    └── ...
+├── server1        # 服务1的代码目录，与微服务多仓库(multi-repo)目录结构基本一样
+├── server2        # 服务2的代码目录，与微服务多仓库(multi-repo)目录结构基本一样
+├── server3        # 服务3的代码目录，与微服务多仓库(multi-repo)目录结构基本一样
+├── ...
+├── third_party    # 依赖的第三方protobuf文件
+├── go.mod         # go 模块依赖关系和版本控制文件
+└── go.sum         # go 模块依赖项的密钥和校验和文件
 ```
 
 <br>
@@ -135,7 +163,7 @@ sponge run
 
 ### sponge开发文档
 
-使用sponge开发项目的详细的操作、配置、部署说明，点击查看[sponge开发文档](https://go-sponge.com/zh-cn/)。
+使用sponge开发项目的详细的步骤、配置、部署说明，点击查看[sponge开发文档](https://go-sponge.com/zh-cn/)。
 
 <br>
 
@@ -148,7 +176,7 @@ sponge run
 - [基于protobuf创建web服务](https://github.com/zhufuyi/sponge_examples/tree/main/3_web-gin-protobuf)
 - [基于protobuf创建grpc服务](https://github.com/zhufuyi/sponge_examples/tree/main/4_micro-grpc-protobuf)
 - [基于protobuf创建grpc网关服务](https://github.com/zhufuyi/sponge_examples/tree/main/5_micro-gin-rpc-gateway)
-- [基于protobuf创建grpc+http服务](https://github.com/zhufuyi/sponge_examples/tree/main/a_micro-grpc-http-protobuf)
+- [基于protobuf创建grpc+http服务](https://github.com/zhufuyi/sponge_examples/tree/main/_10_micro-grpc-http-protobuf)
 
 #### 使用sponge开发完整项目示例
 
@@ -158,26 +186,8 @@ sponge run
 #### 分布式事务示例
 
 - [简单的分布式订单系统](https://github.com/zhufuyi/sponge_examples/tree/main/9_order-grpc-distributed-transaction)
-
-<br>
-
-### 视频介绍
-
-> 视频演示使用sponge v1.3.12版本，而新版本的生成代码页面略有不同，建议结合[文档教程](https://go-sponge.com/zh-cn/)使用。
-
-- [01 sponge的形成过程](https://www.bilibili.com/video/BV1s14y1F7Fz/)
-- [02 sponge的框架介绍](https://www.bilibili.com/video/BV13u4y1F7EU/)
-- [03 一键生成完整的web服务代码](https://www.bilibili.com/video/BV1RY411k7SE/)
-- [04 批量生成CRUD api代码到web服务](https://www.bilibili.com/video/BV1AY411C7J7/)
-- [05 一键生成通用的web服务代码](https://www.bilibili.com/video/BV1CX4y1D7xj/)
-- [06 批量生成任意api模板代码到web服务](https://www.bilibili.com/video/BV1P54y1g7J9/)
-- [07 一键生成完整的grpc服务代码](https://www.bilibili.com/video/BV1Tg4y1b79U/)
-- [08 批量生成CRUD api代码到grpc服务](https://www.bilibili.com/video/BV1TY411z7rY/)
-- [09 一键生成通用的grpc微服务代码](https://www.bilibili.com/video/BV1WY4y1X7zH/)
-- [10 批量生成grpc api代码到grpc服务](https://www.bilibili.com/video/BV1Yo4y1q76o/)
-- [11 grpc测试神器，简单便捷](https://www.bilibili.com/video/BV1VT411z7oj/)
-- [12 一键生成grpc网关服务代码](https://www.bilibili.com/video/BV1mV4y1D7k9/)
-- [13 十分钟搭建一个微服务集群示例](https://www.bilibili.com/video/BV1YM4y127YK/)
+- [秒杀抢购活动](https://github.com/zhufuyi/sponge_examples/tree/main/_12_sponge-dtm-flashSale)
+- [电商系统](https://github.com/zhufuyi/sponge_examples/tree/main/_14_eshop)
 
 <br>
 <br>

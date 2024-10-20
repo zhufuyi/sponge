@@ -10,12 +10,12 @@ import (
 )
 
 // GenerateFiles generate service logic, router, error code files.
-func GenerateFiles(file *protogen.File) ([]byte, []byte, []byte) {
+func GenerateFiles(file *protogen.File, moduleName string) ([]byte, []byte, []byte) {
 	if len(file.Services) == 0 {
 		return nil, nil, nil
 	}
 
-	pss := parse.GetServices(file)
+	pss := parse.GetServices(file, moduleName)
 	logicContent := genServiceLogicFile(pss)
 	routerFileContent := genRouterFile(pss)
 	errCodeFileContent := genErrCodeFile(pss)
@@ -24,8 +24,8 @@ func GenerateFiles(file *protogen.File) ([]byte, []byte, []byte) {
 }
 
 func genServiceLogicFile(fields []*parse.PbService) []byte {
-	lf := &serviceLogicFields{PbServices: fields}
-	return lf.execute()
+	slf := &serviceLogicFields{PbServices: fields}
+	return slf.execute()
 }
 
 func genRouterFile(fields []*parse.PbService) []byte {
@@ -47,7 +47,8 @@ func (f *serviceLogicFields) execute() []byte {
 	if err := serviceLogicTmpl.Execute(buf, f); err != nil {
 		panic(err)
 	}
-	return handleSplitLineMark(buf.Bytes())
+	content := handleSplitLineMark(buf.Bytes())
+	return bytes.ReplaceAll(content, []byte(importPkgPathMark), parse.GetImportPkg(f.PbServices))
 }
 
 type routerFields struct {
@@ -59,7 +60,8 @@ func (f *routerFields) execute() []byte {
 	if err := routerTmpl.Execute(buf, f); err != nil {
 		panic(err)
 	}
-	return handleSplitLineMark(buf.Bytes())
+	content := handleSplitLineMark(buf.Bytes())
+	return bytes.ReplaceAll(content, []byte(importPkgPathMark), parse.GetSourceImportPkg(f.PbServices))
 }
 
 type errCodeFields struct {
@@ -74,6 +76,8 @@ func (f *errCodeFields) execute() []byte {
 	data := bytes.ReplaceAll(buf.Bytes(), []byte("// --blank line--"), []byte{})
 	return handleSplitLineMark(data)
 }
+
+const importPkgPathMark = "// import api service package here"
 
 var splitLineMark = []byte(`// ---------- Do not delete or move this split line, this is the merge code marker ----------`)
 

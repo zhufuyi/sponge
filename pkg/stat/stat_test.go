@@ -16,6 +16,7 @@ func TestInit(t *testing.T) {
 
 		WithLog(l),
 		WithPrintInterval(time.Second),
+		WithPrintField(zap.String("host", "127.0.0.1")),
 
 		WithAlarm(WithCPUThreshold(0.9), WithMemoryThreshold(0.85)),
 	)

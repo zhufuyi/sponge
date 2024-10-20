@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 
 	"github.com/zhufuyi/sponge/cmd/sponge/commands/generate"
@@ -23,7 +24,7 @@ func GenTypesPbCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "gen-types-pb",
 		Short: "Generate types.proto code",
-		Long: `generate types.proto code
+		Long: color.HiBlackString(`generate types.proto code
 
 Examples:
   # generate types.proto code.
@@ -31,7 +32,7 @@ Examples:
 
   # generate types.proto code and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge patch gen-types-pb --out=./yourServerDir
-`,
+`),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -71,7 +72,7 @@ using help:
 			} else {
 				targetFile = "/" + targetFile
 			}
-			fmt.Printf("generate \"types-pb\" code successfully, out = %s\n", outPath+targetFile)
+			fmt.Printf("generate \"types-pb\" code successfully, out = %s\n", cutPathPrefix(outPath+targetFile))
 			return nil
 		},
 	}

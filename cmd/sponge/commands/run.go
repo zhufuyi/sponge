@@ -9,6 +9,7 @@ import (
 	"runtime"
 	"strconv"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 
 	"github.com/zhufuyi/sponge/cmd/sponge/server"
@@ -25,7 +26,7 @@ func OpenUICommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "run",
 		Short: "Run the sponge UI service",
-		Long: `run the sponge UI service.
+		Long: color.HiBlackString(`run the sponge UI service.
 
 Examples:
   # running ui service, local browser access only.
@@ -33,7 +34,7 @@ Examples:
 
   # running ui service, can be accessed from other host browsers.
   sponge run -a http://your-host-ip:24631
-`,
+`),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 

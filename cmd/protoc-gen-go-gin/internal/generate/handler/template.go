@@ -30,7 +30,7 @@ func init() {
 		panic(err)
 	}
 
-	rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano()) //nolint
 }
 
 var (
@@ -44,12 +44,12 @@ import (
 
 	//"github.com/zhufuyi/sponge/pkg/gin/middleware"
 
-	serverNameExampleV1 "moduleNameExample/api/serverNameExample/v1"
+	// import api service package here
 )
 
 {{- range .PbServices}}
 
-var _ serverNameExampleV1.{{.Name}}Logicer = (*{{.LowerName}}Handler)(nil)
+var _ {{.ProtoPkgName}}.{{.Name}}Logicer = (*{{.LowerName}}Handler)(nil)
 
 type {{.LowerName}}Handler struct {
 	// example: 
@@ -57,7 +57,7 @@ type {{.LowerName}}Handler struct {
 }
 
 // New{{.Name}}Handler create a handler
-func New{{.Name}}Handler() serverNameExampleV1.{{.Name}}Logicer {
+func New{{.Name}}Handler() {{.ProtoPkgName}}.{{.Name}}Logicer {
 	return &{{.LowerName}}Handler{
 		// example:
 		// 	{{.LowerName}}Dao: dao.New{{.Name}}Dao(
@@ -70,7 +70,7 @@ func New{{.Name}}Handler() serverNameExampleV1.{{.Name}}Logicer {
 {{- range .Methods}}
 
 {{if eq .InvokeType 0}}{{if .Path}}{{.Comment}}
-func (h *{{.LowerServiceName}}Handler) {{.MethodName}}(ctx context.Context, req *serverNameExampleV1.{{.Request}}) (*serverNameExampleV1.{{.Reply}}, error) {
+func (h *{{.LowerServiceName}}Handler) {{.MethodName}}(ctx context.Context, req *{{.RequestImportPkgName}}.{{.Request}}) (*{{.ReplyImportPkgName}}.{{.Reply}}, error) {
 	panic("implement me")
 
 	// fill in the business logic code here
@@ -96,7 +96,7 @@ func (h *{{.LowerServiceName}}Handler) {{.MethodName}}(ctx context.Context, req 
 	//			return nil, ecode.InternalServerError.Err()
 	//		}
 	//
-	//     return &serverNameExampleV1.{{.Reply}}{
+	//     return &{{.ReplyImportPkgName}}.{{.Reply}}{
 {{- range .ReplyFields}}
 	//     	{{.Name}}: reply.{{.Name}},
 {{- end}}
@@ -121,7 +121,7 @@ import (
 	"github.com/zhufuyi/sponge/pkg/logger"
 	//"github.com/zhufuyi/sponge/pkg/middleware"
 
-	serverNameExampleV1 "moduleNameExample/api/serverNameExample/v1"
+	// import api service package here
 	"moduleNameExample/internal/handler"
 )
 
@@ -146,15 +146,15 @@ func {{.LowerName}}Router(
 	r *gin.Engine,
 	groupPathMiddlewares map[string][]gin.HandlerFunc,
 	singlePathMiddlewares map[string][]gin.HandlerFunc,
-	iService serverNameExampleV1.{{.Name}}Logicer) {
-	serverNameExampleV1.Register{{.Name}}Router(
+	iService {{.ProtoPkgName}}.{{.Name}}Logicer) {
+	{{.ProtoPkgName}}.Register{{.Name}}Router(
 		r,
 		groupPathMiddlewares,
 		singlePathMiddlewares,
 		iService,
-		serverNameExampleV1.With{{.Name}}Logger(logger.Get()),
-		serverNameExampleV1.With{{.Name}}HTTPResponse(),
-		serverNameExampleV1.With{{.Name}}ErrorToHTTPCode(
+		{{.ProtoPkgName}}.With{{.Name}}Logger(logger.Get()),
+		{{.ProtoPkgName}}.With{{.Name}}HTTPResponse(),
+		{{.ProtoPkgName}}.With{{.Name}}ErrorToHTTPCode(
 			// Set some error codes to standard http return codes,
 			// by default there is already ecode.InternalServerError and ecode.ServiceUnavailable
 			// example:
@@ -173,7 +173,7 @@ func {{.LowerName}}Middlewares(c *middlewareConfig) {
 
 	// set up single route middleware, just uncomment the code and fill in the middlewares, nothing else needs to be changed
 {{- range .Methods}}
-	{{if eq .InvokeType 0}}{{if .Path}}//c.setSinglePath("{{.Method}}", "{{.Path}}", middleware.Auth()){{end}}{{end}}
+	{{if eq .InvokeType 0}}{{if .Path}}//c.setSinglePath("{{.Method}}", "{{.Path}}", middleware.Auth())    {{.Comment}}{{end}}{{end}}
 {{- end}}
 }
 
@@ -190,20 +190,20 @@ package handler
 import (
 	"context"
 
-	serverNameExampleV1 "moduleNameExample/api/serverNameExample/v1"
+	// import api service package here
 	"moduleNameExample/internal/service"
 )
 
 {{- range .PbServices}}
 
-var _ serverNameExampleV1.{{.Name}}Logicer = (*{{.LowerName}}Handler)(nil)
+var _ {{.ProtoPkgName}}.{{.Name}}Logicer = (*{{.LowerName}}Handler)(nil)
 
 type {{.LowerName}}Handler struct {
-	server serverNameExampleV1.{{.Name}}Server
+	server {{.ProtoPkgName}}.{{.Name}}Server
 }
 
 // New{{.Name}}Handler create a handler
-func New{{.Name}}Handler() serverNameExampleV1.{{.Name}}Logicer {
+func New{{.Name}}Handler() {{.ProtoPkgName}}.{{.Name}}Logicer {
 	return &{{.LowerName}}Handler{
 		server: service.New{{.Name}}Server(),
 	}
@@ -212,7 +212,7 @@ func New{{.Name}}Handler() serverNameExampleV1.{{.Name}}Logicer {
 {{- range .Methods}}
 
 {{if eq .InvokeType 0}}{{if .Path}}{{.Comment}}
-func (h *{{.LowerServiceName}}Handler) {{.MethodName}}(ctx context.Context, req *serverNameExampleV1.{{.Request}}) (*serverNameExampleV1.{{.Reply}}, error) {
+func (h *{{.LowerServiceName}}Handler) {{.MethodName}}(ctx context.Context, req *{{.RequestImportPkgName}}.{{.Request}}) (*{{.ReplyImportPkgName}}.{{.Reply}}, error) {
 	{{if eq true .IsIgnoreShouldBind .IsPassGinContext}}_, ctx = middleware.AdaptCtx(ctx){{end}}
 	return h.server.{{.MethodName}}(ctx, req)
 }{{end}}{{end}}
@@ -238,7 +238,7 @@ import (
 	"github.com/zhufuyi/sponge/pkg/gin/middleware"
 	"github.com/zhufuyi/sponge/pkg/logger"
 
-	serverNameExampleV1 "moduleNameExample/api/serverNameExample/v1"
+	// import api service package here
 	"moduleNameExample/internal/handler"
 )
 
@@ -263,22 +263,23 @@ func {{.LowerName}}Router(
 	r *gin.Engine,
 	groupPathMiddlewares map[string][]gin.HandlerFunc,
 	singlePathMiddlewares map[string][]gin.HandlerFunc,
-	iService serverNameExampleV1.{{.Name}}Logicer) {
+	iService {{.ProtoPkgName}}.{{.Name}}Logicer) {
 	ctxFn := func(c *gin.Context) context.Context {
 		md := metadata.New(map[string]string{
-			middleware.ContextRequestIDKey: middleware.GCtxRequestID(c),
+			middleware.ContextRequestIDKey: middleware.GCtxRequestID(c), // request_id
+			//middleware.HeaderAuthorizationKey: c.GetHeader(middleware.HeaderAuthorizationKey),  // authorization
 		})
 		return metadata.NewIncomingContext(c.Request.Context(), md)
 	}
-	serverNameExampleV1.Register{{.Name}}Router(
+	{{.ProtoPkgName}}.Register{{.Name}}Router(
 		r,
 		groupPathMiddlewares,
 		singlePathMiddlewares,
 		iService,
-		serverNameExampleV1.With{{.Name}}Logger(logger.Get()),
-		serverNameExampleV1.With{{.Name}}RPCResponse(),
-		serverNameExampleV1.With{{.Name}}WrapCtx(ctxFn),
-		serverNameExampleV1.With{{.Name}}ErrorToHTTPCode(
+		{{.ProtoPkgName}}.With{{.Name}}Logger(logger.Get()),
+		{{.ProtoPkgName}}.With{{.Name}}RPCResponse(),
+		{{.ProtoPkgName}}.With{{.Name}}WrapCtx(ctxFn),
+		{{.ProtoPkgName}}.With{{.Name}}ErrorToHTTPCode(
 			// Set some error codes to standard http return codes,
 			// by default there is already ecode.InternalServerError and ecode.ServiceUnavailable
 			// example:
@@ -297,7 +298,7 @@ func {{.LowerName}}Middlewares(c *middlewareConfig) {
 
 	// set up single route middleware, just uncomment the code and fill in the middlewares, nothing else needs to be changed
 {{- range .Methods}}
-	{{if eq .InvokeType 0}}{{if .Path}}//c.setSinglePath("{{.Method}}", "{{.Path}}", middleware.Auth()){{end}}{{end}}
+	{{if eq .InvokeType 0}}{{if .Path}}//c.setSinglePath("{{.Method}}", "{{.Path}}", middleware.Auth())    {{.Comment}}{{end}}{{end}}
 {{- end}}
 }
 

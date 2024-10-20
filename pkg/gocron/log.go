@@ -5,15 +5,26 @@ import (
 	"go.uber.org/zap"
 )
 
+var (
+	SecondType = 0
+	MinuteType = 1
+)
+
 var defaultLog, _ = zap.NewProduction()
 
 type options struct {
-	zapLog *zap.Logger
+	zapLog           *zap.Logger
+	isOnlyPrintError bool // default false
+
+	granularity int // 0: second, 1: minute
 }
 
 func defaultOptions() *options {
 	return &options{
-		zapLog: defaultLog,
+		zapLog:           defaultLog,
+		isOnlyPrintError: false,
+
+		granularity: SecondType,
 	}
 }
 
@@ -26,19 +37,38 @@ func (o *options) apply(opts ...Option) {
 // Option set the cron options.
 type Option func(*options)
 
-// WithLog set log
-func WithLog(log *zap.Logger) Option {
+// WithGranularity set log
+func WithGranularity(granularity int) Option {
 	return func(o *options) {
+		if granularity >= MinuteType {
+			granularity = MinuteType
+		} else {
+			granularity = SecondType
+		}
+		o.granularity = granularity
+	}
+}
+
+// WithLog set granularity
+func WithLog(log *zap.Logger, isOnlyPrintError ...bool) Option {
+	return func(o *options) {
+		if len(isOnlyPrintError) > 0 {
+			o.isOnlyPrintError = isOnlyPrintError[0]
+		}
 		o.zapLog = log
 	}
 }
 
 type zapLog struct {
-	zapLog *zap.Logger
+	zapLog           *zap.Logger
+	isOnlyPrintError bool
 }
 
 // Info print info
 func (l *zapLog) Info(msg string, keysAndValues ...interface{}) {
+	if l.zapLog == nil || l.isOnlyPrintError {
+		return
+	}
 	if msg == "wake" { // 忽略wake
 		return
 	}
@@ -49,6 +79,9 @@ func (l *zapLog) Info(msg string, keysAndValues ...interface{}) {
 
 // Error print error
 func (l *zapLog) Error(err error, msg string, keysAndValues ...interface{}) {
+	if l.zapLog == nil {
+		return
+	}
 	fields := parseKVs(keysAndValues)
 	fields = append(fields, zap.String("err", err.Error()))
 	msg = "cron_" + msg

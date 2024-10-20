@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 
 	"github.com/zhufuyi/sponge/pkg/replacer"
@@ -28,7 +29,7 @@ func ModelCommand(parentName string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "model",
 		Short: "Generate model code based on sql",
-		Long: fmt.Sprintf(`generate model code based on sql.
+		Long: color.HiBlackString(fmt.Sprintf(`generate model code based on sql.
 
 Examples:
   # generate model code.
@@ -39,7 +40,7 @@ Examples:
 
   # generate model code and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge %s model --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
-`, parentName, parentName, parentName),
+`, parentName, parentName, parentName)),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -97,7 +98,7 @@ type modelGenerator struct {
 }
 
 func (g *modelGenerator) generateCode() (string, error) {
-	subTplName := "model"
+	subTplName := codeNameModel
 	r := Replacers[TplNameSponge]
 	if r == nil {
 		return "", errors.New("replacer is nil")

@@ -73,26 +73,15 @@ func TestParseErr(t *testing.T) {
 func TestParseConfigData(t *testing.T) {
 	conf := make(map[string]interface{})
 
-	reloads := []func(){
-		func() {
-			fmt.Println("close and reconnect mysql")
-			fmt.Println("close and reconnect redis")
-		},
-	}
-
-	data, _ := os.ReadFile("test.yml")
-	err := ParseConfigData(data, "yaml", &conf, reloads...)
+	data, err := os.ReadFile("test.yml")
 	if err != nil {
 		t.Error(err)
 		return
 	}
-
-	time.Sleep(time.Second)
-	content, _ := os.ReadFile("test.yml")
-	contentChange := append(content, byte('#'))
-	time.Sleep(time.Millisecond * 100)
-	_ = os.WriteFile("test.yml", contentChange, 0666) // change file
-	time.Sleep(time.Millisecond * 100)
-	_ = os.WriteFile("test.yml", content, 0666) // recovery documents
-	time.Sleep(time.Millisecond * 100)
+	err = ParseConfigData(data, "yaml", &conf)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	t.Log(Show(conf))
 }

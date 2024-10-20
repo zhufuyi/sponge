@@ -21,7 +21,7 @@ func init() {
 		panic(err)
 	}
 
-	rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano()) //nolint
 }
 
 var (
@@ -33,32 +33,32 @@ package service
 import (
 	"context"
 
-	serverNameExampleV1 "moduleNameExample/api/serverNameExample/v1"
+	// import api service package here
 	//"moduleNameExample/internal/rpcclient"
 )
 
 {{- range .PbServices}}
 
-var _ serverNameExampleV1.{{.Name}}Logicer = (*{{.LowerName}}Client)(nil)
+var _ {{.ProtoPkgName}}.{{.Name}}Logicer = (*{{.LowerName}}Client)(nil)
 
 type {{.LowerName}}Client struct {
 	// define rpc clients interface here
 	// example:
-	//	    {{.LowerName}}Cli {{.LowerCutServiceName}}V1.{{.Name}}Client
+	//	    {{.LowerName}}Cli {{.ProtoPkgName}}.{{.Name}}Client
 }
 
 // New{{.Name}}Client create a client
-func New{{.Name}}Client() serverNameExampleV1.{{.Name}}Logicer {
+func New{{.Name}}Client() {{.ProtoPkgName}}.{{.Name}}Logicer {
 	return &{{.LowerName}}Client{
 		// example:
-		//	    {{.LowerName}}Cli: {{.LowerCutServiceName}}V1.New{{.Name}}Client(rpcclient.Get{{.CutServiceName}}RPCConn()),
+		//	    {{.LowerName}}Cli: {{.ProtoPkgName}}.New{{.Name}}Client(rpcclient.Get{{.CutServiceName}}RPCConn()),
 	}
 }
 
 {{- range .Methods}}
 
 {{if eq .InvokeType 0}}{{if .Path}}{{.Comment}}
-func (c *{{.LowerServiceName}}Client) {{.MethodName}}(ctx context.Context, req *serverNameExampleV1.{{.Request}}) (*serverNameExampleV1.{{.Reply}}, error) {
+func (c *{{.LowerServiceName}}Client) {{.MethodName}}(ctx context.Context, req *{{.RequestImportPkgName}}.{{.Request}}) (*{{.ReplyImportPkgName}}.{{.Reply}}, error) {
 	panic("implement me")
 
 	// fill in the business logic code here
@@ -74,7 +74,7 @@ func (c *{{.LowerServiceName}}Client) {{.MethodName}}(ctx context.Context, req *
 	//		    return nil, ecode.StatusInvalidParams.Err()
 	//	    }
 	//
-	//     reply, err := c.{{.LowerServiceName}}Cli.{{.MethodName}}(ctx, &{{.LowerCutServiceName}}V1.{{.Request}}{
+	//     reply, err := c.{{.LowerServiceName}}Cli.{{.MethodName}}(ctx, &{{.RequestImportPkgName}}.{{.Request}}{
 {{- range .RequestFields}}
 	//     	{{.Name}}: req.{{.Name}},
 {{- end}}
@@ -84,7 +84,7 @@ func (c *{{.LowerServiceName}}Client) {{.MethodName}}(ctx context.Context, req *
 	//     	return nil, err
 	//     }
 	//
-	//     return &serverNameExampleV1.{{.Reply}}{
+	//     return &{{.ReplyImportPkgName}}.{{.Reply}}{
 {{- range .ReplyFields}}
 	//     	{{.Name}}: reply.{{.Name}},
 {{- end}}
@@ -112,7 +112,7 @@ import (
 	"github.com/zhufuyi/sponge/pkg/gin/middleware"
 	"github.com/zhufuyi/sponge/pkg/logger"
 
-	serverNameExampleV1 "moduleNameExample/api/serverNameExample/v1"
+	// import api service package here
 	"moduleNameExample/internal/service"
 )
 
@@ -137,7 +137,7 @@ func {{.LowerName}}Router(
 	r *gin.Engine,
 	groupPathMiddlewares map[string][]gin.HandlerFunc,
 	singlePathMiddlewares map[string][]gin.HandlerFunc,
-	iService serverNameExampleV1.{{.Name}}Logicer) {
+	iService {{.ProtoPkgName}}.{{.Name}}Logicer) {
 	ctxFn := func(c *gin.Context) context.Context {
 		md := metadata.New(map[string]string{
 			// set metadata to be passed from http to rpc
@@ -147,15 +147,15 @@ func {{.LowerName}}Router(
 		return metadata.NewOutgoingContext(c.Request.Context(), md)
 	}
 
-	serverNameExampleV1.Register{{.Name}}Router(
+	{{.ProtoPkgName}}.Register{{.Name}}Router(
 		r,
 		groupPathMiddlewares,
 		singlePathMiddlewares,
 		iService,
-		serverNameExampleV1.With{{.Name}}Logger(logger.Get()),
-		serverNameExampleV1.With{{.Name}}RPCResponse(),
-		serverNameExampleV1.With{{.Name}}WrapCtx(ctxFn),
-		serverNameExampleV1.With{{.Name}}RPCStatusToHTTPCode(
+		{{.ProtoPkgName}}.With{{.Name}}Logger(logger.Get()),
+		{{.ProtoPkgName}}.With{{.Name}}RPCResponse(),
+		{{.ProtoPkgName}}.With{{.Name}}WrapCtx(ctxFn),
+		{{.ProtoPkgName}}.With{{.Name}}RPCStatusToHTTPCode(
 			// Set some error codes to standard http return codes,
 			// by default there is already ecode.StatusInternalServerError and ecode.StatusServiceUnavailable
 			// example:
@@ -174,7 +174,7 @@ func {{.LowerName}}Middlewares(c *middlewareConfig) {
 
 	// set up single route middleware, just uncomment the code and fill in the middlewares, nothing else needs to be changed
 {{- range .Methods}}
-	{{if eq .InvokeType 0}}{{if .Path}}//c.setSinglePath("{{.Method}}", "{{.Path}}", middleware.Auth()){{end}}{{end}}
+	{{if eq .InvokeType 0}}{{if .Path}}//c.setSinglePath("{{.Method}}", "{{.Path}}", middleware.Auth())    {{.Comment}}{{end}}{{end}}
 {{- end}}
 }
 

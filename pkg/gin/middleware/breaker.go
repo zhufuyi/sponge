@@ -20,6 +20,8 @@ type circuitBreakerOptions struct {
 	group *group.Group
 	// http code for circuit breaker, default already includes 500 and 503
 	validCodes map[int]struct{}
+	// degrade func
+	degradeHandler func(c *gin.Context)
 }
 
 func defaultCircuitBreakerOptions() *circuitBreakerOptions {
@@ -59,6 +61,13 @@ func WithValidCode(code ...int) CircuitBreakerOption {
 	}
 }
 
+// WithDegradeHandler set degrade handler function
+func WithDegradeHandler(handler func(c *gin.Context)) CircuitBreakerOption {
+	return func(o *circuitBreakerOptions) {
+		o.degradeHandler = handler
+	}
+}
+
 // CircuitBreaker a circuit breaker middleware
 func CircuitBreaker(opts ...CircuitBreakerOption) gin.HandlerFunc {
 	o := defaultCircuitBreakerOptions()
@@ -69,7 +78,11 @@ func CircuitBreaker(opts ...CircuitBreakerOption) gin.HandlerFunc {
 		if err := breaker.Allow(); err != nil {
 			// NOTE: when client reject request locally, keep adding counter let the drop ratio higher.
 			breaker.MarkFailed()
-			response.Output(c, http.StatusServiceUnavailable, err.Error())
+			if o.degradeHandler != nil {
+				o.degradeHandler(c)
+			} else {
+				response.Output(c, http.StatusServiceUnavailable, err.Error())
+			}
 			c.Abort()
 			return
 		}

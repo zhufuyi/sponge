@@ -4,8 +4,13 @@ serverName="serverNameExample_mixExample"
 
 binaryFile="cmd/${serverName}/${serverName}"
 
-if [ -f "${serverName}" ] ;then
-     rm "${serverName}"
+osType=$(uname -s)
+if [ "${osType%%_*}"x = "MINGW64"x ];then
+    binaryFile="${binaryFile}.exe"
+fi
+
+if [ -f "${binaryFile}" ] ;then
+     rm "${binaryFile}"
 fi
 
 function checkResult() {

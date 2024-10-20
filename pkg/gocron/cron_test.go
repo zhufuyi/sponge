@@ -41,7 +41,7 @@ func TestInitAndRun(t *testing.T) {
 		},
 	}
 
-	err := Init()
+	err := Init(WithLog(defaultLog, false), WithGranularity(SecondType))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -73,7 +73,7 @@ func TestRunOnce(t *testing.T) {
 		IsRunOnce: true,
 	}
 
-	err := Init(WithLog(zap.NewNop()))
+	err := Init(WithLog(zap.NewNop()), WithGranularity(MinuteType))
 	if err != nil {
 		t.Fatal(err)
 	}

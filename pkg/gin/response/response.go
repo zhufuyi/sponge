@@ -62,41 +62,43 @@ func respJSONWithStatusCode(c *gin.Context, code int, msg string, data ...interf
 	writeJSON(c, code, resp)
 }
 
-// Output return json data by http status code
-func Output(c *gin.Context, code int, msg ...interface{}) {
+// Output return standard HTTP status codes and message, parameter code is HTTP status code
+func Output(c *gin.Context, code int, data ...interface{}) {
 	switch code {
 	case http.StatusOK:
-		respJSONWithStatusCode(c, http.StatusOK, "ok", msg...)
+		respJSONWithStatusCode(c, http.StatusOK, "ok", data...)
 	case http.StatusBadRequest:
-		respJSONWithStatusCode(c, http.StatusBadRequest, errcode.InvalidParams.Msg(), msg...)
+		respJSONWithStatusCode(c, http.StatusBadRequest, errcode.InvalidParams.Msg(), data...)
 	case http.StatusUnauthorized:
-		respJSONWithStatusCode(c, http.StatusUnauthorized, errcode.Unauthorized.Msg(), msg...)
+		respJSONWithStatusCode(c, http.StatusUnauthorized, errcode.Unauthorized.Msg(), data...)
 	case http.StatusForbidden:
-		respJSONWithStatusCode(c, http.StatusForbidden, errcode.Forbidden.Msg(), msg...)
+		respJSONWithStatusCode(c, http.StatusForbidden, errcode.Forbidden.Msg(), data...)
 	case http.StatusNotFound:
-		respJSONWithStatusCode(c, http.StatusNotFound, errcode.NotFound.Msg(), msg...)
+		respJSONWithStatusCode(c, http.StatusNotFound, errcode.NotFound.Msg(), data...)
 	case http.StatusRequestTimeout:
-		respJSONWithStatusCode(c, http.StatusRequestTimeout, errcode.Timeout.Msg(), msg...)
+		respJSONWithStatusCode(c, http.StatusRequestTimeout, errcode.Timeout.Msg(), data...)
 	case http.StatusConflict:
-		respJSONWithStatusCode(c, http.StatusConflict, errcode.AlreadyExists.Msg(), msg...)
+		respJSONWithStatusCode(c, http.StatusConflict, errcode.Conflict.Msg(), data...)
 	case http.StatusInternalServerError:
-		respJSONWithStatusCode(c, http.StatusInternalServerError, errcode.InternalServerError.Msg(), msg...)
+		respJSONWithStatusCode(c, http.StatusInternalServerError, errcode.InternalServerError.Msg(), data...)
 	case http.StatusTooManyRequests:
-		respJSONWithStatusCode(c, http.StatusTooManyRequests, errcode.LimitExceed.Msg(), msg...)
+		respJSONWithStatusCode(c, http.StatusTooManyRequests, errcode.LimitExceed.Msg(), data...)
 	case http.StatusServiceUnavailable:
-		respJSONWithStatusCode(c, http.StatusServiceUnavailable, errcode.ServiceUnavailable.Msg(), msg...)
+		respJSONWithStatusCode(c, http.StatusServiceUnavailable, errcode.ServiceUnavailable.Msg(), data...)
 
 	default:
-		respJSONWithStatusCode(c, code, http.StatusText(code), msg...)
+		respJSONWithStatusCode(c, code, http.StatusText(code), data...)
 	}
 }
 
-// Out return json data by http status code, converted by errcode
+// Out returns the standard HTTP status code and message, parameter err is errcode.Error
 func Out(c *gin.Context, err *errcode.Error, data ...interface{}) {
 	code := err.ToHTTPCode()
 	switch code {
 	case http.StatusOK:
 		respJSONWithStatusCode(c, http.StatusOK, "ok", data...)
+	case http.StatusInternalServerError:
+		respJSONWithStatusCode(c, http.StatusInternalServerError, err.Msg(), data...)
 	case http.StatusBadRequest:
 		respJSONWithStatusCode(c, http.StatusBadRequest, err.Msg(), data...)
 	case http.StatusUnauthorized:
@@ -109,8 +111,6 @@ func Out(c *gin.Context, err *errcode.Error, data ...interface{}) {
 		respJSONWithStatusCode(c, http.StatusRequestTimeout, err.Msg(), data...)
 	case http.StatusConflict:
 		respJSONWithStatusCode(c, http.StatusConflict, err.Msg(), data...)
-	case http.StatusInternalServerError:
-		respJSONWithStatusCode(c, http.StatusInternalServerError, err.Msg(), data...)
 	case http.StatusTooManyRequests:
 		respJSONWithStatusCode(c, http.StatusTooManyRequests, err.Msg(), data...)
 	case http.StatusServiceUnavailable:

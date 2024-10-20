@@ -1,5 +1,3 @@
 ## Change log
 
-1. Modify the returned ID type, it will affect the ID types of GetByID and List for `⓵Create web service based on sql`, which are consistent with the ID types in the database.
-
-> Warning: If you are using code for `⓵Create web service based on sql` before v1.8.6, do not modify the sponge version under go.mod and upgrade to v1.8.6 or above. Otherwise, the List interface will return empty data because the original `size` field has become invalid (replaced by `limit` field).
+- Modify the scripts in the large repository type so that the web service and grpc service code generated based on SQL can automatically complete the missing parts.

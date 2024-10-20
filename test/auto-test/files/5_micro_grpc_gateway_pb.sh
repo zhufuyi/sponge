@@ -7,11 +7,13 @@ mysqlDSN="root:123456@(192.168.3.37:3306)/school"
 mysqlTable="teacher"
 
 # grpc gateway server
-rpcGwServiceName="user_gw"
-rpcGwDir="5_grpc_gateway_${rpcGwServiceName}"
+testServerName="user_gw"
+testServerDir="5_micro_grpc_gateway_${testServerName}"
 
-colorCyan='\033[1;36m'
-markEnd='\033[0m'
+colorCyan='\e[1;36m'
+colorGreen='\e[1;32m'
+colorRed='\e[1;31m'
+markEnd='\e[0m'
 errCount=0
 
 function checkResult() {
@@ -25,6 +27,14 @@ function checkErrCount() {
   result=$1
   if [ ${result} -ne 0 ]; then
       ((errCount++))
+  fi
+}
+
+function printTestResult() {
+  if [ ${errCount} -eq 0 ]; then
+    echo -e "\n\n${colorGreen}--------------------- [${testServerDir}] test result: passed ---------------------${markEnd}\n"
+  else
+    echo -e "\n\n${colorRed}--------------------- [${testServerDir}] test result: failed ${errCount} ---------------------${markEnd}\n"
   fi
 }
 
@@ -68,11 +78,10 @@ function checkServiceStarted() {
 
 function testRequest() {
   checkServiceStarted $grpcServiceName
-  checkServiceStarted $rpcGwServiceName
+  checkServiceStarted $testServerName
   sleep 1
-  echo "--------------------- start testing ---------------------"
 
-  echo -e "\n\n"
+  echo -e "start testing [${testServerName}] api:\n\n"
   echo -e "${colorCyan}curl -X POST http://localhost:8080/api/v1/user/register -H \"Content-Type: application/json\" -d {\"email\":\"foo@bar.com\",\"password\":\"123456\"} ${markEnd}"
   curl -X POST http://localhost:8080/api/v1/user/register -H "Content-Type: application/json" -d "{\"email\":\"foo@bar.com\",\"password\":\"123456\"}"
   checkErrCount $?
@@ -82,12 +91,13 @@ function testRequest() {
   curl -X POST http://localhost:8080/api/v1/user/register -H "Content-Type: application/json" -H "X-Request-Id: qaz12wx3ed4" -d "{\"email\":\"foo@bar.com\",\"password\":\"123456\"}"
   checkErrCount $?
 
-  echo -e "\n--------------------- the test is over, error result: $errCount ---------------------\n"
+  printTestResult
   stopService $grpcServiceName
-  stopService $rpcGwServiceName
+  stopService $testServerName
 }
 
 function runGRPCService() {
+  echo -e "\n\n"
   if [ -d "${grpcDir}" ]; then
     echo "service ${grpcDir} already exists"
   else
@@ -112,30 +122,32 @@ function runGRPCService() {
 echo "running service ${grpcDir}"
 runGRPCService &
 
-if [ -d "${rpcGwDir}" ]; then
-  echo "service ${rpcGwDir} already exists"
+echo -e "\n\n"
+
+if [ -d "${testServerDir}" ]; then
+  echo "service ${testServerDir} already exists"
 else
-  echo "create service ${rpcGwDir}"
-  echo -e "${colorCyan}sponge micro rpc-gw-pb --module-name=${rpcGwServiceName} --server-name=${rpcGwServiceName} --project-name=grpcgwdemo --protobuf-file=./files/user_gw.proto --out=./${rpcGwDir} ${markEnd}"
-  sponge micro rpc-gw-pb --module-name=${rpcGwServiceName} --server-name=${rpcGwServiceName} --project-name=grpcgwdemo --protobuf-file=./files/user_gw.proto --out=./${rpcGwDir}
+  echo "create service ${testServerDir}"
+  echo -e "${colorCyan}sponge micro rpc-gw-pb --module-name=${testServerName} --server-name=${testServerName} --project-name=grpcgwdemo --protobuf-file=./files/user_gw.proto --out=./${testServerDir} ${markEnd}"
+  sponge micro rpc-gw-pb --module-name=${testServerName} --server-name=${testServerName} --project-name=grpcgwdemo --protobuf-file=./files/user_gw.proto --out=./${testServerDir}
   checkResult $?
 
-  echo -e "${colorCyan}sponge micro rpc-conn --rpc-server-name=${grpcServiceName} --out=./${rpcGwDir} ${markEnd}"
-  sponge micro rpc-conn --rpc-server-name=${grpcServiceName} --out=./${rpcGwDir}
+  echo -e "${colorCyan}sponge micro rpc-conn --rpc-server-name=${grpcServiceName} --out=./${testServerDir} ${markEnd}"
+  sponge micro rpc-conn --rpc-server-name=${grpcServiceName} --out=./${testServerDir}
   checkResult $?
 
   echo "modify grpcClient field of configuration file"
-  sed -i "s/your_grpc_service_name/user/g" ./${rpcGwDir}/configs/user_gw.yml
+  sed -i "s/your_grpc_service_name/user/g" ./${testServerDir}/configs/user_gw.yml
   checkResult $?
 
   echo "copy the proto file to the grpc gateway service directory"
-  cd ${rpcGwDir}
+  cd ${testServerDir}
   make copy-proto SERVER=../${grpcDir}
   checkResult $?
   cd -
 fi
 
-cd ${rpcGwDir}
+cd ${testServerDir}
 
 echo "make proto"
 make proto
@@ -146,6 +158,6 @@ replaceCode ../files/rpc_gateway_content ./internal/service/user_gw.go
 
 testRequest &
 
-echo "running service ${rpcGwDir}"
+echo "running service ${testServerDir}"
 make run
 checkResult $?

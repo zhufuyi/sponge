@@ -15,38 +15,47 @@ import "github.com/zhufuyi/sponge/pkg/grpc/interceptor"
 **grpc server-side**
 
 ```go
-var logger *zap.Logger
-
+// set unary server logging
 func getServerOptions() []grpc.ServerOption {
 	var options []grpc.ServerOption
 	
 	options = append(options, grpc_middleware.WithUnaryServerChain(
-		interceptor.UnaryClientLog(
-			logger.Get(), // zap
-			// middleware.WithLogFields(map[string]interface{}{"serverName": "userExample"}), // additional print fields
-			middleware.WithLogIgnoreMethods("/proto.userExampleService/GetByID"), // ignore the specified method print, you can specify more than one
+		// if you don't want to log reply data, you can use interceptor.StreamServerSimpleLog instead of interceptor.UnaryServerLog,
+		interceptor.UnaryServerLog(
+			logger.Get(),
+			interceptor.WithReplaceGRPCLogger(),
+			//interceptor.WithMarshalFn(fn), // customised marshal function, default is jsonpb.Marshal
+			//interceptor.WithLogIgnoreMethods(fullMethodNames), // ignore methods logging
+			//interceptor.WithMaxLen(400), // logging max length, default 300
 		),
 	))
 
 	return options
 }
+
+
+// you can also set stream server logging
 ```
 
 **grpc client-side**
 
 ```go
+// set unary client logging
 func getDialOptions() []grpc.DialOption {
 	var options []grpc.DialOption
 
 	option := grpc.WithUnaryInterceptor(
 		grpc_middleware.ChainUnaryClient(
 			interceptor.UnaryClientLog(logger.Get()),
+			interceptor.WithReplaceGRPCLogger(),
 		),
 	)
 	options = append(options, option)
 
 	return options
 }
+
+// you can also set stream client logging
 ```
 
 <br>
@@ -127,10 +136,15 @@ func getDialOptions() []grpc.DialOption {
 	// use insecure transfer
 	options = append(options, grpc.WithTransportCredentials(insecure.NewCredentials()))
 
-	// circuit breaker
+	// rate limiter
 	option := grpc.WithUnaryInterceptor(
 		grpc_middleware.ChainUnaryClient(
-			interceptor.UnaryRateLimit(),
+			interceptor.UnaryRateLimit(
+				//interceptor.WithWindow(time.Second*5),
+				//interceptor.WithBucket(200),
+				//interceptor.WithCPUThreshold(600),
+				//interceptor.WithCPUQuota(0), 
+			),
 		),
 	)
 	options = append(options, option)
@@ -155,7 +169,10 @@ func getDialOptions() []grpc.DialOption {
 	// circuit breaker
 	option := grpc.WithUnaryInterceptor(
 		grpc_middleware.ChainUnaryClient(
-			interceptor.UnaryClientCircuitBreaker(),
+			interceptor.UnaryClientCircuitBreaker(
+				//interceptor.WithValidCode(codes.DeadlineExceeded), // add error code 4 for circuit breaker
+				//interceptor.WithUnaryServerDegradeHandler(handler), // add custom degrade handler
+			),
 		),
 	)
 	options = append(options, option)
@@ -300,20 +317,78 @@ func getDialOptions() []grpc.DialOption {
 
 <br>
 
-#### jwt
+#### jwt authentication
+
+**grpc client-side**
+
+```go
+package main
+
+import (
+	"context"
+	"github.com/zhufuyi/sponge/pkg/jwt"
+	"github.com/zhufuyi/sponge/pkg/grpc/interceptor"
+	"github.com/zhufuyi/sponge/pkg/grpc/grpccli"
+	userV1 "user/api/user/v1"
+)
+
+func main() {
+	ctx := context.Background()
+	conn, _ := grpccli.Dial(ctx, "127.0.0.1:8282")
+	cli := userV1.NewUserClient(conn)
+
+	token := "xxxxxx"
+	ctx = interceptor.SetJwtTokenToCtx(ctx, token)
+
+	req := &userV1.GetUserByIDRequest{Id: 100}
+	cli.GetByID(ctx, req)
+}
+```
 
 **grpc server-side**
 
 ```go
-func getServerOptions() []grpc.ServerOption {
+package main
+
+import (
+	"context"
+	"net"
+	"github.com/zhufuyi/sponge/pkg/jwt"
+	"github.com/zhufuyi/sponge/pkg/grpc/interceptor"
+	"google.golang.org/grpc"
+	userV1 "user/api/user/v1"
+)
+
+func standardVerifyFn(claims *jwt.Claims, tokenTail32 string) error {
+	// you can check the claims and tokenTail32, and return an error if necessary
+	// see example in jwtAuth_test.go line 23
+
+	return nil
+}
+
+func customVerifyFn(claims *jwt.CustomClaims, tokenTail32 string) error {
+	// you can check the claims and tokenTail32, and return an error if necessary
+	// see example in jwtAuth_test.go line 34
+
+	return nil
+}
+
+func getUnaryServerOptions() []grpc.ServerOption {
 	var options []grpc.ServerOption
 
-	// token authorization
+	// other interceptors ...
+
 	options = append(options, grpc.UnaryInterceptor(
+	    // jwt authorization interceptor
 	    interceptor.UnaryServerJwtAuth(
-	        // middleware.WithAuthClaimsName("tokenInfo"), // set the name of the forensic information attached to the ctx, the default is tokenInfo
-	        middleware.WithAuthIgnoreMethods( // add a way to ignore token validation
-	            "/proto.Account/Register",
+			// // choose a verification method as needed
+			//interceptor.WithStandardVerify(standardVerifyFn), // standard verify (default), standardVerifyFn is not mandatory, you can set nil if you don't need it
+			//interceptor.WithCustomVerify(customVerifyFn), // custom verify
+
+	        // specify the grpc API to ignore token verification(full path)
+	        interceptor.WithAuthIgnoreMethods(
+	            "/api.user.v1.User/Register",
+	            "/api.user.v1.User/Login",
 	        ),
 	    ),
 	))
@@ -321,27 +396,38 @@ func getServerOptions() []grpc.ServerOption {
 	return options
 }
 
-// generate forensic information authorization
-func (a *Account) Register(ctx context.Context, req *serverNameV1.RegisterRequest) (*serverNameV1.RegisterReply, error) {
-	// ......
-	token, err := jwt.GenerateToken(uid)
-	// handle err
-	authorization = middleware.GetAuthorization(token)
-	// ......
+
+type user struct {
+	userV1.UnimplementedUserServer
 }
 
-// the client must pass in the authentication information via the context when calling the method, and the key name must be authorization
-func getUser(client serverNameV1.AccountClient, req *serverNameV1.RegisterReply) error {
-	md := metadata.Pairs("authorization", req.Authorization)
-	ctx := metadata.NewOutgoingContext(context.Background(), md)
+// Login ...
+func (s *user) Login(ctx context.Context, req *userV1.LoginRequest) (*userV1.LoginReply, error) {
+	// check user and password success
 
-	resp, err := client.GetUser(ctx, &serverNameV1.GetUserRequest{Id: req.Id})
-	if err != nil {
-		return err
-	}
+	uid := 100
+	name := "tom"
+	token, err := jwt.GenerateToken(uid, name)
 
-	fmt.Println("get user success", resp)
-	return nil
+	return &userV1.LoginReply{Token: token},nil
+}
+
+// GetByID ...
+func (s *user) GetByID(ctx context.Context, req *userV1.GetUserByIDRequest) (*userV1.GetUserByIDReply, error) {
+	// if token is valid, won't get here, because the interceptor has returned an error message 
+
+	// if you want get jwt claims, you can use the following code
+	claims, err := interceptor.GetJwtClaims(ctx)
+
+	return &userV1.GetUserByIDReply{},nil
+}
+
+func main()  {
+	list, err := net.Listen("tcp", ":8282")
+	server := grpc.NewServer(getUnaryServerOptions()...)
+	userV1.RegisterUserServer(server, &user{})
+	server.Serve(list)
+	select{}
 }
 ```
 

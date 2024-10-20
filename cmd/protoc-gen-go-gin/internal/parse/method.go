@@ -13,23 +13,23 @@ import (
 var methodSets = make(map[string]int)
 
 // GetMethods get rpc method descriptions
-func GetMethods(m *protogen.Method) []*RPCMethod {
+func GetMethods(m *protogen.Method, protoSelfPkgPath string) []*RPCMethod {
 	var methods []*RPCMethod
 
 	// http rule config
 	rule, ok := proto.GetExtension(m.Desc.Options(), annotations.E_Http).(*annotations.HttpRule)
 	if rule != nil && ok {
 		for _, bind := range rule.AdditionalBindings {
-			methods = append(methods, buildHTTPRule(m, bind))
+			methods = append(methods, buildHTTPRule(m, bind, protoSelfPkgPath))
 		}
-		methods = append(methods, buildHTTPRule(m, rule))
+		methods = append(methods, buildHTTPRule(m, rule, protoSelfPkgPath))
 		return methods
 	}
 
 	return methods
 }
 
-func buildHTTPRule(m *protogen.Method, rule *annotations.HttpRule) *RPCMethod {
+func buildHTTPRule(m *protogen.Method, rule *annotations.HttpRule, protoSelfPkgPath string) *RPCMethod {
 	var (
 		path       string
 		method     string
@@ -58,14 +58,27 @@ func buildHTTPRule(m *protogen.Method, rule *annotations.HttpRule) *RPCMethod {
 		customKind = strings.ToLower(pattern.Custom.Kind)
 		method = http.MethodPost // default
 	}
-	md := buildMethodDesc(m, method, path, customKind, selector)
+	md := buildMethodDesc(m, method, path, customKind, selector, protoSelfPkgPath)
 	return md
 }
 
-func buildMethodDesc(m *protogen.Method, httpMethod, path string, customKind string, selector string) *RPCMethod {
+func buildMethodDesc(m *protogen.Method, httpMethod, path string, customKind string, selector string, protoSelfPkgPath string) *RPCMethod {
 	defer func() {
 		methodSets[m.GoName]++
 	}()
+
+	importPkgPaths := make(map[string]struct{})
+	requestImportPkgName := ""
+	replyImportPkgName := ""
+	if m.Input.GoIdent.GoImportPath.String() != protoSelfPkgPath {
+		requestImportPkgName = convertToPkgName(m.Input.GoIdent.GoImportPath.String()) + "."
+		importPkgPaths[m.Input.GoIdent.GoImportPath.String()] = struct{}{}
+	}
+	if m.Output.GoIdent.GoImportPath.String() != protoSelfPkgPath {
+		replyImportPkgName = convertToPkgName(m.Output.GoIdent.GoImportPath.String()) + "."
+		importPkgPaths[m.Output.GoIdent.GoImportPath.String()] = struct{}{}
+	}
+
 	md := &RPCMethod{
 		Name:       m.GoName,
 		Num:        methodSets[m.GoName],
@@ -76,6 +89,11 @@ func buildMethodDesc(m *protogen.Method, httpMethod, path string, customKind str
 		Selector:   selector,
 		CustomKind: customKind,
 		InvokeType: getInvokeType(m.Desc.IsStreamingClient(), m.Desc.IsStreamingServer()),
+
+		RequestImportPkgName: requestImportPkgName,
+		ReplyImportPkgName:   replyImportPkgName,
+		ProtoSelfPkgPath:     protoSelfPkgPath,
+		ImportPkgPaths:       importPkgPaths,
 	}
 	md.checkCustomKind()
 	md.checkSelector()
@@ -105,6 +123,12 @@ type RPCMethod struct {
 	// if Selector is [no_bind], IsPassGinContext and IsPassGinContext are both true
 	// if true, ignore c.ShouldBindXXX for this method, you must use c.ShouldBindXXX() in rpc method
 	IsIgnoreShouldBind bool
+
+	RequestImportPkgName string // e.g. empty or userV1
+	ReplyImportPkgName   string // e.g. empty or userV1
+
+	ProtoSelfPkgPath string              // e.g. "module/api/user/v1"
+	ImportPkgPaths   map[string]struct{} // exclude ProtoSelfPkgPath
 }
 
 // HandlerName for gin handler name

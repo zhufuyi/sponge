@@ -14,8 +14,9 @@ type grpcLogger struct {
 
 // ReplaceGRPCLoggerV2 replace grpc logger v2
 func ReplaceGRPCLoggerV2(l *zap.Logger) {
+	zLog := l.WithOptions(zap.AddCallerSkip(5)).With(zap.Bool("grpc_system", true))
 	zzl := &grpcLogger{
-		zLog:      l.With(zap.String("log_from", "grpc_system")),
+		zLog:      zLog,
 		verbosity: 0,
 	}
 	grpclog.SetLoggerV2(zzl)

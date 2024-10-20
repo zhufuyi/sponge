@@ -1,13 +1,15 @@
 #!/bin/bash
 
-grpcServiceName="user"
-grpcDir="2_micro_grpc_${grpcServiceName}"
+testServerName="user"
+testServerDir="2_micro_grpc_${testServerName}"
 
 mysqlDSN="root:123456@(192.168.3.37:3306)/school"
 mysqlTable="teacher"
 
-colorCyan='\033[1;36m'
-markEnd='\033[0m'
+colorCyan='\e[1;36m'
+colorGreen='\e[1;32m'
+colorRed='\e[1;31m'
+markEnd='\e[0m'
 errCount=0
 
 function checkResult() {
@@ -21,6 +23,14 @@ function checkErrCount() {
   result=$1
   if [ ${result} -ne 0 ]; then
       ((errCount++))
+  fi
+}
+
+function printTestResult() {
+  if [ ${errCount} -eq 0 ]; then
+    echo -e "\n\n${colorGreen}--------------------- [${testServerDir}] test result: passed ---------------------${markEnd}\n"
+  else
+    echo -e "\n\n${colorRed}--------------------- [${testServerDir}] test result: failed ${errCount} ---------------------${markEnd}\n"
   fi
 }
 
@@ -63,13 +73,11 @@ function checkServiceStarted() {
 }
 
 function testRequest() {
-  checkServiceStarted $grpcServiceName
+  checkServiceStarted $testServerName
   sleep 1
 
-  echo "--------------------- start testing ---------------------"
   cd internal/service
-
-  echo -e "\n\n"
+  echo -e "start testing [${testServerName}] api:\n\n"
   echo -e "${colorCyan}go test -run Test_service_${mysqlTable}_methods/GetByID ${markEnd}"
   sed -i "s/Id: 0,/Id: 1,/g" ${mysqlTable}_client_test.go
   go test -run Test_service_${mysqlTable}_methods/GetByID
@@ -81,26 +89,34 @@ function testRequest() {
   go test -run Test_service_${mysqlTable}_methods/ListByLastID
   checkErrCount $?
 
-  echo -e "\n--------------------- the test is over, error result: $errCount ---------------------\n"
   cd -
-  stopService $grpcServiceName
+  printTestResult
+  stopService $testServerName
 }
 
-if [ -d "${grpcDir}" ]; then
-  echo "service ${grpcDir} already exists"
+echo -e "\n\n"
+
+if [ -d "${testServerDir}" ]; then
+  echo "service ${testServerDir} already exists"
 else
-  echo "create service ${grpcDir}"
-  echo -e "\n${colorCyan}sponge micro rpc --module-name=${grpcServiceName} --server-name=${grpcServiceName} --project-name=grpcdemo --db-dsn=${mysqlDSN} --db-table=${mysqlTable} --out=./${grpcDir} ${markEnd}"
-  sponge micro rpc --module-name=${grpcServiceName} --server-name=${grpcServiceName} --project-name=grpcdemo --db-dsn=${mysqlDSN} --db-table=${mysqlTable} --out=./${grpcDir}
+  echo "create service ${testServerDir}"
+  echo -e "\n${colorCyan}sponge micro rpc --module-name=${testServerName} --server-name=${testServerName} --project-name=grpcdemo --db-dsn=${mysqlDSN} --db-table=${mysqlTable} --out=./${testServerDir} ${markEnd}"
+  sponge micro rpc --module-name=${testServerName} --server-name=${testServerName} --project-name=grpcdemo --db-dsn=${mysqlDSN} --db-table=${mysqlTable} --out=./${testServerDir}
   checkResult $?
 fi
 
-cd ${grpcDir}
+
+cd ${testServerDir}
 checkResult $?
 
 echo "make proto"
 make proto
 checkResult $?
+
+#cp -r ../pkg .
+#checkResult $?
+#sed -i "s/github.com\/zhufuyi\/sponge\/pkg\/grpc\/benchmark/${testServerName}\/pkg\/grpc\/benchmark/g" internal/service/${mysqlTable}_client_test.go
+#checkResult $?
 
 testRequest &
 

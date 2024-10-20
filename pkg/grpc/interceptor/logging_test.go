@@ -1,6 +1,7 @@
 package interceptor
 
 import (
+	"encoding/json"
 	"testing"
 	"time"
 
@@ -42,7 +43,12 @@ func TestStreamClientLog(t *testing.T) {
 func TestUnaryServerLog_ignore(t *testing.T) {
 	addr := newUnaryRPCServer(
 		UnaryServerLog(logger.Get(),
+			WithMaxLen(200),
 			WithLogFields(map[string]interface{}{"foo": "bar"}),
+			WithMarshalFn(func(reply interface{}) []byte {
+				data, _ := json.Marshal(reply)
+				return data
+			}),
 			WithLogIgnoreMethods("/api.user.v1.user/GetByID"),
 		),
 	)

@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 
 	"github.com/zhufuyi/sponge/pkg/gobash"
@@ -22,14 +23,14 @@ func UpgradeCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "upgrade",
 		Short: "Upgrade sponge version",
-		Long: `upgrade sponge version.
+		Long: color.HiBlackString(`upgrade sponge version.
 
 Examples:
   # upgrade to latest version
   sponge upgrade
   # upgrade to specified version
   sponge upgrade --version=v1.5.6
-`,
+`),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
