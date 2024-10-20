@@ -5,13 +5,17 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"github.com/uptrace/opentelemetry-go-extra/otelgorm"
+	mysqlDriver "gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
+	"gorm.io/gorm/schema"
+	"gorm.io/plugin/dbresolver"
 	"log"
 	"os"
 	"time"
-
-	mysqlDriver "gorm.io/driver/mysql"
-	"gorm.io/gorm/logger"
-	"gorm.io/gorm/schema"
 )
 
 const (
