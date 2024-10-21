@@ -1,3 +1,5 @@
 ## Change log
 
-- Modify the scripts in the large repository type so that the web service and grpc service code generated based on SQL can automatically complete the missing parts.
+- Fix for specifying schema in postgesql [#74](https://github.com/zhufuyi/sponge/issues/74).
+- Add statistics on grpc service connections in metrics.
+- Update command example.
