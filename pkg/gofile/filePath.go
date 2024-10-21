@@ -336,3 +336,28 @@ func walkDir(dirPath string, allFiles *[]string) error {
 
 	return nil
 }
+
+// ListSubDirs list all sub dirs that have the specified sub dir, if sub dir is empty, return all sub dirs
+func ListSubDirs(root string, subDir string) ([]string, error) {
+	var dirs []string
+	err := filepath.Walk(root, func(dirPath string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if info.IsDir() && hasSubDir(dirPath, subDir) {
+			if subDir == "" {
+				dirs = append(dirs, dirPath)
+			} else {
+				dirs = append(dirs, dirPath+GetPathDelimiter()+subDir)
+			}
+		}
+		return nil
+	})
+	return dirs, err
+}
+
+func hasSubDir(dirPath string, subDir string) bool {
+	_, err := os.Stat(filepath.Join(dirPath, subDir))
+	return err == nil || os.IsExist(err)
+}

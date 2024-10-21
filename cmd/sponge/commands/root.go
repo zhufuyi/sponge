@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 
 	"github.com/zhufuyi/sponge/cmd/sponge/commands/generate"
@@ -19,9 +20,9 @@ var (
 func NewRootCMD() *cobra.Command {
 	cmd := &cobra.Command{
 		Use: "sponge",
-		Long: `Sponge is a powerful Go development framework, it's easy to develop web and microservice projects.
-repo: https://github.com/zhufuyi/sponge
-docs: https://go-sponge.com`,
+		Long: fmt.Sprintf(`Sponge is a powerful Go development framework, it's easy to develop web and microservice projects.
+Repo: %s
+Docs: %s`, color.HiCyanString("https://github.com/zhufuyi/sponge"), color.HiCyanString("https://go-sponge.com")),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		Version:       getVersion(),
@@ -38,6 +39,7 @@ docs: https://go-sponge.com`,
 		OpenUICommand(),
 		MergeCommand(),
 		PatchCommand(),
+		GenGraphCommand(),
 	)
 
 	return cmd

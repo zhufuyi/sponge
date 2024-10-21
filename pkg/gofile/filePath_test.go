@@ -170,3 +170,13 @@ func TestListDirs(t *testing.T) {
 	t.Log(FilterDirs(dirs, WithPrefix("query")))
 	t.Log(FilterDirs(dirs, WithContain("auth")))
 }
+
+func TestListSubDirs(t *testing.T) {
+	dir := ".."
+	dirs, err := ListSubDirs(dir, "gin")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	t.Log(dirs)
+}
