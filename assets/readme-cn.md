@@ -4,6 +4,8 @@
 
 [sponge](https://github.com/zhufuyi/sponge) 是一个集成了 `自动生成代码`、`Gin和GRPC` 的强大的开发框架。sponge拥有丰富的生成代码命令，生成不同的功能代码可以组合成完整的服务(类似人为打散的海绵细胞可以自动重组成一个新的海绵)。sponge提供了一站式项目开发(生成代码、开发、测试、api文档、部署)，大幅提高了开发效率和降低了开发难度，以"低代码方式"开发高质量项目。
 
+sponge 用来快速高效开发各种应用场景和需求的高性能后端服务，包括 `web` 服务、`gRPC` 服务、`http+gRPC` 混合服务、 `gRPC网关API`服务等。
+
 <br>
 
 ### sponge 核心设计理念
@@ -81,6 +83,7 @@ sponge包含丰富的组件(按需使用)：
 - 资源统计 [gopsutil](https://github.com/shirou/gopsutil)
 - 代码质量检查 [golangci-lint](https://github.com/golangci/golangci-lint)
 - 持续集成部署 CICD [jenkins](https://github.com/jenkinsci/jenkins), [docker](https://www.docker.com/), [kubernetes](https://github.com/kubernetes/kubernetes)
+- 生成项目业务架构图，[示例](https://github.com/zhufuyi/sponge_examples/blob/main/assets/eshop-business-architecture-diagram.svg)。
 
 <br>
 

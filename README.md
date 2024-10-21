@@ -17,6 +17,8 @@
 
 **Sponge** is a powerful development framework that integrates `automatic code generation`, `Gin and GRPC`. Sponge has a rich set of code generation commands, and the generated different functional codes can be combined into a complete service (similar to how artificially broken sponge cells can automatically reassemble into a new complete sponge). Sponge provides one-stop project development (code generation, development, testing, api documentation, deployment), it greatly improves development efficiency and reduces development difficulty, develop high-quality projects with a "low code approach".
 
+Sponge is used to quickly and efficiently develop high-performance back-end services for various application scenarios and requirements, including `web` services, `gRPC` services, `http+gRPC` hybrid services, `gRPC gateway API` services.
+
 <br>
 
 ### Sponge Core Design Philosophy
@@ -94,6 +96,7 @@ Click to view the [**test code**](https://github.com/zhufuyi/microservices_frame
 - Resource statistics [gopsutil](https://github.com/shirou/gopsutil)
 - Code quality checking [golangci-lint](https://github.com/golangci/golangci-lint)
 - Continuous integration and deployment [jenkins](https://github.com/jenkinsci/jenkins), [docker](https://www.docker.com/), [kubernetes](https://github.com/kubernetes/kubernetes)
+- Generate project business architecture diagram, [example](https://github.com/zhufuyi/sponge_examples/blob/main/assets/eshop-business-architecture-diagram.svg).
 
 <br>
 
