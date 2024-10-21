@@ -18,7 +18,7 @@
 // 注意 暂时实现 http web 版本，  pb 版本暂时不支持
 
 ### 源码安装 使用说明
-```go
+```git
     git clone https://github.com/ice-leng/sponge.git
     cd sponge/cmd/sponge
     go run ./main.go init
@@ -30,7 +30,7 @@
     数据库dsn: root:@(127.0.0.1:3306)/hyperf;prefix=t_
 ```
 - 去掉下载代码功能，替换为，命令行 在那个目录，代码就在这个目录下生成
-```go
+```shell
     mkdir xxx
     cd xxx
     sponge run 
