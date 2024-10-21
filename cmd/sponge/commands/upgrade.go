@@ -3,6 +3,7 @@ package commands
 import (
 	"context"
 	"fmt"
+	"github.com/zhufuyi/sponge/cmd/sponge/global"
 	"os"
 	"sort"
 	"strings"
@@ -122,7 +123,8 @@ func copyToTempDir(targetVersion string) (string, error) {
 		spongeDirName = "sponge@" + targetVersion
 	}
 
-	srcDir := adaptPathDelimiter(fmt.Sprintf("%s/pkg/mod/github.com/zhufuyi/%s", gopath, spongeDirName))
+	//srcDir := adaptPathDelimiter(fmt.Sprintf("%s/pkg/mod/github.com/zhufuyi/%s", gopath, spongeDirName))
+	srcDir := adaptPathDelimiter(global.Root)
 	destDir := adaptPathDelimiter(GetSpongeDir() + "/")
 	targetDir := adaptPathDelimiter(destDir + ".sponge")
 

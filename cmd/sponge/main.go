@@ -7,9 +7,9 @@ package main
 import (
 	"fmt"
 	"github.com/zhufuyi/sponge/cmd/sponge/global"
-	"os"
-
 	"github.com/zhufuyi/sponge/pkg/gofile"
+	"os"
+	"path/filepath"
 
 	"github.com/zhufuyi/sponge/cmd/sponge/commands"
 	"github.com/zhufuyi/sponge/cmd/sponge/commands/generate"
@@ -28,6 +28,7 @@ func main() {
 		os.Exit(1)
 	}
 	global.Path = dir
+	global.Root = filepath.Dir(filepath.Dir(dir))
 
 	rootCMD := commands.NewRootCMD()
 	if err = rootCMD.Execute(); err != nil {
