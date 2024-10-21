@@ -24,18 +24,15 @@ func ConvertSwagJSONCommand(parentName string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "swagger",
 		Short: "Convert 64-bit fields type string to integer",
-		Long: color.HiBlackString(fmt.Sprintf(`convert 64-bit fields type string to integer
-
-Examples:
-  # convent file docs/apis.swagger.json.
+		Long:  "Convert 64-bit fields type string to integer.",
+		Example: color.HiBlackString(fmt.Sprintf(`  # Convent file docs/apis.swagger.json.
   sponge %s swagger
 
-  # convent file test/swagger.json
+  # Convent file test/swagger.json
   sponge %s swagger --file=test/swagger.json
 
-  # convent file docs/apis.swagger.json and sort json key.
-  sponge %s swagger --is-sort
-`, parentName, parentName, parentName)),
+  # Convent file docs/apis.swagger.json and sort json key.
+  sponge %s swagger --is-sort`, parentName, parentName, parentName)),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {

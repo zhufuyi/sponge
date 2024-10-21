@@ -14,12 +14,9 @@ func InitCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "init",
 		Short: "Initialize sponge",
-		Long: color.HiBlackString(`initialize sponge.
-
-Examples:
-  # run init, download code and install plugins.
-  sponge init
-`),
+		Long:  "Initialize sponge.",
+		Example: color.HiBlackString(`  # Run init, download code and install plugins.
+  sponge init`),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {

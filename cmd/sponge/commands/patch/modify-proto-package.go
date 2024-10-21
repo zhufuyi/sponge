@@ -25,15 +25,12 @@ func ModifyProtoPackageCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "modify-proto-package",
 		Short: "Modifies the package and go_package names of proto files",
-		Long: color.HiBlackString(`modifies the package and go_package names of proto files.
-
-Examples:
-  # modify the package and go_package names of all proto files in the api directory.
+		Long:  "Modifies the package and go_package names of proto files.",
+		Example: color.HiBlackString(`  # Modify the package and go_package names of all proto files in the api directory.
   sponge patch modify-proto-package --dir=api --module-name=foo
 
-  # modify the package and go_package names of all proto files in the api directory, get module name from docs/gen.
-  sponge patch modify-proto-package --dir=api --server-dir=server
-`),
+  # Modify the package and go_package names of all proto files in the api directory, get module name from docs/gen.
+  sponge patch modify-proto-package --dir=api --server-dir=server`),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {

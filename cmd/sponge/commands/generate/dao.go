@@ -34,23 +34,21 @@ func DaoCommand(parentName string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "dao",
 		Short: "Generate dao code based on sql",
-		Long: color.HiBlackString(fmt.Sprintf(`generate dao code based on sql.
-
-Examples:
-  # generate dao code.
+		Long:  "Generate dao code based on sql.",
+		Example: color.HiBlackString(fmt.Sprintf(`  # Generate dao code.
   sponge %s dao --module-name=yourModuleName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
-  # generate dao code with multiple table names.
+  # Generate dao code with multiple table names.
   sponge %s dao --module-name=yourModuleName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=t1,t2
 
-  # generate dao code with extened api.
+  # Generate dao code with extened api.
   sponge %s dao --module-name=yourModuleName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --extended-api=true
 
-  # generate dao code and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
+  # Generate dao code and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge %s dao --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
 
-  # if you want the generated code to suited to mono-repo, you need to set the parameter --suited-mono-repo=true --server-name=yourServerName
-`, parentName, parentName, parentName, parentName)),
+  # If you want the generated code to suited to mono-repo, you need to set the parameter --suited-mono-repo=true --server-name=yourServerName`,
+			parentName, parentName, parentName, parentName)),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {

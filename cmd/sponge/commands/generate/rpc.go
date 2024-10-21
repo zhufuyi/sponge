@@ -38,26 +38,23 @@ func RPCCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "rpc",
 		Short: "Generate grpc service code based on sql",
-		Long: color.HiBlackString(`generate grpc service code based on sql.
-
-Examples:
-  # generate grpc service code.
+		Long:  "Generate grpc service code based on sql.",
+		Example: color.HiBlackString(`  # Generate grpc service code.
   sponge micro rpc --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
-  # generate grpc service code with multiple table names.
+  # Generate grpc service code with multiple table names.
   sponge micro rpc --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=t1,t2
 
-  # generate grpc service code with extended api.
+  # Generate grpc service code with extended api.
   sponge micro rpc --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --extended-api=true
 
-  # generate grpc service code and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
+  # Generate grpc service code and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge micro rpc --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
 
-  # generate grpc service code and specify the docker image repository address.
+  # Generate grpc service code and specify the docker image repository address.
   sponge micro rpc --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
-  # if you want the generated code to suited to mono-repo, you need to set the parameter --suited-mono-repo=true
-`),
+  # If you want the generated code to suited to mono-repo, you need to set the parameter --suited-mono-repo=true`),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {

@@ -59,19 +59,16 @@ func PluginsCommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "plugins",
-		Short: "Managing sponge dependency plugins",
-		Long: color.HiBlackString(`managing sponge dependency plugins.
-
-Examples:
-  # show all dependency plugins.
+		Short: "Manage plugins that sponge depends on",
+		Long:  "Manage plugins that sponge depends on.",
+		Example: color.HiBlackString(`  # Show all dependency plugins.
   sponge plugins
 
-  # install all dependency plugins.
+  # Install all dependency plugins.
   sponge plugins --install
 
-  # skip installing dependency plugins, multiple plugin names separated by commas
-  sponge plugins --install --skip=go-callvis
-`),
+  # Skip installing dependency plugins, multiple plugin names separated by commas
+  sponge plugins --install --skip=go-callvis`),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {

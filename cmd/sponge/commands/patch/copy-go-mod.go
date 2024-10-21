@@ -25,15 +25,12 @@ func CopyGOModCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "copy-go-mod",
 		Short: "Copy go mod files",
-		Long: color.HiBlackString(`copy go mod files to local directory.
-
-Examples:
-  # copy go mod files to current directory
+		Long:  "Copy go mod files to local directory.",
+		Example: color.HiBlackString(`  # Copy go mod files to current directory
   sponge patch copy-go-mod --module-name=yourModuleName
 
-  # copy go mod files to yourServerDir, module name from out directory
-  sponge patch copy-go-mod --out=./yourServerDir
-`),
+  # Copy go mod files to yourServerDir, module name from out directory
+  sponge patch copy-go-mod --out=./yourServerDir`),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {

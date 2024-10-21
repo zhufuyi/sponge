@@ -460,8 +460,6 @@ func getDBConfigCode(dbDriver string) string {
 		dbConfigCode = mongodbConfigCode
 	case undeterminedDBDriver:
 		dbConfigCode = undeterminedDatabaseConfigCode
-	default:
-		panic("getDBConfigCode error, unsupported database driver: " + dbDriver)
 	}
 	return dbConfigCode
 }

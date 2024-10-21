@@ -34,23 +34,20 @@ func HandlerCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "handler",
 		Short: "Generate handler CRUD code based on sql",
-		Long: color.HiBlackString(`generate handler CRUD code based on sql.
-
-Examples:
-  # generate handler code.
+		Long:  "Generate handler CRUD code based on sql.",
+		Example: color.HiBlackString(`  # Generate handler code.
   sponge web handler --module-name=yourModuleName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
-  # generate handler code with multiple table names.
+  # Generate handler code with multiple table names.
   sponge web handler --module-name=yourModuleName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=t1,t2
 
-  # generate handler code with extended api.
+  # Generate handler code with extended api.
   sponge web handler --module-name=yourModuleName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --extended-api=true
 
-  # generate handler code and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
+  # Generate handler code and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge web handler --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
 
-  # if you want the generated code to suited to mono-repo, you need to set the parameter --suited-mono-repo=true --server-name=yourServerName
-`),
+  # If you want the generated code to suited to mono-repo, you need to set the parameter --suited-mono-repo=true --server-name=yourServerName`),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {

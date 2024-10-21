@@ -27,20 +27,17 @@ func HTTPPbCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "http-pb",
 		Short: "Generate web service code based on protobuf file",
-		Long: color.HiBlackString(`generate web service code based on protobuf file.
-
-Examples:
-  # generate web service code.
+		Long:  "Generate web service code based on protobuf file.",
+		Example: color.HiBlackString(`  # Generate web service code.
   sponge web http-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --protobuf-file=./test.proto
 
-  # generate web service code and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
+  # Generate web service code and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge web http-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --protobuf-file=./test.proto --out=./yourServerDir
 
-  # generate web service code and specify the docker image repository address.
+  # Generate web service code and specify the docker image repository address.
   sponge web http-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --protobuf-file=./test.proto
 
-  # if you want the generated code to suited to mono-repo, you need to set the parameter --suited-mono-repo=true
-`),
+  # If you want the generated code to suited to mono-repo, you need to set the parameter --suited-mono-repo=true`),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {

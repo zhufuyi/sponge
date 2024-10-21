@@ -21,16 +21,12 @@ func DeleteJSONOmitemptyCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "del-omitempty",
 		Short: "Delete json tag omitempty",
-		Long: color.HiBlackString(`delete json tag omitempty
-
-Examples:
-  # delete all files that include the omitempty character
+		Long:  "Delete json tag omitempty.",
+		Example: color.HiBlackString(`  # Delete all files that include the omitempty character
   sponge patch del-omitempty --dir=./api
 
-  # delete the specified suffix file including the omitempty character
-  sponge patch del-omitempty --dir=./api --suffix-name=pb.go
-
-`),
+  # Delete the specified suffix file including the omitempty character
+  sponge patch del-omitempty --dir=./api --suffix-name=pb.go`),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {

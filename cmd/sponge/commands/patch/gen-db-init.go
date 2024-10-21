@@ -25,15 +25,12 @@ func GenerateDBInitCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "gen-db-init",
 		Short: "Generate database initialization code",
-		Long: color.HiBlackString(`generate database initialization code.
-
-Examples:
-  # generate mysql initialization code.
+		Long:  "Generate database initialization code.",
+		Example: color.HiBlackString(`  # Generate mysql initialization code.
   sponge patch gen-db-init --module-name=yourModuleName --db-driver=mysql
 
-  # generate mysql initialization code, and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
-  sponge patch gen-db-init --db-driver=mysql --out=./yourServerDir
-`),
+  # Generate mysql initialization code, and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
+  sponge patch gen-db-init --db-driver=mysql --out=./yourServerDir`),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {

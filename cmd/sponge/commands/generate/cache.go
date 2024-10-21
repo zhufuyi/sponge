@@ -30,17 +30,15 @@ func CacheCommand(parentName string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "cache",
 		Short: "Generate cache code",
-		Long: color.HiBlackString(fmt.Sprintf(`generate cache code.
-
-Examples:
-  # generate kv cache code
+		Long:  "Generate cache code.",
+		Example: color.HiBlackString(fmt.Sprintf(`  # Generate kv cache code
   sponge %s cache --module-name=yourModuleName --cache-name=userToken --key-name=id --key-type=uint64 --value-name=token --value-type=string
 
-  # generate kv cache code and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
+  # Generate kv cache code and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge %s cache --module-name=yourModuleName --cache-name=token --prefix-key=user:token --key-name=id --key-type=uint64 --value-name=token --value-type=string --out=./yourServerDir
 
-  # if you want the generated code to suited to mono-repo, you need to set the parameter --suited-mono-repo=true --server-name=yourServerName
-`, parentName, parentName)),
+  # If you want the generated code to suited to mono-repo, you need to set the parameter --suited-mono-repo=true --server-name=yourServerName`,
+			parentName, parentName)),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {

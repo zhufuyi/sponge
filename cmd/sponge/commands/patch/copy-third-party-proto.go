@@ -21,15 +21,12 @@ func CopyThirdPartyProtoCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "copy-third-party-proto",
 		Short: "Copy third-party proto files",
-		Long: color.HiBlackString(`copy third-party proto files to local directory.
-
-Examples:
-  # copy third-party proto files to current directory
+		Long:  "Copy third-party proto files to local directory.",
+		Example: color.HiBlackString(`  # Copy third-party proto files to current directory
   sponge patch copy-third-party-proto
 
-  # copy third-party proto files to yourServerDir
-  sponge patch copy-third-party-proto --out=./yourServerDir
-`),
+  # Copy third-party proto files to yourServerDir
+  sponge patch copy-third-party-proto --out=./yourServerDir`),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {

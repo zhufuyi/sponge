@@ -27,20 +27,17 @@ func RPCGwPbCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "rpc-gw-pb",
 		Short: "Generate grpc gateway service code based on protobuf file",
-		Long: color.HiBlackString(`generate grpc gateway service code based on protobuf file.
-
-Examples:
-  # generate grpc gateway service code.
+		Long:  "Generate grpc gateway service code based on protobuf file.",
+		Example: color.HiBlackString(`  # Generate grpc gateway service code.
   sponge micro rpc-gw-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --protobuf-file=./demo.proto
 
-  # generate grpc gateway service code and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
+  # Generate grpc gateway service code and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge micro rpc-gw-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --protobuf-file=./demo.proto --out=./yourServerDir
 
-  # generate grpc gateway service code and specify the docker image repository address.
+  # Generate grpc gateway service code and specify the docker image repository address.
   sponge micro rpc-gw-pb --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --protobuf-file=./demo.proto
 
-  # if you want the generated code to suited to mono-repo, you need to set the parameter --suited-mono-repo=true
-`),
+  # If you want the generated code to suited to mono-repo, you need to set the parameter --suited-mono-repo=true`),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -211,7 +208,7 @@ func (g *rpcGwPbGenerator) addFields(r replacer.Replacer) []replacer.Field {
 		},
 		{ // replace the configuration of the *.yml file
 			Old: appConfigFileMark2,
-			New: getDBConfigCode(undeterminedDBDriver),
+			New: getDBConfigCode(""), // no db config
 		},
 		{ // replace the configuration of the *.yml file
 			Old: appConfigFileMark,

@@ -11,7 +11,7 @@ func GenWebCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:           "web",
 		Short:         "Generate model, cache, dao, handler, http code",
-		Long:          "generate model, cache, dao, handler, http code.",
+		Long:          "Generate model, cache, dao, handler, http code.",
 		SilenceErrors: true,
 		SilenceUsage:  true,
 	}

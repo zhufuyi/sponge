@@ -29,18 +29,16 @@ func ModelCommand(parentName string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "model",
 		Short: "Generate model code based on sql",
-		Long: color.HiBlackString(fmt.Sprintf(`generate model code based on sql.
-
-Examples:
-  # generate model code.
+		Long:  "Generate model code based on sql.",
+		Example: color.HiBlackString(fmt.Sprintf(`  # Generate model code.
   sponge %s model --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
-  # generate model code with multiple table names.
+  # Generate model code with multiple table names.
   sponge %s model --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=t1,t2
 
-  # generate model code and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
-  sponge %s model --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
-`, parentName, parentName, parentName)),
+  # Generate model code and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
+  sponge %s model --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir`,
+			parentName, parentName, parentName)),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {

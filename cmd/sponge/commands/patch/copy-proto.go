@@ -33,20 +33,17 @@ func CopyProtoCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "copy-proto",
 		Short: "Copy proto file from the grpc service directory",
-		Long: color.HiBlackString(`copy proto file from the grpc service, if the proto file exists, it will be forced to overwrite it,
+		Long: `Copy proto file from the grpc service, if the proto file exists, it will be forced to overwrite it,
 don't worry about losing the proto file after overwriting it, before copying proto it will be backed up to 
-the directory /tmp/sponge_copy_backup_proto_files.
-
-Examples:
-  # copy all proto files from a grpc service directory
+the directory /tmp/sponge_copy_backup_proto_files.`,
+		Example: color.HiBlackString(`  # Copy all proto files from a grpc service directory
   sponge patch copy-proto --server-dir=../grpc-server
 
-  # copy all proto files from multiple grpc services directory
+  # Copy all proto files from multiple grpc services directory
   sponge patch copy-proto --server-dir=../grpc-server1,../rpc-server2
 
-  # copy the specified proto files in the grpc service directory
-  sponge patch copy-proto --server-dir=../grpc-server --proto-file=name1.proto,name2.proto
-`),
+  # Copy the specified proto files in the grpc service directory
+  sponge patch copy-proto --server-dir=../grpc-server --proto-file=name1.proto,name2.proto`),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {

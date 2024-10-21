@@ -23,14 +23,12 @@ func UpgradeCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "upgrade",
 		Short: "Upgrade sponge version",
-		Long: color.HiBlackString(`upgrade sponge version.
-
-Examples:
-  # upgrade to latest version
+		Long:  "Upgrade sponge version.",
+		Example: color.HiBlackString(`  # Upgrade to latest version
   sponge upgrade
-  # upgrade to specified version
-  sponge upgrade --version=v1.5.6
-`),
+
+  # Upgrade to specified version
+  sponge upgrade --version=v1.5.6`),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {

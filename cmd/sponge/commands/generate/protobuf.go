@@ -30,24 +30,21 @@ func ProtobufCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "protobuf",
 		Short: "Generate protobuf code based on sql",
-		Long: color.HiBlackString(`generate protobuf code based on sql.
-
-Examples:
-  # generate protobuf code.
+		Long:  "Generate protobuf code based on sql.",
+		Example: color.HiBlackString(`  # Generate protobuf code.
   sponge micro protobuf --module-name=yourModuleName --server-name=yourServerName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
-  # generate protobuf code with multiple table names.
+  # Generate protobuf code with multiple table names.
   sponge micro protobuf --module-name=yourModuleName --server-name=yourServerName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=t1,t2
 
-  # generate protobuf code with extended api.
+  # Generate protobuf code with extended api.
   sponge micro protobuf --module-name=yourModuleName --server-name=yourServerName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --extended-api=true
 
-  # generate protobuf code that include router path and swagger info.
+  # Generate protobuf code that include router path and swagger info.
   sponge micro protobuf --module-name=yourModuleName --server-name=yourServerName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --web-type=true
 
-  # generate protobuf code and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
-  sponge micro protobuf --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
-`),
+  # Generate protobuf code and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
+  sponge micro protobuf --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir`),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {

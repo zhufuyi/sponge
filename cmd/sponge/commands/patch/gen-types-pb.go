@@ -24,15 +24,12 @@ func GenTypesPbCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "gen-types-pb",
 		Short: "Generate types.proto code",
-		Long: color.HiBlackString(`generate types.proto code
-
-Examples:
-  # generate types.proto code.
+		Long:  "Generate types.proto code.",
+		Example: color.HiBlackString(`  # Generate types.proto code.
   sponge patch gen-types-pb --module-name=yourModuleName
 
-  # generate types.proto code and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
-  sponge patch gen-types-pb --out=./yourServerDir
-`),
+  # Generate types.proto code and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
+  sponge patch gen-types-pb --out=./yourServerDir`),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {

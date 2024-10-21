@@ -37,26 +37,23 @@ func HTTPCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "http",
 		Short: "Generate web service code based on sql",
-		Long: color.HiBlackString(`generate web service code based on sql.
-
-Examples:
-  # generate web service code.
+		Long:  "Generate web service code based on sql.",
+		Example: color.HiBlackString(`  # Generate web service code.
   sponge web http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
-  # generate web service code with multiple table names.
+  # Generate web service code with multiple table names.
   sponge web http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=t1,t2
 
-  # generate web service code with extended api.
+  # Generate web service code with extended api.
   sponge web http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --extended-api=true
 
-  # generate web service code and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
+  # Generate web service code and specify the output directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge web http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
 
-  # generate web service code and specify the docker image repository address.
+  # Generate web service code and specify the docker image repository address.
   sponge web http --module-name=yourModuleName --server-name=yourServerName --project-name=yourProjectName --repo-addr=192.168.3.37:9443/user-name --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
-  # if you want the generated code to suited to mono-repo, you need to set the parameter --suited-mono-repo=true
-`),
+  # If you want the generated code to suited to mono-repo, you need to set the parameter --suited-mono-repo=true`),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {

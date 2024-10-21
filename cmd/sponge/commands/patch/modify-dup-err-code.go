@@ -22,12 +22,9 @@ func ModifyDuplicateErrCodeCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "modify-dup-err-code",
 		Short: "Modify duplicate error codes",
-		Long: color.HiBlackString(`modify duplicate error codes 
-
-Examples:
-  # modify duplicate error codes
-  sponge patch modify-dup-err-code --dir=internal/ecode
-`),
+		Long:  "Modify duplicate error codes.",
+		Example: color.HiBlackString(`  # Modify duplicate error codes
+  sponge patch modify-dup-err-code --dir=internal/ecode`),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {

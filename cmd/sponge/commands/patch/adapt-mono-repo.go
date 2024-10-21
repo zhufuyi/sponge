@@ -23,15 +23,12 @@ func AdaptMonoRepoCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "adapt-mono-repo",
 		Short: "Adapt to mono-repo in api directory code",
-		Long: color.HiBlackString(`adapt to mono-repo in api directory code
-
-Examples:
-  # adapt to mono-repo code in local server directory
+		Long:  "Adapt to mono-repo in api directory code.",
+		Example: color.HiBlackString(`  # Adapt to mono-repo code in local server directory
   sponge patch adapt-mono-repo
 
-  # adapt to mono-repo code in specified directory
-  sponge patch adapt-mono-repo --dir=/path/to/server/directory
-`),
+  # Adapt to mono-repo code in specified directory
+  sponge patch adapt-mono-repo --dir=/path/to/server/directory`),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {

@@ -21,12 +21,9 @@ func ModifyDuplicateNumCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "modify-dup-num",
 		Short: "Modify duplicate numbers",
-		Long: color.HiBlackString(`modify duplicate numbers 
-
-Examples:
-  # modify duplicate numbers
-  sponge patch modify-dup-num --dir=internal/ecode
-`),
+		Long:  "Modify duplicate numbers.",
+		Example: color.HiBlackString(`  # Modify duplicate numbers
+  sponge patch modify-dup-num --dir=internal/ecode`),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {

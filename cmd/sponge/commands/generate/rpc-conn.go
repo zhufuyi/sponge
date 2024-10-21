@@ -25,20 +25,17 @@ func GRPCConnectionCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "rpc-conn",
 		Short: "Generate grpc connection code",
-		Long: color.HiBlackString(`generate grpc connection code.
-
-Examples:
-  # generate grpc connection code
+		Long:  "Generate grpc connection code.",
+		Example: color.HiBlackString(`  # Generate grpc connection code
   sponge micro rpc-conn --module-name=yourModuleName --rpc-server-name=yourGrpcName
 
-  # generate grpc connection code with multiple names.
+  # Generate grpc connection code with multiple names.
   sponge micro rpc-conn --module-name=yourModuleName --rpc-server-name=name1,name2
 
-  # generate grpc connection code and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
+  # Generate grpc connection code and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge micro rpc-conn --rpc-server-name=user --out=./yourServerDir
 
-  # if you want the generated code to suited to mono-repo, you need to set the parameter --suited-mono-repo=true --server-name=yourServerName
-`),
+  # If you want the generated code to suited to mono-repo, you need to set the parameter --suited-mono-repo=true --server-name=yourServerName`),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {

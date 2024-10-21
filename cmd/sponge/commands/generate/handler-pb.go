@@ -36,23 +36,20 @@ func HandlerPbCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "handler-pb",
 		Short: "Generate handler and protobuf CRUD code based on sql",
-		Long: color.HiBlackString(`generate handler and protobuf CRUD code based on sql.
-
-Examples:
-  # generate handler and protobuf code.
+		Long:  "Generate handler and protobuf CRUD code based on sql.",
+		Example: color.HiBlackString(`  # Generate handler and protobuf code.
   sponge web handler-pb --module-name=yourModuleName --server-name=yourServerName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user
 
-  # generate handler and protobuf code with multiple table names.
+  # Generate handler and protobuf code with multiple table names.
   sponge web handler-pb --module-name=yourModuleName --server-name=yourServerName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=t1,t2
 
-  # generate handler and protobuf code with extended api.
+  # Generate handler and protobuf code with extended api.
   sponge web handler-pb --module-name=yourModuleName --server-name=yourServerName --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --extended-api=true
 
-  # generate handler and protobuf code and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
+  # Generate handler and protobuf code and specify the server directory, Note: code generation will be canceled when the latest generated file already exists.
   sponge web handler-pb --db-driver=mysql --db-dsn=root:123456@(192.168.3.37:3306)/test --db-table=user --out=./yourServerDir
 
-  # if you want the generated code to suited to mono-repo, you need to set the parameter --suited-mono-repo=true
-`),
+  # If you want the generated code to suited to mono-repo, you need to set the parameter --suited-mono-repo=true`),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
