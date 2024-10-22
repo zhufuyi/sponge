@@ -83,7 +83,7 @@ sponge包含丰富的组件(按需使用)：
 - 资源统计 [gopsutil](https://github.com/shirou/gopsutil)
 - 代码质量检查 [golangci-lint](https://github.com/golangci/golangci-lint)
 - 持续集成部署 CICD [jenkins](https://github.com/jenkinsci/jenkins), [docker](https://www.docker.com/), [kubernetes](https://github.com/kubernetes/kubernetes)
-- 生成项目业务架构图，[示例](https://github.com/zhufuyi/sponge_examples/blob/main/assets/eshop-business-architecture-diagram.svg)。
+- 生成项目业务架构图 [spograph](https://github.com/zhufuyi/spograph)
 
 <br>
 

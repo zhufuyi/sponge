@@ -96,7 +96,7 @@ Click to view the [**test code**](https://github.com/zhufuyi/microservices_frame
 - Resource statistics [gopsutil](https://github.com/shirou/gopsutil)
 - Code quality checking [golangci-lint](https://github.com/golangci/golangci-lint)
 - Continuous integration and deployment [jenkins](https://github.com/jenkinsci/jenkins), [docker](https://www.docker.com/), [kubernetes](https://github.com/kubernetes/kubernetes)
-- Generate project business architecture diagram, [example](https://github.com/zhufuyi/sponge_examples/blob/main/assets/eshop-business-architecture-diagram.svg).
+- Generate project business architecture diagram [spograph](https://github.com/zhufuyi/spograph)
 
 <br>
 
