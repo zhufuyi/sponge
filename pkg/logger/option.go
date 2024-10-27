@@ -130,7 +130,7 @@ func WithFileName(filename string) FileOption {
 // WithFileMaxSize set maximum file size (MB)
 func WithFileMaxSize(maxSize int) FileOption {
 	return func(f *fileOptions) {
-		if f.maxSize > 0 {
+		if maxSize > 0 {
 			f.maxSize = maxSize
 		}
 	}

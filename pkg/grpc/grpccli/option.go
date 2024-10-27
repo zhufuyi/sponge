@@ -96,9 +96,9 @@ func WithEnableLog(log *zap.Logger) Option {
 		o.enableLog = true
 		if log != nil {
 			o.log = log
-		} else {
-			o.log = zap.NewNop()
+			return
 		}
+		o.log, _ = zap.NewProduction()
 	}
 }
 

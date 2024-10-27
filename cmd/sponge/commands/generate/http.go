@@ -87,16 +87,16 @@ func HTTPCommand() *cobra.Command {
 				return err
 			}
 			g := &httpGenerator{
-				moduleName:    moduleName,
-				serverName:    serverName,
-				projectName:   projectName,
-				repoAddr:      repoAddr,
-				dbDSN:         sqlArgs.DBDsn,
-				dbDriver:      sqlArgs.DBDriver,
-				codes:         codes,
-				outPath:       outPath,
-				isExtendedAPI: sqlArgs.IsExtendedAPI,
-
+				moduleName:     moduleName,
+				serverName:     serverName,
+				projectName:    projectName,
+				repoAddr:       repoAddr,
+				dbDSN:          sqlArgs.DBDsn,
+				dbDriver:       sqlArgs.DBDriver,
+				codes:          codes,
+				outPath:        outPath,
+				isExtendedAPI:  sqlArgs.IsExtendedAPI,
+				isEmbed:        sqlArgs.IsEmbed,
 				suitedMonoRepo: suitedMonoRepo,
 			}
 			outPath, err = g.generateCode()

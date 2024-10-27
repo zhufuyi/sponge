@@ -347,18 +347,14 @@ func defaultOptions() *options {
 // WithParams set params
 func WithParams(params map[string]interface{}) Option {
 	return func(o *options) {
-		if o.params != nil {
-			o.params = params
-		}
+		o.params = params
 	}
 }
 
 // WithHeaders set headers
 func WithHeaders(headers map[string]string) Option {
 	return func(o *options) {
-		if o.headers != nil {
-			o.headers = headers
-		}
+		o.headers = headers
 	}
 }
 

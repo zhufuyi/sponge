@@ -870,7 +870,7 @@ func adaptPgDsn(dsn string) string {
 
 	u, err := url.Parse(dsn)
 	if err != nil {
-		panic(err)
+		return dsn
 	}
 
 	if u.RawQuery == "" {
