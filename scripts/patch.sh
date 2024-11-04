@@ -2,11 +2,11 @@
 
 patchType=$1
 typesPb="types-pb"
-initMysql="init-mysql"
-initMongodb="init-mongodb"
-initTidb="init-tidb"
-initPostgresql="init-postgresql"
-initSqlite="init-sqlite"
+initMysql="mysql"
+initMongodb="mongodb"
+initTidb="tidb"
+initPostgresql="postgresql"
+initSqlite="sqlite"
 
 function checkResult() {
     result=$1
@@ -56,20 +56,20 @@ function generateInitSqliteCode() {
 
 if [  "$patchType" = "$typesPb"  ]; then
     generateTypesPbCode
-elif [ "$patchType" = "$initMysql" ]; then
+elif [ "$patchType" = "$initMysql" ] || [ "$patchType" == "init-$initMysql" ]; then
     generateInitMysqlCode
-elif [ "$patchType" = "$initMongodb" ]; then
+elif [ "$patchType" = "$initMongodb" ] || [ "$patchType" == "init-$initMongodb" ]; then
     generateInitMongodbCode
-elif [ "$patchType" = "$initTidb" ]; then
+elif [ "$patchType" = "$initTidb" ] || [ "$patchType" == "init-$initTidb" ]; then
     generateInitTidbCode
-elif [ "$patchType" = "$initPostgresql" ]; then
+elif [ "$patchType" = "$initPostgresql" ] || [ "$patchType" == "init-$initPostgresql" ]; then
     generateInitPostgresqlCode
-elif [ "$patchType" = "$initSqlite" ]; then
+elif [ "$patchType" = "$initSqlite" ] || [ "$patchType" == "init-$initSqlite" ]; then
     generateInitSqliteCode
 else
     echo "invalid patch type: '$patchType'"
     echo "supported types: $initMysql, $initMongodb, $initTidb, $initPostgresql, $initSqlite, $typesPb"
-    echo "e.g. make patch TYPE=init-mysql"
+    echo "e.g. make patch TYPE=$initMysql"
     echo ""
     exit 1
 fi

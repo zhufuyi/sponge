@@ -93,6 +93,19 @@ function handlePbGoFiles(){
     cd ..
 }
 
+function patchTypesPbFile() {
+  for file in $allProtoFiles; do
+    if [  "$file" = "api/types/types.proto"  ]; then
+      return
+    fi
+    if grep -q "api/types/types.proto" "$file"; then
+      allProtoFiles=$allProtoFiles" api/types/types.proto"
+      bash scripts/patch.sh types-pb
+      return
+    fi
+  done
+}
+
 function generateByAllProto(){
   getSpecifiedProtoFiles
   if [ $? -eq 0 ]; then
@@ -100,6 +113,8 @@ function generateByAllProto(){
   else
     allProtoFiles=$specifiedProtoFilePaths
   fi
+
+  patchTypesPbFile
 
   if [ "$allProtoFiles"x = x ];then
     echo "Error: not found proto file in path $protoBasePath"
