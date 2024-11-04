@@ -1,12 +1,12 @@
 syntax = "proto3";
 
-package api.user_gw.v1;
+package api.user_http.v1;
 
 import "google/api/annotations.proto";
-import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 
-option go_package = "user/api/user_gw/v1;v1";
+option go_package = "user/api/user_http/v1;v1";
 
 // Default settings for generating swagger documents
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
@@ -33,11 +33,11 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   }
 };
 
-service user_gw {
+service user_http {
   // Register
   rpc Register(RegisterRequest) returns (RegisterReply) {
     option (google.api.http) = {
-      post: "/api/v1/user/register"
+      post: "/api/v1/auth/register"
       body: "*"
     };
   }
@@ -45,7 +45,7 @@ service user_gw {
   // Login
   rpc Login(LoginRequest) returns (LoginReply) {
     option (google.api.http) = {
-      post: "/api/v1/user/login"
+      post: "/api/v1/auth/login"
       body: "*"
     };
   }
@@ -53,15 +53,7 @@ service user_gw {
   // Logout
   rpc Logout(LogoutRequest) returns (LogoutReply) {
     option (google.api.http) = {
-      post: "/api/v1/user/logout"
-      body: "*"
-    };
-  }
-
-  // ChangePassword
-  rpc ChangePassword(ChangePasswordRequest) returns (ChangeRegisterReply)  {
-    option (google.api.http) = {
-      post: "/api/v1/user/change_password"
+      post: "/api/v1/auth/logout"
       body: "*"
     };
   }
@@ -92,11 +84,3 @@ message LogoutRequest {
 }
 
 message LogoutReply {}
-
-message ChangePasswordRequest {
-  uint64 id = 1 [(validate.rules).uint64.gte  = 1];
-  string password = 2 [(validate.rules).string.min_len = 6];
-}
-
-message ChangeRegisterReply {}
-

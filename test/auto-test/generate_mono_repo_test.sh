@@ -3,22 +3,30 @@
 projectName="edusys"
 
 mysqlDsn="root:123456@(192.168.3.37:3306)/account"
-mysqlTable1="user_example"
-mysqlTable2="user"
-mysqlTable3="user_account"
+mysqlTable1="user"
+mysqlTable2="user_order"
+mysqlTable3="user_str"
 
 postgresqlDsn="root:123456@(192.168.3.37:5432)/account"
-postgresqlTable1="user_example"
-postgresqlTable2="user"
+postgresqlTable1="user"
+postgresqlTable2="user_order"
+postgresqlTable3="user_str"
 
 sqliteDsn="../sql/sqlite/sponge.db"
-sqliteTable1="user_example"
-sqliteTable2="user"
+sqliteTable1="user"
+sqliteTable2="user_order"
+sqliteTable3="user_str"
 
 mongodbDsn="root:123456@(192.168.3.37:27017)/account"
-mongodbCollection1="user_example"
-mongodbCollection2="user"
-mongodbCollection3="userInfo"
+mongodbCollection1="user"
+mongodbCollection2="user_order"
+mongodbCollection3="people"
+
+httpProtobufFile="files/user_http.proto"
+grpcProtobufFile="files/user_rpc.proto"
+mixProtobufFile="files/user_hybrid.proto"
+grpcGwProtobufFile="files/user_gw.proto"
+mixedProtobufFile="files/mixed.proto"
 
 colorCyan='\e[1;36m'
 colorGreen='\e[1;32m'
@@ -148,8 +156,8 @@ function generate_http_mysql() {
     sponge web http --server-name=$serverName --module-name=$projectName --project-name=$projectName --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --embed=true --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge web handler --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable2 --embed=true --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
-    sponge web handler --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable2 --embed=true --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
+    echo -e "\n${colorCyan}sponge web handler --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable2,$mysqlTable3 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge web handler --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable2,$mysqlTable3 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
     checkResult $?
   fi
 
@@ -173,12 +181,12 @@ function generate_http_postgresql() {
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
-    echo -e "\n${colorCyan}sponge web http --server-name=$serverName --module-name=$projectName --project-name=$projectName --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable1 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
-    sponge web http --server-name=$serverName --module-name=$projectName --project-name=$projectName --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable1 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
+    echo -e "\n${colorCyan}sponge web http --server-name=$serverName --module-name=$projectName --project-name=$projectName --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable1 --embed=true --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge web http --server-name=$serverName --module-name=$projectName --project-name=$projectName --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable1 --embed=true --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge web handler --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable2 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
-    sponge web handler --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable2 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
+    echo -e "\n${colorCyan}sponge web handler --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable2,$postgresqlTable3 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge web handler --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable2,$postgresqlTable3 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
     checkResult $?
   fi
 
@@ -202,12 +210,12 @@ function generate_http_sqlite() {
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
-    echo -e "\n${colorCyan}sponge web http --server-name=$serverName --module-name=$projectName --project-name=$projectName --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable1 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
-    sponge web http --server-name=$serverName --module-name=$projectName --project-name=$projectName --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable1 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
+    echo -e "\n${colorCyan}sponge web http --server-name=$serverName --module-name=$projectName --project-name=$projectName --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable1 --embed=true --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge web http --server-name=$serverName --module-name=$projectName --project-name=$projectName --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable1 --embed=true --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge web handler --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable2 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
-    sponge web handler --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable2 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
+    echo -e "\n${colorCyan}sponge web handler --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable2,$sqliteTable3 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge web handler --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable2,$sqliteTable3 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
     checkResult $?
 
     sed -E -i 's/\\\\sql\\\\/\\\\\.\.\\\\\sql\\\\/g' ${outDir}/configs/${serverName}.yml
@@ -237,8 +245,8 @@ function generate_http_mongodb() {
     sponge web http --server-name=$serverName --module-name=$projectName --project-name=$projectName --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection1 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge web handler --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection2 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
-    sponge web handler --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection2 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
+    echo -e "\n${colorCyan}sponge web handler --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection2,$mongodbCollection3 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge web handler --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection2,$mongodbCollection3 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
     checkResult $?
   fi
 
@@ -264,12 +272,12 @@ function generate_grpc_mysql() {
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
-    echo -e "\n${colorCyan}sponge micro rpc --server-name=$serverName --module-name=$projectName --project-name=$projectName --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
-    sponge micro rpc --server-name=$serverName --module-name=$projectName --project-name=$projectName --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
+    echo -e "\n${colorCyan}sponge micro rpc --server-name=$serverName --module-name=$projectName --project-name=$projectName --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --embed=true --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge micro rpc --server-name=$serverName --module-name=$projectName --project-name=$projectName --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --embed=true --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge micro service --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable2 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
-    sponge micro service --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable2 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
+    echo -e "\n${colorCyan}sponge micro service --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable2,$mysqlTable3 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge micro service --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable2,$mysqlTable3 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
     checkResult $?
   fi
 
@@ -293,12 +301,12 @@ function generate_grpc_postgresql() {
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
-    echo -e "\n${colorCyan}sponge micro rpc --server-name=$serverName --module-name=$projectName --project-name=$projectName --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable1 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
-    sponge micro rpc --server-name=$serverName --module-name=$projectName --project-name=$projectName --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable1 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
+    echo -e "\n${colorCyan}sponge micro rpc --server-name=$serverName --module-name=$projectName --project-name=$projectName --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable1 --embed=true --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge micro rpc --server-name=$serverName --module-name=$projectName --project-name=$projectName --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable1 --embed=true --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge micro service --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable2 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
-    sponge micro service --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable2 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
+    echo -e "\n${colorCyan}sponge micro service --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable2,$postgresqlTable3 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge micro service --db-driver=postgresql --db-dsn=$postgresqlDsn --db-table=$postgresqlTable2,$postgresqlTable3 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
     checkResult $?
   fi
 
@@ -322,12 +330,12 @@ function generate_grpc_sqlite() {
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
-    echo -e "\n${colorCyan}sponge micro rpc --server-name=$serverName --module-name=$projectName --project-name=$projectName --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable1 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
-    sponge micro rpc --server-name=$serverName --module-name=$projectName --project-name=$projectName --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable1 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
+    echo -e "\n${colorCyan}sponge micro rpc --server-name=$serverName --module-name=$projectName --project-name=$projectName --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable1 --embed=true --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge micro rpc --server-name=$serverName --module-name=$projectName --project-name=$projectName --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable1 --embed=true --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge micro service --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable2 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
-    sponge micro service --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable2 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
+    echo -e "\n${colorCyan}sponge micro service --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable2,$sqliteTable3 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge micro service --db-driver=sqlite --db-dsn=$sqliteDsn --db-table=$sqliteTable2,$sqliteTable3 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
     checkResult $?
 
     sed -E -i 's/\\\\sql\\\\/\\\\\.\.\\\\\sql\\\\/g' ${outDir}/configs/${serverName}.yml
@@ -357,8 +365,8 @@ function generate_grpc_mongodb() {
     sponge micro rpc --server-name=$serverName --module-name=$projectName --project-name=$projectName --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection1 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge micro service --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection2 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
-    sponge micro service --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection2 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
+    echo -e "\n${colorCyan}sponge micro service --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection2,$mongodbCollection3 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge micro service --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection2,$mongodbCollection3 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
     checkResult $?
   fi
 
@@ -384,12 +392,16 @@ function generate_http_pb_mysql() {
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
-    echo -e "\n${colorCyan}sponge web http-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=./files/user.proto --suited-mono-repo=true --out=$outDir ${markEnd}"
-    sponge web http-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=./files/user.proto --suited-mono-repo=true --out=$outDir
+    echo -e "\n${colorCyan}sponge web http-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=${httpProtobufFile} --suited-mono-repo=true --out=$outDir ${markEnd}"
+    sponge web http-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=${httpProtobufFile} --suited-mono-repo=true --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge web handler-pb --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
-    sponge web handler-pb --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
+    echo -e "\n${colorCyan}sponge web handler-pb --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --embed=true --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge web handler-pb --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --embed=true --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
+    checkResult $?
+
+    echo -e "\n${colorCyan}sponge web handler-pb --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable2,$mysqlTable3 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge web handler-pb --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable2,$mysqlTable3 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
     checkResult $?
 
     mysqlDsnTmp=$(echo "$mysqlDsn" | sed -E 's/\(/\\\(/g' | sed -E 's/\)/\\\)/g' | sed -E 's/\//\\\//g')
@@ -418,12 +430,12 @@ function generate_http_pb_mongodb() {
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
-    echo -e "\n${colorCyan}sponge web http-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=./files/user.proto --suited-mono-repo=true --out=$outDir ${markEnd}"
-    sponge web http-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=./files/user.proto --suited-mono-repo=true --out=$outDir
+    echo -e "\n${colorCyan}sponge web http-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=${httpProtobufFile} --suited-mono-repo=true --out=$outDir ${markEnd}"
+    sponge web http-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=${httpProtobufFile} --suited-mono-repo=true --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge web handler-pb --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection1 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
-    sponge web handler-pb --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection1 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
+    echo -e "\n${colorCyan}sponge web handler-pb --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection1,$mongodbCollection2,$mongodbCollection3 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge web handler-pb --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection1,$mongodbCollection2,$mongodbCollection3 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
     checkResult $?
 
     sed -E -i 's/\"mysql\"/\"mongodb\"/g' ${outDir}/configs/${serverName}.yml
@@ -456,12 +468,16 @@ function generate_grpc_pb_mysql() {
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
-    echo -e "\n${colorCyan}sponge micro rpc-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=./files/user2.proto --suited-mono-repo=true --out=$outDir ${markEnd}"
-    sponge micro rpc-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=./files/user2.proto --suited-mono-repo=true --out=$outDir
+    echo -e "\n${colorCyan}sponge micro rpc-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=${grpcProtobufFile} --suited-mono-repo=true --out=$outDir ${markEnd}"
+    sponge micro rpc-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=${grpcProtobufFile} --suited-mono-repo=true --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge micro service --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
-    sponge micro service --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
+    echo -e "\n${colorCyan}sponge micro service --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --embed=true --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge micro service --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --embed=true --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
+    checkResult $?
+
+    echo -e "\n${colorCyan}sponge micro service --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable2,$mysqlTable3 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge micro service --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable2,$mysqlTable3 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
     checkResult $?
 
     mysqlDsnTmp=$(echo "$mysqlDsn" | sed -E 's/\(/\\\(/g' | sed -E 's/\)/\\\)/g' | sed -E 's/\//\\\//g')
@@ -490,12 +506,12 @@ function generate_grpc_pb_mongodb() {
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
-    echo -e "\n${colorCyan}sponge micro rpc-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=./files/user2.proto --suited-mono-repo=true --out=$outDir ${markEnd}"
-    sponge micro rpc-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=./files/user2.proto --suited-mono-repo=true --out=$outDir
+    echo -e "\n${colorCyan}sponge micro rpc-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=${grpcProtobufFile} --suited-mono-repo=true --out=$outDir ${markEnd}"
+    sponge micro rpc-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=${grpcProtobufFile} --suited-mono-repo=true --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge micro service --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=user_example --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
-    sponge micro service --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=user_example --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
+    echo -e "\n${colorCyan}sponge micro service --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection1,$mongodbCollection2,$mongodbCollection3 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge micro service --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection1,$mongodbCollection2,$mongodbCollection3 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
     checkResult $?
 
     sed -E -i 's/\"mysql\"/\"mongodb\"/g' ${outDir}/configs/${serverName}.yml
@@ -528,12 +544,16 @@ function generate_grpc_http_pb_mysql() {
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
-    echo -e "\n${colorCyan}sponge micro grpc-http-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=./files/user.proto --suited-mono-repo=true --out=$outDir ${markEnd}"
-    sponge micro grpc-http-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=./files/user.proto --suited-mono-repo=true --out=$outDir
+    echo -e "\n${colorCyan}sponge micro grpc-http-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=${mixProtobufFile} --suited-mono-repo=true --out=$outDir ${markEnd}"
+    sponge micro grpc-http-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=${mixProtobufFile} --suited-mono-repo=true --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge micro service-handler --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
-    sponge micro service-handler --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
+    echo -e "\n${colorCyan}sponge micro service-handler --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --embed=true --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge micro service-handler --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable1 --embed=true --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
+    checkResult $?
+
+    echo -e "\n${colorCyan}sponge micro service-handler --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable2,$mysqlTable3 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge micro service-handler --db-driver=mysql --db-dsn=$mysqlDsn --db-table=$mysqlTable2,$mysqlTable3 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
     checkResult $?
 
     mysqlDsnTmp=$(echo "$mysqlDsn" | sed -E 's/\(/\\\(/g' | sed -E 's/\)/\\\)/g' | sed -E 's/\//\\\//g')
@@ -562,12 +582,12 @@ function generate_grpc_http_pb_mongodb() {
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
-    echo -e "\n${colorCyan}sponge micro grpc-http-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=./files/user.proto --suited-mono-repo=true --out=$outDir ${markEnd}"
-    sponge micro grpc-http-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=./files/user.proto --suited-mono-repo=true --out=$outDir
+    echo -e "\n${colorCyan}sponge micro grpc-http-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=${mixProtobufFile} --suited-mono-repo=true --out=$outDir ${markEnd}"
+    sponge micro grpc-http-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=${mixProtobufFile} --suited-mono-repo=true --out=$outDir
     checkResult $?
 
-    echo -e "\n${colorCyan}sponge micro service-handler --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=user_example --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
-    sponge micro service-handler --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=user_example --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
+    echo -e "\n${colorCyan}sponge micro service-handler --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection1,$mongodbCollection2,$mongodbCollection3 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir ${markEnd}"
+    sponge micro service-handler --db-driver=mongodb --db-dsn=$mongodbDsn --db-table=$mongodbCollection1,$mongodbCollection2,$mongodbCollection3 --suited-mono-repo=true --extended-api=$isExtended --out=$outDir
     checkResult $?
 
     sed -E -i 's/\"mysql\"/\"mongodb\"/g' ${outDir}/configs/${serverName}.yml
@@ -599,8 +619,8 @@ function generate_http_pb_mixed() {
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
-    echo -e "\n${colorCyan}sponge web http-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=./files/mixed.proto --suited-mono-repo=true --out=$outDir ${markEnd}"
-    sponge web http-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=./files/mixed.proto --suited-mono-repo=true --out=$outDir
+    echo -e "\n${colorCyan}sponge web http-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=${mixedProtobufFile} --suited-mono-repo=true --out=$outDir ${markEnd}"
+    sponge web http-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=${mixedProtobufFile} --suited-mono-repo=true --out=$outDir
     checkResult $?
   fi
 
@@ -624,8 +644,8 @@ function generate_grpc_pb_mixed() {
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
-    echo -e "\n${colorCyan}sponge micro rpc-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=./files/mixed.proto --suited-mono-repo=true --out=$outDir ${markEnd}"
-    sponge micro rpc-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=./files/mixed.proto --suited-mono-repo=true --out=$outDir
+    echo -e "\n${colorCyan}sponge micro rpc-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=${mixedProtobufFile} --suited-mono-repo=true --out=$outDir ${markEnd}"
+    sponge micro rpc-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=${mixedProtobufFile} --suited-mono-repo=true --out=$outDir
     checkResult $?
   fi
 
@@ -651,8 +671,8 @@ function generate_grpc_gw_pb_mixed() {
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
-    echo -e "\n${colorCyan}sponge micro rpc-gw-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=./files/mixed.proto --suited-mono-repo=true --out=$outDir ${markEnd}"
-    sponge micro rpc-gw-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=./files/mixed.proto --suited-mono-repo=true --out=$outDir
+    echo -e "\n${colorCyan}sponge micro rpc-gw-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=${mixedProtobufFile} --suited-mono-repo=true --out=$outDir ${markEnd}"
+    sponge micro rpc-gw-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=${mixedProtobufFile} --suited-mono-repo=true --out=$outDir
     checkResult $?
   fi
 
@@ -676,8 +696,8 @@ function generate_grpc_gw_pb() {
   if [ -d "${outDir}" ]; then
     echo -e "$outDir already exists\n\n"
   else
-    echo -e "\n${colorCyan}sponge micro rpc-gw-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=./files/user_gw.proto --suited-mono-repo=true --out=$outDir ${markEnd}"
-    sponge micro rpc-gw-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=./files/user_gw.proto --suited-mono-repo=true --out=$outDir
+    echo -e "\n${colorCyan}sponge micro rpc-gw-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=${grpcGwProtobufFile} --suited-mono-repo=true --out=$outDir ${markEnd}"
+    sponge micro rpc-gw-pb --server-name=$serverName --module-name=$projectName --project-name=$projectName --protobuf-file=${grpcGwProtobufFile} --suited-mono-repo=true --out=$outDir
     checkResult $?
 
     echo -e "\n${colorCyan}sponge micro rpc-conn --rpc-server-name=user --suited-mono-repo=true --out=$outDir ${markEnd}"

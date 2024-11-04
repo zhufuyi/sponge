@@ -3,18 +3,42 @@
 # grpc server
 grpcServiceName="user"
 grpcDir="2_micro_grpc_${grpcServiceName}"
-mysqlDSN="root:123456@(192.168.3.37:3306)/school"
-mysqlTable="teacher"
+
+mysqlDSN="root:123456@(192.168.3.37:3306)/account"
+mysqlTable="user"
 
 # grpc gateway server
 testServerName="user_gw"
 testServerDir="5_micro_grpc_gateway_${testServerName}"
+projectName="edusys"
+protobufFile="files/user_gw.proto"
 
 colorCyan='\e[1;36m'
 colorGreen='\e[1;32m'
 colorRed='\e[1;31m'
 markEnd='\e[0m'
 errCount=0
+
+srcStr1='// define rpc clients interface here'
+dstStr1='userCli userV1.UserClient'
+
+srcStr2='func (c *userGwClient) Register(ctx context.Context, req *user_gwV1.RegisterRequest) (*user_gwV1.RegisterReply, error) {'
+dstStr2='func (c *userGwClient) Register(ctx context.Context, req *user_gwV1.RegisterRequest) (*user_gwV1.RegisterReply, error) {
+	rep, err := c.userCli.GetByID(ctx, &userV1.GetUserByIDRequest{Id: 1})
+	if err != nil {
+		return nil, err
+	}
+	return &user_gwV1.RegisterReply{
+		Id: rep.User.Id,
+	}, nil
+'
+
+srcStr3='//"user_gw/internal/rpcclient"'
+dstStr3='"user_gw/internal/rpcclient"
+	userV1 "user_gw/api/user/v1"'
+
+srcStr4='//	    userGwCli: user_gwV1.NewUserGwClient(rpcclient.GetUserGwRPCConn()),'
+dstStr4='	    userCli: userV1.NewUserClient(rpcclient.GetUserRPCConn()),'
 
 function checkResult() {
   result=$1
@@ -102,8 +126,8 @@ function runGRPCService() {
     echo "service ${grpcDir} already exists"
   else
     echo "create service ${grpcDir}"
-    echo -e "${colorCyan}sponge micro rpc --module-name=${grpcServiceName} --server-name=${grpcServiceName} --project-name=grpcdemo --db-dsn=$mysqlDSN --db-table=$mysqlTable --out=./${grpcDir} ${markEnd}"
-    sponge micro rpc --module-name=${grpcServiceName} --server-name=${grpcServiceName} --project-name=grpcdemo --db-dsn=$mysqlDSN --db-table=$mysqlTable --out=./${grpcDir}
+    echo -e "${colorCyan}sponge micro rpc --module-name=${grpcServiceName} --server-name=${grpcServiceName} --project-name=${projectName} --db-dsn=$mysqlDSN --db-table=$mysqlTable --out=./${grpcDir} ${markEnd}"
+    sponge micro rpc --module-name=${grpcServiceName} --server-name=${grpcServiceName} --project-name=${projectName} --db-dsn=$mysqlDSN --db-table=$mysqlTable --out=./${grpcDir}
     checkResult $?
   fi
 
@@ -119,6 +143,41 @@ function runGRPCService() {
   checkResult $?
 }
 
+function replaceContent() {
+    local file="$1"
+    local src="$2"
+    local dst="$3"
+
+    if [ ! -f "$file" ]; then
+        echo "File not found!"
+        return 1
+    fi
+
+    # Use sed for multiline substitution to ensure special characters are parsed correctly
+    sed -i.bak -e "/$(echo "$src" | sed 's/[]\/$*.^[]/\\&/g')/{
+        r /dev/stdin
+        d
+    }" "$file" <<< "$dst"
+	checkResult $?
+}
+
+function replaceContents() {
+    local file="$1"
+    shift
+
+    if (( $# % 2 != 0 )); then
+        echo "Error: Parameters must be in pairs of 'src' and 'dst'"
+        return 1
+    fi
+
+    while (( "$#" )); do
+        local src="$1"
+        local dst="$2"
+        replaceContent "$file" "$src" "$dst"
+        shift 2
+    done
+}
+
 echo "running service ${grpcDir}"
 runGRPCService &
 
@@ -128,8 +187,8 @@ if [ -d "${testServerDir}" ]; then
   echo "service ${testServerDir} already exists"
 else
   echo "create service ${testServerDir}"
-  echo -e "${colorCyan}sponge micro rpc-gw-pb --module-name=${testServerName} --server-name=${testServerName} --project-name=grpcgwdemo --protobuf-file=./files/user_gw.proto --out=./${testServerDir} ${markEnd}"
-  sponge micro rpc-gw-pb --module-name=${testServerName} --server-name=${testServerName} --project-name=grpcgwdemo --protobuf-file=./files/user_gw.proto --out=./${testServerDir}
+  echo -e "${colorCyan}sponge micro rpc-gw-pb --module-name=${testServerName} --server-name=${testServerName} --project-name=${projectName} --protobuf-file=${protobufFile} --out=./${testServerDir} ${markEnd}"
+  sponge micro rpc-gw-pb --module-name=${testServerName} --server-name=${testServerName} --project-name=${projectName} --protobuf-file=${protobufFile} --out=./${testServerDir}
   checkResult $?
 
   echo -e "${colorCyan}sponge micro rpc-conn --rpc-server-name=${grpcServiceName} --out=./${testServerDir} ${markEnd}"
@@ -153,8 +212,8 @@ echo "make proto"
 make proto
 checkResult $?
 
-echo "replace the sample template code"
-replaceCode ../files/rpc_gateway_content ./internal/service/user_gw.go
+echo "replace template code"
+replaceContents ./internal/service/user_gw.go "$srcStr1" "$dstStr1" "$srcStr2" "$dstStr2" "$srcStr3" "$dstStr3" "$srcStr4" "$dstStr4"
 
 testRequest &
 

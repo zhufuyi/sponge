@@ -1,12 +1,12 @@
 syntax = "proto3";
 
-package api.user.v1;
+package api.user_grpc.v1;
 
 import "validate/validate.proto";
 
-option go_package = "edusys/api/user/v1;v1";
+option go_package = "user/api/user_rpc/v1;v1";
 
-service user {
+service userRpc {
   // Register
   rpc Register(RegisterRequest) returns (RegisterReply) {}
   // Login
@@ -41,13 +41,11 @@ message LogoutRequest {
   string token = 2 [(validate.rules).string.min_len  = 20];
 }
 
-message LogoutReply {
-}
+message LogoutReply {}
 
 message ChangePasswordRequest {
   uint64 id = 1 [(validate.rules).uint64.gte  = 1];
   string password = 2 [(validate.rules).string.min_len = 6];
 }
 
-message ChangeRegisterReply {
-}
+message ChangeRegisterReply {}

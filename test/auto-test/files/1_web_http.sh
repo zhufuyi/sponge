@@ -2,9 +2,10 @@
 
 testServerName="user"
 testServerDir="1_web_http_${testServerName}"
+projectName="edusys"
 
-mysqlDSN="root:123456@(192.168.3.37:3306)/school"
-mysqlTable="teacher"
+mysqlDSN="root:123456@(192.168.3.37:3306)/account"
+mysqlTable="user"
 
 colorCyan='\e[1;36m'
 colorGreen='\e[1;32m'
@@ -102,8 +103,8 @@ if [ -d "${testServerDir}" ]; then
   echo "service ${testServerDir} already exists"
 else
   echo "create service ${testServerDir}"
-  echo -e "${colorCyan}sponge web http --module-name=${testServerName} --server-name=${testServerName} --project-name=webdemo --extended-api=true --db-dsn=${mysqlDSN} --db-table=${mysqlTable} --out=./${testServerDir} ${markEnd}"
-  sponge web http --module-name=${testServerName} --server-name=${testServerName} --project-name=webdemo --extended-api=true --db-dsn=${mysqlDSN} --db-table=${mysqlTable} --out=./${testServerDir}
+  echo -e "${colorCyan}sponge web http --module-name=${testServerName} --server-name=${testServerName} --project-name=${projectName} --extended-api=true --db-dsn=${mysqlDSN} --db-table=${mysqlTable} --out=./${testServerDir} ${markEnd}"
+  sponge web http --module-name=${testServerName} --server-name=${testServerName} --project-name=${projectName} --extended-api=true --db-dsn=${mysqlDSN} --db-table=${mysqlTable} --out=./${testServerDir}
   checkResult $?
 fi
 

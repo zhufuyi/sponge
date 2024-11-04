@@ -1,12 +1,12 @@
 syntax = "proto3";
 
-package api.user.v1;
+package api.user_hybrid.v1;
 
 import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
-option go_package = "edusys/api/user/v1;v1";
+option go_package = "user/api/user_hybrid/v1;v1";
 
 // Default settings for generating swagger documents
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
@@ -33,44 +33,28 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   }
 };
 
-service user {
+service user_hybrid {
   // Register
   rpc Register(RegisterRequest) returns (RegisterReply) {
     option (google.api.http) = {
       post: "/api/v1/auth/register"
       body: "*"
     };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "register",
-      description: "register",
-    };
   }
+
   // Login
   rpc Login(LoginRequest) returns (LoginReply) {
     option (google.api.http) = {
       post: "/api/v1/auth/login"
       body: "*"
     };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "login",
-      description: "login",
-    };
   }
-  // LogoutRequest
+
+  // Logout
   rpc Logout(LogoutRequest) returns (LogoutReply) {
     option (google.api.http) = {
       post: "/api/v1/auth/logout"
       body: "*"
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "logout",
-      description: "logout",
-      security: {
-        security_requirement: {
-          key: "BearerAuth";
-          value: {}
-        }
-      }
     };
   }
 }
@@ -99,5 +83,4 @@ message LogoutRequest {
   string token = 2 [(validate.rules).string.min_len  = 20];
 }
 
-message LogoutReply {
-}
+message LogoutReply {}

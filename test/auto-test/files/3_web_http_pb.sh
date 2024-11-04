@@ -2,12 +2,21 @@
 
 testServerName="user"
 testServerDir="3_web_http_pb_${testServerName}"
+projectName="edusys"
+protobufFile="files/user_http.proto"
 
 colorCyan='\e[1;36m'
 colorGreen='\e[1;32m'
 colorRed='\e[1;31m'
 markEnd='\e[0m'
 errCount=0
+
+srcStr1='func (h *userHttpHandler) Register(ctx context.Context, req *userV1.RegisterRequest) (*userV1.RegisterReply, error) {'
+dstStr1='func (h *userHttpHandler) Register(ctx context.Context, req *userV1.RegisterRequest) (*userV1.RegisterReply, error) {
+    return &userV1.RegisterReply{
+        Id: 100,
+    }, nil
+'
 
 function checkResult() {
   result=$1
@@ -87,14 +96,32 @@ function testRequest() {
   stopService $testServerName
 }
 
+function replaceContent() {
+    local file="$1"
+    local src="$2"
+    local dst="$3"
+
+    if [ ! -f "$file" ]; then
+        echo "file $file not found!"
+        return 1
+    fi
+
+    # Use sed for multiline substitution to ensure special characters are parsed correctly
+    sed -i.bak -e "/$(echo "$src" | sed 's/[]\/$*.^[]/\\&/g')/{
+        r /dev/stdin
+        d
+    }" "$file" <<< "$dst"
+	checkResult $?
+}
+
 echo -e "\n\n"
 
 if [ -d "${testServerDir}" ]; then
   echo "service ${testServerDir} already exists"
 else
   echo "create service ${testServerDir}"
-  echo -e "${colorCyan}sponge web http-pb --module-name=${testServerName} --server-name=${testServerName} --project-name=ginpbdemo --protobuf-file=./files/user.proto --out=./${testServerDir} ${markEnd}"
-  sponge web http-pb --module-name=${testServerName} --server-name=${testServerName} --project-name=ginpbdemo --protobuf-file=./files/user.proto --out=./${testServerDir}
+  echo -e "${colorCyan}sponge web http-pb --module-name=${testServerName} --server-name=${testServerName} --project-name=${projectName} --protobuf-file=${protobufFile} --out=./${testServerDir} ${markEnd}"
+  sponge web http-pb --module-name=${testServerName} --server-name=${testServerName} --project-name=${projectName} --protobuf-file=${protobufFile} --out=./${testServerDir}
   checkResult $?
 fi
 
@@ -105,8 +132,8 @@ echo "make proto"
 make proto
 checkResult $?
 
-echo "replace the sample template code"
-replaceCode ../files/web_http_pb_content ./internal/handler/user.go
+echo "replace template code"
+replaceContent ./internal/handler/user_http.go "$srcStr1" "$dstStr1"
 checkResult $?
 
 testRequest &

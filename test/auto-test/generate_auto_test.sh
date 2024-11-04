@@ -1,16 +1,5 @@
 #!/bin/bash
 
-function checkResult() {
-    result=$1
-    if [ ${result} -ne 0 ]; then
-        exit ${result}
-    fi
-}
-
-# check if replaceCode exists
-which replaceCode
-checkResult $?
-
 function main() {
   bash files/1_web_http.sh
   bash files/2_micro_grpc.sh
