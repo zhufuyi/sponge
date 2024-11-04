@@ -75,3 +75,16 @@ func TestInt64ToStr(t *testing.T) {
 	val := Int64ToStr(1)
 	assert.Equal(t, "1", val)
 }
+
+func TestProtoAndGoTypeConversion(t *testing.T) {
+	var (
+		val1 int32  = 1
+		val2 int    = 1
+		val3 int64  = 1
+		val4 uint64 = 1
+	)
+	assert.Equal(t, val2, ProtoInt32ToInt(val1))
+	assert.Equal(t, val1, IntToProtoInt32(val2))
+	assert.Equal(t, val4, ProtoInt64ToUint64(val3))
+	assert.Equal(t, val3, Uint64ToProtoInt64(val4))
+}

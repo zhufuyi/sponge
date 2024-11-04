@@ -1,6 +1,11 @@
 package utils
 
-import "strconv"
+import (
+	"strconv"
+)
+
+// MaxStringID is the maximum string ID
+const MaxStringID = "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
 
 // StrToInt string to int
 func StrToInt(str string) int {
@@ -79,4 +84,24 @@ func Uint64ToStr(v uint64) string {
 // Int64ToStr int64 to string
 func Int64ToStr(v int64) string {
 	return strconv.FormatInt(v, 10)
+}
+
+// ProtoInt32ToInt convert proto int32 to int
+func ProtoInt32ToInt(v int32) int {
+	return int(v)
+}
+
+// IntToProtoInt32 convert int to proto int32
+func IntToProtoInt32(v int) int32 {
+	return int32(v)
+}
+
+// ProtoInt64ToUint64 convert proto int64 to uint64
+func ProtoInt64ToUint64(v int64) uint64 {
+	return uint64(v)
+}
+
+// Uint64ToProtoInt64 convert uint64 to proto int64
+func Uint64ToProtoInt64(v uint64) int64 {
+	return int64(v)
 }

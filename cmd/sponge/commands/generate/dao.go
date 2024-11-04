@@ -151,7 +151,7 @@ type daoGenerator struct {
 
 func (g *daoGenerator) generateCode() (string, error) {
 	subTplName := codeNameDao
-	r := Replacers[TplNameSponge]
+	r, _ := replacer.New(SpongeDir)
 	if r == nil {
 		return "", errors.New("r is nil")
 	}
@@ -171,14 +171,45 @@ func (g *daoGenerator) generateCode() (string, error) {
 			"userExample.go",
 		},
 	}
-	replaceFiles := make(map[string][]string)
 
+	info := g.codes[parser.CodeTypeCrudInfo]
+	crudInfo, _ := unmarshalCrudInfo(info)
+	if crudInfo.CheckCommonType() {
+		selectFiles = map[string][]string{
+			"internal/cache": {
+				"userExample.go.tpl",
+			},
+			"internal/dao": {
+				"userExample.go.tpl",
+			},
+			"internal/model": {
+				"userExample.go",
+			},
+		}
+		var fields []replacer.Field
+		if g.isExtendedAPI {
+			selectFiles["internal/dao"] = []string{"userExample.go.exp.tpl"}
+			fields = commonDaoExtendedFields(r)
+		} else {
+			fields = commonDaoFields(r)
+		}
+		contentFields, err := replaceFilesContent(r, getTemplateFiles(selectFiles), crudInfo)
+		if err != nil {
+			return "", err
+		}
+		g.fields = append(g.fields, contentFields...)
+		g.fields = append(g.fields, fields...)
+	}
+
+	replaceFiles := make(map[string][]string)
 	switch strings.ToLower(g.dbDriver) {
 	case DBDriverMysql, DBDriverPostgresql, DBDriverTidb, DBDriverSqlite:
 		g.fields = append(g.fields, getExpectedSQLForDeletionField(g.isEmbed)...)
 		if g.isExtendedAPI {
 			var fields []replacer.Field
-			replaceFiles, fields = daoExtendedAPI(r)
+			if !crudInfo.CheckCommonType() {
+				replaceFiles, fields = daoExtendedAPI(r)
+			}
 			g.fields = append(g.fields, fields...)
 		}
 
@@ -318,4 +349,40 @@ func daoMongoDBExtendedAPI(r replacer.Replacer) (map[string][]string, []replacer
 	}...)
 
 	return replaceFiles, fields
+}
+
+func commonDaoFields(r replacer.Replacer) []replacer.Field {
+	var fields []replacer.Field
+
+	fields = append(fields, deleteFieldsMark(r, daoFile+tplSuffix, startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, daoTestFile+tplSuffix, startMark, endMark)...)
+
+	fields = append(fields, []replacer.Field{
+		{
+			Old: "userExample.go.tpl",
+			New: "userExample.go",
+		},
+	}...)
+
+	return fields
+}
+
+func commonDaoExtendedFields(r replacer.Replacer) []replacer.Field {
+	var fields []replacer.Field
+
+	fields = append(fields, deleteFieldsMark(r, daoFile+expSuffix+tplSuffix, startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, daoTestFile+expSuffix+tplSuffix, startMark, endMark)...)
+
+	fields = append(fields, []replacer.Field{
+		{
+			Old: "userExample.go.tpl",
+			New: "userExample.go",
+		},
+		{
+			Old: "userExample.go.exp.tpl",
+			New: "userExample.go",
+		},
+	}...)
+
+	return fields
 }

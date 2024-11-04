@@ -21,6 +21,9 @@ func init() {
 // Replacers replacer name
 var Replacers = map[string]replacer.Replacer{}
 
+// SpongeDir sponge directory
+var SpongeDir = getHomeDir() + gofile.GetPathDelimiter() + ".sponge"
+
 // Template information
 type Template struct {
 	Name     string
@@ -29,9 +32,9 @@ type Template struct {
 }
 
 // Init initializing the template
-func Init(name string, filepath string) error {
+func Init() error {
 	// determine if the template file exists, if not, prompt to initialize first
-	if !gofile.IsExists(filepath) {
+	if !gofile.IsExists(SpongeDir) {
 		if isShowCommand() {
 			return nil
 		}
@@ -39,10 +42,10 @@ func Init(name string, filepath string) error {
 	}
 
 	var err error
-	if _, ok := Replacers[name]; ok {
-		panic(fmt.Sprintf("template name \"%s\" already exists", name))
+	if _, ok := Replacers[TplNameSponge]; ok {
+		panic(fmt.Sprintf("template name \"%s\" already exists", TplNameSponge))
 	}
-	Replacers[name], err = replacer.New(filepath)
+	Replacers[TplNameSponge], err = replacer.New(SpongeDir)
 	if err != nil {
 		return err
 	}
@@ -82,4 +85,14 @@ func isShowCommand() bool {
 	}
 
 	return false
+}
+
+func getHomeDir() string {
+	dir, err := os.UserHomeDir()
+	if err != nil {
+		fmt.Println("can't get home directory'")
+		return ""
+	}
+
+	return dir
 }

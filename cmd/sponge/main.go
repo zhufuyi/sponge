@@ -8,14 +8,12 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/zhufuyi/sponge/pkg/gofile"
-
 	"github.com/zhufuyi/sponge/cmd/sponge/commands"
 	"github.com/zhufuyi/sponge/cmd/sponge/commands/generate"
 )
 
 func main() {
-	err := generate.Init(generate.TplNameSponge, commands.GetSpongeDir()+gofile.GetPathDelimiter()+".sponge")
+	err := generate.Init()
 	if err != nil {
 		fmt.Printf("\n    %v\n\n", err)
 		return

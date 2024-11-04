@@ -74,12 +74,12 @@ func (c *{{.LowerServiceName}}Client) {{.MethodName}}(ctx context.Context, req *
 	//		    return nil, ecode.StatusInvalidParams.Err()
 	//	    }
 	//
-	//     reply, err := c.{{.LowerServiceName}}Cli.{{.MethodName}}(ctx, &{{.RequestImportPkgName}}.{{.Request}}{
+	//	    reply, err := c.{{.LowerServiceName}}Cli.{{.MethodName}}(ctx, &{{.RequestImportPkgName}}.{{.Request}}{
 {{- range .RequestFields}}
 	//     	{{.Name}}: req.{{.Name}},
 {{- end}}
 	//     })
-	//     if err != nil {
+	//	    if err != nil {
 	//     	logger.Warn("{{.MethodName}} error", logger.Err(err), interceptor.CtxRequestIDField(ctx))
 	//     	return nil, err
 	//     }

@@ -180,12 +180,13 @@ type rpcGenerator struct {
 	outPath        string
 	suitedMonoRepo bool
 
-	fields []replacer.Field
+	fields        []replacer.Field
+	isCommonStyle bool
 }
 
 func (g *rpcGenerator) generateCode() (string, error) {
 	subTplName := codeNameGRPC
-	r := Replacers[TplNameSponge]
+	r, _ := replacer.New(SpongeDir)
 	if r == nil {
 		return "", errors.New("replacer is nil")
 	}
@@ -228,6 +229,31 @@ func (g *rpcGenerator) generateCode() (string, error) {
 		"internal/service": {
 			"service.go", "service_test.go", "userExample.go", "userExample_client_test.go",
 		},
+	}
+
+	info := g.codes[parser.CodeTypeCrudInfo]
+	crudInfo, _ := unmarshalCrudInfo(info)
+	if crudInfo.CheckCommonType() {
+		g.isCommonStyle = true
+		selectFiles["internal/cache"] = []string{"userExample.go.tpl"}
+		selectFiles["internal/dao"] = []string{"userExample.go.tpl"}
+		selectFiles["internal/ecode"] = []string{"systemCode_rpc.go", "userExample_rpc.go.tpl"}
+		selectFiles["internal/service"] = []string{"service.go", "service_test.go", "userExample.go.tpl"}
+		var fields []replacer.Field
+		if g.isExtendedAPI {
+			selectFiles["internal/dao"] = []string{"userExample.go.exp.tpl"}
+			selectFiles["internal/ecode"] = []string{"systemCode_rpc.go", "userExample_rpc.go.exp.tpl"}
+			selectFiles["internal/service"] = []string{"service.go", "service_test.go", "userExample.go.exp.tpl"}
+			fields = commonGRPCExtendedFields(r)
+		} else {
+			fields = commonGRPCFields(r)
+		}
+		contentFields, err := replaceFilesContent(r, getTemplateFiles(selectFiles), crudInfo)
+		if err != nil {
+			return "", err
+		}
+		g.fields = append(g.fields, contentFields...)
+		g.fields = append(g.fields, fields...)
 	}
 
 	if g.suitedMonoRepo {
@@ -367,7 +393,7 @@ func (g *rpcGenerator) addFields(r replacer.Replacer) []replacer.Field {
 		},
 		{ // replace the contents of the service/userExample_client_test.go file
 			Old: serviceFileMark,
-			New: adjustmentOfIDType(g.codes[parser.CodeTypeService], g.dbDriver),
+			New: adjustmentOfIDType(g.codes[parser.CodeTypeService], g.dbDriver, g.isCommonStyle),
 		},
 		{ // replace the contents of the Dockerfile file
 			Old: dockerFileMark,
@@ -517,4 +543,12 @@ func (g *rpcGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	}
 
 	return fields
+}
+
+func commonGRPCFields(r replacer.Replacer) []replacer.Field {
+	return commonServiceFields(r)
+}
+
+func commonGRPCExtendedFields(r replacer.Replacer) []replacer.Field {
+	return commonServiceExtendedFields(r)
 }

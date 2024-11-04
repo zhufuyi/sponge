@@ -180,12 +180,13 @@ type httpGenerator struct {
 	isExtendedAPI  bool
 	suitedMonoRepo bool
 
-	fields []replacer.Field
+	fields        []replacer.Field
+	isCommonStyle bool
 }
 
 func (g *httpGenerator) generateCode() (string, error) {
 	subTplName := codeNameHTTP
-	r := Replacers[TplNameSponge]
+	r, _ := replacer.New(SpongeDir)
 	if r == nil {
 		return "", errors.New("replacer is nil")
 	}
@@ -234,14 +235,45 @@ func (g *httpGenerator) generateCode() (string, error) {
 			"swagger_types.go", "userExample_types.go",
 		},
 	}
-	replaceFiles := make(map[string][]string)
 
+	info := g.codes[parser.CodeTypeCrudInfo]
+	crudInfo, _ := unmarshalCrudInfo(info)
+	if crudInfo.CheckCommonType() {
+		g.isCommonStyle = true
+		selectFiles["internal/cache"] = []string{"userExample.go.tpl"}
+		selectFiles["internal/dao"] = []string{"userExample.go.tpl"}
+		selectFiles["internal/ecode"] = []string{"systemCode_http.go", "userExample_http.go.tpl"}
+		selectFiles["internal/handler"] = []string{"userExample.go.tpl"}
+		selectFiles["internal/routers"] = []string{"routers.go", "userExample.go.tpl"}
+		selectFiles["internal/types"] = []string{"swagger_types.go", "userExample_types.go.tpl"}
+		var fields []replacer.Field
+		if g.isExtendedAPI {
+			selectFiles["internal/dao"] = []string{"userExample.go.exp.tpl"}
+			selectFiles["internal/ecode"] = []string{"systemCode_http.go", "userExample_http.go.exp.tpl"}
+			selectFiles["internal/handler"] = []string{"userExample.go.exp.tpl"}
+			selectFiles["internal/routers"] = []string{"routers.go", "userExample.go.exp.tpl"}
+			selectFiles["internal/types"] = []string{"swagger_types.go", "userExample_types.go.exp.tpl"}
+			fields = commonHTTPExtendedFields(r)
+		} else {
+			fields = commonHTTPFields(r)
+		}
+		contentFields, err := replaceFilesContent(r, getTemplateFiles(selectFiles), crudInfo)
+		if err != nil {
+			return "", err
+		}
+		g.fields = append(g.fields, contentFields...)
+		g.fields = append(g.fields, fields...)
+	}
+
+	replaceFiles := make(map[string][]string)
 	switch strings.ToLower(g.dbDriver) {
 	case DBDriverMysql, DBDriverPostgresql, DBDriverTidb, DBDriverSqlite:
 		g.fields = append(g.fields, getExpectedSQLForDeletionField(g.isEmbed)...)
 		if g.isExtendedAPI {
 			var fields []replacer.Field
-			replaceFiles, fields = handlerExtendedAPI(r, codeNameHTTP)
+			if !crudInfo.CheckCommonType() {
+				replaceFiles, fields = handlerExtendedAPI(r, codeNameHTTP)
+			}
 			g.fields = append(g.fields, fields...)
 		}
 
@@ -304,8 +336,8 @@ func (g *httpGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	fields = append(fields, deleteFieldsMark(r, daoFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, daoMgoFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, daoTestFile, startMark, endMark)...)
-	fields = append(fields, deleteFieldsMark(r, handlerFile, startMark, endMark)...)
-	fields = append(fields, deleteFieldsMark(r, handlerMgoFile, startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, typesFile, startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, typesMgoFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, handlerTestFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, httpFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, dockerFile, wellStartMark, wellEndMark)...)
@@ -345,7 +377,7 @@ func (g *httpGenerator) addFields(r replacer.Replacer) []replacer.Field {
 		},
 		{ // replace the contents of the handler/userExample.go file
 			Old: handlerFileMark,
-			New: adjustmentOfIDType(g.codes[parser.CodeTypeHandler], g.dbDriver),
+			New: adjustmentOfIDType(g.codes[parser.CodeTypeHandler], g.dbDriver, g.isCommonStyle),
 		},
 		{ // replace the contents of the Dockerfile file
 			Old: dockerFileMark,
@@ -498,4 +530,12 @@ func (g *httpGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	}
 
 	return fields
+}
+
+func commonHTTPFields(r replacer.Replacer) []replacer.Field {
+	return commonHandlerFields(r)
+}
+
+func commonHTTPExtendedFields(r replacer.Replacer) []replacer.Field {
+	return commonHandlerExtendedFields(r)
 }

@@ -161,7 +161,7 @@ func (d *userExampleDao) GetByID(ctx context.Context, id uint64) (*model.UserExa
 			// set cache
 			err = d.cache.Set(ctx, id, table, cache.UserExampleExpireTime)
 			if err != nil {
-				return nil, fmt.Errorf("cache.Set error: %v, id=%d", err, id)
+				return nil, fmt.Errorf("cache.Set error: %v, id=%v", err, id)
 			}
 			return table, nil
 		})
@@ -222,7 +222,7 @@ func (d *userExampleDao) GetByColumns(ctx context.Context, params *query.Params)
 
 	var total int64
 	if params.Sort != "ignore count" { // determine if count is required
-		err = d.db.WithContext(ctx).Model(&model.UserExample{}).Select([]string{"id"}).Where(queryStr, args...).Count(&total).Error
+		err = d.db.WithContext(ctx).Model(&model.UserExample{}).Where(queryStr, args...).Count(&total).Error
 		if err != nil {
 			return nil, 0, err
 		}

@@ -54,6 +54,15 @@ func (c *Cache) GetIDs() []uint64 {
 	return ids
 }
 
+// GetFields get test data fields
+func (c *Cache) GetFields() []string {
+	var fields []string
+	for idStr := range c.TestDataMap {
+		fields = append(fields, idStr)
+	}
+	return fields
+}
+
 // GetTestData get test data
 func (c *Cache) GetTestData() map[string]interface{} {
 	return c.TestDataMap

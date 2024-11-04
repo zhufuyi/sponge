@@ -148,7 +148,7 @@ type handlerPbGenerator struct {
 
 func (g *handlerPbGenerator) generateCode() (string, error) {
 	subTplName := codeNameHandlerPb
-	r := Replacers[TplNameSponge]
+	r, _ := replacer.New(SpongeDir)
 	if r == nil {
 		return "", errors.New("replacer is nil")
 	}
@@ -181,14 +181,56 @@ func (g *handlerPbGenerator) generateCode() (string, error) {
 			"userExample.go",
 		},
 	}
-	replaceFiles := make(map[string][]string)
 
+	info := g.codes[parser.CodeTypeCrudInfo]
+	crudInfo, _ := unmarshalCrudInfo(info)
+	if crudInfo.CheckCommonType() {
+		selectFiles = map[string][]string{
+			"api/serverNameExample/v1": {
+				"userExample.proto",
+			},
+			"internal/cache": {
+				"userExample.go.tpl",
+			},
+			"internal/dao": {
+				"userExample.go.tpl",
+			},
+			"internal/ecode": {
+				"userExample_http.go.tpl",
+			},
+			"internal/handler": {
+				"userExample_logic.go.tpl",
+			},
+			"internal/model": {
+				"userExample.go",
+			},
+		}
+		var fields []replacer.Field
+		if g.isExtendedAPI {
+			selectFiles["internal/dao"] = []string{"userExample.go.exp.tpl"}
+			selectFiles["internal/ecode"] = []string{"userExample_http.go.exp.tpl"}
+			selectFiles["internal/handler"] = []string{"userExample_logic.go.exp.tpl"}
+			fields = commonHandlerPbExtendedFields(r)
+		} else {
+			fields = commonHandlerPbFields(r)
+		}
+		contentFields, err := replaceFilesContent(r, getTemplateFiles(selectFiles), crudInfo)
+		if err != nil {
+			return "", err
+		}
+		g.fields = append(g.fields, contentFields...)
+		g.fields = append(g.fields, fields...)
+	}
+
+	replaceFiles := make(map[string][]string)
 	switch strings.ToLower(g.dbDriver) {
 	case DBDriverMysql, DBDriverPostgresql, DBDriverTidb, DBDriverSqlite:
 		g.fields = append(g.fields, getExpectedSQLForDeletionField(g.isEmbed)...)
 		if g.isExtendedAPI {
 			var fields []replacer.Field
-			replaceFiles, fields = handlerPbExtendedAPI(r)
+			if !crudInfo.CheckCommonType() {
+				replaceFiles, fields = handlerPbExtendedAPI(r)
+			}
 			g.fields = append(g.fields, fields...)
 		}
 	case DBDriverMongodb:
@@ -417,4 +459,55 @@ func handlerPbMongoDBExtendedAPI(r replacer.Replacer) (map[string][]string, []re
 	}...)
 
 	return replaceFiles, fields
+}
+
+func commonHandlerPbFields(r replacer.Replacer) []replacer.Field {
+	var fields []replacer.Field
+
+	fields = append(fields, deleteFieldsMark(r, daoFile+tplSuffix, startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, handlerPbFile+tplSuffix, startMark, endMark)...)
+	fields = append(fields, []replacer.Field{
+		{
+			Old: "userExample_http.go.tpl",
+			New: "userExample_http.go",
+		},
+		{
+			Old: "userExample_logic.go.tpl",
+			New: "userExample.go",
+		},
+		{
+			Old: "userExample.go.tpl",
+			New: "userExample.go",
+		},
+	}...)
+
+	return fields
+}
+
+func commonHandlerPbExtendedFields(r replacer.Replacer) []replacer.Field {
+	var fields []replacer.Field
+
+	fields = append(fields, deleteFieldsMark(r, daoFile+expSuffix+tplSuffix, startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, handlerPbFile+expSuffix+tplSuffix, startMark, endMark)...)
+
+	fields = append(fields, []replacer.Field{
+		{
+			Old: "userExample_http.go.exp.tpl",
+			New: "userExample_http.go",
+		},
+		{
+			Old: "userExample_logic.go.exp.tpl",
+			New: "userExample.go",
+		},
+		{
+			Old: "userExample.go.tpl",
+			New: "userExample.go",
+		},
+		{
+			Old: "userExample.go.exp.tpl",
+			New: "userExample.go",
+		},
+	}...)
+
+	return fields
 }

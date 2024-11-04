@@ -4,6 +4,7 @@ package generate
 import (
 	"bufio"
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/url"
@@ -12,6 +13,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"text/template"
 	"time"
 
 	"github.com/huandu/xstrings"
@@ -19,6 +21,7 @@ import (
 	"github.com/zhufuyi/sponge/pkg/gobash"
 	"github.com/zhufuyi/sponge/pkg/gofile"
 	"github.com/zhufuyi/sponge/pkg/replacer"
+	"github.com/zhufuyi/sponge/pkg/sql2code/parser"
 	"github.com/zhufuyi/sponge/pkg/utils"
 )
 
@@ -62,6 +65,7 @@ const (
 	mgoSuffix     = ".mgo"
 	pkgPathSuffix = "/pkg"
 	expSuffix     = ".exp"
+	tplSuffix     = ".tpl"
 	apiDocsSuffix = " api docs"
 )
 
@@ -79,10 +83,11 @@ var (
 	daoFileMark = "// todo generate the update fields code to here"
 	daoTestFile = "dao/userExample_test.go"
 
-	handlerFile       = "types/userExample_types.go"
-	handlerMgoFile    = "types/userExample_types.go.mgo"
+	typesFile         = "types/userExample_types.go"
+	typesMgoFile      = "types/userExample_types.go.mgo"
 	handlerFileMark   = "// todo generate the request and response struct to here"
 	handlerTestFile   = "handler/userExample_test.go"
+	handlerPbFile     = "handler/userExample_logic.go"
 	handlerPbTestFile = "handler/userExample_logic_test.go"
 
 	handlerLogicFile = "handler/userExample_logic.go"
@@ -97,6 +102,7 @@ var (
 	serviceTestFile      = "service/userExample_test.go"
 	serviceClientFile    = "service/userExample_client_test.go"
 	serviceClientMgoFile = "service/userExample_client_test.go.mgo"
+	serviceFile          = "service/userExample.go"
 	serviceFileMark      = "// todo generate the service struct code here"
 
 	dockerFile     = "scripts/build/Dockerfile"
@@ -186,9 +192,12 @@ func convertProjectAndServerName(projectName, serverName string) (pn string, sn 
 	return pn, sn, err
 }
 
-func adjustmentOfIDType(handlerCodes string, dbDriver string) string {
+func adjustmentOfIDType(handlerCodes string, dbDriver string, isCommonStyle bool) string {
 	if dbDriver == DBDriverMongodb {
 		return idTypeToStr(handlerCodes)
+	}
+	if isCommonStyle {
+		return handlerCodes
 	}
 	return idTypeToUint64(idTypeFixToUint64(handlerCodes))
 }
@@ -880,4 +889,84 @@ func adaptPgDsn(dsn string) string {
 	}
 
 	return strings.ReplaceAll(u.String(), "postgres://", "")
+}
+
+func unmarshalCrudInfo(str string) (*parser.CrudInfo, error) {
+	if str == "" {
+		return nil, errors.New("crud info is empty")
+	}
+	crudInfo := &parser.CrudInfo{}
+	err := json.Unmarshal([]byte(str), crudInfo)
+	if err != nil {
+		return nil, err
+	}
+	return crudInfo, nil
+}
+
+func getTemplateFiles(files map[string][]string) []string {
+	var templateFiles []string
+	for dir, filenames := range files {
+		for _, filename := range filenames {
+			if strings.HasSuffix(filename, tplSuffix) {
+				templateFiles = append(templateFiles, dir+"/"+filename)
+			}
+		}
+	}
+	return templateFiles
+}
+
+func replaceFilesContent(r replacer.Replacer, files []string, crudInfo *parser.CrudInfo) ([]replacer.Field, error) {
+	var fields []replacer.Field
+
+	for _, file := range files {
+		field, err := replaceTemplateFileContent(r, file, crudInfo)
+		if err != nil {
+			return nil, err
+		}
+		if field.Old == "" {
+			continue
+		}
+		fields = append(fields, field)
+	}
+	return fields, nil
+}
+
+func replaceTemplateFileContent(r replacer.Replacer, file string, crudInfo *parser.CrudInfo) (field replacer.Field, err error) {
+	var data []byte
+	data, err = r.ReadFile(file)
+	if err != nil {
+		return field, err
+	}
+
+	content := string(data)
+	if strings.Contains(content, "{{{.ColumnNameCamelFCL}}}") {
+		content = strings.ReplaceAll(content, "{{{.ColumnNameCamelFCL}}}", fmt.Sprintf("{%s}", crudInfo.ColumnNameCamelFCL))
+	}
+
+	defer func() {
+		if e := recover(); e != nil {
+			err = fmt.Errorf("%v", e)
+		}
+	}()
+	tpl := template.Must(template.New(file).Parse(content))
+	buf := new(bytes.Buffer)
+	err = tpl.Execute(buf, crudInfo)
+	if err != nil {
+		return field, err
+	}
+
+	dstContent := buf.String()
+	if !strings.Contains(dstContent, "utils.") {
+		dstContent = strings.ReplaceAll(dstContent, `"github.com/zhufuyi/sponge/pkg/utils"`, "")
+	}
+	if !strings.Contains(dstContent, "math.MaxInt32") {
+		dstContent = strings.ReplaceAll(dstContent, `"math"`, "")
+	}
+
+	field = replacer.Field{
+		Old: string(data),
+		New: dstContent,
+	}
+
+	return field, nil
 }

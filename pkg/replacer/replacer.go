@@ -27,6 +27,7 @@ type Replacer interface {
 	GetSourcePath() string
 	SaveFiles() error
 	ReadFile(filename string) ([]byte, error)
+	GetFiles() []string
 }
 
 // replacerInfo replacer information
@@ -104,6 +105,11 @@ func (r *replacerInfo) SetReplacementFields(fields []Field) {
 		}
 	}
 	r.replacementFields = newFields
+}
+
+// GetFiles get files
+func (r *replacerInfo) GetFiles() []string {
+	return r.files
 }
 
 // SetSubDirsAndFiles set up processing of specified subdirectories, files in other directories are ignored

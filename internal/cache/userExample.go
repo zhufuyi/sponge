@@ -141,9 +141,5 @@ func (c *userExampleCache) Del(ctx context.Context, id uint64) error {
 // SetCacheWithNotFound set empty cache
 func (c *userExampleCache) SetCacheWithNotFound(ctx context.Context, id uint64) error {
 	cacheKey := c.GetUserExampleCacheKey(id)
-	err := c.cache.SetCacheWithNotFound(ctx, cacheKey)
-	if err != nil {
-		return err
-	}
-	return nil
+	return c.cache.SetCacheWithNotFound(ctx, cacheKey)
 }

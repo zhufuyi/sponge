@@ -24,6 +24,7 @@ func TestRedisCache_GetIDs(t *testing.T) {
 	c.ICache = struct{}{}
 	c.Close()
 	t.Log(c.GetIDs())
+	t.Log(c.GetFields())
 }
 
 func TestRedisCache_GetTestData(t *testing.T) {

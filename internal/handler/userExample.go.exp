@@ -370,7 +370,7 @@ func (h *userExampleHandler) ListByIDs(c *gin.Context) {
 // @Tags userExample
 // @accept json
 // @Produce json
-// @Param lastID query int true "last id, default is MaxInt32" default(0)
+// @Param lastID query int false "last id, default is MaxInt32" default(0)
 // @Param limit query int false "number per page" default(10)
 // @Param sort query string false "sort by column name of table, and the "-" sign before column name indicates reverse order" default(-id)
 // @Success 200 {object} types.ListUserExamplesReply{}
@@ -390,7 +390,7 @@ func (h *userExampleHandler) ListByLastID(c *gin.Context) {
 	ctx := middleware.WrapCtx(c)
 	userExamples, err := h.iDao.GetByLastID(ctx, lastID, limit, sort)
 	if err != nil {
-		logger.Error("GetByLastID error", logger.Err(err), logger.Uint64("latsID", lastID), logger.Int("limit", limit), middleware.GCtxRequestIDField(c))
+		logger.Error("GetByLastID error", logger.Err(err), logger.Uint64("lastID", lastID), logger.Int("limit", limit), middleware.GCtxRequestIDField(c))
 		response.Output(c, ecode.InternalServerError.ToHTTPCode())
 		return
 	}

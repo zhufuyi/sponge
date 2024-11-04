@@ -382,7 +382,7 @@ func (h *userExampleHandler) ListByLastID(c *gin.Context) {
 	ctx := middleware.WrapCtx(c)
 	userExamples, err := h.iDao.GetByLastID(ctx, lastID, limit, sort)
 	if err != nil {
-		logger.Error("GetByLastID error", logger.Err(err), logger.String("latsID", lastID), logger.Int("limit", limit), middleware.GCtxRequestIDField(c))
+		logger.Error("GetByLastID error", logger.Err(err), logger.String("lastID", lastID), logger.Int("limit", limit), middleware.GCtxRequestIDField(c))
 		response.Output(c, ecode.InternalServerError.ToHTTPCode())
 		return
 	}

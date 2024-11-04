@@ -159,6 +159,12 @@ func main() {
 
 func saveGinRouterFiles(f *protogen.File) error {
 	ginRouterFileContent := router.GenerateFiles(f)
+	if !bytes.Contains(ginRouterFileContent, []byte("errors.")) {
+		ginRouterFileContent = bytes.Replace(ginRouterFileContent, []byte(`"errors"`), []byte(""), 1)
+	}
+	if !bytes.Contains(ginRouterFileContent, []byte("middleware.")) {
+		ginRouterFileContent = bytes.Replace(ginRouterFileContent, []byte(`"github.com/zhufuyi/sponge/pkg/gin/middleware"`), []byte(""), 1)
+	}
 	filePath := f.GeneratedFilenamePrefix + "_router.pb.go"
 	return os.WriteFile(filePath, ginRouterFileContent, 0666)
 }

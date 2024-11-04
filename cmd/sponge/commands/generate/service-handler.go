@@ -144,13 +144,14 @@ type serviceAndHandlerGenerator struct {
 	outPath        string
 	suitedMonoRepo bool
 
-	fields []replacer.Field
+	fields        []replacer.Field
+	isCommonStyle bool
 }
 
 // nolint
 func (g *serviceAndHandlerGenerator) generateCode() (string, error) {
 	subTplName := codeNameServiceHTTP
-	r := Replacers[TplNameSponge]
+	r, _ := replacer.New(SpongeDir)
 	if r == nil {
 		return "", errors.New("replacer is nil")
 	}
@@ -183,14 +184,57 @@ func (g *serviceAndHandlerGenerator) generateCode() (string, error) {
 			"userExample.go", "userExample_client_test.go",
 		},
 	}
-	replaceFiles := make(map[string][]string)
 
+	info := g.codes[parser.CodeTypeCrudInfo]
+	crudInfo, _ := unmarshalCrudInfo(info)
+	if crudInfo.CheckCommonType() {
+		g.isCommonStyle = true
+		selectFiles = map[string][]string{
+			"api/serverNameExample/v1": {
+				"userExample.proto",
+			},
+			"internal/cache": {
+				"userExample.go.tpl",
+			},
+			"internal/dao": {
+				"userExample.go.tpl",
+			},
+			"internal/handler": {
+				"userExample.go.service.tpl",
+			},
+			"internal/model": {
+				"userExample.go",
+			},
+			"internal/service": {
+				"userExample.go.tpl",
+			},
+		}
+		var fields []replacer.Field
+		if g.isExtendedAPI {
+			selectFiles["internal/dao"] = []string{"userExample.go.exp.tpl"}
+			selectFiles["internal/handler"] = []string{"userExample.go.service.exp.tpl"}
+			selectFiles["internal/service"] = []string{"userExample.go.exp.tpl"}
+			fields = commonServiceHandlerExtendedFields(r)
+		} else {
+			fields = commonServiceHandlerFields(r)
+		}
+		contentFields, err := replaceFilesContent(r, getTemplateFiles(selectFiles), crudInfo)
+		if err != nil {
+			return "", err
+		}
+		g.fields = append(g.fields, contentFields...)
+		g.fields = append(g.fields, fields...)
+	}
+
+	replaceFiles := make(map[string][]string)
 	switch strings.ToLower(g.dbDriver) {
 	case DBDriverMysql, DBDriverPostgresql, DBDriverTidb, DBDriverSqlite:
 		g.fields = append(g.fields, getExpectedSQLForDeletionField(g.isEmbed)...)
 		if g.isExtendedAPI {
 			var fields []replacer.Field
-			replaceFiles, fields = serviceHandlerExtendedAPI(r)
+			if !crudInfo.CheckCommonType() {
+				replaceFiles, fields = serviceHandlerExtendedAPI(r)
+			}
 			g.fields = append(g.fields, fields...)
 		}
 
@@ -268,7 +312,7 @@ func (g *serviceAndHandlerGenerator) addFields(r replacer.Replacer) []replacer.F
 		},
 		{ // replace the contents of the service/userExample_client_test.go file
 			Old: serviceFileMark,
-			New: adjustmentOfIDType(g.codes[parser.CodeTypeService], g.dbDriver),
+			New: adjustmentOfIDType(g.codes[parser.CodeTypeService], g.dbDriver, g.isCommonStyle),
 		},
 		{
 			Old: selfPackageName + "/" + r.GetSourcePath(),
@@ -445,4 +489,50 @@ func serviceHandlerMongoDBExtendedAPI(r replacer.Replacer) (map[string][]string,
 	}...)
 
 	return replaceFiles, fields
+}
+
+func commonServiceHandlerFields(r replacer.Replacer) []replacer.Field {
+	var fields []replacer.Field
+
+	fields = append(fields, deleteFieldsMark(r, daoFile+tplSuffix, startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, daoTestFile+tplSuffix, startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, serviceFile+tplSuffix, startMark, endMark)...)
+
+	fields = append(fields, []replacer.Field{
+		{
+			Old: "userExample.go.service.tpl",
+			New: "userExample.go",
+		},
+		{
+			Old: "userExample.go.tpl",
+			New: "userExample.go",
+		},
+	}...)
+
+	return fields
+}
+
+func commonServiceHandlerExtendedFields(r replacer.Replacer) []replacer.Field {
+	var fields []replacer.Field
+
+	fields = append(fields, deleteFieldsMark(r, daoFile+expSuffix+tplSuffix, startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, daoTestFile+expSuffix+tplSuffix, startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, serviceFile+expSuffix+tplSuffix, startMark, endMark)...)
+
+	fields = append(fields, []replacer.Field{
+		{
+			Old: "userExample.go.service.exp.tpl",
+			New: "userExample.go",
+		},
+		{
+			Old: "userExample.go.tpl",
+			New: "userExample.go",
+		},
+		{
+			Old: "userExample.go.exp.tpl",
+			New: "userExample.go",
+		},
+	}...)
+
+	return fields
 }

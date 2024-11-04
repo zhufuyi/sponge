@@ -86,12 +86,12 @@ func (h *{{.LowerServiceName}}Handler) {{.MethodName}}(ctx context.Context, req 
 	//		    return nil, ecode.InvalidParams.Err()
 	//	    }
 	//
-	// 	reply, err := h.{{.LowerServiceName}}Dao.{{.MethodName}}(ctx, &model.{{.ServiceName}}{
+	//	    reply, err := h.{{.LowerServiceName}}Dao.{{.MethodName}}(ctx, &model.{{.ServiceName}}{
 {{- range .RequestFields}}
 	//     	{{.Name}}: req.{{.Name}},
 {{- end}}
 	//     })
-	// 	if err != nil {
+	//	    if err != nil {
 	//			logger.Warn("{{.MethodName}} error", logger.Err(err), middleware.CtxRequestIDField(ctx))
 	//			return nil, ecode.InternalServerError.Err()
 	//		}
