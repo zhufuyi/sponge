@@ -13,6 +13,7 @@ import (
 
 	"github.com/zhufuyi/sponge/internal/cache"
 	"github.com/zhufuyi/sponge/internal/dao"
+	"github.com/zhufuyi/sponge/internal/database"
 	"github.com/zhufuyi/sponge/internal/ecode"
 	"github.com/zhufuyi/sponge/internal/model"
 	"github.com/zhufuyi/sponge/internal/types"
@@ -37,8 +38,8 @@ type {{.TableNameCamelFCL}}Handler struct {
 func New{{.TableNameCamel}}Handler() {{.TableNameCamel}}Handler {
 	return &{{.TableNameCamelFCL}}Handler{
 		iDao: dao.New{{.TableNameCamel}}Dao(
-			model.GetDB(),
-			cache.New{{.TableNameCamel}}Cache(model.GetCacheType()),
+			database.GetDB(),
+			cache.New{{.TableNameCamel}}Cache(database.GetCacheType()),
 		),
 	}
 }
@@ -175,7 +176,7 @@ func (h *{{.TableNameCamelFCL}}Handler) GetBy{{.ColumnNameCamel}}(c *gin.Context
 	ctx := middleware.WrapCtx(c)
 	{{.TableNameCamelFCL}}, err := h.iDao.GetBy{{.ColumnNameCamel}}(ctx, {{.ColumnNameCamelFCL}})
 	if err != nil {
-		if errors.Is(err, model.ErrRecordNotFound) {
+		if errors.Is(err, database.ErrRecordNotFound) {
 			logger.Warn("GetBy{{.ColumnNameCamel}} not found", logger.Err(err), logger.Any("{{.ColumnNameCamelFCL}}", {{.ColumnNameCamelFCL}}), middleware.GCtxRequestIDField(c))
 			response.Error(c, ecode.NotFound)
 		} else {

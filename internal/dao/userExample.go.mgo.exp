@@ -17,6 +17,7 @@ import (
 	"github.com/zhufuyi/sponge/pkg/mgo/query"
 
 	"github.com/zhufuyi/sponge/internal/cache"
+	"github.com/zhufuyi/sponge/internal/database"
 	"github.com/zhufuyi/sponge/internal/model"
 )
 
@@ -78,7 +79,7 @@ func (d *userExampleDao) Create(ctx context.Context, record *model.UserExample) 
 
 // DeleteByID soft delete a record by id
 func (d *userExampleDao) DeleteByID(ctx context.Context, id string) error {
-	filter := bson.M{"_id": model.ToObjectID(id)}
+	filter := bson.M{"_id": database.ToObjectID(id)}
 	_, err := d.collection.UpdateOne(ctx, mgo.ExcludeDeleted(filter), mgo.EmbedDeletedAt(bson.M{}))
 	if err != nil {
 		return err
@@ -141,9 +142,9 @@ func (d *userExampleDao) updateDataByID(ctx context.Context, collection *mongo.C
 
 // GetByID get a record by id
 func (d *userExampleDao) GetByID(ctx context.Context, id string) (*model.UserExample, error) {
-	oid := model.ToObjectID(id)
+	oid := database.ToObjectID(id)
 	if oid.IsZero() {
-		return nil, model.ErrRecordNotFound
+		return nil, database.ErrRecordNotFound
 	}
 	filter := bson.M{"_id": oid}
 	// no cache
@@ -159,19 +160,19 @@ func (d *userExampleDao) GetByID(ctx context.Context, id string) (*model.UserExa
 		return cacheRecord, nil
 	}
 
-	if errors.Is(err, model.ErrCacheNotFound) {
+	if errors.Is(err, database.ErrCacheNotFound) {
 		// for the same id, prevent high concurrent simultaneous access to mongodb
 		val, err, _ := d.sfg.Do(id, func() (interface{}, error) { //nolint
 			record := &model.UserExample{}
 			err = d.collection.FindOne(ctx, mgo.ExcludeDeleted(filter)).Decode(record)
 			if err != nil {
 				// if data is empty, set not found cache to prevent cache penetration, default expiration time 10 minutes
-				if errors.Is(err, model.ErrRecordNotFound) {
+				if errors.Is(err, database.ErrRecordNotFound) {
 					err = d.cache.SetCacheWithNotFound(ctx, id)
 					if err != nil {
 						return nil, err
 					}
-					return nil, model.ErrRecordNotFound
+					return nil, database.ErrRecordNotFound
 				}
 				return nil, err
 			}
@@ -187,11 +188,11 @@ func (d *userExampleDao) GetByID(ctx context.Context, id string) (*model.UserExa
 		}
 		record, ok := val.(*model.UserExample)
 		if !ok {
-			return nil, model.ErrRecordNotFound
+			return nil, database.ErrRecordNotFound
 		}
 		return record, nil
 	} else if errors.Is(err, cacheBase.ErrPlaceholder) {
-		return nil, model.ErrRecordNotFound
+		return nil, database.ErrRecordNotFound
 	}
 
 	// fail fast, if cache error return, don't request to db
@@ -405,7 +406,7 @@ func (d *userExampleDao) GetByLastID(ctx context.Context, lastID string, limit i
 	findOpts.Sort = page.Sort()
 
 	records := []*model.UserExample{}
-	filter := bson.M{"_id": bson.M{"$lt": model.ToObjectID(lastID)}}
+	filter := bson.M{"_id": bson.M{"$lt": database.ToObjectID(lastID)}}
 
 	cursor, err := d.collection.Find(ctx, mgo.ExcludeDeleted(filter), findOpts)
 	if err != nil {

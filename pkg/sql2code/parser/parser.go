@@ -310,7 +310,7 @@ const (
 )
 
 var replaceFields = map[string]string{
-	__mysqlModel__: "ggorm.Model",
+	__mysqlModel__: "sgorm.Model",
 	__type__:       "",
 }
 
@@ -394,6 +394,9 @@ func makeCode(stmt *ast.CreateTableStmt, opt options) (*codeText, error) {
 	for _, con := range stmt.Constraints {
 		if con.Tp == ast.ConstraintPrimaryKey {
 			isPrimaryKey[con.Keys[0].Column.String()] = true
+		}
+		if con.Tp == ast.ConstraintForeignKey {
+			// TODO: foreign key support
 		}
 	}
 
@@ -633,7 +636,7 @@ func getModelStructCode(data tmplData, importPaths []string, isEmbed bool, jsonN
 				newImportPaths = append(newImportPaths, path)
 			}
 		}
-		newImportPaths = append(newImportPaths, "github.com/zhufuyi/sponge/pkg/ggorm")
+		newImportPaths = append(newImportPaths, "github.com/zhufuyi/sponge/pkg/sgorm")
 	} else {
 		for i, field := range data.Fields {
 			switch field.DBDriver {
@@ -683,7 +686,7 @@ func getModelStructCode(data tmplData, importPaths []string, isEmbed bool, jsonN
 	if isEmbed {
 		gormEmbed := replaceFields[__mysqlModel__]
 		if jsonNamedType == 0 { // snake case
-			gormEmbed += "2" // ggorm.Model2
+			gormEmbed += "2" // sgorm.Model2
 		}
 		structCode = strings.ReplaceAll(structCode, __mysqlModel__, gormEmbed)
 		structCode = strings.ReplaceAll(structCode, __type__, replaceFields[__type__])

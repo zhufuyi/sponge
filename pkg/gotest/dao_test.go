@@ -9,7 +9,7 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"gorm.io/gorm"
 
-	"github.com/zhufuyi/sponge/pkg/ggorm/query"
+	"github.com/zhufuyi/sponge/pkg/sgorm/query"
 )
 
 func TestNewDao(t *testing.T) {

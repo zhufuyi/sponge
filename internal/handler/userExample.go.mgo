@@ -12,6 +12,7 @@ import (
 
 	"github.com/zhufuyi/sponge/internal/cache"
 	"github.com/zhufuyi/sponge/internal/dao"
+	"github.com/zhufuyi/sponge/internal/database"
 	"github.com/zhufuyi/sponge/internal/ecode"
 	"github.com/zhufuyi/sponge/internal/model"
 	"github.com/zhufuyi/sponge/internal/types"
@@ -37,8 +38,8 @@ func NewUserExampleHandler() UserExampleHandler {
 	collectionName := new(model.UserExample).TableName()
 	return &userExampleHandler{
 		iDao: dao.NewUserExampleDao(
-			model.GetDB().Collection(collectionName),
-			cache.NewUserExampleCache(model.GetCacheType()),
+			database.GetDB().Collection(collectionName),
+			cache.NewUserExampleCache(database.GetCacheType()),
 		),
 	}
 }
@@ -116,7 +117,7 @@ func (h *userExampleHandler) DeleteByID(c *gin.Context) {
 // @Router /api/v1/userExample/{id} [put]
 // @Security BearerAuth
 func (h *userExampleHandler) UpdateByID(c *gin.Context) {
-	oid := model.ToObjectID(c.Param("id"))
+	oid := database.ToObjectID(c.Param("id"))
 	if oid.IsZero() {
 		logger.Warn("id invalid error", middleware.GCtxRequestIDField(c))
 		response.Error(c, ecode.InvalidParams)
@@ -165,7 +166,7 @@ func (h *userExampleHandler) GetByID(c *gin.Context) {
 	ctx := middleware.WrapCtx(c)
 	userExample, err := h.iDao.GetByID(ctx, id)
 	if err != nil {
-		if errors.Is(err, model.ErrRecordNotFound) {
+		if errors.Is(err, database.ErrRecordNotFound) {
 			logger.Warn("GetByID not found", logger.Err(err), logger.Any("id", id), middleware.GCtxRequestIDField(c))
 			response.Error(c, ecode.NotFound)
 		} else {

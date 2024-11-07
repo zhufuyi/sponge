@@ -9,6 +9,7 @@ import (
 	"github.com/zhufuyi/sponge/pkg/encoding"
 	"github.com/zhufuyi/sponge/pkg/utils"
 
+	"github.com/zhufuyi/sponge/internal/database"
 	"github.com/zhufuyi/sponge/internal/model"
 )
 
@@ -37,7 +38,7 @@ type userExampleCache struct {
 }
 
 // NewUserExampleCache new a cache
-func NewUserExampleCache(cacheType *model.CacheType) UserExampleCache {
+func NewUserExampleCache(cacheType *database.CacheType) UserExampleCache {
 	jsonEncoding := encoding.JSONEncoding{}
 	cachePrefix := ""
 

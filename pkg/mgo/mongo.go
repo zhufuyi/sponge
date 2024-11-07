@@ -12,6 +12,10 @@ import (
 	"go.uber.org/zap"
 )
 
+type DB = mongo.Database
+
+var ErrNoDocuments = mongo.ErrNoDocuments
+
 const (
 	// DBDriverName mongodb driver
 	DBDriverName = "mongodb"

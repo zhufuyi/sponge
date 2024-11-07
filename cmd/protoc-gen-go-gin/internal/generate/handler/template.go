@@ -61,8 +61,8 @@ func New{{.Name}}Handler() {{.ProtoPkgName}}.{{.Name}}Logicer {
 	return &{{.LowerName}}Handler{
 		// example:
 		// 	{{.LowerName}}Dao: dao.New{{.Name}}Dao(
-		// 		model.GetDB(),
-		// 		cache.New{{.Name}}Cache(model.GetCacheType()),
+		// 		database.GetDB(),
+		// 		cache.New{{.Name}}Cache(database.GetCacheType()),
 		// 	),
 	}
 }

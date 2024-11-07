@@ -62,6 +62,7 @@ func TestInit(t *testing.T) {
 				t.Logf("error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
+			defer Close(rdb)
 			assert.NotNil(t, rdb)
 		})
 	}
@@ -114,6 +115,7 @@ func TestInitCluster(t *testing.T) {
 		WithTLSConfig(nil),      // nil means no set field
 		WithClusterOptions(nil), // nil means no set field
 	)
+	defer CloseCluster(clusterRdb)
 	assert.Nil(t, err)
 	assert.NotNil(t, clusterRdb)
 }

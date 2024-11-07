@@ -63,3 +63,13 @@ func listErrCodeFiles(dir string) ([]string, error) {
 
 	return filterFiles, nil
 }
+
+func getSubFiles(selectedFiles map[string][]string) []string {
+	subFiles := []string{}
+	for dir, files := range selectedFiles {
+		for _, file := range files {
+			subFiles = append(subFiles, dir+"/"+file)
+		}
+	}
+	return subFiles
+}

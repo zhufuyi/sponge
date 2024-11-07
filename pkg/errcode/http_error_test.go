@@ -39,7 +39,7 @@ var errorsCodes = []*Error{
 }
 
 func TestNewError(t *testing.T) {
-	code := 21101
+	code := 201101
 	msg := "something is wrong"
 
 	e := NewError(code, msg)
@@ -80,7 +80,8 @@ func TestHCode(t *testing.T) {
 	defer func() {
 		recover()
 	}()
-	code = HCode(101)
+	code = HCode(1001)
+	t.Log("error code is", code)
 }
 
 func TestListHTTPErrCodes(t *testing.T) {
@@ -92,7 +93,7 @@ func TestListHTTPErrCodes(t *testing.T) {
 
 func TestParseError(t *testing.T) {
 	errorsCodes = append(errorsCodes,
-		NewError(21102, "something is wrong"),
+		NewError(201102, "something is wrong"),
 		ParseError(errors.New("unknown error")),
 	)
 
@@ -122,13 +123,13 @@ func TestGetErrorCode(t *testing.T) {
 
 func TestError_WithOutMsgI18n(t *testing.T) {
 	var langMsg = map[int]map[string]string{
-		20011: {
+		200011: {
 			"en-US": "login failed",
 			"zh-CN": "登录失败",
 		},
 	}
 
-	e := NewError(20011, "login failed")
+	e := NewError(200011, "login failed")
 	e1 := e.WithOutMsgI18n(langMsg, "zh-CN")
 	assert.Equal(t, "登录失败", e1.Msg())
 

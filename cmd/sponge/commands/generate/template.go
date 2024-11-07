@@ -547,121 +547,34 @@ database:
 
 	modelInitDBFileMysqlCode = `// InitDB connect database
 func InitDB() {
-	switch strings.ToLower(config.Get().Database.Driver) {
-	case ggorm.DBDriverMysql, ggorm.DBDriverTidb:
-		InitMysql()
+	dbDriver := config.Get().Database.Driver
+	switch strings.ToLower(dbDriver) {
+	case sgorm.DBDriverMysql, sgorm.DBDriverTidb:
+		gdb = InitMysql()
 	default:
-		panic("InitDB error, unsupported database driver: " + config.Get().Database.Driver)
-	}
-}
-
-// InitMysql connect mysql
-func InitMysql() {
-	opts := []ggorm.Option{
-		ggorm.WithMaxIdleConns(config.Get().Database.Mysql.MaxIdleConns),
-		ggorm.WithMaxOpenConns(config.Get().Database.Mysql.MaxOpenConns),
-		ggorm.WithConnMaxLifetime(time.Duration(config.Get().Database.Mysql.ConnMaxLifetime) * time.Minute),
-	}
-	if config.Get().Database.Mysql.EnableLog {
-		opts = append(opts,
-			ggorm.WithLogging(logger.Get()),
-			ggorm.WithLogRequestIDKey("request_id"),
-		)
-	}
-
-	if config.Get().App.EnableTrace {
-		opts = append(opts, ggorm.WithEnableTrace())
-	}
-
-	// setting mysql slave and master dsn addresses
-	//opts = append(opts, ggorm.WithRWSeparation(
-	//	config.Get().Database.Mysql.SlavesDsn,
-	//	config.Get().Database.Mysql.MastersDsn...,
-	//))
-
-	// add custom gorm plugin
-	//opts = append(opts, ggorm.WithGormPlugin(yourPlugin))
-
-	var dsn = utils.AdaptiveMysqlDsn(config.Get().Database.Mysql.Dsn)
-	var err error
-	db, err = ggorm.InitMysql(dsn, opts...)
-	if err != nil {
-		panic("InitMysql error: " + err.Error())
+		panic("InitDB error, unsupported database driver: " + dbDriver)
 	}
 }`
 
 	modelInitDBFilePostgresqlCode = `// InitDB connect database
 func InitDB() {
-	switch strings.ToLower(config.Get().Database.Driver) {
-	case ggorm.DBDriverPostgresql:
-		InitPostgresql()
+	dbDriver := config.Get().Database.Driver
+	switch strings.ToLower(dbDriver) {
+	case sgorm.DBDriverPostgresql:
+		gdb = InitPostgresql()
 	default:
-		panic("InitDB error, unsupported database driver: " + config.Get().Database.Driver)
-	}
-}
-
-// InitPostgresql connect postgresql
-func InitPostgresql() {
-	opts := []ggorm.Option{
-		ggorm.WithMaxIdleConns(config.Get().Database.Postgresql.MaxIdleConns),
-		ggorm.WithMaxOpenConns(config.Get().Database.Postgresql.MaxOpenConns),
-		ggorm.WithConnMaxLifetime(time.Duration(config.Get().Database.Postgresql.ConnMaxLifetime) * time.Minute),
-	}
-	if config.Get().Database.Postgresql.EnableLog {
-		opts = append(opts,
-			ggorm.WithLogging(logger.Get()),
-			ggorm.WithLogRequestIDKey("request_id"),
-		)
-	}
-
-	if config.Get().App.EnableTrace {
-		opts = append(opts, ggorm.WithEnableTrace())
-	}
-
-	// add custom gorm plugin
-	//opts = append(opts, ggorm.WithGormPlugin(yourPlugin))
-
-	var dsn = utils.AdaptivePostgresqlDsn(config.Get().Database.Postgresql.Dsn)
-	var err error
-	db, err = ggorm.InitPostgresql(dsn, opts...)
-	if err != nil {
-		panic("InitPostgresql error: " + err.Error())
+		panic("InitDB error, unsupported database driver: " + dbDriver)
 	}
 }`
 
 	modelInitDBFileSqliteCode = `// InitDB connect database
 func InitDB() {
-	switch strings.ToLower(config.Get().Database.Driver) {
-	case ggorm.DBDriverSqlite:
-		InitSqlite()
+	dbDriver := config.Get().Database.Driver
+	switch strings.ToLower(dbDriver) {
+	case sgorm.DBDriverSqlite:
+		gdb = InitSqlite()
 	default:
-		panic("InitDB error, unsupported database driver: " + config.Get().Database.Driver)
-	}
-}
-
-// InitSqlite connect sqlite
-func InitSqlite() {
-	opts := []ggorm.Option{
-		ggorm.WithMaxIdleConns(config.Get().Database.Sqlite.MaxIdleConns),
-		ggorm.WithMaxOpenConns(config.Get().Database.Sqlite.MaxOpenConns),
-		ggorm.WithConnMaxLifetime(time.Duration(config.Get().Database.Sqlite.ConnMaxLifetime) * time.Minute),
-	}
-	if config.Get().Database.Sqlite.EnableLog {
-		opts = append(opts,
-			ggorm.WithLogging(logger.Get()),
-			ggorm.WithLogRequestIDKey("request_id"),
-		)
-	}
-
-	if config.Get().App.EnableTrace {
-		opts = append(opts, ggorm.WithEnableTrace())
-	}
-
-	var err error
-	var dbFile = utils.AdaptiveSqlite(config.Get().Database.Sqlite.DBFile)
-	db, err = ggorm.InitSqlite(dbFile, opts...)
-	if err != nil {
-		panic("InitSqlite error: " + err.Error())
+		panic("InitDB error, unsupported database driver: " + dbDriver)
 	}
 }`
 

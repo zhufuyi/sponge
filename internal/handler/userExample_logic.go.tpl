@@ -8,13 +8,14 @@ import (
 
 	"github.com/jinzhu/copier"
 
-	"github.com/zhufuyi/sponge/pkg/ggorm/query"
+	"github.com/zhufuyi/sponge/pkg/sgorm/query"
 	"github.com/zhufuyi/sponge/pkg/gin/middleware"
 	"github.com/zhufuyi/sponge/pkg/logger"
 
 	serverNameExampleV1 "github.com/zhufuyi/sponge/api/serverNameExample/v1"
 	"github.com/zhufuyi/sponge/internal/cache"
 	"github.com/zhufuyi/sponge/internal/dao"
+	"github.com/zhufuyi/sponge/internal/database"
 	"github.com/zhufuyi/sponge/internal/ecode"
 	"github.com/zhufuyi/sponge/internal/model"
 )
@@ -30,8 +31,8 @@ type {{.TableNameCamelFCL}}Handler struct {
 func New{{.TableNameCamel}}Handler() serverNameExampleV1.{{.TableNameCamel}}Logicer {
 	return &{{.TableNameCamelFCL}}Handler{
 		{{.TableNameCamelFCL}}Dao: dao.New{{.TableNameCamel}}Dao(
-			model.GetDB(),
-			cache.New{{.TableNameCamel}}Cache(model.GetCacheType()),
+			database.GetDB(),
+			cache.New{{.TableNameCamel}}Cache(database.GetCacheType()),
 		),
 	}
 }
@@ -112,7 +113,7 @@ func (h *{{.TableNameCamelFCL}}Handler) GetBy{{.ColumnNameCamel}}(ctx context.Co
 
 	record, err := h.{{.TableNameCamelFCL}}Dao.GetBy{{.ColumnNameCamel}}(ctx, req.{{if .IsStandardPrimaryKey}}Id{{else}}{{.ColumnNameCamel}}{{end}})
 	if err != nil {
-		if errors.Is(err, model.ErrRecordNotFound) {
+		if errors.Is(err, database.ErrRecordNotFound) {
 			logger.Warn("GetBy{{.ColumnNameCamel}} error", logger.Err(err), logger.Any("{{.ColumnNameCamelFCL}}", req.{{if .IsStandardPrimaryKey}}Id{{else}}{{.ColumnNameCamel}}{{end}}), middleware.CtxRequestIDField(ctx))
 			return nil, ecode.NotFound.Err()
 		}

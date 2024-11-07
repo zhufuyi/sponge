@@ -9,13 +9,14 @@ import (
 	"github.com/jinzhu/copier"
 	"google.golang.org/grpc"
 
-	"github.com/zhufuyi/sponge/pkg/ggorm/query"
 	"github.com/zhufuyi/sponge/pkg/grpc/interceptor"
 	"github.com/zhufuyi/sponge/pkg/logger"
+	"github.com/zhufuyi/sponge/pkg/sgorm/query"
 
 	serverNameExampleV1 "github.com/zhufuyi/sponge/api/serverNameExample/v1"
 	"github.com/zhufuyi/sponge/internal/cache"
 	"github.com/zhufuyi/sponge/internal/dao"
+	"github.com/zhufuyi/sponge/internal/database"
 	"github.com/zhufuyi/sponge/internal/ecode"
 	"github.com/zhufuyi/sponge/internal/model"
 )
@@ -39,8 +40,8 @@ type userExample struct {
 func NewUserExampleServer() serverNameExampleV1.UserExampleServer {
 	return &userExample{
 		iDao: dao.NewUserExampleDao(
-			model.GetDB(),
-			cache.NewUserExampleCache(model.GetCacheType()),
+			database.GetDB(),
+			cache.NewUserExampleCache(database.GetCacheType()),
 		),
 	}
 }
@@ -125,7 +126,7 @@ func (s *userExample) GetByID(ctx context.Context, req *serverNameExampleV1.GetU
 
 	record, err := s.iDao.GetByID(ctx, req.Id)
 	if err != nil {
-		if errors.Is(err, model.ErrRecordNotFound) {
+		if errors.Is(err, database.ErrRecordNotFound) {
 			logger.Warn("GetByID error", logger.Err(err), logger.Any("id", req.Id), interceptor.ServerCtxRequestIDField(ctx))
 			return nil, ecode.StatusNotFound.Err()
 		}

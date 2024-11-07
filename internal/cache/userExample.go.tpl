@@ -9,6 +9,7 @@ import (
 	"github.com/zhufuyi/sponge/pkg/encoding"
 	"github.com/zhufuyi/sponge/pkg/utils"
 
+	"github.com/zhufuyi/sponge/internal/database"
 	"github.com/zhufuyi/sponge/internal/model"
 )
 
@@ -37,7 +38,7 @@ type {{.TableNameCamelFCL}}Cache struct {
 }
 
 // New{{.TableNameCamel}}Cache new a cache
-func New{{.TableNameCamel}}Cache(cacheType *model.CacheType) {{.TableNameCamel}}Cache {
+func New{{.TableNameCamel}}Cache(cacheType *database.CacheType) {{.TableNameCamel}}Cache {
 	jsonEncoding := encoding.JSONEncoding{}
 	cachePrefix := ""
 

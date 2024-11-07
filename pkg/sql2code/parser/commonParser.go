@@ -63,6 +63,10 @@ func setCrudInfo(field tmplField) *CrudInfo {
 }
 
 func newCrudInfo(data tmplData) *CrudInfo {
+	if len(data.Fields) == 0 {
+		return nil
+	}
+
 	var info *CrudInfo
 	for _, field := range data.Fields {
 		if field.IsPrimaryKey {
@@ -81,7 +85,7 @@ func newCrudInfo(data tmplData) *CrudInfo {
 		}
 	}
 
-	// if not found xxx_id field, use the first column as primary key
+	// if not found xxx_id field, use the first field of integer or string type
 	if info == nil {
 		for _, field := range data.Fields {
 			if isDesiredGoType(field.GoType) {
@@ -89,11 +93,11 @@ func newCrudInfo(data tmplData) *CrudInfo {
 				break
 			}
 		}
-		if len(data.Fields) > 0 {
-			info = setCrudInfo(data.Fields[0])
-		} else {
-			return nil
-		}
+	}
+
+	// use the first column as primary key
+	if info == nil {
+		info = setCrudInfo(data.Fields[0])
 	}
 
 	info.TableNameCamel = data.TableName

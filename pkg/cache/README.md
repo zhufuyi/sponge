@@ -7,7 +7,7 @@ memory and redis cache libraries.
 ```go
 
 // Choose to create a memory or redis cache depending on CType
-cache := cache.NewUserExampleCache(&model.CacheType{
+cache := cache.NewUserExampleCache(&database.CacheType{
   CType: "redis",
   Rdb:   c.RedisClient,
 })
@@ -31,18 +31,18 @@ func (d *userExampleDao) GetByID(ctx context.Context, id uint64) (*model.UserExa
 		return record, nil
 	}
 
-	if errors.Is(err, model.ErrCacheNotFound) {
+	if errors.Is(err, database.ErrCacheNotFound) {
 		// get from mysql
 		table := &model.UserExample{}
 		err = d.db.WithContext(ctx).Where("id = ?", id).First(table).Error
 		if err != nil {
 			// if data is empty, set not found cache to prevent cache penetration(preventing Cache Penetration)
-			if errors.Is(err, model.ErrRecordNotFound) {
+			if errors.Is(err, database.ErrRecordNotFound) {
 				err = d.cache.SetCacheWithNotFound(ctx, id)
 				if err != nil {
 					return nil, err
 				}
-				return nil, model.ErrRecordNotFound
+				return nil, database.ErrRecordNotFound
 			}
 			return nil, err
 		}
@@ -54,7 +54,7 @@ func (d *userExampleDao) GetByID(ctx context.Context, id uint64) (*model.UserExa
 		}
 		return table, nil
 	} else if errors.Is(err, cacheBase.ErrPlaceholder) {
-		return nil, model.ErrRecordNotFound
+		return nil, database.ErrRecordNotFound
 	}
 
 	// fail fast, if cache error return, don't request to db

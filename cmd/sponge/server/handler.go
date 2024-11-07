@@ -17,12 +17,15 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 
 	"github.com/zhufuyi/sponge/pkg/errcode"
-	"github.com/zhufuyi/sponge/pkg/ggorm"
 	"github.com/zhufuyi/sponge/pkg/gin/response"
 	"github.com/zhufuyi/sponge/pkg/gobash"
 	"github.com/zhufuyi/sponge/pkg/gofile"
 	"github.com/zhufuyi/sponge/pkg/krand"
 	"github.com/zhufuyi/sponge/pkg/mgo"
+	"github.com/zhufuyi/sponge/pkg/sgorm"
+	"github.com/zhufuyi/sponge/pkg/sgorm/mysql"
+	"github.com/zhufuyi/sponge/pkg/sgorm/postgresql"
+	"github.com/zhufuyi/sponge/pkg/sgorm/sqlite"
 	"github.com/zhufuyi/sponge/pkg/utils"
 )
 
@@ -44,11 +47,11 @@ type kv struct {
 // ListDbDrivers list db drivers
 func ListDbDrivers(c *gin.Context) {
 	dbDrivers := []string{
-		ggorm.DBDriverMysql,
+		sgorm.DBDriverMysql,
 		mgo.DBDriverName,
-		ggorm.DBDriverPostgresql,
-		ggorm.DBDriverTidb,
-		ggorm.DBDriverSqlite,
+		sgorm.DBDriverPostgresql,
+		sgorm.DBDriverTidb,
+		sgorm.DBDriverSqlite,
 	}
 
 	data := []kv{}
@@ -73,11 +76,11 @@ func ListTables(c *gin.Context) {
 
 	var tables []string
 	switch strings.ToLower(form.DbDriver) {
-	case ggorm.DBDriverMysql, ggorm.DBDriverTidb:
+	case sgorm.DBDriverMysql, sgorm.DBDriverTidb:
 		tables, err = getMysqlTables(form.Dsn)
-	case ggorm.DBDriverPostgresql:
+	case sgorm.DBDriverPostgresql:
 		tables, err = getPostgresqlTables(form.Dsn)
-	case ggorm.DBDriverSqlite:
+	case sgorm.DBDriverSqlite:
 		tables, err = getSqliteTables(form.Dsn)
 	case mgo.DBDriverName:
 		tables, err = getMongodbTables(form.Dsn)
@@ -405,11 +408,11 @@ func getSpongeDir() string {
 
 func getMysqlTables(dsn string) ([]string, error) {
 	dsn = utils.AdaptiveMysqlDsn(dsn)
-	db, err := ggorm.InitMysql(dsn)
+	db, err := mysql.Init(dsn)
 	if err != nil {
 		return nil, err
 	}
-	defer ggorm.CloseSQLDB(db)
+	defer mysql.Close(db) //nolint
 
 	var tables []string
 	err = db.Raw("show tables").Scan(&tables).Error
@@ -422,11 +425,11 @@ func getMysqlTables(dsn string) ([]string, error) {
 
 func getPostgresqlTables(dsn string) ([]string, error) {
 	dsn = utils.AdaptivePostgresqlDsn(dsn)
-	db, err := ggorm.InitPostgresql(dsn)
+	db, err := postgresql.Init(dsn)
 	if err != nil {
 		return nil, err
 	}
-	defer ggorm.CloseSQLDB(db)
+	defer mysql.Close(db) //nolint
 
 	schemas, err := getSchemas(db, dsn)
 	if err != nil {
@@ -444,7 +447,7 @@ type pgTable struct {
 	TableName string
 }
 
-func getSchemas(db *ggorm.DB, dsn string) ([]pgSchema, error) {
+func getSchemas(db *sgorm.DB, dsn string) ([]pgSchema, error) {
 	var schemas []pgSchema
 
 	if strings.Contains(dsn, "search_path=") {
@@ -470,7 +473,7 @@ func getSchemas(db *ggorm.DB, dsn string) ([]pgSchema, error) {
 	return schemas, nil
 }
 
-func getSchemaTables(db *ggorm.DB, schemas []pgSchema) ([]string, error) {
+func getSchemaTables(db *sgorm.DB, schemas []pgSchema) ([]string, error) {
 	var schemaTables []string
 	for _, schema := range schemas {
 		if schema.SchemaName == "information_schema" || schema.SchemaName == "pg_catalog" || schema.SchemaName == "pg_toast" {
@@ -495,11 +498,11 @@ func getSqliteTables(dbFile string) ([]string, error) {
 		return nil, fmt.Errorf("sqlite db file %s not found in local host", dbFile)
 	}
 
-	db, err := ggorm.InitSqlite(dbFile)
+	db, err := sqlite.Init(dbFile)
 	if err != nil {
 		return nil, err
 	}
-	defer ggorm.CloseSQLDB(db)
+	defer sqlite.Close(db) //nolint
 
 	var tables []string
 	err = db.Raw("select name from sqlite_master where type = ?", "table").Scan(&tables).Error

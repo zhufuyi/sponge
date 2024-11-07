@@ -217,11 +217,14 @@ func (g *rpcGenerator) generateCode() (string, error) {
 		"internal/dao": {
 			"userExample.go", "userExample_test.go",
 		},
+		"internal/database": {
+			"init.go",
+		},
 		"internal/ecode": {
 			"systemCode_rpc.go", "userExample_rpc.go",
 		},
 		"internal/model": {
-			"init.go", "userExample.go",
+			"userExample.go",
 		},
 		"internal/server": {
 			"grpc.go", "grpc_test.go", "grpc_option.go",
@@ -229,6 +232,10 @@ func (g *rpcGenerator) generateCode() (string, error) {
 		"internal/service": {
 			"service.go", "service_test.go", "userExample.go", "userExample_client_test.go",
 		},
+	}
+	err := SetSelectFiles(g.dbDriver, selectFiles)
+	if err != nil {
+		return "", err
 	}
 
 	info := g.codes[parser.CodeTypeCrudInfo]
@@ -285,9 +292,6 @@ func (g *rpcGenerator) generateCode() (string, error) {
 				"internal/dao": {
 					"userExample.go.mgo",
 				},
-				"internal/model": {
-					"init.go.mgo", "userExample.go",
-				},
 				"internal/service": {
 					"service.go", "service_test.go", "userExample.go.mgo", "userExample_client_test.go.mgo",
 				},
@@ -331,7 +335,7 @@ func (g *rpcGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	var fields []replacer.Field
 	fields = append(fields, g.fields...)
 	fields = append(fields, deleteFieldsMark(r, modelFile, startMark, endMark)...)
-	fields = append(fields, deleteFieldsMark(r, modelInitDBFile, startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, databaseInitDBFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, daoFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, daoMgoFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, daoTestFile, startMark, endMark)...)
@@ -367,8 +371,8 @@ func (g *rpcGenerator) addFields(r replacer.Replacer) []replacer.Field {
 			Old: modelFileMark,
 			New: g.codes[parser.CodeTypeModel],
 		},
-		{ // replace the contents of the model/init.go file
-			Old: modelInitDBFileMark,
+		{ // replace the contents of the database/init.go file
+			Old: databaseInitDBFileMark,
 			New: getInitDBCode(g.dbDriver),
 		},
 		{ // replace the contents of the dao/userExample.go file
@@ -521,6 +525,10 @@ func (g *rpcGenerator) addFields(r replacer.Replacer) []replacer.Field {
 		{
 			Old: "init.go.mgo",
 			New: "init.go",
+		},
+		{
+			Old: "mongodb.go.mgo",
+			New: "mongodb.go",
 		},
 		{
 			Old: "userExample_client_test.go.mgo",

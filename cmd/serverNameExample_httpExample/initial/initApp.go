@@ -18,7 +18,7 @@ import (
 
 	"github.com/zhufuyi/sponge/configs"
 	"github.com/zhufuyi/sponge/internal/config"
-	"github.com/zhufuyi/sponge/internal/model"
+	"github.com/zhufuyi/sponge/internal/database"
 )
 
 var (
@@ -75,9 +75,9 @@ func InitApp() {
 	}
 
 	// initializing database
-	model.InitDB()
+	database.InitDB()
 	logger.Infof("[%s] was initialized", cfg.Database.Driver)
-	model.InitCache(cfg.App.CacheType)
+	database.InitCache(cfg.App.CacheType)
 	if cfg.App.CacheType != "" {
 		logger.Infof("[%s] was initialized", cfg.App.CacheType)
 	}

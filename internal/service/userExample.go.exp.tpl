@@ -10,13 +10,14 @@ import (
 	"github.com/jinzhu/copier"
 	"google.golang.org/grpc"
 
-	"github.com/zhufuyi/sponge/pkg/ggorm/query"
+	"github.com/zhufuyi/sponge/pkg/sgorm/query"
 	"github.com/zhufuyi/sponge/pkg/grpc/interceptor"
 	"github.com/zhufuyi/sponge/pkg/logger"
 
 	serverNameExampleV1 "github.com/zhufuyi/sponge/api/serverNameExample/v1"
 	"github.com/zhufuyi/sponge/internal/cache"
 	"github.com/zhufuyi/sponge/internal/dao"
+	"github.com/zhufuyi/sponge/internal/database"
 	"github.com/zhufuyi/sponge/internal/ecode"
 	"github.com/zhufuyi/sponge/internal/model"
 )
@@ -40,8 +41,8 @@ type {{.TableNameCamelFCL}} struct {
 func New{{.TableNameCamel}}Server() serverNameExampleV1.{{.TableNameCamel}}Server {
 	return &{{.TableNameCamelFCL}}{
 		iDao: dao.New{{.TableNameCamel}}Dao(
-			model.GetDB(),
-			cache.New{{.TableNameCamel}}Cache(model.GetCacheType()),
+			database.GetDB(),
+			cache.New{{.TableNameCamel}}Cache(database.GetCacheType()),
 		),
 	}
 }
@@ -126,7 +127,7 @@ func (s *{{.TableNameCamelFCL}}) GetBy{{.ColumnNameCamel}}(ctx context.Context, 
 
 	record, err := s.iDao.GetBy{{.ColumnNameCamel}}(ctx, req.{{if .IsStandardPrimaryKey}}Id{{else}}{{.ColumnNameCamel}}{{end}})
 	if err != nil {
-		if errors.Is(err, model.ErrRecordNotFound) {
+		if errors.Is(err, database.ErrRecordNotFound) {
 			logger.Warn("GetBy{{.ColumnNameCamel}} error", logger.Err(err), logger.Any("{{.ColumnNameCamelFCL}}", req.{{if .IsStandardPrimaryKey}}Id{{else}}{{.ColumnNameCamel}}{{end}}), interceptor.ServerCtxRequestIDField(ctx))
 			return nil, ecode.StatusNotFound.Err()
 		}
@@ -226,7 +227,7 @@ func (s *{{.TableNameCamelFCL}}) GetByCondition(ctx context.Context, req *server
 
 	record, err := s.iDao.GetByCondition(ctx, conditions)
 	if err != nil {
-		if errors.Is(err, model.ErrRecordNotFound) {
+		if errors.Is(err, database.ErrRecordNotFound) {
 			logger.Warn("GetByCondition error", logger.Err(err), logger.Any("req", req), interceptor.ServerCtxRequestIDField(ctx))
 			return nil, ecode.StatusNotFound.Err()
 		}

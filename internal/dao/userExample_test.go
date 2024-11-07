@@ -6,11 +6,12 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
-	"github.com/zhufuyi/sponge/pkg/ggorm/query"
 	"github.com/zhufuyi/sponge/pkg/gotest"
+	"github.com/zhufuyi/sponge/pkg/sgorm/query"
 	"github.com/zhufuyi/sponge/pkg/utils"
 
 	"github.com/zhufuyi/sponge/internal/cache"
+	"github.com/zhufuyi/sponge/internal/database"
 	"github.com/zhufuyi/sponge/internal/model"
 )
 
@@ -24,7 +25,7 @@ func newUserExampleDao() *gotest.Dao {
 	// init mock cache
 	//c := gotest.NewCache(map[string]interface{}{"no cache": testData}) // to test mysql, disable caching
 	c := gotest.NewCache(map[string]interface{}{utils.Uint64ToStr(testData.ID): testData})
-	c.ICache = cache.NewUserExampleCache(&model.CacheType{
+	c.ICache = cache.NewUserExampleCache(&database.CacheType{
 		CType: "redis",
 		Rdb:   c.RedisClient,
 	})

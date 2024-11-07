@@ -1,0 +1,42 @@
+package database
+
+import (
+	"strings"
+	"sync"
+
+	"github.com/zhufuyi/sponge/pkg/mgo"
+
+	"github.com/zhufuyi/sponge/internal/config"
+)
+
+var (
+	mdb     *mgo.DB
+	mdbOnce sync.Once
+)
+
+// InitDB connect database
+func InitDB() {
+	dbDriver := config.Get().Database.Driver
+	switch strings.ToLower(dbDriver) {
+	case mgo.DBDriverName:
+		mdb = InitMongodb()
+	default:
+		panic("InitDB error, unsupported database driver: " + dbDriver)
+	}
+}
+
+// GetDB get db
+func GetDB() *mgo.DB {
+	if mdb == nil {
+		mdbOnce.Do(func() {
+			InitDB()
+		})
+	}
+
+	return mdb
+}
+
+// CloseDB close db
+func CloseDB() error {
+	return mgo.Close(mdb)
+}

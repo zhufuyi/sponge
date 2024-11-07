@@ -10,10 +10,11 @@ import (
 	"gorm.io/gorm"
 
 	cacheBase "github.com/zhufuyi/sponge/pkg/cache"
-	"github.com/zhufuyi/sponge/pkg/ggorm/query"
+	"github.com/zhufuyi/sponge/pkg/sgorm/query"
 	"github.com/zhufuyi/sponge/pkg/utils"
 
 	"github.com/zhufuyi/sponge/internal/cache"
+	"github.com/zhufuyi/sponge/internal/database"
 	"github.com/zhufuyi/sponge/internal/model"
 )
 
@@ -146,7 +147,7 @@ func (d *{{.TableNameCamelFCL}}Dao) GetBy{{.ColumnNameCamel}}(ctx context.Contex
 		return record, nil
 	}
 
-	if errors.Is(err, model.ErrCacheNotFound) {
+	if errors.Is(err, database.ErrCacheNotFound) {
 		// for the same {{.ColumnNameCamelFCL}}, prevent high concurrent simultaneous access to database
 		{{if .IsStringType}}val, err, _ := d.sfg.Do({{.ColumnNameCamelFCL}}, func() (interface{}, error) {
 {{else}}		val, err, _ := d.sfg.Do(utils.{{.GoTypeFCU}}ToStr({{.ColumnNameCamelFCL}}), func() (interface{}, error) {
@@ -155,12 +156,12 @@ func (d *{{.TableNameCamelFCL}}Dao) GetBy{{.ColumnNameCamel}}(ctx context.Contex
 			err = d.db.WithContext(ctx).Where("{{.ColumnName}} = ?", {{.ColumnNameCamelFCL}}).First(table).Error
 			if err != nil {
 				// if data is empty, set not found cache to prevent cache penetration, default expiration time 10 minutes
-				if errors.Is(err, model.ErrRecordNotFound) {
+				if errors.Is(err, database.ErrRecordNotFound) {
 					err = d.cache.SetCacheWithNotFound(ctx, {{.ColumnNameCamelFCL}})
 					if err != nil {
 						return nil, err
 					}
-					return nil, model.ErrRecordNotFound
+					return nil, database.ErrRecordNotFound
 				}
 				return nil, err
 			}
@@ -176,11 +177,11 @@ func (d *{{.TableNameCamelFCL}}Dao) GetBy{{.ColumnNameCamel}}(ctx context.Contex
 		}
 		table, ok := val.(*model.{{.TableNameCamel}})
 		if !ok {
-			return nil, model.ErrRecordNotFound
+			return nil, database.ErrRecordNotFound
 		}
 		return table, nil
 	} else if errors.Is(err, cacheBase.ErrPlaceholder) {
-		return nil, model.ErrRecordNotFound
+		return nil, database.ErrRecordNotFound
 	}
 
 	// fail fast, if cache error return, don't request to db

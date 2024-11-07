@@ -404,9 +404,6 @@ func handlerMongoDBExtendedAPI(r replacer.Replacer, codeName string) (map[string
 		"internal/handler": {
 			"userExample.go.mgo.exp",
 		},
-		"internal/model": {
-			"init.go.mgo", "userExample.go",
-		},
 		"internal/routers": {
 			"routers.go", "userExample.go.exp",
 		},
@@ -416,7 +413,6 @@ func handlerMongoDBExtendedAPI(r replacer.Replacer, codeName string) (map[string
 	}
 	if codeName == codeNameHandler {
 		replaceFiles["internal/ecode"] = []string{"userExample_http.go.exp"}
-		replaceFiles["internal/model"] = []string{"userExample.go"}
 		replaceFiles["internal/routers"] = []string{"userExample.go.exp"}
 		replaceFiles["internal/types"] = []string{"userExample_types.go.mgo.exp"}
 	}

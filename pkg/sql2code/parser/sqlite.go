@@ -4,16 +4,16 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/zhufuyi/sponge/pkg/ggorm"
+	"github.com/zhufuyi/sponge/pkg/sgorm/sqlite"
 )
 
 // GetSqliteTableInfo get table info from sqlite
 func GetSqliteTableInfo(dbFile string, tableName string) (string, error) {
-	db, err := ggorm.InitSqlite(dbFile)
+	db, err := sqlite.Init(dbFile)
 	if err != nil {
 		return "", err
 	}
-	defer closeDB(db)
+	defer sqlite.Close(db) //nolint
 
 	var sqliteFields SqliteFields
 	sql := fmt.Sprintf("PRAGMA table_info('%s')", tableName)

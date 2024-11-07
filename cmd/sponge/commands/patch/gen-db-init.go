@@ -3,7 +3,6 @@ package patch
 import (
 	"errors"
 	"fmt"
-	"strings"
 
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
@@ -19,7 +18,7 @@ func GenerateDBInitCommand() *cobra.Command {
 		moduleName string // go.mod module name
 		dbDriver   string // database driver e.g. mysql, mongodb, postgresql, tidb, sqlite
 		outPath    string // output directory
-		targetFile = "internal/model/init.go"
+		targetFile = "internal/database/init.go"
 	)
 
 	cmd := &cobra.Command{
@@ -51,8 +50,9 @@ func GenerateDBInitCommand() *cobra.Command {
 				isEmpty = true
 			} else {
 				isEmpty = false
-				if gofile.IsExists(targetFile) {
-					fmt.Printf("'%s' already exists, no need to generate it.\n", targetFile)
+				initFile := outPath + "/" + targetFile
+				if gofile.IsExists(initFile) {
+					fmt.Printf("\"%s\" initialization code (%s) already exists, no need to generate it.\n", dbDriver, initFile)
 					return nil
 				}
 			}
@@ -78,12 +78,7 @@ using help:
 
 `)
 			}
-			if gofile.IsWindows() {
-				targetFile = "\\" + strings.ReplaceAll(targetFile, "/", "\\")
-			} else {
-				targetFile = "/" + targetFile
-			}
-			fmt.Printf("generate \"init-%s\" codes successfully, out = %s\n", dbDriver, cutPathPrefix(outPath+targetFile))
+			fmt.Printf("generate \"%s\" initialization code successfully, out = %s\n", dbDriver, outPath)
 			return nil
 		},
 	}
@@ -106,32 +101,23 @@ type dbInitGenerator struct {
 }
 
 func (g *dbInitGenerator) generateCode() (string, error) {
-	subTplName := "init-" + g.dbDriver
+	subTplName := "init_" + g.dbDriver
 	r := generate.Replacers[generate.TplNameSponge]
 	if r == nil {
 		return "", errors.New("replacer is nil")
 	}
 
-	// setting up template information
-	subDirs := []string{"internal/model"} // only the specified subdirectory is processed, if empty or no subdirectory is specified, it means all files
-	ignoreDirs := []string{}              // specify the directory in the subdirectory where processing is ignored
-	var ignoreFiles []string
-	switch strings.ToLower(g.dbDriver) {
-	case generate.DBDriverMysql, generate.DBDriverPostgresql, generate.DBDriverTidb, generate.DBDriverSqlite:
-		ignoreFiles = []string{ // specify the files in the subdirectory to be ignored for processing
-			"userExample.go", "init_test.go", "init.go.mgo",
-		}
-	case generate.DBDriverMongodb:
-		ignoreFiles = []string{ // specify the files in the subdirectory to be ignored for processing
-			"userExample.go", "init_test.go", "init.go",
-		}
-	default:
-		return "", fmt.Errorf("unsupported database driver: %s", g.dbDriver)
+	subDirs := []string{}
+	selectFiles := map[string][]string{}
+	err := generate.SetSelectFiles(g.dbDriver, selectFiles)
+	if err != nil {
+		return "", err
+	}
+	if len(selectFiles) == 0 {
+		return "", errors.New("no files to generate")
 	}
 
-	r.SetSubDirsAndFiles(subDirs)
-	r.SetIgnoreSubDirs(ignoreDirs...)
-	r.SetIgnoreSubFiles(ignoreFiles...)
+	r.SetSubDirsAndFiles(subDirs, getSubFiles(selectFiles)...)
 	_ = r.SetOutputDir(g.outPath, subTplName)
 	fields := g.addFields(r)
 	r.SetReplacementFields(fields)
@@ -157,9 +143,13 @@ func (g *dbInitGenerator) addFields(r replacer.Replacer) []replacer.Field {
 			New:             g.moduleName + "/configs",
 			IsCaseSensitive: false,
 		},
-		{ // rename init.go.mgo --> init.go
+		{
 			Old: "init.go.mgo",
 			New: "init.go",
+		},
+		{
+			Old: "mongodb.go.mgo",
+			New: "mongodb.go",
 		},
 		{ // replace the contents of the model/init.go file
 			Old: generate.ModelInitDBFileMark,

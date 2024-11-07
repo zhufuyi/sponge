@@ -9,13 +9,14 @@ import (
 	"github.com/jinzhu/copier"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/zhufuyi/sponge/pkg/ggorm/query"
 	"github.com/zhufuyi/sponge/pkg/gotest"
 	"github.com/zhufuyi/sponge/pkg/httpcli"
+	"github.com/zhufuyi/sponge/pkg/sgorm/query"
 	"github.com/zhufuyi/sponge/pkg/utils"
 
 	"github.com/zhufuyi/sponge/internal/cache"
 	"github.com/zhufuyi/sponge/internal/dao"
+	"github.com/zhufuyi/sponge/internal/database"
 	"github.com/zhufuyi/sponge/internal/model"
 	"github.com/zhufuyi/sponge/internal/types"
 )
@@ -29,7 +30,7 @@ func newUserExampleHandler() *gotest.Handler {
 
 	// init mock cache
 	c := gotest.NewCache(map[string]interface{}{utils.Uint64ToStr(testData.ID): testData})
-	c.ICache = cache.NewUserExampleCache(&model.CacheType{
+	c.ICache = cache.NewUserExampleCache(&database.CacheType{
 		CType: "redis",
 		Rdb:   c.RedisClient,
 	})

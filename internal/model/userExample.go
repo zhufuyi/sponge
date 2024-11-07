@@ -4,12 +4,12 @@
 package model
 
 import (
-	"github.com/zhufuyi/sponge/pkg/ggorm"
+	"github.com/zhufuyi/sponge/pkg/sgorm"
 )
 
 // UserExample object fields mapping table
 type UserExample struct {
-	ggorm.Model `gorm:"embedded"`
+	sgorm.Model `gorm:"embedded"`
 
 	Name     string `gorm:"column:name;NOT NULL" json:"name"`         // username
 	Password string `gorm:"column:password;NOT NULL" json:"password"` // password

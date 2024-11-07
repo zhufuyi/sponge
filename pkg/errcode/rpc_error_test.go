@@ -41,7 +41,7 @@ var rpcStatus = []*RPCStatus{
 }
 
 func TestRPCStatus(t *testing.T) {
-	st := NewRPCStatus(41101, "something is wrong")
+	st := NewRPCStatus(401101, "something is wrong")
 	err := st.Err()
 	assert.Error(t, err)
 	err = st.Err("another thing is wrong")
@@ -52,7 +52,7 @@ func TestRPCStatus(t *testing.T) {
 	assert.Equal(t, s.Message(), "another thing is wrong")
 
 	code := st.Code()
-	assert.Equal(t, int(code), 41101)
+	assert.Equal(t, int(code), 401101)
 	msg := st.Msg()
 	assert.Equal(t, msg, "something is wrong")
 
@@ -61,7 +61,7 @@ func TestRPCStatus(t *testing.T) {
 			t.Log(e)
 		}
 	}()
-	NewRPCStatus(41101, "something is wrong 2")
+	NewRPCStatus(401101, "something is wrong 2")
 }
 
 func TestToRPCCode(t *testing.T) {
@@ -121,7 +121,8 @@ func TestRCode(t *testing.T) {
 	defer func() {
 		recover()
 	}()
-	code = RCode(101)
+	code = RCode(1001)
+	t.Log("error code is", int(code))
 }
 
 func TestHandlers(t *testing.T) {

@@ -426,16 +426,12 @@ func serviceMongoDBExtendedAPI(r replacer.Replacer, codeName string) (map[string
 		"internal/ecode": {
 			"systemCode_rpc.go", "userExample_rpc.go.exp",
 		},
-		"internal/model": {
-			"init.go.mgo", "userExample.go",
-		},
 		"internal/service": {
 			"service.go", "service_test.go", "userExample.go.mgo.exp", "userExample_client_test.go.mgo.exp",
 		},
 	}
 	if codeName == codeNameService {
 		replaceFiles["internal/ecode"] = []string{"userExample_rpc.go.exp"}
-		replaceFiles["internal/model"] = []string{"userExample.go"}
 		replaceFiles["internal/service"] = []string{"userExample.go.mgo.exp", "userExample_client_test.go.mgo.exp"}
 	}
 

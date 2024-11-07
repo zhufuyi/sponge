@@ -41,6 +41,7 @@ import (
 	// import api service package here
 	//"moduleNameExample/internal/cache"
 	//"moduleNameExample/internal/dao"
+	//"moduleNameExample/internal/database"
 	//"moduleNameExample/internal/ecode"
 	//"moduleNameExample/internal/model"
 )
@@ -69,8 +70,8 @@ func New{{.Name}}Server() {{.ProtoPkgName}}.{{.Name}}Server {
 	return &{{.LowerName}}{
 		// example:
 		//		iDao: dao.New{{.Name}}Dao(
-		//			model.GetDB(),
-		//			cache.New{{.Name}}Cache(model.GetCacheType()),
+		//			database.GetDB(),
+		//			cache.New{{.Name}}Cache(database.GetCacheType()),
 		//		),
 	}
 }

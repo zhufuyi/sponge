@@ -9,7 +9,7 @@ import (
 )
 
 var _ time.Time
-var _ = model.MaxObjectID
+var _  model.UserExample
 
 // Tip: suggested filling in the binding rules https://github.com/go-playground/validator in request struct fields tag.
 

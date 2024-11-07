@@ -9,6 +9,7 @@ import (
 	"github.com/zhufuyi/sponge/pkg/gotest"
 	"github.com/zhufuyi/sponge/pkg/utils"
 
+	"github.com/zhufuyi/sponge/internal/database"
 	"github.com/zhufuyi/sponge/internal/model"
 )
 
@@ -23,7 +24,7 @@ func newUserExampleCache() *gotest.Cache {
 	}
 
 	c := gotest.NewCache(testData)
-	c.ICache = NewUserExampleCache(&model.CacheType{
+	c.ICache = NewUserExampleCache(&database.CacheType{
 		CType: "redis",
 		Rdb:   c.RedisClient,
 	})
@@ -129,15 +130,15 @@ func Test_userExampleCache_SetCacheWithNotFound(t *testing.T) {
 }
 
 func TestNewUserExampleCache(t *testing.T) {
-	c := NewUserExampleCache(&model.CacheType{
+	c := NewUserExampleCache(&database.CacheType{
 		CType: "",
 	})
 	assert.Nil(t, c)
-	c = NewUserExampleCache(&model.CacheType{
+	c = NewUserExampleCache(&database.CacheType{
 		CType: "memory",
 	})
 	assert.NotNil(t, c)
-	c = NewUserExampleCache(&model.CacheType{
+	c = NewUserExampleCache(&database.CacheType{
 		CType: "redis",
 	})
 	assert.NotNil(t, c)

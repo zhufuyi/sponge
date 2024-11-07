@@ -216,6 +216,9 @@ func (g *httpGenerator) generateCode() (string, error) {
 		"internal/dao": {
 			"userExample.go", "userExample_test.go",
 		},
+		"internal/database": {
+			"init.go",
+		},
 		"internal/ecode": {
 			"systemCode_http.go", "userExample_http.go",
 		},
@@ -223,7 +226,7 @@ func (g *httpGenerator) generateCode() (string, error) {
 			"userExample.go", "userExample_test.go",
 		},
 		"internal/model": {
-			"init.go", "userExample.go",
+			"userExample.go",
 		},
 		"internal/routers": {
 			"routers.go", "userExample.go",
@@ -234,6 +237,10 @@ func (g *httpGenerator) generateCode() (string, error) {
 		"internal/types": {
 			"swagger_types.go", "userExample_types.go",
 		},
+	}
+	err := SetSelectFiles(g.dbDriver, selectFiles)
+	if err != nil {
+		return "", err
 	}
 
 	info := g.codes[parser.CodeTypeCrudInfo]
@@ -293,9 +300,6 @@ func (g *httpGenerator) generateCode() (string, error) {
 				"internal/handler": {
 					"userExample.go.mgo",
 				},
-				"internal/model": {
-					"init.go.mgo", "userExample.go",
-				},
 				"internal/types": {
 					"swagger_types.go", "userExample_types.go.mgo",
 				},
@@ -332,7 +336,7 @@ func (g *httpGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	var fields []replacer.Field
 	fields = append(fields, g.fields...)
 	fields = append(fields, deleteFieldsMark(r, modelFile, startMark, endMark)...)
-	fields = append(fields, deleteFieldsMark(r, modelInitDBFile, startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, databaseInitDBFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, daoFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, daoMgoFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, daoTestFile, startMark, endMark)...)
@@ -367,8 +371,8 @@ func (g *httpGenerator) addFields(r replacer.Replacer) []replacer.Field {
 			Old: modelFileMark,
 			New: g.codes[parser.CodeTypeModel],
 		},
-		{ // replace the contents of the model/init.go file
-			Old: modelInitDBFileMark,
+		{ // replace the contents of the database/init.go file
+			Old: databaseInitDBFileMark,
 			New: getInitDBCode(g.dbDriver),
 		},
 		{ // replace the contents of the dao/userExample.go file
@@ -508,6 +512,10 @@ func (g *httpGenerator) addFields(r replacer.Replacer) []replacer.Field {
 		{
 			Old: "init.go.mgo",
 			New: "init.go",
+		},
+		{
+			Old: "mongodb.go.mgo",
+			New: "mongodb.go",
 		},
 		{
 			Old: "userExample_types.go.mgo",

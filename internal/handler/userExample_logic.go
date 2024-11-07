@@ -8,13 +8,14 @@ import (
 
 	"github.com/jinzhu/copier"
 
-	"github.com/zhufuyi/sponge/pkg/ggorm/query"
 	"github.com/zhufuyi/sponge/pkg/gin/middleware"
 	"github.com/zhufuyi/sponge/pkg/logger"
+	"github.com/zhufuyi/sponge/pkg/sgorm/query"
 
 	serverNameExampleV1 "github.com/zhufuyi/sponge/api/serverNameExample/v1"
 	"github.com/zhufuyi/sponge/internal/cache"
 	"github.com/zhufuyi/sponge/internal/dao"
+	"github.com/zhufuyi/sponge/internal/database"
 	"github.com/zhufuyi/sponge/internal/ecode"
 	"github.com/zhufuyi/sponge/internal/model"
 )
@@ -30,8 +31,8 @@ type userExamplePbHandler struct {
 func NewUserExamplePbHandler() serverNameExampleV1.UserExampleLogicer {
 	return &userExamplePbHandler{
 		userExampleDao: dao.NewUserExampleDao(
-			model.GetDB(),
-			cache.NewUserExampleCache(model.GetCacheType()),
+			database.GetDB(),
+			cache.NewUserExampleCache(database.GetCacheType()),
 		),
 	}
 }
@@ -112,7 +113,7 @@ func (h *userExamplePbHandler) GetByID(ctx context.Context, req *serverNameExamp
 
 	record, err := h.userExampleDao.GetByID(ctx, req.Id)
 	if err != nil {
-		if errors.Is(err, model.ErrRecordNotFound) {
+		if errors.Is(err, database.ErrRecordNotFound) {
 			logger.Warn("GetByID error", logger.Err(err), logger.Any("id", req.Id), middleware.CtxRequestIDField(ctx))
 			return nil, ecode.NotFound.Err()
 		}

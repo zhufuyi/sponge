@@ -1,4 +1,4 @@
-package model
+package database
 
 import (
 	"context"
@@ -6,11 +6,12 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"gorm.io/gorm"
 
 	"github.com/zhufuyi/sponge/configs"
-	"github.com/zhufuyi/sponge/internal/config"
+	"github.com/zhufuyi/sponge/pkg/sgorm"
 	"github.com/zhufuyi/sponge/pkg/utils"
+
+	"github.com/zhufuyi/sponge/internal/config"
 )
 
 func TestGetDB(t *testing.T) {
@@ -27,8 +28,8 @@ func TestGetDB(t *testing.T) {
 	assert.NoError(t, err)
 
 	utils.SafeRunWithTimeout(time.Second*2, func(cancel context.CancelFunc) {
-		gdb := GetDB()
-		assert.NotNil(t, gdb)
+		db := GetDB()
+		assert.NotNil(t, db)
 		cancel()
 	})
 }
@@ -45,7 +46,7 @@ func TestInitMysqlError(t *testing.T) {
 	utils.SafeRunWithTimeout(time.Second*2, func(cancel context.CancelFunc) {
 		_ = CloseDB()
 		InitMysql()
-		assert.NotNil(t, db)
+		assert.NotNil(t, gdb)
 		cancel()
 	})
 }
@@ -59,7 +60,7 @@ func TestInitPostgresqlError(t *testing.T) {
 	utils.SafeRunWithTimeout(time.Second*2, func(cancel context.CancelFunc) {
 		_ = CloseDB()
 		InitPostgresql()
-		assert.NotNil(t, db)
+		assert.NotNil(t, gdb)
 		cancel()
 	})
 }
@@ -68,14 +69,14 @@ func TestInitSqliteError(t *testing.T) {
 	_ = config.Init(configs.Path("serverNameExample.yml"))
 	utils.SafeRunWithTimeout(time.Second*2, func(cancel context.CancelFunc) {
 		InitSqlite()
-		assert.NotNil(t, db)
+		assert.NotNil(t, gdb)
 		cancel()
 	})
 }
 
 func TestCloseDB(t *testing.T) {
 	defer func() { recover() }()
-	db = &gorm.DB{}
+	gdb = &sgorm.DB{}
 	err := CloseDB()
 	assert.NoError(t, err)
 }
@@ -105,10 +106,6 @@ func TestInitRedis(t *testing.T) {
 	redisCli = nil
 	_ = CloseRedis()
 	_ = GetRedisCli()
-}
-
-func TestTableName(t *testing.T) {
-	t.Log(new(UserExample).TableName())
 }
 
 func TestGetCacheType(t *testing.T) {

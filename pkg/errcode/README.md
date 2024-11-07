@@ -1,15 +1,21 @@
 ## errcode
 
-Error codes usually include system-level error codes and business-level error codes, consisting of a total of 5 decimal digits, e.g. 20101
+Error codes usually include system-level error codes and business-level error codes, consisting of a total of 6 decimal digits, e.g. 200101
 
-| First digit                                                                          | Middle two digits | Last two digits |
-|:-------------------------------------------------------------------------------------|:-------|:-------|
-| For http error codes, 2 indicates a business-level error (1 is a system-level error) | Service Module Code | Specific error codes |
-| For grpc error codes, 4 indicates a business-level error (3 is a system-level error) | Service Module Code | Specific error codes |
+**Error code structure:**
 
-- Error levels occupy one digit: 1 (http) and 3 (grpc) indicate system-level errors, 2 (http) and 4 (grpc) indicate business-level errors, usually caused by illegal user operations.
-- Double-digit service modules: A large system usually has no more than two service modules; if it exceeds that, it's time to split the system.
-- Error codes take up two digits: prevents a module from being customised with too many error codes, which are not well maintained later.
+| First digit                                                                                                                    | Middle three digits                  | Last two digits         |
+|:-------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------|:------------------------|
+| `1` is http system-level error<br>`2` is http business-level error<br>`3` is grpc system-level error<br>`4` is grpc system-level error | Table or module number, range 1~1000 | Custom number, range 1~100 |
+
+<br>
+
+**Error code ranges:**
+
+| Service Type | System-level Error Code Range | Business-level Error Code Range |
+|:-------------|:------------------------------|:--------------------------------|
+| http         | 100000 ~ 200000               | 200000 ~ 300000                 |
+| grpc         | 300000 ~ 400000               | 400000 ~ 500000                 |
 
 <br>
 

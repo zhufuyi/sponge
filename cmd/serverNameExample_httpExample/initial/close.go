@@ -9,7 +9,7 @@ import (
 	"github.com/zhufuyi/sponge/pkg/tracer"
 
 	"github.com/zhufuyi/sponge/internal/config"
-	"github.com/zhufuyi/sponge/internal/model"
+	"github.com/zhufuyi/sponge/internal/database"
 )
 
 // Close releasing resources after service exit
@@ -23,13 +23,13 @@ func Close(servers []app.IServer) []app.Close {
 
 	// close database
 	closes = append(closes, func() error {
-		return model.CloseDB()
+		return database.CloseDB()
 	})
 
 	// close redis
 	if config.Get().App.CacheType == "redis" {
 		closes = append(closes, func() error {
-			return model.CloseRedis()
+			return database.CloseRedis()
 		})
 	}
 

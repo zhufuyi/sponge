@@ -73,8 +73,10 @@ var (
 	modelFile     = "model/userExample.go"
 	modelFileMark = "// todo generate model code to here"
 
-	modelInitDBFile     = "model/init.go"
-	modelInitDBFileMark = "// todo generate initialisation database code here"
+	//modelInitDBFile     = "model/init.go"
+	databaseInitDBFile = "database/init.go"
+	//modelInitDBFileMark    = "// todo generate initialisation database code here"
+	databaseInitDBFileMark = "// todo generate initialisation database code here"
 
 	cacheFile = "cache/cacheNameExample.go"
 
@@ -159,11 +161,11 @@ var (
 )
 
 var (
-	ModelInitDBFile     = modelInitDBFile
-	ModelInitDBFileMark = modelInitDBFileMark
-	AppConfigFileDBMark = appConfigFileMark2
-	StartMark           = startMark
-	EndMark             = endMark
+	ModelInitDBFile     = databaseInitDBFile
+	ModelInitDBFileMark = databaseInitDBFileMark
+	//AppConfigFileDBMark = appConfigFileMark2
+	StartMark = startMark
+	EndMark   = endMark
 )
 
 func symbolConvert(str string, additionalChar ...string) []byte {
@@ -969,4 +971,22 @@ func replaceTemplateFileContent(r replacer.Replacer, file string, crudInfo *pars
 	}
 
 	return field, nil
+}
+
+// nolint
+func SetSelectFiles(dbDriver string, selectFiles map[string][]string) error {
+	dbDriver = strings.ToLower(dbDriver)
+	switch dbDriver {
+	case DBDriverMysql, DBDriverTidb:
+		selectFiles["internal/database"] = []string{"init.go", "redis.go", "mysql.go"}
+	case DBDriverPostgresql:
+		selectFiles["internal/database"] = []string{"init.go", "redis.go", "postgresql.go"}
+	case DBDriverSqlite:
+		selectFiles["internal/database"] = []string{"init.go", "redis.go", "sqlite.go"}
+	case DBDriverMongodb:
+		selectFiles["internal/database"] = []string{"init.go.mgo", "redis.go", "mongodb.go.mgo"}
+	default:
+		return errors.New("unsupported db driver: " + dbDriver)
+	}
+	return nil
 }

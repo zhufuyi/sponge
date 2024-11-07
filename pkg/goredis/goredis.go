@@ -3,12 +3,16 @@ package goredis
 
 import (
 	"context"
+	"errors"
 	"strings"
 	"time"
 
 	"github.com/redis/go-redis/extra/redisotel/v9"
 	"github.com/redis/go-redis/v9"
 )
+
+// Client is a redis client
+type Client = redis.Client
 
 const (
 	// ErrRedisNotFound not exist in redis
@@ -191,4 +195,32 @@ func getRedisOpt(dsn string, opts *options) (*redis.Options, error) {
 	}
 
 	return redisOpts, nil
+}
+
+// Close redis client
+func Close(rdb *redis.Client) error {
+	if rdb == nil {
+		return nil
+	}
+
+	err := rdb.Close()
+	if err != nil && errors.Is(err, redis.ErrClosed) {
+		return err
+	}
+
+	return nil
+}
+
+// CloseCluster redis cluster client
+func CloseCluster(clusterRdb *redis.ClusterClient) error {
+	if clusterRdb == nil {
+		return nil
+	}
+
+	err := clusterRdb.Close()
+	if err != nil && errors.Is(err, redis.ErrClosed) {
+		return err
+	}
+
+	return nil
 }

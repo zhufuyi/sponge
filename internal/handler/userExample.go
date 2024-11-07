@@ -13,6 +13,7 @@ import (
 
 	"github.com/zhufuyi/sponge/internal/cache"
 	"github.com/zhufuyi/sponge/internal/dao"
+	"github.com/zhufuyi/sponge/internal/database"
 	"github.com/zhufuyi/sponge/internal/ecode"
 	"github.com/zhufuyi/sponge/internal/model"
 	"github.com/zhufuyi/sponge/internal/types"
@@ -37,8 +38,8 @@ type userExampleHandler struct {
 func NewUserExampleHandler() UserExampleHandler {
 	return &userExampleHandler{
 		iDao: dao.NewUserExampleDao(
-			model.GetDB(),
-			cache.NewUserExampleCache(model.GetCacheType()),
+			database.GetDB(),
+			cache.NewUserExampleCache(database.GetCacheType()),
 		),
 	}
 }
@@ -175,7 +176,7 @@ func (h *userExampleHandler) GetByID(c *gin.Context) {
 	ctx := middleware.WrapCtx(c)
 	userExample, err := h.iDao.GetByID(ctx, id)
 	if err != nil {
-		if errors.Is(err, model.ErrRecordNotFound) {
+		if errors.Is(err, database.ErrRecordNotFound) {
 			logger.Warn("GetByID not found", logger.Err(err), logger.Any("id", id), middleware.GCtxRequestIDField(c))
 			response.Error(c, ecode.NotFound)
 		} else {
