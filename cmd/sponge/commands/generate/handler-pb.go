@@ -350,6 +350,10 @@ func (g *handlerPbGenerator) addFields(r replacer.Replacer) []replacer.Field {
 			New: "userExample.go",
 		},
 		{
+			Old: showDbNameMark,
+			New: CurrentDbDriver(g.dbDriver),
+		},
+		{
 			Old:             "UserExamplePb",
 			New:             "UserExample",
 			IsCaseSensitive: true,

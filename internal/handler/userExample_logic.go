@@ -31,7 +31,7 @@ type userExamplePbHandler struct {
 func NewUserExamplePbHandler() serverNameExampleV1.UserExampleLogicer {
 	return &userExamplePbHandler{
 		userExampleDao: dao.NewUserExampleDao(
-			database.GetDB(),
+			database.GetDB(), // todo show db driver name here
 			cache.NewUserExampleCache(database.GetCacheType()),
 		),
 	}

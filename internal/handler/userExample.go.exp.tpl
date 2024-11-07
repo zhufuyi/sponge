@@ -44,7 +44,7 @@ type {{.TableNameCamelFCL}}Handler struct {
 func New{{.TableNameCamel}}Handler() {{.TableNameCamel}}Handler {
 	return &{{.TableNameCamelFCL}}Handler{
 		iDao: dao.New{{.TableNameCamel}}Dao(
-			database.GetDB(),
+			database.GetDB(), // todo show db driver name here
 			cache.New{{.TableNameCamel}}Cache(database.GetCacheType()),
 		),
 	}

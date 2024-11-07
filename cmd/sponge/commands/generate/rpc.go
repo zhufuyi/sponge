@@ -523,6 +523,10 @@ func (g *rpcGenerator) addFields(r replacer.Replacer) []replacer.Field {
 			New: sqliteDSNAdaptation(g.dbDriver, g.dbDSN),
 		},
 		{
+			Old: showDbNameMark,
+			New: CurrentDbDriver(g.dbDriver),
+		},
+		{
 			Old: "init.go.mgo",
 			New: "init.go",
 		},

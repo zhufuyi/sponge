@@ -506,6 +506,10 @@ func (g *httpGenerator) addFields(r replacer.Replacer) []replacer.Field {
 			New: sqliteDSNAdaptation(g.dbDriver, g.dbDSN),
 		},
 		{
+			Old: showDbNameMark,
+			New: CurrentDbDriver(g.dbDriver),
+		},
+		{
 			Old: "Makefile-for-http",
 			New: "Makefile",
 		},

@@ -552,7 +552,8 @@ func InitDB() {
 	case sgorm.DBDriverMysql, sgorm.DBDriverTidb:
 		gdb = InitMysql()
 	default:
-		panic("InitDB error, unsupported database driver: " + dbDriver)
+		panic("InitDB error, please modify the correct 'database' configuration at yaml file. " +
+			"Refer to https://github.com/zhufuyi/sponge/blob/main/configs/serverNameExample.yml#L85")
 	}
 }`
 
@@ -563,7 +564,8 @@ func InitDB() {
 	case sgorm.DBDriverPostgresql:
 		gdb = InitPostgresql()
 	default:
-		panic("InitDB error, unsupported database driver: " + dbDriver)
+		panic("InitDB error, please modify the correct 'database' configuration at yaml file. " +
+			"Refer to https://github.com/zhufuyi/sponge/blob/main/configs/serverNameExample.yml#L85")
 	}
 }`
 
@@ -574,7 +576,8 @@ func InitDB() {
 	case sgorm.DBDriverSqlite:
 		gdb = InitSqlite()
 	default:
-		panic("InitDB error, unsupported database driver: " + dbDriver)
+		panic("InitDB error, please modify the correct 'database' configuration at yaml file. " +
+			"Refer to https://github.com/zhufuyi/sponge/blob/main/configs/serverNameExample.yml#L85")
 	}
 }`
 

@@ -41,7 +41,7 @@ type userExample struct {
 func NewUserExampleServer() serverNameExampleV1.UserExampleServer {
 	return &userExample{
 		iDao: dao.NewUserExampleDao(
-			database.GetDB(),
+			database.GetDB(), // todo show db driver name here
 			cache.NewUserExampleCache(database.GetCacheType()),
 		),
 	}

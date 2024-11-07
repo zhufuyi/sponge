@@ -40,7 +40,7 @@ type {{.TableNameCamelFCL}} struct {
 func New{{.TableNameCamel}}Server() serverNameExampleV1.{{.TableNameCamel}}Server {
 	return &{{.TableNameCamelFCL}}{
 		iDao: dao.New{{.TableNameCamel}}Dao(
-			database.GetDB(),
+			database.GetDB(), // todo show db driver name here
 			cache.New{{.TableNameCamel}}Cache(database.GetCacheType()),
 		),
 	}

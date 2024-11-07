@@ -21,7 +21,8 @@ func InitDB() {
 	case mgo.DBDriverName:
 		mdb = InitMongodb()
 	default:
-		panic("InitDB error, unsupported database driver: " + dbDriver)
+		panic("InitDB error, please modify the correct 'database' configuration at yaml file. " +
+			"Refer to https://github.com/zhufuyi/sponge/blob/main/configs/serverNameExample.yml#L85")
 	}
 }
 

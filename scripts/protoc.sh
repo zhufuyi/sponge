@@ -106,6 +106,10 @@ function patchTypesPbFile() {
   done
 }
 
+function autoDetectInitDbFile() {
+  sponge patch gen-db-init --out=. > /dev/null
+}
+
 function generateByAllProto(){
   getSpecifiedProtoFiles
   if [ $? -eq 0 ]; then
@@ -115,6 +119,7 @@ function generateByAllProto(){
   fi
 
   patchTypesPbFile
+  autoDetectInitDbFile
 
   if [ "$allProtoFiles"x = x ];then
     echo "Error: not found proto file in path $protoBasePath"

@@ -73,10 +73,11 @@ var (
 	modelFile     = "model/userExample.go"
 	modelFileMark = "// todo generate model code to here"
 
-	//modelInitDBFile     = "model/init.go"
-	databaseInitDBFile = "database/init.go"
-	//modelInitDBFileMark    = "// todo generate initialisation database code here"
+	databaseInitDBFile     = "database/init.go"
 	databaseInitDBFileMark = "// todo generate initialisation database code here"
+
+	showDbNameMark  = "// todo show db driver name here"
+	CurrentDbDriver = func(dbDriver string) string { return "// db driver is " + dbDriver }
 
 	cacheFile = "cache/cacheNameExample.go"
 

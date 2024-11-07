@@ -353,6 +353,10 @@ func (g *serviceAndHandlerGenerator) addFields(r replacer.Replacer) []replacer.F
 			New: g.serverName,
 		},
 		{
+			Old: showDbNameMark,
+			New: CurrentDbDriver(g.dbDriver),
+		},
+		{
 			Old: "userExample_client_test.go.mgo",
 			New: "userExample_client_test.go",
 		},

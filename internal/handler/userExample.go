@@ -38,7 +38,7 @@ type userExampleHandler struct {
 func NewUserExampleHandler() UserExampleHandler {
 	return &userExampleHandler{
 		iDao: dao.NewUserExampleDao(
-			database.GetDB(),
+			database.GetDB(), // todo show db driver name here
 			cache.NewUserExampleCache(database.GetCacheType()),
 		),
 	}

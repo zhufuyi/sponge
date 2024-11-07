@@ -319,6 +319,10 @@ func (g *handlerGenerator) addFields(r replacer.Replacer) []replacer.Field {
 			New: "userExample_types.go",
 		},
 		{
+			Old: showDbNameMark,
+			New: CurrentDbDriver(g.dbDriver),
+		},
+		{
 			Old: "userExample.go.mgo",
 			New: "userExample.go",
 		},

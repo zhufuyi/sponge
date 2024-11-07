@@ -32,7 +32,7 @@ type {{.TableNameCamelFCL}}Handler struct {
 func New{{.TableNameCamel}}Handler() serverNameExampleV1.{{.TableNameCamel}}Logicer {
 	return &{{.TableNameCamelFCL}}Handler{
 		{{.TableNameCamelFCL}}Dao: dao.New{{.TableNameCamel}}Dao(
-			database.GetDB(),
+			database.GetDB(), // todo show db driver name here
 			cache.New{{.TableNameCamel}}Cache(database.GetCacheType()),
 		),
 	}
