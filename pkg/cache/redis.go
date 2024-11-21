@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -49,6 +50,9 @@ func (c *redisCache) Set(ctx context.Context, key string, val interface{}, expir
 	//if expiration == 0 {
 	//	expiration = DefaultExpireTime
 	//}
+	if len(buf) == 0 {
+		buf = NotFoundPlaceholderBytes
+	}
 	err = c.client.Set(ctx, cacheKey, buf, expiration).Err()
 	if err != nil {
 		return fmt.Errorf("c.client.Set error: %v, cacheKey=%s", err, cacheKey)
@@ -63,7 +67,7 @@ func (c *redisCache) Get(ctx context.Context, key string, val interface{}) error
 		return fmt.Errorf("BuildCacheKey error: %v, key=%s", err, key)
 	}
 
-	bytes, err := c.client.Get(ctx, cacheKey).Bytes()
+	dataBytes, err := c.client.Get(ctx, cacheKey).Bytes()
 	// NOTE: don't handle the case where redis value is nil
 	// but leave it to the upstream for processing
 	if err != nil {
@@ -71,16 +75,13 @@ func (c *redisCache) Get(ctx context.Context, key string, val interface{}) error
 	}
 
 	// prevent Unmarshal from reporting an error if data is empty
-	if string(bytes) == "" {
-		return nil
-	}
-	if string(bytes) == NotFoundPlaceholder {
+	if len(dataBytes) == 0 || bytes.Equal(dataBytes, NotFoundPlaceholderBytes) {
 		return ErrPlaceholder
 	}
-	err = encoding.Unmarshal(c.encoding, bytes, val)
+	err = encoding.Unmarshal(c.encoding, dataBytes, val)
 	if err != nil {
-		return fmt.Errorf("encoding.Unmarshal error: %v, key=%s, cacheKey=%s, type=%v, json=%+v ",
-			err, key, cacheKey, reflect.TypeOf(val), string(bytes))
+		return fmt.Errorf("encoding.Unmarshal error: %v, key=%s, cacheKey=%s, type=%T, json=%s ",
+			err, key, cacheKey, val, dataBytes)
 	}
 	return nil
 }
@@ -120,7 +121,7 @@ func (c *redisCache) MultiSet(ctx context.Context, valueMap map[string]interface
 		case []byte:
 			pipeline.Expire(ctx, string(paris[i].([]byte)), expiration)
 		default:
-			fmt.Printf("redis expire is unsupported key type: %+v\n", reflect.TypeOf(paris[i]))
+			fmt.Printf("redis expire is unsupported key type: %T\n", paris[i])
 		}
 	}
 	_, err = pipeline.Exec(ctx)
@@ -154,10 +155,14 @@ func (c *redisCache) MultiGet(ctx context.Context, keys []string, value interfac
 		if v == nil {
 			continue
 		}
+		dataBytes := []byte(v.(string))
+		if len(dataBytes) == 0 || bytes.Equal(dataBytes, NotFoundPlaceholderBytes) {
+			continue
+		}
 		object := c.newObject()
-		err = encoding.Unmarshal(c.encoding, []byte(v.(string)), object)
+		err = encoding.Unmarshal(c.encoding, dataBytes, object)
 		if err != nil {
-			fmt.Printf("unmarshal data error: %+v, key=%s, cacheKey=%s type=%v\n", err, keys[i], cacheKeys[i], reflect.TypeOf(value))
+			fmt.Printf("unmarshal data error: %+v, cacheKey=%s valueType=%T\n", err, cacheKeys[i], value)
 			continue
 		}
 		valueMap.SetMapIndex(reflect.ValueOf(cacheKeys[i]), reflect.ValueOf(object))
@@ -245,6 +250,9 @@ func (c *redisClusterCache) Set(ctx context.Context, key string, val interface{}
 	//if expiration == 0 {
 	//	expiration = DefaultExpireTime
 	//}
+	if len(buf) == 0 {
+		buf = NotFoundPlaceholderBytes
+	}
 	err = c.client.Set(ctx, cacheKey, buf, expiration).Err()
 	if err != nil {
 		return fmt.Errorf("c.client.Set error: %v, cacheKey=%s", err, cacheKey)
@@ -259,7 +267,7 @@ func (c *redisClusterCache) Get(ctx context.Context, key string, val interface{}
 		return fmt.Errorf("BuildCacheKey error: %v, key=%s", err, key)
 	}
 
-	bytes, err := c.client.Get(ctx, cacheKey).Bytes()
+	dataBytes, err := c.client.Get(ctx, cacheKey).Bytes()
 	// NOTE: don't handle the case where redis value is nil
 	// but leave it to the upstream for processing
 	if err != nil {
@@ -267,16 +275,13 @@ func (c *redisClusterCache) Get(ctx context.Context, key string, val interface{}
 	}
 
 	// prevent Unmarshal from reporting an error if data is empty
-	if string(bytes) == "" {
-		return nil
-	}
-	if string(bytes) == NotFoundPlaceholder {
+	if len(dataBytes) == 0 || bytes.Equal(dataBytes, NotFoundPlaceholderBytes) {
 		return ErrPlaceholder
 	}
-	err = encoding.Unmarshal(c.encoding, bytes, val)
+	err = encoding.Unmarshal(c.encoding, dataBytes, val)
 	if err != nil {
-		return fmt.Errorf("encoding.Unmarshal error: %v, key=%s, cacheKey=%s, type=%v, json=%+v ",
-			err, key, cacheKey, reflect.TypeOf(val), string(bytes))
+		return fmt.Errorf("encoding.Unmarshal error: %v, key=%s, cacheKey=%s, type=%T, json=%s ",
+			err, key, cacheKey, val, dataBytes)
 	}
 	return nil
 }
@@ -313,7 +318,7 @@ func (c *redisClusterCache) MultiSet(ctx context.Context, valueMap map[string]in
 		case []byte:
 			pipeline.Expire(ctx, string(paris[i].([]byte)), expiration)
 		default:
-			fmt.Printf("redis expire is unsupported key type: %+v\n", reflect.TypeOf(paris[i]))
+			fmt.Printf("redis expire is unsupported key type: %T\n", paris[i])
 		}
 	}
 	_, err = pipeline.Exec(ctx)
@@ -347,10 +352,14 @@ func (c *redisClusterCache) MultiGet(ctx context.Context, keys []string, value i
 		if v == nil {
 			continue
 		}
+		dataBytes := []byte(v.(string))
+		if len(dataBytes) == 0 || bytes.Equal(dataBytes, NotFoundPlaceholderBytes) {
+			continue
+		}
 		object := c.newObject()
-		err = encoding.Unmarshal(c.encoding, []byte(v.(string)), object)
+		err = encoding.Unmarshal(c.encoding, dataBytes, object)
 		if err != nil {
-			fmt.Printf("unmarshal data error: %+v, key=%s, cacheKey=%s type=%v\n", err, keys[i], cacheKeys[i], reflect.TypeOf(value))
+			fmt.Printf("unmarshal data error: %+v, cacheKey=%s type=%T\n", err, cacheKeys[i], value)
 			continue
 		}
 		valueMap.SetMapIndex(reflect.ValueOf(cacheKeys[i]), reflect.ValueOf(object))

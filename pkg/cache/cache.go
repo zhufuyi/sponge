@@ -13,16 +13,14 @@ var (
 	// DefaultNotFoundExpireTime expiry time when result is empty 1 minute,
 	// often used for cache time when data is empty (cache pass-through)
 	DefaultNotFoundExpireTime = time.Minute * 10
+
 	// NotFoundPlaceholder placeholder
-	NotFoundPlaceholder = "*"
+	NotFoundPlaceholder      = "*"
+	NotFoundPlaceholderBytes = []byte(NotFoundPlaceholder)
+	ErrPlaceholder           = errors.New("cache: placeholder")
 
 	// DefaultClient generate a cache client, where keyPrefix is generally the business prefix
 	DefaultClient Cache
-
-	// ErrPlaceholder .
-	ErrPlaceholder = errors.New("cache: placeholder")
-	// ErrSetMemoryWithNotFound .
-	ErrSetMemoryWithNotFound = errors.New("cache: set memory cache err for not found")
 )
 
 // Cache driver interface

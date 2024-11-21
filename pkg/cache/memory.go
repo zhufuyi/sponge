@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -44,6 +45,9 @@ func (m *memoryCache) Set(_ context.Context, key string, val interface{}, expira
 	if err != nil {
 		return fmt.Errorf("encoding.Marshal error: %v, key=%s, val=%+v ", err, key, val)
 	}
+	if len(buf) == 0 {
+		buf = NotFoundPlaceholderBytes
+	}
 	cacheKey, err := BuildCacheKey(m.KeyPrefix, key)
 	if err != nil {
 		return fmt.Errorf("BuildCacheKey error: %v, key=%s", err, key)
@@ -68,14 +72,19 @@ func (m *memoryCache) Get(_ context.Context, key string, val interface{}) error 
 		return CacheNotFound
 	}
 
-	if string(data.([]byte)) == NotFoundPlaceholder {
+	dataBytes, ok := data.([]byte)
+	if !ok {
+		return fmt.Errorf("data type error, key=%s, type=%T", key, data)
+	}
+
+	if len(dataBytes) == 0 || bytes.Equal(dataBytes, NotFoundPlaceholderBytes) {
 		return ErrPlaceholder
 	}
 
-	err = encoding.Unmarshal(m.encoding, data.([]byte), val)
+	err = encoding.Unmarshal(m.encoding, dataBytes, val)
 	if err != nil {
-		return fmt.Errorf("encoding.Unmarshal error: %v, key=%s, cacheKey=%s, type=%v, json=%+v ",
-			err, key, cacheKey, reflect.TypeOf(val), string(data.([]byte)))
+		return fmt.Errorf("encoding.Unmarshal error: %v, key=%s, cacheKey=%s, type=%T, data=%s ",
+			err, key, cacheKey, val, dataBytes)
 	}
 	return nil
 }

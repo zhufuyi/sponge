@@ -2,6 +2,7 @@ package cache
 
 import (
 	"context"
+	"errors"
 	"strings"
 	"time"
 
@@ -29,7 +30,8 @@ type {{.TableNameCamel}}Cache interface {
 	MultiGet(ctx context.Context, {{.ColumnNamePluralCamelFCL}} []{{.GoType}}) (map[{{.GoType}}]*model.{{.TableNameCamel}}, error)
 	MultiSet(ctx context.Context, data []*model.{{.TableNameCamel}}, duration time.Duration) error
 	Del(ctx context.Context, {{.ColumnNameCamelFCL}} {{.GoType}}) error
-	SetCacheWithNotFound(ctx context.Context, {{.ColumnNameCamelFCL}} {{.GoType}}) error
+	SetPlaceholder(ctx context.Context, {{.ColumnNameCamelFCL}} {{.GoType}}) error
+	IsPlaceholderErr(err error) bool
 }
 
 // {{.TableNameCamelFCL}}Cache define a cache struct
@@ -139,8 +141,13 @@ func (c *{{.TableNameCamelFCL}}Cache) Del(ctx context.Context, {{.ColumnNameCame
 	return nil
 }
 
-// SetCacheWithNotFound set empty cache
-func (c *{{.TableNameCamelFCL}}Cache) SetCacheWithNotFound(ctx context.Context, {{.ColumnNameCamelFCL}} {{.GoType}}) error {
+// SetPlaceholder set placeholder value to cache
+func (c *{{.TableNameCamelFCL}}Cache) SetPlaceholder(ctx context.Context, {{.ColumnNameCamelFCL}} {{.GoType}}) error {
 	cacheKey := c.Get{{.TableNameCamel}}CacheKey({{.ColumnNameCamelFCL}})
 	return c.cache.SetCacheWithNotFound(ctx, cacheKey)
+}
+
+// IsPlaceholderErr check if cache is placeholder error
+func (c *{{.TableNameCamelFCL}}Cache) IsPlaceholderErr(err error) bool {
+	return errors.Is(err, cache.ErrPlaceholder)
 }

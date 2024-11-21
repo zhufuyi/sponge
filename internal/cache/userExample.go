@@ -2,6 +2,7 @@ package cache
 
 import (
 	"context"
+	"errors"
 	"strings"
 	"time"
 
@@ -29,7 +30,8 @@ type UserExampleCache interface {
 	MultiGet(ctx context.Context, ids []uint64) (map[uint64]*model.UserExample, error)
 	MultiSet(ctx context.Context, data []*model.UserExample, duration time.Duration) error
 	Del(ctx context.Context, id uint64) error
-	SetCacheWithNotFound(ctx context.Context, id uint64) error
+	SetPlaceholder(ctx context.Context, id uint64) error
+	IsPlaceholderErr(err error) bool
 }
 
 // userExampleCache define a cache struct
@@ -139,8 +141,13 @@ func (c *userExampleCache) Del(ctx context.Context, id uint64) error {
 	return nil
 }
 
-// SetCacheWithNotFound set empty cache
-func (c *userExampleCache) SetCacheWithNotFound(ctx context.Context, id uint64) error {
+// SetPlaceholder set placeholder value to cache
+func (c *userExampleCache) SetPlaceholder(ctx context.Context, id uint64) error {
 	cacheKey := c.GetUserExampleCacheKey(id)
 	return c.cache.SetCacheWithNotFound(ctx, cacheKey)
+}
+
+// IsPlaceholderErr check if cache is placeholder error
+func (c *userExampleCache) IsPlaceholderErr(err error) bool {
+	return errors.Is(err, cache.ErrPlaceholder)
 }

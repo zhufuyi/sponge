@@ -3,7 +3,6 @@ package dao
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -12,7 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"golang.org/x/sync/singleflight"
 
-	cacheBase "github.com/zhufuyi/sponge/pkg/cache"
+	"github.com/zhufuyi/sponge/pkg/logger"
 	"github.com/zhufuyi/sponge/pkg/mgo"
 	"github.com/zhufuyi/sponge/pkg/mgo/query"
 
@@ -154,32 +153,31 @@ func (d *userExampleDao) GetByID(ctx context.Context, id string) (*model.UserExa
 		return record, err
 	}
 
-	// get from cache or mongodb
+	// get from cache
 	cacheRecord, err := d.cache.Get(ctx, id)
 	if err == nil {
 		return cacheRecord, nil
 	}
 
+	// get from mongodb
 	if errors.Is(err, database.ErrCacheNotFound) {
 		// for the same id, prevent high concurrent simultaneous access to mongodb
-		val, err, _ := d.sfg.Do(id, func() (interface{}, error) { //nolint
+		val, err, _ := d.sfg.Do(id, func() (interface{}, error) {
 			record := &model.UserExample{}
-			err = d.collection.FindOne(ctx, mgo.ExcludeDeleted(filter)).Decode(record)
+			err := d.collection.FindOne(ctx, mgo.ExcludeDeleted(filter)).Decode(record)
 			if err != nil {
-				// if data is empty, set not found cache to prevent cache penetration, default expiration time 10 minutes
+				// set placeholder cache to prevent cache penetration, default expiration time 10 minutes
 				if errors.Is(err, database.ErrRecordNotFound) {
-					err = d.cache.SetCacheWithNotFound(ctx, id)
-					if err != nil {
-						return nil, err
+					if err = d.cache.SetPlaceholder(ctx, id); err != nil {
+						logger.Warn("cache.SetPlaceholder error", logger.Err(err), logger.Any("id", id))
 					}
 					return nil, database.ErrRecordNotFound
 				}
 				return nil, err
 			}
 			// set cache
-			err = d.cache.Set(ctx, id, record, cache.UserExampleExpireTime)
-			if err != nil {
-				return nil, fmt.Errorf("cache.Set error: %v, id=%d", err, id)
+			if err = d.cache.Set(ctx, id, record, cache.UserExampleExpireTime); err != nil {
+				logger.Warn("cache.Set error", logger.Err(err), logger.Any("id", id))
 			}
 			return record, nil
 		})
@@ -191,11 +189,12 @@ func (d *userExampleDao) GetByID(ctx context.Context, id string) (*model.UserExa
 			return nil, database.ErrRecordNotFound
 		}
 		return record, nil
-	} else if errors.Is(err, cacheBase.ErrPlaceholder) {
+	}
+
+	if d.cache.IsPlaceholderErr(err) {
 		return nil, database.ErrRecordNotFound
 	}
 
-	// fail fast, if cache error return, don't request to db
 	return nil, err
 }
 
@@ -339,7 +338,7 @@ func (d *userExampleDao) GetByIDs(ctx context.Context, ids []string) (map[string
 		return itemMap, nil
 	}
 
-	// get form cache or mongodb
+	// get form cache
 	itemMap, err := d.cache.MultiGet(ctx, ids)
 	if err != nil {
 		return nil, err
@@ -347,10 +346,8 @@ func (d *userExampleDao) GetByIDs(ctx context.Context, ids []string) (map[string
 
 	var missedIDs []string
 	for _, id := range ids {
-		_, ok := itemMap[id]
-		if !ok {
+		if _, ok := itemMap[id]; !ok {
 			missedIDs = append(missedIDs, id)
-			continue
 		}
 	}
 
@@ -360,35 +357,43 @@ func (d *userExampleDao) GetByIDs(ctx context.Context, ids []string) (map[string
 		var realMissedIDs []string
 		for _, id := range missedIDs {
 			_, err = d.cache.Get(ctx, id)
-			if errors.Is(err, cacheBase.ErrPlaceholder) {
+			if d.cache.IsPlaceholderErr(err) {
 				continue
 			}
 			realMissedIDs = append(realMissedIDs, id)
 		}
 
+		// get missed id from database
 		if len(realMissedIDs) > 0 {
-			missedData := []*model.UserExample{}
+			records := []*model.UserExample{}
+			recordIDMap := make(map[string]struct{})
 			oids := mgo.ConvertToObjectIDs(realMissedIDs)
 			filter := bson.M{"_id": bson.M{"$in": oids}}
 			cursor, err := d.collection.Find(ctx, mgo.ExcludeDeleted(filter))
 			if err != nil {
 				return nil, err
 			}
-			err = cursor.All(ctx, &missedData)
+			err = cursor.All(ctx, &records)
 			if err != nil {
 				return nil, err
 			}
-			if len(missedData) > 0 {
-				for _, data := range missedData {
+			if len(records) > 0 {
+				for _, data := range records {
 					itemMap[data.ID.Hex()] = data
+					recordIDMap[data.ID.Hex()] = struct{}{}
 				}
-				err = d.cache.MultiSet(ctx, missedData, cache.UserExampleExpireTime)
-				if err != nil {
-					return nil, err
+				if err = d.cache.MultiSet(ctx, records, cache.UserExampleExpireTime); err != nil {
+					logger.Warn("cache.MultiSet error", logger.Err(err), logger.Any("ids", records))
 				}
-			} else {
-				for _, id := range realMissedIDs {
-					_ = d.cache.SetCacheWithNotFound(ctx, id)
+				if len(records) == len(realMissedIDs) {
+					return itemMap, nil
+				}
+			}
+			for _, id := range realMissedIDs {
+				if _, ok := recordIDMap[id]; !ok {
+					if err = d.cache.SetPlaceholder(ctx, id); err != nil {
+						logger.Warn("cache.SetPlaceholder error", logger.Err(err), logger.Any("id", id))
+					}
 				}
 			}
 		}

@@ -3,13 +3,12 @@ package dao
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	"golang.org/x/sync/singleflight"
 	"gorm.io/gorm"
 
-	cacheBase "github.com/zhufuyi/sponge/pkg/cache"
+	"github.com/zhufuyi/sponge/pkg/logger"
 	"github.com/zhufuyi/sponge/pkg/sgorm/query"
 	"github.com/zhufuyi/sponge/pkg/utils"
 
@@ -141,34 +140,33 @@ func (d *{{.TableNameCamelFCL}}Dao) GetBy{{.ColumnNameCamel}}(ctx context.Contex
 		return record, err
 	}
 
-	// get from cache or database
+	// get from cache
 	record, err := d.cache.Get(ctx, {{.ColumnNameCamelFCL}})
 	if err == nil {
 		return record, nil
 	}
 
+	// get from database
 	if errors.Is(err, database.ErrCacheNotFound) {
 		// for the same {{.ColumnNameCamelFCL}}, prevent high concurrent simultaneous access to database
 		{{if .IsStringType}}val, err, _ := d.sfg.Do({{.ColumnNameCamelFCL}}, func() (interface{}, error) {
 {{else}}		val, err, _ := d.sfg.Do(utils.{{.GoTypeFCU}}ToStr({{.ColumnNameCamelFCL}}), func() (interface{}, error) {
 {{end}}
 			table := &model.{{.TableNameCamel}}{}
-			err = d.db.WithContext(ctx).Where("{{.ColumnName}} = ?", {{.ColumnNameCamelFCL}}).First(table).Error
+			err := d.db.WithContext(ctx).Where("{{.ColumnName}} = ?", {{.ColumnNameCamelFCL}}).First(table).Error
 			if err != nil {
-				// if data is empty, set not found cache to prevent cache penetration, default expiration time 10 minutes
+				// set placeholder cache to prevent cache penetration, default expiration time 10 minutes
 				if errors.Is(err, database.ErrRecordNotFound) {
-					err = d.cache.SetCacheWithNotFound(ctx, {{.ColumnNameCamelFCL}})
-					if err != nil {
-						return nil, err
+					if err = d.cache.SetPlaceholder(ctx, {{.ColumnNameCamelFCL}}); err != nil {
+						logger.Warn("cache.SetPlaceholder error", logger.Err(err), logger.Any("{{.ColumnNameCamelFCL}}", {{.ColumnNameCamelFCL}}))
 					}
 					return nil, database.ErrRecordNotFound
 				}
 				return nil, err
 			}
 			// set cache
-			err = d.cache.Set(ctx, {{.ColumnNameCamelFCL}}, table, cache.{{.TableNameCamel}}ExpireTime)
-			if err != nil {
-				return nil, fmt.Errorf("cache.Set error: %v, {{.ColumnNameCamelFCL}}=%d", err, {{.ColumnNameCamelFCL}})
+			if err = d.cache.Set(ctx, {{.ColumnNameCamelFCL}}, table, cache.{{.TableNameCamel}}ExpireTime); err != nil {
+				logger.Warn("cache.Set error", logger.Err(err), logger.Any("{{.ColumnNameCamelFCL}}", {{.ColumnNameCamelFCL}}))
 			}
 			return table, nil
 		})
@@ -180,11 +178,12 @@ func (d *{{.TableNameCamelFCL}}Dao) GetBy{{.ColumnNameCamel}}(ctx context.Contex
 			return nil, database.ErrRecordNotFound
 		}
 		return table, nil
-	} else if errors.Is(err, cacheBase.ErrPlaceholder) {
+	}
+
+	if d.cache.IsPlaceholderErr(err) {
 		return nil, database.ErrRecordNotFound
 	}
 
-	// fail fast, if cache error return, don't request to db
 	return nil, err
 }
 
@@ -318,7 +317,7 @@ func (d *{{.TableNameCamelFCL}}Dao) GetBy{{.ColumnNamePluralCamel}}(ctx context.
 		return itemMap, nil
 	}
 
-	// get form cache or database
+	// get form cache
 	itemMap, err := d.cache.MultiGet(ctx, {{.ColumnNamePluralCamelFCL}})
 	if err != nil {
 		return nil, err
@@ -326,10 +325,8 @@ func (d *{{.TableNameCamelFCL}}Dao) GetBy{{.ColumnNamePluralCamel}}(ctx context.
 
 	var missed{{.ColumnNamePluralCamel}} []{{.GoType}}
 	for _, {{.ColumnNameCamelFCL}} := range {{.ColumnNamePluralCamelFCL}} {
-		_, ok := itemMap[{{.ColumnNameCamelFCL}}]
-		if !ok {
+		if _, ok := itemMap[{{.ColumnNameCamelFCL}}]; !ok {
 			missed{{.ColumnNamePluralCamel}} = append(missed{{.ColumnNamePluralCamel}}, {{.ColumnNameCamelFCL}})
-			continue
 		}
 	}
 
@@ -339,30 +336,38 @@ func (d *{{.TableNameCamelFCL}}Dao) GetBy{{.ColumnNamePluralCamel}}(ctx context.
 		var realMissed{{.ColumnNamePluralCamel}} []{{.GoType}}
 		for _, {{.ColumnNameCamelFCL}} := range missed{{.ColumnNamePluralCamel}} {
 			_, err = d.cache.Get(ctx, {{.ColumnNameCamelFCL}})
-			if errors.Is(err, cacheBase.ErrPlaceholder) {
+			if d.cache.IsPlaceholderErr(err) {
 				continue
 			}
 			realMissed{{.ColumnNamePluralCamel}} = append(realMissed{{.ColumnNamePluralCamel}}, {{.ColumnNameCamelFCL}})
 		}
 
 		if len(realMissed{{.ColumnNamePluralCamel}}) > 0 {
-			var missedData []*model.{{.TableNameCamel}}
-			err = d.db.WithContext(ctx).Where("{{.ColumnName}} IN (?)", realMissed{{.ColumnNamePluralCamel}}).Find(&missedData).Error
+			var records []*model.{{.TableNameCamel}}
+			var record{{.ColumnNameCamel}}Map = make(map[{{.GoType}}]struct{})
+			err = d.db.WithContext(ctx).Where("{{.ColumnName}} IN (?)", realMissed{{.ColumnNamePluralCamel}}).Find(&records).Error
 			if err != nil {
 				return nil, err
 			}
 
-			if len(missedData) > 0 {
-				for _, data := range missedData {
-					itemMap[data.{{.ColumnNameCamel}}] = data
+			if len(records) > 0 {
+				for _, record := range records {
+					itemMap[record.{{.ColumnNameCamel}}] = record
+					record{{.ColumnNameCamel}}Map[record.{{.ColumnNameCamel}}] = struct{}{}
 				}
-				err = d.cache.MultiSet(ctx, missedData, cache.{{.TableNameCamel}}ExpireTime)
+				err = d.cache.MultiSet(ctx, records, cache.{{.TableNameCamel}}ExpireTime)
 				if err != nil {
-					return nil, err
+					logger.Warn("cache.MultiSet error", logger.Err(err), logger.Any("{{.ColumnNamePluralCamelFCL}}", records))
 				}
-			} else {
-				for _, {{.ColumnNameCamelFCL}} := range realMissed{{.ColumnNamePluralCamel}} {
-					_ = d.cache.SetCacheWithNotFound(ctx, {{.ColumnNameCamelFCL}})
+				if len(records) == len(realMissed{{.ColumnNamePluralCamel}}) {
+					return itemMap, nil
+				}
+			}
+			for _, {{.ColumnNameCamelFCL}} := range realMissed{{.ColumnNamePluralCamel}} {
+				if _, ok := record{{.ColumnNameCamel}}Map[{{.ColumnNameCamelFCL}}]; !ok {
+					if err = d.cache.SetPlaceholder(ctx, {{.ColumnNameCamelFCL}}); err != nil {
+						logger.Warn("cache.SetPlaceholder error", logger.Err(err), logger.Any("{{.ColumnNameCamelFCL}}", {{.ColumnNameCamelFCL}}))
+					}
 				}
 			}
 		}

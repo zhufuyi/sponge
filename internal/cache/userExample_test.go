@@ -123,10 +123,12 @@ func Test_userExampleCache_SetCacheWithNotFound(t *testing.T) {
 	defer c.Close()
 
 	record := c.TestDataSlice[0].(*model.UserExample)
-	err := c.ICache.(UserExampleCache).SetCacheWithNotFound(c.Ctx, record.ID)
+	err := c.ICache.(UserExampleCache).SetPlaceholder(c.Ctx, record.ID)
 	if err != nil {
 		t.Fatal(err)
 	}
+	b := c.ICache.(UserExampleCache).IsPlaceholderErr(err)
+	t.Log(b)
 }
 
 func TestNewUserExampleCache(t *testing.T) {

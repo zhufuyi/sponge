@@ -3,12 +3,11 @@ package dao
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"golang.org/x/sync/singleflight"
 	"gorm.io/gorm"
 
-	cacheBase "github.com/zhufuyi/sponge/pkg/cache"
+	"github.com/zhufuyi/sponge/pkg/logger"
 	"github.com/zhufuyi/sponge/pkg/sgorm/query"
 	"github.com/zhufuyi/sponge/pkg/utils"
 
@@ -135,34 +134,33 @@ func (d *{{.TableNameCamelFCL}}Dao) GetBy{{.ColumnNameCamel}}(ctx context.Contex
 		return record, err
 	}
 
-	// get from cache or database
+	// get from cache
 	record, err := d.cache.Get(ctx, {{.ColumnNameCamelFCL}})
 	if err == nil {
 		return record, nil
 	}
 
+	// get from database
 	if errors.Is(err, database.ErrCacheNotFound) {
 		// for the same {{.ColumnNameCamelFCL}}, prevent high concurrent simultaneous access to database
 		{{if .IsStringType}}val, err, _ := d.sfg.Do({{.ColumnNameCamelFCL}}, func() (interface{}, error) {
 {{else}}		val, err, _ := d.sfg.Do(utils.{{.GoTypeFCU}}ToStr({{.ColumnNameCamelFCL}}), func() (interface{}, error) {
 {{end}}
 			table := &model.{{.TableNameCamel}}{}
-			err = d.db.WithContext(ctx).Where("{{.ColumnName}} = ?", {{.ColumnNameCamelFCL}}).First(table).Error
+			err := d.db.WithContext(ctx).Where("{{.ColumnName}} = ?", {{.ColumnNameCamelFCL}}).First(table).Error
 			if err != nil {
-				// if data is empty, set not found cache to prevent cache penetration, default expiration time 10 minutes
+				// set placeholder cache to prevent cache penetration, default expiration time 10 minutes
 				if errors.Is(err, database.ErrRecordNotFound) {
-					err = d.cache.SetCacheWithNotFound(ctx, {{.ColumnNameCamelFCL}})
-					if err != nil {
-						return nil, err
+					if err = d.cache.SetPlaceholder(ctx, {{.ColumnNameCamelFCL}}); err != nil {
+						logger.Warn("cache.SetPlaceholder error", logger.Err(err), logger.Any("{{.ColumnNameCamelFCL}}", {{.ColumnNameCamelFCL}}))
 					}
 					return nil, database.ErrRecordNotFound
 				}
 				return nil, err
 			}
 			// set cache
-			err = d.cache.Set(ctx, {{.ColumnNameCamelFCL}}, table, cache.{{.TableNameCamel}}ExpireTime)
-			if err != nil {
-				return nil, fmt.Errorf("cache.Set error: %v, {{.ColumnNameCamelFCL}}=%v", err, {{.ColumnNameCamelFCL}})
+			if err = d.cache.Set(ctx, {{.ColumnNameCamelFCL}}, table, cache.{{.TableNameCamel}}ExpireTime); err != nil {
+				logger.Warn("cache.Set error", logger.Err(err), logger.Any("{{.ColumnNameCamelFCL}}", {{.ColumnNameCamelFCL}}))
 			}
 			return table, nil
 		})
@@ -174,11 +172,12 @@ func (d *{{.TableNameCamelFCL}}Dao) GetBy{{.ColumnNameCamel}}(ctx context.Contex
 			return nil, database.ErrRecordNotFound
 		}
 		return table, nil
-	} else if errors.Is(err, cacheBase.ErrPlaceholder) {
+	}
+
+	if d.cache.IsPlaceholderErr(err) {
 		return nil, database.ErrRecordNotFound
 	}
 
-	// fail fast, if cache error return, don't request to db
 	return nil, err
 }
 
