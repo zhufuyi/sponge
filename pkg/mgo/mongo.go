@@ -12,7 +12,7 @@ import (
 	"go.uber.org/zap"
 )
 
-type DB = mongo.Database
+type Database = mongo.Database
 
 var ErrNoDocuments = mongo.ErrNoDocuments
 

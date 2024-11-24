@@ -33,9 +33,26 @@ func GetFilename(filePath string) string {
 	return name
 }
 
+// GetFileSuffixName get file suffix name, example: ".txt"
+func GetFileSuffixName(filePath string) string {
+	return filepath.Ext(filePath)
+}
+
 // GetDir get dir, not include the last separator
 func GetDir(filePath string) string {
 	return filepath.Dir(filePath)
+}
+
+// GetSuffixDir get suffix dir, not include the last separator
+func GetSuffixDir(filePath string) string {
+	fileInfo, err := os.Stat(filePath)
+	if err != nil {
+		return filepath.Base(filePath)
+	}
+	if !fileInfo.IsDir() {
+		filePath = strings.TrimSuffix(filePath, fileInfo.Name())
+	}
+	return filepath.Base(filePath)
 }
 
 // GetFileDir get dir, include the last separator

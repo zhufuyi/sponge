@@ -18,7 +18,7 @@ var ErrRecordNotFound = mgo.ErrNoDocuments
 
 // InitMongodb connect mongodb
 // For more information on connecting to mongodb, see https://pkg.go.dev/go.mongodb.org/mongo-driver/mongo#Connect
-func InitMongodb() *mgo.DB {
+func InitMongodb() *mgo.Database {
 	dsn := utils.AdaptiveMongodbDsn(config.Get().Database.Mongodb.Dsn)
 	mdb, err := mgo.Init(dsn)
 	if err != nil {

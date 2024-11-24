@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	mdb     *mgo.DB
+	mdb     *mgo.Database
 	mdbOnce sync.Once
 )
 
@@ -27,7 +27,7 @@ func InitDB() {
 }
 
 // GetDB get db
-func GetDB() *mgo.DB {
+func GetDB() *mgo.Database {
 	if mdb == nil {
 		mdbOnce.Do(func() {
 			InitDB()
