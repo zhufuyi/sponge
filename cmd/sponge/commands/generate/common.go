@@ -347,6 +347,20 @@ func parseProtobufFiles(protobufFile string) ([]string, bool, error) {
 	return protobufFiles, countImportTypes > 0, nil
 }
 
+// ParseFuzzyProtobufFiles parse fuzzy protobuf files
+func ParseFuzzyProtobufFiles(protobufFile string) ([]string, error) {
+	var protoFiles []string
+	ss := strings.Split(protobufFile, ",")
+	for _, s := range ss {
+		files, _, err := parseProtobufFiles(s)
+		if err != nil {
+			return nil, err
+		}
+		protoFiles = append(protoFiles, files...)
+	}
+	return protoFiles, nil
+}
+
 // save the moduleName and serverName to the specified file for external use
 func saveGenInfo(moduleName string, serverName string, suitedMonoRepo bool, outputDir string) error {
 	genInfo := moduleName + "," + serverName + "," + strconv.FormatBool(suitedMonoRepo)
