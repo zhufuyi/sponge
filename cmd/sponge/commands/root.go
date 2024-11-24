@@ -40,6 +40,7 @@ Docs: %s`, color.HiCyanString("https://github.com/zhufuyi/sponge"), color.HiCyan
 		MergeCommand(),
 		PatchCommand(),
 		GenGraphCommand(),
+		TemplateCommand(),
 	)
 
 	return cmd
