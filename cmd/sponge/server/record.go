@@ -32,6 +32,11 @@ type parameters struct {
 	IncludeInitDB bool   `json:"includeInitDB"`
 	UpdateAt      string `json:"updateAt"`
 
+	TemplateDir string `json:"templateDir"`
+	Fields      string `json:"fields"`
+	DepProtoDir string `json:"depProtoDir"`
+	OnlyPrint   bool   `json:"onlyPrint"`
+
 	SuitedMonoRepo bool `json:"suitedMonoRepo"`
 }
 
@@ -101,6 +106,7 @@ func (r *record) get(ip string, commandType string) *parameters {
 	return r.HostRecord[key]
 }
 
+// nolint
 func parseCommandArgs(args []string) *parameters {
 	var params = &parameters{UpdateAt: time.Now().Format("20060102T150405")}
 	for _, v := range args {
@@ -111,6 +117,9 @@ func parseCommandArgs(args []string) *parameters {
 			}
 			if ss[0] == "--include-init-db" {
 				params.IncludeInitDB = true
+			}
+			if ss[0] == "--only-print" {
+				params.OnlyPrint = true
 			}
 		} else {
 			val := ss[1]
@@ -148,8 +157,16 @@ func parseCommandArgs(args []string) *parameters {
 				params.ProtobufFile = val
 			case "--yaml-file":
 				params.YamlFile = val
+			case "--tpl-dir":
+				params.TemplateDir = val
+			case "--fields":
+				params.Fields = val
+			case "--only-print":
+				params.OnlyPrint = val == "true"
+			case "--dep-proto-dir":
+				params.DepProtoDir = val
 			case "--suited-mono-repo":
-				params.SuitedMonoRepo = (val == "true")
+				params.SuitedMonoRepo = val == "true"
 			}
 		}
 	}

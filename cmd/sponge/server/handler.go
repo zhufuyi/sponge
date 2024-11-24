@@ -128,6 +128,18 @@ func GenerateCode(c *gin.Context) {
 	handleGenerateCode(c, form.Path, form.Arg)
 }
 
+// GetTemplateInfo get template info
+func GetTemplateInfo(c *gin.Context) {
+	form := &GenerateCodeForm{}
+	err := c.ShouldBindJSON(form)
+	if err != nil {
+		responseErr(c, err, errcode.InvalidParams)
+		return
+	}
+
+	handleGenerateCode(c, form.Path, form.Arg)
+}
+
 // nolint
 func handleGenerateCode(c *gin.Context, outPath string, arg string) {
 	out := "-" + time.Now().Format("150405")
@@ -157,11 +169,26 @@ func handleGenerateCode(c *gin.Context, outPath string, arg string) {
 
 	ctx, _ := context.WithTimeout(context.Background(), time.Minute*2) // nolint
 	result := gobash.Run(ctx, "sponge", args...)
+	resultInfo := ""
+	count := 0
 	for v := range result.StdOut {
-		_ = v
+		count++
+		if count == 1 { // first line is the command
+			continue
+		}
+		resultInfo += v
 	}
 	if result.Err != nil {
-		responseErr(c, result.Err, errcode.InternalServerError)
+		if params.OnlyPrint {
+			response.Out(c, errcode.InternalServerError.RewriteMsg(result.Err.Error()))
+		} else {
+			responseErr(c, result.Err, errcode.InternalServerError)
+		}
+		return
+	}
+
+	if params.OnlyPrint {
+		response.Success(c, resultInfo)
 		return
 	}
 
@@ -178,7 +205,8 @@ func handleGenerateCode(c *gin.Context, outPath string, arg string) {
 		return
 	}
 
-	c.Writer.Header().Set("content-disposition", gofile.GetFilename(zipFile))
+	c.Writer.Header().Set("Content-Type", "application/zip")
+	c.Writer.Header().Set("Content-Disposition", gofile.GetFilename(zipFile))
 	c.File(zipFile)
 
 	recordObj().set(c.ClientIP(), outPath, params)
@@ -268,10 +296,10 @@ func UploadFiles(c *gin.Context) {
 		for _, file := range files {
 			filename := filepath.Base(file.Filename)
 			fileType = path.Ext(filename)
-			if !checkFileType(fileType) {
-				response.Error(c, errcode.InvalidParams.RewriteMsg("only .proto or yaml files are allowed to be uploaded"))
-				return
-			}
+			//if !checkFileType(fileType) {
+			//	response.Error(c, errcode.InvalidParams.RewriteMsg("only .proto or yaml files are allowed to be uploaded"))
+			//	return
+			//}
 
 			filePath = savePath + "/" + filename
 			if checkSameFile(hadSaveFiles, filePath) {
@@ -302,14 +330,14 @@ func UploadFiles(c *gin.Context) {
 //	return valueSlice[0], nil
 //}
 
-func checkFileType(typeName string) bool {
-	switch typeName {
-	case ".proto", ".yml", ".yaml":
-		return true
-	}
-
-	return false
-}
+//func checkFileType(typeName string) bool {
+//	switch typeName {
+//	case ".proto", ".yml", ".yaml", "json":
+//		return true
+//	}
+//
+//	return false
+//}
 
 func checkSameFile(files []string, file string) bool {
 	for _, v := range files {
@@ -325,7 +353,7 @@ func getSavePath() string {
 	if gofile.IsWindows() {
 		dir = strings.ReplaceAll(saveDir, "\\", "/")
 	}
-	dir += "/" + krand.String(krand.R_All, 8)
+	dir += "/" + "s_" + krand.String(krand.R_NUM|krand.R_LOWER, 10)
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
 		_ = os.MkdirAll(dir, 0766)
 	}
