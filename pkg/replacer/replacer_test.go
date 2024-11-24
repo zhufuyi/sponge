@@ -88,6 +88,22 @@ func TestNewWithFS(t *testing.T) {
 	}
 }
 
+func TestSaveTemplateFiles(t *testing.T) {
+	out := fmt.Sprintf("%s/replacer_test/template_%s", os.TempDir(), time.Now().Format("150405"))
+	m := map[string]interface{}{
+		"service":  map[string]interface{}{"name": "user", "version": 1.0},
+		"port":     8080,
+		"isSecure": true,
+	}
+
+	r, err := New("testDir")
+	assert.NoError(t, err)
+	_ = r.SetOutputDir(out)
+	err = r.SaveTemplateFiles(m)
+	assert.NoError(t, err)
+	t.Log(out)
+}
+
 func TestReplacerError(t *testing.T) {
 	_, err := New("/notfound")
 	assert.Error(t, err)

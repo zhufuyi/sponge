@@ -1,3 +1,7 @@
 test1
 
 to do replace
+
+{{.service}}
+{{.port}}
+{{.isSecure}}

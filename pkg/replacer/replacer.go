@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"text/template"
 	"time"
 
 	"github.com/zhufuyi/sponge/pkg/gofile"
@@ -28,6 +29,7 @@ type Replacer interface {
 	SaveFiles() error
 	ReadFile(filename string) ([]byte, error)
 	GetFiles() []string
+	SaveTemplateFiles(m map[string]interface{}, parentDir ...string) error
 }
 
 // replacerInfo replacer information
@@ -287,6 +289,86 @@ func (r *replacerInfo) SaveFiles() error {
 	return nil
 }
 
+// SaveTemplateFiles save file with setting
+func (r *replacerInfo) SaveTemplateFiles(m map[string]interface{}, parentDir ...string) error {
+	refDir := ""
+	if len(parentDir) > 0 {
+		refDir = strings.Join(parentDir, gofile.GetPathDelimiter())
+	}
+
+	writeData := make(map[string][]byte, len(r.files))
+	for _, file := range r.files {
+		data, err := replaceTemplateData(file, m)
+		if err != nil {
+			return err
+		}
+		newFilePath := r.getNewFilePath2(file, refDir)
+		newFilePath = trimExt(newFilePath)
+		if gofile.IsExists(newFilePath) {
+			return fmt.Errorf("file %s already exists, cancel code generation", newFilePath)
+		}
+		newFilePath, err = replaceTemplateFilePath(newFilePath, m)
+		if err != nil {
+			return err
+		}
+		writeData[newFilePath] = data
+	}
+
+	for file, data := range writeData {
+		err := saveToNewFile(file, data)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func replaceTemplateData(file string, m map[string]interface{}) ([]byte, error) {
+	data, err := os.ReadFile(file)
+	if err != nil {
+		return nil, fmt.Errorf("read file failed, err=%s", err)
+	}
+	if !bytes.Contains(data, []byte("{{")) {
+		return data, nil
+	}
+
+	builder := bytes.Buffer{}
+	tmpl, err := template.New(file).Parse(string(data))
+	if err != nil {
+		return nil, fmt.Errorf("parse data failed, err=%s", err)
+	}
+	err = tmpl.Execute(&builder, m)
+	if err != nil {
+		return nil, fmt.Errorf("execute data failed, err=%s", err)
+	}
+	return builder.Bytes(), nil
+}
+
+func replaceTemplateFilePath(file string, m map[string]interface{}) (string, error) {
+	if !strings.Contains(file, "{{") {
+		return file, nil
+	}
+
+	builder := strings.Builder{}
+	tmpl, err := template.New("file: " + file).Parse(file)
+	if err != nil {
+		return file, fmt.Errorf("parse file failed, err=%s", err)
+	}
+	err = tmpl.Execute(&builder, m)
+	if err != nil {
+		return file, fmt.Errorf("execute file failed, err=%s", err)
+	}
+	return builder.String(), nil
+}
+
+func trimExt(file string) string {
+	file = strings.TrimSuffix(file, ".tmpl")
+	file = strings.TrimSuffix(file, ".tpl")
+	file = strings.TrimSuffix(file, ".template")
+	return file
+}
+
 func (r *replacerInfo) isIgnoreFile(file string) bool {
 	isIgnore := false
 	for _, v := range r.ignoreFiles {
@@ -331,6 +413,18 @@ func (r *replacerInfo) getNewFilePath(file string) string {
 		newFilePath = strings.ReplaceAll(newFilePath, "/", "\\")
 	}
 
+	return newFilePath
+}
+
+func (r *replacerInfo) getNewFilePath2(file string, refDir string) string {
+	if refDir == "" {
+		return r.getNewFilePath(file)
+	}
+
+	newFilePath := r.outPath + gofile.GetPathDelimiter() + refDir + gofile.GetPathDelimiter() + strings.Replace(file, r.path, "", 1)
+	if gofile.IsWindows() {
+		newFilePath = strings.ReplaceAll(newFilePath, "/", "\\")
+	}
 	return newFilePath
 }
 
