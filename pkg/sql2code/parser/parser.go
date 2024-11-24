@@ -37,6 +37,8 @@ const (
 	CodeTypeService = "service"
 	// CodeTypeCrudInfo crud info json data
 	CodeTypeCrudInfo = "crud_info"
+	// CodeTypeTableInfo table info json data
+	CodeTypeTableInfo = "table_info"
 
 	// DBDriverMysql mysql driver
 	DBDriverMysql = "mysql"
@@ -87,6 +89,7 @@ func ParseSQL(sql string, options ...Option) (map[string]string, error) {
 	importPath := make(map[string]struct{})
 	tableNames := make([]string, 0, len(stmts))
 	primaryKeysCodes := make([]string, 0, len(stmts))
+	tableInfoCodes := make([]string, 0, len(stmts))
 	for _, stmt := range stmts {
 		if ct, ok := stmt.(*ast.CreateTableStmt); ok {
 			code, err2 := makeCode(ct, opt)
@@ -101,6 +104,7 @@ func ParseSQL(sql string, options ...Option) (map[string]string, error) {
 			modelJSONCodes = append(modelJSONCodes, code.modelJSON)
 			tableNames = append(tableNames, toCamel(ct.Table.Name.String()))
 			primaryKeysCodes = append(primaryKeysCodes, code.crudInfo)
+			tableInfoCodes = append(tableInfoCodes, string(code.tableInfo))
 			for _, s := range code.importPaths {
 				importPath[s] = struct{}{}
 			}
@@ -124,24 +128,27 @@ func ParseSQL(sql string, options ...Option) (map[string]string, error) {
 	}
 
 	var codesMap = map[string]string{
-		CodeTypeModel:    modelCode,
-		CodeTypeJSON:     strings.Join(modelJSONCodes, "\n\n"),
-		CodeTypeDAO:      strings.Join(updateFieldsCodes, "\n\n"),
-		CodeTypeHandler:  strings.Join(handlerStructCodes, "\n\n"),
-		CodeTypeProto:    strings.Join(protoFileCodes, "\n\n"),
-		CodeTypeService:  strings.Join(serviceStructCodes, "\n\n"),
-		TableName:        strings.Join(tableNames, ", "),
-		CodeTypeCrudInfo: strings.Join(primaryKeysCodes, "||||"),
+		CodeTypeModel:     modelCode,
+		CodeTypeJSON:      strings.Join(modelJSONCodes, "\n\n"),
+		CodeTypeDAO:       strings.Join(updateFieldsCodes, "\n\n"),
+		CodeTypeHandler:   strings.Join(handlerStructCodes, "\n\n"),
+		CodeTypeProto:     strings.Join(protoFileCodes, "\n\n"),
+		CodeTypeService:   strings.Join(serviceStructCodes, "\n\n"),
+		TableName:         strings.Join(tableNames, ", "),
+		CodeTypeCrudInfo:  strings.Join(primaryKeysCodes, "||||"),
+		CodeTypeTableInfo: strings.Join(tableInfoCodes, "||||"),
 	}
 
 	return codesMap, nil
 }
 
 type tmplData struct {
-	TableName       string
-	TName           string
+	TableNamePrefix string
+
+	RawTableName    string // raw table name, example: foo_bar
+	TableName       string // table name in camel case, example: FooBar
+	TName           string // table name first letter in lower case, example: fooBar
 	NameFunc        bool
-	RawTableName    string
 	Fields          []tmplField
 	Comment         string
 	SubStructs      string // sub structs for model
@@ -351,25 +358,31 @@ type codeText struct {
 	protoFile     string
 	serviceStruct string
 	crudInfo      string
+	tableInfo     []byte
 }
 
 // nolint
 func makeCode(stmt *ast.CreateTableStmt, opt options) (*codeText, error) {
 	importPath := make([]string, 0, 1)
 	data := tmplData{
-		TableName:    stmt.Table.Name.String(),
-		RawTableName: stmt.Table.Name.String(),
-		//Fields:       make([]tmplField, 0, 1),
-		DBDriver: opt.DBDriver,
+		TableNamePrefix: opt.TablePrefix,
+		RawTableName:    stmt.Table.Name.String(),
+		DBDriver:        opt.DBDriver,
 	}
-	tablePrefix := opt.TablePrefix
-	if tablePrefix != "" && strings.HasPrefix(data.TableName, tablePrefix) {
+
+	tablePrefix := data.TableNamePrefix
+	if tablePrefix != "" && strings.HasPrefix(data.RawTableName, tablePrefix) {
 		data.NameFunc = true
-		data.TableName = data.TableName[len(tablePrefix):]
+		data.TableName = toCamel(data.RawTableName[len(tablePrefix):])
+	} else {
+		data.TableName = toCamel(data.RawTableName)
 	}
+	data.TName = firstLetterToLower(data.TableName)
+
 	if opt.ForceTableName || data.RawTableName != inflection.Plural(data.RawTableName) {
 		data.NameFunc = true
 	}
+
 	switch opt.DBDriver {
 	case DBDriverMongodb:
 		if opt.JSONNamedType != 0 {
@@ -378,9 +391,6 @@ func makeCode(stmt *ast.CreateTableStmt, opt options) (*codeText, error) {
 			SetJSONTagSnakeCase()
 		}
 	}
-
-	data.TableName = toCamel(data.TableName)
-	data.TName = firstLetterToLower(data.TableName)
 
 	// find table comment
 	for _, o := range stmt.Options {
@@ -518,6 +528,13 @@ func makeCode(stmt *ast.CreateTableStmt, opt options) (*codeText, error) {
 		data.Fields = append(data.Fields, field)
 	}
 
+	if v, ok := opt.FieldTypes[SubStructKey]; ok {
+		data.SubStructs = v
+	}
+	if v, ok := opt.FieldTypes[ProtoSubStructKey]; ok {
+		data.ProtoSubStructs = v
+	}
+
 	if len(data.Fields) == 0 {
 		return nil, errors.New("no columns found in table " + data.TableName)
 	}
@@ -525,11 +542,9 @@ func makeCode(stmt *ast.CreateTableStmt, opt options) (*codeText, error) {
 	data.CrudInfo = newCrudInfo(data)
 	data.CrudInfo.IsCommonType = data.isCommonStyle(opt.IsEmbed)
 
-	if v, ok := opt.FieldTypes[SubStructKey]; ok {
-		data.SubStructs = v
-	}
-	if v, ok := opt.FieldTypes[ProtoSubStructKey]; ok {
-		data.ProtoSubStructs = v
+	if opt.IsCustomTemplate {
+		tableInfo := newTableInfo(data)
+		return &codeText{tableInfo: tableInfo.getCode()}, nil
 	}
 
 	updateFieldsCode, err := getUpdateFieldsCode(data, opt.IsEmbed)

@@ -85,14 +85,43 @@ func TestGenerate(t *testing.T) {
 			}},
 			wantErr: false,
 		},
-		//{
-		//	name: "sql from db",
-		//	args: args{args: &Args{
-		//		DBDsn:   "root:123456@(127.0.0.1:3306)/test",
-		//		DBTable: "user",
-		//	}},
-		//	wantErr: false,
-		//},
+		{
+			name: "sql from mysql",
+			args: args{args: &Args{
+				DBDsn:    "root:123456@(192.168.3.37:3306)/account",
+				DBTable:  "user",
+				DBDriver: "mysql",
+			}},
+			wantErr: false,
+		},
+		{
+			name: "sql from postgresql",
+			args: args{args: &Args{
+				DBDsn:    "root:123456@(192.168.3.37:5432)/account",
+				DBTable:  "user",
+				DBDriver: "postgresql",
+			}},
+			wantErr: false,
+		},
+		{
+			name: "sql from sqlite",
+			args: args{args: &Args{
+				DBDsn:    "C:\\Users\\zhuyasen\\Desktop\\genTest\\sql\\sqlite\\sponge.db",
+				DBTable:  "user",
+				DBDriver: "sqlite",
+			}},
+			wantErr: false,
+		},
+		{
+			name: "sql from mongodb",
+			args: args{args: &Args{
+				DBDsn:            "root:123456@(192.168.3.37:27017)/account",
+				DBTable:          "people",
+				DBDriver:         "mongodb",
+				IsCustomTemplate: true,
+			}},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

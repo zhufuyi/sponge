@@ -261,10 +261,11 @@ func ConvertToSQLByMgoFields(tableName string, fields []*MgoField) (string, map[
 			protoObjectStrs = append(protoObjectStrs, field.ProtoObjectStr)
 		}
 	}
-	if isHaveID {
-		fieldStr = "    id bigint unsigned primary key,\n" + fieldStr
-	}
+
 	fieldStr = strings.TrimSuffix(fieldStr, ",\n")
+	if isHaveID {
+		fieldStr = "    `id` varchar(24),\n" + fieldStr + ",\n    PRIMARY KEY (id)"
+	}
 
 	if len(objectStrs) > 0 {
 		srcMongoTypeMap[SubStructKey] = strings.Join(objectStrs, "\n") + "\n"

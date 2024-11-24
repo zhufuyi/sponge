@@ -40,6 +40,8 @@ type Args struct {
 	NoNullType     bool
 	NullStyle      string
 	IsExtendedAPI  bool // true: generate extended api (9 api), false: generate basic api (5 api)
+
+	IsCustomTemplate bool // whether to use custom template, default is false
 }
 
 func (a *Args) checkValid() error {
@@ -180,6 +182,9 @@ func setOptions(args *Args) []parser.Option {
 	}
 	if args.IsExtendedAPI {
 		opts = append(opts, parser.WithExtendedAPI())
+	}
+	if args.IsCustomTemplate {
+		opts = append(opts, parser.WithCustomTemplate())
 	}
 
 	return opts
