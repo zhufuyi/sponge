@@ -23,6 +23,7 @@ var pluginNames = []string{
 	"protoc-gen-gotag",
 	"protoc-gen-go-gin",
 	"protoc-gen-go-rpc-tmpl",
+	"protoc-gen-json-field",
 	"protoc-gen-openapiv2",
 	"protoc-gen-doc",
 	"swag",
@@ -39,6 +40,7 @@ var installPluginCommands = map[string]string{
 	"protoc-gen-gotag":       "github.com/srikrsna/protoc-gen-gotag@latest",
 	"protoc-gen-go-gin":      "github.com/zhufuyi/sponge/cmd/protoc-gen-go-gin@latest",
 	"protoc-gen-go-rpc-tmpl": "github.com/zhufuyi/sponge/cmd/protoc-gen-go-rpc-tmpl@latest",
+	"protoc-gen-json-field":  "github.com/zhufuyi/sponge/cmd/protoc-gen-json-field@latest",
 	"protoc-gen-openapiv2":   "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@latest",
 	"protoc-gen-doc":         "github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc@latest",
 	"swag":                   "github.com/swaggo/swag/cmd/swag@v1.8.12",
@@ -59,8 +61,8 @@ func PluginsCommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "plugins",
-		Short: "Manage plugins that sponge depends on",
-		Long:  "Manage plugins that sponge depends on.",
+		Short: "Manage sponge dependency plugins",
+		Long:  "Manage sponge dependency plugins.",
 		Example: color.HiBlackString(`  # Show all dependency plugins.
   sponge plugins
 
@@ -177,7 +179,7 @@ func installPlugins(lackNames []string) {
 }
 
 func adaptInternalCommand(name string, pkgAddr string) string {
-	if name == "protoc-gen-go-gin" || name == "protoc-gen-go-rpc-tmpl" {
+	if name == "protoc-gen-go-gin" || name == "protoc-gen-go-rpc-tmpl" || name == "protoc-gen-json-field" {
 		if version != "v0.0.0" {
 			return strings.ReplaceAll(pkgAddr, "@latest", "@"+version)
 		}

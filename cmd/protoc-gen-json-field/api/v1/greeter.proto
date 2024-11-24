@@ -1,0 +1,194 @@
+syntax = "proto3";
+
+package api.greeter.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "yourModuleName/api/v1";
+
+service GreeterService {
+  // create a record
+  rpc Create(CreateGreeterRequest) returns (CreateGreeterReply) {
+    option (google.api.http) = {
+      post: "/api/v1/greeter"
+      body: "*"
+    };
+  }
+
+  // delete a record by id
+  rpc DeleteByID(DeleteGreeterByIDRequest) returns (DeleteGreeterByIDReply) {
+    option (google.api.http) = {
+      delete: "/api/v1/greeter/{id}"
+    };
+  }
+
+  rpc DeleteByID2(DeleteGreeterByIDRequest) returns (DeleteGreeterByIDReply) {
+    option (google.api.http) = {
+      delete: "/api/v1/greeter2/{id}"
+    };
+  }
+
+  // update a record by id
+  rpc UpdateByID(UpdateGreeterByIDRequest) returns (UpdateGreeterByIDReply) {
+    option (google.api.http) = {
+      put: "/api/v1/greeter/{id}"
+      body: "*"
+    };
+  }
+
+  // get a record by id
+  rpc GetByID(GetGreeterByIDRequest) returns (GetGreeterByIDReply) {
+    option (google.api.http) = {
+      get: "/api/v1/greeter/{id}"
+    };
+  }
+
+  // list of records by parameters
+  rpc List(ListGreeterRequest) returns (ListGreeterReply) {
+    option (google.api.http) = {
+      post: "/api/v1/greeter/list"
+      body: "*"
+    };
+  }
+
+  // upload file
+  rpc Upload(UploadGreeterRequest) returns (UploadGreeterReply) {
+    option (google.api.http) = {
+      selector: "[no_bind]"
+      post: "/api/v1/greeter/upload"
+      additional_bindings {
+        selector: "[no_bind]"
+        put: "/api/v1/greeter/upload2"
+      }
+      body: "*"
+    };
+  }
+
+  // register
+  rpc Register(CreateGreeterRequest) returns (CreateGreeterReply) {
+    option (google.api.http) = {
+      selector: "[ctx]"
+      post: "/api/v1/greeter/register"
+      body: "*"
+    };
+  }
+
+  // login
+  rpc Login(CreateGreeterRequest) returns (CreateGreeterReply) {
+    option (google.api.http) = {
+      selector: "[no_bind]"
+      post: "/api/v1/greeter/login"
+      body: "*"
+    };
+  }
+
+  // head request
+  rpc Head(CreateGreeterRequest) returns (CreateGreeterReply) {
+    option (google.api.http) = {
+      selector: "[no_bind]"
+      custom: {
+        kind: "HEAD"
+        path: "/api/v1/greeter/head"
+      }
+    };
+  }
+}
+
+message CreateGreeterRequest {
+  string name = 1;
+  string email = 2;
+  string password = 3;
+}
+
+message CreateGreeterReply {
+  uint64   id = 1;
+}
+
+message DeleteGreeterByIDRequest {
+  uint64   id = 1;
+}
+
+message DeleteGreeterByIDReply {
+
+}
+
+message UpdateGreeterByIDRequest {
+  uint64   id = 1;
+  string name = 2;
+  string email = 3;
+}
+
+message UpdateGreeterByIDReply {
+
+}
+
+message GreeterInfo {
+  uint64   id = 1;
+  string name = 2;
+  string email = 3;
+
+}
+
+message GetGreeterByIDRequest {
+  uint64   id = 1;
+}
+
+message GetGreeterByIDReply {
+  GreeterInfo userExample = 1;
+}
+
+message ListGreeterRequest {
+  Params params = 1;
+}
+
+message ListGreeterReply {
+  int64 total = 1;
+  repeated GreeterInfo userExamples = 2;
+}
+
+message Params {
+  int32 page = 1;
+  int32 limit = 2;
+  string sort = 3;
+}
+
+message UploadGreeterRequest{
+  // file name with suffix
+  string file_suffix = 1;
+  // file data
+  bytes file_data = 2;
+
+}
+message UploadGreeterReply{
+  string  url = 1;
+}
+
+service Foo {
+  rpc Create(CreateFooRequest) returns (CreateFooReply) {
+    option (google.api.http) = {
+      post: "/api/v1/foo"
+      body: "*"
+    };
+  }
+  rpc GetByID(GetFooByIDRequest) returns (GetFooByIDReply) {
+    option (google.api.http) = {
+      get: "/api/v1/foo/:id"
+    };
+  }
+}
+
+message CreateFooRequest {
+  string name = 1;
+}
+
+message CreateFooReply {
+   int64 id = 1;
+}
+
+message GetFooByIDRequest {
+  uint64   id = 1;
+}
+
+message GetFooByIDReply {
+  string name = 1;
+}
