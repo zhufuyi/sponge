@@ -147,7 +147,7 @@ func (d *{{.TableNameCamelFCL}}Dao) GetBy{{.ColumnNameCamel}}(ctx context.Contex
 {{else}}		val, err, _ := d.sfg.Do(utils.{{.GoTypeFCU}}ToStr({{.ColumnNameCamelFCL}}), func() (interface{}, error) {
 {{end}}
 			table := &model.{{.TableNameCamel}}{}
-			err := d.db.WithContext(ctx).Where("{{.ColumnName}} = ?", {{.ColumnNameCamelFCL}}).First(table).Error
+			err = d.db.WithContext(ctx).Where("{{.ColumnName}} = ?", {{.ColumnNameCamelFCL}}).First(table).Error
 			if err != nil {
 				// set placeholder cache to prevent cache penetration, default expiration time 10 minutes
 				if errors.Is(err, database.ErrRecordNotFound) {

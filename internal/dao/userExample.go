@@ -141,7 +141,7 @@ func (d *userExampleDao) GetByID(ctx context.Context, id uint64) (*model.UserExa
 		// for the same id, prevent high concurrent simultaneous access to database
 		val, err, _ := d.sfg.Do(utils.Uint64ToStr(id), func() (interface{}, error) { //nolint
 			table := &model.UserExample{}
-			err := d.db.WithContext(ctx).Where("id = ?", id).First(table).Error
+			err = d.db.WithContext(ctx).Where("id = ?", id).First(table).Error
 			if err != nil {
 				if errors.Is(err, database.ErrRecordNotFound) {
 					// set placeholder cache to prevent cache penetration, default expiration time 10 minutes

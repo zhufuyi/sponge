@@ -164,7 +164,7 @@ func (d *userExampleDao) GetByID(ctx context.Context, id string) (*model.UserExa
 		// for the same id, prevent high concurrent simultaneous access to mongodb
 		val, err, _ := d.sfg.Do(id, func() (interface{}, error) {
 			record := &model.UserExample{}
-			err := d.collection.FindOne(ctx, mgo.ExcludeDeleted(filter)).Decode(record)
+			err = d.collection.FindOne(ctx, mgo.ExcludeDeleted(filter)).Decode(record)
 			if err != nil {
 				// set placeholder cache to prevent cache penetration, default expiration time 10 minutes
 				if errors.Is(err, database.ErrRecordNotFound) {
