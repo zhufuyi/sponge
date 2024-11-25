@@ -4,7 +4,6 @@ patchType=$1
 typesPb="types-pb"
 initMysql="mysql"
 initMongodb="mongodb"
-initTidb="tidb"
 initPostgresql="postgresql"
 initSqlite="sqlite"
 
@@ -36,12 +35,6 @@ function generateInitMongodbCode() {
     importPkg
 }
 
-function generateInitTidbCode() {
-    sponge patch gen-db-init --db-driver=tidb --out=./
-    checkResult $?
-    importPkg
-}
-
 function generateInitPostgresqlCode() {
     sponge patch gen-db-init --db-driver=postgresql --out=./
     checkResult $?
@@ -60,15 +53,13 @@ elif [ "$patchType" = "$initMysql" ] || [ "$patchType" == "init-$initMysql" ]; t
     generateInitMysqlCode
 elif [ "$patchType" = "$initMongodb" ] || [ "$patchType" == "init-$initMongodb" ]; then
     generateInitMongodbCode
-elif [ "$patchType" = "$initTidb" ] || [ "$patchType" == "init-$initTidb" ]; then
-    generateInitTidbCode
 elif [ "$patchType" = "$initPostgresql" ] || [ "$patchType" == "init-$initPostgresql" ]; then
     generateInitPostgresqlCode
 elif [ "$patchType" = "$initSqlite" ] || [ "$patchType" == "init-$initSqlite" ]; then
     generateInitSqliteCode
 else
     echo "invalid patch type: '$patchType'"
-    echo "supported types: $initMysql, $initMongodb, $initTidb, $initPostgresql, $initSqlite, $typesPb"
+    echo "supported types: $initMysql, $initMongodb, $initPostgresql, $initSqlite, $typesPb"
     echo "e.g. make patch TYPE=$initMysql"
     echo ""
     exit 1

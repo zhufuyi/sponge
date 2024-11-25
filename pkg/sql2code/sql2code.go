@@ -20,7 +20,7 @@ type Args struct {
 
 	DDLFile string // DDL file
 
-	DBDriver   string            // db driver name, such as mysql, mongodb, postgresql, tidb, sqlite, default is mysql
+	DBDriver   string            // db driver name, such as mysql, mongodb, postgresql, sqlite, default is mysql
 	DBDsn      string            // connecting to mysql's dsn, if DBDriver is sqlite, DBDsn is local db file
 	DBTable    string            // table name
 	fieldTypes map[string]string // field name:type

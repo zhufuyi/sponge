@@ -2,7 +2,7 @@
 
 `ggorm` library wrapped in [gorm](gorm.io/gorm), with added features such as tracer, paging queries, etc.
 
-Support `mysql`, `postgresql`, `tidb`, `sqlite`.
+Support `mysql`, `postgresql`, `sqlite`.
 
 <br>
 

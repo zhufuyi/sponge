@@ -19,7 +19,6 @@ func PatchCommand() *cobra.Command {
 	cmd.AddCommand(
 		patch.DeleteJSONOmitemptyCommand(),
 		patch.GenerateDBInitCommand(),
-		patch.GenMysqlInitCommand(),
 		patch.GenTypesPbCommand(),
 		patch.CopyProtoCommand(),
 		patch.CopyThirdPartyProtoCommand(),
