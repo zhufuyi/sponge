@@ -211,7 +211,7 @@ func (g *httpGenerator) generateCode() (string, error) {
 			"userExample.go", "userExample_test.go",
 		},
 		"internal/config": {
-			"serverNameExample.go", "serverNameExample_test.go", "serverNameExample_cc.go",
+			"serverNameExample.go",
 		},
 		"internal/dao": {
 			"userExample.go", "userExample_test.go",
@@ -232,7 +232,7 @@ func (g *httpGenerator) generateCode() (string, error) {
 			"routers.go", "userExample.go",
 		},
 		"internal/server": {
-			"http.go", "http_test.go", "http_option.go",
+			"http.go.noregistry", "http_option.go.noregistry",
 		},
 		"internal/types": {
 			"swagger_types.go", "userExample_types.go",
@@ -314,7 +314,8 @@ func (g *httpGenerator) generateCode() (string, error) {
 
 	// ignore some directories and files
 	ignoreDirs := []string{"cmd/sponge"}
-	ignoreFiles := []string{"scripts/image-rpc-test.sh", "scripts/patch.sh", "scripts/protoc.sh", "scripts/proto-doc.sh"}
+	ignoreFiles := []string{"scripts/image-rpc-test.sh", "scripts/patch.sh", "scripts/protoc.sh",
+		"scripts/proto-doc.sh", "configs/serverNameExample_cc.yml"}
 
 	r.SetSubDirsAndFiles(subDirs, subFiles...)
 	r.SetIgnoreSubDirs(ignoreDirs...)
@@ -344,6 +345,7 @@ func (g *httpGenerator) addFields(r replacer.Replacer) []replacer.Field {
 	fields = append(fields, deleteFieldsMark(r, typesMgoFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, handlerTestFile, startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, httpFile, startMark, endMark)...)
+	fields = append(fields, deleteFieldsMark(r, httpFile+".noregistry", startMark, endMark)...)
 	fields = append(fields, deleteFieldsMark(r, dockerFile, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, dockerFileBuild, wellStartMark, wellEndMark)...)
 	fields = append(fields, deleteFieldsMark(r, dockerComposeFile, wellStartMark, wellEndMark)...)
@@ -535,6 +537,8 @@ func (g *httpGenerator) addFields(r replacer.Replacer) []replacer.Field {
 			IsCaseSensitive: true,
 		},
 	}...)
+
+	fields = append(fields, getHTTPServiceFields()...)
 
 	if g.suitedMonoRepo {
 		fs := serverCodeFields(codeNameHTTP, g.moduleName, g.serverName)

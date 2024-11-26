@@ -128,6 +128,9 @@ func copyToTempDir(targetVersion string) (string, error) {
 		return "", err
 	}
 	_ = executeCommand("rm", "-rf", targetDir+"/cmd/sponge")
+	_ = executeCommand("rm", "-rf", targetDir+"/cmd/protoc-gen-go-gin")
+	_ = executeCommand("rm", "-rf", targetDir+"/cmd/protoc-gen-go-rpc-tmpl")
+	_ = executeCommand("rm", "-rf", targetDir+"/cmd/protoc-gen-json-field")
 	_ = executeCommand("rm", "-rf", targetDir+"/pkg")
 	_ = executeCommand("rm", "-rf", targetDir+"/test")
 	_ = executeCommand("rm", "-rf", targetDir+"/assets")
@@ -205,6 +208,18 @@ func updateSpongeInternalPlugin(targetVersion string) error {
 	}
 	if result.Err != nil {
 		return result.Err
+	}
+
+	// v1.x.x version does not support protoc-gen-json-field
+	if !strings.HasPrefix(targetVersion, "v1") {
+		ctx, _ = context.WithTimeout(context.Background(), time.Minute) //nolint
+		result = gobash.Run(ctx, "go", "install", "github.com/zhufuyi/sponge/cmd/protoc-gen-json-field@"+targetVersion)
+		for v := range result.StdOut {
+			_ = v
+		}
+		if result.Err != nil {
+			return result.Err
+		}
 	}
 
 	return nil

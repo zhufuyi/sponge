@@ -129,7 +129,7 @@ func (g *rpcGwPbGenerator) generateCode() error {
 			"apis.go", "apis.swagger.json",
 		},
 		"internal/config": {
-			"serverNameExample.go", "serverNameExample_test.go", "serverNameExample_cc.go",
+			"serverNameExample.go",
 		},
 		"internal/ecode": {
 			"systemCode_rpc.go",
@@ -138,7 +138,7 @@ func (g *rpcGwPbGenerator) generateCode() error {
 			"routers_pbExample.go",
 		},
 		"internal/server": {
-			"http.go", "http_test.go", "http_option.go",
+			"http.go", "http_option.go",
 		},
 	}
 
@@ -150,11 +150,13 @@ func (g *rpcGwPbGenerator) generateCode() error {
 	replaceFiles := make(map[string][]string)
 	subFiles = append(subFiles, getSubFiles(selectFiles, replaceFiles)...)
 
-	// ignore some directories
+	// ignore some directories and files
 	ignoreDirs := []string{"cmd/sponge"}
+	ignoreFiles := []string{"configs/serverNameExample_cc.yml"}
 
 	r.SetSubDirsAndFiles(subDirs, subFiles...)
 	r.SetIgnoreSubDirs(ignoreDirs...)
+	r.SetIgnoreSubFiles(ignoreFiles...)
 	_ = r.SetOutputDir(g.outPath, g.serverName+"_"+subTplName)
 	fields := g.addFields(r)
 	r.SetReplacementFields(fields)
@@ -318,6 +320,8 @@ func (g *rpcGwPbGenerator) addFields(r replacer.Replacer) []replacer.Field {
 			New: "",
 		},
 	}...)
+
+	fields = append(fields, getGRPCServiceFields()...)
 
 	if g.suitedMonoRepo {
 		fs := serverCodeFields(codeNameGRPCGW, g.moduleName, g.serverName)

@@ -126,13 +126,13 @@ func (g *rpcPbGenerator) generateCode() error {
 
 	selectFiles := map[string][]string{
 		"internal/config": {
-			"serverNameExample.go", "serverNameExample_test.go", "serverNameExample_cc.go",
+			"serverNameExample.go",
 		},
 		"internal/ecode": {
 			"systemCode_rpc.go",
 		},
 		"internal/server": {
-			"grpc.go", "grpc_test.go", "grpc_option.go",
+			"grpc.go", "grpc_option.go",
 		},
 		"internal/service": {
 			"service.go", "service_test.go",
@@ -149,7 +149,7 @@ func (g *rpcPbGenerator) generateCode() error {
 
 	// ignore some directories and files
 	ignoreDirs := []string{"cmd/sponge"}
-	ignoreFiles := []string{"scripts/swag-docs.sh"}
+	ignoreFiles := []string{"scripts/swag-docs.sh", "configs/serverNameExample_cc.yml"}
 
 	r.SetSubDirsAndFiles(subDirs, subFiles...)
 	r.SetIgnoreSubDirs(ignoreDirs...)
@@ -309,6 +309,8 @@ func (g *rpcPbGenerator) addFields(r replacer.Replacer) []replacer.Field {
 			New: "",
 		},
 	}...)
+
+	fields = append(fields, getGRPCServiceFields()...)
 
 	if g.suitedMonoRepo {
 		fs := serverCodeFields(codeNameGRPCPb, g.moduleName, g.serverName)

@@ -212,7 +212,7 @@ func (g *rpcGenerator) generateCode() (string, error) {
 			"userExample.go", "userExample_test.go",
 		},
 		"internal/config": {
-			"serverNameExample.go", "serverNameExample_test.go", "serverNameExample_cc.go",
+			"serverNameExample.go",
 		},
 		"internal/dao": {
 			"userExample.go", "userExample_test.go",
@@ -227,7 +227,7 @@ func (g *rpcGenerator) generateCode() (string, error) {
 			"userExample.go",
 		},
 		"internal/server": {
-			"grpc.go", "grpc_test.go", "grpc_option.go",
+			"grpc.go", "grpc_option.go",
 		},
 		"internal/service": {
 			"service.go", "service_test.go", "userExample.go", "userExample_client_test.go",
@@ -307,7 +307,7 @@ func (g *rpcGenerator) generateCode() (string, error) {
 
 	// ignore some directories and files
 	ignoreDirs := []string{"cmd/sponge"}
-	ignoreFiles := []string{"scripts/swag-docs.sh"}
+	ignoreFiles := []string{"scripts/swag-docs.sh", "configs/serverNameExample_cc.yml"}
 
 	r.SetSubDirsAndFiles(subDirs, subFiles...)
 	r.SetIgnoreSubDirs(ignoreDirs...)
@@ -548,6 +548,8 @@ func (g *rpcGenerator) addFields(r replacer.Replacer) []replacer.Field {
 			IsCaseSensitive: true,
 		},
 	}...)
+
+	fields = append(fields, getGRPCServiceFields()...)
 
 	if g.suitedMonoRepo {
 		fs := serverCodeFields(codeNameGRPC, g.moduleName, g.serverName)

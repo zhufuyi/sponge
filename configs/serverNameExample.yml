@@ -1,4 +1,4 @@
-# Generate the go struct command: sponge config --server-dir=./serverDir
+# If you need to convert YAML to a Go struct, please execute the command: make update-config
 
 # app settings
 app:
@@ -83,7 +83,7 @@ logger:
 # delete the templates code start
 # database setting
 database:
-  driver: "mysql"           # database driver, currently support mysql, postgresql, tidb, sqlite
+  driver: "mysql"           # database driver, currently support mysql, postgresql, sqlite
   # mysql settings
   mysql:
     # dsn format,  <username>:<password>@(<hostname>:<port>)/<db>?[k=v& ......]
@@ -109,7 +109,7 @@ database:
 
   # sqlite settings
   sqlite:
-    dbFile: "test/sql/sqlite/sponge.db"   # if you are in a windows environment, the path separator is \\
+    dbFile: "test/sql/sqlite/sponge.db"   # if you are in a Windows environment, the path separator is \\
     enableLog: true         # whether to turn on printing of all logs
     maxIdleConns: 10        # set the maximum number of connections in the idle connection pool
     maxOpenConns: 100       # set the maximum number of open database connections
@@ -139,6 +139,8 @@ jaeger:
   agentPort: 6831
 
 
+# todo generate the registry and discovery configuration here
+# delete the templates code start
 # consul settings
 consul:
   addr: "192.168.3.37:8500"
@@ -154,3 +156,4 @@ nacosRd:
   ipAddr: "192.168.3.37"
   port: 8848
   namespaceID: "3454d2b5-2455-4d0e-bf6d-e033b086bb4c"   # namespace id
+# delete the templates code end

@@ -136,6 +136,7 @@ var (
 	appConfigFile      = "configs/serverNameExample.yml"
 	appConfigFileMark  = "# todo generate http or rpc server configuration here"
 	appConfigFileMark2 = "# todo generate the database configuration here"
+	appConfigFileMark3 = "# todo generate the registry and discovery configuration here"
 
 	expectedSQLForDeletion = "expectedSQLForDeletion := \"UPDATE .*\""
 
@@ -1004,4 +1005,52 @@ func SetSelectFiles(dbDriver string, selectFiles map[string][]string) error {
 		return errors.New("unsupported db driver: " + dbDriver)
 	}
 	return nil
+}
+
+func getHTTPServiceFields() []replacer.Field {
+	return []replacer.Field{
+		{
+			Old: appConfigFileMark3,
+			New: "",
+		},
+		{
+			Old: "http.go.noregistry",
+			New: "http.go",
+		},
+		{
+			Old: "http_option.go.noregistry",
+			New: "http_option.go",
+		},
+		{
+			Old: `registryDiscoveryType: ""`,
+			New: `#registryDiscoveryType: ""`,
+		},
+	}
+}
+
+func getGRPCServiceFields() []replacer.Field {
+	return []replacer.Field{
+		{
+			Old: appConfigFileMark3,
+			New: `# consul settings
+#consul:
+#  addr: "192.168.3.37:8500"
+
+
+# etcd settings
+#etcd:
+#  addrs: ["192.168.3.37:2379"]
+
+
+# nacos settings, used in service registration discovery
+#nacosRd:
+#  ipAddr: "192.168.3.37"
+#  port: 8848
+#  namespaceID: "3454d2b5-2455-4d0e-bf6d-e033b086bb4c"   # namespace id`,
+		},
+		{
+			Old: `registryDiscoveryType: ""`,
+			New: `#registryDiscoveryType: ""`,
+		},
+	}
 }

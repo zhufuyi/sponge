@@ -9,15 +9,8 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/zhufuyi/sponge/pkg/consulcli"
-	"github.com/zhufuyi/sponge/pkg/etcdcli"
 	"github.com/zhufuyi/sponge/pkg/grpc/grpccli"
 	"github.com/zhufuyi/sponge/pkg/logger"
-	"github.com/zhufuyi/sponge/pkg/nacoscli"
-	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
-	"github.com/zhufuyi/sponge/pkg/servicerd/registry/consul"
-	"github.com/zhufuyi/sponge/pkg/servicerd/registry/etcd"
-	"github.com/zhufuyi/sponge/pkg/servicerd/registry/nacos"
 	"github.com/zhufuyi/sponge/pkg/utils"
 
 	"github.com/zhufuyi/sponge/configs"
@@ -75,52 +68,16 @@ func getRPCClientConnForTest(grpcClient ...config.GrpcClient) *grpc.ClientConn {
 		grpccli.WithEnableLog(logger.Get()),
 	)
 
-	var (
-		endpoint      string
-		isUseDiscover bool
-		iDiscovery    registry.Discovery
-	)
+	endpoint := grpcClientCfg.Host + ":" + strconv.Itoa(grpcClientCfg.Port)
+	isUseDiscover := false
 
-	switch grpcClientCfg.RegistryDiscoveryType {
-	case "consul":
-		endpoint = "discovery:///" + grpcClientCfg.Name // Connecting to grpc services by service name
-		cli, err := consulcli.Init(config.Get().Consul.Addr, consulcli.WithWaitTime(time.Second*2))
-		if err != nil {
-			panic(err)
-		}
-		iDiscovery = consul.New(cli)
-		isUseDiscover = true
-
-	case "etcd":
-		endpoint = "discovery:///" + grpcClientCfg.Name // Connecting to grpc services by service name
-		cli, err := etcdcli.Init(config.Get().Etcd.Addrs, etcdcli.WithDialTimeout(time.Second*2))
-		if err != nil {
-			panic(err)
-		}
-		iDiscovery = etcd.New(cli)
-		isUseDiscover = true
-	case "nacos":
-		// example: endpoint = "discovery:///serverName.scheme"
-		endpoint = "discovery:///" + grpcClientCfg.Name + ".grpc"
-		cli, err := nacoscli.NewNamingClient(
-			config.Get().NacosRd.IPAddr,
-			config.Get().NacosRd.Port,
-			config.Get().NacosRd.NamespaceID)
-		if err != nil {
-			panic(err)
-		}
-		iDiscovery = nacos.New(cli)
-		isUseDiscover = true
-
-	default:
-		endpoint = grpcClientCfg.Host + ":" + strconv.Itoa(grpcClientCfg.Port)
-		iDiscovery = nil
-		isUseDiscover = false
-	}
-
-	if iDiscovery != nil {
-		cliOptions = append(cliOptions, grpccli.WithDiscovery(iDiscovery))
-	}
+	// using service discovery
+	//grpcCliOption, discoveryEndpoint := discoverService(config.Get(), grpcClientCfg)
+	//if grpcCliOption != nil {
+	//	cliOptions = append(cliOptions, grpcCliOption)
+	//	isUseDiscover = true
+	//	endpoint = discoveryEndpoint
+	//}
 
 	msg := "dialing grpc server"
 	if isUseDiscover {
@@ -171,3 +128,45 @@ func getGRPCClientCfg(grpcClient ...config.GrpcClient) config.GrpcClient {
 
 	return grpcClientCfg
 }
+
+// discovery service with consul or etcd or nacos, select one of them to use
+//func discoverService(cfg *config.Config, grpcClientCfg config.GrpcClient) (grpccli.Option, string) {
+//	var (
+//		endpoint      string
+//		grpcCliOption grpccli.Option
+//	)
+//
+//	switch grpcClientCfg.RegistryDiscoveryType {
+//	case "consul":
+//		endpoint = "discovery:///" + grpcClientCfg.Name // format: discovery:///serverName.scheme
+//		cli, err := consulcli.Init(cfg.Consul.Addr, consulcli.WithWaitTime(time.Second*2))
+//		if err != nil {
+//			panic(err)
+//		}
+//		iDiscovery := consul.New(cli)
+//		grpcCliOption = grpccli.WithDiscovery(iDiscovery)
+//
+//	case "etcd":
+//		endpoint = "discovery:///" + grpcClientCfg.Name // format: discovery:///serverName.scheme
+//		cli, err := etcdcli.Init(cfg.Etcd.Addrs, etcdcli.WithDialTimeout(time.Second*2))
+//		if err != nil {
+//			panic(err)
+//		}
+//		iDiscovery := etcd.New(cli)
+//		grpcCliOption = grpccli.WithDiscovery(iDiscovery)
+//
+//	case "nacos":
+//		endpoint = "discovery:///" + grpcClientCfg.Name + ".grpc" // format: discovery:///serverName.scheme
+//		cli, err := nacoscli.NewNamingClient(
+//			cfg.NacosRd.IPAddr,
+//			cfg.NacosRd.Port,
+//			cfg.NacosRd.NamespaceID)
+//		if err != nil {
+//			panic(err)
+//		}
+//		iDiscovery := nacos.New(cli)
+//		grpcCliOption = grpccli.WithDiscovery(iDiscovery)
+//	}
+//
+//	return grpcCliOption, endpoint
+//}

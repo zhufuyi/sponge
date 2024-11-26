@@ -91,42 +91,50 @@ func initConfig() {
 	flag.Parse()
 
 	if enableConfigCenter {
-		// get the configuration from the configuration center (first get the nacos configuration,
-		// then read the service configuration according to the nacos configuration center)
-		if configFile == "" {
-			configFile = configs.Path("serverNameExample_cc.yml")
-		}
-		nacosConfig, err := config.NewCenter(configFile)
-		if err != nil {
-			panic(err)
-		}
-		appConfig := &config.Config{}
-		params := &nacoscli.Params{}
-		_ = copier.Copy(params, &nacosConfig.Nacos)
-		format, data, err := nacoscli.GetConfig(params)
-		if err != nil {
-			panic(fmt.Sprintf("connect to configuration center err, %v", err))
-		}
-		err = conf.ParseConfigData(data, format, appConfig)
-		if err != nil {
-			panic(fmt.Sprintf("parse configuration data err, %v", err))
-		}
-		if appConfig.App.Name == "" {
-			panic("read the config from center error, config data is empty")
-		}
-		config.Set(appConfig)
+		getConfigFromNacos()
 	} else {
-		// get configuration from local configuration file
-		if configFile == "" {
-			configFile = configs.Path("serverNameExample.yml")
-		}
-		err := config.Init(configFile)
-		if err != nil {
-			panic("init config error: " + err.Error())
-		}
+		getConfigFromLocal()
 	}
 
 	if version != "" {
 		config.Get().App.Version = version
+	}
+}
+
+// get the configuration from the configuration center (first get the nacos configuration,
+// then read the service configuration according to the nacos configuration center)
+func getConfigFromNacos() {
+	if configFile == "" {
+		configFile = configs.Path("serverNameExample_cc.yml")
+	}
+	nacosConfig, err := config.NewCenter(configFile)
+	if err != nil {
+		panic(err)
+	}
+	appConfig := &config.Config{}
+	params := &nacoscli.Params{}
+	_ = copier.Copy(params, &nacosConfig.Nacos)
+	format, data, err := nacoscli.GetConfig(params)
+	if err != nil {
+		panic(fmt.Sprintf("connect to configuration center err, %v", err))
+	}
+	err = conf.ParseConfigData(data, format, appConfig)
+	if err != nil {
+		panic(fmt.Sprintf("parse configuration data err, %v", err))
+	}
+	if appConfig.App.Name == "" {
+		panic("read the config from center error, config data is empty")
+	}
+	config.Set(appConfig)
+}
+
+// get configuration from local configuration file
+func getConfigFromLocal() {
+	if configFile == "" {
+		configFile = configs.Path("serverNameExample.yml")
+	}
+	err := config.Init(configFile)
+	if err != nil {
+		panic("init config error: " + err.Error())
 	}
 }
