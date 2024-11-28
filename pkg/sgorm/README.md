@@ -2,7 +2,7 @@
 
 `sgorm` is a library encapsulated on [gorm](gorm.io/gorm), and added features such as tracer, paging queries, etc.
 
-Support `mysql`, `postgresql`, `tidb`, `sqlite`.
+Support `mysql`, `postgresql`, `sqlite`.
 
 <br>
 

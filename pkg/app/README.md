@@ -31,12 +31,12 @@ func initApp() {
 func registerServers() []app.IServer {
     var servers []app.IServer
 
-    // creating http service
+    // create a http service
     servers = append(servers, server.NewHTTPServer(
 
     ))
 
-    // creating grpc service
+    // create a grpc service
     servers = append(servers, server.NewGRPCServer(
 
     ))
