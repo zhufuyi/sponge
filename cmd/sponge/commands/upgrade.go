@@ -32,7 +32,6 @@ func UpgradeCommand() *cobra.Command {
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			fmt.Println("upgrading sponge, please wait a moment ......")
 			if targetVersion == "" {
 				targetVersion = latestVersion
 			}
@@ -50,24 +49,41 @@ func UpgradeCommand() *cobra.Command {
 }
 
 func runUpgrade(targetVersion string) (string, error) {
+	runningTip := "upgrading sponge binary "
+	finishTip := "upgrade sponge binary done " + installedSymbol
+	failTip := "upgrade sponge binary failed " + lackSymbol
+	p := utils.NewWaitPrinter(time.Millisecond * 500)
+	p.LoopPrint(runningTip)
 	err := runUpgradeCommand(targetVersion)
 	if err != nil {
-		fmt.Println(lackSymbol + "upgrade sponge binary.")
+		p.StopPrint(failTip)
 		return "", err
 	}
-	fmt.Println(installedSymbol + "upgraded sponge binary.")
+	p.StopPrint(finishTip)
+
+	runningTip = "upgrading template code "
+	finishTip = "upgrade template code done " + installedSymbol
+	failTip = "upgrade template code failed " + lackSymbol
+	p = utils.NewWaitPrinter(time.Millisecond * 500)
+	p.LoopPrint(runningTip)
 	ver, err := copyToTempDir(targetVersion)
 	if err != nil {
-		fmt.Println(lackSymbol + "upgrade template code.")
+		p.StopPrint(failTip)
 		return "", err
 	}
-	fmt.Println(installedSymbol + "upgraded template code.")
+	p.StopPrint(finishTip)
+
+	runningTip = "upgrading the built-in plugins of sponge "
+	finishTip = "upgrade the built-in plugins of sponge done " + installedSymbol
+	failTip = "upgrade the built-in plugins of sponge failed " + lackSymbol
+	p = utils.NewWaitPrinter(time.Millisecond * 500)
+	p.LoopPrint(runningTip)
 	err = updateSpongeInternalPlugin(ver)
 	if err != nil {
-		fmt.Println(lackSymbol + "upgrade protoc plugins.")
+		p.StopPrint(failTip)
 		return "", err
 	}
-	fmt.Println(installedSymbol + "upgraded protoc plugins.")
+	p.StopPrint(finishTip)
 	return ver, nil
 }
 

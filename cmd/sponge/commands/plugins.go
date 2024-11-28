@@ -115,20 +115,20 @@ func showDependencyPlugins(installedNames []string, lackNames []string) {
 	var content string
 
 	if len(installedNames) > 0 {
-		content = "Installed dependency plugins:\n"
+		content = "installed dependency plugins:\n"
 		for _, name := range installedNames {
 			content += "    " + installedSymbol + " " + name + "\n"
 		}
 	}
 
 	if len(lackNames) > 0 {
-		content += "\nUninstalled dependency plugins:\n"
+		content += "\nuninstalled dependency plugins:\n"
 		for _, name := range lackNames {
 			content += "    " + lackSymbol + " " + name + "\n"
 		}
-		content += "\nInstalling dependency plugins using the command: sponge plugins --install\n"
+		content += "\ninstalling dependency plugins using the command: sponge plugins --install\n"
 	} else {
-		content += "\nAll dependency plugins installed.\n"
+		content += "\nall dependency plugins installed.\n"
 	}
 
 	fmt.Println(content)
@@ -136,10 +136,10 @@ func showDependencyPlugins(installedNames []string, lackNames []string) {
 
 func installPlugins(lackNames []string) {
 	if len(lackNames) == 0 {
-		fmt.Printf("\n    All dependency plugins installed.\n\n")
+		fmt.Printf("\n    all dependency plugins installed.\n\n")
 		return
 	}
-	fmt.Printf("install a total of %d dependency plugins, need to wait a little time.\n\n", len(lackNames))
+	fmt.Printf("\ninstalling %d dependency plugins, please wait a moment.\n\n", len(lackNames))
 
 	var wg = &sync.WaitGroup{}
 	var manuallyNames []string

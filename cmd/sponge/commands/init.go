@@ -1,8 +1,6 @@
 package commands
 
 import (
-	"fmt"
-
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
@@ -20,8 +18,6 @@ func InitCommand() *cobra.Command {
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			fmt.Println("initializing sponge, please wait a moment ......")
-
 			targetVersion := latestVersion
 			// download sponge template code
 			_, err := runUpgrade(targetVersion)

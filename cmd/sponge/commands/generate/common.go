@@ -4,6 +4,7 @@ package generate
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -1052,5 +1053,32 @@ func getGRPCServiceFields() []replacer.Field {
 			Old: `registryDiscoveryType: ""`,
 			New: `#registryDiscoveryType: ""`,
 		},
+	}
+}
+
+func clearCurrentLine() {
+	fmt.Print("\033[2K\r")
+}
+
+func PrintWaiting(ctx context.Context, runningTip string, finishTip string) {
+	defer func() {
+		clearCurrentLine()
+		fmt.Println(finishTip)
+	}()
+	symbols := []string{runningTip + ".", runningTip + "..", runningTip + "...", runningTip + "....", runningTip + ".....", runningTip + "......"}
+	index := 0
+	fmt.Printf("\r%s", symbols[index])
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-time.After(500 * time.Millisecond):
+			index++
+			if index >= len(symbols) {
+				index = 0
+				clearCurrentLine()
+			}
+			fmt.Printf("\r%s", symbols[index])
+		}
 	}
 }
