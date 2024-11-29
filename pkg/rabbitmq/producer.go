@@ -187,7 +187,7 @@ func NewProducer(exchange *Exchange, queueName string, connection *Connection, o
 		return nil, err
 	}
 
-	fields := logFields(queueName, exchange)
+	fields := logFields(q.Name, exchange)
 	fields = append(fields, zap.Bool("isPersistent", o.isPersistent))
 
 	// create dead letter exchange and queue if enabled

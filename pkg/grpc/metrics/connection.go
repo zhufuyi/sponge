@@ -1,7 +1,6 @@
 package metrics
 
 import (
-	"fmt"
 	"net"
 	"sync"
 
@@ -75,9 +74,8 @@ func (l *CustomListener) Accept() (net.Conn, error) {
 
 	if l.zapLogger != nil {
 		l.zapLogger.Info("new grpc client connected", zap.String("client", conn.RemoteAddr().String()), zap.Int("active connections", count))
-	} else {
-		fmt.Printf("new grpc client connected, client: %s, active connections: %d\n", conn.RemoteAddr().String(), count)
 	}
+
 	if l.connectionGauge != nil {
 		l.connectionGauge.Set(float64(count))
 	}
@@ -105,9 +103,8 @@ func (l *CustomListener) closeConnection(clientAddr string) {
 
 	if l.zapLogger != nil {
 		l.zapLogger.Info("grpc client disconnected", zap.String("client", clientAddr), zap.Int("active connections", count))
-	} else {
-		fmt.Printf("grpc client disconnected client: %s, active connections: %d\n", clientAddr, count)
 	}
+
 	if l.connectionGauge != nil {
 		l.connectionGauge.Set(float64(count))
 	}
