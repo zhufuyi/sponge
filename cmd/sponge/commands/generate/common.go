@@ -27,7 +27,7 @@ import (
 )
 
 const (
-	defaultGoModVersion = "go 1.20"
+	defaultGoModVersion = "go 1.22"
 
 	// TplNameSponge name of the template
 	TplNameSponge = "sponge"
