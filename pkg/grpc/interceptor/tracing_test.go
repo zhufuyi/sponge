@@ -1,6 +1,7 @@
 package interceptor
 
 import (
+	"google.golang.org/grpc"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -24,4 +25,12 @@ func TestUnaryClientTracing(t *testing.T) {
 func TestUnaryServerTracing(t *testing.T) {
 	interceptor := UnaryServerTracing()
 	assert.NotNil(t, interceptor)
+}
+
+func TestClientOptionTracing(t *testing.T) {
+	_, _ = grpc.NewClient("localhost", ClientOptionTracing())
+}
+
+func TestServerOptionTracing(t *testing.T) {
+	_ = grpc.NewServer(ServerOptionTracing())
 }

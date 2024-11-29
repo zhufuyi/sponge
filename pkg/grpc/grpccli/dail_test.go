@@ -13,13 +13,15 @@ import (
 	"github.com/zhufuyi/sponge/pkg/servicerd/registry/etcd"
 )
 
-func TestDial(t *testing.T) {
-	_, err := Dial(context.Background(), "localhost:8282")
+func TestNewClient(t *testing.T) {
+	_, err := NewClient("localhost:8282")
+	assert.NoError(t, err)
+	_, err = Dial(context.Background(), "localhost:8282")
 	assert.NoError(t, err)
 }
 
-func TestDial2(t *testing.T) {
-	_, err := Dial(context.Background(), "localhost:8282",
+func TestNewClient2(t *testing.T) {
+	_, err := NewClient("localhost:8282",
 		WithEnableLog(zap.NewNop()),
 		WithEnableMetrics(),
 		WithToken(true, "grpc", "123456"),

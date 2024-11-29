@@ -32,13 +32,14 @@ var streamInterceptors = []grpc.StreamClientInterceptor{
 	},
 }
 
-func TestDial(t *testing.T) {
-	conn, err := Dial(context.Background(), "127.0.0.1:50082",
+func TestNewClient(t *testing.T) {
+	conn, err := NewClient("127.0.0.1:50082",
 		WithServiceDiscover(new(builder)),
 		WithLoadBalance(),
 		WithSecure(insecure.NewCredentials()),
 		WithUnaryInterceptor(unaryInterceptors...),
 		WithStreamInterceptor(streamInterceptors...),
+		WithDialOption(grpc.WithDefaultServiceConfig(`{"loadBalancingConfig": [{"round_robin":{}}]}`)),
 	)
 	defer conn.Close()
 	t.Log(conn, err)

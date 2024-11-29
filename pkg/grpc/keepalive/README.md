@@ -42,7 +42,7 @@ func getDialOptions() []grpc.DialOption {
 }
 
 func main() {
-	conn, err := grpc.Dial("127.0.0.1:8080", getDialOptions()...)
+	conn, err := grpc.NewClient("127.0.0.1:8080", getDialOptions()...)
 	if err != nil {
 		panic(err)
 	}

@@ -95,7 +95,6 @@ type App struct {
 type GrpcClient struct {
 	ClientSecure          ClientSecure `yaml:"clientSecure" json:"clientSecure"`
 	ClientToken           ClientToken  `yaml:"clientToken" json:"clientToken"`
-	EnableLoadBalance     bool         `yaml:"enableLoadBalance" json:"enableLoadBalance"`
 	Host                  string       `yaml:"host" json:"host"`
 	Name                  string       `yaml:"name" json:"name"`
 	Port                  int          `yaml:"port" json:"port"`

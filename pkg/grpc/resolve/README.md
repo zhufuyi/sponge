@@ -20,7 +20,7 @@ func getDialOptions() []grpc.DialOption {
 
 func main() {
 	endpoint := resolve.Register("grpc", "hello.grpc.io", []string{"127.0.0.1:8282", "127.0.0.1:8284", "127.0.0.1:8286"})
-	roundRobinConn, err := grpc.Dial(endpoint, getDialOptions()...)
+	roundRobinConn, err := grpc.NewClient(endpoint, getDialOptions()...)
 	if err != nil {
 		panic(err)
 	}

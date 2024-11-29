@@ -59,7 +59,7 @@ func (s *Service) GoGrpcServer() {
 
 // GetClientConn dial rpc server
 func (s *Service) GetClientConn() *grpc.ClientConn {
-	conn, err := grpc.Dial(s.clientAddr,
+	conn, err := grpc.NewClient(s.clientAddr,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {

@@ -1,7 +1,6 @@
 package rpcclient
 
 import (
-	"context"
 	"fmt"
 	"strings"
 	"sync"
@@ -41,14 +40,18 @@ func NewServerNameExampleRPCConn() {
 		grpccli.WithEnableLog(logger.Get()),
 	}
 
-	if grpcClientCfg.Timeout > 0 {
-		cliOptions = append(cliOptions, grpccli.WithTimeout(time.Second*time.Duration(grpcClientCfg.Timeout)))
-	}
+	// if service discovery is not used, connect directly to the rpc service using the ip and port
+	endpoint := fmt.Sprintf("%s:%d", grpcClientCfg.Host, grpcClientCfg.Port)
+	isUseDiscover := false
 
-	// load balance
-	if grpcClientCfg.EnableLoadBalance {
-		cliOptions = append(cliOptions, grpccli.WithEnableLoadBalance())
-	}
+	// using service discovery
+	//discoverOption, discoveryEndpoint := discoverService(cfg, grpcClientCfg)
+	//if discoverOption != nil {
+	//	isUseDiscover = true
+	//	endpoint = discoveryEndpoint
+	//	cliOptions = append(cliOptions, discoverOption)
+	//	cliOptions = append(cliOptions, grpccli.WithEnableLoadBalance()) // load balance
+	//}
 
 	// secure
 	cliOptions = append(cliOptions, grpccli.WithSecure(
@@ -66,18 +69,6 @@ func NewServerNameExampleRPCConn() {
 		grpcClientCfg.ClientToken.AppKey,
 	))
 
-	// if service discovery is not used, connect directly to the rpc service using the ip and port
-	endpoint := fmt.Sprintf("%s:%d", grpcClientCfg.Host, grpcClientCfg.Port)
-	isUseDiscover := false
-
-	// using service discovery
-	//grpcCliOption, discoveryEndpoint := discoverService(cfg, grpcClientCfg)
-	//if grpcCliOption != nil {
-	//	cliOptions = append(cliOptions, grpcCliOption)
-	//	isUseDiscover = true
-	//	endpoint = discoveryEndpoint
-	//}
-
 	if cfg.App.EnableTrace {
 		cliOptions = append(cliOptions, grpccli.WithEnableTrace())
 	}
@@ -87,6 +78,9 @@ func NewServerNameExampleRPCConn() {
 	if cfg.App.EnableMetrics {
 		cliOptions = append(cliOptions, grpccli.WithEnableMetrics())
 	}
+	if grpcClientCfg.Timeout > 0 {
+		cliOptions = append(cliOptions, grpccli.WithTimeout(time.Second*time.Duration(grpcClientCfg.Timeout)))
+	}
 
 	msg := "dial grpc server"
 	if isUseDiscover {
@@ -95,9 +89,9 @@ func NewServerNameExampleRPCConn() {
 	logger.Info(msg, logger.String("name", serverName), logger.String("endpoint", endpoint))
 
 	var err error
-	serverNameExampleConn, err = grpccli.Dial(context.Background(), endpoint, cliOptions...)
+	serverNameExampleConn, err = grpccli.NewClient(endpoint, cliOptions...)
 	if err != nil {
-		panic(fmt.Sprintf("dial rpc server failed: %v, name: %s, endpoint: %s", err, serverName, endpoint))
+		panic(fmt.Sprintf("grpccli.NewClient error: %v, name: %s, endpoint: %s", err, serverName, endpoint))
 	}
 }
 

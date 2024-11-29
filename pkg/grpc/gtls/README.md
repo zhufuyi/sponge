@@ -38,7 +38,7 @@ func main() {
 	)
     // check err
 
-    conn, err := grpc.Dial("127.0.0.1:8080", grpc.WithTransportCredentials(credentials))
+    conn, err := grpc.NewClient("127.0.0.1:8080", grpc.WithTransportCredentials(credentials))
     // check err
 }
 ```
@@ -82,7 +82,7 @@ func main() {
     )
     // check err
 
-    conn, err := grpc.Dial("127.0.0.1:8080", grpc.WithTransportCredentials(credentials))
+    conn, err := grpc.NewClient("127.0.0.1:8080", grpc.WithTransportCredentials(credentials))
     // check err
 }
 ```

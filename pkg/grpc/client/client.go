@@ -19,6 +19,7 @@ type options struct {
 	credentials        credentials.TransportCredentials
 	unaryInterceptors  []grpc.UnaryClientInterceptor
 	streamInterceptors []grpc.StreamClientInterceptor
+	dialOptions        []grpc.DialOption
 }
 
 func defaultOptions() *options {
@@ -66,8 +67,15 @@ func WithStreamInterceptor(interceptors ...grpc.StreamClientInterceptor) Option 
 	}
 }
 
-// Dial to grpc server
-func Dial(ctx context.Context, endpoint string, opts ...Option) (*grpc.ClientConn, error) {
+// WithDialOption set DialOption
+func WithDialOption(dialOptions ...grpc.DialOption) Option {
+	return func(o *options) {
+		o.dialOptions = dialOptions
+	}
+}
+
+// NewClient create a new grpc client
+func NewClient(endpoint string, opts ...Option) (*grpc.ClientConn, error) {
 	o := defaultOptions()
 	o.apply(opts...)
 
@@ -90,6 +98,11 @@ func Dial(ctx context.Context, endpoint string, opts ...Option) (*grpc.ClientCon
 		dialOptions = append(dialOptions, grpc.WithTransportCredentials(o.credentials))
 	}
 
+	// custom dial option
+	if len(o.dialOptions) > 0 {
+		dialOptions = append(dialOptions, o.dialOptions...)
+	}
+
 	// custom unary interceptor option
 	if len(o.unaryInterceptors) > 0 {
 		dialOptions = append(dialOptions, grpc.WithChainUnaryInterceptor(o.unaryInterceptors...))
@@ -100,5 +113,10 @@ func Dial(ctx context.Context, endpoint string, opts ...Option) (*grpc.ClientCon
 		dialOptions = append(dialOptions, grpc.WithChainStreamInterceptor(o.streamInterceptors...))
 	}
 
-	return grpc.DialContext(ctx, endpoint, dialOptions...)
+	return grpc.NewClient(endpoint, dialOptions...)
+}
+
+// Dial to grpc server
+func Dial(_ context.Context, endpoint string, opts ...Option) (*grpc.ClientConn, error) {
+	return NewClient(endpoint, opts...)
 }

@@ -42,7 +42,7 @@ func TestRun(t *testing.T) {
 	t.Log("grpc server started", port)
 	time.Sleep(time.Second * 2)
 
-	conn, err := grpc.Dial(fmt.Sprintf("localhost:%d", port), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(fmt.Sprintf("localhost:%d", port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		t.Error(err)
 		return

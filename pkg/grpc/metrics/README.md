@@ -84,7 +84,7 @@ func getDialOptions() []grpc.DialOption {
 }
 
 func main() {
-	conn, err := grpc.Dial("127.0.0.1:8282", getDialOptions()...)
+	conn, err := grpc.NewClient("127.0.0.1:8282", getDialOptions()...)
 
 	metrics.ClientHTTPService(":8284")
 	fmt.Println("start metrics server", ":8284")

@@ -15,8 +15,8 @@ import (
 	"github.com/zhufuyi/sponge/pkg/servicerd/discovery"
 )
 
-// Dial to grpc server
-func Dial(ctx context.Context, endpoint string, opts ...Option) (*grpc.ClientConn, error) {
+// NewClient creates a new grpc client
+func NewClient(endpoint string, opts ...Option) (*grpc.ClientConn, error) {
 	o := defaultOptions()
 	o.apply(opts...)
 
@@ -59,7 +59,13 @@ func Dial(ctx context.Context, endpoint string, opts ...Option) (*grpc.ClientCon
 	// custom options
 	clientOptions = append(clientOptions, o.dialOptions...)
 
-	return grpc.DialContext(ctx, endpoint, clientOptions...)
+	return grpc.NewClient(endpoint, clientOptions...)
+}
+
+// Dial to grpc server
+// Deprecated: use NewClient instead
+func Dial(_ context.Context, endpoint string, opts ...Option) (*grpc.ClientConn, error) {
+	return NewClient(endpoint, opts...)
 }
 
 func secureOption(o *options) (grpc.DialOption, error) {

@@ -70,7 +70,7 @@ func newRPCClient(addr string, unaryClientInterceptors []grpc.UnaryClientInterce
 	options = append(options, option1, option2)
 
 	addr = "127.0.0.1" + addr
-	conn, err := grpc.Dial(addr, options...)
+	conn, err := grpc.NewClient(addr, options...)
 	if err != nil {
 		panic(err)
 	}

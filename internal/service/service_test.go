@@ -38,13 +38,20 @@ func getRPCClientConnForTest(grpcClient ...config.GrpcClient) *grpc.ClientConn {
 
 	var cliOptions []grpccli.Option
 
+	endpoint := grpcClientCfg.Host + ":" + strconv.Itoa(grpcClientCfg.Port)
+	isUseDiscover := false
+
+	// using service discovery
+	//discoverOption, discoveryEndpoint := discoverService(config.Get(), grpcClientCfg)
+	//if discoverOption != nil {
+	//	isUseDiscover = true
+	//	endpoint = discoveryEndpoint
+	//	cliOptions = append(cliOptions, discoverOption)
+	//	cliOptions = append(cliOptions, grpccli.WithEnableLoadBalance()) // load balance
+	//}
+
 	if grpcClientCfg.Timeout > 0 {
 		cliOptions = append(cliOptions, grpccli.WithTimeout(time.Second*time.Duration(grpcClientCfg.Timeout)))
-	}
-
-	// load balance
-	if grpcClientCfg.EnableLoadBalance {
-		cliOptions = append(cliOptions, grpccli.WithEnableLoadBalance())
 	}
 
 	// secure
@@ -68,24 +75,13 @@ func getRPCClientConnForTest(grpcClient ...config.GrpcClient) *grpc.ClientConn {
 		grpccli.WithEnableLog(logger.Get()),
 	)
 
-	endpoint := grpcClientCfg.Host + ":" + strconv.Itoa(grpcClientCfg.Port)
-	isUseDiscover := false
-
-	// using service discovery
-	//grpcCliOption, discoveryEndpoint := discoverService(config.Get(), grpcClientCfg)
-	//if grpcCliOption != nil {
-	//	cliOptions = append(cliOptions, grpcCliOption)
-	//	isUseDiscover = true
-	//	endpoint = discoveryEndpoint
-	//}
-
 	msg := "dialing grpc server"
 	if isUseDiscover {
 		msg += " with discovery from " + grpcClientCfg.RegistryDiscoveryType
 	}
 	logger.Info(msg, logger.String("name", grpcClientCfg.Name), logger.String("endpoint", endpoint))
 
-	conn, err := grpccli.Dial(context.Background(), endpoint, cliOptions...)
+	conn, err := grpccli.NewClient(endpoint, cliOptions...)
 	if err != nil {
 		panic(err)
 	}
@@ -120,9 +116,6 @@ func getGRPCClientCfg(grpcClient ...config.GrpcClient) config.GrpcClient {
 			// If RegistryDiscoveryType is not empty, service discovery is used, and Host and Port values are invalid
 			RegistryDiscoveryType: config.Get().App.RegistryDiscoveryType, // supports consul, etcd and nacos
 			Name:                  config.Get().App.Name,
-		}
-		if grpcClientCfg.RegistryDiscoveryType != "" {
-			grpcClientCfg.EnableLoadBalance = true
 		}
 	}
 

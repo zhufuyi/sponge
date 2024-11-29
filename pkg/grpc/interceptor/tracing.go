@@ -24,3 +24,13 @@ func UnaryServerTracing() grpc.UnaryServerInterceptor {
 func StreamServerTracing() grpc.StreamServerInterceptor {
 	return otelgrpc.StreamServerInterceptor() //nolint
 }
+
+// ClientOptionTracing client-side tracing interceptor
+func ClientOptionTracing() grpc.DialOption {
+	return grpc.WithStatsHandler(otelgrpc.NewClientHandler())
+}
+
+// ServerOptionTracing server-side tracing interceptor
+func ServerOptionTracing() grpc.ServerOption {
+	return grpc.StatsHandler(otelgrpc.NewServerHandler())
+}

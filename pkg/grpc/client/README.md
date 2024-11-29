@@ -7,7 +7,7 @@ Generic grpc client.
 ```go
 	import "github.com/zhufuyi/sponge/pkg/grpc/client"
 
-	conn, err := client.Dial(context.Background(), "127.0.0.1:8282",
+	conn, err := client.NewClient(context.Background(), "127.0.0.1:8282",
 		//client.WithServiceDiscover(builder),
 		//client.WithLoadBalance(),
 		//client.WithSecure(credentials),
