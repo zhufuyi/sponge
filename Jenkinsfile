@@ -1,6 +1,5 @@
 pipeline {
     agent any
-
     stages  {
         stage("Check Build Branch") {
             steps {
