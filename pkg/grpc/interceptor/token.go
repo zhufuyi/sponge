@@ -3,7 +3,7 @@ package interceptor
 import (
 	"context"
 
-	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
+	grpc_metadata "github.com/grpc-ecosystem/go-grpc-middleware/v2/metadata"
 	"google.golang.org/grpc"
 )
 
@@ -49,8 +49,8 @@ type CheckToken func(appID string, appKey string) error
 // UnaryServerToken recovery unary token
 func UnaryServerToken(f CheckToken) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		appID := metautils.ExtractIncoming(ctx).Get("app_id")
-		appKey := metautils.ExtractIncoming(ctx).Get("app_key")
+		appID := grpc_metadata.ExtractIncoming(ctx).Get("app_id")
+		appKey := grpc_metadata.ExtractIncoming(ctx).Get("app_key")
 		err := f(appID, appKey)
 		if err != nil {
 			return nil, err
@@ -64,8 +64,8 @@ func UnaryServerToken(f CheckToken) grpc.UnaryServerInterceptor {
 func StreamServerToken(f CheckToken) grpc.StreamServerInterceptor {
 	return func(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
 		ctx := stream.Context()
-		appID := metautils.ExtractIncoming(ctx).Get("app_id")
-		appKey := metautils.ExtractIncoming(ctx).Get("app_key")
+		appID := grpc_metadata.ExtractIncoming(ctx).Get("app_id")
+		appKey := grpc_metadata.ExtractIncoming(ctx).Get("app_key")
 		err := f(appID, appKey)
 		if err != nil {
 			return err

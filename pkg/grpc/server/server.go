@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net"
 
-	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 
@@ -85,15 +84,11 @@ func customInterceptorOptions(o *options) []grpc.ServerOption {
 	}
 
 	if len(o.unaryInterceptors) > 0 {
-		option := grpc.UnaryInterceptor(
-			grpc_middleware.ChainUnaryServer(o.unaryInterceptors...),
-		)
+		option := grpc.ChainUnaryInterceptor(o.unaryInterceptors...)
 		opts = append(opts, option)
 	}
 	if len(o.streamInterceptors) > 0 {
-		option := grpc.StreamInterceptor(
-			grpc_middleware.ChainStreamServer(o.streamInterceptors...),
-		)
+		option := grpc.ChainStreamInterceptor(o.streamInterceptors...)
 		opts = append(opts, option)
 	}
 

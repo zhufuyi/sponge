@@ -4,7 +4,7 @@ import (
 	"context"
 	"sync"
 
-	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
+	grpc_metadata "github.com/grpc-ecosystem/go-grpc-middleware/v2/metadata"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -38,17 +38,17 @@ var RequestIDKey = CtxKeyString(ContextRequestIDKey)
 
 // CtxRequestIDField get request id field from context.Context
 func CtxRequestIDField(ctx context.Context) zap.Field {
-	return zap.String(ContextRequestIDKey, metautils.ExtractOutgoing(ctx).Get(ContextRequestIDKey))
+	return zap.String(ContextRequestIDKey, grpc_metadata.ExtractOutgoing(ctx).Get(ContextRequestIDKey))
 }
 
 // ClientCtxRequestID get request id from rpc client context.Context
 func ClientCtxRequestID(ctx context.Context) string {
-	return metautils.ExtractOutgoing(ctx).Get(ContextRequestIDKey)
+	return grpc_metadata.ExtractOutgoing(ctx).Get(ContextRequestIDKey)
 }
 
 // ClientCtxRequestIDField get request id field from rpc client context.Context
 func ClientCtxRequestIDField(ctx context.Context) zap.Field {
-	return zap.String(ContextRequestIDKey, metautils.ExtractOutgoing(ctx).Get(ContextRequestIDKey))
+	return zap.String(ContextRequestIDKey, grpc_metadata.ExtractOutgoing(ctx).Get(ContextRequestIDKey))
 }
 
 // UnaryClientRequestID client-side request_id unary interceptor
@@ -87,7 +87,7 @@ type KV struct {
 
 // WrapServerCtx wrap context, used in grpc server-side
 func WrapServerCtx(ctx context.Context, kvs ...KV) context.Context {
-	ctx = context.WithValue(ctx, ContextRequestIDKey, metautils.ExtractIncoming(ctx).Get(ContextRequestIDKey)) //nolint
+	ctx = context.WithValue(ctx, ContextRequestIDKey, grpc_metadata.ExtractIncoming(ctx).Get(ContextRequestIDKey)) //nolint
 	for _, kv := range kvs {
 		ctx = context.WithValue(ctx, kv.Key, kv.Val) //nolint
 	}
@@ -96,12 +96,12 @@ func WrapServerCtx(ctx context.Context, kvs ...KV) context.Context {
 
 // ServerCtxRequestID get request id from rpc server context.Context
 func ServerCtxRequestID(ctx context.Context) string {
-	return metautils.ExtractIncoming(ctx).Get(ContextRequestIDKey)
+	return grpc_metadata.ExtractIncoming(ctx).Get(ContextRequestIDKey)
 }
 
 // ServerCtxRequestIDField get request id field from rpc server context.Context
 func ServerCtxRequestIDField(ctx context.Context) zap.Field {
-	return zap.String(ContextRequestIDKey, metautils.ExtractIncoming(ctx).Get(ContextRequestIDKey))
+	return zap.String(ContextRequestIDKey, grpc_metadata.ExtractIncoming(ctx).Get(ContextRequestIDKey))
 }
 
 // UnaryServerRequestID server-side request_id unary interceptor
@@ -110,7 +110,7 @@ func UnaryServerRequestID() grpc.UnaryServerInterceptor {
 		requestID := ServerCtxRequestID(ctx)
 		if requestID == "" {
 			requestID = krand.String(krand.R_All, 10)
-			ctx = metautils.ExtractIncoming(ctx).Add(ContextRequestIDKey, requestID).ToIncoming(ctx)
+			ctx = grpc_metadata.ExtractIncoming(ctx).Add(ContextRequestIDKey, requestID).ToIncoming(ctx)
 		}
 
 		return handler(ctx, req)
@@ -125,7 +125,7 @@ func StreamServerRequestID() grpc.StreamServerInterceptor {
 		//requestID := ServerCtxRequestID(ctx)
 		//if requestID == "" {
 		//	requestID = krand.String(krand.R_All, 10)
-		//	ctx = metautils.ExtractIncoming(ctx).Add(ContextRequestIDKey, requestID).ToIncoming(ctx)
+		//	ctx = grpc_metadata.ExtractIncoming(ctx).Add(ContextRequestIDKey, requestID).ToIncoming(ctx)
 		//}
 		return handler(srv, stream)
 	}

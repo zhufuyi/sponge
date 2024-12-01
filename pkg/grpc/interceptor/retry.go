@@ -1,9 +1,10 @@
 package interceptor
 
 import (
+	"context"
 	"time"
 
-	grpc_retry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
+	grpc_retry "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/retry"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 )
@@ -81,7 +82,7 @@ func UnaryClientRetry(opts ...RetryOption) grpc.UnaryClientInterceptor {
 
 	return grpc_retry.UnaryClientInterceptor(
 		grpc_retry.WithMax(o.times), // set the number of retries
-		grpc_retry.WithBackoff(func(attempt uint) time.Duration { // set retry interval
+		grpc_retry.WithBackoff(func(ctx context.Context, attempt uint) time.Duration { // set retry interval
 			return o.interval
 		}),
 		grpc_retry.WithCodes(o.errCodes...), // set retry error code
@@ -95,7 +96,7 @@ func StreamClientRetry(opts ...RetryOption) grpc.StreamClientInterceptor {
 
 	return grpc_retry.StreamClientInterceptor(
 		grpc_retry.WithMax(o.times), // set the number of retries
-		grpc_retry.WithBackoff(func(attempt uint) time.Duration { // set retry interval
+		grpc_retry.WithBackoff(func(ctx context.Context, attempt uint) time.Duration { // set retry interval
 			return o.interval
 		}),
 		grpc_retry.WithCodes(o.errCodes...), // set retry error code

@@ -19,7 +19,7 @@ import "github.com/zhufuyi/sponge/pkg/grpc/interceptor"
 func getServerOptions() []grpc.ServerOption {
 	var options []grpc.ServerOption
 	
-	options = append(options, grpc_middleware.WithUnaryServerChain(
+	option := grpc.ChainUnaryInterceptor(
 		// if you don't want to log reply data, you can use interceptor.StreamServerSimpleLog instead of interceptor.UnaryServerLog,
 		interceptor.UnaryServerLog(
 			logger.Get(),
@@ -28,7 +28,8 @@ func getServerOptions() []grpc.ServerOption {
 			//interceptor.WithLogIgnoreMethods(fullMethodNames), // ignore methods logging
 			//interceptor.WithMaxLen(400), // logging max length, default 300
 		),
-	))
+	)
+	options = append(options, option)
 
 	return options
 }
@@ -44,9 +45,9 @@ func getServerOptions() []grpc.ServerOption {
 func getDialOptions() []grpc.DialOption {
 	var options []grpc.DialOption
 
-	option := grpc.WithUnaryInterceptor(
-		grpc_middleware.ChainUnaryClient(
-			interceptor.UnaryClientLog(logger.Get()),
+	option := grpc.WithChainUnaryInterceptor(
+		interceptor.UnaryClientLog(
+			logger.Get(),
 			interceptor.WithReplaceGRPCLogger(),
 		),
 	)
@@ -68,10 +69,10 @@ func getDialOptions() []grpc.DialOption {
 func getServerOptions() []grpc.ServerOption {
 	var options []grpc.ServerOption
 
-	recoveryOption := grpc_middleware.WithUnaryServerChain(
+	option := grpc.ChainUnaryInterceptor(
 		interceptor.UnaryServerRecovery(),
 	)
-	options = append(options, recoveryOption)
+	options = append(options, option)
 
 	return options
 }
@@ -83,10 +84,8 @@ func getServerOptions() []grpc.ServerOption {
 func getDialOptions() []grpc.DialOption {
 	var options []grpc.DialOption
 
-	option := grpc.WithUnaryInterceptor(
-		grpc_middleware.ChainUnaryClient(
-			interceptor.UnaryClientRecovery(),
-		),
+	option := grpc.WithChainUnaryInterceptor(
+		interceptor.UnaryClientRecovery(),
 	)
 	options = append(options, option)
 
@@ -108,13 +107,11 @@ func getDialOptions() []grpc.DialOption {
 	options = append(options, grpc.WithTransportCredentials(insecure.NewCredentials()))
 
 	// retry
-	option := grpc.WithUnaryInterceptor(
-		grpc_middleware.ChainUnaryClient(
-			interceptor.UnaryClientRetry(
-				//middleware.WithRetryTimes(5), // modify the default number of retries to 3 by default
-				//middleware.WithRetryInterval(100*time.Millisecond), // modify the default retry interval, default 50 milliseconds
-				//middleware.WithRetryErrCodes(), // add trigger retry error code, default is codes.Internal, codes.DeadlineExceeded, codes.Unavailable
-			),
+	option := grpc.WithChainUnaryInterceptor(
+		interceptor.UnaryClientRetry(
+			//middleware.WithRetryTimes(5), // modify the default number of retries to 3 by default
+			//middleware.WithRetryInterval(100*time.Millisecond), // modify the default retry interval, default 50 milliseconds
+			//middleware.WithRetryErrCodes(), // add trigger retry error code, default is codes.Internal, codes.DeadlineExceeded, codes.Unavailable
 		),
 	)
 	options = append(options, option)
@@ -137,14 +134,12 @@ func getDialOptions() []grpc.DialOption {
 	options = append(options, grpc.WithTransportCredentials(insecure.NewCredentials()))
 
 	// rate limiter
-	option := grpc.WithUnaryInterceptor(
-		grpc_middleware.ChainUnaryClient(
-			interceptor.UnaryRateLimit(
-				//interceptor.WithWindow(time.Second*5),
-				//interceptor.WithBucket(200),
-				//interceptor.WithCPUThreshold(600),
-				//interceptor.WithCPUQuota(0), 
-			),
+	option := grpc.ChainUnaryInterceptor(
+		interceptor.UnaryServerRateLimit(
+			//interceptor.WithWindow(time.Second*5),
+			//interceptor.WithBucket(200),
+			//interceptor.WithCPUThreshold(600),
+			//interceptor.WithCPUQuota(0),
 		),
 	)
 	options = append(options, option)
@@ -167,12 +162,10 @@ func getDialOptions() []grpc.DialOption {
 	options = append(options, grpc.WithTransportCredentials(insecure.NewCredentials()))
 
 	// circuit breaker
-	option := grpc.WithUnaryInterceptor(
-		grpc_middleware.ChainUnaryClient(
-			interceptor.UnaryClientCircuitBreaker(
-				//interceptor.WithValidCode(codes.DeadlineExceeded), // add error code 4 for circuit breaker
-				//interceptor.WithUnaryServerDegradeHandler(handler), // add custom degrade handler
-			),
+	option := grpc.ChainUnaryInterceptor(
+		interceptor.UnaryServerCircuitBreaker(
+			//interceptor.WithValidCode(codes.DeadlineExceeded), // add error code 4 for circuit breaker
+			//interceptor.WithUnaryServerDegradeHandler(handler), // add custom degrade handler
 		),
 	)
 	options = append(options, option)
@@ -195,10 +188,8 @@ func getDialOptions() []grpc.DialOption {
 	options = append(options, grpc.WithTransportCredentials(insecure.NewCredentials()))
 
 	// timeout
-	option := grpc.WithUnaryInterceptor(
-		grpc_middleware.ChainUnaryClient(
-			middleware.ContextTimeout(time.Second), // set timeout
-		),
+	option := grpc.WithChainUnaryInterceptor(
+		interceptor.UnaryClientTimeout(time.Second), // set timeout
 	)
 	options = append(options, option)
 
@@ -237,9 +228,10 @@ func getDialOptions() []grpc.DialOption {
 	options = append(options, grpc.WithTransportCredentials(insecure.NewCredentials()))
 
 	// use tracing
-	options = append(options, grpc.WithUnaryInterceptor(
+	option := grpc.WithUnaryInterceptor(
 		interceptor.UnaryClientTracing(),
-	))
+	)
+	options = append(options, option)
 
 	return options
 }
@@ -249,9 +241,10 @@ func getServerOptions() []grpc.ServerOption {
 	var options []grpc.ServerOption
 
 	// use tracing
-	options = append(options, grpc.UnaryInterceptor(
+	option := grpc.UnaryInterceptor(
 		interceptor.UnaryServerTracing(),
-	))
+	)
+	options = append(options, option)
 
 	return options
 }
@@ -284,10 +277,10 @@ example [metrics](../metrics/README.md).
 func getServerOptions() []grpc.ServerOption {
 	var options []grpc.ServerOption
 
-	recoveryOption := grpc_middleware.WithUnaryServerChain(
+	option := grpc.ChainUnaryInterceptor(
 		interceptor.UnaryServerRequestID(),
 	)
-	options = append(options, recoveryOption)
+	options = append(options, option)
 
 	return options
 }
@@ -304,10 +297,8 @@ func getDialOptions() []grpc.DialOption {
 	// use insecure transfer
 	options = append(options, grpc.WithTransportCredentials(insecure.NewCredentials()))
 
-	option := grpc.WithUnaryInterceptor(
-		grpc_middleware.ChainUnaryClient(
-			interceptor.UnaryClientRequestID(),
-		),
+	option := grpc.WithChainUnaryInterceptor(
+		interceptor.UnaryClientRequestID(),
 	)
 	options = append(options, option)
 
@@ -334,7 +325,7 @@ import (
 
 func main() {
 	ctx := context.Background()
-	conn, _ := grpccli.Dial(ctx, "127.0.0.1:8282")
+	conn, _ := grpccli.NewClient("127.0.0.1:8282")
 	cli := userV1.NewUserClient(conn)
 
 	token := "xxxxxx"

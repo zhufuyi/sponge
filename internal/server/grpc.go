@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"time"
 
-	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -204,7 +203,7 @@ func (s *grpcServer) unaryServerOptions() grpc.ServerOption {
 		unaryServerInterceptors = append(unaryServerInterceptors, interceptor.UnaryServerTracing())
 	}
 
-	return grpc_middleware.WithUnaryServerChain(unaryServerInterceptors...)
+	return grpc.ChainUnaryInterceptor(unaryServerInterceptors...)
 }
 
 // setting up stream server interceptors
@@ -265,7 +264,7 @@ func (s *grpcServer) streamServerOptions() grpc.ServerOption {
 		streamServerInterceptors = append(streamServerInterceptors, interceptor.StreamServerTracing())
 	}
 
-	return grpc_middleware.WithStreamServerChain(streamServerInterceptors...)
+	return grpc.ChainStreamInterceptor(streamServerInterceptors...)
 }
 
 func (s *grpcServer) getOptions() []grpc.ServerOption {

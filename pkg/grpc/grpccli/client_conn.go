@@ -5,7 +5,6 @@ import (
 	"context"
 	"errors"
 
-	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
@@ -151,9 +150,7 @@ func unaryClientOptions(o *options) grpc.DialOption {
 	// custom unary interceptors
 	unaryClientInterceptors = append(unaryClientInterceptors, o.unaryInterceptors...)
 
-	return grpc.WithUnaryInterceptor(
-		grpc_middleware.ChainUnaryClient(unaryClientInterceptors...),
-	)
+	return grpc.WithChainUnaryInterceptor(unaryClientInterceptors...)
 }
 
 func streamClientOptions(o *options) grpc.DialOption {
@@ -197,7 +194,5 @@ func streamClientOptions(o *options) grpc.DialOption {
 	// custom stream interceptors
 	streamClientInterceptors = append(streamClientInterceptors, o.streamInterceptors...)
 
-	return grpc.WithStreamInterceptor(
-		grpc_middleware.ChainStreamClient(streamClientInterceptors...),
-	)
+	return grpc.WithChainStreamInterceptor(streamClientInterceptors...)
 }

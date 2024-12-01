@@ -23,17 +23,17 @@ func getServerOptions() []grpc.ServerOption {
 	var options []grpc.ServerOption
 
 	// metrics interceptor
-	option := grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
+	option := grpc.ChainUnaryInterceptor(
 		//UnaryServerLabels,                  // tag
 		metrics.UnaryServerMetrics(
 			// metrics.WithCounterMetrics(customizedCounterMetric) // adding custom metrics
 		),
-	))
+	)
 	options = append(options, option)
 
-	option = grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(
+	option = grpc.ChainStreamInterceptor(
 		metrics.StreamServerMetrics(), // metrics interceptor for streaming rpc
-	))
+	)
 	options = append(options, option)
 
 	return options

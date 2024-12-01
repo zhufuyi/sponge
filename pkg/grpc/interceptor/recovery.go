@@ -3,7 +3,7 @@ package interceptor
 import (
 	"context"
 
-	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
+	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/recovery"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -44,7 +44,6 @@ func StreamClientRecovery() grpc.StreamClientInterceptor {
 
 // UnaryServerRecovery recovery unary interceptor
 func UnaryServerRecovery() grpc.UnaryServerInterceptor {
-	// https://pkg.go.dev/github.com/grpc-ecosystem/go-grpc-middleware/recovery
 	customFunc := func(p interface{}) (err error) {
 		return status.Errorf(codes.Internal, "triggered panic: %v", p)
 	}
@@ -57,7 +56,6 @@ func UnaryServerRecovery() grpc.UnaryServerInterceptor {
 
 // StreamServerRecovery recovery stream interceptor
 func StreamServerRecovery() grpc.StreamServerInterceptor {
-	// https://pkg.go.dev/github.com/grpc-ecosystem/go-grpc-middleware/recovery
 	customFunc := func(p interface{}) (err error) {
 		return status.Errorf(codes.Internal, "triggered panic: %v", p)
 	}

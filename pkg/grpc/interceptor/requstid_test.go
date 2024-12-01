@@ -10,7 +10,6 @@ import (
 	"testing"
 	"time"
 
-	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -38,8 +37,8 @@ func newRPCServer(unaryServerInterceptors []grpc.UnaryServerInterceptor, streamS
 		panic(err)
 	}
 
-	options1 := grpc_middleware.WithUnaryServerChain(unaryServerInterceptors...)
-	options2 := grpc_middleware.WithStreamServerChain(streamServerInterceptors...)
+	options1 := grpc.ChainUnaryInterceptor(unaryServerInterceptors...)
+	options2 := grpc.ChainStreamInterceptor(streamServerInterceptors...)
 	server := grpc.NewServer(options1, options2)
 
 	RegisterGreeterServer(server, &greeterServer{})
@@ -65,8 +64,8 @@ func newStreamRPCClient(addr string, streamClientInterceptors ...grpc.StreamClie
 func newRPCClient(addr string, unaryClientInterceptors []grpc.UnaryClientInterceptor, streamClientInterceptors []grpc.StreamClientInterceptor) GreeterClient {
 	var options []grpc.DialOption
 	options = append(options, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	option1 := grpc.WithUnaryInterceptor(grpc_middleware.ChainUnaryClient(unaryClientInterceptors...))
-	option2 := grpc.WithChainStreamInterceptor(grpc_middleware.ChainStreamClient(streamClientInterceptors...))
+	option1 := grpc.WithChainUnaryInterceptor(unaryClientInterceptors...)
+	option2 := grpc.WithChainStreamInterceptor(streamClientInterceptors...)
 	options = append(options, option1, option2)
 
 	addr = "127.0.0.1" + addr

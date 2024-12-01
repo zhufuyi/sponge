@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
+	grpc_metadata "github.com/grpc-ecosystem/go-grpc-middleware/v2/metadata"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -44,8 +44,8 @@ func TestUnaryServerToken(t *testing.T) {
 	ctx := context.Background()
 	_, err := interceptor(ctx, nil, unaryServerInfo, unaryServerHandler)
 	assert.NotNil(t, err)
-	ctx = metautils.ExtractIncoming(ctx).Add("app_id", "grpc").ToIncoming(ctx)
-	ctx = metautils.ExtractIncoming(ctx).Add("app_key", "123456").ToIncoming(ctx)
+	ctx = grpc_metadata.ExtractIncoming(ctx).Add("app_id", "grpc").ToIncoming(ctx)
+	ctx = grpc_metadata.ExtractIncoming(ctx).Add("app_key", "123456").ToIncoming(ctx)
 	_, err = interceptor(ctx, nil, unaryServerInfo, unaryServerHandler)
 	assert.NoError(t, err)
 }
@@ -63,8 +63,8 @@ func TestStreamServerToken(t *testing.T) {
 	ctx := context.Background()
 	err := interceptor(nil, newStreamServer(ctx), streamServerInfo, streamServerHandler)
 	assert.NotNil(t, err)
-	ctx = metautils.ExtractIncoming(ctx).Add("app_id", "grpc").ToIncoming(ctx)
-	ctx = metautils.ExtractIncoming(ctx).Add("app_key", "123456").ToIncoming(ctx)
+	ctx = grpc_metadata.ExtractIncoming(ctx).Add("app_id", "grpc").ToIncoming(ctx)
+	ctx = grpc_metadata.ExtractIncoming(ctx).Add("app_key", "123456").ToIncoming(ctx)
 	err = interceptor(nil, newStreamServer(ctx), streamServerInfo, streamServerHandler)
 	assert.NoError(t, err)
 }
