@@ -35,7 +35,6 @@ Docs: %s`, color.HiCyanString("https://github.com/zhufuyi/sponge"), color.HiCyan
 		GenWebCommand(),
 		GenMicroCommand(),
 		generate.ConfigCommand(),
-		generate.ConfigmapCommand(),
 		OpenUICommand(),
 		MergeCommand(),
 		PatchCommand(),

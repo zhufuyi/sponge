@@ -69,6 +69,10 @@ func ConfigCommand() *cobra.Command {
 	cmd.Flags().StringVarP(&ysArgs.InputFile, "yaml-file", "f", "", "yaml file")
 	cmd.Flags().StringVarP(&outPath, "out", "o", "", "output directory, default is ./config_<time>")
 
+	cmd.AddCommand(
+		ConfigmapCommand(), // k8s configmap command
+	)
+
 	return cmd
 }
 
