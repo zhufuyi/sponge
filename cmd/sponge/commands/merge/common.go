@@ -6,6 +6,7 @@ package merge
 import (
 	"bufio"
 	"bytes"
+	"errors"
 	"fmt"
 	"os"
 	"path"
@@ -112,7 +113,7 @@ func (m *mergeParam) runMergeCode(file string) (string, error) {
 	count1 := bytes.Count(data1, m.splitLineMark)
 	count2 := bytes.Count(data2, m.splitLineMark)
 	if count1 != count2 {
-		return "", fmt.Errorf(color.RedString("merge code failed (%s --> %s), manually merge code"+
+		return "", errors.New(color.RedString("merge code failed (%s --> %s), manually merge code"+
 			" reference document https://github.com/zhufuyi/sponge/tree/main/cmd/sponge/commands/merge",
 			cutPathPrefix(file), getTargetFilename(file)))
 	}
@@ -135,7 +136,7 @@ func (m *mergeParam) runMergeCode(file string) (string, error) {
 	}
 
 	if len(data1) > len(data) {
-		return "", fmt.Errorf(color.RedString("merge code failed (%s --> %s), to avoid replacing logical code, "+
+		return "", errors.New(color.RedString("merge code failed (%s --> %s), to avoid replacing logical code, "+
 			"manually merge code reference document https://github.com/zhufuyi/sponge/tree/main/cmd/sponge/commands/merge",
 			cutPathPrefix(file), getTargetFilename(file)))
 	}

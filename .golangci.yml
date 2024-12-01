@@ -56,7 +56,7 @@ linters:
     - unconvert
     - whitespace
     - staticcheck
-    #- bodyclose
+    - bodyclose
     #- dupl
     #- goprintffuncname
     #- gosec
@@ -67,6 +67,8 @@ linters:
 linters-settings:
   revive:
     rules:
+      - name: indent-error-flow
+      - name: unused-parameter
       - name: argument-limit
         arguments: [ 8 ]
       - name: atomic
@@ -96,7 +98,6 @@ linters-settings:
       - name: if-return
       - name: import-shadowing
       - name: increment-decrement
-      - name: indent-error-flow
       - name: modifies-parameter
       - name: modifies-value-receiver
       - name: package-comments
@@ -113,7 +114,6 @@ linters-settings:
       - name: unexported-naming
       - name: unnecessary-stmt
       - name: unreachable-code
-      - name: unused-parameter
       - name: var-declaration
       - name: var-naming
       - name: waitgroup-by-value

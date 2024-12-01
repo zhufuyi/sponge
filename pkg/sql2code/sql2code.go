@@ -116,7 +116,7 @@ func getSQL(args *Args) (string, map[string]string, error) {
 			sqlStr, mongoTypeMap := parser.ConvertToSQLByMgoFields(args.DBTable, fields)
 			return sqlStr, mongoTypeMap, nil
 		default:
-			return "", nil, fmt.Errorf("getsql error, unsupported database driver: " + dbDriverName)
+			return "", nil, errors.New("get sql error, unsupported database driver: " + dbDriverName)
 		}
 	}
 

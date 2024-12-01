@@ -63,7 +63,9 @@ func (p *WaitPrinter) StopPrint(tip string) {
 	}
 
 	defer func() {
-		recover()
+		if e := recover(); e != nil {
+			fmt.Println(e)
+		}
 	}()
 
 	p.cancel()
