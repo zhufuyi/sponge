@@ -85,15 +85,15 @@ func TestGenerate(t *testing.T) {
 			}},
 			wantErr: false,
 		},
-		{
-			name: "sql from sqlite",
-			args: args{args: &Args{
-				DBDsn:    "C:\\Users\\zhuyasen\\Desktop\\genTest\\sql\\sqlite\\sponge.db",
-				DBTable:  "user",
-				DBDriver: "sqlite",
-			}},
-			wantErr: false,
-		},
+		//{
+		//	name: "sql from sqlite",
+		//	args: args{args: &Args{
+		//		DBDsn:    "C:\\Users\\zhuyasen\\Desktop\\genTest\\sql\\sqlite\\sponge.db",
+		//		DBTable:  "user",
+		//		DBDriver: "sqlite",
+		//	}},
+		//	wantErr: false,
+		//},
 		//{
 		//	name: "sql from mysql",
 		//	args: args{args: &Args{
