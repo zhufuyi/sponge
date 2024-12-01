@@ -1,5 +1,5 @@
 
-建议使用go 1.20以上版本： [https://studygolang.com/dl](https://studygolang.com/dl)
+要求使用go 1.22以上版本： [https://studygolang.com/dl](https://studygolang.com/dl)
 
 > 注：如果不能科学上网，获取github的库可能会遇到超时失败问题，建议设置为国内代理，执行命令 **go env -w GOPROXY=https://goproxy.cn,direct**
 
