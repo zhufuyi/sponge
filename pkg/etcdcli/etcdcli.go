@@ -28,9 +28,8 @@ func Init(endpoints []string, opts ...Option) (*clientv3.Client, error) {
 	conf := clientv3.Config{
 		Endpoints:            endpoints,
 		DialTimeout:          o.dialTimeout,
-		DialKeepAliveTime:    10 * time.Second,
-		DialKeepAliveTimeout: 3 * time.Second,
-		DialOptions:          []grpc.DialOption{grpc.WithBlock()},
+		DialKeepAliveTime:    20 * time.Second,
+		DialKeepAliveTimeout: 10 * time.Second,
 		AutoSyncInterval:     o.autoSyncInterval,
 		Logger:               o.logger,
 		Username:             o.username,

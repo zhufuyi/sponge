@@ -4,7 +4,6 @@ package generate
 import (
 	"bufio"
 	"bytes"
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -12,6 +11,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"text/template"
@@ -802,29 +802,54 @@ func getSubFiles(selectFiles map[string][]string, replaceFiles map[string][]stri
 	return files
 }
 
+type Version struct {
+	major     string
+	minor     string
+	patch     string
+	goVersion string
+}
+
 func getLocalGoVersion() string {
 	result, err := gobash.Exec("go", "version")
 	if err != nil {
 		return defaultGoModVersion
 	}
 
-	pattern := `go(\d+\.\d+)`
-	re := regexp.MustCompile(pattern)
-	matches := re.FindStringSubmatch(string(result))
-	if len(matches) < 2 {
+	versions := []string{
+		strings.ReplaceAll(defaultGoModVersion, " ", ""),
+		string(result),
+	}
+
+	versionRegex := regexp.MustCompile(`go(\d+)\.(\d+)(\.(\d+))?`)
+
+	var versionList []Version
+	for _, v := range versions {
+		matches := versionRegex.FindStringSubmatch(v)
+		if len(matches) >= 3 {
+			goVersion := "go " + matches[1] + "." + matches[2]
+			if matches[4] != "" {
+				goVersion += "." + matches[4]
+			}
+			versionList = append(versionList, Version{major: matches[1], minor: matches[2], patch: matches[4], goVersion: goVersion})
+		}
+	}
+
+	//  descending sort by major, minor, patch
+	sort.Slice(versionList, func(i, j int) bool {
+		if versionList[i].major != versionList[j].major {
+			return utils.StrToInt(versionList[i].major) > utils.StrToInt(versionList[j].major)
+		}
+		if versionList[i].minor != versionList[j].minor {
+			return utils.StrToInt(versionList[i].minor) > utils.StrToInt(versionList[j].minor)
+		}
+		return utils.StrToInt(versionList[i].patch) > utils.StrToInt(versionList[j].patch)
+	})
+
+	if len(versionList) == 0 {
 		return defaultGoModVersion
 	}
 
-	localGoVersion := "go " + matches[1]
-	if localGoVersion < defaultGoModVersion {
-		return defaultGoModVersion
-	}
-
-	if len(localGoVersion) != 6 && len(localGoVersion) != 7 {
-		return defaultGoModVersion
-	}
-
-	return localGoVersion
+	return versionList[0].goVersion
 }
 
 func dbDriverErr(driver string) error {
@@ -1053,32 +1078,5 @@ func getGRPCServiceFields() []replacer.Field {
 			Old: `registryDiscoveryType: ""`,
 			New: `#registryDiscoveryType: ""`,
 		},
-	}
-}
-
-func clearCurrentLine() {
-	fmt.Print("\033[2K\r")
-}
-
-func PrintWaiting(ctx context.Context, runningTip string, finishTip string) {
-	defer func() {
-		clearCurrentLine()
-		fmt.Println(finishTip)
-	}()
-	symbols := []string{runningTip + ".", runningTip + "..", runningTip + "...", runningTip + "....", runningTip + ".....", runningTip + "......"}
-	index := 0
-	fmt.Printf("\r%s", symbols[index])
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case <-time.After(500 * time.Millisecond):
-			index++
-			if index >= len(symbols) {
-				index = 0
-				clearCurrentLine()
-			}
-			fmt.Printf("\r%s", symbols[index])
-		}
 	}
 }
