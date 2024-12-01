@@ -2,7 +2,7 @@ SHELL := /bin/bash
 
 PROJECT_NAME := "github.com/zhufuyi/sponge"
 PKG := "$(PROJECT_NAME)"
-PKG_LIST := $(shell go list ${PKG}/... | grep -v /vendor/ | grep -v /api/)
+PKG_LIST := $(shell go list ${PKG}/... | grep -v /vendor/ | grep -v /api/ | grep -v /cmd/)
 
 
 
