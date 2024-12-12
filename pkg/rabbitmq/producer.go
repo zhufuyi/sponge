@@ -23,6 +23,9 @@ type producerOptions struct {
 	// If true, the message will be returned to the sender if the queue cannot be
 	// found according to its own exchange type and routeKey rules.
 	mandatory bool
+
+	// only for publish-subscribe mode
+	isPublisherConfirm bool
 }
 
 func (o *producerOptions) apply(opts ...ProducerOption) {
@@ -39,8 +42,9 @@ func defaultProducerOptions() *producerOptions {
 		queueBind:       defaultQueueBindOptions(),
 		deadLetter:      defaultDeadLetterOptions(),
 
-		isPersistent: true,
-		mandatory:    true,
+		isPersistent:       true,
+		mandatory:          true,
+		isPublisherConfirm: false,
 	}
 }
 
@@ -86,6 +90,13 @@ func WithProducerMandatory(enable bool) ProducerOption {
 	}
 }
 
+// WithPublisherConfirm enables publisher confirm.
+func WithPublisherConfirm() ProducerOption {
+	return func(o *producerOptions) {
+		o.isPublisherConfirm = true
+	}
+}
+
 // -------------------------------------------------------------------------------------------
 
 // Producer session
@@ -108,6 +119,9 @@ type Producer struct {
 	exchangeArgs  amqp.Table
 	queueArgs     amqp.Table
 	queueBindArgs amqp.Table
+
+	// only for publish-subscribe mode
+	isPublisherConfirm bool
 }
 
 // NewProducer create a producer

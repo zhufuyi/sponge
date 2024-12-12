@@ -2,6 +2,7 @@ package rabbitmq
 
 import (
 	"context"
+	"fmt"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 	"go.uber.org/zap"
@@ -23,6 +24,15 @@ func NewPublisher(channelName string, connection *Connection, opts ...ProducerOp
 	ch, err := connection.conn.Channel()
 	if err != nil {
 		return nil, err
+	}
+
+	// enable publisher confirm
+	if o.isPublisherConfirm {
+		err = ch.Confirm(false)
+		if err != nil {
+			_ = ch.Close()
+			return nil, err
+		}
 	}
 
 	// declare the exchange type
@@ -61,7 +71,7 @@ func NewPublisher(channelName string, connection *Connection, opts ...ProducerOp
 }
 
 func (p *Publisher) Publish(ctx context.Context, body []byte) error {
-	return p.ch.PublishWithContext(
+	err := p.ch.PublishWithContext(
 		ctx,
 		p.Exchange.name,
 		p.Exchange.routingKey,
@@ -73,6 +83,24 @@ func (p *Publisher) Publish(ctx context.Context, body []byte) error {
 			Body:         body,
 		},
 	)
+	if err != nil {
+		return err
+	}
+
+	if p.isPublisherConfirm {
+		// wait for publisher confirm
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case confirm := <-p.ch.NotifyPublish(make(chan amqp.Confirmation, 1)):
+			if !confirm.Ack {
+				return fmt.Errorf("publisher confirm failed, exchangeName: %s, routingKey: %s, deliveryTag: %d",
+					p.Exchange.name, p.Exchange.routingKey, confirm.DeliveryTag)
+			}
+		}
+	}
+
+	return nil
 }
 
 // Close publisher
