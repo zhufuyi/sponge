@@ -2,25 +2,74 @@
 
 <br>
 
-**sponge** 是一个集成了`代码生成`、`Gin` 和 `gRPC` 的强大开发框架，提供丰富的代码生成命令，可灵活生成各类功能模块，并组合成完整的服务(类似打散的海绵细胞能重新组合成新的海绵)。sponge 提供一站式项目开发解决方案，涵盖代码生成、开发、测试、API 文档生成和部署，大幅提升开发效率，降低开发难度，实现以"低代码"方式构建高质量项目。
-
-sponge 用来快速高效开发各种应用场景的高性能后端服务，包括 `web` 服务、`gRPC` 服务、`http+gRPC` 混合服务、 `gRPC网关API`服务等。sponge 不仅支持基于自带的模板生成代码，还支持基于自定义模板和相关参数生成你的项目所需的代码。
+**sponge** 是一个强大的 `Go` 开发框架，其核心理念是通过解析 `JSON`、`SQL` 或 `Protobuf` 文件逆向生成模块化的代码，这些代码可以灵活、无缝地组合成多种类型的完整后端服务(类似海绵细胞的特性，打散的海绵细胞能自动重新组合成新的海绵)。sponge 提供一站式项目开发解决方案，涵盖代码生成、开发、测试、API 文档生成和部署，大幅提升开发效率，降低开发难度，实现以"低代码"方式构建高质量项目。
 
 <br>
 
-### sponge 核心设计理念
+### 适用场景
 
-sponge 的核心设计理念是通过 `SQL` 或 `Protobuf` 文件逆向生成模块化的代码，这些代码可以灵活、无缝地组合成多种类型的后端服务，从而大幅大提升开发效率，简化后端服务开发流程：
+sponge 适用于快速开发各种高性能后端服务，包括但不限于：
+- `Web` 服务；
+- `gRPC` 服务；
+- `HTTP+gRPC` 混合服务；
+- `gRPC Gateway API` 服务。
 
-- 如果开发只有 CRUD api 的 web 或 gRPC 服务，不需要编写任何 go 代码就可以编译并部署到 linux 服务器、docker、k8s 上，只需要连接到数据库(例如`mysql`, `mongodb`,`postgresql`,`sqlite`)就可以一键自动生成完整的后端服务 go 代码。
-- 如果开发通用的 web、gRPC、http+gRPC、gRPC 网关等服务，只需聚焦`在数据库定义表`、`在protobuf文件定义api描述信息`、`在生成的模板文件填写业务逻辑代码`这三部分，其他 go 代码(包括CRUD api)都由 sponge 来生成。
-- 通过自定义模板和参数(如 json、sql、protobuf)生成你的项目所需的代码(不局限于 Go 语言)，例如后端代码、前端代码、配置文件、测试代码、构建和部署脚本等。
+此外，开发者还可以通过自定义模板，生成满足业务需求的各类代码。
 
 <br>
 
-#### 生成代码的框架图
+### 核心亮点
 
-sponge 基于自带模板生成代码框架如下图所示，共有 sql 和 protobuf 两种方式生成代码。
+1. **一键生成完整后端服务代码**  
+   对于仅需 `CRUD API` 的 `Web` 或 `gRPC` 服务，无需编写任何 `Go` 代码。只需连接数据库(如 `MySQL`、`MongoDB`、`PostgreSQL`、`SQLite`)，即可一键生成完整后端服务代码，并轻松部署到 Linux 服务器、Docker 或 Kubernetes 上。
+
+2. **高效开发通用服务**  
+   开发通用的 `Web`、`gRPC`、`HTTP+gRPC` 或 `gRPC Gateway` 服务，只需专注于以下三部分：
+    - 数据库表的定义；
+    - 在 Protobuf 文件中定义 API 描述信息；
+    - 在生成的模板中编写业务逻辑代码。  
+
+   服务的框架代码和 CRUD API 代码均由 sponge 自动生成。
+
+3. **支持自定义模板，灵活扩展**  
+   sponge 支持通过自定义模板生成项目所需的多种代码类型，不局限于 `Go` 语言。例如：
+    - 后端代码；
+    - 前端代码；
+    - 配置文件；
+    - 测试代码；
+    - 构建和部署脚本等。
+
+<br>
+
+### 快速开始
+
+1. **安装 sponge**
+
+   支持在 windows、mac、linux 环境下安装 sponge，点击查看 [**安装 sponge 说明**](https://github.com/zhufuyi/sponge/blob/main/assets/install-cn.md)。
+
+2. **打开生成代码 UI 页面**
+
+   安装完成后，执行命令打开 sponge UI 页面：
+
+   ```bash
+   sponge run
+   ```
+
+   在本地浏览器访问 `http://localhost:24631`，在页面上操作生成代码，如下图所示：
+
+   <p align="center">
+   <img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/sponge-ui.png">
+   </p>
+
+   > 如果想要在跨主机的浏览器上访问，启动UI时需要指定宿主机ip或域名，示例 `sponge run -a http://your_host_ip:24631`。 也可以在 docker 上启动UI服务来支持跨主机访问，点击查看 [在 docker 运行 sponge UI 服务说明](https://github.com/zhufuyi/sponge/blob/main/assets/install-cn.md#Docker%E7%8E%AF%E5%A2%83)。
+
+<br>
+
+### 生成代码的框架图
+
+sponge 支持基于自带模板和自定义模板两种方式生成你的项目所需的代码，下面是两种生成代码的框架图。
+
+1. sponge 基于自带模板生成代码框架如下图所示，共有 sql 和 protobuf 两种方式生成代码。
 
 <p align="center">
 <img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/sponge-framework.png">
@@ -28,7 +77,7 @@ sponge 基于自带模板生成代码框架如下图所示，共有 sql 和 prot
 
 <br>
 
-sponge 基于自定义模板生成代码框架如下图所示，共有 json、sql、protobuf 三种方式生成代码。
+2. sponge 基于自定义模板生成代码框架如下图所示，共有 json、sql、protobuf 三种方式生成代码。
 
 <p align="center">
 <img width="1200px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/template-framework.png">
@@ -36,17 +85,9 @@ sponge 基于自定义模板生成代码框架如下图所示，共有 json、sq
 
 <br>
 
-#### 生成代码框架对应的UI界面
-
-<p align="center">
-<img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/sponge-ui.png">
-</p>
-
-<br>
-
 ### 微服务框架
 
-sponge 生成的服务代码本身是一个微服务，框架图如下图所示，这是典型的微服务分层结构，具有高性能，高扩展性，包含了常用的服务治理功能。
+sponge 支持创建 6 种类型的后端服务，均为微服务架构。下图展示了典型的微服务分层结构，具备高性能、高扩展性，并内置常用的服务治理功能。
 
 <p align="center">
 <img width="1000px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/microservices-framework.png">
@@ -152,26 +193,6 @@ sponge包含丰富的组件(按需使用)：
 ├── go.mod         # go 模块依赖关系和版本控制文件
 └── go.sum         # go 模块依赖项的密钥和校验和文件
 ```
-
-<br>
-
-### 快速开始
-
-#### 安装 sponge
-
-支持在windows、mac、linux环境下安装sponge，点击查看[安装sponge说明](https://github.com/zhufuyi/sponge/blob/main/assets/install-cn.md)。
-
-#### 启动UI服务
-
-安装完成后，启动sponge UI服务：
-
-```bash
-sponge run
-```
-
-在本地浏览器访问 `http://localhost:24631`，在UI页面上操作生成代码。
-
-> 如果想要在跨主机的浏览器上访问，启动UI时需要指定宿主机ip或域名，示例 `sponge run -a http://your_host_ip:24631`。 也可以在docker上启动UI服务来支持跨主机访问，点击查看[docker启动sponge UI服务说明](https://github.com/zhufuyi/sponge/blob/main/assets/install-cn.md#Docker%E7%8E%AF%E5%A2%83)。
 
 <br>
 
