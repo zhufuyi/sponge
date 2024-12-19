@@ -3,8 +3,8 @@ package handler
 import (
 	"context"
 
-	serverNameExampleV1 "github.com/zhufuyi/sponge/api/serverNameExample/v1"
-	"github.com/zhufuyi/sponge/internal/service"
+	serverNameExampleV1 "github.com/go-dev-frame/sponge/api/serverNameExample/v1"
+	"github.com/go-dev-frame/sponge/internal/service"
 )
 
 var _ serverNameExampleV1.{{.TableNameCamel}}Logicer = (*{{.TableNameCamelFCL}}Handler)(nil)

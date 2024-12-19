@@ -9,9 +9,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/zhufuyi/sponge/pkg/gofile"
-	"github.com/zhufuyi/sponge/pkg/sql2code/parser"
-	"github.com/zhufuyi/sponge/pkg/utils"
+	"github.com/go-dev-frame/sponge/pkg/gofile"
+	"github.com/go-dev-frame/sponge/pkg/sql2code/parser"
+	"github.com/go-dev-frame/sponge/pkg/utils"
 )
 
 // Args generate code arguments

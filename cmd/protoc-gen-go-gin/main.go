@@ -13,9 +13,9 @@ import (
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/types/pluginpb"
 
-	"github.com/zhufuyi/sponge/cmd/protoc-gen-go-gin/internal/generate/handler"
-	"github.com/zhufuyi/sponge/cmd/protoc-gen-go-gin/internal/generate/router"
-	"github.com/zhufuyi/sponge/cmd/protoc-gen-go-gin/internal/generate/service"
+	"github.com/go-dev-frame/sponge/cmd/protoc-gen-go-gin/internal/generate/handler"
+	"github.com/go-dev-frame/sponge/cmd/protoc-gen-go-gin/internal/generate/router"
+	"github.com/go-dev-frame/sponge/cmd/protoc-gen-go-gin/internal/generate/service"
 )
 
 const (
@@ -163,7 +163,7 @@ func saveGinRouterFiles(f *protogen.File) error {
 		ginRouterFileContent = bytes.Replace(ginRouterFileContent, []byte(`"errors"`), []byte(""), 1)
 	}
 	if !bytes.Contains(ginRouterFileContent, []byte("middleware.")) {
-		ginRouterFileContent = bytes.Replace(ginRouterFileContent, []byte(`"github.com/zhufuyi/sponge/pkg/gin/middleware"`), []byte(""), 1)
+		ginRouterFileContent = bytes.Replace(ginRouterFileContent, []byte(`"github.com/go-dev-frame/sponge/pkg/gin/middleware"`), []byte(""), 1)
 	}
 	filePath := f.GeneratedFilenamePrefix + "_router.pb.go"
 	return os.WriteFile(filePath, ginRouterFileContent, 0666)

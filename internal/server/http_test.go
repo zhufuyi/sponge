@@ -10,11 +10,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
-	"github.com/zhufuyi/sponge/pkg/utils"
+	"github.com/go-dev-frame/sponge/pkg/servicerd/registry"
+	"github.com/go-dev-frame/sponge/pkg/utils"
 
-	"github.com/zhufuyi/sponge/configs"
-	"github.com/zhufuyi/sponge/internal/config"
+	"github.com/go-dev-frame/sponge/configs"
+	"github.com/go-dev-frame/sponge/internal/config"
 )
 
 // need real database to test

@@ -19,8 +19,8 @@ import (
 
 	"github.com/fatih/color"
 
-	"github.com/zhufuyi/sponge/pkg/gobash"
-	"github.com/zhufuyi/sponge/pkg/gofile"
+	"github.com/go-dev-frame/sponge/pkg/gobash"
+	"github.com/go-dev-frame/sponge/pkg/gofile"
 )
 
 var (
@@ -114,7 +114,7 @@ func (m *mergeParam) runMergeCode(file string) (string, error) {
 	count2 := bytes.Count(data2, m.splitLineMark)
 	if count1 != count2 {
 		return "", errors.New(color.RedString("merge code failed (%s --> %s), manually merge code"+
-			" reference document https://github.com/zhufuyi/sponge/tree/main/cmd/sponge/commands/merge",
+			" reference document https://github.com/go-dev-frame/sponge/tree/main/cmd/sponge/commands/merge",
 			cutPathPrefix(file), getTargetFilename(file)))
 	}
 
@@ -137,7 +137,7 @@ func (m *mergeParam) runMergeCode(file string) (string, error) {
 
 	if len(data1) > len(data) {
 		return "", errors.New(color.RedString("merge code failed (%s --> %s), to avoid replacing logical code, "+
-			"manually merge code reference document https://github.com/zhufuyi/sponge/tree/main/cmd/sponge/commands/merge",
+			"manually merge code reference document https://github.com/go-dev-frame/sponge/tree/main/cmd/sponge/commands/merge",
 			cutPathPrefix(file), getTargetFilename(file)))
 	}
 

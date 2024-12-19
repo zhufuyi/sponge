@@ -8,7 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/zhufuyi/sponge/pkg/errcode"
+	"github.com/go-dev-frame/sponge/pkg/errcode"
 )
 
 // Result output data format

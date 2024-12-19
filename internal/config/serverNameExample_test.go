@@ -5,9 +5,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/zhufuyi/sponge/pkg/gofile"
+	"github.com/go-dev-frame/sponge/pkg/gofile"
 
-	"github.com/zhufuyi/sponge/configs"
+	"github.com/go-dev-frame/sponge/configs"
 )
 
 func TestInit(t *testing.T) {

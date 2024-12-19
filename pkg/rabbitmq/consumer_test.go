@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
 
-	"github.com/zhufuyi/sponge/pkg/utils"
+	"github.com/go-dev-frame/sponge/pkg/utils"
 )
 
 func TestConsumerOptions(t *testing.T) {

@@ -8,7 +8,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 
-	"github.com/zhufuyi/sponge/pkg/replacer"
+	"github.com/go-dev-frame/sponge/pkg/replacer"
 )
 
 // GRPCConnectionCommand generate grpc connection code
@@ -132,11 +132,11 @@ func (g *grpcConnectionGenerator) addFields() []replacer.Field {
 
 	fields = append(fields, []replacer.Field{
 		{
-			Old: "github.com/zhufuyi/sponge/configs",
+			Old: "github.com/go-dev-frame/sponge/configs",
 			New: g.moduleName + "/configs",
 		},
 		{
-			Old: "github.com/zhufuyi/sponge/internal/config",
+			Old: "github.com/go-dev-frame/sponge/internal/config",
 			New: g.moduleName + "/internal/config",
 		},
 		{

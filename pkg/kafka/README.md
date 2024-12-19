@@ -16,7 +16,7 @@ package main
 import (
 	"fmt"
 	"github.com/IBM/sarama"
-	"github.com/zhufuyi/pkg/kafka"
+	"github.com/go-dev-frame/sponge/pkg/kafka"
 )
 
 func main() {
@@ -31,7 +31,7 @@ func main() {
 	defer p.Close()
 
 	// Case 1: send sarama.ProducerMessage type message
-	msg := testData[0].(*sarama.ProducerMessage) // testData is https://github.com/zhufuyi/sponge/blob/main/pkg/kafka/producer_test.go#L18
+	msg := testData[0].(*sarama.ProducerMessage) // testData is https://github.com/go-dev-frame/sponge/blob/main/pkg/kafka/producer_test.go#L18
 	partition, offset, err := p.SendMessage(msg)
 	if err != nil {
 		fmt.Println(err)
@@ -62,7 +62,7 @@ import (
 	"fmt"
 	"time"
 	"github.com/IBM/sarama"
-	"github.com/zhufuyi/pkg/kafka"
+	"github.com/go-dev-frame/sponge/pkg/kafka"
 )
 
 func main() {
@@ -82,7 +82,7 @@ func main() {
 	defer p.Close()
 
 	// Case 1: send sarama.ProducerMessage type message, supports multiple messages
-	msg := testData[0].(*sarama.ProducerMessage) // testData is https://github.com/zhufuyi/sponge/blob/main/pkg/kafka/producer_test.go#L18
+	msg := testData[0].(*sarama.ProducerMessage) // testData is https://github.com/go-dev-frame/sponge/blob/main/pkg/kafka/producer_test.go#L18
 	err = p.SendMessage(msg, msg)
 	if err != nil {
 		fmt.Println(err)
@@ -113,7 +113,7 @@ import (
 	"fmt"
 	"time"
 	"github.com/IBM/sarama"
-	"github.com/zhufuyi/pkg/kafka"
+	"github.com/go-dev-frame/sponge/pkg/kafka"
 )
 
 func main() {
@@ -130,10 +130,10 @@ func main() {
 	defer cg.Close()
 
 	// Case 1: consume default handle message
-	go cg.Consume(context.Background(), []string{testTopic}, handleMsgFn) // handleMsgFn is https://github.com/zhufuyi/sponge/blob/main/pkg/kafka/consumer_test.go#L19
+	go cg.Consume(context.Background(), []string{testTopic}, handleMsgFn) // handleMsgFn is https://github.com/go-dev-frame/sponge/blob/main/pkg/kafka/consumer_test.go#L19
 
 	// Case 2: consume custom handle message
-	go cg.ConsumeCustom(context.Background(), []string{testTopic}, &myConsumerGroupHandler{ // myConsumerGroupHandler is https://github.com/zhufuyi/sponge/blob/main/pkg/kafka/consumer_test.go#L26
+	go cg.ConsumeCustom(context.Background(), []string{testTopic}, &myConsumerGroupHandler{ // myConsumerGroupHandler is https://github.com/go-dev-frame/sponge/blob/main/pkg/kafka/consumer_test.go#L26
 		autoCommitEnable: cg.autoCommitEnable,
 	})
 
@@ -151,7 +151,7 @@ package main
 import (
 	"fmt"
 	"github.com/IBM/sarama"
-	"github.com/zhufuyi/pkg/kafka"
+	"github.com/go-dev-frame/sponge/pkg/kafka"
 	"time"
 )
 
@@ -167,7 +167,7 @@ func main() {
 	defer c.Close()
 
 	// Case 1: consume one partition
-	go c.ConsumePartition(context.Background(), testTopic, 0, sarama.OffsetNewest, handleMsgFn) // // handleMsgFn is https://github.com/zhufuyi/sponge/blob/main/pkg/kafka/consumer_test.go#L19
+	go c.ConsumePartition(context.Background(), testTopic, 0, sarama.OffsetNewest, handleMsgFn) // // handleMsgFn is https://github.com/go-dev-frame/sponge/blob/main/pkg/kafka/consumer_test.go#L19
 
 	// Case 2: consume all partition
 	c.ConsumeAllPartition(context.Background(), testTopic, sarama.OffsetNewest, handleMsgFn)
@@ -187,7 +187,7 @@ package main
 
 import (    
 	"fmt"
-	"github.com/zhufuyi/pkg/kafka"    
+	"github.com/go-dev-frame/sponge/pkg/kafka"    
 )
 
 func main() {

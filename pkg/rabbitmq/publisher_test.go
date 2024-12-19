@@ -8,7 +8,7 @@ import (
 
 	amqp "github.com/rabbitmq/amqp091-go"
 
-	"github.com/zhufuyi/sponge/pkg/utils"
+	"github.com/go-dev-frame/sponge/pkg/utils"
 )
 
 var testChannelName = "pub-sub"

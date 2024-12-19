@@ -6,17 +6,17 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
 
-	"github.com/zhufuyi/sponge/pkg/gin/middleware"
-	"github.com/zhufuyi/sponge/pkg/gin/response"
-	"github.com/zhufuyi/sponge/pkg/logger"
-	"github.com/zhufuyi/sponge/pkg/utils"
+	"github.com/go-dev-frame/sponge/pkg/gin/middleware"
+	"github.com/go-dev-frame/sponge/pkg/gin/response"
+	"github.com/go-dev-frame/sponge/pkg/logger"
+	"github.com/go-dev-frame/sponge/pkg/utils"
 
-	"github.com/zhufuyi/sponge/internal/cache"
-	"github.com/zhufuyi/sponge/internal/dao"
-	"github.com/zhufuyi/sponge/internal/database"
-	"github.com/zhufuyi/sponge/internal/ecode"
-	"github.com/zhufuyi/sponge/internal/model"
-	"github.com/zhufuyi/sponge/internal/types"
+	"github.com/go-dev-frame/sponge/internal/cache"
+	"github.com/go-dev-frame/sponge/internal/dao"
+	"github.com/go-dev-frame/sponge/internal/database"
+	"github.com/go-dev-frame/sponge/internal/ecode"
+	"github.com/go-dev-frame/sponge/internal/model"
+	"github.com/go-dev-frame/sponge/internal/types"
 )
 
 var _ UserExampleHandler = (*userExampleHandler)(nil)

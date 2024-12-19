@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/zhufuyi/sponge/pkg/gofile"
-	"github.com/zhufuyi/sponge/pkg/replacer"
+	"github.com/go-dev-frame/sponge/pkg/gofile"
+	"github.com/go-dev-frame/sponge/pkg/replacer"
 )
 
 const warnSymbol = "⚠ "

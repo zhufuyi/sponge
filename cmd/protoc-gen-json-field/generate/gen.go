@@ -10,7 +10,7 @@ import (
 	"github.com/jinzhu/inflection"
 	"google.golang.org/protobuf/compiler/protogen"
 
-	"github.com/zhufuyi/sponge/cmd/protoc-gen-json-field/parser"
+	"github.com/go-dev-frame/sponge/cmd/protoc-gen-json-field/parser"
 )
 
 // ProtoInfo is the info for parsing proto file

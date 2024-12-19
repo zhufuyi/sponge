@@ -9,7 +9,7 @@ Tracer library wrapped in [go.opentelemetry.io/otel](https://github.com/open-tel
 Initialize the trace, specifying exporter and resource.
 
 ```go
-import "github.com/zhufuyi/sponge/pkg/tracer"
+import "github.com/go-dev-frame/sponge/pkg/tracer"
 
 func initTrace() {
 	// exporter := tracer.NewConsoleExporter() // output to terminal

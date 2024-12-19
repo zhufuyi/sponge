@@ -10,7 +10,7 @@
 package v1
 
 import (
-	types "github.com/zhufuyi/sponge/api/types"
+	types "github.com/go-dev-frame/sponge/api/types"
 
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"

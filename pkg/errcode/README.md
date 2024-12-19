@@ -26,7 +26,7 @@ Error codes usually include system-level error codes and business-level error co
 Web services created based on **SQL**, use the following error code:
 
 ```go
-    import "github.com/zhufuyi/sponge/pkg/gin/response"
+    import "github.com/go-dev-frame/sponge/pkg/gin/response"
 
     // return error
     response.Error(c, ecode.InvalidParams)

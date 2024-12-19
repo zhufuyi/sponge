@@ -92,7 +92,7 @@ package api.serverNameExample.v1;
 import "api/types/types.proto";
 import "validate/validate.proto";
 
-option go_package = "github.com/zhufuyi/sponge/api/serverNameExample/v1;v1";
+option go_package = "github.com/go-dev-frame/sponge/api/serverNameExample/v1;v1";
 
 service {{.TName}} {
   // create {{.TName}}
@@ -215,7 +215,7 @@ package api.serverNameExample.v1;
 import "api/types/types.proto";
 import "validate/validate.proto";
 
-option go_package = "github.com/zhufuyi/sponge/api/serverNameExample/v1;v1";
+option go_package = "github.com/go-dev-frame/sponge/api/serverNameExample/v1;v1";
 
 service {{.TName}} {
   // create {{.TName}}
@@ -295,7 +295,7 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 import "tagger/tagger.proto";
 import "validate/validate.proto";
 
-option go_package = "github.com/zhufuyi/sponge/api/serverNameExample/v1;v1";
+option go_package = "github.com/go-dev-frame/sponge/api/serverNameExample/v1;v1";
 
 /*
 Reference https://github.com/grpc-ecosystem/grpc-gateway/blob/db7fbefff7c04877cdb32e16d4a248a024428207/examples/internal/proto/examplepb/a_bit_of_everything.proto
@@ -516,7 +516,7 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 import "tagger/tagger.proto";
 import "validate/validate.proto";
 
-option go_package = "github.com/zhufuyi/sponge/api/serverNameExample/v1;v1";
+option go_package = "github.com/go-dev-frame/sponge/api/serverNameExample/v1;v1";
 
 /*
 Reference https://github.com/grpc-ecosystem/grpc-gateway/blob/db7fbefff7c04877cdb32e16d4a248a024428207/examples/internal/proto/examplepb/a_bit_of_everything.proto

@@ -9,7 +9,7 @@ Wrap the official `net/http/pprof` route and add the profile io wait time route.
 #### sampling profile by http
 
 ```go
-    import "github.com/zhufuyi/sponge/pkg/prof"
+    import "github.com/go-dev-frame/sponge/pkg/prof"
 
     mux := http.NewServeMux()
     prof.Register(mux, prof.WithPrefix("/myServer"), prof.WithIOWaitTime())
@@ -29,7 +29,7 @@ Wrap the official `net/http/pprof` route and add the profile io wait time route.
 #### sampling profile by system notification signal
 
 ```go
-import "github.com/zhufuyi/sponge/pkg/prof"
+import "github.com/go-dev-frame/sponge/pkg/prof"
 
 func WaitSign() {
 	p := prof.NewProfile()

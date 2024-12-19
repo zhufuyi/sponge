@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/zhufuyi/sponge/cmd/sponge/commands"
-	"github.com/zhufuyi/sponge/cmd/sponge/commands/generate"
+	"github.com/go-dev-frame/sponge/cmd/sponge/commands"
+	"github.com/go-dev-frame/sponge/cmd/sponge/commands/generate"
 )
 
 func main() {

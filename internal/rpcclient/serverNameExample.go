@@ -8,9 +8,9 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/zhufuyi/sponge/internal/config"
-	"github.com/zhufuyi/sponge/pkg/grpc/grpccli"
-	"github.com/zhufuyi/sponge/pkg/logger"
+	"github.com/go-dev-frame/sponge/internal/config"
+	"github.com/go-dev-frame/sponge/pkg/grpc/grpccli"
+	"github.com/go-dev-frame/sponge/pkg/logger"
 )
 
 var (

@@ -3,9 +3,9 @@ package types
 import (
 	"time"
 
-	"github.com/zhufuyi/sponge/pkg/mgo/query"
+	"github.com/go-dev-frame/sponge/pkg/mgo/query"
 
-	"github.com/zhufuyi/sponge/internal/model"
+	"github.com/go-dev-frame/sponge/internal/model"
 )
 
 var _ time.Time

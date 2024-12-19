@@ -5,9 +5,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/zhufuyi/sponge/pkg/container/group"
-	"github.com/zhufuyi/sponge/pkg/gin/response"
-	"github.com/zhufuyi/sponge/pkg/shield/circuitbreaker"
+	"github.com/go-dev-frame/sponge/pkg/container/group"
+	"github.com/go-dev-frame/sponge/pkg/gin/response"
+	"github.com/go-dev-frame/sponge/pkg/shield/circuitbreaker"
 )
 
 // ErrNotAllowed error not allowed.

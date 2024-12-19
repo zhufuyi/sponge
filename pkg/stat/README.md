@@ -7,7 +7,7 @@ Statistics on system and process cpu and memory information, alarm notification 
 ### Example of use
 
 ```go
-    import "github.com/zhufuyi/sponge/pkg/stat"
+    import "github.com/go-dev-frame/sponge/pkg/stat"
 
     l, _ := zap.NewDevelopment()
     stat.Init(

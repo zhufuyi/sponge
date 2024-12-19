@@ -9,7 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/zhufuyi/sponge/pkg/shield/window"
+	"github.com/go-dev-frame/sponge/pkg/shield/window"
 )
 
 var (

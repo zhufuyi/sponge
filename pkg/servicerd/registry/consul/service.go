@@ -4,7 +4,7 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
+	"github.com/go-dev-frame/sponge/pkg/servicerd/registry"
 )
 
 type serviceSet struct {

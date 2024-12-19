@@ -5,7 +5,7 @@ Compression testing of rpc methods and generation of reported results.
 ### Example of use
 
 ```go
-import "github.com/zhufuyi/sponge/pkg/grpc/benchmark"
+import "github.com/go-dev-frame/sponge/pkg/grpc/benchmark"
 
 func benchmarkExample() error {
 	host := "127.0.0.1:8282"

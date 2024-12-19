@@ -9,8 +9,8 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
-	"github.com/zhufuyi/sponge/pkg/jwt"
-	"github.com/zhufuyi/sponge/pkg/utils"
+	"github.com/go-dev-frame/sponge/pkg/jwt"
+	"github.com/go-dev-frame/sponge/pkg/utils"
 )
 
 var (

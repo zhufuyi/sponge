@@ -10,7 +10,7 @@ Adaptive rate limit, only available for linux systems.
 
 ```go
 import (
-	rl "github.com/zhufuyi/sponge/pkg/shield/ratelimit"
+	rl "github.com/go-dev-frame/sponge/pkg/shield/ratelimit"
 )
 
 func RateLimit(opts ...RateLimitOption) gin.HandlerFunc {
@@ -44,7 +44,7 @@ func RateLimit(opts ...RateLimitOption) gin.HandlerFunc {
 
 ```go
 import (
-	rl "github.com/zhufuyi/sponge/pkg/shield/ratelimit"
+	rl "github.com/go-dev-frame/sponge/pkg/shield/ratelimit"
 )
 
 

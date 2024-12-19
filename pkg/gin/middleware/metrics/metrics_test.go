@@ -8,8 +8,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/zhufuyi/sponge/pkg/gin/handlerfunc"
-	"github.com/zhufuyi/sponge/pkg/utils"
+	"github.com/go-dev-frame/sponge/pkg/gin/handlerfunc"
+	"github.com/go-dev-frame/sponge/pkg/utils"
 )
 
 func TestMetrics(t *testing.T) {

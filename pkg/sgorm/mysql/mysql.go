@@ -14,8 +14,8 @@ import (
 	"gorm.io/gorm/schema"
 	"gorm.io/plugin/dbresolver"
 
-	"github.com/zhufuyi/sponge/pkg/sgorm/dbclose"
-	"github.com/zhufuyi/sponge/pkg/sgorm/glog"
+	"github.com/go-dev-frame/sponge/pkg/sgorm/dbclose"
+	"github.com/go-dev-frame/sponge/pkg/sgorm/glog"
 )
 
 // Init mysql

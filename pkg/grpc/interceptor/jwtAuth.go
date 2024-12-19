@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
-	"github.com/zhufuyi/sponge/pkg/jwt"
+	"github.com/go-dev-frame/sponge/pkg/jwt"
 )
 
 // ---------------------------------- client ----------------------------------

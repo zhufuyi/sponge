@@ -9,7 +9,7 @@
 **grpc server example**
 
 ```go
-import "github.com/zhufuyi/sponge/pkg/grpc/gtls"
+import "github.com/go-dev-frame/sponge/pkg/grpc/gtls"
 
 func main() {
     // one-way connection
@@ -28,7 +28,7 @@ func main() {
 **grpc client example**
 
 ```go
-import "github.com/zhufuyi/sponge/pkg/grpc/gtls"
+import "github.com/go-dev-frame/sponge/pkg/grpc/gtls"
 
 func main() {
     // one-way connection
@@ -50,7 +50,7 @@ func main() {
 **grpc server example**
 
 ```go
-import "github.com/zhufuyi/sponge/pkg/grpc/gtls"
+import "github.com/go-dev-frame/sponge/pkg/grpc/gtls"
 
 func main() {
     // two-way secure connection
@@ -70,7 +70,7 @@ func main() {
 **grpc client example**
 
 ```go
-import "github.com/zhufuyi/sponge/pkg/grpc/gtls"
+import "github.com/go-dev-frame/sponge/pkg/grpc/gtls"
 
 func main() {
     // two-way secure connection

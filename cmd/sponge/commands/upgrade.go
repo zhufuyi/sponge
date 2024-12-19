@@ -11,9 +11,9 @@ import (
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 
-	"github.com/zhufuyi/sponge/pkg/gobash"
-	"github.com/zhufuyi/sponge/pkg/gofile"
-	"github.com/zhufuyi/sponge/pkg/utils"
+	"github.com/go-dev-frame/sponge/pkg/gobash"
+	"github.com/go-dev-frame/sponge/pkg/gofile"
+	"github.com/go-dev-frame/sponge/pkg/utils"
 )
 
 // UpgradeCommand upgrade sponge binaries
@@ -89,7 +89,11 @@ func runUpgrade(targetVersion string) (string, error) {
 
 func runUpgradeCommand(targetVersion string) error {
 	ctx, _ := context.WithTimeout(context.Background(), time.Minute*3) //nolint
-	result := gobash.Run(ctx, "go", "install", "github.com/zhufuyi/sponge/cmd/sponge@"+targetVersion)
+	spongeVersion := "github.com/go-dev-frame/sponge/cmd/sponge@" + targetVersion
+	if targetVersion != latestVersion && targetVersion < "v1.11.2" {
+		spongeVersion = strings.ReplaceAll(spongeVersion, "go-dev-frame", "zhufuyi")
+	}
+	result := gobash.Run(ctx, "go", "install", spongeVersion)
 	for v := range result.StdOut {
 		_ = v
 	}
@@ -113,7 +117,7 @@ func copyToTempDir(targetVersion string) (string, error) {
 	spongeDirName := ""
 	if targetVersion == latestVersion {
 		// find the new version of the sponge code directory
-		arg := fmt.Sprintf("%s/pkg/mod/github.com/zhufuyi", gopath)
+		arg := fmt.Sprintf("%s/pkg/mod/github.com/go-dev-frame", gopath)
 		result, err = gobash.Exec("ls", adaptPathDelimiter(arg))
 		if err != nil {
 			return "", fmt.Errorf("execute command failed, %v", err)
@@ -121,13 +125,13 @@ func copyToTempDir(targetVersion string) (string, error) {
 
 		spongeDirName = getLatestVersion(string(result))
 		if spongeDirName == "" {
-			return "", fmt.Errorf("not found sponge directory in '$GOPATH/pkg/mod/github.com/zhufuyi'")
+			return "", fmt.Errorf("not found sponge directory in '$GOPATH/pkg/mod/github.com/go-dev-frame'")
 		}
 	} else {
 		spongeDirName = "sponge@" + targetVersion
 	}
 
-	srcDir := adaptPathDelimiter(fmt.Sprintf("%s/pkg/mod/github.com/zhufuyi/%s", gopath, spongeDirName))
+	srcDir := adaptPathDelimiter(fmt.Sprintf("%s/pkg/mod/github.com/go-dev-frame/%s", gopath, spongeDirName))
 	destDir := adaptPathDelimiter(GetSpongeDir() + "/")
 	targetDir := adaptPathDelimiter(destDir + ".sponge")
 
@@ -209,7 +213,11 @@ func getLatestVersion(s string) string {
 
 func updateSpongeInternalPlugin(targetVersion string) error {
 	ctx, _ := context.WithTimeout(context.Background(), time.Minute) //nolint
-	result := gobash.Run(ctx, "go", "install", "github.com/zhufuyi/sponge/cmd/protoc-gen-go-gin@"+targetVersion)
+	genGinVersion := "github.com/go-dev-frame/sponge/cmd/protoc-gen-go-gin@" + targetVersion
+	if targetVersion < "v1.11.2" {
+		genGinVersion = strings.ReplaceAll(genGinVersion, "go-dev-frame", "zhufuyi")
+	}
+	result := gobash.Run(ctx, "go", "install", genGinVersion)
 	for v := range result.StdOut {
 		_ = v
 	}
@@ -218,7 +226,11 @@ func updateSpongeInternalPlugin(targetVersion string) error {
 	}
 
 	ctx, _ = context.WithTimeout(context.Background(), time.Minute) //nolint
-	result = gobash.Run(ctx, "go", "install", "github.com/zhufuyi/sponge/cmd/protoc-gen-go-rpc-tmpl@"+targetVersion)
+	genRPCVersion := "github.com/go-dev-frame/sponge/cmd/protoc-gen-go-rpc-tmpl@" + targetVersion
+	if targetVersion < "v1.11.2" {
+		genRPCVersion = strings.ReplaceAll(genRPCVersion, "go-dev-frame", "zhufuyi")
+	}
+	result = gobash.Run(ctx, "go", "install", genRPCVersion)
 	for v := range result.StdOut {
 		_ = v
 	}
@@ -229,7 +241,11 @@ func updateSpongeInternalPlugin(targetVersion string) error {
 	// v1.x.x version does not support protoc-gen-json-field
 	if !strings.HasPrefix(targetVersion, "v1") {
 		ctx, _ = context.WithTimeout(context.Background(), time.Minute) //nolint
-		result = gobash.Run(ctx, "go", "install", "github.com/zhufuyi/sponge/cmd/protoc-gen-json-field@"+targetVersion)
+		genJSONVersion := "github.com/go-dev-frame/sponge/cmd/protoc-gen-json-field@" + targetVersion
+		if targetVersion < "v1.11.2" {
+			genJSONVersion = strings.ReplaceAll(genJSONVersion, "go-dev-frame", "zhufuyi")
+		}
+		result = gobash.Run(ctx, "go", "install", genJSONVersion)
 		for v := range result.StdOut {
 			_ = v
 		}

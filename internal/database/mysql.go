@@ -3,12 +3,12 @@ package database
 import (
 	"time"
 
-	"github.com/zhufuyi/sponge/pkg/logger"
-	"github.com/zhufuyi/sponge/pkg/sgorm"
-	"github.com/zhufuyi/sponge/pkg/sgorm/mysql"
-	"github.com/zhufuyi/sponge/pkg/utils"
+	"github.com/go-dev-frame/sponge/pkg/logger"
+	"github.com/go-dev-frame/sponge/pkg/sgorm"
+	"github.com/go-dev-frame/sponge/pkg/sgorm/mysql"
+	"github.com/go-dev-frame/sponge/pkg/utils"
 
-	"github.com/zhufuyi/sponge/internal/config"
+	"github.com/go-dev-frame/sponge/internal/config"
 )
 
 // InitMysql connect mysql

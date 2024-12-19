@@ -16,17 +16,17 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 
-	"github.com/zhufuyi/sponge/pkg/errcode"
-	"github.com/zhufuyi/sponge/pkg/gin/response"
-	"github.com/zhufuyi/sponge/pkg/gobash"
-	"github.com/zhufuyi/sponge/pkg/gofile"
-	"github.com/zhufuyi/sponge/pkg/krand"
-	"github.com/zhufuyi/sponge/pkg/mgo"
-	"github.com/zhufuyi/sponge/pkg/sgorm"
-	"github.com/zhufuyi/sponge/pkg/sgorm/mysql"
-	"github.com/zhufuyi/sponge/pkg/sgorm/postgresql"
-	"github.com/zhufuyi/sponge/pkg/sgorm/sqlite"
-	"github.com/zhufuyi/sponge/pkg/utils"
+	"github.com/go-dev-frame/sponge/pkg/errcode"
+	"github.com/go-dev-frame/sponge/pkg/gin/response"
+	"github.com/go-dev-frame/sponge/pkg/gobash"
+	"github.com/go-dev-frame/sponge/pkg/gofile"
+	"github.com/go-dev-frame/sponge/pkg/krand"
+	"github.com/go-dev-frame/sponge/pkg/mgo"
+	"github.com/go-dev-frame/sponge/pkg/sgorm"
+	"github.com/go-dev-frame/sponge/pkg/sgorm/mysql"
+	"github.com/go-dev-frame/sponge/pkg/sgorm/postgresql"
+	"github.com/go-dev-frame/sponge/pkg/sgorm/sqlite"
+	"github.com/go-dev-frame/sponge/pkg/utils"
 )
 
 var (

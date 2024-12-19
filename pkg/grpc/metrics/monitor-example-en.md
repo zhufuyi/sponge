@@ -2,7 +2,7 @@
 
 **(1) Prometheus Service**
 
-Here is the [script for starting the Prometheus service](https://github.com/zhufuyi/sponge/tree/main/test/server/monitor/prometheus). Start the Prometheus service:
+Here is the [script for starting the Prometheus service](https://github.com/go-dev-frame/sponge/tree/main/test/server/monitor/prometheus). Start the Prometheus service:
 
 ```bash
 docker-compose up -d
@@ -14,7 +14,7 @@ Access the Prometheus homepage in your browser at [http://localhost:9090](http:/
 
 **(2) Grafana Service**
 
-Here is the [script for starting the Grafana service](https://github.com/zhufuyi/sponge/tree/main/test/server/monitor/grafana). Start the Grafana service:
+Here is the [script for starting the Grafana service](https://github.com/go-dev-frame/sponge/tree/main/test/server/monitor/grafana). Start the Grafana service:
 
 ```bash
 docker-compose up -d
@@ -49,7 +49,7 @@ Trigger the Prometheus configuration to take effect by executing `curl -X POST h
 
 **(2) Adding Monitoring Dashboards to Grafana**
 
-Import the [HTTP monitoring dashboard](https://github.com/zhufuyi/sponge/blob/main/pkg/gin/middleware/metrics/gin_grafana.json) into Grafana. If the monitoring interface does not display data, check if the data source name in the JSON matches the Prometheus data source name in Grafana's configuration.
+Import the [HTTP monitoring dashboard](https://github.com/go-dev-frame/sponge/blob/main/pkg/gin/middleware/metrics/gin_grafana.json) into Grafana. If the monitoring interface does not display data, check if the data source name in the JSON matches the Prometheus data source name in Grafana's configuration.
 
 <br>
 
@@ -67,7 +67,7 @@ wrk -t2 -c10 -d10s http://192.168.3.27:8080/api/v1/course/1
 
 The monitoring interface will look like the following image:
 
-![http-grafana](https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/http-grafana.jpg)
+![http-grafana](https://raw.githubusercontent.com/go-dev-frame/sponge_examples/main/assets/http-grafana.jpg)
 
 <br>
 
@@ -94,7 +94,7 @@ Trigger the Prometheus configuration to take effect by executing `curl -X POST h
 
 **(2) Adding Monitoring Dashboards to Grafana**
 
-Import the [grpc service monitoring dashboard](https://github.com/zhufuyi/sponge/blob/main/pkg/grpc/metrics/server_grafana.json) into Grafana. If the monitoring interface does not display data, check if the data source name in the JSON matches the Prometheus data source name in Grafana's configuration.
+Import the [grpc service monitoring dashboard](https://github.com/go-dev-frame/sponge/blob/main/pkg/grpc/metrics/server_grafana.json) into Grafana. If the monitoring interface does not display data, check if the data source name in the JSON matches the Prometheus data source name in Grafana's configuration.
 
 <br>
 
@@ -104,11 +104,11 @@ Open the `internal/service/teacher_client_test.go` file using the `Goland` IDE a
 
 The monitoring interface will look like the following image:
 
-![rpc-grafana](https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/rpc-grafana.jpg)
+![rpc-grafana](https://raw.githubusercontent.com/go-dev-frame/sponge_examples/main/assets/rpc-grafana.jpg)
 
 <br>
 
-The monitoring for the grpc client is similar to the server monitoring, and you can find the [grpc client monitoring dashboard](https://github.com/zhufuyi/sponge/blob/main/pkg/grpc/metrics/client_grafana.json) here.
+The monitoring for the grpc client is similar to the server monitoring, and you can find the [grpc client monitoring dashboard](https://github.com/go-dev-frame/sponge/blob/main/pkg/grpc/metrics/client_grafana.json) here.
 
 <br>
 
@@ -116,7 +116,7 @@ The monitoring for the grpc client is similar to the server monitoring, and you 
 
 In real-world scenarios, managing monitoring targets in Prometheus manually can be cumbersome and error-prone, especially when dealing with a large number of services. Prometheus supports dynamic configuration using service discovery with tools like `Consul` to automatically add and remove monitoring targets.
 
-Start a local Consul service using the [Consul service start script](https://github.com/zhufuyi/sponge/tree/main/test/server/consul):
+Start a local Consul service using the [Consul service start script](https://github.com/go-dev-frame/sponge/tree/main/test/server/consul):
 
 ```bash
 docker-compose up -d

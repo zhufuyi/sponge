@@ -7,7 +7,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 
-	"github.com/zhufuyi/sponge/pkg/gobash"
+	"github.com/go-dev-frame/sponge/pkg/gobash"
 )
 
 // GenGraphCommand generate graph command
@@ -40,7 +40,7 @@ func GenGraphCommand() *cobra.Command {
 			_, err := gobash.Exec("spograph", "-h")
 			if err != nil {
 				fmt.Printf("not found spograph command, please install it by running the following command: %s\n",
-					color.HiCyanString("go install github.com/zhufuyi/spograph@latest"))
+					color.HiCyanString("go install github.com/go-dev-frame/spograph@latest"))
 				return nil
 			}
 

@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/zhufuyi/sponge/pkg/grpc/gtls/certfile"
+	"github.com/go-dev-frame/sponge/pkg/grpc/gtls/certfile"
 )
 
 func TestGetServerTLSCredentials(t *testing.T) {

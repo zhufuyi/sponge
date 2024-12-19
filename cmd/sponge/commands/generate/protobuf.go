@@ -8,10 +8,10 @@ import (
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 
-	"github.com/zhufuyi/sponge/pkg/gofile"
-	"github.com/zhufuyi/sponge/pkg/replacer"
-	"github.com/zhufuyi/sponge/pkg/sql2code"
-	"github.com/zhufuyi/sponge/pkg/sql2code/parser"
+	"github.com/go-dev-frame/sponge/pkg/gofile"
+	"github.com/go-dev-frame/sponge/pkg/replacer"
+	"github.com/go-dev-frame/sponge/pkg/sql2code"
+	"github.com/go-dev-frame/sponge/pkg/sql2code/parser"
 )
 
 // ProtobufCommand generate protobuf code
@@ -160,7 +160,7 @@ func (g *protobufGenerator) addFields(r replacer.Replacer) []replacer.Field {
 			New: g.codes[parser.CodeTypeProto],
 		},
 		{
-			Old: "github.com/zhufuyi/sponge",
+			Old: "github.com/go-dev-frame/sponge",
 			New: g.moduleName,
 		},
 		// replace directory name

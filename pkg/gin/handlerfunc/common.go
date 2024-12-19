@@ -9,8 +9,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/zhufuyi/sponge/pkg/errcode"
-	"github.com/zhufuyi/sponge/pkg/utils"
+	"github.com/go-dev-frame/sponge/pkg/errcode"
+	"github.com/go-dev-frame/sponge/pkg/utils"
 )
 
 // CheckHealthReply check health result

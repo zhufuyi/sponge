@@ -5,7 +5,7 @@ Connect to the consul service client.
 ### Example of use
 
 ```go
-    import "github.com/zhufuyi/sponge/pkg/consulcli"
+    import "github.com/go-dev-frame/sponge/pkg/consulcli"
 
     addr := "192.168.3.37:8500"
 

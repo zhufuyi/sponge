@@ -9,8 +9,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	"github.com/zhufuyi/sponge/pkg/grpc/interceptor"
-	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
+	"github.com/go-dev-frame/sponge/pkg/grpc/interceptor"
+	"github.com/go-dev-frame/sponge/pkg/servicerd/registry"
 )
 
 func TestWithDialOptions(t *testing.T) {

@@ -3,11 +3,11 @@ package database
 import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
-	"github.com/zhufuyi/sponge/pkg/logger"
-	"github.com/zhufuyi/sponge/pkg/mgo"
-	"github.com/zhufuyi/sponge/pkg/utils"
+	"github.com/go-dev-frame/sponge/pkg/logger"
+	"github.com/go-dev-frame/sponge/pkg/mgo"
+	"github.com/go-dev-frame/sponge/pkg/utils"
 
-	"github.com/zhufuyi/sponge/internal/config"
+	"github.com/go-dev-frame/sponge/internal/config"
 )
 
 // MaxObjectID max object id

@@ -10,15 +10,15 @@ import (
 
 	"github.com/jinzhu/copier"
 
-	"github.com/zhufuyi/sponge/pkg/conf"
-	"github.com/zhufuyi/sponge/pkg/logger"
-	"github.com/zhufuyi/sponge/pkg/nacoscli"
-	"github.com/zhufuyi/sponge/pkg/stat"
-	"github.com/zhufuyi/sponge/pkg/tracer"
+	"github.com/go-dev-frame/sponge/pkg/conf"
+	"github.com/go-dev-frame/sponge/pkg/logger"
+	"github.com/go-dev-frame/sponge/pkg/nacoscli"
+	"github.com/go-dev-frame/sponge/pkg/stat"
+	"github.com/go-dev-frame/sponge/pkg/tracer"
 
-	"github.com/zhufuyi/sponge/configs"
-	"github.com/zhufuyi/sponge/internal/config"
-	"github.com/zhufuyi/sponge/internal/database"
+	"github.com/go-dev-frame/sponge/configs"
+	"github.com/go-dev-frame/sponge/internal/config"
+	"github.com/go-dev-frame/sponge/internal/database"
 )
 
 var (

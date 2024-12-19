@@ -7,9 +7,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc"
 
-	"github.com/zhufuyi/sponge/pkg/container/group"
-	"github.com/zhufuyi/sponge/pkg/errcode"
-	"github.com/zhufuyi/sponge/pkg/shield/circuitbreaker"
+	"github.com/go-dev-frame/sponge/pkg/container/group"
+	"github.com/go-dev-frame/sponge/pkg/errcode"
+	"github.com/go-dev-frame/sponge/pkg/shield/circuitbreaker"
 	"google.golang.org/grpc/codes"
 )
 

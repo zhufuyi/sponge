@@ -7,8 +7,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/zhufuyi/sponge/pkg/shield/cpu"
-	"github.com/zhufuyi/sponge/pkg/shield/window"
+	"github.com/go-dev-frame/sponge/pkg/shield/cpu"
+	"github.com/go-dev-frame/sponge/pkg/shield/window"
 )
 
 var (

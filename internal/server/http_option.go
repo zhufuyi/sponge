@@ -1,7 +1,7 @@
 package server
 
 import (
-	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
+	"github.com/go-dev-frame/sponge/pkg/servicerd/registry"
 )
 
 // HTTPOption setting up http

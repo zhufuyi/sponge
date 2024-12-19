@@ -23,7 +23,7 @@ go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2.0
 
 #### Install protoc-gen-go-gin
 
-> go install github.com/zhufuyi/sponge/cmd/protoc-gen-go-gin@latest
+> go install github.com/go-dev-frame/sponge/cmd/protoc-gen-go-gin@latest
 
 <br>
 

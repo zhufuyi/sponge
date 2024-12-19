@@ -23,7 +23,7 @@ function checkResult() {
 # download the specified version of the sponge binary file
 binaryFile="sponge_${TAG#v}_linux_amd64.zip"
 rmFile ${binaryFile}
-wget https://github.com/zhufuyi/sponge/releases/download/${TAG}/${binaryFile}
+wget https://github.com/go-dev-frame/sponge/releases/download/${TAG}/${binaryFile}
 checkResult $?
 unzip -o -q ${binaryFile}
 rmFile ${binaryFile} && rmFile LICENSE && rmFile README.md
@@ -31,7 +31,7 @@ rmFile ${binaryFile} && rmFile LICENSE && rmFile README.md
 # download the specified version of the sponge template code
 codeFile="${TAG}.zip"
 rmFile ${codeFile}
-wget https://github.com/zhufuyi/sponge/archive/refs/tags/${codeFile}
+wget https://github.com/go-dev-frame/sponge/archive/refs/tags/${codeFile}
 checkResult $?
 unzip -o -q ${codeFile}
 mv sponge-${TAG#v} .sponge

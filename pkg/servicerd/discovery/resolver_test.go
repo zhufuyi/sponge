@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/resolver"
 	"google.golang.org/grpc/serviceconfig"
 
-	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
+	"github.com/go-dev-frame/sponge/pkg/servicerd/registry"
 )
 
 type cliConn struct {

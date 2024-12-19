@@ -7,7 +7,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/zhufuyi/sponge/pkg/shield/window"
+	"github.com/go-dev-frame/sponge/pkg/shield/window"
 )
 
 // Option is sre breaker option function.

@@ -3,7 +3,7 @@ package commands
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/zhufuyi/sponge/cmd/sponge/commands/generate"
+	"github.com/go-dev-frame/sponge/cmd/sponge/commands/generate"
 )
 
 // GenMicroCommand generate micro service code

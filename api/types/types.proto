@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package api.types;
 
-option go_package = "github.com/zhufuyi/sponge/api/types;types";
+option go_package = "github.com/go-dev-frame/sponge/api/types;types";
 
 message Params {
   int32 page = 1; // page number, starting from 0
@@ -13,9 +13,9 @@ message Params {
 
 message Column {
   string  name = 1;  // column name
-  string  exp = 2;   // expressions, which default to = when the value is null, have =, !=, >, >=, <, <=, like, in
+  string  exp = 2;   // expressions, default value is "=", support =, !=, >, >=, <, <=, like, in
   string value = 3; // column value
-  string  logic = 4; // logical type, defaults to and when value is null, only &(and), ||(or)
+  string  logic = 4; // logical type, default value is "and", support &, and, ||, or
 }
 
 message Conditions {

@@ -91,7 +91,7 @@ go env GOBIN
 
 ```bash
 # 安装sponge
-go install github.com/zhufuyi/sponge/cmd/sponge@latest
+go install github.com/go-dev-frame/sponge/cmd/sponge@latest
 
 # 初始化sponge，自动安装sponge依赖插件
 sponge init

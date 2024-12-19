@@ -15,8 +15,8 @@ import (
     "context"
     "fmt"
     "time"
-    "github.com/zhufuyi/sponge/pkg/goredis"
-    "github.com/zhufuyi/sponge/pkg/dlock"
+    "github.com/go-dev-frame/sponge/pkg/goredis"
+    "github.com/go-dev-frame/sponge/pkg/dlock"
 )
 
 func main() {
@@ -78,8 +78,8 @@ import (
     "context"
     "fmt"
     "time"
-    "github.com/zhufuyi/sponge/pkg/etcdcli"
-    "github.com/zhufuyi/sponge/pkg/dlock"
+    "github.com/go-dev-frame/sponge/pkg/etcdcli"
+    "github.com/go-dev-frame/sponge/pkg/dlock"
 )
 
 func main() {

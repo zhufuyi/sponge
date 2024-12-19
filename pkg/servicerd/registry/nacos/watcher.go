@@ -8,7 +8,7 @@ import (
 	"github.com/nacos-group/nacos-sdk-go/v2/model"
 	"github.com/nacos-group/nacos-sdk-go/v2/vo"
 
-	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
+	"github.com/go-dev-frame/sponge/pkg/servicerd/registry"
 )
 
 var _ registry.Watcher = (*watcher)(nil)

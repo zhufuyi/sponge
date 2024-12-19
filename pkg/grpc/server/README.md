@@ -5,7 +5,7 @@ Generic grpc server.
 ### Example of use
 
 ```go
-	import "github.com/zhufuyi/sponge/pkg/grpc/server"
+	import "github.com/go-dev-frame/sponge/pkg/grpc/server"
 
 	port := 8282
 	registerFn := func(s *grpc.Server) {

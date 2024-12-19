@@ -8,7 +8,7 @@ import (
 
 	"google.golang.org/grpc/resolver"
 
-	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
+	"github.com/go-dev-frame/sponge/pkg/servicerd/registry"
 )
 
 const name = "discovery"

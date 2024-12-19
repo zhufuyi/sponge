@@ -8,7 +8,7 @@ import (
 	"encoding/hex"
 	"errors"
 
-	"github.com/zhufuyi/sponge/pkg/gocrypto/wcipher"
+	"github.com/go-dev-frame/sponge/pkg/gocrypto/wcipher"
 )
 
 // AesEncrypt aes encryption, returns ciphertext is not transcoded

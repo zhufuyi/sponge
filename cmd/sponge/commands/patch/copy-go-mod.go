@@ -9,8 +9,8 @@ import (
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 
-	"github.com/zhufuyi/sponge/cmd/sponge/commands/generate"
-	"github.com/zhufuyi/sponge/pkg/gofile"
+	"github.com/go-dev-frame/sponge/cmd/sponge/commands/generate"
+	"github.com/go-dev-frame/sponge/pkg/gofile"
 )
 
 // CopyGOModCommand copy go mod files

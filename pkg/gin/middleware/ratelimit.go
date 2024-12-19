@@ -7,8 +7,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/zhufuyi/sponge/pkg/gin/response"
-	rl "github.com/zhufuyi/sponge/pkg/shield/ratelimit"
+	"github.com/go-dev-frame/sponge/pkg/gin/response"
+	rl "github.com/go-dev-frame/sponge/pkg/shield/ratelimit"
 )
 
 // ErrLimitExceed is returned when the rate limiter is

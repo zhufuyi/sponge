@@ -17,7 +17,7 @@ import (
 	"github.com/gin-gonic/gin/binding"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/zhufuyi/sponge/pkg/utils"
+	"github.com/go-dev-frame/sponge/pkg/utils"
 )
 
 func runValidatorHTTPServer() string {

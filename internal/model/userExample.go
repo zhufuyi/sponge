@@ -4,7 +4,7 @@
 package model
 
 import (
-	"github.com/zhufuyi/sponge/pkg/sgorm"
+	"github.com/go-dev-frame/sponge/pkg/sgorm"
 )
 
 // UserExample object fields mapping table

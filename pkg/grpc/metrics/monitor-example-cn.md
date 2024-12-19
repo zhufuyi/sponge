@@ -2,7 +2,7 @@
 
 **(1) prometheus服务**
 
-这是 [prometheus服务启动脚本](https://github.com/zhufuyi/sponge/tree/main/test/server/monitor/prometheus)，启动prometheus服务：
+这是 [prometheus服务启动脚本](https://github.com/go-dev-frame/sponge/tree/main/test/server/monitor/prometheus)，启动prometheus服务：
 
 ```bash
 docker-compose up -d
@@ -14,7 +14,7 @@ docker-compose up -d
 
 **(2) grafana服务**
 
-这是 [grafana服务启动脚本](https://github.com/zhufuyi/sponge/tree/main/test/server/monitor/grafana)，启动grafana服务：
+这是 [grafana服务启动脚本](https://github.com/go-dev-frame/sponge/tree/main/test/server/monitor/grafana)，启动grafana服务：
 
 ```bash
 docker-compose up -d
@@ -49,7 +49,7 @@ docker-compose up -d
 
 **(2) 在grafana添加监控面板**
 
-把 [http 监控面板](https://github.com/zhufuyi/sponge/blob/main/pkg/gin/middleware/metrics/gin_grafana.json) 导入到grafana，如果监控界面没有数据显示，检查json里的数据源名称与grafana配置prometheus数据源名称是否一致。
+把 [http 监控面板](https://github.com/go-dev-frame/sponge/blob/main/pkg/gin/middleware/metrics/gin_grafana.json) 导入到grafana，如果监控界面没有数据显示，检查json里的数据源名称与grafana配置prometheus数据源名称是否一致。
 
 <br>
 
@@ -67,7 +67,7 @@ wrk -t2 -c10 -d10s http://192.168.3.27:8080/api/v1/course/1
 
 监控界面如下图所示：
 
-![http-grafana](https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/http-grafana.jpg)
+![http-grafana](https://raw.githubusercontent.com/go-dev-frame/sponge_examples/main/assets/http-grafana.jpg)
 
 <br>
 
@@ -94,7 +94,7 @@ wrk -t2 -c10 -d10s http://192.168.3.27:8080/api/v1/course/1
 
 **(2) 在grafana添加监控面板**
 
-把 [grpc server 监控面板](https://github.com/zhufuyi/sponge/blob/main/pkg/grpc/metrics/server_grafana.json) 导入到grafana，如果监控界面没有数据显示，检查json里的数据源名称与grafana配置prometheus数据源名称是否一致。
+把 [grpc server 监控面板](https://github.com/go-dev-frame/sponge/blob/main/pkg/grpc/metrics/server_grafana.json) 导入到grafana，如果监控界面没有数据显示，检查json里的数据源名称与grafana配置prometheus数据源名称是否一致。
 
 <br>
 
@@ -103,11 +103,11 @@ wrk -t2 -c10 -d10s http://192.168.3.27:8080/api/v1/course/1
 使用`Goland` IDE打开`internal/service/teacher_client_test.go`文件，对**Test_teacherService_methods** 或 **Test_teacherService_benchmark** 下各个方法进行测试。
 
 监控界面如下图所示。
-![rpc-grafana](https://raw.githubusercontent.com/zhufuyi/sponge_examples/main/assets/rpc-grafana.jpg)
+![rpc-grafana](https://raw.githubusercontent.com/go-dev-frame/sponge_examples/main/assets/rpc-grafana.jpg)
 
 <br>
 
-上面是grpc服务端的监控，grpc的客户端的监控也类似，[grpc client 监控面板](https://github.com/zhufuyi/sponge/blob/main/pkg/grpc/metrics/client_grafana.json) 。
+上面是grpc服务端的监控，grpc的客户端的监控也类似，[grpc client 监控面板](https://github.com/go-dev-frame/sponge/blob/main/pkg/grpc/metrics/client_grafana.json) 。
 
 <br>
 
@@ -115,7 +115,7 @@ wrk -t2 -c10 -d10s http://192.168.3.27:8080/api/v1/course/1
 
 实际使用中服务数量比较多，手动添加监控目标到prometheus比较繁琐，也容易出错。prometheus支持使用`consul`的服务注册与发现进行动态配置，自动添加和移除监控目标。
 
-在本地启动 consul 服务，这是 [consul 服务启动脚本](https://github.com/zhufuyi/sponge/tree/main/test/server/consul)，启动consul服务：
+在本地启动 consul 服务，这是 [consul 服务启动脚本](https://github.com/go-dev-frame/sponge/tree/main/test/server/consul)，启动consul服务：
 
 ```bash
 docker-compose up -d

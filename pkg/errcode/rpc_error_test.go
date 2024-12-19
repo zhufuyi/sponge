@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/status"
 
-	"github.com/zhufuyi/sponge/pkg/utils"
+	"github.com/go-dev-frame/sponge/pkg/utils"
 )
 
 var rpcStatus = []*RPCStatus{

@@ -7,11 +7,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/zhufuyi/sponge/configs"
-	"github.com/zhufuyi/sponge/pkg/sgorm"
-	"github.com/zhufuyi/sponge/pkg/utils"
+	"github.com/go-dev-frame/sponge/configs"
+	"github.com/go-dev-frame/sponge/pkg/sgorm"
+	"github.com/go-dev-frame/sponge/pkg/utils"
 
-	"github.com/zhufuyi/sponge/internal/config"
+	"github.com/go-dev-frame/sponge/internal/config"
 )
 
 func TestGetDB(t *testing.T) {

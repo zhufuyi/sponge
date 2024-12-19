@@ -8,15 +8,15 @@ import (
 	"github.com/jinzhu/copier"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/zhufuyi/sponge/pkg/gotest"
-	"github.com/zhufuyi/sponge/pkg/utils"
+	"github.com/go-dev-frame/sponge/pkg/gotest"
+	"github.com/go-dev-frame/sponge/pkg/utils"
 
-	serverNameExampleV1 "github.com/zhufuyi/sponge/api/serverNameExample/v1"
-	"github.com/zhufuyi/sponge/api/types"
-	"github.com/zhufuyi/sponge/internal/cache"
-	"github.com/zhufuyi/sponge/internal/dao"
-	"github.com/zhufuyi/sponge/internal/database"
-	"github.com/zhufuyi/sponge/internal/model"
+	serverNameExampleV1 "github.com/go-dev-frame/sponge/api/serverNameExample/v1"
+	"github.com/go-dev-frame/sponge/api/types"
+	"github.com/go-dev-frame/sponge/internal/cache"
+	"github.com/go-dev-frame/sponge/internal/dao"
+	"github.com/go-dev-frame/sponge/internal/database"
+	"github.com/go-dev-frame/sponge/internal/model"
 )
 
 func newUserExampleService() *gotest.Service {

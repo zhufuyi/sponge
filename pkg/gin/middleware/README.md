@@ -11,7 +11,7 @@ Gin middleware plugin.
 You can set the maximum length for printing, add a request id field, ignore print path, customize [zap](go.uber.org/zap) log.
 
 ```go
-    import "github.com/zhufuyi/sponge/pkg/gin/middleware"
+    import "github.com/go-dev-frame/sponge/pkg/gin/middleware"
 
     r := gin.Default()
 
@@ -35,7 +35,7 @@ You can set the maximum length for printing, add a request id field, ignore prin
 ### Allow cross-domain requests middleware
 
 ```go
-    import "github.com/zhufuyi/sponge/pkg/gin/middleware"
+    import "github.com/go-dev-frame/sponge/pkg/gin/middleware"
 
     r := gin.Default()
     r.Use(middleware.Cors())
@@ -48,7 +48,7 @@ You can set the maximum length for printing, add a request id field, ignore prin
 Adaptive flow limitation based on hardware resources.
 
 ```go
-    import "github.com/zhufuyi/sponge/pkg/gin/middleware"
+    import "github.com/go-dev-frame/sponge/pkg/gin/middleware"
 
     r := gin.Default()
 
@@ -71,7 +71,7 @@ Adaptive flow limitation based on hardware resources.
 ### Circuit Breaker middleware
 
 ```go
-    import "github.com/zhufuyi/sponge/pkg/gin/middleware"
+    import "github.com/go-dev-frame/sponge/pkg/gin/middleware"
 
     r := gin.Default()
     r.Use(middleware.CircuitBreaker(
@@ -87,8 +87,8 @@ Adaptive flow limitation based on hardware resources.
 #### standard authorization
 
 ```go
-import "github.com/zhufuyi/sponge/pkg/jwt"
-import "github.com/zhufuyi/sponge/pkg/gin/middleware"
+import "github.com/go-dev-frame/sponge/pkg/jwt"
+import "github.com/go-dev-frame/sponge/pkg/gin/middleware"
 
 func main() {
     r := gin.Default()
@@ -123,8 +123,8 @@ func Login(c *gin.Context) {
 #### custom authorization
 
 ```go
-import "github.com/zhufuyi/sponge/pkg/jwt"
-import "github.com/zhufuyi/sponge/pkg/gin/middleware"
+import "github.com/go-dev-frame/sponge/pkg/jwt"
+import "github.com/go-dev-frame/sponge/pkg/gin/middleware"
 
 func main() {
     r := gin.Default()
@@ -167,8 +167,8 @@ func Login(c *gin.Context) {
 ### tracing middleware
 
 ```go
-import "github.com/zhufuyi/sponge/pkg/tracer"
-import "github.com/zhufuyi/sponge/pkg/gin/middleware"
+import "github.com/go-dev-frame/sponge/pkg/tracer"
+import "github.com/go-dev-frame/sponge/pkg/gin/middleware"
 
 func InitTrace(serviceName string) {
 	exporter, err := tracer.NewJaegerAgentExporter("192.168.3.37", "6831")
@@ -209,7 +209,7 @@ func SpanDemo(serviceName string, spanName string, ctx context.Context) {
 ### Metrics middleware
 
 ```go
-    import "github.com/zhufuyi/sponge/pkg/gin/middleware/metrics"
+    import "github.com/go-dev-frame/sponge/pkg/gin/middleware/metrics"
 
     r := gin.Default()
 
@@ -226,7 +226,7 @@ func SpanDemo(serviceName string, spanName string, ctx context.Context) {
 ### Request id
 
 ```go
-    import "github.com/zhufuyi/sponge/pkg/gin/middleware"
+    import "github.com/go-dev-frame/sponge/pkg/gin/middleware"
 
     // Default request id
     r := gin.Default()
@@ -252,7 +252,7 @@ func SpanDemo(serviceName string, spanName string, ctx context.Context) {
 ### Timeout
 
 ```go
-    import "github.com/zhufuyi/sponge/pkg/gin/middleware"
+    import "github.com/go-dev-frame/sponge/pkg/gin/middleware"
 
     r := gin.Default()
 

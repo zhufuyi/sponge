@@ -47,7 +47,7 @@ linters:
 
 linters-settings:
   goimports:
-    local-prefixes: github.com/zhufuyi/sponge
+    local-prefixes: github.com/go-dev-frame/sponge
   gofmt:
     rewrite-rules:
       - pattern: 'interface{}'

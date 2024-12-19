@@ -9,16 +9,16 @@ import (
 	"github.com/jinzhu/copier"
 	"google.golang.org/grpc"
 
-	"github.com/zhufuyi/sponge/pkg/grpc/interceptor"
-	"github.com/zhufuyi/sponge/pkg/logger"
-	"github.com/zhufuyi/sponge/pkg/sgorm/query"
+	"github.com/go-dev-frame/sponge/pkg/grpc/interceptor"
+	"github.com/go-dev-frame/sponge/pkg/logger"
+	"github.com/go-dev-frame/sponge/pkg/sgorm/query"
 
-	serverNameExampleV1 "github.com/zhufuyi/sponge/api/serverNameExample/v1"
-	"github.com/zhufuyi/sponge/internal/cache"
-	"github.com/zhufuyi/sponge/internal/dao"
-	"github.com/zhufuyi/sponge/internal/database"
-	"github.com/zhufuyi/sponge/internal/ecode"
-	"github.com/zhufuyi/sponge/internal/model"
+	serverNameExampleV1 "github.com/go-dev-frame/sponge/api/serverNameExample/v1"
+	"github.com/go-dev-frame/sponge/internal/cache"
+	"github.com/go-dev-frame/sponge/internal/dao"
+	"github.com/go-dev-frame/sponge/internal/database"
+	"github.com/go-dev-frame/sponge/internal/ecode"
+	"github.com/go-dev-frame/sponge/internal/model"
 )
 
 func init() {

@@ -8,12 +8,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/zhufuyi/sponge/pkg/gin/middleware"
-	"github.com/zhufuyi/sponge/pkg/utils"
+	"github.com/go-dev-frame/sponge/pkg/gin/middleware"
+	"github.com/go-dev-frame/sponge/pkg/utils"
 
-	serverNameExampleV1 "github.com/zhufuyi/sponge/api/serverNameExample/v1"
-	"github.com/zhufuyi/sponge/configs"
-	"github.com/zhufuyi/sponge/internal/config"
+	serverNameExampleV1 "github.com/go-dev-frame/sponge/api/serverNameExample/v1"
+	"github.com/go-dev-frame/sponge/configs"
+	"github.com/go-dev-frame/sponge/internal/config"
 )
 
 func TestNewRouter_pbExample(t *testing.T) {

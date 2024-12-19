@@ -6,10 +6,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/zhufuyi/sponge/pkg/gotest"
-	"github.com/zhufuyi/sponge/pkg/utils"
+	"github.com/go-dev-frame/sponge/pkg/gotest"
+	"github.com/go-dev-frame/sponge/pkg/utils"
 
-	"github.com/zhufuyi/sponge/internal/database"
+	"github.com/go-dev-frame/sponge/internal/database"
 )
 
 type cacheNameExampleData struct {

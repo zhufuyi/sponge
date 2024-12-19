@@ -8,7 +8,7 @@ import (
 	"github.com/huandu/xstrings"
 	"github.com/spf13/cobra"
 
-	"github.com/zhufuyi/sponge/pkg/replacer"
+	"github.com/go-dev-frame/sponge/pkg/replacer"
 )
 
 // ConfigmapCommand generate k8s configmap command

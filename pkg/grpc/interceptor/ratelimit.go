@@ -6,8 +6,8 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/zhufuyi/sponge/pkg/errcode"
-	rl "github.com/zhufuyi/sponge/pkg/shield/ratelimit"
+	"github.com/go-dev-frame/sponge/pkg/errcode"
+	rl "github.com/go-dev-frame/sponge/pkg/shield/ratelimit"
 )
 
 // ---------------------------------- server interceptor ----------------------------------

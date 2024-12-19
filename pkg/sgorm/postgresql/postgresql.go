@@ -12,8 +12,8 @@ import (
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
 
-	"github.com/zhufuyi/sponge/pkg/sgorm/dbclose"
-	"github.com/zhufuyi/sponge/pkg/sgorm/glog"
+	"github.com/go-dev-frame/sponge/pkg/sgorm/dbclose"
+	"github.com/go-dev-frame/sponge/pkg/sgorm/glog"
 )
 
 // Init postgresql

@@ -10,7 +10,7 @@ import (
 
 	"golang.org/x/sync/errgroup"
 
-	"github.com/zhufuyi/sponge/pkg/prof"
+	"github.com/go-dev-frame/sponge/pkg/prof"
 )
 
 // IServer server interface

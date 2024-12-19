@@ -3,7 +3,7 @@ package circuitbreaker_test
 import (
 	"testing"
 
-	"github.com/zhufuyi/sponge/pkg/shield/circuitbreaker"
+	"github.com/go-dev-frame/sponge/pkg/shield/circuitbreaker"
 )
 
 // This is an example of using a circuit breaker Do() when return nil.

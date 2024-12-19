@@ -3,7 +3,7 @@ package commands
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/zhufuyi/sponge/cmd/sponge/commands/merge"
+	"github.com/go-dev-frame/sponge/cmd/sponge/commands/merge"
 )
 
 // MergeCommand merge the generated code

@@ -651,7 +651,7 @@ func getModelStructCode(data tmplData, importPaths []string, isEmbed bool, jsonN
 				newImportPaths = append(newImportPaths, path)
 			}
 		}
-		newImportPaths = append(newImportPaths, "github.com/zhufuyi/sponge/pkg/sgorm")
+		newImportPaths = append(newImportPaths, "github.com/go-dev-frame/sponge/pkg/sgorm")
 	} else {
 		for i, field := range data.Fields {
 			switch field.DBDriver {

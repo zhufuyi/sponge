@@ -11,7 +11,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 
-	"github.com/zhufuyi/sponge/pkg/gofile"
+	"github.com/go-dev-frame/sponge/pkg/gofile"
 )
 
 // ModifyProtoPackageCommand modifies the package and go_package names of proto files.

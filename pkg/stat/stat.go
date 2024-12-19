@@ -8,8 +8,8 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/zhufuyi/sponge/pkg/stat/cpu"
-	"github.com/zhufuyi/sponge/pkg/stat/mem"
+	"github.com/go-dev-frame/sponge/pkg/stat/cpu"
+	"github.com/go-dev-frame/sponge/pkg/stat/mem"
 )
 
 var (

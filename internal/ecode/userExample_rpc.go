@@ -1,7 +1,7 @@
 package ecode
 
 import (
-	"github.com/zhufuyi/sponge/pkg/errcode"
+	"github.com/go-dev-frame/sponge/pkg/errcode"
 )
 
 // userExample business-level rpc error codes.

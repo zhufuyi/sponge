@@ -3,7 +3,7 @@ package consul
 import (
 	"context"
 
-	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
+	"github.com/go-dev-frame/sponge/pkg/servicerd/registry"
 )
 
 type watcher struct {

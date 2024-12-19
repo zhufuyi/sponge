@@ -6,7 +6,7 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 
-	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
+	"github.com/go-dev-frame/sponge/pkg/servicerd/registry"
 )
 
 var (

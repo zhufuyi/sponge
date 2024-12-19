@@ -8,7 +8,7 @@ import (
 	"github.com/huandu/xstrings"
 	"gorm.io/gorm"
 
-	"github.com/zhufuyi/sponge/pkg/sgorm/dbclose"
+	"github.com/go-dev-frame/sponge/pkg/sgorm/dbclose"
 )
 
 type DB = gorm.DB

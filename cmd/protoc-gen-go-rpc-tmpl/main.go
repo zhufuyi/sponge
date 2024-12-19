@@ -13,7 +13,7 @@ import (
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/types/pluginpb"
 
-	"github.com/zhufuyi/sponge/cmd/protoc-gen-go-rpc-tmpl/internal/generate/service"
+	"github.com/go-dev-frame/sponge/cmd/protoc-gen-go-rpc-tmpl/internal/generate/service"
 )
 
 const (

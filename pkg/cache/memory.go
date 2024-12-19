@@ -10,7 +10,7 @@ import (
 
 	"github.com/dgraph-io/ristretto"
 
-	"github.com/zhufuyi/sponge/pkg/encoding"
+	"github.com/go-dev-frame/sponge/pkg/encoding"
 )
 
 type memoryCache struct {

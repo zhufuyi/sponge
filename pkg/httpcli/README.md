@@ -9,7 +9,7 @@
 #### Request way 1
 
 ```go
-    import "github.com/zhufuyi/sponge/pkg/httpcli"
+    import "github.com/go-dev-frame/sponge/pkg/httpcli"
 
     type User struct{
         Name string
@@ -51,7 +51,7 @@
 Get, Delete request example.
 
 ```go
-    import "github.com/zhufuyi/sponge/pkg/httpcli"
+    import "github.com/go-dev-frame/sponge/pkg/httpcli"
 
     url := "http://localhost:8080/user"
     headers := map[string]string{"Authorization": "Bearer token"}
@@ -75,7 +75,7 @@ Get, Delete request example.
 Post, Put, Patch request example.
 
 ```go
-    import "github.com/zhufuyi/sponge/pkg/httpcli"
+    import "github.com/go-dev-frame/sponge/pkg/httpcli"
 
 
     type User struct{

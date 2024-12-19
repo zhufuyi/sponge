@@ -19,11 +19,11 @@ import (
 
 	"github.com/huandu/xstrings"
 
-	"github.com/zhufuyi/sponge/pkg/gobash"
-	"github.com/zhufuyi/sponge/pkg/gofile"
-	"github.com/zhufuyi/sponge/pkg/replacer"
-	"github.com/zhufuyi/sponge/pkg/sql2code/parser"
-	"github.com/zhufuyi/sponge/pkg/utils"
+	"github.com/go-dev-frame/sponge/pkg/gobash"
+	"github.com/go-dev-frame/sponge/pkg/gofile"
+	"github.com/go-dev-frame/sponge/pkg/replacer"
+	"github.com/go-dev-frame/sponge/pkg/sql2code/parser"
+	"github.com/go-dev-frame/sponge/pkg/utils"
 )
 
 const (
@@ -160,7 +160,7 @@ var (
 	wellEndMark   = symbolConvert(endMarkStr)
 
 	// embed FS template file when using
-	selfPackageName = "github.com/zhufuyi/sponge"
+	selfPackageName = "github.com/go-dev-frame/sponge"
 )
 
 var (
@@ -537,7 +537,7 @@ func getLocalSpongeTemplateVersion() string {
 	if v == "" {
 		return ""
 	}
-	return fmt.Sprintf("github.com/zhufuyi/sponge %s", v)
+	return fmt.Sprintf("github.com/go-dev-frame/sponge %s", v)
 }
 
 func getEmbedTimeCode(isEmbed bool) string {
@@ -758,7 +758,7 @@ func serverCodeFields(serverType string, moduleName string, serverName string) [
 		},
 		{
 			Old: fmt.Sprintf("go get %s@", moduleName),
-			New: fmt.Sprintf("go get %s@", "github.com/zhufuyi/sponge"),
+			New: fmt.Sprintf("go get %s@", "github.com/go-dev-frame/sponge"),
 		},
 	}
 }
@@ -901,7 +901,7 @@ func setReadmeTitle(moduleName string, serverName string, serverType string, sui
 func GetGoModFields(moduleName string) []replacer.Field {
 	return []replacer.Field{
 		{
-			Old: "github.com/zhufuyi/sponge",
+			Old: "github.com/go-dev-frame/sponge",
 			New: moduleName,
 		},
 		{
@@ -1001,7 +1001,7 @@ func replaceTemplateFileContent(r replacer.Replacer, file string, crudInfo *pars
 
 	dstContent := buf.String()
 	if !strings.Contains(dstContent, "utils.") {
-		dstContent = strings.ReplaceAll(dstContent, `"github.com/zhufuyi/sponge/pkg/utils"`, "")
+		dstContent = strings.ReplaceAll(dstContent, `"github.com/go-dev-frame/sponge/pkg/utils"`, "")
 	}
 	if !strings.Contains(dstContent, "math.MaxInt32") {
 		dstContent = strings.ReplaceAll(dstContent, `"math"`, "")

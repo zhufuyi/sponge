@@ -3,7 +3,7 @@
 
 > [!note] 要能够使用http api采集profile，需要在`configs`目录下yaml文件设置 `enableMetrics: true`，默认路由是`/debug/pprof`。
 
-在服务中通过http api采集profile[代码示例](https://github.com/zhufuyi/sponge/blob/main/pkg/prof/README.md#sampling-profile-by-http)。
+在服务中通过http api采集profile[代码示例](https://github.com/go-dev-frame/sponge/blob/main/pkg/prof/README.md#sampling-profile-by-http)。
 
 通常在开发或测试时使用，如果线上开启会有一点点性能损耗，根据实际情况是否开启使用。除了支持go语言本身提供默认的profile分析，还支持io分析，路由是`/debug/pprof/profile-io`。
 
@@ -18,7 +18,7 @@
 
 > [!note] 默认已开启系统信号通知采集profile功能，不需要额外配置。
 
-在服务中开启系统信号通知采集profile[代码示例](https://github.com/zhufuyi/sponge/blob/main/pkg/prof/README.md#sampling-profile-by-system-notification-signal)。
+在服务中开启系统信号通知采集profile[代码示例](https://github.com/go-dev-frame/sponge/blob/main/pkg/prof/README.md#sampling-profile-by-system-notification-signal)。
 
 使用`http接口`方式，程序后台一直定时记录profile相关信息等，绝大多数时间都不会去读取这些profile，可以改进一下，只有需要的时候再开始采集profile，采集完后自动关闭，sponge生成的服务支持监听系统信号来开启和停止采集profile，默认使用了 **SIGTRAP**(5) 系统信号(linux环境建议改为SIGUSR1，windows环境不支持SIGUSR1)，发送信号给服务：
 

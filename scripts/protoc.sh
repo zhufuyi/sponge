@@ -203,7 +203,7 @@ function generateBySpecifiedProto(){
   # return error code template file *_http.go (default path in internal/ecode)
   protoc --proto_path=. --proto_path=./third_party \
     --go-gin_out=. --go-gin_opt=paths=source_relative --go-gin_opt=plugin=service \
-    --go-gin_opt=moduleName=github.com/zhufuyi/sponge --go-gin_opt=serverName=serverNameExample \
+    --go-gin_opt=moduleName=github.com/go-dev-frame/sponge --go-gin_opt=serverName=serverNameExample \
     $specifiedProtoFiles
 
   sponge merge rpc-gw-pb

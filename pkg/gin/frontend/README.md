@@ -7,7 +7,7 @@ Embed front-end web static files in gin and add routing.
 ### Example of use
 
 ```go
-import "github.com/zhufuyi/sponge/pkg/gin/frontend"
+import "github.com/go-dev-frame/sponge/pkg/gin/frontend"
 
 //go:embed user
 var staticFS embed.FS

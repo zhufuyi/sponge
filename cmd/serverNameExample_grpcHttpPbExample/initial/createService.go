@@ -3,10 +3,10 @@ package initial
 import (
 	"strconv"
 
-	"github.com/zhufuyi/sponge/pkg/app"
+	"github.com/go-dev-frame/sponge/pkg/app"
 
-	"github.com/zhufuyi/sponge/internal/config"
-	"github.com/zhufuyi/sponge/internal/server"
+	"github.com/go-dev-frame/sponge/internal/config"
+	"github.com/go-dev-frame/sponge/internal/server"
 )
 
 // CreateServices create services

@@ -7,7 +7,7 @@ Commonly used grpc client-side and server-side interceptors.
 ### Example of use
 
 ```go
-import "github.com/zhufuyi/sponge/pkg/grpc/interceptor"
+import "github.com/go-dev-frame/sponge/pkg/grpc/interceptor"
 ```
 
 #### logging
@@ -317,9 +317,9 @@ package main
 
 import (
 	"context"
-	"github.com/zhufuyi/sponge/pkg/jwt"
-	"github.com/zhufuyi/sponge/pkg/grpc/interceptor"
-	"github.com/zhufuyi/sponge/pkg/grpc/grpccli"
+	"github.com/go-dev-frame/sponge/pkg/jwt"
+	"github.com/go-dev-frame/sponge/pkg/grpc/interceptor"
+	"github.com/go-dev-frame/sponge/pkg/grpc/grpccli"
 	userV1 "user/api/user/v1"
 )
 
@@ -344,8 +344,8 @@ package main
 import (
 	"context"
 	"net"
-	"github.com/zhufuyi/sponge/pkg/jwt"
-	"github.com/zhufuyi/sponge/pkg/grpc/interceptor"
+	"github.com/go-dev-frame/sponge/pkg/jwt"
+	"github.com/go-dev-frame/sponge/pkg/grpc/interceptor"
 	"google.golang.org/grpc"
 	userV1 "user/api/user/v1"
 )

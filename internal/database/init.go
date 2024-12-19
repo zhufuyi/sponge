@@ -5,9 +5,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/zhufuyi/sponge/pkg/sgorm"
+	"github.com/go-dev-frame/sponge/pkg/sgorm"
 
-	"github.com/zhufuyi/sponge/internal/config"
+	"github.com/go-dev-frame/sponge/internal/config"
 )
 
 var (
@@ -32,7 +32,7 @@ func InitDB() {
 		gdb = InitSqlite()
 	default:
 		panic("InitDB error, please modify the correct 'database' configuration at yaml file. " +
-			"Refer to https://github.com/zhufuyi/sponge/blob/main/configs/serverNameExample.yml#L85")
+			"Refer to https://github.com/go-dev-frame/sponge/blob/main/configs/serverNameExample.yml#L85")
 	}
 }
 

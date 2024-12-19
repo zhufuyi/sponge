@@ -8,18 +8,18 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 
-	"github.com/zhufuyi/sponge/pkg/errcode"
-	"github.com/zhufuyi/sponge/pkg/gin/handlerfunc"
-	"github.com/zhufuyi/sponge/pkg/gin/middleware"
-	"github.com/zhufuyi/sponge/pkg/gin/middleware/metrics"
-	"github.com/zhufuyi/sponge/pkg/gin/prof"
-	"github.com/zhufuyi/sponge/pkg/gin/swagger"
-	"github.com/zhufuyi/sponge/pkg/gin/validator"
-	"github.com/zhufuyi/sponge/pkg/jwt"
-	"github.com/zhufuyi/sponge/pkg/logger"
+	"github.com/go-dev-frame/sponge/pkg/errcode"
+	"github.com/go-dev-frame/sponge/pkg/gin/handlerfunc"
+	"github.com/go-dev-frame/sponge/pkg/gin/middleware"
+	"github.com/go-dev-frame/sponge/pkg/gin/middleware/metrics"
+	"github.com/go-dev-frame/sponge/pkg/gin/prof"
+	"github.com/go-dev-frame/sponge/pkg/gin/swagger"
+	"github.com/go-dev-frame/sponge/pkg/gin/validator"
+	"github.com/go-dev-frame/sponge/pkg/jwt"
+	"github.com/go-dev-frame/sponge/pkg/logger"
 
-	"github.com/zhufuyi/sponge/docs"
-	"github.com/zhufuyi/sponge/internal/config"
+	"github.com/go-dev-frame/sponge/docs"
+	"github.com/go-dev-frame/sponge/internal/config"
 )
 
 type routeFns = []func(r *gin.Engine, groupPathMiddlewares map[string][]gin.HandlerFunc, singlePathMiddlewares map[string][]gin.HandlerFunc)

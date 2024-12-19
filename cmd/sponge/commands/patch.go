@@ -3,7 +3,7 @@ package commands
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/zhufuyi/sponge/cmd/sponge/commands/patch"
+	"github.com/go-dev-frame/sponge/cmd/sponge/commands/patch"
 )
 
 // PatchCommand patch server code

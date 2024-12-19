@@ -12,7 +12,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 
-	"github.com/zhufuyi/sponge/cmd/sponge/server"
+	"github.com/go-dev-frame/sponge/cmd/sponge/server"
 )
 
 // OpenUICommand run the sponge ui service

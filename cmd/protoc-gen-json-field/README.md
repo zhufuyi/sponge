@@ -19,7 +19,7 @@ mkdir -p protocDir \
 
 #### Install protoc-gen-json-field
 
-> go install github.com/zhufuyi/sponge/cmd/protoc-gen-json-field@latest
+> go install github.com/go-dev-frame/sponge/cmd/protoc-gen-json-field@latest
 
 <br>
 

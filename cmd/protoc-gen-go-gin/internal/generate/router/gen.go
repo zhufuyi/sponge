@@ -6,7 +6,7 @@ import (
 
 	"google.golang.org/protobuf/compiler/protogen"
 
-	"github.com/zhufuyi/sponge/cmd/protoc-gen-go-gin/internal/parse"
+	"github.com/go-dev-frame/sponge/cmd/protoc-gen-go-gin/internal/parse"
 )
 
 // GenerateFiles generate gin router code.

@@ -13,8 +13,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/zhufuyi/sponge/pkg/gocron"
-	"github.com/zhufuyi/sponge/pkg/logger"
+	"github.com/go-dev-frame/sponge/pkg/gocron"
+	"github.com/go-dev-frame/sponge/pkg/logger"
 )
 
 var task1 = func() {

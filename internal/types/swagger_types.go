@@ -26,7 +26,7 @@ type Column struct {
 	Name  string      `json:"name"`  // column name
 	Exp   string      `json:"exp"`   // expressions, which default to = when the value is null, have =, !=, >, >=, <, <=, like
 	Value interface{} `json:"value"` // column value
-	Logic string      `json:"logic"` // logical type, defaults to and when value is null, only &(and), ||(or)
+	Logic string      `json:"logic"` // logical type, default value is "and", support &, and, ||, or
 }
 
 // Conditions query conditions

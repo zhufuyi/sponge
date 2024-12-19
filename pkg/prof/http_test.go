@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/zhufuyi/sponge/pkg/utils"
+	"github.com/go-dev-frame/sponge/pkg/utils"
 )
 
 func TestRegister(t *testing.T) {

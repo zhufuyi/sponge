@@ -12,7 +12,7 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/zhufuyi/sponge/pkg/gofile"
+	"github.com/go-dev-frame/sponge/pkg/gofile"
 )
 
 var _ Replacer = (*replacerInfo)(nil)

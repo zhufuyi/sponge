@@ -86,7 +86,7 @@ Download the corresponding **protoc** executable file according to the system ty
 
 ```bash
 # Install Sponge
-go install github.com/zhufuyi/sponge/cmd/sponge@latest
+go install github.com/go-dev-frame/sponge/cmd/sponge@latest
 
 # Initialize Sponge, automatically install Sponge's dependency plugins
 sponge init

@@ -7,13 +7,13 @@ import (
 	"golang.org/x/sync/singleflight"
 	"gorm.io/gorm"
 
-	"github.com/zhufuyi/sponge/pkg/logger"
-	"github.com/zhufuyi/sponge/pkg/sgorm/query"
-	"github.com/zhufuyi/sponge/pkg/utils"
+	"github.com/go-dev-frame/sponge/pkg/logger"
+	"github.com/go-dev-frame/sponge/pkg/sgorm/query"
+	"github.com/go-dev-frame/sponge/pkg/utils"
 
-	"github.com/zhufuyi/sponge/internal/cache"
-	"github.com/zhufuyi/sponge/internal/database"
-	"github.com/zhufuyi/sponge/internal/model"
+	"github.com/go-dev-frame/sponge/internal/cache"
+	"github.com/go-dev-frame/sponge/internal/database"
+	"github.com/go-dev-frame/sponge/internal/model"
 )
 
 var _ UserExampleDao = (*userExampleDao)(nil)
@@ -190,7 +190,7 @@ func (d *userExampleDao) GetByID(ctx context.Context, id uint64) (*model.UserExa
 //	name: column name
 //	exp: expressions, which default is "=",  support =, !=, >, >=, <, <=, like, in
 //	value: column value, if exp=in, multiple values are separated by commas
-//	logic: logical type, defaults to and when value is null, only &(and), ||(or)
+//	logic: logical type, default value is "and", support &, and, ||, or
 //
 // example: search for a male over 20 years of age
 //

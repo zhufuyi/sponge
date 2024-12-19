@@ -9,7 +9,7 @@ Commonly used `one-way encryption`, `symmetric encryption and decryption`, `asym
 ### Hash one-way encryption
 
 ```go
-    import "github.com/zhufuyi/sponge/pkg/gocrypto"
+    import "github.com/go-dev-frame/sponge/pkg/gocrypto"
 
     var hashRawData = []byte("hash_abcdefghijklmnopqrstuvwxyz0123456789")
 
@@ -35,7 +35,7 @@ Commonly used `one-way encryption`, `symmetric encryption and decryption`, `asym
 The password registered by the user is stored in the database through hash, and the password registered is compared with the hash value to judge whether the password is correct all the time, so as to ensure that only the user knows the plaintext of the password.
 
 ```go
-    import "github.com/zhufuyi/sponge/pkg/gocrypto"
+    import "github.com/go-dev-frame/sponge/pkg/gocrypto"
 
     pwd := "123"
 
@@ -61,7 +61,7 @@ AES (`Advanced Encryption Standard`) Advanced Encryption Standard, designed to r
 There are four functions `AesEncrypt`, `AesDecrypt`, `AesEncryptHex`, `AesDecryptHex`.
 
 ```go
-    import "github.com/zhufuyi/sponge/pkg/gocrypto"
+    import "github.com/go-dev-frame/sponge/pkg/gocrypto"
 
     var (
         aesRawData = []byte("aes_abcdefghijklmnopqrstuvwxyz0123456789")
@@ -101,7 +101,7 @@ DES (`Data Encryption Standard`) data encryption standard, is currently one of t
 There are four functions `DesEncrypt`, `DesDecrypt`, `DesEncryptHex`, `DesDecryptHex`.
 
 ```go
-    import "github.com/zhufuyi/sponge/pkg/gocrypto"
+    import "github.com/go-dev-frame/sponge/pkg/gocrypto"
 
     var (
         desRawData = []byte("des_abcdefghijklmnopqrstuvwxyz0123456789")
@@ -156,7 +156,7 @@ The public key is used for encryption, and the private key is used for decryptio
 There are four functions: `RsaEncrypt`, `RsaDecrypt`, `RsaEncryptHex`, `RsaDecryptHex`.
 
 ```go
-    import "github.com/zhufuyi/sponge/pkg/gocrypto"
+    import "github.com/go-dev-frame/sponge/pkg/gocrypto"
 
     var rsaRawData = []byte("rsa_abcdefghijklmnopqrstuvwxyz0123456789")
     // PKCS#1
@@ -197,7 +197,7 @@ The private key is used to sign, and the public key is used to verify the signat
 There are four functions: `RsaSign`, `RsaVerify`, `RsaSignBase64`, `RsaVerifyBase64`.
 
 ```go
-   import "github.com/zhufuyi/sponge/pkg/gocrypto"
+   import "github.com/go-dev-frame/sponge/pkg/gocrypto"
 
     var rsaRawData = []byte("rsa_abcdefghijklmnopqrstuvwxyz0123456789")
 

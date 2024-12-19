@@ -1,17 +1,17 @@
 ## English | [简体中文](assets/readme-cn.md)
 
 <p align="center">
-<img width="500px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/logo.png">
+<img width="500px" src="https://raw.githubusercontent.com/go-dev-frame/sponge/main/assets/logo.png">
 </p>
 
 <div align=center>
 
-[![Go Report](https://goreportcard.com/badge/github.com/zhufuyi/sponge)](https://goreportcard.com/report/github.com/zhufuyi/sponge)
-[![codecov](https://codecov.io/gh/zhufuyi/sponge/branch/main/graph/badge.svg)](https://codecov.io/gh/zhufuyi/sponge)
-[![Go Reference](https://pkg.go.dev/badge/github.com/zhufuyi/sponge.svg)](https://pkg.go.dev/github.com/zhufuyi/sponge)
-[![Go](https://github.com/zhufuyi/sponge/workflows/Go/badge.svg?branch=main)](https://github.com/zhufuyi/sponge/actions)
+[![Go Report](https://goreportcard.com/badge/github.com/go-dev-frame/sponge)](https://goreportcard.com/report/github.com/go-dev-frame/sponge)
+[![codecov](https://codecov.io/gh/go-dev-frame/sponge/branch/main/graph/badge.svg)](https://codecov.io/gh/go-dev-frame/sponge)
+[![Go Reference](https://pkg.go.dev/badge/github.com/go-dev-frame/sponge.svg)](https://pkg.go.dev/github.com/go-dev-frame/sponge)
+[![Go](https://github.com/go-dev-frame/sponge/workflows/Go/badge.svg?branch=main)](https://github.com/go-dev-frame/sponge/actions)
 [![Awesome Go](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/avelino/awesome-go)
-[![License: MIT](https://img.shields.io/github/license/zhufuyi/sponge)](https://img.shields.io/github/license/zhufuyi/sponge)
+[![License: MIT](https://img.shields.io/github/license/go-dev-frame/sponge)](https://img.shields.io/github/license/go-dev-frame/sponge)
 
 </div>
 
@@ -58,7 +58,7 @@ Additionally, developers can use custom templates to generate various types of c
 
 1. **Install sponge**
 
-   sponge supports installation on Windows, macOS, and Linux. Click to view the [**sponge installation guide**](https://github.com/zhufuyi/sponge/blob/main/assets/install-cn.md).
+   Sponge supports installation on Windows, macOS, and Linux. Click to view the [**sponge installation guide**](https://github.com/go-dev-frame/sponge/blob/main/assets/install-cn.md).
 
 2. **Open the code generation UI**
 
@@ -71,10 +71,10 @@ Additionally, developers can use custom templates to generate various types of c
    Access `http://localhost:24631` in a local browser to generate code through the UI interface, as shown below:
 
    <p align="center">
-   <img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/en_sponge-ui.png">
+   <img width="1500px" src="https://raw.githubusercontent.com/go-dev-frame/sponge/main/assets/en_sponge-ui.png">
    </p>
 
-   > To access from a browser on a different host, specify the host IP or domain when starting the UI, e.g., `sponge run -a http://your_host_ip:24631`. Alternatively, you can run the UI service in Docker to support cross-host access. Click to view the guide on [running the sponge UI service in Docker](https://github.com/zhufuyi/sponge/blob/main/assets/install-cn.md#Docker%E7%8E%AF%E5%A2%83).
+   > To access from a browser on a different host, specify the host IP or domain when starting the UI, e.g., `sponge run -a http://your_host_ip:24631`. Alternatively, you can run the UI service in Docker to support cross-host access. Click to view the guide on [running the sponge UI service in Docker](https://github.com/go-dev-frame/sponge/blob/main/assets/install-cn.md#Docker%E7%8E%AF%E5%A2%83).
 
 <br>
 
@@ -85,7 +85,7 @@ Sponge supports generating code using both built-in templates and custom templat
 1. The code generation framework based on Sponge's built-in templates is shown below. There are two approaches: SQL and Protobuf.
 
 <p align="center">
-<img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/sponge-framework.png">
+<img width="1500px" src="https://raw.githubusercontent.com/go-dev-frame/sponge/main/assets/sponge-framework.png">
 </p>
 
 <br>
@@ -93,7 +93,7 @@ Sponge supports generating code using both built-in templates and custom templat
 2. The code generation framework based on custom templates is shown below. There are three approaches: JSON, SQL, and Protobuf.
 
 <p align="center">
-<img width="1200px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/template-framework.png">
+<img width="1200px" src="https://raw.githubusercontent.com/go-dev-frame/sponge/main/assets/template-framework.png">
 </p>
 
 <br>
@@ -103,7 +103,7 @@ Sponge supports generating code using both built-in templates and custom templat
 Sponge supports creating six types of backend services, all based on microservice architecture. The diagram below illustrates a typical layered microservice structure, featuring high performance, scalability, and built-in service governance capabilities.
 
 <p align="center">
-<img width="1000px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/microservices-framework.png">
+<img width="1000px" src="https://raw.githubusercontent.com/go-dev-frame/sponge/main/assets/microservices-framework.png">
 </p>
 
 <br>
@@ -132,10 +132,10 @@ Click to view the [**test code**](https://github.com/zhufuyi/microservices_frame
 - Crontab [cron](https://github.com/robfig/cron)
 - Message Queue [rabbitmq](https://github.com/rabbitmq/amqp091-go), [kafka](https://github.com/IBM/sarama)
 - Distributed Transaction Manager [dtm](https://github.com/dtm-labs/dtm)
-- Distributed lock [dlock](https://github.com/zhufuyi/sponge/tree/main/pkg/dlock)
+- Distributed lock [dlock](https://github.com/go-dev-frame/sponge/tree/main/pkg/dlock)
 - Parameter validation [validator](https://github.com/go-playground/validator)
-- Adaptive rate limiting [ratelimit](https://github.com/zhufuyi/sponge/tree/main/pkg/shield/ratelimit)
-- Adaptive circuit breaking [circuitbreaker](https://github.com/zhufuyi/sponge/tree/main/pkg/shield/circuitbreaker)
+- Adaptive rate limiting [ratelimit](https://github.com/go-dev-frame/sponge/tree/main/pkg/shield/ratelimit)
+- Adaptive circuit breaking [circuitbreaker](https://github.com/go-dev-frame/sponge/tree/main/pkg/shield/circuitbreaker)
 - Distributed Tracing [opentelemetry](https://github.com/open-telemetry/opentelemetry-go)
 - Metrics monitoring [prometheus](https://github.com/prometheus/client_golang/prometheus), [grafana](https://github.com/grafana/grafana)
 - Service registration and discovery [etcd](https://github.com/etcd-io/etcd), [consul](https://github.com/hashicorp/consul), [nacos](https://github.com/alibaba/nacos)
@@ -144,7 +144,7 @@ Click to view the [**test code**](https://github.com/zhufuyi/microservices_frame
 - Configuration center [nacos](https://github.com/alibaba/nacos)
 - Code quality checking [golangci-lint](https://github.com/golangci/golangci-lint)
 - Continuous integration and deployment [jenkins](https://github.com/jenkinsci/jenkins), [docker](https://www.docker.com/), [kubernetes](https://github.com/kubernetes/kubernetes)
-- Generate project business architecture diagram [spograph](https://github.com/zhufuyi/spograph)
+- Generate project business architecture diagram [spograph](https://github.com/go-dev-frame/spograph)
 - Custom template generation code [go template](https://pkg.go.dev/text/template@go1.23.3)
 
 <br>
@@ -217,23 +217,23 @@ Click to view [the detailed documentation](https://go-sponge.com/) for Sponge de
 
 #### Examples of create services
 
-- [Create **web** service based on **sql** (including CRUD)](https://github.com/zhufuyi/sponge_examples/tree/main/1_web-gin-CRUD)
-- [Create **grpc** service based on **sql** (including CRUD)](https://github.com/zhufuyi/sponge_examples/tree/main/2_micro-grpc-CRUD)
-- [Create **web** service based on **protobuf**](https://github.com/zhufuyi/sponge_examples/tree/main/3_web-gin-protobuf)
-- [Create **grpc** service based on **protobuf** ](https://github.com/zhufuyi/sponge_examples/tree/main/4_micro-grpc-protobuf)
-- [Create **grpc gateway** service based on **protobuf**](https://github.com/zhufuyi/sponge_examples/tree/main/5_micro-gin-rpc-gateway)
-- [Create **grpc+http** service based on **protobuf**](https://github.com/zhufuyi/sponge_examples/tree/main/_10_micro-grpc-http-protobuf)
+- [Create **web** service based on **sql** (including CRUD)](https://github.com/go-dev-frame/sponge_examples/tree/main/1_web-gin-CRUD)
+- [Create **grpc** service based on **sql** (including CRUD)](https://github.com/go-dev-frame/sponge_examples/tree/main/2_micro-grpc-CRUD)
+- [Create **web** service based on **protobuf**](https://github.com/go-dev-frame/sponge_examples/tree/main/3_web-gin-protobuf)
+- [Create **grpc** service based on **protobuf** ](https://github.com/go-dev-frame/sponge_examples/tree/main/4_micro-grpc-protobuf)
+- [Create **grpc gateway** service based on **protobuf**](https://github.com/go-dev-frame/sponge_examples/tree/main/5_micro-gin-rpc-gateway)
+- [Create **grpc+http** service based on **protobuf**](https://github.com/go-dev-frame/sponge_examples/tree/main/_10_micro-grpc-http-protobuf)
 
 #### Examples of develop complete project
 
-- [Simple community web backend service](https://github.com/zhufuyi/sponge_examples/tree/main/7_community-single)
-- [Simple community web service broken down into microservice](https://github.com/zhufuyi/sponge_examples/tree/main/8_community-cluster)
+- [Simple community web backend service](https://github.com/go-dev-frame/sponge_examples/tree/main/7_community-single)
+- [Simple community web service broken down into microservice](https://github.com/go-dev-frame/sponge_examples/tree/main/8_community-cluster)
 
 #### Distributed transaction examples
 
-- [Simple distributed order system](https://github.com/zhufuyi/sponge_examples/tree/main/9_order-grpc-distributed-transaction)
-- [Flash sale](https://github.com/zhufuyi/sponge_examples/tree/main/_12_sponge-dtm-flashSale)
-- [E-Commerce system](https://github.com/zhufuyi/sponge_examples/tree/main/_14_eshop)
+- [Simple distributed order system](https://github.com/go-dev-frame/sponge_examples/tree/main/9_order-grpc-distributed-transaction)
+- [Flash sale](https://github.com/go-dev-frame/sponge_examples/tree/main/_12_sponge-dtm-flashSale)
+- [E-Commerce system](https://github.com/go-dev-frame/sponge_examples/tree/main/_14_eshop)
 
 <br>
 <br>

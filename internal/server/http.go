@@ -8,10 +8,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/zhufuyi/sponge/pkg/app"
-	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
+	"github.com/go-dev-frame/sponge/pkg/app"
+	"github.com/go-dev-frame/sponge/pkg/servicerd/registry"
 
-	"github.com/zhufuyi/sponge/internal/routers"
+	"github.com/go-dev-frame/sponge/internal/routers"
 )
 
 var _ app.IServer = (*httpServer)(nil)

@@ -5,14 +5,14 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/go-dev-frame/sponge/pkg/gotest"
+	"github.com/go-dev-frame/sponge/pkg/sgorm/query"
+	"github.com/go-dev-frame/sponge/pkg/utils"
 	"github.com/stretchr/testify/assert"
-	"github.com/zhufuyi/sponge/pkg/gotest"
-	"github.com/zhufuyi/sponge/pkg/sgorm/query"
-	"github.com/zhufuyi/sponge/pkg/utils"
 
-	"github.com/zhufuyi/sponge/internal/cache"
-	"github.com/zhufuyi/sponge/internal/database"
-	"github.com/zhufuyi/sponge/internal/model"
+	"github.com/go-dev-frame/sponge/internal/cache"
+	"github.com/go-dev-frame/sponge/internal/database"
+	"github.com/go-dev-frame/sponge/internal/model"
 )
 
 func newUserExampleDao() *gotest.Dao {

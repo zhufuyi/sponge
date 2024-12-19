@@ -11,7 +11,7 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swaggo/swag"
 
-	"github.com/zhufuyi/sponge/pkg/gofile"
+	"github.com/go-dev-frame/sponge/pkg/gofile"
 )
 
 // DefaultRouter default swagger router, request url is http://<ip:port>/swagger/index.html

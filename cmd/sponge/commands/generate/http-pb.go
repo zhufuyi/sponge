@@ -8,7 +8,7 @@ import (
 	"github.com/huandu/xstrings"
 	"github.com/spf13/cobra"
 
-	"github.com/zhufuyi/sponge/pkg/replacer"
+	"github.com/go-dev-frame/sponge/pkg/replacer"
 )
 
 // HTTPPbCommand generate web service code based on protobuf file
@@ -257,12 +257,12 @@ func (g *httpPbGenerator) addFields(r replacer.Replacer) []replacer.Field {
 			New: protoShellHandlerCode,
 		},
 		{
-			Old: "github.com/zhufuyi/sponge",
+			Old: "github.com/go-dev-frame/sponge",
 			New: g.moduleName,
 		},
 		{
 			Old: g.moduleName + pkgPathSuffix,
-			New: "github.com/zhufuyi/sponge/pkg",
+			New: "github.com/go-dev-frame/sponge/pkg",
 		},
 		{ // replace the sponge version of the go.mod file
 			Old: spongeTemplateVersionMark,

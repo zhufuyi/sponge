@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/zhufuyi/sponge/pkg/gofile"
+	"github.com/go-dev-frame/sponge/pkg/gofile"
 )
 
 // get moduleName and serverName from directory

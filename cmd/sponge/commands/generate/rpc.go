@@ -10,10 +10,10 @@ import (
 	"github.com/huandu/xstrings"
 	"github.com/spf13/cobra"
 
-	"github.com/zhufuyi/sponge/pkg/gofile"
-	"github.com/zhufuyi/sponge/pkg/replacer"
-	"github.com/zhufuyi/sponge/pkg/sql2code"
-	"github.com/zhufuyi/sponge/pkg/sql2code/parser"
+	"github.com/go-dev-frame/sponge/pkg/gofile"
+	"github.com/go-dev-frame/sponge/pkg/replacer"
+	"github.com/go-dev-frame/sponge/pkg/sql2code"
+	"github.com/go-dev-frame/sponge/pkg/sql2code/parser"
 )
 
 // RPCCommand generate grpc service code
@@ -431,7 +431,7 @@ func (g *rpcGenerator) addFields(r replacer.Replacer) []replacer.Field {
 			Old: k8sServiceFileMark,
 			New: k8sServiceFileGrpcCode,
 		},
-		{ // replace github.com/zhufuyi/sponge/templates/sponge
+		{ // replace github.com/go-dev-frame/sponge/templates/sponge
 			Old: selfPackageName + "/" + r.GetSourcePath(),
 			New: g.moduleName,
 		},
@@ -441,12 +441,12 @@ func (g *rpcGenerator) addFields(r replacer.Replacer) []replacer.Field {
 			New: strings.Join([]string{"api", g.serverName, "v1"}, gofile.GetPathDelimiter()),
 		},
 		{
-			Old: "github.com/zhufuyi/sponge",
+			Old: "github.com/go-dev-frame/sponge",
 			New: g.moduleName,
 		},
 		{
 			Old: g.moduleName + pkgPathSuffix,
-			New: "github.com/zhufuyi/sponge/pkg",
+			New: "github.com/go-dev-frame/sponge/pkg",
 		},
 		{ // replace the sponge version of the go.mod file
 			Old: spongeTemplateVersionMark,

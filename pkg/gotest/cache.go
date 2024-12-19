@@ -6,7 +6,7 @@ import (
 	"github.com/alicebob/miniredis/v2"
 	"github.com/redis/go-redis/v9"
 
-	"github.com/zhufuyi/sponge/pkg/utils"
+	"github.com/go-dev-frame/sponge/pkg/utils"
 )
 
 // Cache redis cache

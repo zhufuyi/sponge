@@ -45,7 +45,7 @@ sponge 适用于快速开发各种高性能后端服务，包括但不限于：
 
 1. **安装 sponge**
 
-   支持在 windows、mac、linux 环境下安装 sponge，点击查看 [**安装 sponge 说明**](https://github.com/zhufuyi/sponge/blob/main/assets/install-cn.md)。
+   支持在 windows、mac、linux 环境下安装 sponge，点击查看 [**安装 sponge 说明**](https://github.com/go-dev-frame/sponge/blob/main/assets/install-cn.md)。
 
 2. **打开生成代码 UI 页面**
 
@@ -58,10 +58,10 @@ sponge 适用于快速开发各种高性能后端服务，包括但不限于：
    在本地浏览器访问 `http://localhost:24631`，在页面上操作生成代码，如下图所示：
 
    <p align="center">
-   <img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/sponge-ui.png">
+   <img width="1500px" src="https://raw.githubusercontent.com/go-dev-frame/sponge/main/assets/sponge-ui.png">
    </p>
 
-   > 如果想要在跨主机的浏览器上访问，启动UI时需要指定宿主机ip或域名，示例 `sponge run -a http://your_host_ip:24631`。 也可以在 docker 上启动UI服务来支持跨主机访问，点击查看 [在 docker 运行 sponge UI 服务说明](https://github.com/zhufuyi/sponge/blob/main/assets/install-cn.md#Docker%E7%8E%AF%E5%A2%83)。
+   > 如果想要在跨主机的浏览器上访问，启动UI时需要指定宿主机ip或域名，示例 `sponge run -a http://your_host_ip:24631`。 也可以在 docker 上启动UI服务来支持跨主机访问，点击查看 [在 docker 运行 sponge UI 服务说明](https://github.com/go-dev-frame/sponge/blob/main/assets/install-cn.md#Docker%E7%8E%AF%E5%A2%83)。
 
 <br>
 
@@ -72,7 +72,7 @@ sponge 支持基于自带模板和自定义模板两种方式生成你的项目�
 1. sponge 基于自带模板生成代码框架如下图所示，共有 sql 和 protobuf 两种方式生成代码。
 
 <p align="center">
-<img width="1500px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/sponge-framework.png">
+<img width="1500px" src="https://raw.githubusercontent.com/go-dev-frame/sponge/main/assets/sponge-framework.png">
 </p>
 
 <br>
@@ -80,7 +80,7 @@ sponge 支持基于自带模板和自定义模板两种方式生成你的项目�
 2. sponge 基于自定义模板生成代码框架如下图所示，共有 json、sql、protobuf 三种方式生成代码。
 
 <p align="center">
-<img width="1200px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/template-framework.png">
+<img width="1200px" src="https://raw.githubusercontent.com/go-dev-frame/sponge/main/assets/template-framework.png">
 </p>
 
 <br>
@@ -90,7 +90,7 @@ sponge 支持基于自带模板和自定义模板两种方式生成你的项目�
 sponge 支持创建 6 种类型的后端服务，均为微服务架构。下图展示了典型的微服务分层结构，具备高性能、高扩展性，并内置常用的服务治理功能。
 
 <p align="center">
-<img width="1000px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/microservices-framework.png">
+<img width="1000px" src="https://raw.githubusercontent.com/go-dev-frame/sponge/main/assets/microservices-framework.png">
 </p>
 
 <br>
@@ -122,9 +122,9 @@ sponge包含丰富的组件(按需使用)：
 - 定时任务 [cron](https://github.com/robfig/cron)
 - 消息队列组件 [rabbitmq](https://github.com/rabbitmq/amqp091-go), [kafka](https://github.com/IBM/sarama)
 - 分布式事务管理器 [dtm](https://github.com/dtm-labs/dtm)
-- 分布式锁 [dlock](https://github.com/zhufuyi/sponge/tree/main/pkg/dlock)
-- 自适应限流 [ratelimit](https://github.com/zhufuyi/sponge/tree/main/pkg/shield/ratelimit)
-- 自适应熔断 [circuitbreaker](https://github.com/zhufuyi/sponge/tree/main/pkg/shield/circuitbreaker)
+- 分布式锁 [dlock](https://github.com/go-dev-frame/sponge/tree/main/pkg/dlock)
+- 自适应限流 [ratelimit](https://github.com/go-dev-frame/sponge/tree/main/pkg/shield/ratelimit)
+- 自适应熔断 [circuitbreaker](https://github.com/go-dev-frame/sponge/tree/main/pkg/shield/circuitbreaker)
 - 链路跟踪 [opentelemetry](https://github.com/open-telemetry/opentelemetry-go)
 - 监控 [prometheus](https://github.com/prometheus/client_golang/prometheus), [grafana](https://github.com/grafana/grafana)
 - 服务注册与发现 [etcd](https://github.com/etcd-io/etcd), [consul](https://github.com/hashicorp/consul), [nacos](https://github.com/alibaba/nacos)
@@ -133,7 +133,7 @@ sponge包含丰富的组件(按需使用)：
 - 配置中心 [nacos](https://github.com/alibaba/nacos)
 - 代码质量检查 [golangci-lint](https://github.com/golangci/golangci-lint)
 - 持续集成部署 CICD [jenkins](https://github.com/jenkinsci/jenkins), [docker](https://www.docker.com/), [kubernetes](https://github.com/kubernetes/kubernetes)
-- 生成项目业务架构图 [spograph](https://github.com/zhufuyi/spograph)
+- 生成项目业务架构图 [spograph](https://github.com/go-dev-frame/spograph)
 - 自定义模板生成代码 [go template](https://pkg.go.dev/text/template@go1.23.3)
 
 <br>
@@ -206,27 +206,27 @@ sponge包含丰富的组件(按需使用)：
 
 #### 使用 sponge 创建服务示例
 
-- [基于sql创建web服务(包括CRUD)](https://github.com/zhufuyi/sponge_examples/tree/main/1_web-gin-CRUD)
-- [基于sql创建grpc服务(包括CRUD)](https://github.com/zhufuyi/sponge_examples/tree/main/2_micro-grpc-CRUD)
-- [基于protobuf创建web服务](https://github.com/zhufuyi/sponge_examples/tree/main/3_web-gin-protobuf)
-- [基于protobuf创建grpc服务](https://github.com/zhufuyi/sponge_examples/tree/main/4_micro-grpc-protobuf)
-- [基于protobuf创建grpc网关服务](https://github.com/zhufuyi/sponge_examples/tree/main/5_micro-gin-rpc-gateway)
-- [基于protobuf创建grpc+http服务](https://github.com/zhufuyi/sponge_examples/tree/main/_10_micro-grpc-http-protobuf)
+- [基于sql创建web服务(包括CRUD)](https://github.com/go-dev-frame/sponge_examples/tree/main/1_web-gin-CRUD)
+- [基于sql创建grpc服务(包括CRUD)](https://github.com/go-dev-frame/sponge_examples/tree/main/2_micro-grpc-CRUD)
+- [基于protobuf创建web服务](https://github.com/go-dev-frame/sponge_examples/tree/main/3_web-gin-protobuf)
+- [基于protobuf创建grpc服务](https://github.com/go-dev-frame/sponge_examples/tree/main/4_micro-grpc-protobuf)
+- [基于protobuf创建grpc网关服务](https://github.com/go-dev-frame/sponge_examples/tree/main/5_micro-gin-rpc-gateway)
+- [基于protobuf创建grpc+http服务](https://github.com/go-dev-frame/sponge_examples/tree/main/_10_micro-grpc-http-protobuf)
 
 #### 使用 sponge 开发完整项目示例
 
-- [简单的社区web后端服务](https://github.com/zhufuyi/sponge_examples/tree/main/7_community-single)
-- [简单的社区web后端服务拆分为微服务](https://github.com/zhufuyi/sponge_examples/tree/main/8_community-cluster)
+- [简单的社区web后端服务](https://github.com/go-dev-frame/sponge_examples/tree/main/7_community-single)
+- [简单的社区web后端服务拆分为微服务](https://github.com/go-dev-frame/sponge_examples/tree/main/8_community-cluster)
 
 #### 分布式事务示例
 
-- [简单的分布式订单系统](https://github.com/zhufuyi/sponge_examples/tree/main/9_order-grpc-distributed-transaction)
-- [秒杀抢购活动](https://github.com/zhufuyi/sponge_examples/tree/main/_12_sponge-dtm-flashSale)
-- [电商系统](https://github.com/zhufuyi/sponge_examples/tree/main/_14_eshop)
+- [简单的分布式订单系统](https://github.com/go-dev-frame/sponge_examples/tree/main/9_order-grpc-distributed-transaction)
+- [秒杀抢购活动](https://github.com/go-dev-frame/sponge_examples/tree/main/_12_sponge-dtm-flashSale)
+- [电商系统](https://github.com/go-dev-frame/sponge_examples/tree/main/_14_eshop)
 
 <br>
 <br>
 
 如果对您有帮助给个star⭐，欢迎加入**go sponge微信群交流**，加微信(备注`sponge`)进群。
 
-<img width="300px" src="https://raw.githubusercontent.com/zhufuyi/sponge/main/assets/wechat-group.jpg">
+<img width="300px" src="https://raw.githubusercontent.com/go-dev-frame/sponge/main/assets/wechat-group.jpg">

@@ -7,7 +7,7 @@ The grpc's server-side and client-side metrics can continue to be captured using
 #### grpc server
 
 ```go
-import "github.com/zhufuyi/sponge/pkg/grpc/metrics"
+import "github.com/go-dev-frame/sponge/pkg/grpc/metrics"
 
 func UnaryServerLabels(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 	// set up prometheus custom labels
@@ -69,7 +69,7 @@ func main() {
 #### grpc client
 
 ```go
-import "github.com/zhufuyi/sponge/pkg/grpc/metrics"
+import "github.com/go-dev-frame/sponge/pkg/grpc/metrics"
 
 func getDialOptions() []grpc.DialOption {
 	var options []grpc.DialOption

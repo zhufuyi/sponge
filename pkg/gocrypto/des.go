@@ -6,7 +6,7 @@ package gocrypto
 import (
 	"encoding/hex"
 
-	"github.com/zhufuyi/sponge/pkg/gocrypto/wcipher"
+	"github.com/go-dev-frame/sponge/pkg/gocrypto/wcipher"
 )
 
 // DesEncrypt des encryption, the returned ciphertext is not transcoded

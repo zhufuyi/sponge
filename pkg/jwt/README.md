@@ -9,7 +9,7 @@ Generate and parse token based on [jwt](https://github.com/golang-jwt/jwt) libra
 Example 1: common fields jwt
 
 ```go
-    import "github.com/zhufuyi/sponge/pkg/jwt"
+    import "github.com/go-dev-frame/sponge/pkg/jwt"
 
 	jwt.Init(
 		// jwt.WithSigningKey("123456"),   // key
@@ -40,7 +40,7 @@ Example 1: common fields jwt
 Example 2: custom fields jwt
 
 ```go
-    import "github.com/zhufuyi/sponge/pkg/jwt"
+    import "github.com/go-dev-frame/sponge/pkg/jwt"
 
 	jwt.Init(
 		// jwt.WithSigningKey("123456"),   // key

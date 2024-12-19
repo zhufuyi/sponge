@@ -9,7 +9,7 @@ import (
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/types/pluginpb"
 
-	"github.com/zhufuyi/sponge/cmd/protoc-gen-json-field/generate"
+	"github.com/go-dev-frame/sponge/cmd/protoc-gen-json-field/generate"
 )
 
 const helpInfo = `

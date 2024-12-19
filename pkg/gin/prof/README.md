@@ -7,7 +7,7 @@ Wrap the official `net/http/pprof` route and add the profile io wait time route.
 ### Example of use
 
 ```go
-    import "github.com/zhufuyi/sponge/pkg/gin/prof"
+    import "github.com/go-dev-frame/sponge/pkg/gin/prof"
 
 	r := gin.Default()
 	prof.Register(r, WithPrefix("/myServer"), WithIOWaitTime())

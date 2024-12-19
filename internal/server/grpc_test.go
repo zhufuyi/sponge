@@ -10,12 +10,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc"
 
-	"github.com/zhufuyi/sponge/pkg/grpc/gtls/certfile"
-	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
-	"github.com/zhufuyi/sponge/pkg/utils"
+	"github.com/go-dev-frame/sponge/pkg/grpc/gtls/certfile"
+	"github.com/go-dev-frame/sponge/pkg/servicerd/registry"
+	"github.com/go-dev-frame/sponge/pkg/utils"
 
-	"github.com/zhufuyi/sponge/configs"
-	"github.com/zhufuyi/sponge/internal/config"
+	"github.com/go-dev-frame/sponge/configs"
+	"github.com/go-dev-frame/sponge/internal/config"
 )
 
 func TestGRPCServer(t *testing.T) {

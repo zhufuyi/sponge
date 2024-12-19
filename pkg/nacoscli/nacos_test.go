@@ -9,7 +9,7 @@ import (
 	"github.com/nacos-group/nacos-sdk-go/v2/common/constant"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/zhufuyi/sponge/pkg/utils"
+	"github.com/go-dev-frame/sponge/pkg/utils"
 )
 
 var (

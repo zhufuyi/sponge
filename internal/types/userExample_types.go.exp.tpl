@@ -3,7 +3,7 @@ package types
 import (
 	"time"
 
-	"github.com/zhufuyi/sponge/pkg/sgorm/query"
+	"github.com/go-dev-frame/sponge/pkg/sgorm/query"
 )
 
 var _ time.Time

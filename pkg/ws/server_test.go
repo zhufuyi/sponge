@@ -13,7 +13,7 @@ import (
 	"github.com/gorilla/websocket"
 	"go.uber.org/zap"
 
-	"github.com/zhufuyi/sponge/pkg/utils"
+	"github.com/go-dev-frame/sponge/pkg/utils"
 )
 
 func TestWebSocketServerDefault(t *testing.T) {

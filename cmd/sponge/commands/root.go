@@ -8,7 +8,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 
-	"github.com/zhufuyi/sponge/cmd/sponge/commands/generate"
+	"github.com/go-dev-frame/sponge/cmd/sponge/commands/generate"
 )
 
 var (
@@ -22,7 +22,7 @@ func NewRootCMD() *cobra.Command {
 		Use: "sponge",
 		Long: fmt.Sprintf(`Sponge is a powerful Go development framework, it's easy to develop web and microservice projects.
 Repo: %s
-Docs: %s`, color.HiCyanString("https://github.com/zhufuyi/sponge"), color.HiCyanString("https://go-sponge.com")),
+Docs: %s`, color.HiCyanString("https://github.com/go-dev-frame/sponge"), color.HiCyanString("https://go-sponge.com")),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		Version:       getVersion(),
