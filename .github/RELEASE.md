@@ -5,9 +5,9 @@ Transfer ownership of the `zhufuyi/sponge` repository to the `go-dev-frame/spong
 
 <br>
 
-**Note: If you currently have Sponge v1.11.1 and below, if you want to upgrade to a higher version, execute the following command:**
+**Note: If the current version of Sponge is lower than v1.11.1, and you want to upgrade to a higher version, execute the following command:**
 
 ```bash
-go install github.com/go-dev-frame/sponge@latest
+go install github.com/go-dev-frame/sponge/cmd/sponge@latest
 sponge upgrade
 ```
