@@ -24,7 +24,7 @@ Make sure the go locale is installed before installing sponge, and add `GOBIN` t
 
 > Because sponge depends on some linux commands, git bash and make need to be installed in windows to support the linux command environment.
 
-For installation convenience, sponge and its dependent programs have been packaged together, download address: [sponge-install.zip](https://drive.google.com/drive/folders/1T55lLXDBIQCnL5IQ-i1hWJovgLI2l0k1?usp=sharing)
+For installation convenience, sponge and its dependent programs have been packaged together, download address: [**sponge-install.zip**](https://drive.google.com/drive/folders/1T55lLXDBIQCnL5IQ-i1hWJovgLI2l0k1?usp=sharing)
 
 After downloading the file:
 
@@ -33,11 +33,11 @@ After downloading the file:
 2. Right-click any folder (Show more options) and select **Open Git Bash here** to open the git bash terminal:
 
 ```bash
+# If the current version of Sponge is lower than v1.11.1, the Sponge binary file needs to be updated first
+go install github.com/go-dev-frame/sponge/cmd/sponge@latest
+
 # Initialize sponge, automatically install sponge's dependency plugins
 sponge init
-
-# Check sponge version
-sponge -v
 ```
 
 Note: 

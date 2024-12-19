@@ -21,8 +21,9 @@
 
 ### Use Cases
 
-sponge is suitable for quickly developing various high-performance backend services, including but not limited to:
-- `Web` services;
+Sponge is suitable for quickly developing various high-performance backend services, including but not limited to:
+
+- `Web` services (gin);
 - `gRPC` services;
 - `HTTP+gRPC` hybrid services;
 - `gRPC Gateway API` services.

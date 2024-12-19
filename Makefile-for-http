@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-PROJECT_NAME := "github.com/zhufuyi/sponge"
+PROJECT_NAME := "github.com/go-dev-frame/sponge"
 PKG := "$(PROJECT_NAME)"
 PKG_LIST := $(shell go list ${PKG}/... | grep -v /vendor/ | grep -v /api/ | grep -v /cmd/)
 
@@ -31,7 +31,7 @@ cover:
 graph:
 	@echo "generating graph ......"
 	@cp -f cmd/serverNameExample_mixExample/main.go .
-	go-callvis -skipbrowser -format=svg -nostd -file=serverNameExample_mixExample github.com/zhufuyi/sponge
+	go-callvis -skipbrowser -format=svg -nostd -file=serverNameExample_mixExample github.com/go-dev-frame/sponge
 	@rm -f main.go serverNameExample_mixExample.gv
 
 
