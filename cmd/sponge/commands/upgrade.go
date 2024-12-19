@@ -90,7 +90,7 @@ func runUpgrade(targetVersion string) (string, error) {
 func runUpgradeCommand(targetVersion string) error {
 	ctx, _ := context.WithTimeout(context.Background(), time.Minute*3) //nolint
 	spongeVersion := "github.com/go-dev-frame/sponge/cmd/sponge@" + targetVersion
-	if targetVersion != latestVersion && targetVersion < "v1.11.2" {
+	if compareVersion(separatedVersion, targetVersion) {
 		spongeVersion = strings.ReplaceAll(spongeVersion, "go-dev-frame", "zhufuyi")
 	}
 	result := gobash.Run(ctx, "go", "install", spongeVersion)
@@ -118,6 +118,9 @@ func copyToTempDir(targetVersion string) (string, error) {
 	if targetVersion == latestVersion {
 		// find the new version of the sponge code directory
 		arg := fmt.Sprintf("%s/pkg/mod/github.com/go-dev-frame", gopath)
+		if compareVersion(separatedVersion, targetVersion) {
+			arg = strings.ReplaceAll(arg, "go-dev-frame", "zhufuyi")
+		}
 		result, err = gobash.Exec("ls", adaptPathDelimiter(arg))
 		if err != nil {
 			return "", fmt.Errorf("execute command failed, %v", err)
@@ -132,6 +135,9 @@ func copyToTempDir(targetVersion string) (string, error) {
 	}
 
 	srcDir := adaptPathDelimiter(fmt.Sprintf("%s/pkg/mod/github.com/go-dev-frame/%s", gopath, spongeDirName))
+	if compareVersion(separatedVersion, targetVersion) {
+		srcDir = strings.ReplaceAll(srcDir, "go-dev-frame", "zhufuyi")
+	}
 	destDir := adaptPathDelimiter(GetSpongeDir() + "/")
 	targetDir := adaptPathDelimiter(destDir + ".sponge")
 
@@ -214,7 +220,7 @@ func getLatestVersion(s string) string {
 func updateSpongeInternalPlugin(targetVersion string) error {
 	ctx, _ := context.WithTimeout(context.Background(), time.Minute) //nolint
 	genGinVersion := "github.com/go-dev-frame/sponge/cmd/protoc-gen-go-gin@" + targetVersion
-	if targetVersion < "v1.11.2" {
+	if compareVersion(separatedVersion, targetVersion) {
 		genGinVersion = strings.ReplaceAll(genGinVersion, "go-dev-frame", "zhufuyi")
 	}
 	result := gobash.Run(ctx, "go", "install", genGinVersion)
@@ -227,7 +233,7 @@ func updateSpongeInternalPlugin(targetVersion string) error {
 
 	ctx, _ = context.WithTimeout(context.Background(), time.Minute) //nolint
 	genRPCVersion := "github.com/go-dev-frame/sponge/cmd/protoc-gen-go-rpc-tmpl@" + targetVersion
-	if targetVersion < "v1.11.2" {
+	if compareVersion(separatedVersion, targetVersion) {
 		genRPCVersion = strings.ReplaceAll(genRPCVersion, "go-dev-frame", "zhufuyi")
 	}
 	result = gobash.Run(ctx, "go", "install", genRPCVersion)
@@ -242,7 +248,7 @@ func updateSpongeInternalPlugin(targetVersion string) error {
 	if !strings.HasPrefix(targetVersion, "v1") {
 		ctx, _ = context.WithTimeout(context.Background(), time.Minute) //nolint
 		genJSONVersion := "github.com/go-dev-frame/sponge/cmd/protoc-gen-json-field@" + targetVersion
-		if targetVersion < "v1.11.2" {
+		if compareVersion(separatedVersion, targetVersion) {
 			genJSONVersion = strings.ReplaceAll(genJSONVersion, "go-dev-frame", "zhufuyi")
 		}
 		result = gobash.Run(ctx, "go", "install", genJSONVersion)
@@ -255,4 +261,33 @@ func updateSpongeInternalPlugin(targetVersion string) error {
 	}
 
 	return nil
+}
+
+// v1 >= v2 return true
+// v1 < v2 return false
+func compareVersion(v1, v2 string) bool {
+	if v1 == "latest" {
+		return true
+	}
+	if v2 == "latest" {
+		return false
+	}
+
+	v1 = strings.ReplaceAll(v1, "v", "")
+	v2 = strings.ReplaceAll(v2, "v", "")
+	v1s := strings.Split(v1, ".")
+	v2s := strings.Split(v2, ".")
+	if len(v1s) < 3 || len(v2s) < 3 {
+		return false
+	}
+
+	if v1s[0] != v2s[0] {
+		return utils.StrToInt(v1s[0]) > utils.StrToInt(v2s[0])
+	}
+
+	if v1s[1] != v2s[1] {
+		return utils.StrToInt(v1s[1]) > utils.StrToInt(v2s[1])
+	}
+
+	return utils.StrToInt(v1s[2]) > utils.StrToInt(v2s[2])
 }
