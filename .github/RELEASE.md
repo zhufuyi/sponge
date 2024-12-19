@@ -1,7 +1,13 @@
 
 ## Change log
 
-Upgrade library versions:
+Transfer ownership of the `zhufuyi/sponge` repository to the `go-dev-frame/sponge`.
 
-- [**github.com/gin-contrib/cors**](https://github.com/gin-contrib/cors): v1.7.1 -> v1.7.2
-- [**golang.org/x/crypto**](https://golang.org/x/crypto): v0.26.0 -> v0.31.0
+<br>
+
+**Note: If you currently have Sponge v1.11.1 and below, if you want to upgrade to a higher version, execute the following command:**
+
+```bash
+go install github.com/go-dev-frame/sponge@latest
+sponge upgrade
+```
